@@ -1,0 +1,5 @@
+frontend/node_modules/*
+frontend/dist/*
+service/node_modules/*
+service/dist/*
+common/dist/*

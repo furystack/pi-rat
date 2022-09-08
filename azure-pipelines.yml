@@ -1,0 +1,55 @@
+# Node.js
+
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - master
+  - develop
+  - feature/*
+  - release/*
+  - greenkeeper/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: 'Install Node.js'
+  - script: yarn install
+    displayName: 'Yarn install'
+
+  - script: yarn lint
+    displayName: 'Yarn Lint'
+
+  - script: yarn workspace service build
+    displayName: 'Build Service'
+
+  - script: yarn test:unit
+    displayName: 'Unit tests'
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    condition: always()
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/coverage/junit.xml'
+
+  - script: yarn playwright install --with-deps
+    displayName: Install Playwright browsers
+
+  - script: yarn seed
+    displayName: 'Seed test data'
+
+  - script: yarn test:e2e
+    displayName: 'E2E tests'
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    condition: always()
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/frontend/testresults/output.xml'

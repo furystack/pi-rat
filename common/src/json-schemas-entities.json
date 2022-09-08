@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "username",
+        "roles"
+      ],
+      "additionalProperties": false
+    },
+    "Session": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "The generated session identifier"
+        },
+        "username": {
+          "type": "string",
+          "description": "The user's login name for the session"
+        }
+      },
+      "required": [
+        "sessionId",
+        "username"
+      ]
+    },
+    "DefaultSession": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "The generated session identifier"
+        },
+        "username": {
+          "type": "string",
+          "description": "The user's login name for the session"
+        }
+      },
+      "required": [
+        "sessionId",
+        "username"
+      ],
+      "additionalProperties": false,
+      "description": "Model class that defines the default session data"
+    }
+  }
+}
