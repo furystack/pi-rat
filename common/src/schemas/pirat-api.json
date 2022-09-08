@@ -1,13 +1,34 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/BoilerplateApi",
+  "$ref": "#/definitions/PiratApi",
   "definitions": {
-    "BoilerplateApi": {
+    "PiratApi": {
       "type": "object",
       "properties": {
         "GET": {
           "type": "object",
           "properties": {
+            "/serviceStatus": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "$ref": "#/definitions/ServiceStatus"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "result"
+              ],
+              "additionalProperties": false
+            },
             "/isAuthenticated": {
               "type": "object",
               "properties": {
@@ -40,81 +61,12 @@
                 "result"
               ],
               "additionalProperties": false
-            },
-            "/testQuery": {
-              "type": "object",
-              "properties": {
-                "query": {
-                  "type": "object",
-                  "properties": {
-                    "param1": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "param1"
-                  ],
-                  "additionalProperties": false
-                },
-                "result": {
-                  "type": "object",
-                  "properties": {
-                    "param1Value": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "param1Value"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "required": [
-                "query",
-                "result"
-              ],
-              "additionalProperties": false
-            },
-            "/testUrlParams/:urlParam": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "urlParam": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "urlParam"
-                  ],
-                  "additionalProperties": false
-                },
-                "result": {
-                  "type": "object",
-                  "properties": {
-                    "urlParamValue": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "urlParamValue"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "required": [
-                "url",
-                "result"
-              ],
-              "additionalProperties": false
             }
           },
           "required": [
+            "/serviceStatus",
             "/isAuthenticated",
-            "/currentUser",
-            "/testQuery",
-            "/testUrlParams/:urlParam"
+            "/currentUser"
           ],
           "additionalProperties": false
         },
@@ -160,37 +112,41 @@
               ],
               "additionalProperties": false
             },
-            "/testPostBody": {
+            "/install": {
               "type": "object",
               "properties": {
-                "body": {
-                  "type": "object",
-                  "properties": {
-                    "value": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "value"
-                  ],
-                  "additionalProperties": false
-                },
                 "result": {
                   "type": "object",
                   "properties": {
-                    "bodyValue": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                },
+                "body": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
                       "type": "string"
                     }
                   },
                   "required": [
-                    "bodyValue"
+                    "username",
+                    "password"
                   ],
                   "additionalProperties": false
                 }
               },
               "required": [
-                "body",
-                "result"
+                "result",
+                "body"
               ],
               "additionalProperties": false
             }
@@ -198,7 +154,7 @@
           "required": [
             "/login",
             "/logout",
-            "/testPostBody"
+            "/install"
           ],
           "additionalProperties": false
         },
@@ -310,6 +266,13 @@
         "POST"
       ],
       "additionalProperties": false
+    },
+    "ServiceStatus": {
+      "type": "string",
+      "enum": [
+        "installed",
+        "needsInstall"
+      ]
     },
     "User": {
       "type": "object",

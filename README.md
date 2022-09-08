@@ -1,6 +1,6 @@
-# boilerplate
+# PI-Rat
 
-Boilerplate app with common type api definitions, a furystack-based backend service and a Shades-based single page application.
+Home cloud and media solutions that runs even on a cutting board
 
 # Usage
 

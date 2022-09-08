@@ -3,7 +3,7 @@ import { ObservableValue, usingAsync } from '@furystack/utils'
 import { Injectable, Injected } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
 import { User } from 'common'
-import { BoilerplateApiClient } from './boilerplate-api-client'
+import { PiratApiClient } from './pirat-api-client'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
 
@@ -101,8 +101,8 @@ export class SessionService implements IdentityContext {
     return currentUser as unknown as TUser
   }
 
-  @Injected(BoilerplateApiClient)
-  private api!: BoilerplateApiClient
+  @Injected(PiratApiClient)
+  private api!: PiratApiClient
 
   @Injected(NotyService)
   private readonly notys!: NotyService

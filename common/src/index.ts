@@ -1,3 +1,3 @@
 export * from './models'
-export * from './boilerplate-api'
+export * from './pirat-api'
 export * from './schemas'

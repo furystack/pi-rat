@@ -1,9 +1,9 @@
 {
-  "name": "furystack-boilerplate-app",
+  "name": "pi-rat",
   "version": "1.0.2",
   "description": "example web app based on furystack",
   "main": "service/src/index.ts",
-  "repository": "https://github.com/furystack/boilerplate.git",
+  "repository": "https://github.com/furystack/pi-rat.git",
   "author": "Gallay Lajos <gallay.lajos@gmail.com>",
   "license": "GPL-2.0-only",
   "private": true,

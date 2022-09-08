@@ -1,9 +1,8 @@
-import { BoilerplateApi, User } from 'common'
+import { PiratApi, User } from 'common'
 import {
   DefaultSession,
   GetCurrentUser,
   IsAuthenticated,
-  JsonResult,
   LoginAction,
   LogoutAction,
   useHttpAuthentication,
@@ -12,12 +11,14 @@ import {
 import '@furystack/repository'
 import { injector } from './config'
 import { attachShutdownHandler } from './shutdown-handler'
+import { GetServiceStatusAction } from './actions/get-service-status'
+import { PostInstallAction } from './actions/post-install-action'
 
 useHttpAuthentication(injector, {
   getUserStore: (sm) => sm.getStoreFor<User & { password: string }, 'username'>(User as any, 'username'),
   getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
 })
-useRestService<BoilerplateApi>({
+useRestService<PiratApi>({
   injector,
   root: 'api',
   port: parseInt(process.env.APP_SERVICE_PORT as string, 10) || 9090,
@@ -30,16 +31,12 @@ useRestService<BoilerplateApi>({
     GET: {
       '/currentUser': GetCurrentUser,
       '/isAuthenticated': IsAuthenticated,
-      '/testQuery': async (options) => JsonResult({ param1Value: options.getQuery().param1 }),
-      '/testUrlParams/:urlParam': async (options) => JsonResult({ urlParamValue: options.getUrlParams().urlParam }),
+      '/serviceStatus': GetServiceStatusAction,
     },
     POST: {
       '/login': LoginAction,
       '/logout': LogoutAction,
-      '/testPostBody': async (options) => {
-        const body = await options.getBody()
-        return JsonResult({ bodyValue: body.value })
-      },
+      '/install': PostInstallAction,
     },
   },
 }).catch((err) => {

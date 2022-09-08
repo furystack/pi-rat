@@ -1,11 +1,11 @@
 import { createClient } from '@furystack/rest-client-fetch'
-import { BoilerplateApi } from 'common'
+import { PiratApi } from 'common'
 import { Injectable } from '@furystack/inject'
 import { environmentOptions } from '../environment-options'
 
 @Injectable({ lifetime: 'singleton' })
-export class BoilerplateApiClient {
-  public call = createClient<BoilerplateApi>({
+export class PiratApiClient {
+  public call = createClient<PiratApi>({
     endpointUrl: environmentOptions.serviceUrl,
     requestInit: {
       credentials: 'include',
