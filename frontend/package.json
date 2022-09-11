@@ -12,17 +12,17 @@
   "devDependencies": {
     "@yarnpkg/esbuild-plugin-pnp": "^3.0.0-rc.15",
     "esbuild": "^0.15.7",
-    "typescript": "^4.8.2"
+    "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@furystack/core": "^11.0.11",
+    "@furystack/core": "^11.0.12",
     "@furystack/inject": "^7.0.4",
     "@furystack/logging": "^3.0.8",
-    "@furystack/rest-client-fetch": "^4.0.12",
-    "@furystack/shades": "^6.0.7",
-    "@furystack/shades-common-components": "^3.4.0",
+    "@furystack/rest-client-fetch": "^4.0.13",
+    "@furystack/shades": "^6.0.8",
+    "@furystack/shades-common-components": "^3.4.1",
     "@furystack/utils": "^3.0.8",
-    "@types/node": "^18.7.15",
+    "@types/node": "^18.7.16",
     "common": "workspace:^",
     "monaco-editor": "^0.34.0"
   }
