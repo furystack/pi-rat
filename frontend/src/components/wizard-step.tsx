@@ -1,7 +1,7 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { animations, Button, WizardStepProps } from '@furystack/shades-common-components'
 
-export const WizardStep = Shade<{ title: string } & WizardStepProps>({
+export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) => void } & WizardStepProps>({
   shadowDomName: 'wizard-step',
   resources: ({ injector, element }) => {
     return [
@@ -25,7 +25,7 @@ export const WizardStep = Shade<{ title: string } & WizardStepProps>({
       <form
         onsubmit={(ev) => {
           ev.preventDefault()
-          props.onNext?.()
+          props.onSubmit ? props.onSubmit(ev) : props.onNext?.()
         }}
         style={{
           padding: '32px',

@@ -1,5 +1,6 @@
 import { StoreManager } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
+import { LoggerCollection } from '@furystack/logging'
 import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
 import { ServiceStatus, User } from 'common'
 
@@ -21,6 +22,7 @@ export class ServiceStatusProvider {
     })
     const credential = await this.authenticator.getHasher().createCredential(username, password)
     await this.storeManager.getStoreFor(PasswordCredential, 'userName').add(credential)
+    this.logger.withScope(this.constructor.name).information({ message: `Service installed for user '${username}'` })
   }
 
   @Injected(StoreManager)
@@ -28,4 +30,7 @@ export class ServiceStatusProvider {
 
   @Injected(PasswordAuthenticator)
   public authenticator!: PasswordAuthenticator
+
+  @Injected(LoggerCollection)
+  public logger!: LoggerCollection
 }

@@ -21,6 +21,7 @@
     "@furystack/rest-client-fetch": "^4.0.13",
     "@furystack/shades": "^6.0.8",
     "@furystack/shades-common-components": "^3.4.1",
+    "@furystack/shades-lottie": "^2.0.14",
     "@furystack/utils": "^3.0.8",
     "@types/node": "^18.7.16",
     "common": "workspace:^",

@@ -26,7 +26,6 @@ export const attachShutdownHandler = (i: Injector): void => {
             code,
             reason,
             error,
-            sendToSlack: true,
           },
         })
       }

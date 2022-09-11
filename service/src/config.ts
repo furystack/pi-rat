@@ -3,7 +3,7 @@ import { addStore, InMemoryStore, isAuthenticated } from '@furystack/core'
 import { FileSystemStore } from '@furystack/filesystem-store'
 import { Injector } from '@furystack/inject'
 import { PasswordCredential } from '@furystack/security'
-import { useLogging, VerboseConsoleLogger } from '@furystack/logging'
+import { getLogger, useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { DataSetSettings, AuthorizationResult, getRepository } from '@furystack/repository'
 import { usePasswordPolicy } from '@furystack/security'
 import { User } from 'common'
@@ -29,6 +29,11 @@ export const authorizedDataSet: Partial<DataSetSettings<any, any>> = {
 
 export const injector = new Injector()
 useLogging(injector, VerboseConsoleLogger)
+
+const configLogger = getLogger(injector).withScope('config')
+
+configLogger.information({ message: '⚙️  Configuring PI-RAT service...' })
+
 addStore(
   injector,
   new FileSystemStore({

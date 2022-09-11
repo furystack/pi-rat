@@ -1,5 +1,5 @@
 import { createComponent, createFragment, Shade, LazyLoad } from '@furystack/shades'
-import { Loader, ThemeProviderService } from '@furystack/shades-common-components'
+import { Button, Loader, Paper, ThemeProviderService } from '@furystack/shades-common-components'
 import { PiratApiClient } from '../services/pirat-api-client'
 import { Body } from './body'
 import { Header } from './header'
@@ -30,7 +30,14 @@ export const Layout = Shade({
           backgroundColor: injector.getInstance(ThemeProviderService).theme.getValue().background.default,
         }}>
         <LazyLoad
-          loader={<Loader />}
+          loader={<Loader style={{ width: '100px', height: '100px', alignSelf: 'center', justifySelf: 'center' }} />}
+          error={(error, retry) => (
+            <Paper>
+              <h1>Cannot reach the service</h1>
+              <p>{error?.toString()}</p>
+              <Button onclick={retry}>Retry</Button>
+            </Paper>
+          )}
           component={async () => {
             const { result } = await injector.getInstance(PiratApiClient).call({
               method: 'GET',
