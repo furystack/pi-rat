@@ -1,5 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Input, Wizard, WizardStepProps } from '@furystack/shades-common-components'
+import { BubbleBackground } from '../components/bubble-background'
 import { WizardStep } from '../components/wizard-step'
 
 const WelcomeStep = Shade<WizardStepProps>({
@@ -54,7 +55,14 @@ export const InstallerPage = Shade({
   shadowDomName: 'shade-installer-page',
   render: () => {
     return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', placeContent: 'center', position: 'fixed' }}>
+      <BubbleBackground
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          placeContent: 'center',
+          position: 'fixed',
+        }}>
         <Wizard
           isOpened
           steps={[WelcomeStep, CreateAdminStep]}
@@ -62,7 +70,7 @@ export const InstallerPage = Shade({
             window.location.reload()
           }}
         />
-      </div>
+      </BubbleBackground>
     )
   },
 })
