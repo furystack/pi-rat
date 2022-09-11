@@ -24,3 +24,10 @@ head {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/** For the Blob Background */
+@keyframes rotate {
+  to {
+    transform: rotate(360deg) translate(-50%, -50%) scale(var(--scale, 1));
+  }
+}

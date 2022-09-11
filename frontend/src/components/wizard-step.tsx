@@ -1,8 +1,20 @@
-import { createComponent, Shade } from '@furystack/shades'
+import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { animations, Button, WizardStepProps } from '@furystack/shades-common-components'
 
 export const WizardStep = Shade<{ title: string } & WizardStepProps>({
   shadowDomName: 'wizard-step',
+  resources: ({ injector, element }) => {
+    return [
+      injector.getInstance(ScreenService).screenSize.atLeast.md.subscribe((isLargeScreen) => {
+        const form = element?.querySelector('form')
+        if (form) {
+          form.style.padding = '16px'
+          form.style.width = isLargeScreen ? '800px' : `${window.innerWidth - 16}px`
+          form.style.height = isLargeScreen ? '500px' : `${window.innerHeight - 192}px`
+        }
+      }, true),
+    ]
+  },
   render: ({ props, element, children }) => {
     setTimeout(() => {
       animations.showParallax(element.querySelector('h1'))
@@ -16,15 +28,16 @@ export const WizardStep = Shade<{ title: string } & WizardStepProps>({
           props.onNext?.()
         }}
         style={{
-          width: '800px',
           padding: '32px',
           display: 'flex',
           flexDirection: 'column',
           height: '430px',
           justifyContent: 'space-between',
+          maxWidth: 'calc(100% - 32px)',
+          maxHeight: 'calc(100% - 32px)',
         }}>
         <h1 style={{ opacity: '0' }}>{props.title}</h1>
-        <div style={{ opacity: '0' }} className="content">
+        <div style={{ opacity: '0', flexShrink: '1', overflow: 'auto', padding: '0 .1em' }} className="content">
           {children}
         </div>
         <div
