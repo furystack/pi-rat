@@ -49,11 +49,11 @@ export const seed = async (i: Injector): Promise<void> => {
   const sm = i.getInstance(StoreManager)
   const userStore = sm.getStoreFor(User, 'username')
   const pwcStore = sm.getStoreFor(PasswordCredential, 'userName')
-  const cred = await i.getInstance(PasswordAuthenticator).getHasher().createCredential('testuser', 'password')
+  const cred = await i.getInstance(PasswordAuthenticator).getHasher().createCredential('testuser@gmail.com', 'password')
   await logger.verbose({ message: 'Saving credential...' })
   await getOrCreate(
     {
-      filter: { userName: { $eq: 'testuser' } },
+      filter: { userName: { $eq: 'testuser@gmail.com' } },
     },
     cred,
     pwcStore,
@@ -61,9 +61,9 @@ export const seed = async (i: Injector): Promise<void> => {
   )
   await logger.verbose({ message: 'Saving User...' })
   await getOrCreate(
-    { filter: { username: { $eq: 'testuser' } } },
+    { filter: { username: { $eq: 'testuser@gmail.com' } } },
     {
-      username: 'testuser',
+      username: 'testuser@gmail.com',
       roles: [],
     },
     userStore,
