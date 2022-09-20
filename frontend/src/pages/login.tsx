@@ -66,61 +66,85 @@ export const Login = Shade<{}, { username: string; password: string; error: stri
     const sessinService = injector.getInstance(SessionService)
 
     return (
-      <div
+      <Paper
         style={{
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '0 100px',
-          paddingTop: '100px',
+          marginTop: '50px',
         }}>
         <form
           className="login-form"
+          style={{
+            minWidth: '300px',
+          }}
           onsubmit={(ev) => {
             ev.preventDefault()
             const state = getState()
             sessinService.login(state.username, state.password)
           }}>
-          <Paper elevation={3}>
-            <h2>Login</h2>
-            <Input
-              labelTitle="User name"
-              name="username"
-              autofocus
-              required
-              disabled={isOperationInProgress}
-              placeholder="The user's login name"
-              value={username}
-              onTextChange={(newUserName) => updateState({ username: newUserName }, true)}
-              type="text"
-            />
-            <Input
-              labelTitle="Password"
-              name="password"
-              required
-              disabled={isOperationInProgress}
-              placeholder="The password for the user"
-              value={password}
-              type="password"
-              onTextChange={(newPassword) => updateState({ password: newPassword }, true)}
-            />
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexDirection: 'row',
-                padding: '1em 0',
-              }}>
-              {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />}
-              <LoginButton />
-            </div>
-            <p style={{ fontSize: '10px' }}>You can login with the default 'testuser' / 'password' credentials</p>
-          </Paper>
+          <h2>Login</h2>
+          <Input
+            labelTitle="User email"
+            name="username"
+            variant="outlined"
+            autofocus
+            required
+            disabled={isOperationInProgress}
+            placeholder="The user's login name"
+            value={username}
+            onTextChange={(newUserName) => updateState({ username: newUserName }, true)}
+            type="email"
+            getEndIcon={() => '👤'}
+            getHelperText={({ state }) => {
+              if (!state.validity.valid) {
+                if (state.validity.valueMissing) {
+                  return 'Please enter the email'
+                }
+                if (state.validity.typeMismatch) {
+                  return 'Please enter a valid email address'
+                }
+                return 'Please enter a valid email'
+              }
+              return 'The email of the user used to log in into the app'
+            }}
+          />
+          <Input
+            labelTitle="Password"
+            name="password"
+            variant="outlined"
+            required
+            disabled={isOperationInProgress}
+            placeholder="The password for the user"
+            value={password}
+            type="password"
+            getEndIcon={() => '🔑'}
+            getHelperText={({ state }) => {
+              if (!state.validity.valid) {
+                if (state.validity.valueMissing) {
+                  return 'Please enter the password'
+                }
+                return 'Please enter a valid password'
+              }
+              return 'The password of the user used to log in into the app'
+            }}
+            onTextChange={(newPassword) => updateState({ password: newPassword }, true)}
+          />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexDirection: 'row',
+              padding: '1em 0',
+            }}>
+            {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />}
+            <LoginButton />
+          </div>
         </form>
-      </div>
+      </Paper>
     )
   },
 })
