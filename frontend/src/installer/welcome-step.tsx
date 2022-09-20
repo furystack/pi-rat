@@ -9,7 +9,7 @@ export const WelcomeStep = Shade<WizardStepProps>({
   render: ({ props }) => {
     return (
       <WizardStep title="Welcome to PI-RAT Installer" {...props}>
-        <lottie-player style={{ height: '128px' }} src={welcome} autoplay loop />
+        <lottie-player style={{ height: '128px' }} src={JSON.stringify(welcome)} autoplay loop />
         It seems that PI-RAT is not ready yet. Please follow the instructions to setup PI-RAT.
       </WizardStep>
     )
