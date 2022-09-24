@@ -1,5 +1,5 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
-import { animations, Button, WizardStepProps } from '@furystack/shades-common-components'
+import { showParallax, Button, WizardStepProps } from '@furystack/shades-common-components'
 
 export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) => void } & WizardStepProps>({
   shadowDomName: 'wizard-step',
@@ -17,9 +17,9 @@ export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) =>
   },
   render: ({ props, element, children }) => {
     setTimeout(() => {
-      animations.showParallax(element.querySelector('h1'))
-      animations.showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
-      animations.showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
+      showParallax(element.querySelector('h1'))
+      showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
+      showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
     }, 1)
     return (
       <form
