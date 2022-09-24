@@ -1,0 +1,24 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: ['master', 'develop']
+  pull_request:
+    branches: ['develop']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: docker login
+        env:
+          DOCKER_USER: ${{secrets.DOCKER_USER}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build . --tag furystack/pi-rat:$(date +%s) --tag furystack/pi-rat:latest
+      - name: Push Docker image to Dockerhub
+        run: docker push furystack/pi-rat
