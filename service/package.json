@@ -5,8 +5,8 @@
   "license": "GPL-2.0-only",
   "private": true,
   "scripts": {
-    "start": "yarn build && node ./dist/service.js",
-    "seed": "yarn build && node ./dist/seed.js",
+    "start": "node ./dist/service.js",
+    "seed": "node ./dist/seed.js",
     "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
     "build": "tsc -b"
   },
