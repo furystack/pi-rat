@@ -31,7 +31,5 @@ jobs:
       # to prevent separate installs per architecture
       - name: Yarn install
         run: yarn install
-      - name: Build the Docker image
-        run: docker build --platform linux/arm64,linux/amd64 . --tag furystack/pi-rat:$(date +%s) --tag furystack/pi-rat:latest
-      - name: Push Docker image to Dockerhub
-        run: docker push furystack/pi-rat
+      - name: Build the Docker image and publish them on DockerHub
+        run: docker build --platform linux/arm64,linux/amd64 --tag furystack/pi-rat:$(date +%s) --tag furystack/pi-rat:latest . --push
