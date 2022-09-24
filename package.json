@@ -64,7 +64,8 @@
     "lint": "eslint . --ext .tsx,.ts --cache",
     "bumpVersions": "yarn version check --interactive",
     "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
-    "assert-listening": "yarn node scripts/assert-listening.mjs"
+    "assert-listening": "yarn node scripts/assert-listening.mjs",
+    "dockerize": "docker build . --tag furystack/pi-rat:latest"
   },
   "jest-junit": {
     "suiteName": "FuryStack Jest tests",
