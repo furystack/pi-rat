@@ -2,8 +2,9 @@ import { PhysicalStore, StoreManager, FindOptions, WithOptionalId } from '@furys
 import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
 import { Injector } from '@furystack/inject'
 import { User } from 'common'
-import { injector } from './config'
+import { injector } from './root-injector'
 import { getLogger } from '@furystack/logging'
+import { setupIdentity } from './setup-identity'
 
 /**
  * gets an existing instance if exists or create and return if not. Throws error on multiple result
@@ -45,7 +46,8 @@ export const getOrCreate = async <T, TKey extends keyof T>(
  */
 export const seed = async (i: Injector): Promise<void> => {
   const logger = getLogger(i).withScope('seeder')
-  await logger.verbose({ message: 'Seeding data...' })
+  await setupIdentity(injector)
+  await logger.verbose({ message: '🌱  Seeding data...' })
   const sm = i.getInstance(StoreManager)
   const userStore = sm.getStoreFor(User, 'username')
   const pwcStore = sm.getStoreFor(PasswordCredential, 'userName')
@@ -70,7 +72,13 @@ export const seed = async (i: Injector): Promise<void> => {
     i,
   )
 
-  logger.verbose({ message: 'Seeding data completed.' })
+  logger.verbose({ message: '✅  Seeding data completed.' })
 }
 
-seed(injector).then(() => injector.dispose())
+seed(injector)
+  .then(() => injector.dispose())
+  .catch((e) => {
+    console.error('Seed failed', e)
+    injector.dispose()
+    process.exit(1)
+  })

@@ -9,10 +9,11 @@
     "create-schemas": "node ./dist/bin/create-schemas.js"
   },
   "devDependencies": {
-    "@types/node": "^18.7.19",
+    "@types/node": "^18.7.23",
     "ts-json-schema-generator": "^1.1.1"
   },
   "dependencies": {
-    "@furystack/rest": "^4.0.12"
+    "@furystack/core": "^11.0.14",
+    "@furystack/rest": "^4.0.13"
   }
 }

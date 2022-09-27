@@ -1,6 +1,22 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "Drive": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string"
+        },
+        "letter": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "physicalPath",
+        "letter"
+      ],
+      "additionalProperties": false
+    },
     "User": {
       "type": "object",
       "properties": {
