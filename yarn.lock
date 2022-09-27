@@ -517,9 +517,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/rest-service@npm:^6.1.6":
-  version: 6.1.6
-  resolution: "@furystack/rest-service@npm:6.1.6"
+"@furystack/rest-service@npm:^6.1.7":
+  version: 6.1.7
+  resolution: "@furystack/rest-service@npm:6.1.7"
   dependencies:
     "@furystack/core": ^11.0.14
     "@furystack/inject": ^7.0.5
@@ -532,7 +532,7 @@ __metadata:
     ajv-formats: ^2.1.1
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: 25c783d1187bacee2adcbcb128d82a1f32ddaf875c732afaf2a4e1fd0a277471bde36c5bc5b025f904f8e2e4dc068d82ffa18f1651da0971a2eef4321930833b
+  checksum: 3beca9b76ad729f07d1ac82e5604092d0306da5c8715a1cfabf48ffd4cce0f9d128918f4a5194be5ad9e8b328a228a7ce39668e07cf23b844bf5004c211ffed0
   languageName: node
   linkType: hard
 
@@ -557,9 +557,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^3.4.3":
-  version: 3.4.3
-  resolution: "@furystack/shades-common-components@npm:3.4.3"
+"@furystack/shades-common-components@npm:^3.4.4":
+  version: 3.4.4
+  resolution: "@furystack/shades-common-components@npm:3.4.4"
   dependencies:
     "@furystack/core": ^11.0.14
     "@furystack/inject": ^7.0.5
@@ -567,7 +567,7 @@ __metadata:
     "@furystack/utils": ^3.0.9
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: 20adf3da9ff989d1590c53c8776e9d97b4594fcb0e3d64c521b30c1011fab3edf84081569200d266d1f055fe7473960bcbb05374d8e4fb256feadfa11d01f69a
+  checksum: 9113975718d311ff58184bc6862c662dc5a2d2005c2eb5642f3501f574ab7edc5f8760b1d0bfe6abaabf70cb4863cef47b33aba6b273b9756f6e76d4f5efc7d5
   languageName: node
   linkType: hard
 
@@ -2917,7 +2917,7 @@ __metadata:
     "@furystack/logging": ^3.0.9
     "@furystack/rest-client-fetch": ^4.0.15
     "@furystack/shades": ^6.0.10
-    "@furystack/shades-common-components": ^3.4.3
+    "@furystack/shades-common-components": ^3.4.4
     "@furystack/shades-lottie": ^2.0.16
     "@furystack/utils": ^3.0.9
     "@types/node": ^18.7.23
@@ -5249,7 +5249,7 @@ __metadata:
     "@furystack/inject": ^7.0.5
     "@furystack/logging": ^3.0.9
     "@furystack/repository": ^6.0.14
-    "@furystack/rest-service": ^6.1.6
+    "@furystack/rest-service": ^6.1.7
     "@furystack/security": ^2.0.14
     "@types/jest": ^29.0.3
     "@types/node": ^18.7.23

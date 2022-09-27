@@ -3,6 +3,7 @@ import { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
 import { Drive } from 'common'
+import { join } from 'path'
 import { authorizedDataSet } from './authorized-data-set'
 
 export const setupDrives = async (injector: Injector) => {
@@ -13,7 +14,7 @@ export const setupDrives = async (injector: Injector) => {
     injector,
     model: Drive,
     primaryKey: 'letter',
-    fileName: '',
+    fileName: join(process.cwd(), 'data', 'drives.json'),
   })
 
   getRepository(injector).createDataSet(Drive, 'letter', {

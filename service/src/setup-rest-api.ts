@@ -70,7 +70,7 @@ export const setupRestApi = async (injector: Injector) => {
         '/login': LoginAction,
         '/logout': LogoutAction,
         '/install': PostInstallAction,
-        '/drives': Validate({ schema: PiratApiSchemas, schemaName: 'PostEndpoint<Drive>' })(
+        '/drives': Validate({ schema: PiratApiSchemas, schemaName: 'PostEndpoint<Drive,"letter">' })(
           createPostEndpoint({
             model: Drive,
             primaryKey: 'letter',

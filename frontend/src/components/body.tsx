@@ -1,7 +1,8 @@
 import { createComponent, Shade, Router } from '@furystack/shades'
 import { User } from 'common'
 import { SessionService, SessionState } from '../services/session'
-import { ButtonsDemo, Init, HelloWorld, Offline, Login } from '../pages'
+import { Init, HelloWorld, Offline, Login } from '../pages'
+import { DrivesPage } from '../pages/drives'
 
 export const Body = Shade<
   { style?: Partial<CSSStyleDeclaration> },
@@ -33,7 +34,7 @@ export const Body = Shade<
               return (
                 <Router
                   routes={[
-                    { url: '/buttons', routingOptions: { end: false }, component: () => <ButtonsDemo /> },
+                    { url: '/drives', routingOptions: { end: false }, component: () => <DrivesPage /> },
                     { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
                   ]}></Router>
               )

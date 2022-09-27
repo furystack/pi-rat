@@ -16,7 +16,6 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           const formData = new FormData(form)
 
           const values = Object.fromEntries(formData.entries())
-          console.log(values)
 
           injector.getInstance(PiratApiClient).call({
             method: 'POST',

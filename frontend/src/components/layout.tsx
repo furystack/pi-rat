@@ -1,4 +1,5 @@
 import { createComponent, createFragment, Shade, LazyLoad } from '@furystack/shades'
+import { NotyList } from '@furystack/shades-common-components'
 import { Button, Loader, Paper, ThemeProviderService } from '@furystack/shades-common-components'
 import { PiratApiClient } from '../services/pirat-api-client'
 import { Body } from './body'
@@ -29,6 +30,7 @@ export const Layout = Shade({
           margin: '0',
           backgroundColor: injector.getInstance(ThemeProviderService).theme.getValue().background.default,
         }}>
+        <NotyList style={{ zIndex: '2' }} />
         <LazyLoad
           loader={<Loader style={{ width: '100px', height: '100px', alignSelf: 'center', justifySelf: 'center' }} />}
           error={(error, retry) => (

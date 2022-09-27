@@ -20,7 +20,7 @@ export const setupIdentity = async (injector: Injector) => {
       model: User,
       primaryKey: 'username',
       tickMs: 30 * 1000,
-      fileName: join(process.cwd(), 'users.json'),
+      fileName: join(process.cwd(), 'data', 'users.json'),
     }),
   )
     .addStore(new InMemoryStore({ model: DefaultSession, primaryKey: 'sessionId' }))
@@ -28,7 +28,7 @@ export const setupIdentity = async (injector: Injector) => {
       new FileSystemStore({
         model: PasswordCredential,
         primaryKey: 'userName',
-        fileName: join(process.cwd(), 'pwc.json'),
+        fileName: join(process.cwd(), 'data', 'pwc.json'),
       }),
     )
 
