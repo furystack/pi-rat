@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { addStore, InMemoryStore } from '@furystack/core'
+import { addStore } from '@furystack/core'
 import { FileSystemStore } from '@furystack/filesystem-store'
 import type { Injector } from '@furystack/inject'
 import { PasswordCredential } from '@furystack/security'
@@ -23,7 +23,13 @@ export const setupIdentity = async (injector: Injector) => {
       fileName: join(process.cwd(), 'data', 'users.json'),
     }),
   )
-    .addStore(new InMemoryStore({ model: DefaultSession, primaryKey: 'sessionId' }))
+    .addStore(
+      new FileSystemStore({
+        model: DefaultSession,
+        primaryKey: 'sessionId',
+        fileName: join(process.cwd(), 'data', 'sessions.json'),
+      }),
+    )
     .addStore(
       new FileSystemStore({
         model: PasswordCredential,

@@ -7,9 +7,9 @@ import {
   createPatchEndpoint,
   createPostEndpoint,
   DefaultSession,
-  EmptyResult,
   GetCurrentUser,
   IsAuthenticated,
+  JsonResult,
   LoginAction,
   LogoutAction,
   useHttpAuthentication,
@@ -22,6 +22,7 @@ import { PostInstallAction } from './actions/post-install-action'
 import { getLogger } from '@furystack/logging'
 import { Drive, PiratApiSchemas } from 'common'
 import type { Injector } from '@furystack/inject'
+import { GetDirectoryEntriesAction } from './actions/get-directory-entries'
 
 export const setupRestApi = async (injector: Injector) => {
   const restApiLogger = getLogger(injector).withScope('service')
@@ -67,6 +68,9 @@ export const setupRestApi = async (injector: Injector) => {
             primaryKey: 'letter',
           }),
         ),
+        '/drives/files/:letter/:path': Validate({ schema: PiratApiSchemas, schemaName: 'GetDirectoryEntries' })(
+          GetDirectoryEntriesAction,
+        ),
       },
       POST: {
         '/login': LoginAction,
@@ -79,9 +83,10 @@ export const setupRestApi = async (injector: Injector) => {
           }),
         ),
         '/drives/:id/upload': async (args) => {
+          // TODO: Implement file upload
           const body = await args.getBody()
           console.log(body)
-          return EmptyResult()
+          return JsonResult({ success: true })
         },
       },
       PATCH: {
