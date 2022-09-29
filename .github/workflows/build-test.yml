@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Playwright browsers
         run: yarn playwright install --with-deps
-      - run: yarn seed
-        name: 'Seed test data'
+      - run: yarn test:e2e:install
+        name: 'Test Installer'
       - run: yarn test:e2e
         name: 'E2E tests'

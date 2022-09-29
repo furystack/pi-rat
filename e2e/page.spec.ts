@@ -1,4 +1,4 @@
-import { test, expect, Locator, Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 test.describe('Example Application', () => {
   test('Login and logout roundtrip', async ({ page }) => {
