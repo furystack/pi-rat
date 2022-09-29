@@ -1,8 +1,8 @@
-import { IdentityContext } from '@furystack/core'
+import type { IdentityContext } from '@furystack/core'
 import { ObservableValue, usingAsync } from '@furystack/utils'
 import { Injectable, Injected } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
-import { User } from 'common'
+import type { User } from 'common'
 import { PiratApiClient } from './pirat-api-client'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'

@@ -1,4 +1,4 @@
-import {
+import type {
   DeleteEndpoint,
   GetCollectionEndpoint,
   GetEntityEndpoint,
@@ -6,8 +6,8 @@ import {
   PostEndpoint,
   RestApi,
 } from '@furystack/rest'
-import { ServiceStatus, User } from './models'
-import { Drive } from './models/drive'
+import type { ServiceStatus, User } from './models'
+import type { Drive } from './models/drive'
 
 export interface PiratApi extends RestApi {
   GET: {
@@ -22,6 +22,7 @@ export interface PiratApi extends RestApi {
     '/logout': { result: unknown }
     '/install': { result: { success: boolean }; body: { username: string; password: string } }
     '/drives': PostEndpoint<Drive, 'letter'>
+    '/drives/:id/upload': { result: unknown; body: any }
   }
   PATCH: {
     '/drives/:id': PatchEndpoint<Drive, 'letter'>

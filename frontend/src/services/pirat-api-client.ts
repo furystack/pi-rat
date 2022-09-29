@@ -1,5 +1,5 @@
 import { createClient } from '@furystack/rest-client-fetch'
-import { PiratApi } from 'common'
+import type { PiratApi } from 'common'
 import { Injectable } from '@furystack/inject'
 import { environmentOptions } from '../environment-options'
 

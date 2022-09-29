@@ -1,6 +1,7 @@
 import { createComponent, Shade, Router } from '@furystack/shades'
-import { User } from 'common'
-import { SessionService, SessionState } from '../services/session'
+import type { User } from 'common'
+import type { SessionState } from '../services/session'
+import { SessionService } from '../services/session'
 import { Init, HelloWorld, Offline, Login } from '../pages'
 import { DrivesPage } from '../pages/drives'
 

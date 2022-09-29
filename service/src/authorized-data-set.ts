@@ -1,6 +1,6 @@
 import { isAuthenticated } from '@furystack/core'
-import { Injector } from '@furystack/inject'
-import { AuthorizationResult, DataSetSettings } from '@furystack/repository'
+import type { Injector } from '@furystack/inject'
+import type { AuthorizationResult } from '@furystack/repository'
 
 export const authorizedOnly = async (options: { injector: Injector }): Promise<AuthorizationResult> => {
   const isAllowed = await isAuthenticated(options.injector)
@@ -10,12 +10,4 @@ export const authorizedOnly = async (options: { injector: Injector }): Promise<A
         isAllowed,
         message: 'You are not authorized :(',
       }
-}
-
-export const authorizedDataSet: Partial<DataSetSettings<any, any>> = {
-  authorizeAdd: authorizedOnly,
-  authorizeGet: authorizedOnly,
-  authorizeRemove: authorizedOnly,
-  authorizeUpdate: authorizedOnly,
-  authroizeRemoveEntity: authorizedOnly,
 }

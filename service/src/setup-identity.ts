@@ -1,14 +1,14 @@
 import { join } from 'path'
 import { addStore, InMemoryStore } from '@furystack/core'
 import { FileSystemStore } from '@furystack/filesystem-store'
-import { Injector } from '@furystack/inject'
+import type { Injector } from '@furystack/inject'
 import { PasswordCredential } from '@furystack/security'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
 import { usePasswordPolicy } from '@furystack/security'
 import { User } from 'common'
 import { DefaultSession } from '@furystack/rest-service'
-import { authorizedDataSet } from './authorized-data-set'
+import { authorizedOnly } from './authorized-data-set'
 
 export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
@@ -33,7 +33,10 @@ export const setupIdentity = async (injector: Injector) => {
     )
 
   getRepository(injector).createDataSet(User, 'username', {
-    ...authorizedDataSet,
+    authorizeAdd: authorizedOnly,
+    authorizeGet: authorizedOnly,
+    authorizeRemove: authorizedOnly,
+    authorizeUpdate: authorizedOnly,
   })
 
   usePasswordPolicy(injector)

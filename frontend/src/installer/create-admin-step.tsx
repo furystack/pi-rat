@@ -1,5 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Input, WizardStepProps } from '@furystack/shades-common-components'
+import type { WizardStepProps } from '@furystack/shades-common-components'
+import { Input } from '@furystack/shades-common-components'
 import { WizardStep } from '../components/wizard-step'
 import { PiratApiClient } from '../services/pirat-api-client'
 

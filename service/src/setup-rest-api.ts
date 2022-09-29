@@ -1,4 +1,5 @@
-import { PiratApi, User } from 'common'
+import type { PiratApi } from 'common'
+import { User } from 'common'
 import {
   createDeleteEndpoint,
   createGetCollectionEndpoint,
@@ -6,6 +7,7 @@ import {
   createPatchEndpoint,
   createPostEndpoint,
   DefaultSession,
+  EmptyResult,
   GetCurrentUser,
   IsAuthenticated,
   LoginAction,
@@ -19,7 +21,7 @@ import { GetServiceStatusAction } from './actions/get-service-status'
 import { PostInstallAction } from './actions/post-install-action'
 import { getLogger } from '@furystack/logging'
 import { Drive, PiratApiSchemas } from 'common'
-import { Injector } from '@furystack/inject'
+import type { Injector } from '@furystack/inject'
 
 export const setupRestApi = async (injector: Injector) => {
   const restApiLogger = getLogger(injector).withScope('service')
@@ -76,6 +78,11 @@ export const setupRestApi = async (injector: Injector) => {
             primaryKey: 'letter',
           }),
         ),
+        '/drives/:id/upload': async (args) => {
+          const body = await args.getBody()
+          console.log(body)
+          return EmptyResult()
+        },
       },
       PATCH: {
         '/drives/:id': createPatchEndpoint({

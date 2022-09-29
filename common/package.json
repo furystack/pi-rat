@@ -10,10 +10,10 @@
   },
   "devDependencies": {
     "@types/node": "^18.7.23",
-    "ts-json-schema-generator": "^1.1.1"
+    "ts-json-schema-generator": "^1.1.2"
   },
   "dependencies": {
-    "@furystack/core": "^11.0.14",
-    "@furystack/rest": "^4.0.13"
+    "@furystack/core": "^11.1.0",
+    "@furystack/rest": "^4.1.0"
   }
 }

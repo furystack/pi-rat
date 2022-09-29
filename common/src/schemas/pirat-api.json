@@ -160,13 +160,26 @@
             },
             "/drives": {
               "$ref": "#/definitions/PostEndpoint%3CDrive%2C%22letter%22%3E"
+            },
+            "/drives/:id/upload": {
+              "type": "object",
+              "properties": {
+                "result": {},
+                "body": {}
+              },
+              "required": [
+                "result",
+                "body"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
             "/login",
             "/logout",
             "/install",
-            "/drives"
+            "/drives",
+            "/drives/:id/upload"
           ],
           "additionalProperties": false
         },
@@ -591,10 +604,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "physicalPath": {
+        "letter": {
           "type": "string"
         },
-        "letter": {
+        "physicalPath": {
           "type": "string"
         }
       },

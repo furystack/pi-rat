@@ -18,7 +18,6 @@ export const InstallerPage = Shade({
           position: 'fixed',
         }}>
         <Wizard
-          isOpened
           steps={[WelcomeStep, CreateAdminStep, AllDoneStep]}
           onFinish={() => {
             window.location.reload()

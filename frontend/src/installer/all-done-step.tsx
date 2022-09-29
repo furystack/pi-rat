@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { WizardStepProps } from '@furystack/shades-common-components'
+import type { WizardStepProps } from '@furystack/shades-common-components'
 import { WizardStep } from '../components/wizard-step'
 import '@furystack/shades-lottie'
 import done from './done.json'

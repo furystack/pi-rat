@@ -15,13 +15,13 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@furystack/core": "^11.0.14",
-    "@furystack/filesystem-store": "^3.0.14",
-    "@furystack/inject": "^7.0.5",
-    "@furystack/logging": "^3.0.9",
-    "@furystack/repository": "^6.0.14",
-    "@furystack/rest-service": "^6.1.7",
-    "@furystack/security": "^2.0.14",
+    "@furystack/core": "^11.1.0",
+    "@furystack/filesystem-store": "^3.1.0",
+    "@furystack/inject": "^7.1.0",
+    "@furystack/logging": "^3.1.0",
+    "@furystack/repository": "^6.1.0",
+    "@furystack/rest-service": "^6.2.0",
+    "@furystack/security": "^2.1.0",
     "@types/jest": "^29.0.3",
     "common": "workspace:^"
   }

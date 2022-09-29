@@ -1,5 +1,6 @@
 import { createComponent, createFragment, Shade } from '@furystack/shades'
-import { Button, fadeIn, fadeOut, Input, Modal, Wizard, WizardStepProps } from '@furystack/shades-common-components'
+import type { WizardStepProps } from '@furystack/shades-common-components'
+import { Button, fadeIn, fadeOut, Input, Modal, Wizard } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import { NotyService } from '@furystack/shades-common-components'
 import { WizardStep } from '../../components/wizard-step'

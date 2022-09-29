@@ -1,4 +1,5 @@
-import { JsonResult, RequestAction } from '@furystack/rest-service'
+import type { RequestAction } from '@furystack/rest-service'
+import { JsonResult } from '@furystack/rest-service'
 import { ServiceStatusProvider } from '../service-installer'
 
 export const PostInstallAction: RequestAction<{

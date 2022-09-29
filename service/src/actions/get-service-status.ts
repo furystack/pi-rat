@@ -1,5 +1,6 @@
-import { JsonResult, RequestAction } from '@furystack/rest-service'
-import { ServiceStatus } from 'common'
+import type { RequestAction } from '@furystack/rest-service'
+import { JsonResult } from '@furystack/rest-service'
+import type { ServiceStatus } from 'common'
 import { ServiceStatusProvider } from '../service-installer'
 
 export const GetServiceStatusAction: RequestAction<{ result: { state: ServiceStatus } }> = async ({ injector }) => {

@@ -1,9 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, DataGrid } from '@furystack/shades-common-components'
-import { Drive } from 'common'
+import type { Drive } from 'common'
 import { PiratApiClient } from '../../services/pirat-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
-import { DriveList } from './drive-list'
 
 export const DrivesPage = Shade<
   unknown,
