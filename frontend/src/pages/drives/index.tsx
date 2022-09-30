@@ -1,7 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, DataGrid } from '@furystack/shades-common-components'
 import type { Drive } from 'common'
-import { PiratApiClient } from '../../services/pirat-api-client'
+import { DrivesApiClient } from '../../services/drives-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
 
 export const DrivesPage = Shade<
@@ -13,9 +13,9 @@ export const DrivesPage = Shade<
   shadowDomName: 'drives-page',
   getInitialState: ({ injector }) => ({
     collectionService: new CollectionService<Drive>(async (options) => {
-      const data = await injector.getInstance(PiratApiClient).call({
+      const data = await injector.getInstance(DrivesApiClient).call({
         method: 'GET',
-        action: '/drives',
+        action: '/',
         query: {
           findOptions: options,
         },

@@ -7,8 +7,9 @@ import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
 import { usePasswordPolicy } from '@furystack/security'
 import { User } from 'common'
-import { DefaultSession } from '@furystack/rest-service'
-import { authorizedOnly } from './authorized-data-set'
+import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
+import { authorizedOnly } from '../authorized-data-set'
+import { setupIdentityRestApi } from './setup-identity-rest-api'
 
 export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
@@ -46,6 +47,13 @@ export const setupIdentity = async (injector: Injector) => {
   })
 
   usePasswordPolicy(injector)
+
+  useHttpAuthentication(injector, {
+    getUserStore: (sm) => sm.getStoreFor<User & { password: string }, 'username'>(User as any, 'username'),
+    getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
+  })
+
+  await setupIdentityRestApi(injector)
 
   logger.information({ message: '✅  Identity setup completed' })
 }

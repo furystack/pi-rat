@@ -6,7 +6,8 @@ import { access, mkdir } from 'fs/promises'
 import { constants } from 'fs'
 import { Drive } from 'common'
 import { join } from 'path'
-import { authorizedOnly } from './authorized-data-set'
+import { authorizedOnly } from '../authorized-data-set'
+import { setupDrivesRestApi } from './setup-drives-rest-api'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -59,6 +60,8 @@ export const setupDrives = async (injector: Injector) => {
       return { isAllowed: true }
     },
   })
+
+  await setupDrivesRestApi(injector)
 
   logger.information({ message: '✅  Drives has been set up' })
 }

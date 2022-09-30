@@ -5,7 +5,7 @@ import type { Injector } from '@furystack/inject'
 import { User } from 'common'
 import { injector } from './root-injector'
 import { getLogger } from '@furystack/logging'
-import { setupIdentity } from './setup-identity'
+import { setupIdentity } from './identity/setup-identity'
 
 /**
  * gets an existing instance if exists or create and return if not. Throws error on multiple result

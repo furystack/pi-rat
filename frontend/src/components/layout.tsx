@@ -1,7 +1,7 @@
 import { createComponent, createFragment, Shade, LazyLoad } from '@furystack/shades'
 import { NotyList } from '@furystack/shades-common-components'
 import { Button, Loader, Paper, ThemeProviderService } from '@furystack/shades-common-components'
-import { PiratApiClient } from '../services/pirat-api-client'
+import { InstallApiClient } from '../services/install-api-client'
 import { Body } from './body'
 import { Header } from './header'
 
@@ -41,7 +41,7 @@ export const Layout = Shade({
             </Paper>
           )}
           component={async () => {
-            const { result } = await injector.getInstance(PiratApiClient).call({
+            const { result } = await injector.getInstance(InstallApiClient).call({
               method: 'GET',
               action: '/serviceStatus',
             })
