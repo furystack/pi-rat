@@ -18,8 +18,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: install root deps
-        run: yarn workspaces focus pi-rat
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
 
       - name: Install Playwright browsers
         run: yarn playwright install --with-deps
