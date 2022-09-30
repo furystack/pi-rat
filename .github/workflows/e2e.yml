@@ -1,0 +1,29 @@
+name: Build and execute tests
+on: [push]
+jobs:
+  build:
+    name: Lint, Build and test
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Playwright browsers
+        run: yarn playwright install --with-deps
+
+      - name: Dockerize
+        run: yarn dockerize
+
+      - name: Start from Docker conatiner
+        run: docker run --rm -d --name pi-rat -p 9090:9090 furystack/pi-rat
+
+      - run: yarn test:e2e:install
+        name: 'Test Installer'
+
+      - run: yarn test:e2e
+        name: 'E2E tests'
+
+      - run: docker logs pi-rat
+        if: always()
+        name: Dump Docker logs
