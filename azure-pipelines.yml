@@ -41,8 +41,14 @@ steps:
   - script: yarn playwright install --with-deps
     displayName: Install Playwright browsers
 
-  - script: yarn seed
-    displayName: 'Seed test data'
+  - displayName: Start from Docker conatiner
+    script: docker run --rm -d -p 9090:9090 furystack/pi-rat
+
+  - displayName: Install Playwright browsers
+    script: yarn playwright install --with-deps
+
+  - script: yarn test:e2e:install
+    displayName: 'E2E tests'
 
   - script: yarn test:e2e
     displayName: 'E2E tests'

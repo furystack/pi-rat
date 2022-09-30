@@ -6,7 +6,6 @@
   "private": true,
   "scripts": {
     "start": "node ./dist/service.js",
-    "seed": "node ./dist/seed.js",
     "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
     "build": "tsc -b"
   },
