@@ -55,7 +55,7 @@
     "build": "tsc -b && yarn workspace frontend build",
     "create-schemas": "yarn workspace common create-schemas",
     "seed": "yarn workspace service seed",
-    "test:e2e:install": "yarn playwright test --grep @install",
+    "test:e2e:install": "yarn playwright test --grep @install --project chromium",
     "test:e2e": "yarn playwright test --grep-invert @install",
     "test:unit": "jest --verbose",
     "start:service": "yarn workspace service start",
