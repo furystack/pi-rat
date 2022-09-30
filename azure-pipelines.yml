@@ -38,14 +38,14 @@ steps:
       testRunner: JUnit
       testResultsFiles: '$(System.DefaultWorkingDirectory)/coverage/junit.xml'
 
+  - displayName: Install Playwright browsers
+    script: yarn playwright install --with-deps
+
   - script: yarn playwright install --with-deps
     displayName: Install Playwright browsers
 
   - displayName: Start from Docker conatiner
-    script: docker run --rm -d -p 9090:9090 furystack/pi-rat
-
-  - displayName: Install Playwright browsers
-    script: yarn playwright install --with-deps
+    script: docker run -d -p 9090:9090 furystack/pi-rat
 
   - script: yarn test:e2e:install
     displayName: 'E2E tests'
