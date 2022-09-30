@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test('Setup Project @install', async ({ page }) => {
-  await page.goto('http://localhost:8080')
+  await page.goto('http://localhost:9090')
 
   const welcomeText = await page.locator('h1', { hasText: 'Welcome to PI-RAT Installer' })
   await expect(welcomeText).toBeVisible()

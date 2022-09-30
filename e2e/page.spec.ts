@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Example Application', () => {
   test('Login and logout roundtrip', async ({ page }) => {
-    await page.goto('http://localhost:8080')
+    await page.goto('http://localhost:9090')
 
     const loginForm = await page.locator('shade-login form')
     await expect(loginForm).toBeVisible()
