@@ -5216,6 +5216,7 @@ __metadata:
     "@furystack/repository": ^6.1.0
     "@furystack/rest-service": ^6.2.1
     "@furystack/security": ^2.1.0
+    "@furystack/utils": ^3.1.0
     "@types/jest": ^29.0.3
     "@types/node": ^18.7.23
     common: "workspace:^"

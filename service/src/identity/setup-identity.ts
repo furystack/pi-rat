@@ -8,7 +8,7 @@ import { getRepository } from '@furystack/repository'
 import { usePasswordPolicy } from '@furystack/security'
 import { User } from 'common'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
-import { authorizedOnly } from '../authorized-data-set'
+import { authorizedOnly } from '../authorized-only'
 import { setupIdentityRestApi } from './setup-identity-rest-api'
 
 export const setupIdentity = async (injector: Injector) => {
