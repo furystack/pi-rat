@@ -46,7 +46,7 @@ jobs:
         run: yarn dockerize
 
       - name: Start from Docker conatiner
-        run: docker run -d -rm -name pi-rat -p 9090:9090 furystack/pi-rat
+        run: docker run --rm -d -name pi-rat -p 9090:9090 furystack/pi-rat
 
       - run: yarn test:e2e:install
         name: 'Test Installer'
