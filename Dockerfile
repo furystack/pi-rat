@@ -21,10 +21,8 @@ RUN yarn workspaces focus service --production
 FROM node:18-alpine as runner
 
 COPY --chown=node:node --from=base /home/node/app /home/node/app
-
-WORKDIR /home/node/app
 USER node
-
 EXPOSE 9090
+WORKDIR /home/node/app
 
 ENTRYPOINT ["yarn", "start:service"]

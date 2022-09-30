@@ -39,9 +39,17 @@ jobs:
         env:
           CI: true
 
+      - name: Dockerize
+        run: yarn dockerize
+
+      - name: Start from Docker conatiner
+        run: docker run --rm -d -p 9090:9090 furystack/pi-rat
+
       - name: Install Playwright browsers
         run: yarn playwright install --with-deps
+
       - run: yarn test:e2e:install
         name: 'Test Installer'
+
       - run: yarn test:e2e
         name: 'E2E tests'

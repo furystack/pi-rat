@@ -20,7 +20,7 @@
     "@furystack/inject": "^7.1.0",
     "@furystack/logging": "^3.1.0",
     "@furystack/repository": "^6.1.0",
-    "@furystack/rest-service": "^6.2.0",
+    "@furystack/rest-service": "^6.2.1",
     "@furystack/security": "^2.1.0",
     "@types/jest": "^29.0.3",
     "common": "workspace:^"

@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { useStaticFiles } from '@furystack/rest-service'
-import { join } from 'path'
+import { join, sep } from 'path'
 
 export const setupFrontendBundle = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('FrontendBundle')
@@ -9,10 +9,10 @@ export const setupFrontendBundle = async (injector: Injector) => {
 
   await useStaticFiles({
     injector,
-    baseUrl: '/',
-    path: join(process.cwd(), '..', 'frontend', 'bundle'),
-    port: 9090,
+    baseUrl: '',
     fallback: 'index.html',
+    path: join(process.cwd(), '..', 'frontend', 'bundle') + sep,
+    port: 9090,
   })
   logger.information({ message: '✅  Frontend bundle setup completed' })
 }
