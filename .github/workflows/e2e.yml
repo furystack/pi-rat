@@ -1,4 +1,4 @@
-name: Build and execute tests
+name: E2E testing
 on: [push]
 jobs:
   build:
