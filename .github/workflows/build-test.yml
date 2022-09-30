@@ -46,10 +46,13 @@ jobs:
         run: yarn dockerize
 
       - name: Start from Docker conatiner
-        run: docker run -d -p 9090:9090 furystack/pi-rat
+        run: docker run -d -rm -name pirat -p 9090:9090 furystack/pi-rat
 
       - run: yarn test:e2e:install
         name: 'Test Installer'
 
       - run: yarn test:e2e
         name: 'E2E tests'
+
+      - run: docker logs pi-rat
+        name: Dump Docker logs
