@@ -19,18 +19,18 @@ export type GetDirectoryEntries = {
 
 export interface DrivesApi extends RestApi {
   GET: {
-    '/': GetCollectionEndpoint<Drive>
-    '/:id': GetEntityEndpoint<Drive, 'letter'>
+    '/volumes': GetCollectionEndpoint<Drive>
+    '/volumes/:id': GetEntityEndpoint<Drive, 'letter'>
     '/files/:letter/:path': GetDirectoryEntries
   }
   POST: {
-    '/': PostEndpoint<Drive, 'letter'>
-    '/:id/upload': { result: { success: true }; body: any }
+    '/volumes': PostEndpoint<Drive, 'letter'>
+    '/volumes/:id/upload': { result: { success: true }; body: any }
   }
   PATCH: {
-    '/:id': PatchEndpoint<Drive, 'letter'>
+    '/volumes/:id': PatchEndpoint<Drive, 'letter'>
   }
   DELETE: {
-    '/:id': DeleteEndpoint<Drive, 'letter'>
+    '/volumes/:id': DeleteEndpoint<Drive, 'letter'>
   }
 }

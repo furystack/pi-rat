@@ -53,7 +53,7 @@ export const setupDrives = async (injector: Injector) => {
       try {
         await ensureFolder(args.entity.physicalPath as string)
       } catch (error) {
-        /** */
+        logger.warning({ message: `Failed to create folder in path ${args.entity.physicalPath}`, data: { error } })
         return {
           isAllowed: false,
           message: `Could not access the physical path: ${args.entity.physicalPath}`,

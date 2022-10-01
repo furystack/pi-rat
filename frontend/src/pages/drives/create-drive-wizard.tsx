@@ -23,7 +23,7 @@ export const AddDriveStep = Shade<WizardStepProps>({
           try {
             await injector.getInstance(DrivesApiClient).call({
               method: 'POST',
-              action: '/',
+              action: '/volumes',
               body: {
                 letter: values.letter.toString(),
                 physicalPath: values.physicalPath.toString(),
