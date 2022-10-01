@@ -20,7 +20,6 @@ export const setupIdentity = async (injector: Injector) => {
     new FileSystemStore({
       model: User,
       primaryKey: 'username',
-      tickMs: 30 * 1000,
       fileName: join(process.cwd(), 'data', 'users.json'),
     }),
   )

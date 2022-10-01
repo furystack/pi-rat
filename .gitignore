@@ -73,4 +73,4 @@ testresults
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-service/data
+service/data/*.json
