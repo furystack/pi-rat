@@ -14,6 +14,6 @@ describe('getDataFolder', () => {
 
   it('should use the defined value from env', () => {
     const dataFolder = getDataFolder({ DATA_FOLDER: '/temp/asd' })
-    expect(dataFolder).toEqual(join(process.cwd(), '/temp/asd'))
+    expect(dataFolder).toEqual('/temp/asd')
   })
 })
