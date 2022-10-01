@@ -10,6 +10,7 @@ import { User } from 'common'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
 import { authorizedOnly } from '../authorized-only'
 import { setupIdentityRestApi } from './setup-identity-rest-api'
+import { getDataFolder } from '../get-data-folder'
 
 export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
@@ -20,21 +21,21 @@ export const setupIdentity = async (injector: Injector) => {
     new FileSystemStore({
       model: User,
       primaryKey: 'username',
-      fileName: join(process.cwd(), 'data', 'users.json'),
+      fileName: join(getDataFolder(), 'users.json'),
     }),
   )
     .addStore(
       new FileSystemStore({
         model: DefaultSession,
         primaryKey: 'sessionId',
-        fileName: join(process.cwd(), 'data', 'sessions.json'),
+        fileName: join(getDataFolder(), 'sessions.json'),
       }),
     )
     .addStore(
       new FileSystemStore({
         model: PasswordCredential,
         primaryKey: 'userName',
-        fileName: join(process.cwd(), 'data', 'pwc.json'),
+        fileName: join(getDataFolder(), 'pwc.json'),
       }),
     )
 

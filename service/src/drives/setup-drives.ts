@@ -8,6 +8,7 @@ import { Drive } from 'common'
 import { join } from 'path'
 import { authorizedOnly } from '../authorized-only'
 import { setupDrivesRestApi } from './setup-drives-rest-api'
+import { getDataFolder } from '../get-data-folder'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -34,7 +35,7 @@ export const setupDrives = async (injector: Injector) => {
     injector,
     model: Drive,
     primaryKey: 'letter',
-    fileName: join(process.cwd(), 'data', 'drives.json'),
+    fileName: join(getDataFolder(), 'drives.json'),
   })
 
   getRepository(injector).createDataSet(Drive, 'letter', {
