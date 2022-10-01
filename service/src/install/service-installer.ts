@@ -2,7 +2,8 @@ import { StoreManager } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import { LoggerCollection } from '@furystack/logging'
 import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
-import { ServiceStatus, User } from 'common'
+import type { ServiceStatus } from 'common'
+import { User } from 'common'
 
 @Injectable()
 export class ServiceStatusProvider {

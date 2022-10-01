@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createComponent, Shade } from '@furystack/shades'
-import { defaultDarkTheme, Theme, ThemeProviderService } from '@furystack/shades-common-components'
+import type { Theme } from '@furystack/shades-common-components'
+import { defaultDarkTheme, ThemeProviderService } from '@furystack/shades-common-components'
 // @ts-ignore
 import ghLight from './gh-light.png'
 // @ts-ignore

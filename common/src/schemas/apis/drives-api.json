@@ -1,133 +1,125 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/PiratApi",
   "definitions": {
-    "PiratApi": {
+    "GetDirectoryEntries": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "letter",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "files": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DirectoryEntry"
+              }
+            }
+          },
+          "required": [
+            "files"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "DirectoryEntry": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "isFile": {
+          "type": "boolean"
+        },
+        "isDirectory": {
+          "type": "boolean"
+        },
+        "isBlockDevice": {
+          "type": "boolean"
+        },
+        "isCharacterDevice": {
+          "type": "boolean"
+        },
+        "isSymbolicLink": {
+          "type": "boolean"
+        },
+        "isFIFO": {
+          "type": "boolean"
+        },
+        "isSocket": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "isFile",
+        "isDirectory",
+        "isBlockDevice",
+        "isCharacterDevice",
+        "isSymbolicLink",
+        "isFIFO",
+        "isSocket"
+      ],
+      "additionalProperties": false
+    },
+    "DrivesApi": {
       "type": "object",
       "properties": {
         "GET": {
           "type": "object",
           "properties": {
-            "/serviceStatus": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "type": "object",
-                  "properties": {
-                    "state": {
-                      "$ref": "#/definitions/ServiceStatus"
-                    }
-                  },
-                  "required": [
-                    "state"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "required": [
-                "result"
-              ],
-              "additionalProperties": false
-            },
-            "/isAuthenticated": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "type": "object",
-                  "properties": {
-                    "isAuthenticated": {
-                      "type": "boolean"
-                    }
-                  },
-                  "required": [
-                    "isAuthenticated"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "required": [
-                "result"
-              ],
-              "additionalProperties": false
-            },
-            "/currentUser": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/User"
-                }
-              },
-              "required": [
-                "result"
-              ],
-              "additionalProperties": false
-            },
-            "/drives": {
+            "/": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CDrive%3E"
             },
-            "/drives/:id": {
+            "/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3CDrive%2C%22letter%22%3E"
+            },
+            "/files/:letter/:path": {
+              "$ref": "#/definitions/GetDirectoryEntries"
             }
           },
           "required": [
-            "/serviceStatus",
-            "/isAuthenticated",
-            "/currentUser",
-            "/drives",
-            "/drives/:id"
+            "/",
+            "/:id",
+            "/files/:letter/:path"
           ],
           "additionalProperties": false
         },
         "POST": {
           "type": "object",
           "properties": {
-            "/login": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/User"
-                },
-                "body": {
-                  "type": "object",
-                  "properties": {
-                    "username": {
-                      "type": "string"
-                    },
-                    "password": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "username",
-                    "password"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "required": [
-                "result",
-                "body"
-              ],
-              "additionalProperties": false
+            "/": {
+              "$ref": "#/definitions/PostEndpoint%3CDrive%2C%22letter%22%3E"
             },
-            "/logout": {
-              "type": "object",
-              "properties": {
-                "result": {}
-              },
-              "required": [
-                "result"
-              ],
-              "additionalProperties": false
-            },
-            "/install": {
+            "/:id/upload": {
               "type": "object",
               "properties": {
                 "result": {
                   "type": "object",
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "const": true
                     }
                   },
                   "required": [
@@ -135,50 +127,30 @@
                   ],
                   "additionalProperties": false
                 },
-                "body": {
-                  "type": "object",
-                  "properties": {
-                    "username": {
-                      "type": "string"
-                    },
-                    "password": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "username",
-                    "password"
-                  ],
-                  "additionalProperties": false
-                }
+                "body": {}
               },
               "required": [
                 "result",
                 "body"
               ],
               "additionalProperties": false
-            },
-            "/drives": {
-              "$ref": "#/definitions/PostEndpoint%3CDrive%2C%22letter%22%3E"
             }
           },
           "required": [
-            "/login",
-            "/logout",
-            "/install",
-            "/drives"
+            "/",
+            "/:id/upload"
           ],
           "additionalProperties": false
         },
         "PATCH": {
           "type": "object",
           "properties": {
-            "/drives/:id": {
+            "/:id": {
               "$ref": "#/definitions/PatchEndpoint%3CDrive%2C%22letter%22%3E"
             }
           },
           "required": [
-            "/drives/:id"
+            "/:id"
           ],
           "additionalProperties": false
         },
@@ -202,12 +174,12 @@
         "DELETE": {
           "type": "object",
           "properties": {
-            "/drives/:id": {
+            "/:id": {
               "$ref": "#/definitions/DeleteEndpoint%3CDrive%2C%22letter%22%3E"
             }
           },
           "required": [
-            "/drives/:id"
+            "/:id"
           ],
           "additionalProperties": false
         },
@@ -271,30 +243,146 @@
       ],
       "additionalProperties": false
     },
-    "ServiceStatus": {
-      "type": "string",
-      "enum": [
-        "installed",
-        "needsInstall"
-      ]
-    },
-    "User": {
+    "RestApi": {
       "type": "object",
       "properties": {
-        "username": {
-          "type": "string"
+        "GET": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
         },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
+        "POST": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
           }
         }
       },
-      "required": [
-        "username",
-        "roles"
-      ],
       "additionalProperties": false
     },
     "GetCollectionEndpoint<Drive>": {
@@ -591,10 +679,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "physicalPath": {
+        "letter": {
           "type": "string"
         },
-        "letter": {
+        "physicalPath": {
           "type": "string"
         }
       },
@@ -602,20 +690,26 @@
         "physicalPath"
       ]
     },
+    "Omit<Drive,\"letter\">": {
+      "$ref": "#/definitions/Pick%3CDrive%2CExclude%3C(%22physicalPath%22%7C%22letter%22)%2C%22letter%22%3E%3E"
+    },
+    "Pick<Drive,Exclude<(\"physicalPath\"|\"letter\"),\"letter\">>": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "physicalPath"
+      ],
+      "additionalProperties": false
+    },
     "PatchEndpoint<Drive,\"letter\">": {
       "type": "object",
       "properties": {
         "body": {
-          "type": "object",
-          "properties": {
-            "physicalPath": {
-              "type": "string"
-            },
-            "letter": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false
+          "$ref": "#/definitions/Partial%3CDrive%3E"
         },
         "url": {
           "type": "object",
@@ -641,6 +735,18 @@
       ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
+    },
+    "Partial<Drive>": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string"
+        },
+        "letter": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "DeleteEndpoint<Drive,\"letter\">": {
       "type": "object",

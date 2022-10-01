@@ -1,5 +1,6 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
-import { showParallax, Button, WizardStepProps } from '@furystack/shades-common-components'
+import type { WizardStepProps } from '@furystack/shades-common-components'
+import { showParallax, Button } from '@furystack/shades-common-components'
 
 export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) => void } & WizardStepProps>({
   shadowDomName: 'wizard-step',

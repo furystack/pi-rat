@@ -1,4 +1,4 @@
-import { Injector } from '@furystack/inject'
+import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { ServerManager } from '@furystack/rest-service'
 
