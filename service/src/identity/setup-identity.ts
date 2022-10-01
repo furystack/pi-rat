@@ -14,8 +14,9 @@ import { getDataFolder } from '../get-data-folder'
 
 export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
-  logger.information({ message: '👤  Setting up Identity...' })
+  await logger.information({ message: '👤  Setting up Identity...' })
 
+  await logger.verbose({ message: 'Setting up storage...' })
   addStore(
     injector,
     new FileSystemStore({
@@ -39,6 +40,7 @@ export const setupIdentity = async (injector: Injector) => {
       }),
     )
 
+  await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(User, 'username', {
     authorizeAdd: authorizedOnly,
     authorizeGet: authorizedOnly,
@@ -46,14 +48,17 @@ export const setupIdentity = async (injector: Injector) => {
     authorizeUpdate: authorizedOnly,
   })
 
+  await logger.verbose({ message: 'Setting up password policy...' })
   usePasswordPolicy(injector)
 
+  await logger.verbose({ message: 'Setting up HTTP Authentication...' })
   useHttpAuthentication(injector, {
     getUserStore: (sm) => sm.getStoreFor<User & { password: string }, 'username'>(User as any, 'username'),
     getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
   })
 
+  await logger.verbose({ message: 'Setting up REST API...' })
   await setupIdentityRestApi(injector)
 
-  logger.information({ message: '✅  Identity setup completed' })
+  await logger.information({ message: '✅  Identity setup completed' })
 }

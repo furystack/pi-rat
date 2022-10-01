@@ -28,9 +28,10 @@ const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
 }
 
 export const setupDrives = async (injector: Injector) => {
-  const logger = getLogger(injector).withScope('setupDrives')
-  logger.information({ message: '📁  Setting up drives...' })
+  const logger = getLogger(injector).withScope('Drives')
+  await logger.information({ message: '📁  Setting up drives...' })
 
+  await logger.verbose({ message: 'Setting up storage...' })
   useFileSystemStore({
     injector,
     model: Drive,
@@ -38,6 +39,7 @@ export const setupDrives = async (injector: Injector) => {
     fileName: join(getDataFolder(), 'drives.json'),
   })
 
+  await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(Drive, 'letter', {
     authorizeGet: authorizedOnly,
     authorizeUpdate: authorizedOnly,
@@ -62,7 +64,8 @@ export const setupDrives = async (injector: Injector) => {
     },
   })
 
+  await logger.verbose({ message: 'Setting up REST API...' })
   await setupDrivesRestApi(injector)
 
-  logger.information({ message: '✅  Drives has been set up' })
+  await logger.information({ message: '✅  Drives has been set up' })
 }
