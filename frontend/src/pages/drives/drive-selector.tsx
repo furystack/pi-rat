@@ -26,7 +26,7 @@ export const DriveSelector = Shade({
                       },
                       {
                         physicalPath: {
-                          $regex: options,
+                          $eq: options,
                         },
                       },
                     ],

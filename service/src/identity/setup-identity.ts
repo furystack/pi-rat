@@ -12,9 +12,9 @@ import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
 
 class UserModel extends Model<User, User> implements User {
-  username!: string
+  declare username: string
 
-  roles: string[] = []
+  declare roles: string[]
 }
 
 class PasswordCredentialModel extends Model<PasswordCredential, PasswordCredential> implements PasswordCredential {
