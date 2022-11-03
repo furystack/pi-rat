@@ -15,14 +15,16 @@
   },
   "dependencies": {
     "@furystack/core": "^11.1.1",
-    "@furystack/filesystem-store": "^3.1.1",
     "@furystack/inject": "^7.1.1",
     "@furystack/logging": "^3.1.1",
     "@furystack/repository": "^6.1.1",
     "@furystack/rest-service": "^6.2.2",
     "@furystack/security": "^2.1.1",
+    "@furystack/sequelize-store": "^2.0.0",
     "@furystack/utils": "^3.1.1",
     "@types/jest": "^29.2.1",
-    "common": "workspace:^"
+    "common": "workspace:^",
+    "sequelize": "^6.25.3",
+    "sqlite3": "^5.1.2"
   }
 }

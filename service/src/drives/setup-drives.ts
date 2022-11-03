@@ -1,4 +1,4 @@
-import { useFileSystemStore } from '@furystack/filesystem-store'
+import { useSequelize } from '@furystack/sequelize-store'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
@@ -9,6 +9,7 @@ import { join } from 'path'
 import { authorizedOnly } from '../authorized-only'
 import { setupDrivesRestApi } from './setup-drives-rest-api'
 import { getDataFolder } from '../get-data-folder'
+import { Model, DataTypes } from 'sequelize'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -27,15 +28,42 @@ const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
   }
 }
 
+class DriveModel extends Model<Drive, Drive> implements Drive {
+  physicalPath!: string
+  letter!: string
+}
+
 export const setupDrives = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('setupDrives')
   logger.information({ message: '📁  Setting up drives...' })
 
-  useFileSystemStore({
+  useSequelize({
     injector,
     model: Drive,
+    sequelizeModel: DriveModel,
     primaryKey: 'letter',
-    fileName: join(getDataFolder(), 'drives.json'),
+    options: {
+      dialect: 'sqlite',
+      storage: join(getDataFolder(), 'drives.sqlite'),
+    },
+    initModel: async (sequelize) => {
+      DriveModel.init(
+        {
+          letter: {
+            type: DataTypes.STRING,
+            primaryKey: true,
+          },
+          physicalPath: {
+            type: DataTypes.STRING,
+          },
+        },
+        {
+          sequelize,
+          modelName: 'Drive',
+        },
+      )
+      await sequelize.sync()
+    },
   })
 
   getRepository(injector).createDataSet(Drive, 'letter', {
