@@ -11,6 +11,7 @@ import { authorizedOnly } from '../authorized-only'
 import { setupIdentityRestApi } from './setup-identity-rest-api'
 import { getDataFolder } from '../get-data-folder'
 import { Model, DataTypes } from 'sequelize'
+import sqlite from 'sqlite3'
 
 class UserModel extends Model<User, User> implements User {
   username!: string
@@ -41,6 +42,7 @@ export const setupIdentity = async (injector: Injector) => {
     primaryKey: 'username',
     options: {
       dialect: 'sqlite',
+      dialectModule: sqlite,
       storage: join(getDataFolder(), 'users.sqlite'),
     },
     initModel: async (sequelize) => {
@@ -51,7 +53,7 @@ export const setupIdentity = async (injector: Injector) => {
             primaryKey: true,
           },
           roles: {
-            type: DataTypes.ARRAY(DataTypes.STRING),
+            type: DataTypes.JSON,
             defaultValue: [],
           },
         },
@@ -71,6 +73,7 @@ export const setupIdentity = async (injector: Injector) => {
     primaryKey: 'userName',
     options: {
       dialect: 'sqlite',
+      dialectModule: sqlite,
       storage: join(getDataFolder(), 'pwc.sqlite'),
     },
     initModel: async (sequelize) => {
@@ -106,6 +109,7 @@ export const setupIdentity = async (injector: Injector) => {
     primaryKey: 'sessionId',
     options: {
       dialect: 'sqlite',
+      dialectModule: sqlite,
       storage: join(getDataFolder(), 'sessions.sqlite'),
     },
     initModel: async (sequelize) => {

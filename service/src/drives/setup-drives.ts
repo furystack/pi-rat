@@ -10,6 +10,7 @@ import { authorizedOnly } from '../authorized-only'
 import { setupDrivesRestApi } from './setup-drives-rest-api'
 import { getDataFolder } from '../get-data-folder'
 import { Model, DataTypes } from 'sequelize'
+import sqlite from 'sqlite3'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -44,6 +45,7 @@ export const setupDrives = async (injector: Injector) => {
     primaryKey: 'letter',
     options: {
       dialect: 'sqlite',
+      dialectModule: sqlite,
       storage: join(getDataFolder(), 'drives.sqlite'),
     },
     initModel: async (sequelize) => {
