@@ -505,9 +505,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/rest-service@npm:^6.2.2":
-  version: 6.2.2
-  resolution: "@furystack/rest-service@npm:6.2.2"
+"@furystack/rest-service@npm:^6.2.3":
+  version: 6.2.3
+  resolution: "@furystack/rest-service@npm:6.2.3"
   dependencies:
     "@furystack/core": ^11.1.1
     "@furystack/inject": ^7.1.1
@@ -520,7 +520,7 @@ __metadata:
     ajv-formats: ^2.1.1
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: d26f1c2ad7ed15e21df02f668862b559a7bf8c6614f28a33e58e913e019c46405926eaccbb38ef00b5f7f4026a6b87174d2764e1e17d259e185e4b9f0d559fee
+  checksum: 2869a12ffd0525df3261ce404b25fe3898828d30440143e3ef3d35f03f58337394f8558c15f541139d1f3478b001816162c9ae80a28e1f5af162f4c095abfd6b
   languageName: node
   linkType: hard
 
@@ -5702,7 +5702,7 @@ __metadata:
     "@furystack/inject": ^7.1.1
     "@furystack/logging": ^3.1.1
     "@furystack/repository": ^6.1.1
-    "@furystack/rest-service": ^6.2.2
+    "@furystack/rest-service": ^6.2.3
     "@furystack/security": ^2.1.1
     "@furystack/sequelize-store": ^2.0.0
     "@furystack/utils": ^3.1.1
