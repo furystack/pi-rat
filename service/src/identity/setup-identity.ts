@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { useSequelize } from '@furystack/sequelize-store'
 import type { Injector } from '@furystack/inject'
 import { PasswordCredential } from '@furystack/security'
@@ -9,9 +8,8 @@ import { User } from 'common'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
 import { authorizedOnly } from '../authorized-only'
 import { setupIdentityRestApi } from './setup-identity-rest-api'
-import { getDataFolder } from '../get-data-folder'
 import { Model, DataTypes } from 'sequelize'
-import sqlite from 'sqlite3'
+import { getDefaultDbSettings } from '../get-default-db-options'
 
 class UserModel extends Model<User, User> implements User {
   username!: string
@@ -20,15 +18,15 @@ class UserModel extends Model<User, User> implements User {
 }
 
 class PasswordCredentialModel extends Model<PasswordCredential, PasswordCredential> implements PasswordCredential {
-  userName!: string
-  passwordHash!: string
-  salt!: string
-  creationDate!: string
+  declare userName: string
+  declare passwordHash: string
+  declare salt: string
+  declare creationDate: string
 }
 
 class SessionModel extends Model<DefaultSession, DefaultSession> implements DefaultSession {
-  sessionId!: string
-  username!: string
+  declare sessionId: string
+  declare username: string
 }
 
 export const setupIdentity = async (injector: Injector) => {
@@ -40,11 +38,8 @@ export const setupIdentity = async (injector: Injector) => {
     model: User,
     sequelizeModel: UserModel,
     primaryKey: 'username',
-    options: {
-      dialect: 'sqlite',
-      dialectModule: sqlite,
-      storage: join(getDataFolder(), 'users.sqlite'),
-    },
+
+    options: getDefaultDbSettings('users.sqlite', logger),
     initModel: async (sequelize) => {
       UserModel.init(
         {
@@ -71,11 +66,7 @@ export const setupIdentity = async (injector: Injector) => {
     model: PasswordCredential,
     sequelizeModel: PasswordCredentialModel,
     primaryKey: 'userName',
-    options: {
-      dialect: 'sqlite',
-      dialectModule: sqlite,
-      storage: join(getDataFolder(), 'pwc.sqlite'),
-    },
+    options: getDefaultDbSettings('pwc.sqlite', logger),
     initModel: async (sequelize) => {
       PasswordCredentialModel.init(
         {
@@ -107,11 +98,7 @@ export const setupIdentity = async (injector: Injector) => {
     model: DefaultSession,
     sequelizeModel: SessionModel,
     primaryKey: 'sessionId',
-    options: {
-      dialect: 'sqlite',
-      dialectModule: sqlite,
-      storage: join(getDataFolder(), 'sessions.sqlite'),
-    },
+    options: getDefaultDbSettings('sessions.sqlite', logger),
     initModel: async (sequelize) => {
       SessionModel.init(
         {

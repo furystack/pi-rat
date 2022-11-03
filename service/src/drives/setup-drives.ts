@@ -5,12 +5,10 @@ import { getRepository } from '@furystack/repository'
 import { access, mkdir } from 'fs/promises'
 import { constants } from 'fs'
 import { Drive } from 'common'
-import { join } from 'path'
 import { authorizedOnly } from '../authorized-only'
 import { setupDrivesRestApi } from './setup-drives-rest-api'
-import { getDataFolder } from '../get-data-folder'
 import { Model, DataTypes } from 'sequelize'
-import sqlite from 'sqlite3'
+import { getDefaultDbSettings } from '../get-default-db-options'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -30,8 +28,8 @@ const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
 }
 
 class DriveModel extends Model<Drive, Drive> implements Drive {
-  physicalPath!: string
-  letter!: string
+  declare physicalPath: string
+  declare letter: string
 }
 
 export const setupDrives = async (injector: Injector) => {
@@ -43,11 +41,7 @@ export const setupDrives = async (injector: Injector) => {
     model: Drive,
     sequelizeModel: DriveModel,
     primaryKey: 'letter',
-    options: {
-      dialect: 'sqlite',
-      dialectModule: sqlite,
-      storage: join(getDataFolder(), 'drives.sqlite'),
-    },
+    options: getDefaultDbSettings('drives.sqlite', logger),
     initModel: async (sequelize) => {
       DriveModel.init(
         {
