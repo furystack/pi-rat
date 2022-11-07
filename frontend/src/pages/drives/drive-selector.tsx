@@ -21,12 +21,12 @@ export const DriveSelector = Shade({
                     $or: [
                       {
                         letter: {
-                          $eq: options,
+                          $eq: `${options}`,
                         },
                       },
                       {
                         physicalPath: {
-                          $eq: options,
+                          $like: `%${options}%`,
                         },
                       },
                     ],
