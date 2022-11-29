@@ -23,13 +23,14 @@ export const GetDirectoryEntriesAction: RequestAction<GetDirectoryEntries> = asy
   const { letter, path } = getUrlParams()
   const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
   if (!drive) {
-    return JsonResult({ files: [] }, 404)
+    return JsonResult({ entries: [], count: 0 }, 404)
   }
   console.log({ drive, letter, path })
   const absolutePath = join(drive.physicalPath, path)
   const entries = await readdir(absolutePath, { withFileTypes: true, encoding: 'utf-8' })
 
   return JsonResult({
-    files: entries.map(direntToApiModel),
+    entries: entries.map(direntToApiModel),
+    count: entries.length,
   })
 }

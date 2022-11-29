@@ -1,53 +1,36 @@
-import { createComponent, Shade } from '@furystack/shades'
-import { Paper, Suggest } from '@furystack/shades-common-components'
+import { createComponent, LazyLoad, Shade } from '@furystack/shades'
+import { Autocomplete, Loader } from '@furystack/shades-common-components'
+import type { ObservableValue } from '@furystack/utils'
 import type { Drive } from 'common'
 import { DrivesApiClient } from '../../services/drives-api-client'
 
-export const DriveSelector = Shade({
+export const DriveSelector = Shade<{ currentDrive: ObservableValue<Drive | undefined> }>({
   shadowDomName: 'drive-selector',
-  render: ({ injector }) => {
+  render: ({ injector, props }) => {
     return (
-      <Paper elevation={1}>
-        Select Drive
-        <Suggest<Drive>
-          getEntries={async (options) => {
-            const result = await injector.getInstance(DrivesApiClient).call({
-              method: 'GET',
-              action: '/volumes',
-              query: {
-                findOptions: {
-                  top: 10,
-                  filter: {
-                    $or: [
-                      {
-                        letter: {
-                          $eq: `${options}`,
-                        },
-                      },
-                      {
-                        physicalPath: {
-                          $like: `%${options}%`,
-                        },
-                      },
-                    ],
-                  },
-                },
-              },
-            })
+      <LazyLoad
+        loader={<Loader />}
+        component={async () => {
+          const { result } = await injector.getInstance(DrivesApiClient).call({
+            method: 'GET',
+            action: '/volumes',
+            query: {
+              findOptions: {},
+            },
+          })
 
-            return result.result.entries
-          }}
-          defaultPrefix="💾"
-          getSuggestionEntry={(entry) => ({
-            score: 1,
-            value: <div>{entry.letter}</div>,
-            element: <div>{entry.letter}</div>,
-          })}
-          onSelectSuggestion={(entry) => {
-            console.log(entry)
-          }}
-        />
-      </Paper>
+          return (
+            <Autocomplete
+              strict
+              inputProps={{ labelTitle: 'Select Drive', value: props.currentDrive.getValue()?.letter }}
+              suggestions={result.entries.map((r) => r.letter)}
+              onchange={(value) => {
+                props.currentDrive.setValue(result.entries.find((e) => e.letter === value))
+              }}
+            />
+          )
+        }}
+      />
     )
   },
 })

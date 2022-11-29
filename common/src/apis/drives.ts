@@ -1,6 +1,7 @@
 import type {
   DeleteEndpoint,
   GetCollectionEndpoint,
+  GetCollectionResult,
   GetEntityEndpoint,
   PatchEndpoint,
   PostEndpoint,
@@ -14,7 +15,7 @@ export type GetDirectoryEntries = {
     letter: string
     path: string
   }
-  result: { files: DirectoryEntry[] }
+  result: GetCollectionResult<DirectoryEntry>
 }
 
 export interface DrivesApi extends RestApi {

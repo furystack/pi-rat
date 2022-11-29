@@ -3,7 +3,7 @@ import { CollectionService } from '@furystack/shades-common-components'
 import type { Drive } from 'common'
 import { DrivesApiClient } from '../../services/drives-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
-import { DriveSelector } from './drive-selector'
+import { FolderPanel } from './folder-panel'
 
 export const DrivesPage = Shade<
   unknown,
@@ -40,7 +40,7 @@ export const DrivesPage = Shade<
           marginTop: '5em',
           flexDirection: 'column',
         }}>
-        <DriveSelector />
+        <FolderPanel service={collectionService} />
         <CreateDriveWizard
           onDriveAdded={() => collectionService.getEntries({ ...collectionService.querySettings.getValue() })}
         />
