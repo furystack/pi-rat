@@ -24,7 +24,7 @@ export const setupDrivesRestApi = async (injector: Injector) => {
     cors: getCorsOptions(),
     api: {
       GET: {
-        '/': Validate({
+        '/volumes': Validate({
           schema: drivesApiSchema,
           schemaName: 'GetCollectionEndpoint<Drive>',
         })(
@@ -33,7 +33,7 @@ export const setupDrivesRestApi = async (injector: Injector) => {
             primaryKey: 'letter',
           }),
         ),
-        '/:id': Validate({
+        '/volumes/:id': Validate({
           schema: drivesApiSchema,
           schemaName: 'GetEntityEndpoint<Drive,"letter">',
         })(
@@ -47,13 +47,13 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         ),
       },
       POST: {
-        '/': Validate({ schema: drivesApiSchema, schemaName: 'PostEndpoint<Drive,"letter">' })(
+        '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostEndpoint<Drive,"letter">' })(
           createPostEndpoint({
             model: Drive,
             primaryKey: 'letter',
           }),
         ),
-        '/:id/upload': async (args) => {
+        '/volumes/:id/upload': async (args) => {
           // TODO: Implement file upload
           const body = await args.getBody()
           console.log(body)
@@ -61,13 +61,13 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         },
       },
       PATCH: {
-        '/:id': createPatchEndpoint({
+        '/volumes/:id': createPatchEndpoint({
           model: Drive,
           primaryKey: 'letter',
         }),
       },
       DELETE: {
-        '/:id': createDeleteEndpoint({
+        '/volumes/:id': createDeleteEndpoint({
           model: Drive,
           primaryKey: 'letter',
         }),

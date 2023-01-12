@@ -21,19 +21,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "properties": {
-            "files": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/DirectoryEntry"
-              }
-            }
-          },
-          "required": [
-            "files"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/GetCollectionResult%3CDirectoryEntry%3E"
         }
       },
       "required": [
@@ -41,6 +29,28 @@
         "result"
       ],
       "additionalProperties": false
+    },
+    "GetCollectionResult<DirectoryEntry>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DirectoryEntry"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
     },
     "DirectoryEntry": {
       "type": "object",
@@ -88,10 +98,10 @@
         "GET": {
           "type": "object",
           "properties": {
-            "/": {
+            "/volumes": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CDrive%3E"
             },
-            "/:id": {
+            "/volumes/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3CDrive%2C%22letter%22%3E"
             },
             "/files/:letter/:path": {
@@ -99,8 +109,8 @@
             }
           },
           "required": [
-            "/",
-            "/:id",
+            "/volumes",
+            "/volumes/:id",
             "/files/:letter/:path"
           ],
           "additionalProperties": false
@@ -108,10 +118,10 @@
         "POST": {
           "type": "object",
           "properties": {
-            "/": {
+            "/volumes": {
               "$ref": "#/definitions/PostEndpoint%3CDrive%2C%22letter%22%3E"
             },
-            "/:id/upload": {
+            "/volumes/:id/upload": {
               "type": "object",
               "properties": {
                 "result": {
@@ -137,20 +147,20 @@
             }
           },
           "required": [
-            "/",
-            "/:id/upload"
+            "/volumes",
+            "/volumes/:id/upload"
           ],
           "additionalProperties": false
         },
         "PATCH": {
           "type": "object",
           "properties": {
-            "/:id": {
+            "/volumes/:id": {
               "$ref": "#/definitions/PatchEndpoint%3CDrive%2C%22letter%22%3E"
             }
           },
           "required": [
-            "/:id"
+            "/volumes/:id"
           ],
           "additionalProperties": false
         },
@@ -174,12 +184,12 @@
         "DELETE": {
           "type": "object",
           "properties": {
-            "/:id": {
+            "/volumes/:id": {
               "$ref": "#/definitions/DeleteEndpoint%3CDrive%2C%22letter%22%3E"
             }
           },
           "required": [
-            "/:id"
+            "/volumes/:id"
           ],
           "additionalProperties": false
         },
@@ -492,6 +502,15 @@
             {
               "type": "object",
               "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
                 "$regex": {
                   "type": "string"
                 }
@@ -535,6 +554,15 @@
             {
               "type": "object",
               "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
                 "$regex": {
                   "type": "string"
                 }

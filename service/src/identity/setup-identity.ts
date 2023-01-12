@@ -12,9 +12,9 @@ import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
 
 class UserModel extends Model<User, User> implements User {
-  username!: string
+  declare username: string
 
-  roles: string[] = []
+  declare roles: string[]
 }
 
 class PasswordCredentialModel extends Model<PasswordCredential, PasswordCredential> implements PasswordCredential {
@@ -31,7 +31,7 @@ class SessionModel extends Model<DefaultSession, DefaultSession> implements Defa
 
 export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
-  logger.information({ message: '👤  Setting up Identity...' })
+  await logger.information({ message: '👤  Setting up Identity...' })
 
   useSequelize({
     injector,
@@ -119,6 +119,7 @@ export const setupIdentity = async (injector: Injector) => {
     },
   })
 
+  await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(User, 'username', {
     authorizeAdd: authorizedOnly,
     authorizeGet: authorizedOnly,
@@ -126,14 +127,17 @@ export const setupIdentity = async (injector: Injector) => {
     authorizeUpdate: authorizedOnly,
   })
 
+  await logger.verbose({ message: 'Setting up password policy...' })
   usePasswordPolicy(injector)
 
+  await logger.verbose({ message: 'Setting up HTTP Authentication...' })
   useHttpAuthentication(injector, {
     getUserStore: (sm) => sm.getStoreFor<User & { password: string }, 'username'>(User as any, 'username'),
     getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
   })
 
+  await logger.verbose({ message: 'Setting up REST API...' })
   await setupIdentityRestApi(injector)
 
-  logger.information({ message: '✅  Identity setup completed' })
+  await logger.information({ message: '✅  Identity setup completed' })
 }

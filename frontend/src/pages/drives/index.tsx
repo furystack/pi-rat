@@ -1,8 +1,9 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { CollectionService, DataGrid } from '@furystack/shades-common-components'
+import { CollectionService } from '@furystack/shades-common-components'
 import type { Drive } from 'common'
 import { DrivesApiClient } from '../../services/drives-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
+import { FolderPanel } from './folder-panel'
 
 export const DrivesPage = Shade<
   unknown,
@@ -15,7 +16,7 @@ export const DrivesPage = Shade<
     collectionService: new CollectionService<Drive>(async (options) => {
       const data = await injector.getInstance(DrivesApiClient).call({
         method: 'GET',
-        action: '/',
+        action: '/volumes',
         query: {
           findOptions: options,
         },
@@ -39,20 +40,7 @@ export const DrivesPage = Shade<
           marginTop: '5em',
           flexDirection: 'column',
         }}>
-        <DataGrid
-          service={collectionService}
-          styles={{
-            wrapper: {
-              position: 'fixed',
-              top: '4em',
-              left: '0',
-              width: '100%',
-              height: 'calc(100% - 12em)',
-            },
-          }}
-          columns={['letter', 'physicalPath']}
-          headerComponents={{}}
-          rowComponents={{}}></DataGrid>
+        <FolderPanel service={collectionService} />
         <CreateDriveWizard
           onDriveAdded={() => collectionService.getEntries({ ...collectionService.querySettings.getValue() })}
         />
