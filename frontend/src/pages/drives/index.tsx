@@ -13,16 +13,19 @@ export const DrivesPage = Shade<
 >({
   shadowDomName: 'drives-page',
   getInitialState: ({ injector }) => ({
-    collectionService: new CollectionService<Drive>(async (options) => {
-      const data = await injector.getInstance(DrivesApiClient).call({
-        method: 'GET',
-        action: '/volumes',
-        query: {
-          findOptions: options,
-        },
-      })
-      return data.result
-    }, {}),
+    collectionService: new CollectionService<Drive>({
+      loader: async (options) => {
+        const data = await injector.getInstance(DrivesApiClient).call({
+          method: 'GET',
+          action: '/volumes',
+          query: {
+            findOptions: options,
+          },
+        })
+        return data.result
+      },
+      defaultSettings: {},
+    }),
   }),
   render: ({ getState }) => {
     const { collectionService } = getState()

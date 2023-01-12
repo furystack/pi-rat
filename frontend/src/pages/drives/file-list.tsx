@@ -8,35 +8,38 @@ export const FileList = Shade<
   { service: CollectionService<DirectoryEntry> }
 >({
   getInitialState: ({ props, injector }) => ({
-    service: new CollectionService(async () => {
-      if (!props.currentDriveLetter || !props.currentPath) {
-        return { count: 0, entries: [] }
-      }
+    service: new CollectionService({
+      loader: async () => {
+        if (!props.currentDriveLetter || !props.currentPath) {
+          return { count: 0, entries: [] }
+        }
 
-      const up: DirectoryEntry = {
-        name: '..',
-        isDirectory: true,
-        isBlockDevice: false,
-        isCharacterDevice: false,
-        isFIFO: false,
-        isFile: false,
-        isSocket: false,
-        isSymbolicLink: false,
-      }
+        const up: DirectoryEntry = {
+          name: '..',
+          isDirectory: true,
+          isBlockDevice: false,
+          isCharacterDevice: false,
+          isFIFO: false,
+          isFile: false,
+          isSocket: false,
+          isSymbolicLink: false,
+        }
 
-      const result = await injector.getInstance(DrivesApiClient).call({
-        method: 'GET',
-        action: '/files/:letter/:path',
-        url: {
-          letter: props.currentDriveLetter,
-          path: encodeURIComponent(props.currentPath),
-        },
-      })
-      if (props.currentPath !== '/') {
-        return { ...result.result, entries: [up, ...result.result.entries] }
-      }
-      return result.result
-    }, {}),
+        const result = await injector.getInstance(DrivesApiClient).call({
+          method: 'GET',
+          action: '/files/:letter/:path',
+          url: {
+            letter: props.currentDriveLetter,
+            path: encodeURIComponent(props.currentPath),
+          },
+        })
+        if (props.currentPath !== '/') {
+          return { ...result.result, entries: [up, ...result.result.entries] }
+        }
+        return result.result
+      },
+      defaultSettings: {},
+    }),
   }),
   shadowDomName: 'file-list',
   render: ({ getState, props }) => {
