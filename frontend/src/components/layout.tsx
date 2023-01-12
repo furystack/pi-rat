@@ -7,11 +7,6 @@ import { Header } from './header'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
-  resources: ({ injector, element }) => [
-    injector.getInstance(ThemeProviderService).theme.subscribe((newTheme) => {
-      ;(element.firstChild as any).style.background = newTheme.background.default
-    }),
-  ],
   render: ({ injector }) => {
     return (
       <div
@@ -28,7 +23,7 @@ export const Layout = Shade({
           overflow: 'hidden',
           padding: '0',
           margin: '0',
-          backgroundColor: injector.getInstance(ThemeProviderService).theme.getValue().background.default,
+          backgroundColor: injector.getInstance(ThemeProviderService).theme.background.default,
         }}>
         <NotyList style={{ zIndex: '2' }} />
         <LazyLoad

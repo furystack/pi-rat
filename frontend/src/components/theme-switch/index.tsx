@@ -1,14 +1,36 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { ButtonProps, Theme } from '@furystack/shades-common-components'
+import type { ButtonProps } from '@furystack/shades-common-components'
+import { getCssVariable } from '@furystack/shades-common-components'
 import { Button, defaultDarkTheme, defaultLightTheme, ThemeProviderService } from '@furystack/shades-common-components'
+import { Trace } from '@furystack/utils'
 
-export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>, { theme: Theme }>({
+export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>, { theme: 'light' | 'dark' }>({
   shadowDomName: 'theme-switch',
-  getInitialState: ({ injector }) => ({
-    theme: injector.getInstance(ThemeProviderService).theme.getValue(),
-  }),
+  getInitialState: ({ injector }) => {
+    const themeProvider = injector.getInstance(ThemeProviderService)
+    return {
+      theme:
+        getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
+          ? 'dark'
+          : 'light',
+    }
+  },
   resources: ({ injector, updateState }) => {
-    return [injector.getInstance(ThemeProviderService).theme.subscribe((theme) => updateState({ theme }))]
+    const themeProvider = injector.getInstance(ThemeProviderService)
+    return [
+      Trace.method({
+        object: themeProvider,
+        method: themeProvider.set,
+        onFinished: () => {
+          updateState({
+            theme:
+              getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
+                ? 'dark'
+                : 'light',
+          })
+        },
+      }),
+    ]
   },
   render: ({ props, injector, getState }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
@@ -17,9 +39,9 @@ export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>, { theme: Theme }>
       <Button
         {...props}
         onclick={() => {
-          themeProvider.theme.setValue(theme === defaultDarkTheme ? defaultLightTheme : defaultDarkTheme)
+          themeProvider.set(theme === 'dark' ? defaultLightTheme : defaultDarkTheme)
         }}>
-        {theme === defaultDarkTheme ? '☀️' : '🌜'}
+        {theme === 'dark' ? '☀️' : '🌜'}
       </Button>
     )
   },
