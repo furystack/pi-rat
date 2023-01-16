@@ -24,7 +24,16 @@ export const FolderPanel = Shade<
     const { service } = props
     const { currentLetter, currentPath } = getState()
     return (
-      <Paper elevation={1}>
+      <Paper
+        elevation={1}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: '0',
+          flexShrink: '0',
+        }}>
         <DriveSelector currentDrive={service.focusedEntry} />
         <FileList
           currentDriveLetter={currentLetter}

@@ -66,85 +66,88 @@ export const Login = Shade<{}, { username: string; password: string; error: stri
     const sessinService = injector.getInstance(SessionService)
 
     return (
-      <Paper
+      <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
+          height: 'calc(100% - 64px)',
           alignItems: 'center',
           justifyContent: 'center',
-          marginTop: '50px',
+          paddingTop: '64px',
+          overflow: 'auto',
         }}>
-        <form
-          className="login-form"
-          style={{
-            minWidth: '300px',
-          }}
-          onsubmit={(ev) => {
-            ev.preventDefault()
-            const state = getState()
-            sessinService.login(state.username, state.password)
-          }}>
-          <h2>Login</h2>
-          <Input
-            labelTitle="User email"
-            name="username"
-            variant="outlined"
-            autofocus
-            required
-            disabled={isOperationInProgress}
-            placeholder="The user's login name"
-            value={username}
-            onTextChange={(newUserName) => updateState({ username: newUserName }, true)}
-            type="email"
-            getEndIcon={() => '👤'}
-            getHelperText={({ state }) => {
-              if (!state.validity.valid) {
-                if (state.validity.valueMissing) {
-                  return 'Please enter the email'
-                }
-                if (state.validity.typeMismatch) {
-                  return 'Please enter a valid email address'
-                }
-                return 'Please enter a valid email'
-              }
-              return 'The email of the user used to log in into the app'
-            }}
-          />
-          <Input
-            labelTitle="Password"
-            name="password"
-            variant="outlined"
-            required
-            disabled={isOperationInProgress}
-            placeholder="The password for the user"
-            value={password}
-            type="password"
-            getEndIcon={() => '🔑'}
-            getHelperText={({ state }) => {
-              if (!state.validity.valid) {
-                if (state.validity.valueMissing) {
-                  return 'Please enter the password'
-                }
-                return 'Please enter a valid password'
-              }
-              return 'The password of the user used to log in into the app'
-            }}
-            onTextChange={(newPassword) => updateState({ password: newPassword }, true)}
-          />
-          <div
+        <Paper>
+          <form
+            className="login-form"
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
-              padding: '1em 0',
+              minWidth: '300px',
+            }}
+            onsubmit={(ev) => {
+              ev.preventDefault()
+              const state = getState()
+              sessinService.login(state.username, state.password)
             }}>
-            {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />}
-            <LoginButton />
-          </div>
-        </form>
-      </Paper>
+            <h2>Login</h2>
+            <Input
+              labelTitle="User email"
+              name="username"
+              variant="outlined"
+              autofocus
+              required
+              disabled={isOperationInProgress}
+              placeholder="The user's login name"
+              value={username}
+              onTextChange={(newUserName) => updateState({ username: newUserName }, true)}
+              type="email"
+              getEndIcon={() => '👤'}
+              getHelperText={({ state }) => {
+                if (!state.validity.valid) {
+                  if (state.validity.valueMissing) {
+                    return 'Please enter the email'
+                  }
+                  if (state.validity.typeMismatch) {
+                    return 'Please enter a valid email address'
+                  }
+                  return 'Please enter a valid email'
+                }
+                return 'The email of the user used to log in into the app'
+              }}
+            />
+            <Input
+              labelTitle="Password"
+              name="password"
+              variant="outlined"
+              required
+              disabled={isOperationInProgress}
+              placeholder="The password for the user"
+              value={password}
+              type="password"
+              getEndIcon={() => '🔑'}
+              getHelperText={({ state }) => {
+                if (!state.validity.valid) {
+                  if (state.validity.valueMissing) {
+                    return 'Please enter the password'
+                  }
+                  return 'Please enter a valid password'
+                }
+                return 'The password of the user used to log in into the app'
+              }}
+              onTextChange={(newPassword) => updateState({ password: newPassword }, true)}
+            />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: 'row',
+                padding: '1em 0',
+              }}>
+              {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />}
+              <LoginButton />
+            </div>
+          </form>
+        </Paper>
+      </div>
     )
   },
 })

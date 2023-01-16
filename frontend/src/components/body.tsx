@@ -27,27 +27,21 @@ export const Body = Shade<
     ]
   },
   render: ({ getState }) => {
-    return (
-      <div id="Body">
-        {(() => {
-          switch (getState().sessionState) {
-            case 'authenticated':
-              return (
-                <Router
-                  routes={[
-                    { url: '/drives', routingOptions: { end: false }, component: () => <DrivesPage /> },
-                    { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
-                  ]}></Router>
-              )
-            case 'offline':
-              return <Offline />
-            case 'unauthenticated':
-              return <Login />
-            default:
-              return <Init />
-          }
-        })()}
-      </div>
-    )
+    switch (getState().sessionState) {
+      case 'authenticated':
+        return (
+          <Router
+            routes={[
+              { url: '/drives', routingOptions: { end: false }, component: () => <DrivesPage /> },
+              { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
+            ]}></Router>
+        )
+      case 'offline':
+        return <Offline />
+      case 'unauthenticated':
+        return <Login />
+      default:
+        return <Init />
+    }
   },
 })

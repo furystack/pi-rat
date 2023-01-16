@@ -1,4 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { ThemeProviderService } from '@furystack/shades-common-components'
 import { SessionService } from '../services/session'
 
 export const HelloWorld = Shade<{}, { userName: string }>({
@@ -12,7 +13,8 @@ export const HelloWorld = Shade<{}, { userName: string }>({
     }, true)
     return () => observable.dispose()
   },
-  render: ({ getState }) => {
+  render: ({ getState, injector }) => {
+    const { theme } = injector.getInstance(ThemeProviderService)
     return (
       <div style={{ overflow: 'auto', paddingTop: '64px' }}>
         <div
@@ -22,6 +24,7 @@ export const HelloWorld = Shade<{}, { userName: string }>({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            color: theme.text.secondary,
           }}>
           <h2> Hello, {getState().userName || 'unknown'} !</h2>
 

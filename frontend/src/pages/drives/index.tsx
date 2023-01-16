@@ -32,16 +32,14 @@ export const DrivesPage = Shade<
     return (
       <div
         style={{
-          position: 'fixed',
-          top: '0',
-          left: '0',
-          width: '100%',
-          height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginTop: '5em',
+          top: '48px',
+          position: 'fixed',
           flexDirection: 'column',
+          height: 'calc(100% - 48px)',
+          width: '100%',
         }}>
         <FolderPanel service={collectionService} />
         <CreateDriveWizard
