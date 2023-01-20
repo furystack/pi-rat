@@ -700,9 +700,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@furystack/shades-common-components@npm:4.0.0"
+"@furystack/shades-common-components@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@furystack/shades-common-components@npm:4.0.1"
   dependencies:
     "@furystack/core": ^11.2.3
     "@furystack/inject": ^7.1.5
@@ -710,7 +710,7 @@ __metadata:
     "@furystack/utils": ^3.1.5
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: 3020cfd4fa482a1d3746917ec98009284d43d2fe9d42d3d11193708072481043c07b173c058ecec05627e2bf020e95e77aaba9a447a579d61bbacc4c1e728ead
+  checksum: ef2a88c155b3223f0af217c2da8126cfb2727c856862fc680c82ff9c70ecde29aeb644657113588d40bc7a96496c256acfae7e866bda9aaca147e04cd209ed8b
   languageName: node
   linkType: hard
 
@@ -3064,7 +3064,7 @@ __metadata:
     "@furystack/rest": ^4.1.6
     "@furystack/rest-client-fetch": ^4.1.6
     "@furystack/shades": ^7.0.0
-    "@furystack/shades-common-components": ^4.0.0
+    "@furystack/shades-common-components": ^4.0.1
     "@furystack/shades-lottie": ^3.0.0
     "@furystack/utils": ^3.1.5
     "@types/node": ^18.11.18
