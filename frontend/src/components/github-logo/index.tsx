@@ -11,30 +11,25 @@ type GithubLogoProps = Omit<Partial<HTMLImageElement>, 'style' | 'src' | 'alt'> 
   style?: Partial<CSSStyleDeclaration> | undefined
 }
 
-export const GithubLogo = Shade<GithubLogoProps, { background: string }>({
+export const GithubLogo = Shade<GithubLogoProps>({
   shadowDomName: 'github-logo',
-  getInitialState: ({ injector }) => {
+
+  render: ({ props, useDisposable, useState, injector }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
-    const value = themeProvider.getTextColor(themeProvider.theme.background.paper, 'light', 'dark')
-    return {
-      background: value,
-    }
-  },
-  resources: ({ injector, updateState }) => {
-    const themeProvider = injector.getInstance(ThemeProviderService)
-    return [
+    const [theme, setTheme] = useState(
+      'themeName',
+      themeProvider.getTextColor(themeProvider.theme.background.paper, 'light', 'dark'),
+    )
+    useDisposable('themeChange', () =>
       Trace.method({
         object: themeProvider,
         method: themeProvider.set,
         onFinished: () => {
           const value = themeProvider.getTextColor(themeProvider.theme.background.paper, 'light', 'dark')
-          updateState({ background: value })
+          setTheme(value)
         },
       }),
-    ]
-  },
-  render: ({ props, getState }) => {
-    const { background } = getState()
-    return <img {...props} src={background === 'dark' ? ghLight : ghDark} alt="gh-logo" />
+    )
+    return <img {...props} src={theme === 'dark' ? ghLight : ghDark} alt="gh-logo" />
   },
 })

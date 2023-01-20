@@ -4,37 +4,29 @@ import { getCssVariable } from '@furystack/shades-common-components'
 import { Button, defaultDarkTheme, defaultLightTheme, ThemeProviderService } from '@furystack/shades-common-components'
 import { Trace } from '@furystack/utils'
 
-export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>, { theme: 'light' | 'dark' }>({
+export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>>({
   shadowDomName: 'theme-switch',
-  getInitialState: ({ injector }) => {
+  render: ({ props, injector, useState, useDisposable }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
-    return {
-      theme:
-        getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
-          ? 'dark'
-          : 'light',
-    }
-  },
-  resources: ({ injector, updateState }) => {
-    const themeProvider = injector.getInstance(ThemeProviderService)
-    return [
+    const [theme, setTheme] = useState<'light' | 'dark'>(
+      'theme',
+      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default ? 'dark' : 'light',
+    )
+
+    useDisposable('traceThemeChange', () =>
       Trace.method({
         object: themeProvider,
         method: themeProvider.set,
         onFinished: () => {
-          updateState({
-            theme:
-              getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
-                ? 'dark'
-                : 'light',
-          })
+          setTheme(
+            getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
+              ? 'dark'
+              : 'light',
+          )
         },
       }),
-    ]
-  },
-  render: ({ props, injector, getState }) => {
-    const themeProvider = injector.getInstance(ThemeProviderService)
-    const { theme } = getState()
+    )
+
     return (
       <Button
         {...props}

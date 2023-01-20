@@ -5,30 +5,26 @@ import { DrivesApiClient } from '../../services/drives-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
 import { FolderPanel } from './folder-panel'
 
-export const DrivesPage = Shade<
-  unknown,
-  {
-    collectionService: CollectionService<Drive>
-  }
->({
+export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
-  getInitialState: ({ injector }) => ({
-    collectionService: new CollectionService<Drive>({
-      loader: async (options) => {
-        const data = await injector.getInstance(DrivesApiClient).call({
-          method: 'GET',
-          action: '/volumes',
-          query: {
-            findOptions: options,
+  render: ({ useDisposable, injector }) => {
+    const collectionService = useDisposable(
+      'service',
+      () =>
+        new CollectionService<Drive>({
+          loader: async (options) => {
+            const data = await injector.getInstance(DrivesApiClient).call({
+              method: 'GET',
+              action: '/volumes',
+              query: {
+                findOptions: options,
+              },
+            })
+            return data.result
           },
-        })
-        return data.result
-      },
-      defaultSettings: {},
-    }),
-  }),
-  render: ({ getState }) => {
-    const { collectionService } = getState()
+          defaultSettings: {},
+        }),
+    )
     return (
       <div
         style={{
