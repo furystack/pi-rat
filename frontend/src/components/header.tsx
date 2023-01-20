@@ -1,7 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { AppBar, AppBarLink, Button, ThemeProviderService } from '@furystack/shades-common-components'
+import { AppBar,AppBarLink, Button } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options'
-import type { SessionState } from '../services/session'
 import { SessionService } from '../services/session'
 import { GithubLogo } from './github-logo'
 import { ThemeSwitch } from './theme-switch'
@@ -11,21 +10,15 @@ export interface HeaderProps {
   links: Array<{ name: string; url: string }>
 }
 
-export const Header = Shade<HeaderProps, { sessionState: SessionState; themeProvider: ThemeProviderService }>({
+const urlStyle: Partial<CSSStyleDeclaration> = {
+  color: '#aaa',
+  textDecoration: 'none',
+}
+
+export const Header = Shade<HeaderProps>({
   shadowDomName: 'shade-app-header',
-  getInitialState: ({ injector }) => ({
-    sessionState: injector.getInstance(SessionService).state.getValue(),
-    themeProvider: injector.getInstance(ThemeProviderService),
-  }),
-  resources: ({ injector, updateState }) => {
-    return [
-      injector.getInstance(SessionService).state.subscribe((newState) => {
-        updateState({ sessionState: newState })
-      }),
-    ]
-  },
-  render: ({ props, injector, getState }) => {
-    const { sessionState } = getState()
+  render: ({ props, injector, useObservable }) => {
+    const [sessionState] = useObservable('sessionState', injector.getInstance(SessionService).state)
     return (
       <AppBar id="header">
         <AppBarLink title={props.title} href="/">

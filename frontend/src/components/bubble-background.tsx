@@ -1,4 +1,4 @@
-import { createFragment, createComponent, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 
 const randomInRange = (min: number, max: number) =>
   Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1) + Math.ceil(min))

@@ -14,7 +14,7 @@ interface QueryStringVariableOptions<T> {
 export class QueryStringVariable<T> implements Disposable {
   public readonly currentValue = new ObservableValue<T | undefined>(this.options.defaultValue)
 
-  private locationObserver = this.options.locationService.onLocationChanged.subscribe(() => {
+  private locationObserver = this.options.locationService.onLocationPathChanged.subscribe(() => {
     const params = new URLSearchParams(location.search)
     this.currentValue.setValue(
       (deserializeQueryString(params.get(this.options.key) as string) as T) || this.options.defaultValue,
@@ -48,7 +48,7 @@ export const useQueryStringVariable = <T>({
 }) => {
   const locationService = injector.getInstance(LocationService)
   const value = new ObservableValue<T>(defaultValue)
-  const locationListener = locationService.onLocationChanged.subscribe(() => {
+  const locationListener = locationService.onLocationPathChanged.subscribe(() => {
     const params = new URLSearchParams(location.search)
     value.setValue((deserializeQueryString(params.get(key) as string) as T) || defaultValue)
   }, true)

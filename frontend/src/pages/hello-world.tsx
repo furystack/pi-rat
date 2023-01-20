@@ -2,18 +2,10 @@ import { Shade, createComponent } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { SessionService } from '../services/session'
 
-export const HelloWorld = Shade<{}, { userName: string }>({
+export const HelloWorld = Shade({
   shadowDomName: 'hello-world',
-  getInitialState: () => ({
-    userName: '',
-  }),
-  constructed: async ({ injector, updateState }) => {
-    const observable = injector.getInstance(SessionService).currentUser.subscribe((usr) => {
-      updateState({ userName: usr ? usr.username : '' })
-    }, true)
-    return () => observable.dispose()
-  },
-  render: ({ getState, injector }) => {
+  render: ({ useObservable, injector }) => {
+    const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
     const { theme } = injector.getInstance(ThemeProviderService)
     return (
       <div style={{ overflow: 'auto', paddingTop: '64px' }}>
@@ -26,7 +18,7 @@ export const HelloWorld = Shade<{}, { userName: string }>({
             justifyContent: 'center',
             color: theme.text.secondary,
           }}>
-          <h2> Hello, {getState().userName || 'unknown'} !</h2>
+          <h2> Hello, {currentUser?.username || 'unknown'} !</h2>
 
           <div style={{ margin: '2em' }}>
             <h3>Egyesült Államok</h3>

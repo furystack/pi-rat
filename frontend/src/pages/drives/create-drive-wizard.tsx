@@ -1,4 +1,4 @@
-import { createComponent, createFragment, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
 import { Button, fadeIn, fadeOut, Input, Modal, Wizard } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
@@ -67,14 +67,10 @@ export const AddDriveStep = Shade<WizardStepProps>({
   },
 })
 
-export const CreateDriveWizard = Shade<{ onDriveAdded: () => void }, { isOpened: ObservableValue<boolean> }>({
+export const CreateDriveWizard = Shade<{ onDriveAdded: () => void }>({
   shadowDomName: 'create-drive-wizard',
-  getInitialState: () => ({ isOpened: new ObservableValue(false) }),
-  constructed: ({ getState }) => {
-    return () => getState().isOpened.dispose()
-  },
-  render: ({ getState, props }) => {
-    const { isOpened } = getState()
+  render: ({ useDisposable, props }) => {
+    const isOpened = useDisposable('isOpened', () => new ObservableValue(false))
     return (
       <>
         <Modal

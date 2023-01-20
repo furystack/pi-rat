@@ -3,34 +3,19 @@ import type { CollectionService } from '@furystack/shades-common-components'
 import { Paper } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
 import type { Drive } from 'common'
-import { useQueryStringVariable } from '../../services/query-string-service'
 import { DriveSelector } from './drive-selector'
 import { FileList } from './file-list'
 
-export const FolderPanel = Shade<
-  { service: CollectionService<Drive>; urlDrive?: string },
-  { currentLetter?: string; currentPath?: string }
->({
+export const FolderPanel = Shade<{ service: CollectionService<Drive> }>({
   shadowDomName: 'folder-panel',
-  resources: ({ props, updateState, injector }) => [
-    props.service.focusedEntry.subscribe((drive) => {
-      updateState({ currentLetter: drive?.letter, currentPath: '/' })
-    }),
-    useQueryStringVariable({
-      injector,
-      key: 'drive',
-      defaultValue: props.service.data.getValue().entries[0]?.letter,
-      updateStrategy: 'push',
-    }),
-  ],
-  getInitialState: ({ props }) => ({
-    currentPath: '/',
-  }),
-  render: ({ props, getState, updateState, element }) => {
+  render: ({ props, useState, useObservable }) => {
     const { service } = props
-    const { currentLetter, currentPath } = getState()
-    element.style.height = '100%'
-    element.style.width = '100%'
+    const [currentLetter, setCurrentLetter] = useState<string | undefined>('currentLetter', undefined)
+    const [currentPath, setCurrentPath] = useState('currentPath', '/')
+    useObservable('currentLetterObservable', service.focusedEntry, (entry) => {
+      setCurrentLetter(entry?.letter)
+      setCurrentPath('/')
+    })
     return (
       <Paper
         elevation={1}
@@ -54,7 +39,7 @@ export const FolderPanel = Shade<
                     ? PathHelper.getParentPath(currentPath)
                     : '/'
                   : PathHelper.joinPaths(currentPath || '/', v.name)
-              updateState({ currentPath: newPath })
+              setCurrentPath(newPath)
             }
             console.log('onActivate', v)
           }}

@@ -5,50 +5,43 @@ import { DrivesApiClient } from '../../services/drives-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
 import { FolderPanel } from './folder-panel'
 
-export const DrivesPage = Shade<
-  unknown,
-  {
-    leftDrivesCollectionService: CollectionService<Drive>
-    rightDrivesCollectionService: CollectionService<Drive>
-  }
->({
+export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
-  getInitialState: ({ injector }) => {
-    const leftDrivesCollectionService = new CollectionService<Drive>({
-      loader: async (options) => {
-        const data = await injector.getInstance(DrivesApiClient).call({
-          method: 'GET',
-          action: '/volumes',
-          query: {
-            findOptions: options,
+  render: ({ useDisposable, injector }) => {
+    const leftDrivesCollectionService = useDisposable(
+      'leftService',
+      () =>
+        new CollectionService<Drive>({
+          loader: async (options) => {
+            const data = await injector.getInstance(DrivesApiClient).call({
+              method: 'GET',
+              action: '/volumes',
+              query: {
+                findOptions: options,
+              },
+            })
+            return data.result
           },
-        })
-        return data.result
-      },
-      defaultSettings: {},
-    })
-    const rightDrivesCollectionService = new CollectionService<Drive>({
-      loader: async (options) => {
-        const data = await injector.getInstance(DrivesApiClient).call({
-          method: 'GET',
-          action: '/volumes',
-          query: {
-            findOptions: options,
+          defaultSettings: {},
+        }),
+    )
+    const rightDrivesCollectionService = useDisposable(
+      'rightService',
+      () =>
+        new CollectionService<Drive>({
+          loader: async (options) => {
+            const data = await injector.getInstance(DrivesApiClient).call({
+              method: 'GET',
+              action: '/volumes',
+              query: {
+                findOptions: options,
+              },
+            })
+            return data.result
           },
-        })
-        return data.result
-      },
-      defaultSettings: {},
-    })
-    leftDrivesCollectionService.getEntries({ ...leftDrivesCollectionService.querySettings.getValue() })
-    rightDrivesCollectionService.getEntries({ ...rightDrivesCollectionService.querySettings.getValue() })
-    return {
-      leftDrivesCollectionService,
-      rightDrivesCollectionService,
-    }
-  },
-  render: ({ getState }) => {
-    const { leftDrivesCollectionService, rightDrivesCollectionService } = getState()
+          defaultSettings: {},
+        }),
+    )
     return (
       <div
         style={{

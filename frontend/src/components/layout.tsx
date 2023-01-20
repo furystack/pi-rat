@@ -1,4 +1,4 @@
-import { createComponent, createFragment, Shade, LazyLoad } from '@furystack/shades'
+import { createComponent, Shade, LazyLoad } from '@furystack/shades'
 import { NotyList } from '@furystack/shades-common-components'
 import { Button, Loader, Paper, ThemeProviderService } from '@furystack/shades-common-components'
 import { InstallApiClient } from '../services/install-api-client'

@@ -1,11 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button } from '@furystack/shades-common-components'
 
-export const ButtonsDemo = Shade<unknown, { disabled: boolean }>({
-  getInitialState: () => ({ disabled: false }),
+export const ButtonsDemo = Shade({
   shadowDomName: 'buttons-demo',
-  render: ({ getState, updateState }) => {
-    const { disabled } = getState()
+  render: ({ useState }) => {
+    const [disabled, setDisabled] = useState('disabled', false)
     const txt = 'Button Text'
     const onclick = () => {
       /** */
@@ -69,7 +68,7 @@ export const ButtonsDemo = Shade<unknown, { disabled: boolean }>({
         </div>
         <Button
           onclick={() => {
-            updateState({ disabled: !getState().disabled })
+            setDisabled(!disabled)
           }}>
           Disable All
         </Button>
