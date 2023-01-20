@@ -5,7 +5,7 @@ test('Setup Project @install', async ({ page }) => {
 
   const welcomeText = await page.locator('h1', { hasText: 'Welcome to PI-RAT Installer' })
   await expect(welcomeText).toBeVisible()
-  const nextButton1 = await page.locator('button', { hasText: 'Next' })
+  const nextButton1 = await page.locator('shade-button', { hasText: 'Next' })
   await expect(nextButton1).toBeVisible()
   await nextButton1.click()
 
@@ -35,7 +35,7 @@ test('Setup Project @install', async ({ page }) => {
 
   const allDoneTitle = await page.locator('h1', { hasText: 'All Done!' })
   await expect(allDoneTitle).toBeVisible()
-  const finishButton = await page.locator('button', { hasText: 'Finish' })
+  const finishButton = await page.locator('shade-button', { hasText: 'Finish' })
   await expect(finishButton).toBeVisible()
   finishButton.click()
 
