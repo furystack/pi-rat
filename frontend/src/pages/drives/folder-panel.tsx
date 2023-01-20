@@ -6,23 +6,16 @@ import type { Drive } from 'common'
 import { DriveSelector } from './drive-selector'
 import { FileList } from './file-list'
 
-export const FolderPanel = Shade<
-  { service: CollectionService<Drive> },
-  { currentLetter?: string; currentPath?: string }
->({
+export const FolderPanel = Shade<{ service: CollectionService<Drive> }>({
   shadowDomName: 'folder-panel',
-  resources: ({ props, updateState }) => [
-    props.service.focusedEntry.subscribe((drive) => {
-      updateState({ currentLetter: drive?.letter, currentPath: '/' })
-    }),
-  ],
-  getInitialState: () => ({
-    currentLetter: undefined,
-    currentPath: undefined,
-  }),
-  render: ({ props, getState, updateState }) => {
+  render: ({ props, useState, useObservable }) => {
     const { service } = props
-    const { currentLetter, currentPath } = getState()
+    const [currentLetter, setCurrentLetter] = useState<string | undefined>('currentLetter', undefined)
+    const [currentPath, setCurrentPath] = useState('currentPath', '/')
+    useObservable('currentLetterObservable', service.focusedEntry, (entry) => {
+      setCurrentLetter(entry?.letter)
+      setCurrentPath('/')
+    })
     return (
       <Paper elevation={1}>
         <DriveSelector currentDrive={service.focusedEntry} />
@@ -37,7 +30,7 @@ export const FolderPanel = Shade<
                     ? PathHelper.getParentPath(currentPath)
                     : '/'
                   : PathHelper.joinPaths(currentPath || '/', v.name)
-              updateState({ currentPath: newPath })
+              setCurrentPath(newPath)
             }
             console.log('onActivate', v)
           }}

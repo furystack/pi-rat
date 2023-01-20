@@ -1,7 +1,6 @@
 import { createComponent, RouteLink, Shade } from '@furystack/shades'
-import { AppBar, Button, ThemeProviderService } from '@furystack/shades-common-components'
+import { AppBar, Button } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options'
-import type { SessionState } from '../services/session'
 import { SessionService } from '../services/session'
 import { GithubLogo } from './github-logo'
 import { ThemeSwitch } from './theme-switch'
@@ -16,19 +15,10 @@ const urlStyle: Partial<CSSStyleDeclaration> = {
   textDecoration: 'none',
 }
 
-export const Header = Shade<HeaderProps, { sessionState: SessionState; themeProvider: ThemeProviderService }>({
+export const Header = Shade<HeaderProps>({
   shadowDomName: 'shade-app-header',
-  getInitialState: ({ injector }) => ({
-    sessionState: injector.getInstance(SessionService).state.getValue(),
-    themeProvider: injector.getInstance(ThemeProviderService),
-  }),
-  constructed: ({ injector, updateState }) => {
-    const observable = injector.getInstance(SessionService).state.subscribe((newState) => {
-      updateState({ sessionState: newState })
-    })
-    return () => observable.dispose()
-  },
-  render: ({ props, injector, getState }) => {
+  render: ({ props, injector, useObservable }) => {
+    const [sessionState] = useObservable('sessionState', injector.getInstance(SessionService).state)
     return (
       <AppBar id="header">
         <h3 style={{ margin: '0 2em 0 0', cursor: 'pointer' }}>
@@ -49,7 +39,7 @@ export const Header = Shade<HeaderProps, { sessionState: SessionState; themeProv
               <GithubLogo style={{ height: '1em' }} />
             </Button>
           </a>
-          {getState().sessionState === 'authenticated' ? (
+          {sessionState === 'authenticated' ? (
             <Button variant="outlined" onclick={() => injector.getInstance(SessionService).logout()}>
               Log Out
             </Button>
