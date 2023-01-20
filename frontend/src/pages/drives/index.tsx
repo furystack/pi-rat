@@ -8,12 +8,13 @@ import { FolderPanel } from './folder-panel'
 export const DrivesPage = Shade<
   unknown,
   {
-    collectionService: CollectionService<Drive>
+    leftDrivesCollectionService: CollectionService<Drive>
+    rightDrivesCollectionService: CollectionService<Drive>
   }
 >({
   shadowDomName: 'drives-page',
-  getInitialState: ({ injector }) => ({
-    collectionService: new CollectionService<Drive>({
+  getInitialState: ({ injector }) => {
+    const leftDrivesCollectionService = new CollectionService<Drive>({
       loader: async (options) => {
         const data = await injector.getInstance(DrivesApiClient).call({
           method: 'GET',
@@ -25,10 +26,29 @@ export const DrivesPage = Shade<
         return data.result
       },
       defaultSettings: {},
-    }),
-  }),
+    })
+    const rightDrivesCollectionService = new CollectionService<Drive>({
+      loader: async (options) => {
+        const data = await injector.getInstance(DrivesApiClient).call({
+          method: 'GET',
+          action: '/volumes',
+          query: {
+            findOptions: options,
+          },
+        })
+        return data.result
+      },
+      defaultSettings: {},
+    })
+    leftDrivesCollectionService.getEntries({ ...leftDrivesCollectionService.querySettings.getValue() })
+    rightDrivesCollectionService.getEntries({ ...rightDrivesCollectionService.querySettings.getValue() })
+    return {
+      leftDrivesCollectionService,
+      rightDrivesCollectionService,
+    }
+  },
   render: ({ getState }) => {
-    const { collectionService } = getState()
+    const { leftDrivesCollectionService, rightDrivesCollectionService } = getState()
     return (
       <div
         style={{
@@ -37,13 +57,18 @@ export const DrivesPage = Shade<
           justifyContent: 'center',
           top: '48px',
           position: 'fixed',
-          flexDirection: 'column',
+          flexDirection: 'row',
+          gap: '8px',
           height: 'calc(100% - 48px)',
           width: '100%',
         }}>
-        <FolderPanel service={collectionService} />
+        <FolderPanel service={leftDrivesCollectionService} />
+        <FolderPanel service={rightDrivesCollectionService} />
         <CreateDriveWizard
-          onDriveAdded={() => collectionService.getEntries({ ...collectionService.querySettings.getValue() })}
+          onDriveAdded={() => {
+            leftDrivesCollectionService.getEntries({ ...leftDrivesCollectionService.querySettings.getValue() })
+            rightDrivesCollectionService.getEntries({ ...rightDrivesCollectionService.querySettings.getValue() })
+          }}
         />
       </div>
     )
