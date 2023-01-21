@@ -92,6 +92,52 @@
       ],
       "additionalProperties": false
     },
+    "UploadEndpoint": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            },
+            "entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DirectoryEntry"
+              }
+            }
+          },
+          "required": [
+            "success",
+            "entries"
+          ],
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "letter",
+            "path"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "result",
+        "url"
+      ],
+      "additionalProperties": false
+    },
     "DrivesApi": {
       "type": "object",
       "properties": {
@@ -121,34 +167,13 @@
             "/volumes": {
               "$ref": "#/definitions/PostEndpoint%3CDrive%2C%22letter%22%3E"
             },
-            "/volumes/:id/upload": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "const": true
-                    }
-                  },
-                  "required": [
-                    "success"
-                  ],
-                  "additionalProperties": false
-                },
-                "body": {}
-              },
-              "required": [
-                "result",
-                "body"
-              ],
-              "additionalProperties": false
+            "/volumes/:letter/:path/upload": {
+              "$ref": "#/definitions/UploadEndpoint"
             }
           },
           "required": [
             "/volumes",
-            "/volumes/:id/upload"
+            "/volumes/:letter/:path/upload"
           ],
           "additionalProperties": false
         },

@@ -5,7 +5,6 @@ import {
   createGetEntityEndpoint,
   createPatchEndpoint,
   createPostEndpoint,
-  JsonResult,
   useRestService,
   Validate,
 } from '@furystack/rest-service'
@@ -15,6 +14,7 @@ import type { Injector } from '@furystack/inject'
 import { GetDirectoryEntriesAction } from './actions/get-directory-entries'
 import { getPort } from '../get-port'
 import { getCorsOptions } from '../get-cors-options'
+import { UploadAction } from './actions/upload-action'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({
@@ -24,15 +24,6 @@ export const setupDrivesRestApi = async (injector: Injector) => {
     cors: getCorsOptions(),
     api: {
       GET: {
-        '/volumes': Validate({
-          schema: drivesApiSchema,
-          schemaName: 'GetCollectionEndpoint<Drive>',
-        })(
-          createGetCollectionEndpoint({
-            model: Drive,
-            primaryKey: 'letter',
-          }),
-        ),
         '/volumes/:id': Validate({
           schema: drivesApiSchema,
           schemaName: 'GetEntityEndpoint<Drive,"letter">',
@@ -42,23 +33,27 @@ export const setupDrivesRestApi = async (injector: Injector) => {
             primaryKey: 'letter',
           }),
         ),
+        '/volumes': Validate({
+          schema: drivesApiSchema,
+          schemaName: 'GetCollectionEndpoint<Drive>',
+        })(
+          createGetCollectionEndpoint({
+            model: Drive,
+            primaryKey: 'letter',
+          }),
+        ),
         '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'GetDirectoryEntries' })(
           GetDirectoryEntriesAction,
         ),
       },
       POST: {
+        '/volumes/:letter/:path/upload': UploadAction,
         '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostEndpoint<Drive,"letter">' })(
           createPostEndpoint({
             model: Drive,
             primaryKey: 'letter',
           }),
         ),
-        '/volumes/:id/upload': async (args) => {
-          // TODO: Implement file upload
-          const body = await args.getBody()
-          console.log(body)
-          return JsonResult({ success: true })
-        },
       },
       PATCH: {
         '/volumes/:id': createPatchEndpoint({

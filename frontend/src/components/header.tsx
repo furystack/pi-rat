@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { AppBar,AppBarLink, Button } from '@furystack/shades-common-components'
+import { AppBar, AppBarLink, Button } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options'
 import { SessionService } from '../services/session'
 import { GithubLogo } from './github-logo'
@@ -8,11 +8,6 @@ import { ThemeSwitch } from './theme-switch'
 export interface HeaderProps {
   title: string
   links: Array<{ name: string; url: string }>
-}
-
-const urlStyle: Partial<CSSStyleDeclaration> = {
-  color: '#aaa',
-  textDecoration: 'none',
 }
 
 export const Header = Shade<HeaderProps>({
