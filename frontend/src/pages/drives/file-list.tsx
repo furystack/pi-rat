@@ -15,9 +15,7 @@ export const FileList = Shade<{
     const { currentDriveLetter, currentPath } = props
 
     const client = injector.getInstance(DrivesApiClient)
-
     const notyService = injector.getInstance(NotyService)
-
     const refetch = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
 
     const service = useDisposable(
@@ -58,7 +56,6 @@ export const FileList = Shade<{
     )
 
     useObservable('onDriveChange', props.currentDriveLetter, refetch)
-
     useObservable('onFolderChange', props.currentPath, refetch)
 
     const activate = () => {
