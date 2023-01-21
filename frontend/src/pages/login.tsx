@@ -60,7 +60,7 @@ export const Login = Shade({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
+          height: 'calc(100% - 64px)',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '0 100px',

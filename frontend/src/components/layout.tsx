@@ -43,8 +43,16 @@ export const Layout = Shade({
             if (result.state === 'installed') {
               return (
                 <>
-                  <Header title="🐀 PI-Rat" links={[]} />
-                  <Body style={{ width: '100%', height: '100%', overflow: 'auto' }} />
+                  <Header
+                    title="🐀 PI-Rat"
+                    links={[
+                      {
+                        name: '☁️ Drives',
+                        url: '/drives',
+                      },
+                    ]}
+                  />
+                  <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} />
                 </>
               )
             } else {

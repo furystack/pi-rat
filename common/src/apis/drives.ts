@@ -18,6 +18,14 @@ export type GetDirectoryEntries = {
   result: GetCollectionResult<DirectoryEntry>
 }
 
+export type UploadEndpoint = {
+  result: { success: true; entries: DirectoryEntry[] }
+  url: {
+    letter: string
+    path: string
+  }
+}
+
 export interface DrivesApi extends RestApi {
   GET: {
     '/volumes': GetCollectionEndpoint<Drive>
@@ -26,7 +34,7 @@ export interface DrivesApi extends RestApi {
   }
   POST: {
     '/volumes': PostEndpoint<Drive, 'letter'>
-    '/volumes/:id/upload': { result: { success: true }; body: any }
+    '/volumes/:letter/:path/upload': UploadEndpoint
   }
   PATCH: {
     '/volumes/:id': PatchEndpoint<Drive, 'letter'>

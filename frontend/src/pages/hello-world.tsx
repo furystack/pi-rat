@@ -1,10 +1,12 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { ThemeProviderService } from '@furystack/shades-common-components'
 import { SessionService } from '../services/session'
 
 export const HelloWorld = Shade({
   shadowDomName: 'hello-world',
   render: ({ useObservable, injector }) => {
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
+    const { theme } = injector.getInstance(ThemeProviderService)
     return (
       <div style={{ overflow: 'auto', paddingTop: '64px' }}>
         <div
@@ -14,6 +16,7 @@ export const HelloWorld = Shade({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            color: theme.text.secondary,
           }}>
           <h2> Hello, {currentUser?.username || 'unknown'} !</h2>
 
