@@ -1,7 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { CollectionService, DataGrid, SelectionCell } from '@furystack/shades-common-components'
+import { CollectionService, DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
 import type { DirectoryEntry } from 'common/src/models/directory-entry'
+import { environmentOptions } from '../../environment-options'
 import { DrivesApiClient } from '../../services/drives-api-client'
 
 export const FileList = Shade<{
@@ -12,6 +13,12 @@ export const FileList = Shade<{
   shadowDomName: 'file-list',
   render: ({ useDisposable, props, injector, useObservable }) => {
     const { currentDriveLetter, currentPath } = props
+
+    const client = injector.getInstance(DrivesApiClient)
+
+    const notyService = injector.getInstance(NotyService)
+
+    const refetch = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
 
     const service = useDisposable(
       'service',
@@ -33,7 +40,7 @@ export const FileList = Shade<{
               isSymbolicLink: false,
             }
 
-            const result = await injector.getInstance(DrivesApiClient).call({
+            const result = await client.call({
               method: 'GET',
               action: '/files/:letter/:path',
               url: {
@@ -50,13 +57,9 @@ export const FileList = Shade<{
         }),
     )
 
-    useObservable('onDriveChange', props.currentDriveLetter, () => {
-      service.querySettings.setValue({ ...service.querySettings.getValue() })
-    })
+    useObservable('onDriveChange', props.currentDriveLetter, refetch)
 
-    useObservable('onFolderChange', props.currentPath, () => {
-      service.querySettings.setValue({ ...service.querySettings.getValue() })
-    })
+    useObservable('onFolderChange', props.currentPath, refetch)
 
     const activate = () => {
       const focused = service.focusedEntry.getValue()
@@ -78,6 +81,39 @@ export const FileList = Shade<{
 
     return (
       <div
+        ondragover={(ev) => {
+          ev.preventDefault()
+        }}
+        ondrop={async (ev) => {
+          ev.preventDefault()
+          if (ev.dataTransfer?.files) {
+            const formData = new FormData()
+            for (const file of ev.dataTransfer.files) {
+              formData.append('uploads', file)
+            }
+            await fetch(
+              `${environmentOptions.serviceUrl}/drives/volumes/${encodeURIComponent(
+                currentDriveLetter.getValue(),
+              )}/${encodeURIComponent(currentPath.getValue())}/upload`,
+              {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+              },
+            )
+              .then(() => {
+                refetch()
+                notyService.addNoty({
+                  type: 'success',
+                  title: 'Upload completed',
+                  body: <>The files are upploaded succesfully</>,
+                })
+              })
+              .catch((err) =>
+                notyService.addNoty({ title: 'Upload failed', body: <>{err.toString()}</>, type: 'error' }),
+              )
+          }
+        }}
         ondblclick={activate}
         onkeydown={(ev) => {
           if (ev.key === 'Enter') {

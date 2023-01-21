@@ -24,6 +24,7 @@ export type UploadEndpoint = {
     letter: string
     path: string
   }
+  body: any
 }
 
 export interface DrivesApi extends RestApi {
