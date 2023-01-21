@@ -25,7 +25,9 @@ export const Layout = Shade({
           margin: '0',
           backgroundColor: injector.getInstance(ThemeProviderService).theme.background.default,
         }}>
-        <NotyList style={{ zIndex: '2' }} />
+        <div style={{ zIndex: '2' }}>
+          <NotyList />
+        </div>
         <LazyLoad
           loader={<Loader style={{ width: '100px', height: '100px', alignSelf: 'center', justifySelf: 'center' }} />}
           error={(error, retry) => (

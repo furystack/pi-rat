@@ -4,6 +4,7 @@ import type { ObservableValue } from '@furystack/utils'
 import type { DirectoryEntry } from 'common/src/models/directory-entry'
 import { environmentOptions } from '../../environment-options'
 import { DrivesApiClient } from '../../services/drives-api-client'
+import { SessionService } from '../../services/session'
 
 export const FileList = Shade<{
   currentDriveLetter: ObservableValue<string>
@@ -84,6 +85,15 @@ export const FileList = Shade<{
         ondrop={async (ev) => {
           ev.preventDefault()
           if (ev.dataTransfer?.files) {
+            const session = injector.getInstance(SessionService)
+            if (!(await session.isAuthorized('admin'))) {
+              return notyService.addNoty({
+                type: 'warning',
+                title: 'Not authorized',
+                body: <>You are not authorized to upload files</>,
+              })
+            }
+
             const formData = new FormData()
             for (const file of ev.dataTransfer.files) {
               formData.append('uploads', file)

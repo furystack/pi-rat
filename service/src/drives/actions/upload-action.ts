@@ -11,13 +11,20 @@ import { existsAsync } from '../setup-drives'
 import type { DirectoryEntry } from 'common/src/models/directory-entry'
 import { join } from 'path'
 import { createDirentListFromFiles } from '../create-dirent-list-from-files'
+import { isAuthorized } from '@furystack/core'
 
 export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, getUrlParams, request }) => {
+  if (!isAuthorized(injector, 'admin')) {
+    throw new RequestError('Unauthorized', 401)
+  }
+
   const logger = getLogger(injector).withScope('UploadAction')
   const { letter, path } = getUrlParams()
   logger.verbose({ message: `Uploading file to ${letter}:${path}` })
 
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
+  const dataSet = getDataSetFor(injector, Drive, 'letter')
+
+  const drive = await dataSet.get(injector, letter)
 
   if (!drive) {
     throw new RequestError(`Drive ${letter} not found`, 404)
