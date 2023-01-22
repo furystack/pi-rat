@@ -70,6 +70,30 @@ export const FileList = Shade<{
         if (ev.key === 'Enter') {
           activate()
         }
+        if (ev.key === 'Delete') {
+          const focused = service.focusedEntry.getValue()
+          focused &&
+            client
+              .call({
+                method: 'DELETE',
+                action: '/files/:letter/:path',
+                url: {
+                  letter: currentDriveLetter.getValue(),
+                  path: encodeURIComponent(`${currentPath.getValue()}/${focused.name}`),
+                },
+              })
+              .then(() => {
+                refetch()
+                notyService.addNoty({
+                  type: 'success',
+                  title: 'Delete completed',
+                  body: <>The file is deleted succesfully</>,
+                })
+              })
+              .catch((err) =>
+                notyService.addNoty({ title: 'Delete failed', body: <>{err.toString()}</>, type: 'error' }),
+              )
+        }
       }
       window.addEventListener('keydown', listener)
       return {

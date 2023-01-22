@@ -27,6 +27,14 @@ export type UploadEndpoint = {
   body: any
 }
 
+export type DeleteFileEndpoint = {
+  url: {
+    letter: string
+    path: string
+  }
+  result: { success: true }
+}
+
 export interface DrivesApi extends RestApi {
   GET: {
     '/volumes': GetCollectionEndpoint<Drive>
@@ -42,5 +50,6 @@ export interface DrivesApi extends RestApi {
   }
   DELETE: {
     '/volumes/:id': DeleteEndpoint<Drive, 'letter'>
+    '/files/:letter/:path': DeleteFileEndpoint
   }
 }

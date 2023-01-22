@@ -130,11 +130,52 @@
             "path"
           ],
           "additionalProperties": false
-        }
+        },
+        "body": {}
       },
       "required": [
         "result",
-        "url"
+        "url",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "DeleteFileEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "letter",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
       ],
       "additionalProperties": false
     },
@@ -211,10 +252,14 @@
           "properties": {
             "/volumes/:id": {
               "$ref": "#/definitions/DeleteEndpoint%3CDrive%2C%22letter%22%3E"
+            },
+            "/files/:letter/:path": {
+              "$ref": "#/definitions/DeleteFileEndpoint"
             }
           },
           "required": [
-            "/volumes/:id"
+            "/volumes/:id",
+            "/files/:letter/:path"
           ],
           "additionalProperties": false
         },

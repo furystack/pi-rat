@@ -14,6 +14,6 @@
   },
   "dependencies": {
     "@furystack/core": "^11.2.3",
-    "@furystack/rest": "^4.1.6"
+    "@furystack/rest": "^4.1.7"
   }
 }
