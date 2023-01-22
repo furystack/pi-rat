@@ -1,6 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
+import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common/src/models/directory-entry'
 import { environmentOptions } from '../../environment-options'
 import { DrivesApiClient } from '../../services/drives-api-client'
@@ -70,6 +71,25 @@ export const FileList = Shade<{
         if (ev.key === 'Enter') {
           activate()
         }
+
+        // TODO
+        if (ev.key === 'F3') {
+          const focused = service.focusedEntry.getValue()
+          if (focused) {
+            const letter = currentDriveLetter.getValue()
+            const path = props.currentPath.getValue()
+            const url = `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
+              letter,
+            )}/${encodeURIComponent(PathHelper.joinPaths(path, focused.name))}/download`
+            const a = document.createElement('a') as HTMLAnchorElement
+            a.href = url
+            ;(a as any).download = focused.name
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+          }
+        }
+
         if (ev.key === 'Delete') {
           const focused = service.focusedEntry.getValue()
           focused &&
