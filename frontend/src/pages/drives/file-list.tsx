@@ -2,7 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
-import type { DirectoryEntry } from 'common/src/models/directory-entry'
+import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options'
 import { DrivesApiClient } from '../../services/drives-api-client'
 import { SessionService } from '../../services/session'
@@ -49,9 +49,9 @@ export const FileList = Shade<{
               },
             })
             if (currentPath.getValue() !== '/') {
-              return { ...result.result, entries: [up, ...result.result.entries] }
+              return { ...result.result, entries: [up, ...result.result.entries.sortBy('isDirectory', 'desc')] }
             }
-            return result.result
+            return { ...result.result, entries: result.result.entries.sortBy('isDirectory', 'desc') }
           },
           defaultSettings: {},
         }),
@@ -83,7 +83,8 @@ export const FileList = Shade<{
             )}/${encodeURIComponent(PathHelper.joinPaths(path, focused.name))}/download`
             const a = document.createElement('a') as HTMLAnchorElement
             a.href = url
-            ;(a as any).download = focused.name
+            a.target = '_blank'
+            a.download = focused.name
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
@@ -175,11 +176,22 @@ export const FileList = Shade<{
           service={service as any}
           autofocus
           columns={['id', 'name']}
-          headerComponents={{}}
+          headerComponents={{
+            id: () => <></>,
+          }}
           styles={{}}
           rowComponents={{
-            name: ({ name }) => <>{name}</>,
-            id: (entry) => <SelectionCell entry={entry} service={service} />,
+            id: (entry) => (
+              <div style={{ width: '48px' }}>
+                <SelectionCell entry={entry} service={service} />
+              </div>
+            ),
+            name: ({ name, isDirectory }) => (
+              <>
+                {isDirectory ? '📁' : '📄'}
+                {name}
+              </>
+            ),
           }}
         />
       </div>
