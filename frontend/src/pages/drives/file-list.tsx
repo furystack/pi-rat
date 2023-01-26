@@ -6,6 +6,8 @@ import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options'
 import { DrivesApiClient } from '../../services/drives-api-client'
 import { SessionService } from '../../services/session'
+import { BreadCrumbs } from './breadcrumbs'
+import { DirectoryEntryIcon } from './directory-entry-icon'
 
 export const FileList = Shade<{
   currentDriveLetter: ObservableValue<string>
@@ -175,22 +177,32 @@ export const FileList = Shade<{
         <DataGrid<DirectoryEntry & { id: any }>
           service={service as any}
           autofocus
-          columns={['id', 'name']}
+          columns={['id']}
           headerComponents={{
-            id: () => <></>,
+            id: () => <BreadCrumbs currentDrive={currentDriveLetter} currentPath={currentPath} />,
           }}
           styles={{}}
           rowComponents={{
             id: (entry) => (
-              <div style={{ width: '48px' }}>
-                <SelectionCell entry={entry} service={service} />
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  gap: '16px',
+                }}
+                title={entry.name}>
+                <div>
+                  <SelectionCell entry={entry} service={service} />
+                </div>
+                <div>
+                  <DirectoryEntryIcon entry={entry} />
+                </div>
+                <div style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '35vw', overflow: 'hidden' }}>
+                  {entry.name}
+                </div>
               </div>
-            ),
-            name: ({ name, isDirectory }) => (
-              <>
-                {isDirectory ? '📁' : '📄'}
-                {name}
-              </>
             ),
           }}
         />

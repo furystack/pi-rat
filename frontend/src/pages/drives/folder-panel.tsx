@@ -24,7 +24,9 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
       true,
     )
     element.style.height = '100%'
-    element.style.width = '100%'
+    element.style.width = '50%'
+    element.style.flexGrow = '0'
+    element.style.flexShrink = '0'
     return (
       <Paper
         elevation={1}
