@@ -1,7 +1,7 @@
-import { createComponent, Shade, Router } from '@furystack/shades'
+import { createComponent, Shade, Router, LazyLoad } from '@furystack/shades'
 import { SessionService } from '../services/session'
 import { Init, HelloWorld, Offline, Login } from '../pages'
-import { DrivesPage } from '../pages/drives'
+import { Loader } from '@furystack/shades-common-components'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
@@ -16,7 +16,35 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
               return (
                 <Router
                   routes={[
-                    { url: '/drives', routingOptions: { end: false }, component: () => <DrivesPage /> },
+                    {
+                      url: '/drives',
+                      component: () => (
+                        <LazyLoad
+                          loader={<Loader />}
+                          component={async () => {
+                            const { DrivesPage } = await import('../pages/drives')
+                            return <DrivesPage />
+                          }}
+                        />
+                      ),
+                    },
+                    {
+                      url: '/drives/openFile/:driveLetter/:path',
+                      component: ({ match }) => (
+                        <LazyLoad
+                          loader={<Loader />}
+                          component={async () => {
+                            const { FilesPage } = await import('../pages/files')
+                            return (
+                              <FilesPage
+                                letter={match.params.driveLetter}
+                                path={decodeURIComponent(match.params.path)}
+                              />
+                            )
+                          }}
+                        />
+                      ),
+                    },
                     { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
                   ]}></Router>
               )

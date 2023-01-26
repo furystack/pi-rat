@@ -1,4 +1,4 @@
-import { createComponent, Shade } from '@furystack/shades'
+import { createComponent, LocationService, Shade } from '@furystack/shades'
 import { Paper } from '@furystack/shades-common-components'
 import { ObservableValue, PathHelper } from '@furystack/utils'
 import type { Drive } from 'common'
@@ -42,8 +42,9 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
           currentDriveLetter={currentLetter}
           currentPath={currentPath}
           onActivate={(v) => {
+            const path = currentPath.getValue()
+
             if (v.isDirectory) {
-              const path = currentPath.getValue()
               const newPath =
                 v.name === '..'
                   ? path && PathHelper.getSegments(path).length > 1
@@ -51,9 +52,15 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
                     : '/'
                   : PathHelper.joinPaths(path || '/', v.name)
               currentPath.setValue(newPath)
-              console.log('Changing path', { newPath })
             } else {
-              console.log('onActivate', v)
+              history.pushState(
+                '',
+                '',
+                `/drives/openFile/${encodeURIComponent(currentLetter.getValue())}/${encodeURIComponent(
+                  PathHelper.joinPaths(path, v.name),
+                )}`,
+              )
+              injector.getInstance(LocationService).updateState()
             }
           }}
         />
