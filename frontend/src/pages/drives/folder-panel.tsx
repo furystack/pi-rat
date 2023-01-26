@@ -7,7 +7,7 @@ import { FileList } from './file-list'
 
 export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availableDrives: ObservableValue<Drive[]> }>({
   shadowDomName: 'folder-panel',
-  render: ({ props, useObservable, element, useDisposable }) => {
+  render: ({ props, useObservable, element, useDisposable, injector }) => {
     const currentLetter = useDisposable(
       'currentLetter',
       () => new ObservableValue(props.currentDrive.getValue().letter),

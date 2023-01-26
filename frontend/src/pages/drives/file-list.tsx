@@ -5,6 +5,7 @@ import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options'
 import { DrivesApiClient } from '../../services/drives-api-client'
+import { DrivesFilesystemNotificationsService } from '../../services/drives-filesystem-notifications-service'
 import { SessionService } from '../../services/session'
 import { BreadCrumbs } from './breadcrumbs'
 import { DirectoryEntryIcon } from './directory-entry-icon'
@@ -21,6 +22,19 @@ export const FileList = Shade<{
     const client = injector.getInstance(DrivesApiClient)
     const notyService = injector.getInstance(NotyService)
     const refetch = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
+
+    useDisposable('DrivesFilesystemNotificationsService', () =>
+      injector.getInstance(DrivesFilesystemNotificationsService).onFilesystemChanged.subscribe((e) => {
+        const currentPathValue = currentPath.getValue()
+        const currentDrive = currentDriveLetter.getValue()
+        if (
+          e.drive === currentDrive &&
+          (e.path === currentPathValue || PathHelper.isAncestorOf(currentPathValue, e.path))
+        ) {
+          refetch()
+        }
+      }),
+    )
 
     const service = useDisposable(
       'service',

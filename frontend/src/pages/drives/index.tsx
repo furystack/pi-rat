@@ -1,7 +1,6 @@
 import { createComponent, LazyLoad, Shade } from '@furystack/shades'
 import { Loader } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import { environmentOptions } from '../../environment-options'
 import { DrivesApiClient } from '../../services/drives-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
 import { FolderPanel } from './folder-panel'
@@ -17,19 +16,6 @@ export const DrivesPage = Shade({
           findOptions: {},
         },
       })
-
-    useDisposable('ws', () => {
-      const socket = new WebSocket(`${environmentOptions.serviceUrl}/ws`.replace('http', 'ws'))
-      socket.onmessage = (ev) => {
-        const messageData = JSON.parse(ev.data)
-        console.log(messageData)
-      }
-      return {
-        dispose: () => {
-          socket.close()
-        },
-      }
-    })
 
     return (
       <LazyLoad
