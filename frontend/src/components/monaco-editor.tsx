@@ -35,7 +35,13 @@ export interface MonacoEditorProps {
 export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
   constructed: ({ element, props }) => {
-    const editorInstance = monaco.editor.create(element as HTMLElement, props.options)
+    const editorInstance = monaco.editor.create(element as HTMLElement, {
+      useShadowDOM: true,
+      automaticLayout: true,
+      fontSize: 20,
+      fontLigatures: true,
+      ...props.options,
+    })
     editorInstance.setValue(props.value || '')
     props.onchange &&
       editorInstance.onKeyUp(() => {

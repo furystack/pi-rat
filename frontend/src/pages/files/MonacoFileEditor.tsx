@@ -18,21 +18,24 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
               credentials: 'include',
             },
           )
-          const text = await result.text()
+          await result.text()
           return (
             <div
               style={{
                 position: 'fixed',
+                top: '0',
+                left: '0',
+                overflow: 'hidden',
                 width: '100%',
                 height: '100%',
               }}>
               <MonacoEditor
                 options={{
-                  language: 'yaml',
+                  language: 'typescript',
                   theme: 'vs-dark',
                   automaticLayout: true,
                 }}
-                value={text}
+                // value={text.toString()}
               />
             </div>
           )
