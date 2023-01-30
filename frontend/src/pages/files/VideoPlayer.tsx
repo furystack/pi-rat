@@ -1,8 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { environmentOptions } from '../../environment-options'
 
-export const ImageViewer = Shade<{ letter: string; path: string }>({
-  shadowDomName: 'drives-files-image-viewer',
+export const VideoPlayer = Shade<{ letter: string; path: string }>({
+  shadowDomName: 'drives-files-video-player',
   render: ({ props }) => {
     const { letter, path } = props
     return (
@@ -20,7 +20,7 @@ export const ImageViewer = Shade<{ letter: string; path: string }>({
         <h1 style={{ paddingLeft: '2em' }}>
           {letter}:{path}
         </h1>
-        <img
+        <video
           style={{
             maxWidth: '100%',
             maxHeight: '80%',
@@ -29,7 +29,7 @@ export const ImageViewer = Shade<{ letter: string; path: string }>({
           src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
             path,
           )}/download`}
-          alt={path}
+          controls
         />
       </div>
     )

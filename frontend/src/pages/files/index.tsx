@@ -3,6 +3,7 @@ import { Loader } from '@furystack/shades-common-components'
 import { FileAssociationsService } from '../../services/file-associations-service'
 import { ImageViewer } from './ImageViewer'
 import { UnknownType } from './unknown-type'
+import { VideoPlayer } from './VideoPlayer'
 
 export const FilesPage = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-page',
@@ -19,6 +20,8 @@ export const FilesPage = Shade<{ letter: string; path: string }>({
           switch (component) {
             case 'image-viewer':
               return <ImageViewer letter={letter} path={path} />
+            case 'video-player':
+              return <VideoPlayer letter={letter} path={path} />
             default:
               return <UnknownType letter={letter} path={path} />
           }
