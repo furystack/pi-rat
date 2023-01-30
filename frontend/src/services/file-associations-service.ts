@@ -43,7 +43,23 @@ export class FileAssociationsService {
 
   private imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
 
-  private monacoEditorExtensions = ['js', 'ts', 'json', 'html', 'css', 'scss', 'less', 'md', 'txt']
+  private monacoEditorExtensions = [
+    'js',
+    'ts',
+    'json',
+    'html',
+    'css',
+    'scss',
+    'less',
+    'md',
+    'txt',
+    'mjs',
+    'jsx',
+    'tsx',
+    'vue',
+    'yml',
+    'yaml',
+  ]
 
   public async getServiceForFile(_letter: string, path: string) {
     const extension = path.split('.').pop()
