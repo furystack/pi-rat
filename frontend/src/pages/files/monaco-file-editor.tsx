@@ -1,4 +1,4 @@
-import { attachStyles, createComponent, LazyLoad, Shade } from '@furystack/shades'
+import { createComponent, LazyLoad, Shade } from '@furystack/shades'
 import { MonacoEditor } from '../../components/monaco-editor'
 import { environmentOptions } from '../../environment-options'
 
