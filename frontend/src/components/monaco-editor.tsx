@@ -35,11 +35,12 @@ export interface MonacoEditorProps {
 export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
   constructed: ({ element, props }) => {
+    element.style.display = 'block'
+    element.style.height = '100%'
+    element.style.width = '100%'
+    element.style.position = 'relative'
     const editorInstance = monaco.editor.create(element as HTMLElement, {
-      useShadowDOM: true,
       automaticLayout: true,
-      fontSize: 20,
-      fontLigatures: true,
       ...props.options,
     })
     editorInstance.setValue(props.value || '')
@@ -50,11 +51,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
       })
     return () => editorInstance.dispose()
   },
-  render: ({ element }) => {
-    element.style.display = 'block'
-    element.style.height = '100%'
-    element.style.width = '100%'
-    element.style.position = 'relative'
+  render: () => {
     return null
   },
 })

@@ -1,10 +1,10 @@
 import { createComponent, LazyLoad, Shade } from '@furystack/shades'
 import { Loader } from '@furystack/shades-common-components'
 import { FileAssociationsService } from '../../services/file-associations-service'
-import { ImageViewer } from './ImageViewer'
-import { MonacoFileEditor } from './MonacoFileEditor'
+import { ImageViewer } from './image-viewer'
+import { MonacoFileEditor } from './monaco-file-editor'
 import { UnknownType } from './unknown-type'
-import { VideoPlayer } from './VideoPlayer'
+import { VideoPlayer } from './video-player'
 
 export const FilesPage = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-page',
