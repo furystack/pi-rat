@@ -1,26 +1,61 @@
-import { createComponent, LocationService, Shade } from '@furystack/shades'
-import type { GridProps } from '@furystack/shades-common-components'
-import type { EntryLoader } from '@furystack/shades-common-components'
+import type { ChildrenList } from '@furystack/shades'
+import { createComponent, LazyLoad, LocationService, Shade } from '@furystack/shades'
+import type { DataGridProps } from '@furystack/shades-common-components'
+import { DataGrid } from '@furystack/shades-common-components'
+import { MonacoEditor } from '../monaco-editor'
+import type { GenericEditorService } from './generic-editor-service'
 
 type GenericEditorProps<T, TKey extends keyof T> = {
-  entryLoader: EntryLoader<T>
-  entryPatcher: (key: TKey, entry: T) => Promise<void>
-  entryRemover: (...keys: TKey[]) => Promise<void>
-  displayFields: Array<keyof T>
+  service: GenericEditorService<T, TKey>
+  columns: DataGridProps<T>['columns']
+  headerComponents: DataGridProps<T>['headerComponents']
+  rowComponents: DataGridProps<T>['rowComponents']
+  styles: DataGridProps<T>['styles']
 }
 
-export const GenericEditor = Shade({
+export const GenericEditor: <T, TKey extends keyof T>(
+  props: GenericEditorProps<T, TKey>,
+  childrenList: ChildrenList,
+) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
-  render: ({ props, element, injector, useObservable }) => {
+  render: ({ props, injector, useObservable }) => {
+    const { service, columns, headerComponents, rowComponents, styles } = props
+
     const [currentId, setCurrentId] = useObservable(
       'currentId',
-      injector.getInstance(LocationService).useSearchParam('currentId', null),
+      injector.getInstance(LocationService).useSearchParam<any>('currentId', null),
     )
 
     if (currentId) {
-      return <div>{currentId}</div>
+      return (
+        <LazyLoad
+          loader={<>Loading...</>}
+          component={async () => {
+            const entry = await service.getSingleEntry(currentId)
+            return <MonacoEditor options={{}} value={JSON.stringify(entry, undefined, 4)} />
+          }}
+        />
+      )
     }
 
-    return null
+    return (
+      <DataGrid
+        service={service}
+        columns={columns}
+        headerComponents={headerComponents}
+        rowComponents={{
+          [service.extendedOptions.keyProperty]: (value: any) => (
+            <span
+              ondblclick={() => {
+                setCurrentId(value[service.extendedOptions.keyProperty])
+              }}>
+              {value[service.extendedOptions.keyProperty]}
+            </span>
+          ),
+          ...rowComponents,
+        }}
+        styles={styles}
+      />
+    )
   },
 })
