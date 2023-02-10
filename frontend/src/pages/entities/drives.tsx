@@ -27,6 +27,14 @@ export const DrivesPage = Shade({
           updater: null as any,
         }),
     )
-    return <GenericEditor service={service} columns={['letter', 'physicalPath']} headerComponents={{}} styles={{}} />
+    return (
+      <GenericEditor
+        service={service}
+        columns={['letter', 'physicalPath']}
+        headerComponents={{}}
+        styles={{}}
+        rowComponents={{}}
+      />
+    )
   },
 })
