@@ -6,6 +6,7 @@ describe('getCorsOptions', () => {
       credentials: true,
       origins: ['http://localhost:8080'],
       headers: ['cache', 'content-type'],
+      methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     })
   })
 })
