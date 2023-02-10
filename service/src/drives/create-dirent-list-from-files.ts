@@ -1,4 +1,4 @@
-import type { DirectoryEntry } from 'common/src/models/directory-entry'
+import type { DirectoryEntry } from 'common'
 import type { File, Files } from 'formidable'
 
 export const createDirentListFromFiles = (files: Files): DirectoryEntry[] => {

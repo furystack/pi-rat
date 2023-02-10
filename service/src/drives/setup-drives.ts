@@ -9,6 +9,7 @@ import { authorizedOnly } from '../authorized-only'
 import { setupDrivesRestApi } from './setup-drives-rest-api'
 import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
+import { useFileWatchers } from './file-watcher-service'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -89,6 +90,9 @@ export const setupDrives = async (injector: Injector) => {
 
   await logger.verbose({ message: 'Setting up REST API...' })
   await setupDrivesRestApi(injector)
+
+  await logger.verbose({ message: '💾  Setting up FileWatchers...' })
+  await useFileWatchers(injector)
 
   await logger.information({ message: '✅  Drives has been set up' })
 }

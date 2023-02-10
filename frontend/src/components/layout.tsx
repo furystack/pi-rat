@@ -8,24 +8,23 @@ import { Header } from './header'
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
   render: ({ injector }) => {
+    const { theme } = injector.getInstance(ThemeProviderService)
     return (
       <div
         id="Layout"
         style={{
+          width: '100%',
+          height: '100%',
           position: 'fixed',
           top: '0',
           left: '0',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          lineHeight: '1.6',
-          overflow: 'hidden',
           padding: '0',
           margin: '0',
-          backgroundColor: injector.getInstance(ThemeProviderService).theme.background.default,
+          background: theme.background.default,
         }}>
-        <NotyList style={{ zIndex: '2' }} />
+        <div style={{ zIndex: '2' }}>
+          <NotyList />
+        </div>
         <LazyLoad
           loader={<Loader style={{ width: '100px', height: '100px', alignSelf: 'center', justifySelf: 'center' }} />}
           error={(error, retry) => (

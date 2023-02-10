@@ -15,6 +15,8 @@ import { GetDirectoryEntriesAction } from './actions/get-directory-entries'
 import { getPort } from '../get-port'
 import { getCorsOptions } from '../get-cors-options'
 import { UploadAction } from './actions/upload-action'
+import { DeleteFileAction } from './actions/delete-file-action'
+import { DownloadAction } from './actions/download-action'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({
@@ -45,6 +47,7 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'GetDirectoryEntries' })(
           GetDirectoryEntriesAction,
         ),
+        '/files/:letter/:path/download': DownloadAction,
       },
       POST: {
         '/volumes/:letter/:path/upload': UploadAction,
@@ -66,6 +69,7 @@ export const setupDrivesRestApi = async (injector: Injector) => {
           model: Drive,
           primaryKey: 'letter',
         }),
+        '/files/:letter/:path': DeleteFileAction,
       },
     },
   })

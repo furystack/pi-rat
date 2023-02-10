@@ -5,7 +5,7 @@ import type { GetDirectoryEntries } from 'common'
 import { Drive } from 'common'
 import { join } from 'path'
 import { readdir } from 'fs/promises'
-import type { DirectoryEntry } from 'common/src/models/directory-entry'
+import type { DirectoryEntry } from 'common'
 import type { Dirent } from 'fs'
 
 const direntToApiModel = (dirent: Dirent): DirectoryEntry => ({

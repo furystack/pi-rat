@@ -24,6 +24,23 @@ export type UploadEndpoint = {
     letter: string
     path: string
   }
+  body: any
+}
+
+export type DeleteFileEndpoint = {
+  url: {
+    letter: string
+    path: string
+  }
+  result: { success: true }
+}
+
+export type DownloadEndpoint = {
+  url: {
+    letter: string
+    path: string
+  }
+  result: unknown
 }
 
 export interface DrivesApi extends RestApi {
@@ -31,6 +48,7 @@ export interface DrivesApi extends RestApi {
     '/volumes': GetCollectionEndpoint<Drive>
     '/volumes/:id': GetEntityEndpoint<Drive, 'letter'>
     '/files/:letter/:path': GetDirectoryEntries
+    '/files/:letter/:path/download': DownloadEndpoint
   }
   POST: {
     '/volumes': PostEndpoint<Drive, 'letter'>
@@ -41,5 +59,6 @@ export interface DrivesApi extends RestApi {
   }
   DELETE: {
     '/volumes/:id': DeleteEndpoint<Drive, 'letter'>
+    '/files/:letter/:path': DeleteFileEndpoint
   }
 }

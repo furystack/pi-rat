@@ -1,13 +1,12 @@
-import { context } from 'esbuild'
+import { build } from 'esbuild'
 import { getBundleBuildOptions, getMonacoBuildOptions } from './build-defaults.mjs'
 
 const buildBundle = () =>
-  context({
+  build({
     ...getBundleBuildOptions(),
     minify: true,
     keepNames: true,
   })
-    .then((r) => r.rebuild())
     .then((result) => {
       console.log('Building the Bundle successful', { result })
     })
@@ -16,12 +15,11 @@ const buildBundle = () =>
     })
 
 const buildMonaco = () =>
-  context({
+  build({
     ...getMonacoBuildOptions(),
     minify: true,
     keepNames: true,
   })
-    .then((r) => r.rebuild())
     .then((result) => console.log('Building Monaco successful', { result }))
     .catch((error) => {
       console.error('Building Monaco failed', error)

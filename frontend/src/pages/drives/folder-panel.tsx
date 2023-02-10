@@ -1,4 +1,4 @@
-import { createComponent, Shade } from '@furystack/shades'
+import { createComponent, LocationService, Shade } from '@furystack/shades'
 import { Paper } from '@furystack/shades-common-components'
 import { ObservableValue, PathHelper } from '@furystack/utils'
 import type { Drive } from 'common'
@@ -7,7 +7,7 @@ import { FileList } from './file-list'
 
 export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availableDrives: ObservableValue<Drive[]> }>({
   shadowDomName: 'folder-panel',
-  render: ({ props, useObservable, element, useDisposable }) => {
+  render: ({ props, useObservable, element, useDisposable, injector }) => {
     const currentLetter = useDisposable(
       'currentLetter',
       () => new ObservableValue(props.currentDrive.getValue().letter),
@@ -24,7 +24,9 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
       true,
     )
     element.style.height = '100%'
-    element.style.width = '100%'
+    element.style.width = '50%'
+    element.style.flexGrow = '0'
+    element.style.flexShrink = '0'
     return (
       <Paper
         elevation={1}
@@ -40,8 +42,9 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
           currentDriveLetter={currentLetter}
           currentPath={currentPath}
           onActivate={(v) => {
+            const path = currentPath.getValue()
+
             if (v.isDirectory) {
-              const path = currentPath.getValue()
               const newPath =
                 v.name === '..'
                   ? path && PathHelper.getSegments(path).length > 1
@@ -49,9 +52,15 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
                     : '/'
                   : PathHelper.joinPaths(path || '/', v.name)
               currentPath.setValue(newPath)
-              console.log('Changing path', { newPath })
             } else {
-              console.log('onActivate', v)
+              history.pushState(
+                '',
+                '',
+                `/drives/openFile/${encodeURIComponent(currentLetter.getValue())}/${encodeURIComponent(
+                  PathHelper.joinPaths(path, v.name),
+                )}`,
+              )
+              injector.getInstance(LocationService).updateState()
             }
           }}
         />
