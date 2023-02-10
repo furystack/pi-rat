@@ -775,19 +775,23 @@
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "description": "The drive creation date"
+                  "description": "The drive creation date",
+                  "format": "date-time"
                 },
                 "$endsWith": {
                   "type": "string",
-                  "description": "The drive creation date"
+                  "description": "The drive creation date",
+                  "format": "date-time"
                 },
                 "$like": {
                   "type": "string",
-                  "description": "The drive creation date"
+                  "description": "The drive creation date",
+                  "format": "date-time"
                 },
                 "$regex": {
                   "type": "string",
-                  "description": "The drive creation date"
+                  "description": "The drive creation date",
+                  "format": "date-time"
                 }
               },
               "additionalProperties": false
@@ -797,11 +801,13 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "description": "The drive creation date"
+                  "description": "The drive creation date",
+                  "format": "date-time"
                 },
                 "$ne": {
                   "type": "string",
-                  "description": "The drive creation date"
+                  "description": "The drive creation date",
+                  "format": "date-time"
                 }
               },
               "additionalProperties": false
@@ -813,14 +819,16 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The drive creation date"
+                    "description": "The drive creation date",
+                    "format": "date-time"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The drive creation date"
+                    "description": "The drive creation date",
+                    "format": "date-time"
                   }
                 }
               },
@@ -835,19 +843,23 @@
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "description": "Last update date"
+                  "description": "Last update date",
+                  "format": "date-time"
                 },
                 "$endsWith": {
                   "type": "string",
-                  "description": "Last update date"
+                  "description": "Last update date",
+                  "format": "date-time"
                 },
                 "$like": {
                   "type": "string",
-                  "description": "Last update date"
+                  "description": "Last update date",
+                  "format": "date-time"
                 },
                 "$regex": {
                   "type": "string",
-                  "description": "Last update date"
+                  "description": "Last update date",
+                  "format": "date-time"
                 }
               },
               "additionalProperties": false
@@ -857,11 +869,13 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "description": "Last update date"
+                  "description": "Last update date",
+                  "format": "date-time"
                 },
                 "$ne": {
                   "type": "string",
-                  "description": "Last update date"
+                  "description": "Last update date",
+                  "format": "date-time"
                 }
               },
               "additionalProperties": false
@@ -873,14 +887,16 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "Last update date"
+                    "description": "Last update date",
+                    "format": "date-time"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "Last update date"
+                    "description": "Last update date",
+                    "format": "date-time"
                   }
                 }
               },
@@ -925,11 +941,13 @@
         },
         "createdAt": {
           "type": "string",
-          "description": "The drive creation date"
+          "description": "The drive creation date",
+          "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Last update date"
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "required": [
@@ -1018,11 +1036,13 @@
         },
         "createdAt": {
           "type": "string",
-          "description": "The drive creation date"
+          "description": "The drive creation date",
+          "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Last update date"
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "required": [
@@ -1043,11 +1063,13 @@
         },
         "createdAt": {
           "type": "string",
-          "description": "The drive creation date"
+          "description": "The drive creation date",
+          "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Last update date"
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "required": [
@@ -1102,11 +1124,13 @@
         },
         "createdAt": {
           "type": "string",
-          "description": "The drive creation date"
+          "description": "The drive creation date",
+          "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Last update date"
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "additionalProperties": false

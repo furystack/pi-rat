@@ -54,11 +54,13 @@
         },
         "createdAt": {
           "type": "string",
-          "description": "The drive creation date"
+          "description": "The drive creation date",
+          "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Last update date"
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "required": [
