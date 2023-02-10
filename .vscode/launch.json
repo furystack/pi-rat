@@ -11,6 +11,14 @@
       "runtimeExecutable": "yarn",
       "skipFiles": ["<node_internals>/**"],
       "type": "node"
+    },
+    {
+      "name": "Playwright test",
+      "type": "node",
+      "runtimeExecutable": "yarn",
+      "request": "launch",
+      // "program": "${file}",
+      "runtimeArgs": ["playwright", "test", "--headed", "--timeout=3000000", "--project=chromium", "${fileBasename}"]
     }
   ]
 }

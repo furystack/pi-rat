@@ -1,28 +1,35 @@
 {
   "name": "service",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "dist/index.js",
   "license": "GPL-2.0-only",
   "private": true,
   "scripts": {
-    "start": "yarn build && node ./dist/service.js",
-    "seed": "yarn build && node ./dist/seed.js",
+    "start": "node ./dist/start.js",
     "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
     "build": "tsc -b"
   },
   "devDependencies": {
-    "@types/node": "^18.7.18",
-    "typescript": "^4.8.3"
+    "@types/formidable": "^2.0.5",
+    "@types/node": "^18.13.0",
+    "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@furystack/core": "^11.0.12",
-    "@furystack/filesystem-store": "^3.0.12",
-    "@furystack/inject": "^7.0.4",
-    "@furystack/logging": "^3.0.8",
-    "@furystack/repository": "^6.0.12",
-    "@furystack/rest-service": "^6.1.4",
-    "@furystack/security": "^2.0.12",
-    "@types/jest": "^29.0.3",
-    "common": "workspace:^"
+    "@furystack/core": "^11.2.5",
+    "@furystack/inject": "^7.1.6",
+    "@furystack/logging": "^3.1.6",
+    "@furystack/repository": "^6.1.7",
+    "@furystack/rest": "^4.1.9",
+    "@furystack/rest-service": "^6.2.12",
+    "@furystack/security": "^2.1.7",
+    "@furystack/sequelize-store": "^2.1.5",
+    "@furystack/utils": "^3.1.6",
+    "@furystack/websocket-api": "^8.1.12",
+    "@types/jest": "^29.4.0",
+    "chokidar": "^3.5.3",
+    "common": "workspace:^",
+    "formidable": "^2.1.2",
+    "sequelize": "^6.28.0",
+    "sqlite3": "^5.1.4"
   }
 }

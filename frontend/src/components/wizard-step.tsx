@@ -1,5 +1,6 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
-import { animations, Button, WizardStepProps } from '@furystack/shades-common-components'
+import type { WizardStepProps } from '@furystack/shades-common-components'
+import { showParallax, Button } from '@furystack/shades-common-components'
 
 export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) => void } & WizardStepProps>({
   shadowDomName: 'wizard-step',
@@ -17,9 +18,9 @@ export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) =>
   },
   render: ({ props, element, children }) => {
     setTimeout(() => {
-      animations.showParallax(element.querySelector('h1'))
-      animations.showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
-      animations.showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
+      showParallax(element.querySelector('h1'))
+      showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
+      showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
     }, 1)
     return (
       <form
@@ -55,7 +56,8 @@ export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) =>
             type="submit"
             disabled={props.currentPage > props.maxPages - 1}
             variant="contained"
-            color={props.currentPage === props.maxPages - 1 ? 'success' : 'primary'}>
+            color={props.currentPage === props.maxPages - 1 ? 'success' : 'primary'}
+            onclick={(ev) => (ev.target as HTMLElement)?.closest('form')?.requestSubmit()}>
             {props.currentPage < props.maxPages - 1 ? 'Next' : 'Finish'}
           </Button>
         </div>

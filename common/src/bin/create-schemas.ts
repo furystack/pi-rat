@@ -21,8 +21,18 @@ export const entityValues: SchemaGenerationSetting[] = [
 
 export const apiValues: SchemaGenerationSetting[] = [
   {
-    inputFile: './src/pirat-api.ts',
-    outputFile: './src/schemas/pirat-api.json',
+    inputFile: './src/apis/drives.ts',
+    outputFile: './src/schemas/apis/drives-api.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/apis/identity.ts',
+    outputFile: './src/schemas/apis/identity-api.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/apis/install.ts',
+    outputFile: './src/schemas/apis/install-api.json',
     type: '*',
   },
 ]
@@ -35,11 +45,12 @@ export const exec = async (): Promise<void> => {
         path: join(process.cwd(), schemaValue.inputFile),
         tsconfig: join(process.cwd(), './tsconfig.json'),
         skipTypeCheck: true,
-        // expose: 'all',
+        expose: 'all',
       }).createSchema(schemaValue.type)
       await promises.writeFile(join(process.cwd(), schemaValue.outputFile), JSON.stringify(schema, null, 2))
     } catch (error) {
       console.error(`There was an error generating schema from ${schemaValue.inputFile}`, error)
+      process.exit(1)
     }
   }
 }

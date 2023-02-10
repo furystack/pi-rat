@@ -1,7 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Input, WizardStepProps } from '@furystack/shades-common-components'
+import type { WizardStepProps } from '@furystack/shades-common-components'
+import { Input } from '@furystack/shades-common-components'
 import { WizardStep } from '../components/wizard-step'
-import { PiratApiClient } from '../services/pirat-api-client'
+import { InstallApiClient } from '../services/install-api-client'
 
 export const CreateAdminStep = Shade<WizardStepProps>({
   shadowDomName: 'create-admin-step',
@@ -16,9 +17,8 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           const formData = new FormData(form)
 
           const values = Object.fromEntries(formData.entries())
-          console.log(values)
 
-          injector.getInstance(PiratApiClient).call({
+          injector.getInstance(InstallApiClient).call({
             method: 'POST',
             action: '/install',
             body: {

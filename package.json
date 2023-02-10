@@ -1,6 +1,6 @@
 {
   "name": "pi-rat",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "example web app based on furystack",
   "main": "service/src/index.ts",
   "repository": "https://github.com/furystack/pi-rat.git",
@@ -15,26 +15,25 @@
     ]
   },
   "dependencies": {
-    "@types/jest": "^29.0.3",
-    "jest": "^29.0.3",
-    "jest-junit": "^14.0.1"
+    "@types/jest": "^29.4.0",
+    "jest": "^29.4.2",
+    "jest-junit": "^15.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.25.2",
-    "@types/node": "^18.7.18",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
-    "concurrently": "^7.4.0",
-    "eslint": "^8.23.1",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-jsdoc": "^39.3.6",
+    "@playwright/test": "^1.30.0",
+    "@types/node": "^18.13.0",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-jsdoc": "^39.8.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.8.3"
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.1",
+    "prettier": "^2.8.4",
+    "rimraf": "^4.1.2",
+    "typescript": "^4.9.5"
   },
   "husky": {
     "hooks": {
@@ -55,8 +54,8 @@
   "scripts": {
     "build": "tsc -b && yarn workspace frontend build",
     "create-schemas": "yarn workspace common create-schemas",
-    "seed": "yarn workspace service seed",
-    "test:e2e": "concurrently --kill-others \"yarn start:service\" \"yarn start:frontend\" \"yarn assert-listening && yarn playwright test\" --success first ",
+    "test:e2e:install": "yarn playwright test --grep @install --project chromium",
+    "test:e2e": "yarn playwright test --grep-invert @install",
     "test:unit": "jest --verbose",
     "start:service": "yarn workspace service start",
     "start:frontend": "yarn workspace frontend start",
@@ -64,7 +63,8 @@
     "lint": "eslint . --ext .tsx,.ts --cache",
     "bumpVersions": "yarn version check --interactive",
     "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
-    "assert-listening": "yarn node scripts/assert-listening.mjs"
+    "assert-listening": "yarn node scripts/assert-listening.mjs",
+    "dockerize": "docker build . --tag furystack/pi-rat:latest"
   },
   "jest-junit": {
     "suiteName": "FuryStack Jest tests",
@@ -73,5 +73,5 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "packageManager": "yarn@3.2.3"
+  "packageManager": "yarn@3.4.1"
 }

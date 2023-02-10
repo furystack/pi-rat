@@ -1,9 +1,11 @@
-import { Injector } from '@furystack/inject'
+import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { ServerManager } from '@furystack/rest-service'
 
 export const attachShutdownHandler = (i: Injector): void => {
   const logger = getLogger(i).withScope('shutdown-handler')
+
+  logger.information({ message: '💤  Attaching shutdown handler...' })
 
   const onExit = async ({ code, reason, error }: { code: number; reason: string; error?: any }) => {
     process.removeAllListeners('exit')
@@ -32,9 +34,6 @@ export const attachShutdownHandler = (i: Injector): void => {
       if (i.cachedSingletons.get(ServerManager)) {
         await i.getInstance(ServerManager).dispose()
       }
-      //   if (i.cachedSingletons.get(DbLogger)) {
-      //     await i.getInstance(DbLogger).dispose()
-      //   }
       await i.dispose()
     } catch (e) {
       console.error('Error during shutdown', e)

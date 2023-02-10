@@ -1,6 +1,62 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "DirectoryEntry": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "isFile": {
+          "type": "boolean"
+        },
+        "isDirectory": {
+          "type": "boolean"
+        },
+        "isBlockDevice": {
+          "type": "boolean"
+        },
+        "isCharacterDevice": {
+          "type": "boolean"
+        },
+        "isSymbolicLink": {
+          "type": "boolean"
+        },
+        "isFIFO": {
+          "type": "boolean"
+        },
+        "isSocket": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "isFile",
+        "isDirectory",
+        "isBlockDevice",
+        "isCharacterDevice",
+        "isSymbolicLink",
+        "isFIFO",
+        "isSocket"
+      ],
+      "additionalProperties": false
+    },
+    "Drive": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string"
+        },
+        "letter": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "physicalPath",
+        "letter"
+      ],
+      "additionalProperties": false
+    },
     "User": {
       "type": "object",
       "properties": {

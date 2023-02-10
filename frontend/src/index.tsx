@@ -5,10 +5,16 @@ import { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { Layout } from './components/layout'
 import { environmentOptions } from './environment-options'
+import { defaultDarkTheme, ThemeProviderService } from '@furystack/shades-common-components'
+import { SessionService } from './services/session'
 
 const shadeInjector = new Injector()
 
 useLogging(shadeInjector, VerboseConsoleLogger)
+
+shadeInjector.getInstance(ThemeProviderService).set(defaultDarkTheme)
+
+shadeInjector.getInstance(SessionService).init()
 
 getLogger(shadeInjector).withScope('Startup').verbose({
   message: 'Initializing Shade Frontend...',

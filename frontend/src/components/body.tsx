@@ -1,39 +1,50 @@
-import { createComponent, Shade, Router } from '@furystack/shades'
-import { User } from 'common'
-import { SessionService, SessionState } from '../services/session'
-import { ButtonsDemo, Init, HelloWorld, Offline, Login } from '../pages'
+import { createComponent, Shade, Router, LazyLoad } from '@furystack/shades'
+import { SessionService } from '../services/session'
+import { Init, HelloWorld, Offline, Login } from '../pages'
+import { Loader } from '@furystack/shades-common-components'
 
-export const Body = Shade<
-  { style?: Partial<CSSStyleDeclaration> },
-  { sessionState: SessionState; currentUser: User | null }
->({
+export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
-  getInitialState: () => ({
-    sessionState: 'initializing',
-    currentUser: null as User | null,
-  }),
-  resources: ({ injector, updateState }) => {
+  render: ({ useObservable, injector }) => {
     const session = injector.getInstance(SessionService)
-    session.init()
-    return [
-      session.state.subscribe((newState) =>
-        updateState({
-          sessionState: newState,
-        }),
-      ),
-      session.currentUser.subscribe((usr) => updateState({ currentUser: usr })),
-    ]
-  },
-  render: ({ getState }) => {
+    const [sessionState] = useObservable('sessionState', session.state)
     return (
       <div id="Body">
         {(() => {
-          switch (getState().sessionState) {
+          switch (sessionState) {
             case 'authenticated':
               return (
                 <Router
                   routes={[
-                    { url: '/buttons', routingOptions: { end: false }, component: () => <ButtonsDemo /> },
+                    {
+                      url: '/drives',
+                      component: () => (
+                        <LazyLoad
+                          loader={<Loader />}
+                          component={async () => {
+                            const { DrivesPage } = await import('../pages/drives')
+                            return <DrivesPage />
+                          }}
+                        />
+                      ),
+                    },
+                    {
+                      url: '/drives/openFile/:driveLetter/:path',
+                      component: ({ match }) => (
+                        <LazyLoad
+                          loader={<Loader />}
+                          component={async () => {
+                            const { FilesPage } = await import('../pages/files')
+                            return (
+                              <FilesPage
+                                letter={match.params.driveLetter}
+                                path={decodeURIComponent(match.params.path)}
+                              />
+                            )
+                          }}
+                        />
+                      ),
+                    },
                     { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
                   ]}></Router>
               )

@@ -1,4 +1,5 @@
-import * as PiratApiSchemas from './pirat-api.json'
-import * as EntityApiSchemas from './entities.json'
+import entitiesSchemas from './entities.json'
 
-export { PiratApiSchemas, EntityApiSchemas }
+export * from './apis'
+
+export { entitiesSchemas }
