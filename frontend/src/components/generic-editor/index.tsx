@@ -32,7 +32,16 @@ export const GenericEditor: <T, TKey extends keyof T>(
           loader={<>Loading...</>}
           component={async () => {
             const entry = await service.getSingleEntry(currentId)
-            return <MonacoEditor options={{}} value={JSON.stringify(entry, undefined, 4)} />
+            return (
+              <div style={{ position: 'fixed', top: '64px', height: 'calc(100% - 64px)', width: '100%' }}>
+                <MonacoEditor
+                  options={{
+                    language: 'json',
+                  }}
+                  value={JSON.stringify(entry, undefined, 4)}
+                />
+              </div>
+            )
           }}
         />
       )

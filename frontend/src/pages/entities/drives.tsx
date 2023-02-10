@@ -22,9 +22,21 @@ export const DrivesPage = Shade({
             })
             return result.result
           },
-          remover: null as any,
-          singleLoader: null as any,
-          updater: null as any,
+          remover: async (id) => {
+            await api.call({ method: 'DELETE', action: `/volumes/:id`, url: { id } })
+          },
+          singleLoader: async (id) => {
+            const result = await api.call({ method: 'GET', action: `/volumes/:id`, url: { id }, query: {} })
+            return result.result
+          },
+          updater: async (id, entity) => {
+            await api.call({
+              method: 'PATCH',
+              action: `/volumes/:id`,
+              url: { id },
+              body: entity,
+            })
+          },
         }),
     )
     return (
