@@ -45,15 +45,27 @@
       "type": "object",
       "properties": {
         "physicalPath": {
-          "type": "string"
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
         },
         "letter": {
-          "type": "string"
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The drive creation date"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update date"
         }
       },
       "required": [
         "physicalPath",
-        "letter"
+        "letter",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },

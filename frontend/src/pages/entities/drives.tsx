@@ -3,11 +3,21 @@ import type { Drive } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { DrivesApiClient } from '../../services/drives-api-client'
+import { MonacoModelProvider } from '../../services/monaco-model-provider'
+import { drivesApiSchema } from 'common'
 
 export const DrivesPage = Shade({
   shadowDomName: 'shade-app-drives-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(DrivesApiClient)
+
+    const modelProvider = injector.getInstance(MonacoModelProvider)
+
+    const model = modelProvider.getModelForEntityType({
+      schemaName: 'Drive',
+      jsonSchema: drivesApiSchema.definitions.Drive,
+    })
+
     const service = useDisposable(
       'service',
       () =>
@@ -46,6 +56,7 @@ export const DrivesPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
+        model={model}
       />
     )
   },

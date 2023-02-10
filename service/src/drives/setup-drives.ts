@@ -31,6 +31,8 @@ const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
 class DriveModel extends Model<Drive, Drive> implements Drive {
   declare physicalPath: string
   declare letter: string
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 export const setupDrives = async (injector: Injector) => {
@@ -52,6 +54,12 @@ export const setupDrives = async (injector: Injector) => {
           },
           physicalPath: {
             type: DataTypes.STRING,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
           },
         },
         {

@@ -4,6 +4,7 @@ import type { DataGridProps } from '@furystack/shades-common-components'
 import { DataGrid } from '@furystack/shades-common-components'
 import { MonacoEditor } from '../monaco-editor'
 import type { GenericEditorService } from './generic-editor-service'
+import type monaco from 'monaco-editor'
 
 type GenericEditorProps<T, TKey extends keyof T> = {
   service: GenericEditorService<T, TKey>
@@ -11,6 +12,7 @@ type GenericEditorProps<T, TKey extends keyof T> = {
   headerComponents: DataGridProps<T>['headerComponents']
   rowComponents: DataGridProps<T>['rowComponents']
   styles: DataGridProps<T>['styles']
+  model?: monaco.editor.ITextModel
 }
 
 export const GenericEditor: <T, TKey extends keyof T>(
@@ -19,7 +21,7 @@ export const GenericEditor: <T, TKey extends keyof T>(
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
   render: ({ props, injector, useObservable }) => {
-    const { service, columns, headerComponents, rowComponents, styles } = props
+    const { service, columns, headerComponents, rowComponents, styles, model } = props
 
     const [currentId, setCurrentId] = useObservable(
       'currentId',
@@ -37,6 +39,7 @@ export const GenericEditor: <T, TKey extends keyof T>(
                 <MonacoEditor
                   options={{
                     language: 'json',
+                    model,
                   }}
                   value={JSON.stringify(entry, undefined, 4)}
                 />
