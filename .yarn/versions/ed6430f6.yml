@@ -1,0 +1,4 @@
+releases:
+  common: minor
+  frontend: minor
+  service: minor
