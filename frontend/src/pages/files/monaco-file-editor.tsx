@@ -47,10 +47,8 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
               style={{
                 position: 'fixed',
                 top: '54px',
-                left: '0',
                 width: '100%',
-                height: '100%',
-                display: 'block',
+                height: 'calc(100% - 64px)',
               }}>
               <MonacoEditor
                 options={{
