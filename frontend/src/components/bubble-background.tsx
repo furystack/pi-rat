@@ -11,7 +11,9 @@ const randomizeBlobVars = (el?: HTMLElement) =>
     '--scale': `${Math.random() + 0.5}`,
     '--hue': `${randomInRange(64, 192)}`,
     '--opacity': `${Math.random() * 0.1 + 0.05}`,
-    '--blur': `${Math.random() * 30 + 5}px`,
+    '--blur': `${randomInRange(1, 30)}px`,
+    '--blob-duration': `${randomInRange(0.2, 0.6)}s`,
+    '--blob-easing': `${Math.random() > 0.5 ? 'ease-out' : 'linear'}`,
   }).forEach(([key, value]) => {
     el.style.setProperty(key, value)
   })
@@ -32,8 +34,8 @@ export const Blob = Shade({
             'translate(-50%, -50%) translate(calc(var(--x, 0) * 1%), calc(var(--y, 0) * 1%)) scale(var(--scale))',
           filter: 'blur(var(--blur))',
           borderRadius: '50%',
-          transition: 'all 0.2s',
-          opacity: 'var(--opacity, 0.01, 1)',
+          transition: 'all var(--blob-duration) var(--blob-easing)',
+          opacity: 'var(--opacity, 0.05, 1)',
         }}
       />
     )
@@ -46,11 +48,13 @@ const randomizeBlobGroupVars = (el?: HTMLElement) =>
     '--x': `${randomInRange(0, 100)}`,
     '--y': `${randomInRange(0, 100)}`,
     '--scale': `${randomInRange(0.5, 1)}`,
-    '--duration': `${Math.random() > 0.75 ? randomInRange(10, 60) : 0}`,
+    '--duration': `${randomInRange(0.1, 0.3)}s`,
     '--origin-x': `${randomInRange(-100, 100)}`,
     '--origin-y': `${randomInRange(-100, 100)}`,
     '--direction': `${Math.random() > 0.5 ? 'normal' : 'reverse'}`,
-    '--timing': `${Math.random() > 0.9 ? 'ease' : 'linear'}`,
+    '--timing': `${
+      Math.random() < 0.01 ? 'cubic-bezier(0.230, 1.000, 0.320, 1.000)' : Math.random() > 0.5 ? 'ease' : 'linear'
+    }`,
   }).forEach(([key, value]) => {
     el.style.setProperty(key, value)
   })
@@ -68,7 +72,7 @@ const BlobGroup = Shade({
           transformOrigin: 'calc(var(--origin-x, 50) * 1%) calc(var(--origin-y, 50) * 1%)',
           animation: 'rotate calc(var(--duration, 10) * 1s) infinite var(--direction, 1) ease',
           transform: 'rotate(0deg) translate(-50%, -50%) scale(var(--scale, 1))',
-          transition: 'all 0.2s',
+          transition: 'all var(--duration) var(--timing)',
         }}>
         {children}
       </div>
