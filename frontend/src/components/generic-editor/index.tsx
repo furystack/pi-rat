@@ -1,10 +1,10 @@
 import type { ChildrenList } from '@furystack/shades'
-import { createComponent, LazyLoad, LocationService, Shade } from '@furystack/shades'
+import { createComponent, LocationService, Shade } from '@furystack/shades'
 import type { DataGridProps } from '@furystack/shades-common-components'
 import { DataGrid } from '@furystack/shades-common-components'
-import { MonacoEditor } from '../monaco-editor'
 import type { GenericEditorService } from './generic-editor-service'
 import type monaco from 'monaco-editor'
+import { GenericMonacoEditor } from './generic-monaco-editor'
 
 type GenericEditorProps<T, TKey extends keyof T> = {
   service: GenericEditorService<T, TKey>
@@ -29,25 +29,7 @@ export const GenericEditor: <T, TKey extends keyof T>(
     )
 
     if (currentId) {
-      return (
-        <LazyLoad
-          loader={<>Loading...</>}
-          component={async () => {
-            const entry = await service.getSingleEntry(currentId)
-            return (
-              <div style={{ position: 'fixed', top: '64px', height: 'calc(100% - 64px)', width: '100%' }}>
-                <MonacoEditor
-                  options={{
-                    language: 'json',
-                    model,
-                  }}
-                  value={JSON.stringify(entry, undefined, 4)}
-                />
-              </div>
-            )
-          }}
-        />
-      )
+      return <GenericMonacoEditor entityId={currentId} service={service} model={model} />
     }
 
     return (
