@@ -20,9 +20,10 @@ const AdminLinks = Shade<{}>({
     return isAdmin ? (
       <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px', gap: '8px' }}>
         <AppBarLink href="/drives" title="Drives">
-          💽 Drives
+          💽 Browser
         </AppBarLink>
-        <AppBarLink href="/entities/drives">📦 Entities</AppBarLink>
+        <AppBarLink href="/entities/drives">📦 Drives</AppBarLink>
+        <AppBarLink href="/entities/users">👥 Users</AppBarLink>
       </div>
     ) : null
   },

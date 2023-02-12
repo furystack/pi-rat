@@ -22,7 +22,7 @@ export const Layout = Shade({
           margin: '0',
           background: theme.background.default,
         }}>
-        <div style={{ zIndex: '2' }}>
+        <div style={{ zIndex: '2', position: 'fixed' }}>
           <NotyList />
         </div>
         <LazyLoad

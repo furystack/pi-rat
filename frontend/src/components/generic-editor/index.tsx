@@ -23,13 +23,13 @@ export const GenericEditor: <T, TKey extends keyof T>(
   render: ({ props, injector, useObservable }) => {
     const { service, columns, headerComponents, rowComponents, styles, model } = props
 
-    const [currentId, setCurrentId] = useObservable(
+    const [selection, setSelection] = useObservable(
       'currentId',
-      injector.getInstance(LocationService).useSearchParam<any>('currentId', null),
+      injector.getInstance(LocationService).useSearchParam('currentId', { currentId: null as string | null }),
     )
 
-    if (currentId) {
-      return <GenericMonacoEditor entityId={currentId} service={service} model={model} />
+    if (selection.currentId) {
+      return <GenericMonacoEditor entityId={selection.currentId} service={service} model={model} />
     }
 
     return (
@@ -41,7 +41,7 @@ export const GenericEditor: <T, TKey extends keyof T>(
           [service.extendedOptions.keyProperty]: (value: any) => (
             <span
               ondblclick={() => {
-                setCurrentId(value[service.extendedOptions.keyProperty])
+                setSelection({ currentId: value[service.extendedOptions.keyProperty] })
               }}>
               {value[service.extendedOptions.keyProperty]}
             </span>
