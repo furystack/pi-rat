@@ -10,6 +10,7 @@ import { setupIdentityRestApi } from './setup-identity-rest-api'
 import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
 import { withRole } from '../with-role'
+import { getCurrentUser } from '@furystack/core'
 
 class UserModel extends Model<User, User> implements User {
   declare username: string
@@ -124,6 +125,13 @@ export const setupIdentity = async (injector: Injector) => {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeRemove: withRole('admin'),
+    authroizeRemoveEntity: async (args) => {
+      const currentUser = await getCurrentUser(args.injector)
+      if (currentUser?.username === args.entity.username) {
+        return { isAllowed: false, message: 'Cannot remove your own account' }
+      }
+      return { isAllowed: true }
+    },
     authorizeUpdate: withRole('admin'),
   })
 
