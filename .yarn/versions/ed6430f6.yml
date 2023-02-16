@@ -1,4 +1,5 @@
 releases:
-  common: minor
-  frontend: minor
-  service: minor
+  common: patch
+  frontend: patch
+  pi-rat: patch
+  service: patch
