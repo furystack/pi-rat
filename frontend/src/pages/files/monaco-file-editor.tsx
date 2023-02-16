@@ -53,7 +53,6 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
               <MonacoEditor
                 options={{
                   language: getMonacoLanguage(path),
-                  theme: 'vs-dark',
                   automaticLayout: true,
                 }}
                 value={text}

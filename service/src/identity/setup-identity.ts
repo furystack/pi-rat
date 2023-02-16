@@ -6,10 +6,11 @@ import { getRepository } from '@furystack/repository'
 import { usePasswordPolicy } from '@furystack/security'
 import { User } from 'common'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
-import { authorizedOnly } from '../authorized-only'
 import { setupIdentityRestApi } from './setup-identity-rest-api'
 import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
+import { withRole } from '../with-role'
+import { getCurrentUser } from '@furystack/core'
 
 class UserModel extends Model<User, User> implements User {
   declare username: string
@@ -121,10 +122,17 @@ export const setupIdentity = async (injector: Injector) => {
 
   await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(User, 'username', {
-    authorizeAdd: authorizedOnly,
-    authorizeGet: authorizedOnly,
-    authorizeRemove: authorizedOnly,
-    authorizeUpdate: authorizedOnly,
+    authorizeAdd: withRole('admin'),
+    authorizeGet: withRole('admin'),
+    authorizeRemove: withRole('admin'),
+    authroizeRemoveEntity: async (args) => {
+      const currentUser = await getCurrentUser(args.injector)
+      if (currentUser?.username === args.entity.username) {
+        return { isAllowed: false, message: 'Cannot remove your own account' }
+      }
+      return { isAllowed: true }
+    },
+    authorizeUpdate: withRole('admin'),
   })
 
   await logger.verbose({ message: 'Setting up password policy...' })

@@ -7,25 +7,43 @@ import { ThemeSwitch } from './theme-switch'
 
 export interface HeaderProps {
   title: string
-  links: Array<{ name: string; url: string }>
 }
+
+const AdminLinks = Shade<{}>({
+  shadowDomName: 'shade-app-header-admin-links',
+  render: ({ injector, useObservable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+
+    const isAdmin = currentUser?.roles?.includes('admin') ?? false
+
+    return isAdmin ? (
+      <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px', gap: '8px' }}>
+        <AppBarLink href="/drives" title="Drives">
+          💽 Browser
+        </AppBarLink>
+        <AppBarLink href="/entities/drives">📦 Drives</AppBarLink>
+        <AppBarLink href="/entities/users">👥 Users</AppBarLink>
+      </div>
+    ) : null
+  },
+})
 
 export const Header = Shade<HeaderProps>({
   shadowDomName: 'shade-app-header',
   render: ({ props, injector, useObservable }) => {
     const [sessionState] = useObservable('sessionState', injector.getInstance(SessionService).state)
+
     return (
       <AppBar id="header">
         <AppBarLink title={props.title} href="/">
           {props.title}
         </AppBarLink>
-        {sessionState === 'authenticated'
-          ? props.links.map((link) => (
-              <AppBarLink title={link.name} href={link.url}>
-                {link.name || ''}
-              </AppBarLink>
-            ))
-          : null}
+        {sessionState === 'authenticated' ? (
+          <>
+            <AdminLinks />
+          </>
+        ) : null}
         <div style={{ flex: '1' }} />
         <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
           <ThemeSwitch variant="outlined" />
