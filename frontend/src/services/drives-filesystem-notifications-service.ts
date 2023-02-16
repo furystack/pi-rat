@@ -22,7 +22,9 @@ type DrivesFilesystemChangedEvent = {
 export class DrivesFilesystemNotificationsService {
   public readonly onFilesystemChanged = new ObservableValue<DrivesFilesystemChangedEvent>()
 
-  public socket = new WebSocket(`${environmentOptions.serviceUrl}/ws`.replace('http', 'ws'))
+  private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
+
+  public socket = new WebSocket(this.wsUrl.toString().replace('http', 'ws'))
 
   public dispose() {
     this.socket.close()

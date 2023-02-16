@@ -3,6 +3,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import 'monaco-editor/esm/vs/editor/editor.main'
 
 import type { EditorLanguage } from 'monaco-editor/esm/metadata'
+import { defaultDarkTheme, getCssVariable, ThemeProviderService } from '@furystack/shades-common-components'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -34,13 +35,20 @@ export interface MonacoEditorProps {
 }
 export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
-  constructed: ({ element, props }) => {
+  constructed: ({ element, props, injector, useState }) => {
+    const themeProvider = injector.getInstance(ThemeProviderService)
+    const [theme] = useState<'light' | 'dark'>(
+      'theme',
+      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default ? 'dark' : 'light',
+    )
+
     element.style.display = 'block'
     element.style.height = '100%'
     element.style.width = '100%'
     element.style.position = 'relative'
     const editorInstance = monaco.editor.create(element as HTMLElement, {
       automaticLayout: true,
+      theme: theme === 'dark' ? 'vs-dark' : 'vs',
       ...props.options,
     })
     editorInstance.setValue(props.value || '')

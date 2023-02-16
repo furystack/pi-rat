@@ -5,11 +5,11 @@ import { getRepository } from '@furystack/repository'
 import { access, mkdir } from 'fs/promises'
 import { constants } from 'fs'
 import { Drive } from 'common'
-import { authorizedOnly } from '../authorized-only'
 import { setupDrivesRestApi } from './setup-drives-rest-api'
 import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
 import { useFileWatchers } from './file-watcher-service'
+import { withRole } from '../with-role'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -31,6 +31,8 @@ const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
 class DriveModel extends Model<Drive, Drive> implements Drive {
   declare physicalPath: string
   declare letter: string
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 export const setupDrives = async (injector: Injector) => {
@@ -53,6 +55,12 @@ export const setupDrives = async (injector: Injector) => {
           physicalPath: {
             type: DataTypes.STRING,
           },
+          createdAt: {
+            type: DataTypes.DATE,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+          },
         },
         {
           sequelize,
@@ -65,11 +73,11 @@ export const setupDrives = async (injector: Injector) => {
 
   await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(Drive, 'letter', {
-    authorizeGet: authorizedOnly,
-    authorizeUpdate: authorizedOnly,
-    authorizeRemove: authorizedOnly,
+    authorizeGet: withRole('admin'),
+    authorizeUpdate: withRole('admin'),
+    authorizeRemove: withRole('admin'),
     authorizeAdd: async (args) => {
-      const isAuthorized = await authorizedOnly(args)
+      const isAuthorized = await withRole('admin')(args)
       if (isAuthorized?.isAllowed === false) {
         return isAuthorized
       }

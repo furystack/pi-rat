@@ -5,6 +5,7 @@ import { ObservableValue } from '@furystack/utils'
 import { NotyService } from '@furystack/shades-common-components'
 import { WizardStep } from '../../components/wizard-step'
 import { DrivesApiClient } from '../../services/drives-api-client'
+import type { Drive } from 'common'
 
 export const AddDriveStep = Shade<WizardStepProps>({
   shadowDomName: 'add-drive-step',
@@ -27,7 +28,7 @@ export const AddDriveStep = Shade<WizardStepProps>({
               body: {
                 letter: values.letter.toString(),
                 physicalPath: values.physicalPath.toString(),
-              },
+              } as Drive,
             })
             await props.onNext?.()
             injector.getInstance(NotyService).addNoty({

@@ -179,6 +179,33 @@
       ],
       "additionalProperties": false
     },
+    "DownloadEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "letter",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
     "DrivesApi": {
       "type": "object",
       "properties": {
@@ -193,12 +220,16 @@
             },
             "/files/:letter/:path": {
               "$ref": "#/definitions/GetDirectoryEntries"
+            },
+            "/files/:letter/:path/download": {
+              "$ref": "#/definitions/DownloadEndpoint"
             }
           },
           "required": [
             "/volumes",
             "/volumes/:id",
-            "/files/:letter/:path"
+            "/files/:letter/:path",
+            "/files/:letter/:path/download"
           ],
           "additionalProperties": false
         },
@@ -298,6 +329,23 @@
           }
         },
         "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
           "type": "object",
           "additionalProperties": {
             "type": "object",
@@ -461,6 +509,23 @@
             ],
             "additionalProperties": false
           }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false
@@ -472,7 +537,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CDrive%2C(%22physicalPath%22%7C%22letter%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CDrive%2C(%22physicalPath%22%7C%22letter%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -488,7 +553,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<Drive,(\"physicalPath\"|\"letter\")[]>": {
+    "FindOptions<Drive,(\"physicalPath\"|\"letter\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -515,6 +580,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -526,7 +605,9 @@
             "type": "string",
             "enum": [
               "physicalPath",
-              "letter"
+              "letter",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -573,16 +654,20 @@
               "type": "object",
               "properties": {
                 "$startsWith": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The physical path that will be mounted to the drive letter"
                 },
                 "$endsWith": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The physical path that will be mounted to the drive letter"
                 },
                 "$like": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The physical path that will be mounted to the drive letter"
                 },
                 "$regex": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The physical path that will be mounted to the drive letter"
                 }
               },
               "additionalProperties": false
@@ -591,10 +676,12 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The physical path that will be mounted to the drive letter"
                 },
                 "$ne": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The physical path that will be mounted to the drive letter"
                 }
               },
               "additionalProperties": false
@@ -605,13 +692,15 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The physical path that will be mounted to the drive letter"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The physical path that will be mounted to the drive letter"
                   }
                 }
               },
@@ -625,16 +714,20 @@
               "type": "object",
               "properties": {
                 "$startsWith": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The drive letter, should be unique"
                 },
                 "$endsWith": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The drive letter, should be unique"
                 },
                 "$like": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The drive letter, should be unique"
                 },
                 "$regex": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The drive letter, should be unique"
                 }
               },
               "additionalProperties": false
@@ -643,10 +736,12 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The drive letter, should be unique"
                 },
                 "$ne": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The drive letter, should be unique"
                 }
               },
               "additionalProperties": false
@@ -657,13 +752,151 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The drive letter, should be unique"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The drive letter, should be unique"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The drive creation date",
+                  "format": "date-time"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The drive creation date",
+                  "format": "date-time"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The drive creation date",
+                  "format": "date-time"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The drive creation date",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The drive creation date",
+                  "format": "date-time"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The drive creation date",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The drive creation date",
+                    "format": "date-time"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The drive creation date",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Last update date",
+                  "format": "date-time"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Last update date",
+                  "format": "date-time"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Last update date",
+                  "format": "date-time"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Last update date",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Last update date",
+                  "format": "date-time"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Last update date",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Last update date",
+                    "format": "date-time"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Last update date",
+                    "format": "date-time"
                   }
                 }
               },
@@ -699,15 +932,29 @@
       "type": "object",
       "properties": {
         "physicalPath": {
-          "type": "string"
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
         },
         "letter": {
-          "type": "string"
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The drive creation date",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "required": [
         "physicalPath",
-        "letter"
+        "letter",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -723,7 +970,9 @@
                 "type": "string",
                 "enum": [
                   "physicalPath",
-                  "letter"
+                  "letter",
+                  "createdAt",
+                  "updatedAt"
                 ]
               },
               "description": "The list of fields to select"
@@ -778,28 +1027,55 @@
       "additionalProperties": false,
       "properties": {
         "letter": {
-          "type": "string"
+          "type": "string",
+          "description": "The drive letter, should be unique"
         },
         "physicalPath": {
-          "type": "string"
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The drive creation date",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "required": [
-        "physicalPath"
+        "createdAt",
+        "physicalPath",
+        "updatedAt"
       ]
     },
     "Omit<Drive,\"letter\">": {
-      "$ref": "#/definitions/Pick%3CDrive%2CExclude%3C(%22physicalPath%22%7C%22letter%22)%2C%22letter%22%3E%3E"
+      "$ref": "#/definitions/Pick%3CDrive%2CExclude%3C(%22physicalPath%22%7C%22letter%22%7C%22createdAt%22%7C%22updatedAt%22)%2C%22letter%22%3E%3E"
     },
-    "Pick<Drive,Exclude<(\"physicalPath\"|\"letter\"),\"letter\">>": {
+    "Pick<Drive,Exclude<(\"physicalPath\"|\"letter\"|\"createdAt\"|\"updatedAt\"),\"letter\">>": {
       "type": "object",
       "properties": {
         "physicalPath": {
-          "type": "string"
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The drive creation date",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "required": [
-        "physicalPath"
+        "physicalPath",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -813,7 +1089,8 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string"
+              "type": "string",
+              "description": "The drive letter, should be unique"
             }
           },
           "required": [
@@ -838,10 +1115,22 @@
       "type": "object",
       "properties": {
         "physicalPath": {
-          "type": "string"
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
         },
         "letter": {
-          "type": "string"
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The drive creation date",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update date",
+          "format": "date-time"
         }
       },
       "additionalProperties": false
@@ -853,7 +1142,8 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string"
+              "type": "string",
+              "description": "The drive letter, should be unique"
             }
           },
           "required": [

@@ -22,7 +22,7 @@ export const Layout = Shade({
           margin: '0',
           background: theme.background.default,
         }}>
-        <div style={{ zIndex: '2' }}>
+        <div style={{ zIndex: '2', position: 'fixed' }}>
           <NotyList />
         </div>
         <LazyLoad
@@ -42,15 +42,7 @@ export const Layout = Shade({
             if (result.state === 'installed') {
               return (
                 <>
-                  <Header
-                    title="🐀 PI-Rat"
-                    links={[
-                      {
-                        name: '☁️ Drives',
-                        url: '/drives',
-                      },
-                    ]}
-                  />
+                  <Header title="🐀 PI-Rat" />
                   <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} />
                 </>
               )
