@@ -130,11 +130,15 @@
             },
             "/logout": {
               "$ref": "#/definitions/LogoutAction"
+            },
+            "/users": {
+              "$ref": "#/definitions/PostEndpoint%3CUser%2C%22username%22%3E"
             }
           },
           "required": [
             "/login",
-            "/logout"
+            "/logout",
+            "/users"
           ],
           "additionalProperties": false
         },
@@ -695,6 +699,62 @@
       ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
+    },
+    "PostEndpoint<User,\"username\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CUser%2C%22username%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/User"
+        }
+      },
+      "required": [
+        "body",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "WithOptionalId<User,\"username\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Name of the user"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of roles"
+        }
+      },
+      "required": [
+        "roles"
+      ]
+    },
+    "Omit<User,\"username\">": {
+      "$ref": "#/definitions/Pick%3CUser%2CExclude%3C(%22username%22%7C%22roles%22)%2C%22username%22%3E%3E"
+    },
+    "Pick<User,Exclude<(\"username\"|\"roles\"),\"username\">>": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of roles"
+        }
+      },
+      "required": [
+        "roles"
+      ],
+      "additionalProperties": false
     },
     "PatchEndpoint<User,\"username\">": {
       "type": "object",

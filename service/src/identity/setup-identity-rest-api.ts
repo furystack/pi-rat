@@ -1,10 +1,10 @@
 import type { Injector } from '@furystack/inject'
 import {
-  Authorize,
   createDeleteEndpoint,
   createGetCollectionEndpoint,
   createGetEntityEndpoint,
   createPatchEndpoint,
+  createPostEndpoint,
   GetCurrentUser,
   IsAuthenticated,
   LoginAction,
@@ -12,7 +12,8 @@ import {
   useRestService,
   Validate,
 } from '@furystack/rest-service'
-import { IdentityApi, User } from 'common'
+import type { IdentityApi } from 'common'
+import { User } from 'common'
 import { getCorsOptions } from '../get-cors-options'
 import { getPort } from '../get-port'
 import { identityApiSchema } from 'common'
@@ -26,46 +27,44 @@ export const setupIdentityRestApi = async (injector: Injector) => {
     api: {
       GET: {
         '/currentUser': Validate({ schema: identityApiSchema, schemaName: 'GetCurrentUserAction' })(GetCurrentUser),
-        '/users': Authorize('admin')(
-          Validate({ schema: identityApiSchema, schemaName: 'GetCollectionEndpoint<User>' })(
-            createGetCollectionEndpoint({
-              model: User,
-              primaryKey: 'username',
-            }),
-          ),
+        '/users': Validate({ schema: identityApiSchema, schemaName: 'GetCollectionEndpoint<User>' })(
+          createGetCollectionEndpoint({
+            model: User,
+            primaryKey: 'username',
+          }),
         ),
-        '/users/:id': Authorize('admin')(
-          Validate({ schema: identityApiSchema, schemaName: 'GetEntityEndpoint<User,"username">' })(
-            createGetEntityEndpoint({
-              model: User,
-              primaryKey: 'username',
-            }),
-          ),
+        '/users/:id': Validate({ schema: identityApiSchema, schemaName: 'GetEntityEndpoint<User,"username">' })(
+          createGetEntityEndpoint({
+            model: User,
+            primaryKey: 'username',
+          }),
         ),
         '/isAuthenticated': IsAuthenticated,
       },
       POST: {
         '/login': LoginAction,
         '/logout': LogoutAction,
+        '/users': Validate({ schema: identityApiSchema, schemaName: 'PostEndpoint<User,"username">' })(
+          createPostEndpoint({
+            model: User,
+            primaryKey: 'username',
+          }),
+        ),
       },
       PATCH: {
-        '/users/:id': Authorize('admin')(
-          Validate({ schema: identityApiSchema, schemaName: 'PatchEndpoint<User,"username">' })(
-            createPatchEndpoint({
-              model: User,
-              primaryKey: 'username',
-            }),
-          ),
+        '/users/:id': Validate({ schema: identityApiSchema, schemaName: 'PatchEndpoint<User,"username">' })(
+          createPatchEndpoint({
+            model: User,
+            primaryKey: 'username',
+          }),
         ),
       },
       DELETE: {
-        '/users/:id': Authorize('admin')(
-          Validate({ schema: identityApiSchema, schemaName: 'DeleteEndpoint<User,"username">' })(
-            createDeleteEndpoint({
-              model: User,
-              primaryKey: 'username',
-            }),
-          ),
+        '/users/:id': Validate({ schema: identityApiSchema, schemaName: 'DeleteEndpoint<User,"username">' })(
+          createDeleteEndpoint({
+            model: User,
+            primaryKey: 'username',
+          }),
         ),
       },
     },

@@ -1,5 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { identityApiSchema, User } from 'common'
+import type { User } from 'common'
+import { identityApiSchema } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { IdentityApiClient } from '../../services/identity-api-client'
@@ -31,20 +32,28 @@ export const UsersPage = Shade({
             })
             return result.result
           },
-          remover: async (id) => {
+          deleteEntities: async (id) => {
             await api.call({ method: 'DELETE', action: `/users/:id`, url: { id } })
           },
-          singleLoader: async (id) => {
+          getEntity: async (id) => {
             const result = await api.call({ method: 'GET', action: `/users/:id`, url: { id }, query: {} })
             return result.result
           },
-          updater: async (id, entity) => {
+          patchEntity: async (id, entity) => {
             await api.call({
               method: 'PATCH',
               action: `/users/:id`,
               url: { id },
               body: entity,
             })
+          },
+          postEntity: async (entity) => {
+            const { result } = await api.call({
+              method: 'POST',
+              action: `/users`,
+              body: entity,
+            })
+            return result
           },
         }),
     )

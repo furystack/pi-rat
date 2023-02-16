@@ -32,20 +32,28 @@ export const DrivesPage = Shade({
             })
             return result.result
           },
-          remover: async (id) => {
+          deleteEntities: async (id) => {
             await api.call({ method: 'DELETE', action: `/volumes/:id`, url: { id } })
           },
-          singleLoader: async (id) => {
+          getEntity: async (id) => {
             const result = await api.call({ method: 'GET', action: `/volumes/:id`, url: { id }, query: {} })
             return result.result
           },
-          updater: async (id, entity) => {
+          patchEntity: async (id, entity) => {
             await api.call({
               method: 'PATCH',
               action: `/volumes/:id`,
               url: { id },
               body: entity,
             })
+          },
+          postEntity: async (entity) => {
+            const { result } = await api.call({
+              method: 'POST',
+              action: `/volumes`,
+              body: entity,
+            })
+            return result
           },
         }),
     )
