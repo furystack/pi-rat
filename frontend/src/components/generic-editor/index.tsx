@@ -1,7 +1,9 @@
 import type { ChildrenList } from '@furystack/shades'
 import { LazyLoad } from '@furystack/shades'
 import { createComponent, LocationService, Shade } from '@furystack/shades'
-import type { DataGridProps } from '@furystack/shades-common-components'
+import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
+import { NotyService } from '@furystack/shades-common-components'
+import { Button, SelectionCell } from '@furystack/shades-common-components'
 import { Fab } from '@furystack/shades-common-components'
 import { DataGrid } from '@furystack/shades-common-components'
 import type { GenericEditorService } from './generic-editor-service'
@@ -25,6 +27,10 @@ export const GenericEditor: <T, TKey extends keyof T>(
   render: ({ props, injector, useObservable }) => {
     const { service, columns, headerComponents, rowComponents, styles, model } = props
 
+    const refresh = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
+
+    const noty = injector.getInstance(NotyService)
+
     const locationService = injector.getInstance(LocationService)
 
     const [mode, setMode] = useObservable(
@@ -47,7 +53,13 @@ export const GenericEditor: <T, TKey extends keyof T>(
               <GenericMonacoEditor
                 value={entry}
                 onSave={async (value) => {
-                  await service.patchEntry(currentId as any, value)
+                  try {
+                    await service.patchEntry(currentId as any, value)
+                    noty.addNoty({ type: 'success', title: 'Entity updated', body: 'Entity updated successfully' })
+                    refresh()
+                  } catch (error) {
+                    noty.addNoty({ type: 'error', title: 'Failed to update entity', body: (error as Error).toString() })
+                  }
                 }}
                 service={service}
                 model={model}
@@ -65,9 +77,15 @@ export const GenericEditor: <T, TKey extends keyof T>(
           model={model}
           value={{}}
           onSave={async (value) => {
-            const response = await service.postEntry(value)
-            setMode('edit')
-            setCurrentId(response[service.extendedOptions.keyProperty] as string)
+            try {
+              const response = await service.postEntry(value)
+              setMode('edit')
+              setCurrentId(response[service.extendedOptions.keyProperty] as string)
+              noty.addNoty({ type: 'success', title: 'Entity created', body: 'Entity created successfully' })
+              refresh()
+            } catch (error) {
+              noty.addNoty({ type: 'error', title: 'Failed to create entity', body: (error as Error).toString() })
+            }
           }}
         />
       )
@@ -77,22 +95,48 @@ export const GenericEditor: <T, TKey extends keyof T>(
       <>
         <DataGrid
           service={service}
-          columns={columns}
-          headerComponents={headerComponents}
+          columns={['selection' as any, ...columns, 'actions' as any]}
+          headerComponents={{ actions: () => null, ...headerComponents }}
           rowComponents={{
-            [service.extendedOptions.keyProperty]: (value: any) => (
-              <span
-                ondblclick={() => {
-                  setMode('edit')
-
-                  setCurrentId(value[service.extendedOptions.keyProperty] as string)
-                }}>
-                {value[service.extendedOptions.keyProperty]}
-              </span>
+            selection: (entry) => <SelectionCell entry={entry} service={service as CollectionService<any>} />,
+            actions: (entry) => (
+              <div style={{ width: '156px' }}>
+                <Button
+                  onclick={() => {
+                    setMode('edit')
+                    setCurrentId(entry[service.extendedOptions.keyProperty] as string)
+                    refresh()
+                  }}>
+                  ✏️
+                </Button>
+                <Button
+                  onclick={() => {
+                    service
+                      .removeEntries(entry[service.extendedOptions.keyProperty] as any)
+                      .then(() => {
+                        noty.addNoty({ type: 'success', title: 'Entity deleted', body: 'Entity deleted successfully' })
+                        refresh()
+                      })
+                      .catch((error) => {
+                        noty.addNoty({
+                          type: 'error',
+                          title: 'Failed to delete entity',
+                          body: (error as Error).toString(),
+                        })
+                      })
+                  }}>
+                  ❌
+                </Button>
+              </div>
             ),
             ...rowComponents,
           }}
-          styles={styles}
+          styles={{
+            ...styles,
+            header: { width: '128px', ...styles?.header },
+            cell: { width: '128px', ...styles?.cell },
+            wrapper: { marginTop: '56px', ...styles?.wrapper },
+          }}
         />
         <Fab
           onclick={() => {
