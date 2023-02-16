@@ -664,6 +664,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@furystack/rest@npm:^4.1.10":
+  version: 4.1.10
+  resolution: "@furystack/rest@npm:4.1.10"
+  dependencies:
+    "@furystack/core": ^11.2.5
+    "@furystack/inject": ^7.1.6
+  checksum: c07fe64a414a2522bcad6c273fc67422b89dd1877ae81351fe6a5ff6166eb4f117febe4a4f64dd6e7a58b8bcaaae1bcbb988bb23459030d19ec1bb652c73e6b8
+  languageName: node
+  linkType: hard
+
 "@furystack/rest@npm:^4.1.9":
   version: 4.1.9
   resolution: "@furystack/rest@npm:4.1.9"
@@ -699,41 +709,41 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^4.0.4":
-  version: 4.0.4
-  resolution: "@furystack/shades-common-components@npm:4.0.4"
+"@furystack/shades-common-components@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "@furystack/shades-common-components@npm:4.0.5"
   dependencies:
     "@furystack/core": ^11.2.5
     "@furystack/inject": ^7.1.6
-    "@furystack/shades": ^7.1.2
+    "@furystack/shades": ^7.1.3
     "@furystack/utils": ^3.1.6
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: 4da4fa12de5102a886a8e351051d3af6ad3fc8635de8fcf66486302ddf0a549e41897f4b8b45f3e92d5cf08e10ab513df8d9275bed33659e2a9f7ea6c76e65f8
+  checksum: a8878b1a37aa3d8f58ad8e19d785078be9467d0665dbe260b7257afe2cb8dfb7d0333f6d0513032dba8f59d073c085563a10be65dd556e4c55bbe6c41e9d65c7
   languageName: node
   linkType: hard
 
-"@furystack/shades-lottie@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "@furystack/shades-lottie@npm:3.0.3"
+"@furystack/shades-lottie@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@furystack/shades-lottie@npm:3.0.4"
   dependencies:
-    "@furystack/shades": ^7.1.2
+    "@furystack/shades": ^7.1.3
     "@lottiefiles/lottie-player": ^1.7.1
-  checksum: 9f1cac5b9a78729bea4972efabeec86a4f36a75bfe8af9c741417732acb5906a566270ca58c1513ab82c5b382a458732d1892bea2106a8c29266e8a201f7ca19
+  checksum: 9f8f554b9e8cb576c64e42301ac8a4bed7cea66f894ac86fe3c850a5c337faa75783ae12ef974d2ea340e9d2d4e472cd923ea6ad066aa62a1195461db5abfb33
   languageName: node
   linkType: hard
 
-"@furystack/shades@npm:^7.1.2":
-  version: 7.1.2
-  resolution: "@furystack/shades@npm:7.1.2"
+"@furystack/shades@npm:^7.1.3":
+  version: 7.1.3
+  resolution: "@furystack/shades@npm:7.1.3"
   dependencies:
     "@furystack/core": ^11.2.5
     "@furystack/inject": ^7.1.6
-    "@furystack/rest": ^4.1.9
+    "@furystack/rest": ^4.1.10
     "@furystack/utils": ^3.1.6
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: 201cd40ff2641e0fbc0c04bab6f673f167de4381a9ecc731dac831b42338d77c6df2aecae47b473eb33eac37b94528bd14fcab3368826a958391b783e13c6596
+  checksum: fbef0592b03bbdd4258678f3e3dc3463484d9ee8b603a2d73b5af691a86d2b7cb93ef1d3e68de8c396634a205d1a2da0e535bc1f632b312f78c408ae1742f484
   languageName: node
   linkType: hard
 
@@ -2279,7 +2289,7 @@ __metadata:
   resolution: "common@workspace:common"
   dependencies:
     "@furystack/core": ^11.2.5
-    "@furystack/rest": ^4.1.9
+    "@furystack/rest": ^4.1.10
     "@types/node": ^18.13.0
     ts-json-schema-generator: ^1.2.0
   languageName: unknown
@@ -3140,11 +3150,11 @@ __metadata:
     "@furystack/core": ^11.2.5
     "@furystack/inject": ^7.1.6
     "@furystack/logging": ^3.1.6
-    "@furystack/rest": ^4.1.9
+    "@furystack/rest": ^4.1.10
     "@furystack/rest-client-fetch": ^4.1.10
-    "@furystack/shades": ^7.1.2
-    "@furystack/shades-common-components": ^4.0.4
-    "@furystack/shades-lottie": ^3.0.3
+    "@furystack/shades": ^7.1.3
+    "@furystack/shades-common-components": ^4.0.5
+    "@furystack/shades-lottie": ^3.0.4
     "@furystack/utils": ^3.1.6
     "@types/node": ^18.13.0
     "@yarnpkg/esbuild-plugin-pnp": ^3.0.0-rc.15
@@ -5810,7 +5820,7 @@ __metadata:
     "@furystack/inject": ^7.1.6
     "@furystack/logging": ^3.1.6
     "@furystack/repository": ^6.1.7
-    "@furystack/rest": ^4.1.9
+    "@furystack/rest": ^4.1.10
     "@furystack/rest-service": ^6.2.13
     "@furystack/security": ^2.1.7
     "@furystack/sequelize-store": ^2.1.5

@@ -19,7 +19,7 @@
     "@furystack/inject": "^7.1.6",
     "@furystack/logging": "^3.1.6",
     "@furystack/repository": "^6.1.7",
-    "@furystack/rest": "^4.1.9",
+    "@furystack/rest": "^4.1.10",
     "@furystack/rest-service": "^6.2.13",
     "@furystack/security": "^2.1.7",
     "@furystack/sequelize-store": "^2.1.5",
