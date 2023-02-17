@@ -48,7 +48,6 @@ export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, ge
     logger.debug({ message: `Uploading File '${file.originalFilename}'`, data: { formName, file } })
   })
 
-  // TODO: Implement response parsing
   const parseResult = await new Promise<{ files: Files; fields: Fields }>((resolve, reject) => {
     try {
       form.parse(request, (err, fields, files) => {

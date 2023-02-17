@@ -1,19 +1,19 @@
 import type { GetCollectionEndpoint, GetEntityEndpoint, RestApi } from '@furystack/rest'
-import type { WebTorrent } from '../models/web-torrent'
+import type { WebTorrentEntity } from '../models/web-torrent-entity'
 
-type UploadTorrentEndpoint = {
-  result: { success: true; entries: WebTorrent[] }
+export type UploadTorrentEndpoint = {
+  result: { success: true; entries: WebTorrentEntity[] }
   body: any
 }
 
-type StartTorrentEndpoint = {
+export type StartTorrentEndpoint = {
   url: {
     id: string
   }
   result: { success: true }
 }
 
-type StopTorrentEndpoint = {
+export type StopTorrentEndpoint = {
   url: {
     id: string
   }
@@ -22,8 +22,8 @@ type StopTorrentEndpoint = {
 
 export interface WebTorrentApi extends RestApi {
   GET: {
-    '/torrents': GetCollectionEndpoint<WebTorrent>
-    '/torrents/:id': GetEntityEndpoint<WebTorrent, 'id'>
+    '/torrents': GetCollectionEndpoint<WebTorrentEntity>
+    '/torrents/:id': GetEntityEndpoint<WebTorrentEntity, 'id'>
   }
   POST: {
     '/torrents': UploadTorrentEndpoint

@@ -35,6 +35,11 @@ export const apiValues: SchemaGenerationSetting[] = [
     outputFile: './src/schemas/apis/install-api.json',
     type: '*',
   },
+  {
+    inputFile: './src/apis/webtorrent.ts',
+    outputFile: './src/schemas/apis/webtorrent-api.json',
+    type: '*',
+  },
 ]
 
 export const exec = async (): Promise<void> => {
