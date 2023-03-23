@@ -58,6 +58,7 @@ module.exports = {
     'default-case': 'error',
     'jsdoc/require-param-type': 'off',
     'jsdoc/require-returns-type': 'off',
+    'jsdoc/check-tag-names': 'off',
   },
   overrides: [
     {
