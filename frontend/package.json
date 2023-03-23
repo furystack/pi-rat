@@ -10,21 +10,21 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@furystack/rest": "^4.1.12",
+    "@furystack/rest": "^4.1.13",
     "@yarnpkg/esbuild-plugin-pnp": "^3.0.0-rc.15",
-    "esbuild": "^0.17.10",
-    "typescript": "^4.9.5"
+    "esbuild": "^0.17.12",
+    "typescript": "^5.0.2"
   },
   "dependencies": {
-    "@furystack/core": "^11.2.7",
-    "@furystack/inject": "^7.1.6",
-    "@furystack/logging": "^3.1.6",
-    "@furystack/rest-client-fetch": "^4.1.12",
-    "@furystack/shades": "^7.1.5",
-    "@furystack/shades-common-components": "^4.0.7",
-    "@furystack/shades-lottie": "^3.0.6",
-    "@furystack/utils": "^3.1.6",
-    "@types/node": "^18.14.2",
+    "@furystack/core": "^11.2.8",
+    "@furystack/inject": "^7.1.7",
+    "@furystack/logging": "^3.1.7",
+    "@furystack/rest-client-fetch": "^4.1.13",
+    "@furystack/shades": "^7.1.6",
+    "@furystack/shades-common-components": "^4.0.8",
+    "@furystack/shades-lottie": "^3.0.7",
+    "@furystack/utils": "^3.1.7",
+    "@types/node": "^18.15.5",
     "common": "workspace:^",
     "monaco-editor": "^0.36.1"
   }
