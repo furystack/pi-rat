@@ -28,7 +28,7 @@
     "@types/jest": "^29.5.0",
     "chokidar": "^3.5.3",
     "common": "workspace:^",
-    "formidable": "^2.1.1",
+    "formidable": "^2.1.2",
     "sequelize": "^6.29.3",
     "sqlite3": "^5.1.6"
   }
