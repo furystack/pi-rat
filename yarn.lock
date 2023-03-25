@@ -617,14 +617,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/core@npm:^11.2.9":
-  version: 11.2.9
-  resolution: "@furystack/core@npm:11.2.9"
+"@furystack/core@npm:^11.2.10":
+  version: 11.2.10
+  resolution: "@furystack/core@npm:11.2.10"
   dependencies:
     "@furystack/inject": ^7.1.7
     "@furystack/utils": ^3.1.7
     semaphore-async-await: ^1.5.1
-  checksum: 4e69b3fe96b6fb37f5253700af3b3df7b10581e89a4356313d65c00f7a823f84fcf42476186f83091668734cc3a944f0f1b2f4b42f09cd38368d4f99f21303f1
+  checksum: dd848450c7d29d3aa0313b5431fef91707598c820a129fdad75805f1082ca68dd5c4895ae214b1234b3fa36f5a85867fe8529b14080a19969eb4d20260a64986
   languageName: node
   linkType: hard
 
@@ -647,119 +647,119 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/repository@npm:^6.1.11":
-  version: 6.1.11
-  resolution: "@furystack/repository@npm:6.1.11"
+"@furystack/repository@npm:^6.1.12":
+  version: 6.1.12
+  resolution: "@furystack/repository@npm:6.1.12"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
     "@furystack/logging": ^3.1.7
     "@furystack/utils": ^3.1.7
-  checksum: 79bab66234d543333cc4521c279fd949b21e6cbb4f047078a8dc9020bb24e43bebd8859ff88949e3f6563409895b34aa8a2dd1a2a48e695df10758d5e9716a76
+  checksum: 022099849a145e5a0f27935d3ac9b64a99936c456c5eff4802dc6adfd9e5ed595b34e4c8938c02a4277bf0a58d439d46c9c7d44c6ab47870223e128728b7727d
   languageName: node
   linkType: hard
 
-"@furystack/rest-client-fetch@npm:^4.1.14":
-  version: 4.1.14
-  resolution: "@furystack/rest-client-fetch@npm:4.1.14"
+"@furystack/rest-client-fetch@npm:^4.1.15":
+  version: 4.1.15
+  resolution: "@furystack/rest-client-fetch@npm:4.1.15"
   dependencies:
     "@furystack/inject": ^7.1.7
     "@furystack/logging": ^3.1.7
-    "@furystack/rest": ^4.1.14
+    "@furystack/rest": ^4.1.15
     path-to-regexp: ^6.2.1
-  checksum: 4fa3067f65ab0e8ebf9237546b197ca704c0ae240d64bbad7c4c49903c8203346ba47faeaf3c2633ea7ccf504278b53feb3d0ecd5a32143bca621f2e542022d8
+  checksum: d01ddb4bec831ce6e80838130dea0a4edd7ff52168b81c28f4ae87c912c235d0acbc07eb8b853a1cccbf841785410dde3b76ee6752f67bfd1bbb2bb033ec4fe3
   languageName: node
   linkType: hard
 
-"@furystack/rest-service@npm:^6.2.17":
-  version: 6.2.17
-  resolution: "@furystack/rest-service@npm:6.2.17"
+"@furystack/rest-service@npm:^6.2.18":
+  version: 6.2.18
+  resolution: "@furystack/rest-service@npm:6.2.18"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
     "@furystack/logging": ^3.1.7
-    "@furystack/repository": ^6.1.11
-    "@furystack/rest": ^4.1.14
-    "@furystack/security": ^2.1.11
+    "@furystack/repository": ^6.1.12
+    "@furystack/rest": ^4.1.15
+    "@furystack/security": ^2.1.12
     "@furystack/utils": ^3.1.7
     ajv: ^8.12.0
     ajv-formats: ^2.1.1
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: c70fe61b6cb96b2b8b9b722ddad95beb5454e2e000e6b2135814dd6eaae0ae8692a8ec83044a5ea5201d964f03be048650ebd53abcd3951964a156da49069702
+  checksum: f9fb4bfafb9c03b1be1d706d6c7f404e6071ecdab830fd95fc9578008e53b966b1d533c5e020dee9207316ea62aa4299e3561872520f29861dc3badbf51983cf
   languageName: node
   linkType: hard
 
-"@furystack/rest@npm:^4.1.14":
-  version: 4.1.14
-  resolution: "@furystack/rest@npm:4.1.14"
+"@furystack/rest@npm:^4.1.15":
+  version: 4.1.15
+  resolution: "@furystack/rest@npm:4.1.15"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
-  checksum: b79eafa77a73852e1306b60552c5b63a417c4b3ac52f16a4d62d008836c2256d80781513b31edda0a556a8123cd722a2e9f4c5050e5bc6fb2dad296fade80524
+  checksum: 12a991abd6a84f1024733b2b2fb5ae3c32b958002018bc46456a994077e40593d19586333213f9b95f7f603404731cfbf81cce67c8ba90dd0192c6b6c64f207f
   languageName: node
   linkType: hard
 
-"@furystack/security@npm:^2.1.11":
-  version: 2.1.11
-  resolution: "@furystack/security@npm:2.1.11"
+"@furystack/security@npm:^2.1.12":
+  version: 2.1.12
+  resolution: "@furystack/security@npm:2.1.12"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
     "@furystack/utils": ^3.1.7
-  checksum: d701e069b5ad11a7c2603b929e883b33b63187a102d9e30adbc5db93bc3792770e32f68870084ba7ab693bf0f12781cc8192aa16b4e4f90b50d215d6feabe4bc
+  checksum: 16ef99cb513f151660dec5e7f2d5282fe5b2153c5d4d272b6afdbbf6993dbeefe553db48a69356eed4557b47adc83396716bd9503ccd3a2a4cc39d866ca2ffea
   languageName: node
   linkType: hard
 
-"@furystack/sequelize-store@npm:^2.1.9":
-  version: 2.1.9
-  resolution: "@furystack/sequelize-store@npm:2.1.9"
+"@furystack/sequelize-store@npm:^2.1.10":
+  version: 2.1.10
+  resolution: "@furystack/sequelize-store@npm:2.1.10"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
     "@furystack/logging": ^3.1.7
     "@furystack/utils": ^3.1.7
     semaphore-async-await: ^1.5.1
     sequelize: ^6.30.0
-  checksum: 1ecbdf1b19d1ca8a59be538116e92c582b73c60fe7339b73e12dc923a4effc46d9560dc687e5eda40476b5d654f392625b89cc56d4dc19f242c94060ddcca020
+  checksum: d294f9e7dd969b0aedacda580ee35f5d7c623c787f3ddb80349c149bf53d2d921fe86d34678623be6822a585c26240a06caaa36c1c7b4460e2010ead34743488
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^4.0.9":
-  version: 4.0.9
-  resolution: "@furystack/shades-common-components@npm:4.0.9"
+"@furystack/shades-common-components@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "@furystack/shades-common-components@npm:4.0.10"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
-    "@furystack/shades": ^7.2.0
+    "@furystack/shades": ^7.2.1
     "@furystack/utils": ^3.1.7
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: 7d2af3bba3d891bbb73662b4f1f56aa11be0e4ae474052ee2a6f37b5a8bf58a59c89738f7309eb50583fdf7fb52982562904feca5c121a353f1e2b61a2e6fc15
+  checksum: fbba76a0e1d86de8b48ee812ab103cb5a25af1a4129815833d789265df79853f7e744753fc64a4b715f0a64ff86ff33f96483afed0dff6a91563bda9f931f5ab
   languageName: node
   linkType: hard
 
-"@furystack/shades-lottie@npm:^3.0.8":
-  version: 3.0.8
-  resolution: "@furystack/shades-lottie@npm:3.0.8"
+"@furystack/shades-lottie@npm:^3.0.9":
+  version: 3.0.9
+  resolution: "@furystack/shades-lottie@npm:3.0.9"
   dependencies:
-    "@furystack/shades": ^7.2.0
+    "@furystack/shades": ^7.2.1
     "@lottiefiles/lottie-player": ^1.7.1
-  checksum: 145155a3d6d3f41286a9cc2a65f5178adcaebab55c34f7a6095e3a4c0f742070f375de5f53612793fdc6fa30e15ccdd4bc0f170de55fc78c0e4f62e45f3c0219
+  checksum: 616876f2264a6ace1a90bc96f10a101c990fdaeae1c2904cb13e754ca27e44bef78ac310cb2e8c0ebc047d28eaaaa3d1b733391229bba18d774e3d6585b6c3b3
   languageName: node
   linkType: hard
 
-"@furystack/shades@npm:^7.2.0":
-  version: 7.2.0
-  resolution: "@furystack/shades@npm:7.2.0"
+"@furystack/shades@npm:^7.2.1":
+  version: 7.2.1
+  resolution: "@furystack/shades@npm:7.2.1"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
-    "@furystack/rest": ^4.1.14
+    "@furystack/rest": ^4.1.15
     "@furystack/utils": ^3.1.7
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: a35db71c9740cc8f19eebb83130e7e229bfa08491fa80c07dc9d6d2cdba005dc0e6c21a792067718b1ab703c05b2b0ba670de2dfef3bba1ccbb1f91deb01c0cf
+  checksum: 582ac864489a929d34b23a151bdba4dcc9c883917d56065e75397705a442e7863c89ddd6bd7bf6e8c1a619c56f197a93491c225e6f3534e1b5be9556cc463d01
   languageName: node
   linkType: hard
 
@@ -770,17 +770,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/websocket-api@npm:^8.1.17":
-  version: 8.1.17
-  resolution: "@furystack/websocket-api@npm:8.1.17"
+"@furystack/websocket-api@npm:^8.1.18":
+  version: 8.1.18
+  resolution: "@furystack/websocket-api@npm:8.1.18"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
     "@furystack/logging": ^3.1.7
-    "@furystack/rest-service": ^6.2.17
+    "@furystack/rest-service": ^6.2.18
     "@furystack/utils": ^3.1.7
     ws: ^8.13.0
-  checksum: ee4a087885671b4f4316d1050cccf2db7401c52c2f7012ae61939b45cbea83345c7b69dbd04fc4b22be534d5811a309d9ef2933e8279a1d2794aca96708a9f11
+  checksum: 9f9756fb9f9517c6c494afe668e11e2a3e79b280670184a9712f9d1e58d467bc8099e3e6c9ab9a3767de2e86299ffb3a5bd4df44940e307688bddb0332b8b238
   languageName: node
   linkType: hard
 
@@ -2339,8 +2339,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "common@workspace:common"
   dependencies:
-    "@furystack/core": ^11.2.9
-    "@furystack/rest": ^4.1.14
+    "@furystack/core": ^11.2.10
+    "@furystack/rest": ^4.1.15
     "@types/node": ^18.15.9
     ts-json-schema-generator: ^1.2.0
   languageName: unknown
@@ -3182,14 +3182,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "frontend@workspace:frontend"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
     "@furystack/logging": ^3.1.7
-    "@furystack/rest": ^4.1.14
-    "@furystack/rest-client-fetch": ^4.1.14
-    "@furystack/shades": ^7.2.0
-    "@furystack/shades-common-components": ^4.0.9
-    "@furystack/shades-lottie": ^3.0.8
+    "@furystack/rest": ^4.1.15
+    "@furystack/rest-client-fetch": ^4.1.15
+    "@furystack/shades": ^7.2.1
+    "@furystack/shades-common-components": ^4.0.10
+    "@furystack/shades-lottie": ^3.0.9
     "@furystack/utils": ^3.1.7
     "@types/node": ^18.15.9
     "@yarnpkg/esbuild-plugin-pnp": ^3.0.0-rc.15
@@ -5885,16 +5885,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "service@workspace:service"
   dependencies:
-    "@furystack/core": ^11.2.9
+    "@furystack/core": ^11.2.10
     "@furystack/inject": ^7.1.7
     "@furystack/logging": ^3.1.7
-    "@furystack/repository": ^6.1.11
-    "@furystack/rest": ^4.1.14
-    "@furystack/rest-service": ^6.2.17
-    "@furystack/security": ^2.1.11
-    "@furystack/sequelize-store": ^2.1.9
+    "@furystack/repository": ^6.1.12
+    "@furystack/rest": ^4.1.15
+    "@furystack/rest-service": ^6.2.18
+    "@furystack/security": ^2.1.12
+    "@furystack/sequelize-store": ^2.1.10
     "@furystack/utils": ^3.1.7
-    "@furystack/websocket-api": ^8.1.17
+    "@furystack/websocket-api": ^8.1.18
     "@types/formidable": ^2.0.5
     "@types/jest": ^29.5.0
     "@types/node": ^18.15.9
