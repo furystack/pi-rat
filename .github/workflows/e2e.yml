@@ -42,3 +42,9 @@ jobs:
       - run: docker logs pi-rat
         if: always()
         name: Dump Docker logs
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          path: test-results
+          name: test-results
