@@ -1,17 +1,12 @@
 import { test, expect } from '@playwright/test'
 import { assertAndDismissNoty, login } from './helpers'
 import { join } from 'path'
-import { mkdir } from 'fs/promises'
-import { rimraf } from 'rimraf'
 
 test.describe('Browser', () => {
   test('Should be able to create a drive in the temp directory', async ({ page, browserName }) => {
     const tempPath = join((process as any).env?.E2E_TEMP || process.cwd(), 'browser-temp', browserName)
 
     console.log('Using temp path:', { tempPath })
-
-    await rimraf(tempPath)
-    await mkdir(tempPath, { recursive: true })
 
     await page.goto('/')
 
