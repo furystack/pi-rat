@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { User } from 'common'
+import { User } from 'common'
 import { identityApiSchema } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
@@ -21,9 +21,11 @@ export const UsersPage = Shade({
     const service = useDisposable(
       'service',
       () =>
-        new GenericEditorService<User, 'username'>({
+        new GenericEditorService({
           defaultSettings: {},
+          model: User,
           keyProperty: 'username',
+          readonlyProperties: [],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',

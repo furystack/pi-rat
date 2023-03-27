@@ -6,10 +6,9 @@ import { Button } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 
 export const GenericMonacoEditor = Shade<{
-  // entityId?: any
   value: any
   onSave: (value: any) => Promise<void>
-  service: GenericEditorService<any, any>
+  service: GenericEditorService<any, any, any>
   model?: monaco.editor.ITextModel
 }>({
   shadowDomName: 'shade-generic-monaco-editor',

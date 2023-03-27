@@ -74,7 +74,23 @@ export const setupDrives = async (injector: Injector) => {
   await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(Drive, 'letter', {
     authorizeGet: withRole('admin'),
-    authorizeUpdate: withRole('admin'),
+    authorizeUpdate: async (args) => {
+      const internalFields = ['createdAt', 'updatedAt', 'letter']
+
+      const isAuthorized = await withRole('admin')(args)
+      if (isAuthorized?.isAllowed === false) {
+        return isAuthorized
+      }
+
+      if (Object.keys(args.change).some((key) => internalFields.includes(key))) {
+        return {
+          isAllowed: false,
+          message: `You are not allowed to change the following properties: ${internalFields.join(', ')}`,
+        }
+      }
+
+      return { isAllowed: true }
+    },
     authorizeRemove: withRole('admin'),
     authorizeAdd: async (args) => {
       const isAuthorized = await withRole('admin')(args)

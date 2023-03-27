@@ -33,7 +33,7 @@ export const AddDriveStep = Shade<WizardStepProps>({
             await props.onNext?.()
             injector.getInstance(NotyService).addNoty({
               type: 'success',
-              body: `Drive '${values.letter.toString()}' has been succesfully`,
+              body: `Drive '${values.letter.toString()}' has been created succesfully`,
               title: 'Drive created',
             })
           } catch (error) {

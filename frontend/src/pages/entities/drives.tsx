@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { Drive } from 'common'
+import { Drive } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { DrivesApiClient } from '../../services/drives-api-client'
@@ -21,9 +21,11 @@ export const DrivesPage = Shade({
     const service = useDisposable(
       'service',
       () =>
-        new GenericEditorService<Drive, 'letter'>({
+        new GenericEditorService({
           defaultSettings: {},
+          model: Drive,
           keyProperty: 'letter',
+          readonlyProperties: ['createdAt', 'updatedAt', 'letter'],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',

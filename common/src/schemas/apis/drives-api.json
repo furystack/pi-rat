@@ -206,6 +206,117 @@
       ],
       "additionalProperties": false
     },
+    "PostDriveEndpoint": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Omit%3CWithOptionalId%3CDrive%2C%22letter%22%3E%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/Drive"
+        }
+      },
+      "required": [
+        "body",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "Omit<WithOptionalId<Drive,\"letter\">,(\"createdAt\"|\"updatedAt\")>": {
+      "$ref": "#/definitions/Pick%3CWithOptionalId%3CDrive%2C%22letter%22%3E%2CExclude%3C(%22physicalPath%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22letter%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+    },
+    "Pick<WithOptionalId<Drive,\"letter\">,Exclude<(\"physicalPath\"|\"createdAt\"|\"updatedAt\"|\"letter\"),(\"createdAt\"|\"updatedAt\")>>": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "letter": {
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        }
+      },
+      "required": [
+        "physicalPath"
+      ],
+      "additionalProperties": false
+    },
+    "Drive": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "letter": {
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The drive creation date",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update date",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "physicalPath",
+        "letter",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "PatchDriveEndpoint": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3COmit%3CDrive%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The drive letter, should be unique"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "Partial<Omit<Drive,(\"createdAt\"|\"updatedAt\")>>": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "letter": {
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        }
+      },
+      "additionalProperties": false
+    },
     "DrivesApi": {
       "type": "object",
       "properties": {
@@ -237,7 +348,7 @@
           "type": "object",
           "properties": {
             "/volumes": {
-              "$ref": "#/definitions/PostEndpoint%3CDrive%2C%22letter%22%3E"
+              "$ref": "#/definitions/PostDriveEndpoint"
             },
             "/volumes/:letter/:path/upload": {
               "$ref": "#/definitions/UploadEndpoint"
@@ -928,36 +1039,6 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "Drive": {
-      "type": "object",
-      "properties": {
-        "physicalPath": {
-          "type": "string",
-          "description": "The physical path that will be mounted to the drive letter"
-        },
-        "letter": {
-          "type": "string",
-          "description": "The drive letter, should be unique"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The drive creation date",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Last update date",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "physicalPath",
-        "letter",
-        "createdAt",
-        "updatedAt"
-      ],
-      "additionalProperties": false
-    },
     "GetEntityEndpoint<Drive,\"letter\">": {
       "type": "object",
       "properties": {
@@ -1004,80 +1085,6 @@
       ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
-    },
-    "PostEndpoint<Drive,\"letter\">": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/WithOptionalId%3CDrive%2C%22letter%22%3E"
-        },
-        "result": {
-          "$ref": "#/definitions/Drive"
-        }
-      },
-      "required": [
-        "body",
-        "result"
-      ],
-      "additionalProperties": false,
-      "description": "Endpoint model for creating new entities"
-    },
-    "WithOptionalId<Drive,\"letter\">": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "letter": {
-          "type": "string",
-          "description": "The drive letter, should be unique"
-        },
-        "physicalPath": {
-          "type": "string",
-          "description": "The physical path that will be mounted to the drive letter"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The drive creation date",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Last update date",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "createdAt",
-        "physicalPath",
-        "updatedAt"
-      ]
-    },
-    "Omit<Drive,\"letter\">": {
-      "$ref": "#/definitions/Pick%3CDrive%2CExclude%3C(%22physicalPath%22%7C%22letter%22%7C%22createdAt%22%7C%22updatedAt%22)%2C%22letter%22%3E%3E"
-    },
-    "Pick<Drive,Exclude<(\"physicalPath\"|\"letter\"|\"createdAt\"|\"updatedAt\"),\"letter\">>": {
-      "type": "object",
-      "properties": {
-        "physicalPath": {
-          "type": "string",
-          "description": "The physical path that will be mounted to the drive letter"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The drive creation date",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Last update date",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "physicalPath",
-        "createdAt",
-        "updatedAt"
-      ],
-      "additionalProperties": false
     },
     "PatchEndpoint<Drive,\"letter\">": {
       "type": "object",

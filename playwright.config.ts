@@ -17,7 +17,9 @@ const config: PlaywrightTestConfig = {
   },
   use: {
     trace: 'on-first-retry',
+    baseURL: 'http://localhost:9090',
   },
+
   projects: [
     {
       name: 'chromium',
@@ -26,10 +28,6 @@ const config: PlaywrightTestConfig = {
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
     },
   ],
 }

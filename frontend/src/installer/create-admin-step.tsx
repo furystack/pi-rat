@@ -22,7 +22,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
             method: 'POST',
             action: '/install',
             body: {
-              username: values.username.toString(),
+              username: values.userName.toString(),
               password: values.password.toString(),
             },
           })
@@ -31,7 +31,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
         }}>
         You have to create a super admin user.
         <Input
-          name="username"
+          name="userName"
           variant="outlined"
           autofocus
           autocomplete="false"

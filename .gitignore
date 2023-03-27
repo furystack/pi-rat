@@ -74,3 +74,5 @@ testresults
 !.yarn/sdks
 !.yarn/versions
 service/data/*.sqlite
+
+browser-temp
