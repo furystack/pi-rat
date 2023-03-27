@@ -8,7 +8,7 @@ test.describe('Browser', () => {
   test('Should be able to create a drive in the temp directory', async ({ page, browserName }) => {
     const tempPath = join(process.cwd(), 'browser-temp', browserName)
     await rimraf(tempPath)
-    await mkdir(tempPath)
+    await mkdir(tempPath, { recursive: true })
 
     await page.goto('/')
 
