@@ -71,25 +71,6 @@
       ],
       "additionalProperties": false
     },
-    "ReadonlyDrive": {
-      "$ref": "#/definitions/Omit%3CDrive%2C(%22createdAt%22%7C%22updatedAt%22%7C%22letter%22)%3E"
-    },
-    "Omit<Drive,(\"createdAt\"|\"updatedAt\"|\"letter\")>": {
-      "$ref": "#/definitions/Pick%3CDrive%2CExclude%3C(%22physicalPath%22%7C%22letter%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22%7C%22letter%22)%3E%3E"
-    },
-    "Pick<Drive,Exclude<(\"physicalPath\"|\"letter\"|\"createdAt\"|\"updatedAt\"),(\"createdAt\"|\"updatedAt\"|\"letter\")>>": {
-      "type": "object",
-      "properties": {
-        "physicalPath": {
-          "type": "string",
-          "description": "The physical path that will be mounted to the drive letter"
-        }
-      },
-      "required": [
-        "physicalPath"
-      ],
-      "additionalProperties": false
-    },
     "User": {
       "type": "object",
       "properties": {
