@@ -21,6 +21,11 @@ RUN yarn workspaces focus service --production
 FROM node:18-alpine as runner
 
 COPY --chown=node:node --from=base /home/node/app /home/node/app
+
+RUN mkdir /home/node/tmp && chown node:node /home/node/tmp
+
+ENV TMP /home/node/tmp
+
 USER node
 EXPOSE 9090
 WORKDIR /home/node/app
