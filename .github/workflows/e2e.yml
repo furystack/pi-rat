@@ -39,7 +39,7 @@ jobs:
       - run: yarn test:e2e
         name: 'E2E tests'
         env:
-          E2E_TEMP: /home/node/tmp
+          E2E_TEMP: /home/node/app/tmp
 
       - run: docker logs pi-rat
         if: always()
