@@ -6,9 +6,9 @@ import { rimraf } from 'rimraf'
 
 test.describe('Browser', () => {
   test('Should be able to create a drive in the temp directory', async ({ page, browserName }) => {
-    const tempPath = join((process as any).env?.TEMP, 'browser-temp', browserName)
+    const tempPath = join((process as any).env?.TMP || process.env.TEMP || process.cwd(), 'browser-temp', browserName)
 
-    console.log({ tempPath })
+    console.log('Using temp path:', { tempPath })
 
     await rimraf(tempPath)
     await mkdir(tempPath, { recursive: true })
