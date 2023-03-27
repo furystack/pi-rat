@@ -19,11 +19,7 @@ const config: PlaywrightTestConfig = {
     trace: 'on-first-retry',
     baseURL: 'http://localhost:9090',
   },
-  webServer: {
-    command: 'yarn start:service',
-    url: 'http://localhost:9090',
-    reuseExistingServer: !isInCi,
-  },
+
   projects: [
     {
       name: 'chromium',

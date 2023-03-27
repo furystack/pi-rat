@@ -1,8 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { login } from './helpers'
 
 test.describe('Pi-Rat Application', () => {
   test('Login and logout roundtrip', async ({ page }) => {
     await page.goto('/')
+
+    await login(page)
 
     const loginForm = await page.locator('shade-login form')
     await expect(loginForm).toBeVisible()

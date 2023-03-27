@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { login } from './helpers'
 
 test('Setup Project @install', async ({ page }) => {
   await page.goto('/')
@@ -41,6 +42,5 @@ test('Setup Project @install', async ({ page }) => {
 
   await page.waitForNavigation()
 
-  const loginForm = await page.locator('shade-login form.login-form')
-  await expect(loginForm).toBeVisible()
+  await login(page, 'testuser@gmail.com', 'password')
 })
