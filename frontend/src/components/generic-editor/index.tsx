@@ -10,8 +10,8 @@ import type { GenericEditorService } from './generic-editor-service'
 import type monaco from 'monaco-editor'
 import { GenericMonacoEditor } from './generic-monaco-editor'
 
-type GenericEditorProps<T, TKey extends keyof T> = {
-  service: GenericEditorService<T, TKey>
+type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
+  service: GenericEditorService<T, TKey, TReadonlyProperties>
   columns: DataGridProps<T>['columns']
   headerComponents: DataGridProps<T>['headerComponents']
   rowComponents: DataGridProps<T>['rowComponents']
@@ -19,8 +19,8 @@ type GenericEditorProps<T, TKey extends keyof T> = {
   model?: monaco.editor.ITextModel
 }
 
-export const GenericEditor: <T, TKey extends keyof T>(
-  props: GenericEditorProps<T, TKey>,
+export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T>(
+  props: GenericEditorProps<T, TKey, TReadonlyProperties>,
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',

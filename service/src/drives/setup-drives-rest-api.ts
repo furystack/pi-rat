@@ -51,7 +51,7 @@ export const setupDrivesRestApi = async (injector: Injector) => {
       },
       POST: {
         '/volumes/:letter/:path/upload': UploadAction,
-        '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostEndpoint<Drive,"letter">' })(
+        '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostDriveEndpoint' })(
           createPostEndpoint({
             model: Drive,
             primaryKey: 'letter',
@@ -59,10 +59,12 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         ),
       },
       PATCH: {
-        '/volumes/:id': createPatchEndpoint({
-          model: Drive,
-          primaryKey: 'letter',
-        }),
+        '/volumes/:id': Validate({ schema: drivesApiSchema, schemaName: 'PatchDriveEndpoint' })(
+          createPatchEndpoint({
+            model: Drive,
+            primaryKey: 'letter',
+          }),
+        ),
       },
       DELETE: {
         '/volumes/:id': createDeleteEndpoint({

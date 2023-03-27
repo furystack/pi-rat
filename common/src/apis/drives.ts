@@ -4,11 +4,11 @@ import type {
   GetCollectionResult,
   GetEntityEndpoint,
   PatchEndpoint,
-  PostEndpoint,
   RestApi,
 } from '@furystack/rest'
 import type { DirectoryEntry } from '../models/directory-entry'
 import type { Drive } from '../models/drive'
+import type { WithOptionalId } from '@furystack/core'
 
 export type GetDirectoryEntries = {
   url: {
@@ -43,6 +43,19 @@ export type DownloadEndpoint = {
   result: unknown
 }
 
+export type PostDriveEndpoint = {
+  body: Omit<WithOptionalId<Drive, 'letter'>, 'createdAt' | 'updatedAt'>
+  result: Drive
+}
+
+export type PatchDriveEndpoint = {
+  body: Partial<Omit<Drive, 'createdAt' | 'updatedAt'>>
+  url: {
+    id: Drive['letter']
+  }
+  result: {}
+}
+
 export interface DrivesApi extends RestApi {
   GET: {
     '/volumes': GetCollectionEndpoint<Drive>
@@ -51,7 +64,7 @@ export interface DrivesApi extends RestApi {
     '/files/:letter/:path/download': DownloadEndpoint
   }
   POST: {
-    '/volumes': PostEndpoint<Drive, 'letter'>
+    '/volumes': PostDriveEndpoint
     '/volumes/:letter/:path/upload': UploadEndpoint
   }
   PATCH: {
