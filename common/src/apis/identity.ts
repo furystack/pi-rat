@@ -1,18 +1,14 @@
-import type { User } from '@furystack/core'
-import type {
-  DeleteEndpoint,
-  GetCollectionEndpoint,
-  GetEntityEndpoint,
-  PatchEndpoint,
-  PostEndpoint,
-  RestApi,
-} from '@furystack/rest'
+import type { DeleteEndpoint, GetCollectionEndpoint, GetEntityEndpoint, PatchEndpoint, RestApi } from '@furystack/rest'
+import type { User } from '../models'
+import type { User as FurystackUser, WithOptionalId } from '@furystack/core'
 
 export type IsAuthenticatedAction = { result: { isAuthenticated: boolean } }
-export type GetCurrentUserAction = { result: User }
+export type GetCurrentUserAction = { result: FurystackUser }
 
-export type LoginAction = { result: User; body: { username: string; password: string } }
+export type LoginAction = { result: FurystackUser; body: { username: string; password: string } }
 export type LogoutAction = { result: unknown }
+
+export type PostUserEndpoint = { result: User; body: WithOptionalId<FurystackUser, 'username'> }
 
 export interface IdentityApi extends RestApi {
   GET: {
@@ -24,10 +20,10 @@ export interface IdentityApi extends RestApi {
   POST: {
     '/login': LoginAction
     '/logout': LogoutAction
-    '/users': PostEndpoint<User, 'username'>
+    '/users': PostUserEndpoint
   }
   PATCH: {
-    '/users/:id': PatchEndpoint<User, 'username'>
+    '/users/:id': PatchEndpoint<Omit<User, 'createdAt' | 'updatedAt'>, 'username'>
   }
   DELETE: {
     '/users/:id': DeleteEndpoint<User, 'username'>

@@ -44,7 +44,7 @@ export const setupIdentityRestApi = async (injector: Injector) => {
       POST: {
         '/login': LoginAction,
         '/logout': LogoutAction,
-        '/users': Validate({ schema: identityApiSchema, schemaName: 'PostEndpoint<User,"username">' })(
+        '/users': Validate({ schema: identityApiSchema, schemaName: 'PostUserEndpoint' })(
           createPostEndpoint({
             model: User,
             primaryKey: 'username',

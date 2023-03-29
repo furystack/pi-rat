@@ -4,7 +4,7 @@ import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { DrivesApiClient } from '../../services/drives-api-client'
 import { MonacoModelProvider } from '../../services/monaco-model-provider'
-import { drivesApiSchema } from 'common'
+import { drivesSchemas } from 'common'
 
 export const DrivesPage = Shade({
   shadowDomName: 'shade-app-drives-page',
@@ -15,7 +15,7 @@ export const DrivesPage = Shade({
 
     const model = modelProvider.getModelForEntityType({
       schemaName: 'Drive',
-      jsonSchema: drivesApiSchema.definitions.Drive,
+      jsonSchema: drivesSchemas.definitions.Drive,
     })
 
     const service = useDisposable(

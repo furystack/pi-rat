@@ -70,32 +70,6 @@
         "updatedAt"
       ],
       "additionalProperties": false
-    },
-    "User": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "username",
-        "roles"
-      ],
-      "additionalProperties": false
-    },
-    "ServiceStatus": {
-      "type": "string",
-      "enum": [
-        "installed",
-        "needsInstall"
-      ]
     }
   }
 }

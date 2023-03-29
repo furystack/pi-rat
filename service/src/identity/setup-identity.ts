@@ -16,6 +16,10 @@ class UserModel extends Model<User, User> implements User {
   declare username: string
 
   declare roles: string[]
+
+  declare createdAt: string
+
+  declare updatedAt: string
 }
 
 class PasswordCredentialModel extends Model<PasswordCredential, PasswordCredential> implements PasswordCredential {
@@ -51,6 +55,12 @@ export const setupIdentity = async (injector: Injector) => {
           roles: {
             type: DataTypes.JSON,
             defaultValue: [],
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
           },
         },
         {
