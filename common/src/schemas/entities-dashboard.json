@@ -172,6 +172,12 @@
           "items": {
             "$ref": "#/definitions/Widget"
           }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -179,7 +185,9 @@
         "name",
         "description",
         "owner",
-        "widgets"
+        "widgets",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     }

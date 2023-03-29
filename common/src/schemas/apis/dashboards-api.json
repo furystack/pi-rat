@@ -1,123 +1,182 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "FurystackUser": {
+    "PostDashboardEndpoint": {
+      "$ref": "#/definitions/PostEndpoint%3CDashboard%2C%22id%22%2COmit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+    },
+    "PostEndpoint<Dashboard,\"id\",Omit<Dashboard,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
-        "username": {
+        "body": {
+          "$ref": "#/definitions/Omit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/Dashboard"
+        }
+      },
+      "required": [
+        "body",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "Omit<Dashboard,(\"createdAt\"|\"updatedAt\")>": {
+      "$ref": "#/definitions/Pick%3CDashboard%2CExclude%3C(%22id%22%7C%22name%22%7C%22description%22%7C%22owner%22%7C%22widgets%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+    },
+    "Pick<Dashboard,Exclude<(\"id\"|\"name\"|\"description\"|\"owner\"|\"widgets\"|\"createdAt\"|\"updatedAt\"),(\"createdAt\"|\"updatedAt\")>>": {
+      "type": "object",
+      "properties": {
+        "id": {
           "type": "string"
         },
-        "roles": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "widgets": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Widget"
           }
         }
       },
       "required": [
-        "username",
-        "roles"
+        "id",
+        "name",
+        "description",
+        "owner",
+        "widgets"
       ],
       "additionalProperties": false
     },
-    "IsAuthenticatedAction": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "type": "object",
-          "properties": {
-            "isAuthenticated": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "isAuthenticated"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "result"
-      ],
-      "additionalProperties": false
-    },
-    "GetCurrentUserAction": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "$ref": "#/definitions/FurystackUser"
-        }
-      },
-      "required": [
-        "result"
-      ],
-      "additionalProperties": false
-    },
-    "LoginAction": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "$ref": "#/definitions/FurystackUser"
+    "Widget": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/AppShortcutWidget"
         },
-        "body": {
-          "type": "object",
-          "properties": {
-            "username": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "username",
-            "password"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "result",
-        "body"
-      ],
-      "additionalProperties": false
-    },
-    "LogoutAction": {
-      "type": "object",
-      "properties": {
-        "result": {}
-      },
-      "required": [
-        "result"
-      ],
-      "additionalProperties": false
-    },
-    "PostUserEndpoint": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "$ref": "#/definitions/User"
+        {
+          "$ref": "#/definitions/MarkdownWidget"
         },
-        "body": {
-          "$ref": "#/definitions/WithOptionalId%3CFurystackUser%2C%22username%22%3E"
+        {
+          "$ref": "#/definitions/HtmlWidget"
+        },
+        {
+          "$ref": "#/definitions/WidgetGroup"
         }
-      },
-      "required": [
-        "result",
-        "body"
-      ],
-      "additionalProperties": false
+      ]
     },
-    "User": {
+    "AppShortcutWidget": {
       "type": "object",
       "properties": {
-        "username": {
+        "type": {
+          "type": "string",
+          "const": "app-shortcut"
+        },
+        "appName": {
+          "type": "string",
+          "enum": [
+            "home",
+            "browser"
+          ]
+        },
+        "icon": {
           "type": "string"
         },
-        "roles": {
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "appName",
+        "icon",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "MarkdownWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "markdown"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "HtmlWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "html"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "WidgetGroup": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "group"
+        },
+        "title": {
+          "type": "string"
+        },
+        "widgets": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Widget"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "widgets"
+      ],
+      "additionalProperties": false
+    },
+    "Dashboard": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "widgets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Widget"
           }
         },
         "createdAt": {
@@ -128,105 +187,90 @@
         }
       },
       "required": [
-        "username",
-        "roles",
+        "id",
+        "name",
+        "description",
+        "owner",
+        "widgets",
         "createdAt",
         "updatedAt"
       ],
       "additionalProperties": false
     },
-    "WithOptionalId<FurystackUser,\"username\">": {
+    "PatchDashboardEndpoint": {
+      "$ref": "#/definitions/PatchEndpoint%3CDashboard%2C%22id%22%2COmit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+    },
+    "PatchEndpoint<Dashboard,\"id\",Omit<Dashboard,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "username": {
-          "type": "string"
+        "body": {
+          "$ref": "#/definitions/Omit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
         },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
         }
       },
       "required": [
-        "roles"
-      ]
-    },
-    "Omit<FurystackUser,\"username\">": {
-      "$ref": "#/definitions/Pick%3CFurystackUser%2CExclude%3C(%22username%22%7C%22roles%22)%2C%22username%22%3E%3E"
-    },
-    "Pick<FurystackUser,Exclude<(\"username\"|\"roles\"),\"username\">>": {
-      "type": "object",
-      "properties": {
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "roles"
+        "body",
+        "url",
+        "result"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
     },
-    "IdentityApi": {
+    "DashboardsApi": {
       "type": "object",
       "properties": {
         "GET": {
           "type": "object",
           "properties": {
-            "/isAuthenticated": {
-              "$ref": "#/definitions/IsAuthenticatedAction"
+            "/dashboards": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CDashboard%3E"
             },
-            "/currentUser": {
-              "$ref": "#/definitions/GetCurrentUserAction"
-            },
-            "/users": {
-              "$ref": "#/definitions/GetCollectionEndpoint%3CUser%3E"
-            },
-            "/users/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CUser%2C%22username%22%3E"
+            "/dashboards/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CDashboard%2C%22id%22%3E"
             }
           },
           "required": [
-            "/isAuthenticated",
-            "/currentUser",
-            "/users",
-            "/users/:id"
+            "/dashboards",
+            "/dashboards/:id"
           ],
           "additionalProperties": false
         },
         "POST": {
           "type": "object",
           "properties": {
-            "/login": {
-              "$ref": "#/definitions/LoginAction"
-            },
-            "/logout": {
-              "$ref": "#/definitions/LogoutAction"
-            },
-            "/users": {
-              "$ref": "#/definitions/PostUserEndpoint"
+            "/dashboards": {
+              "$ref": "#/definitions/PostDashboardEndpoint"
             }
           },
           "required": [
-            "/login",
-            "/logout",
-            "/users"
+            "/dashboards"
           ],
           "additionalProperties": false
         },
         "PATCH": {
           "type": "object",
           "properties": {
-            "/users/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3COmit%3CUser%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22username%22%3E"
+            "/dashboards/:id": {
+              "$ref": "#/definitions/PatchDashboardEndpoint"
             }
           },
           "required": [
-            "/users/:id"
+            "/dashboards/:id"
           ],
           "additionalProperties": false
         },
@@ -250,12 +294,12 @@
         "DELETE": {
           "type": "object",
           "properties": {
-            "/users/:id": {
-              "$ref": "#/definitions/DeleteEndpoint%3CUser%2C%22username%22%3E"
+            "/dashboards/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CDashboard%2C%22id%22%3E"
             }
           },
           "required": [
-            "/users/:id"
+            "/dashboards/:id"
           ],
           "additionalProperties": false
         },
@@ -495,20 +539,20 @@
       },
       "additionalProperties": false
     },
-    "GetCollectionEndpoint<User>": {
+    "GetCollectionEndpoint<Dashboard>": {
       "type": "object",
       "properties": {
         "query": {
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CUser%2C(%22username%22%7C%22roles%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CDashboard%2C(%22id%22%7C%22name%22%7C%22description%22%7C%22owner%22%7C%22widgets%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CUser%3E"
+          "$ref": "#/definitions/GetCollectionResult%3CDashboard%3E"
         }
       },
       "required": [
@@ -518,7 +562,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<User,(\"username\"|\"roles\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<Dashboard,(\"id\"|\"name\"|\"description\"|\"owner\"|\"widgets\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -532,14 +576,35 @@
         "order": {
           "type": "object",
           "properties": {
-            "username": {
+            "id": {
               "type": "string",
               "enum": [
                 "ASC",
                 "DESC"
               ]
             },
-            "roles": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "owner": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "widgets": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -569,8 +634,11 @@
           "items": {
             "type": "string",
             "enum": [
-              "username",
-              "roles",
+              "id",
+              "name",
+              "description",
+              "owner",
+              "widgets",
               "createdAt",
               "updatedAt"
             ]
@@ -578,42 +646,42 @@
           "description": "The result set will be limited to these fields"
         },
         "filter": {
-          "$ref": "#/definitions/FilterType%3CUser%3E",
+          "$ref": "#/definitions/FilterType%3CDashboard%3E",
           "description": "The fields should match this filter"
         }
       },
       "additionalProperties": false,
       "description": "Type for default filtering model"
     },
-    "FilterType<User>": {
+    "FilterType<Dashboard>": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "$and": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CUser%3E"
+            "$ref": "#/definitions/FilterType%3CDashboard%3E"
           }
         },
         "$not": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CUser%3E"
+            "$ref": "#/definitions/FilterType%3CDashboard%3E"
           }
         },
         "$nor": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CUser%3E"
+            "$ref": "#/definitions/FilterType%3CDashboard%3E"
           }
         },
         "$or": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CUser%3E"
+            "$ref": "#/definitions/FilterType%3CDashboard%3E"
           }
         },
-        "username": {
+        "id": {
           "anyOf": [
             {
               "type": "object",
@@ -665,7 +733,163 @@
             }
           ]
         },
-        "roles": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "widgets": {
           "anyOf": [
             {
               "type": "object",
@@ -673,13 +897,13 @@
                 "$eq": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "$ref": "#/definitions/Widget"
                   }
                 },
                 "$ne": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "$ref": "#/definitions/Widget"
                   }
                 }
               },
@@ -693,7 +917,7 @@
                   "items": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "$ref": "#/definitions/Widget"
                     }
                   }
                 },
@@ -702,7 +926,7 @@
                   "items": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "$ref": "#/definitions/Widget"
                     }
                   }
                 }
@@ -817,7 +1041,7 @@
         }
       }
     },
-    "GetCollectionResult<User>": {
+    "GetCollectionResult<Dashboard>": {
       "type": "object",
       "properties": {
         "count": {
@@ -827,7 +1051,7 @@
         "entries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/User"
+            "$ref": "#/definitions/Dashboard"
           },
           "description": "List of the selected entities"
         }
@@ -839,7 +1063,7 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "GetEntityEndpoint<User,\"username\">": {
+    "GetEntityEndpoint<Dashboard,\"id\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -850,8 +1074,11 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "username",
-                  "roles",
+                  "id",
+                  "name",
+                  "description",
+                  "owner",
+                  "widgets",
                   "createdAt",
                   "updatedAt"
                 ]
@@ -875,7 +1102,7 @@
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/User"
+          "$ref": "#/definitions/Dashboard"
         }
       },
       "required": [
@@ -886,53 +1113,7 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "PatchEndpoint<Omit<User,(\"createdAt\"|\"updatedAt\")>,\"username\">": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/Partial%3COmit%3CUser%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
-        },
-        "url": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object",
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
-      "additionalProperties": false,
-      "description": "Endpoint model for updating entities"
-    },
-    "Partial<Omit<User,(\"createdAt\"|\"updatedAt\")>>": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "DeleteEndpoint<User,\"username\">": {
+    "DeleteEndpoint<Dashboard,\"id\">": {
       "type": "object",
       "properties": {
         "url": {

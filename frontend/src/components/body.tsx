@@ -53,6 +53,18 @@ const adminRoutes: Array<Route<any>> = [
       />
     ),
   },
+  {
+    url: '/entities/dashboards',
+    component: () => (
+      <LazyLoad
+        loader={<Loader />}
+        component={async () => {
+          const { DashboardsPage } = await import('../pages/entities/dashboards')
+          return <DashboardsPage />
+        }}
+      />
+    ),
+  },
 ]
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({

@@ -24,6 +24,7 @@ const AdminLinks = Shade<{}>({
         </AppBarLink>
         <AppBarLink href="/entities/drives">📦 Drives</AppBarLink>
         <AppBarLink href="/entities/users">👥 Users</AppBarLink>
+        <AppBarLink href="/entities/dashboards">📔 Dashboards</AppBarLink>
       </div>
     ) : null
   },

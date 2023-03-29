@@ -5,6 +5,10 @@ import { getLogger } from '@furystack/logging'
 import type { Injector } from '@furystack/inject'
 import { useSequelize } from '@furystack/sequelize-store'
 import { getDefaultDbSettings } from '../get-default-db-options'
+import { getRepository } from '@furystack/repository'
+import { withRole } from '../with-role'
+import { getCurrentUser } from '@furystack/core'
+import { setupDashboardsRestApi } from './setup-dashboards-rest-api'
 
 class DashboardModel extends Model<Dashboard, Dashboard> implements Dashboard {
   declare id: string
@@ -32,7 +36,7 @@ export const setupDashboards = async (injector: Injector) => {
           id: {
             type: DataTypes.UUID,
             primaryKey: true,
-            defaultValue: DataTypes.UUIDV4(),
+            defaultValue: DataTypes.UUIDV4,
           },
           name: {
             type: DataTypes.STRING,
@@ -66,4 +70,21 @@ export const setupDashboards = async (injector: Injector) => {
       await sequelize.sync()
     },
   })
+  await logger.verbose({ message: 'Setting up repository...' })
+  getRepository(injector).createDataSet(Dashboard, 'id', {
+    authorizeAdd: withRole('admin'),
+    authorizeGet: withRole('admin'),
+    authorizeRemove: withRole('admin'),
+    authroizeRemoveEntity: async (args) => {
+      const currentUser = await getCurrentUser(args.injector)
+      if (currentUser?.username === args.entity.owner) {
+        return { isAllowed: true }
+      }
+      return { isAllowed: false, message: 'Not your dashboard!' }
+    },
+    authorizeUpdate: withRole('admin'),
+  })
+
+  await logger.verbose({ message: 'Setting up REST API...' })
+  await setupDashboardsRestApi(injector)
 }

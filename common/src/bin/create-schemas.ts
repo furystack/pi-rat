@@ -36,6 +36,11 @@ export const entityValues: SchemaGenerationSetting[] = [
 
 export const apiValues: SchemaGenerationSetting[] = [
   {
+    inputFile: './src/apis/dashboards.ts',
+    outputFile: './src/schemas/apis/dashboards-api.json',
+    type: '*',
+  },
+  {
     inputFile: './src/apis/drives.ts',
     outputFile: './src/schemas/apis/drives-api.json',
     type: '*',

@@ -1,6 +1,8 @@
 import type { DeleteEndpoint, GetCollectionEndpoint, GetEntityEndpoint, PatchEndpoint, RestApi } from '@furystack/rest'
 import type { User } from '../models'
-import type { User as FurystackUser, WithOptionalId } from '@furystack/core'
+import type { WithOptionalId } from '@furystack/core'
+
+type FurystackUser = { username: string; roles: string[] }
 
 export type IsAuthenticatedAction = { result: { isAuthenticated: boolean } }
 export type GetCurrentUserAction = { result: FurystackUser }
