@@ -2,6 +2,8 @@ import { IdentityContext } from '@furystack/core'
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
 import { withRole } from './with-role'
+import { describe, it } from 'node:test'
+import { deepStrictEqual } from 'node:assert/strict'
 
 describe('withRoleOnly', () => {
   it('Should fail if not authorized', async () => {
@@ -10,7 +12,7 @@ describe('withRoleOnly', () => {
       Object.assign(ic, { isAuthenticated: async () => false })
       i.setExplicitInstance(ic)
       const result = await withRole('admin')({ injector: i })
-      expect(result).toEqual({
+      deepStrictEqual(result, {
         isAllowed: false,
         message: 'You are not authorized :(',
       })
@@ -22,7 +24,7 @@ describe('withRoleOnly', () => {
       Object.assign(ic, { isAuthenticated: async () => true })
       i.setExplicitInstance(ic)
       const result = await withRole('admin')({ injector: i })
-      expect(result).toEqual({
+      deepStrictEqual(result, {
         isAllowed: false,
         message: 'You are not authorized :(',
       })
@@ -37,7 +39,7 @@ describe('withRoleOnly', () => {
 
       i.setExplicitInstance(ic)
       const result = await withRole('role1', 'admin')({ injector: i })
-      expect(result).toEqual({
+      deepStrictEqual(result, {
         isAllowed: true,
       })
     })

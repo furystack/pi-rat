@@ -19,6 +19,15 @@
       "request": "launch",
       // "program": "${file}",
       "runtimeArgs": ["playwright", "test", "--headed", "--timeout=3000000", "--project=chromium", "${fileBasename}"]
+    },
+    {
+      "name": "Debiug unit test file",
+      "runtimeExecutable": "yarn",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}/service",
+      "runtimeArgs": ["node", "--test", "${file}"]
     }
   ]
 }

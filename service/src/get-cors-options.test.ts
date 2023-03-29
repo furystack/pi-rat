@@ -1,8 +1,10 @@
 import { getCorsOptions } from './get-cors-options'
+import { describe, it } from 'node:test'
+import { deepStrictEqual } from 'node:assert/strict'
 
 describe('getCorsOptions', () => {
   it('Should match the default options', () => {
-    expect(getCorsOptions()).toEqual({
+    deepStrictEqual(getCorsOptions(), {
       credentials: true,
       origins: ['http://localhost:8080'],
       headers: ['cache', 'content-type'],

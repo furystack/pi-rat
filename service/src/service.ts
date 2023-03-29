@@ -1,4 +1,3 @@
-import '@furystack/repository'
 import { injector as rootInjector } from './root-injector'
 import { attachShutdownHandler } from './shutdown-handler'
 import { getLogger } from '@furystack/logging'

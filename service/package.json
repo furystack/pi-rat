@@ -25,7 +25,6 @@
     "@furystack/sequelize-store": "^2.1.10",
     "@furystack/utils": "^3.1.7",
     "@furystack/websocket-api": "^8.1.18",
-    "@types/jest": "^29.5.0",
     "chokidar": "^3.5.3",
     "common": "workspace:^",
     "formidable": "^2.1.1",
