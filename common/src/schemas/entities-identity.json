@@ -13,11 +13,19 @@
           "items": {
             "type": "string"
           }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
         "username",
-        "roles"
+        "roles",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     }

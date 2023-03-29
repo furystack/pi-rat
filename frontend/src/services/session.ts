@@ -3,6 +3,7 @@ import { ObservableValue, usingAsync } from '@furystack/utils'
 import { Injectable, Injected } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
 import type { User } from 'common'
+import type { User as FurystackUser } from '@furystack/core'
 import { IdentityApiClient } from './identity-api-client'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
@@ -15,7 +16,7 @@ export class SessionService implements IdentityContext {
   }
 
   public state = new ObservableValue<SessionState>('initializing')
-  public currentUser = new ObservableValue<Omit<User, 'password'> | null>(null)
+  public currentUser = new ObservableValue<Pick<User, 'username' | 'roles'> | null>(null)
 
   public isOperationInProgress = new ObservableValue(true)
 
@@ -45,7 +46,7 @@ export class SessionService implements IdentityContext {
     await usingAsync(this.operation(), async () => {
       try {
         const { result: usr } = await this.api.call({ method: 'POST', action: '/login', body: { username, password } })
-        this.currentUser.setValue(usr)
+        this.currentUser.setValue({ username: usr.username, roles: usr.roles })
         this.state.setValue('authenticated')
         this.notys.addNoty({
           body: 'Welcome back ;)',
@@ -88,7 +89,7 @@ export class SessionService implements IdentityContext {
     }
     return true
   }
-  public async getCurrentUser<TUser extends User>(): Promise<TUser> {
+  public async getCurrentUser<TUser extends FurystackUser>(): Promise<TUser> {
     const currentUser = this.currentUser.getValue()
     if (!currentUser) {
       this.notys.addNoty({
@@ -98,7 +99,7 @@ export class SessionService implements IdentityContext {
       })
       throw Error('No user available')
     }
-    return currentUser as unknown as TUser
+    return currentUser as any as TUser
   }
 
   @Injected(IdentityApiClient)

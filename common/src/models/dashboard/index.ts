@@ -1,3 +1,5 @@
 export * from './app-shortcut-widget'
 export * from './dashboard'
 export * from './markdown-widget'
+export * from './widget'
+export * from './widget-group'
