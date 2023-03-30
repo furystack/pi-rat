@@ -6,9 +6,8 @@ import type { Injector } from '@furystack/inject'
 import { useSequelize } from '@furystack/sequelize-store'
 import { getDefaultDbSettings } from '../get-default-db-options'
 import { getRepository } from '@furystack/repository'
-import { withRole } from '../with-role'
+import { withRole } from '../authorization/with-role'
 import { getCurrentUser } from '@furystack/core'
-import { setupDashboardsRestApi } from './setup-dashboards-rest-api'
 
 class DashboardModel extends Model<Dashboard, Dashboard> implements Dashboard {
   declare id: string
@@ -22,7 +21,7 @@ class DashboardModel extends Model<Dashboard, Dashboard> implements Dashboard {
 
 export const setupDashboards = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Dashboards')
-  await logger.information({ message: '📔  Setting up Dashboards...' })
+  await logger.verbose({ message: '📔  Setting up Dashboards store and repository...' })
 
   useSequelize({
     injector,
@@ -64,7 +63,6 @@ export const setupDashboards = async (injector: Injector) => {
         },
         {
           sequelize,
-          modelName: 'User',
         },
       )
       await sequelize.sync()
@@ -85,6 +83,5 @@ export const setupDashboards = async (injector: Injector) => {
     authorizeUpdate: withRole('admin'),
   })
 
-  await logger.verbose({ message: 'Setting up REST API...' })
-  await setupDashboardsRestApi(injector)
+  await logger.verbose({ message: '✅  Dashboard setup completed' })
 }

@@ -6,10 +6,9 @@ import { getRepository } from '@furystack/repository'
 import { usePasswordPolicy } from '@furystack/security'
 import { User } from 'common'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
-import { setupIdentityRestApi } from './setup-identity-rest-api'
 import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
-import { withRole } from '../with-role'
+import { withRole } from '../authorization/with-role'
 import { getCurrentUser } from '@furystack/core'
 
 class UserModel extends Model<User, User> implements User {
@@ -36,7 +35,7 @@ class SessionModel extends Model<DefaultSession, DefaultSession> implements Defa
 
 export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
-  await logger.information({ message: '👤  Setting up Identity...' })
+  await logger.verbose({ message: '👤  Setting up Identity stores and repository...' })
 
   useSequelize({
     injector,
@@ -65,7 +64,6 @@ export const setupIdentity = async (injector: Injector) => {
         },
         {
           sequelize,
-          modelName: 'User',
         },
       )
       await sequelize.sync()
@@ -97,7 +95,6 @@ export const setupIdentity = async (injector: Injector) => {
         },
         {
           sequelize,
-          modelName: 'PasswordCredential',
         },
       )
       await sequelize.sync()
@@ -123,7 +120,6 @@ export const setupIdentity = async (injector: Injector) => {
         },
         {
           sequelize,
-          modelName: 'Session',
         },
       )
       await sequelize.sync()
@@ -153,9 +149,5 @@ export const setupIdentity = async (injector: Injector) => {
     getUserStore: (sm) => sm.getStoreFor<User & { password: string }, 'username'>(User as any, 'username'),
     getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
   })
-
-  await logger.verbose({ message: 'Setting up REST API...' })
-  await setupIdentityRestApi(injector)
-
-  await logger.information({ message: '✅  Identity setup completed' })
+  await logger.verbose({ message: '✅  Identity stores and repo setup completed' })
 }

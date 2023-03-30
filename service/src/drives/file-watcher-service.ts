@@ -19,11 +19,11 @@ export const useFileWatchers = async (injector: Injector) => {
   })
 
   const addWatcher = async (drive: Drive) => {
-    logger.information({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
+    logger.verbose({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
     const watcher = watch(drive.physicalPath, { ignoreInitial: true })
     watcher.on('all', (event, path) => {
       const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
-      logger.information({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
+      logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
       injector.getInstance(WebSocketApi).broadcast(async (options) => {
         if (await isAuthorized(options.injector, 'admin')) {
           options.ws.send(JSON.stringify({ type: 'file-change', event, path: relativePath, drive: drive.letter }))

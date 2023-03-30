@@ -5,11 +5,10 @@ import { getRepository } from '@furystack/repository'
 import { access, mkdir } from 'fs/promises'
 import { constants } from 'fs'
 import { Drive } from 'common'
-import { setupDrivesRestApi } from './setup-drives-rest-api'
 import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options'
 import { useFileWatchers } from './file-watcher-service'
-import { withRole } from '../with-role'
+import { withRole } from '../authorization/with-role'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -37,7 +36,7 @@ class DriveModel extends Model<Drive, Drive> implements Drive {
 
 export const setupDrives = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Drives')
-  await logger.information({ message: '📁  Setting up drives...' })
+  await logger.verbose({ message: '📁  Setting up drives store and repository...' })
 
   useSequelize({
     injector,
@@ -64,7 +63,6 @@ export const setupDrives = async (injector: Injector) => {
         },
         {
           sequelize,
-          modelName: 'Drive',
         },
       )
       await sequelize.sync()
@@ -112,11 +110,8 @@ export const setupDrives = async (injector: Injector) => {
     },
   })
 
-  await logger.verbose({ message: 'Setting up REST API...' })
-  await setupDrivesRestApi(injector)
-
   await logger.verbose({ message: '💾  Setting up FileWatchers...' })
   await useFileWatchers(injector)
 
-  await logger.information({ message: '✅  Drives has been set up' })
+  await logger.verbose({ message: '✅  Drives store and repository has been set up' })
 }
