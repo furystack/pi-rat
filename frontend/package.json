@@ -11,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@furystack/rest": "^4.2.0",
+    "@types/marked": "^4.0.8",
     "@yarnpkg/esbuild-plugin-pnp": "^3.0.0-rc.15",
     "esbuild": "^0.17.14",
     "typescript": "^5.0.2"
@@ -26,6 +27,7 @@
     "@furystack/utils": "^3.1.7",
     "@types/node": "^18.15.11",
     "common": "workspace:^",
+    "marked": "^4.3.0",
     "monaco-editor": "^0.36.1"
   }
 }

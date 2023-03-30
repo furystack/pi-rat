@@ -33,9 +33,10 @@ export const setupDashboards = async (injector: Injector) => {
       DashboardModel.init(
         {
           id: {
-            type: DataTypes.UUID,
+            type: DataTypes.UUIDV4,
             primaryKey: true,
-            defaultValue: DataTypes.UUIDV4,
+            allowNull: false,
+            defaultValue: () => crypto.randomUUID(),
           },
           name: {
             type: DataTypes.STRING,

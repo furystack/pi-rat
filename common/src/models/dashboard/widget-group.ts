@@ -5,7 +5,3 @@ export interface WidgetGroup {
   title: string
   widgets: Widget[]
 }
-
-export const isWidgetGroup = (widget: Widget): widget is WidgetGroup => {
-  return widget.type === 'group'
-}

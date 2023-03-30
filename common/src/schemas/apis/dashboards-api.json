@@ -2,13 +2,13 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "PostDashboardEndpoint": {
-      "$ref": "#/definitions/PostEndpoint%3CDashboard%2C%22id%22%2COmit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+      "$ref": "#/definitions/PostEndpoint%3CDashboard%2C%22id%22%2COmit%3CWithOptionalId%3CDashboard%2C%22id%22%3E%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
     },
-    "PostEndpoint<Dashboard,\"id\",Omit<Dashboard,(\"createdAt\"|\"updatedAt\")>>": {
+    "PostEndpoint<Dashboard,\"id\",Omit<WithOptionalId<Dashboard,\"id\">,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/Omit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
+          "$ref": "#/definitions/Omit%3CWithOptionalId%3CDashboard%2C%22id%22%3E%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
         },
         "result": {
           "$ref": "#/definitions/Dashboard"
@@ -21,15 +21,12 @@
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
-    "Omit<Dashboard,(\"createdAt\"|\"updatedAt\")>": {
-      "$ref": "#/definitions/Pick%3CDashboard%2CExclude%3C(%22id%22%7C%22name%22%7C%22description%22%7C%22owner%22%7C%22widgets%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+    "Omit<WithOptionalId<Dashboard,\"id\">,(\"createdAt\"|\"updatedAt\")>": {
+      "$ref": "#/definitions/Pick%3CWithOptionalId%3CDashboard%2C%22id%22%3E%2CExclude%3C(%22name%22%7C%22description%22%7C%22owner%22%7C%22widgets%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
     },
-    "Pick<Dashboard,Exclude<(\"id\"|\"name\"|\"description\"|\"owner\"|\"widgets\"|\"createdAt\"|\"updatedAt\"),(\"createdAt\"|\"updatedAt\")>>": {
+    "Pick<WithOptionalId<Dashboard,\"id\">,Exclude<(\"name\"|\"description\"|\"owner\"|\"widgets\"|\"createdAt\"|\"updatedAt\"|\"id\"),(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "name": {
           "type": "string"
         },
@@ -44,10 +41,12 @@
           "items": {
             "$ref": "#/definitions/Widget"
           }
+        },
+        "id": {
+          "type": "string"
         }
       },
       "required": [
-        "id",
         "name",
         "description",
         "owner",
@@ -61,10 +60,13 @@
           "$ref": "#/definitions/AppShortcutWidget"
         },
         {
-          "$ref": "#/definitions/MarkdownWidget"
+          "$ref": "#/definitions/EntityShortcutWidget"
         },
         {
           "$ref": "#/definitions/HtmlWidget"
+        },
+        {
+          "$ref": "#/definitions/MarkdownWidget"
         },
         {
           "$ref": "#/definitions/WidgetGroup"
@@ -84,28 +86,42 @@
             "home",
             "browser"
           ]
-        },
-        "icon": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
         }
       },
       "required": [
         "type",
-        "appName",
-        "icon",
-        "title"
+        "appName"
       ],
       "additionalProperties": false
     },
-    "MarkdownWidget": {
+    "EntityShortcutWidget": {
       "type": "object",
       "properties": {
         "type": {
           "type": "string",
-          "const": "markdown"
+          "const": "entity-shortcut"
+        },
+        "entityName": {
+          "type": "string",
+          "enum": [
+            "drive",
+            "user",
+            "dasboard"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "entityName"
+      ],
+      "additionalProperties": false
+    },
+    "HtmlWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "html"
         },
         "content": {
           "type": "string"
@@ -117,12 +133,12 @@
       ],
       "additionalProperties": false
     },
-    "HtmlWidget": {
+    "MarkdownWidget": {
       "type": "object",
       "properties": {
         "type": {
           "type": "string",
-          "const": "html"
+          "const": "markdown"
         },
         "content": {
           "type": "string"
@@ -198,13 +214,13 @@
       "additionalProperties": false
     },
     "PatchDashboardEndpoint": {
-      "$ref": "#/definitions/PatchEndpoint%3CDashboard%2C%22id%22%2COmit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+      "$ref": "#/definitions/PatchEndpoint%3CDashboard%2C%22id%22%2COmit%3CWithOptionalId%3CDashboard%2C%22id%22%3E%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
     },
-    "PatchEndpoint<Dashboard,\"id\",Omit<Dashboard,(\"createdAt\"|\"updatedAt\")>>": {
+    "PatchEndpoint<Dashboard,\"id\",Omit<WithOptionalId<Dashboard,\"id\">,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/Omit%3CDashboard%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
+          "$ref": "#/definitions/Omit%3CWithOptionalId%3CDashboard%2C%22id%22%3E%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
         },
         "url": {
           "type": "object",

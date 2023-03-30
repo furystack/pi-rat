@@ -1,6 +1,49 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "AppShortcutWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "app-shortcut"
+        },
+        "appName": {
+          "type": "string",
+          "enum": [
+            "home",
+            "browser"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "appName"
+      ],
+      "additionalProperties": false
+    },
+    "EntityShortcutWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "entity-shortcut"
+        },
+        "entityName": {
+          "type": "string",
+          "enum": [
+            "drive",
+            "user",
+            "dasboard"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "entityName"
+      ],
+      "additionalProperties": false
+    },
     "HtmlWidget": {
       "type": "object",
       "properties": {
@@ -15,63 +58,6 @@
       "required": [
         "type",
         "content"
-      ],
-      "additionalProperties": false
-    },
-    "NamedParameters<typeof isHtmlWidget>": {
-      "type": "object",
-      "properties": {
-        "widget": {
-          "$ref": "#/definitions/Widget"
-        }
-      },
-      "required": [
-        "widget"
-      ],
-      "additionalProperties": false
-    },
-    "Widget": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/AppShortcutWidget"
-        },
-        {
-          "$ref": "#/definitions/MarkdownWidget"
-        },
-        {
-          "$ref": "#/definitions/HtmlWidget"
-        },
-        {
-          "$ref": "#/definitions/WidgetGroup"
-        }
-      ]
-    },
-    "AppShortcutWidget": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "const": "app-shortcut"
-        },
-        "appName": {
-          "type": "string",
-          "enum": [
-            "home",
-            "browser"
-          ]
-        },
-        "icon": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "type",
-        "appName",
-        "icon",
-        "title"
       ],
       "additionalProperties": false
     },
@@ -116,41 +102,24 @@
       ],
       "additionalProperties": false
     },
-    "NamedParameters<typeof isMarkdownWidget>": {
-      "type": "object",
-      "properties": {
-        "widget": {
-          "$ref": "#/definitions/Widget"
+    "Widget": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/AppShortcutWidget"
+        },
+        {
+          "$ref": "#/definitions/EntityShortcutWidget"
+        },
+        {
+          "$ref": "#/definitions/HtmlWidget"
+        },
+        {
+          "$ref": "#/definitions/MarkdownWidget"
+        },
+        {
+          "$ref": "#/definitions/WidgetGroup"
         }
-      },
-      "required": [
-        "widget"
-      ],
-      "additionalProperties": false
-    },
-    "NamedParameters<typeof isWidgetGroup>": {
-      "type": "object",
-      "properties": {
-        "widget": {
-          "$ref": "#/definitions/Widget"
-        }
-      },
-      "required": [
-        "widget"
-      ],
-      "additionalProperties": false
-    },
-    "NamedParameters<typeof isAppShortcutWidget>": {
-      "type": "object",
-      "properties": {
-        "widget": {
-          "$ref": "#/definitions/Widget"
-        }
-      },
-      "required": [
-        "widget"
-      ],
-      "additionalProperties": false
+      ]
     },
     "Dashboard": {
       "type": "object",

@@ -35,9 +35,6 @@ export const setupDashboardsRestApi = async (injector: Injector) => {
         ),
       },
       POST: {
-        // TODO
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         '/dashboards': Validate({ schema: dashboardsApiSchema, schemaName: 'PostDashboardEndpoint' })(
           createPostEndpoint({
             model: Dashboard,

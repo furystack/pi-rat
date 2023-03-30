@@ -1,12 +1,23 @@
 import type { Route } from '@furystack/shades'
 import { createComponent, Shade, Router, LazyLoad } from '@furystack/shades'
 import { SessionService } from '../services/session'
-import { Init, HelloWorld, Offline, Login } from '../pages'
-import { Loader } from '@furystack/shades-common-components'
+import { Init, Offline, Login } from '../pages'
+import { Loader, fadeOut, fadeIn } from '@furystack/shades-common-components'
+import { DefaultDashboard } from './dashboard/default-dashboard'
+
+const onLeave = async ({ element }: { element: HTMLElement }) => {
+  await fadeOut(element, { easing: 'ease-in', duration: 200 })
+}
+
+const onVisit = async ({ element }: { element: HTMLElement }) => {
+  await fadeIn(element, { easing: 'ease-out', duration: 750 })
+}
 
 const adminRoutes: Array<Route<any>> = [
   {
     url: '/drives',
+    onVisit,
+    onLeave,
     component: () => (
       <LazyLoad
         loader={<Loader />}
@@ -19,6 +30,8 @@ const adminRoutes: Array<Route<any>> = [
   },
   {
     url: '/drives/openFile/:driveLetter/:path',
+    onVisit,
+    onLeave,
     component: ({ match }) => (
       <LazyLoad
         loader={<Loader />}
@@ -31,6 +44,8 @@ const adminRoutes: Array<Route<any>> = [
   },
   {
     url: '/entities/drives',
+    onVisit,
+    onLeave,
     component: () => (
       <LazyLoad
         loader={<Loader />}
@@ -43,6 +58,8 @@ const adminRoutes: Array<Route<any>> = [
   },
   {
     url: '/entities/users',
+    onVisit,
+    onLeave,
     component: () => (
       <LazyLoad
         loader={<Loader />}
@@ -55,6 +72,8 @@ const adminRoutes: Array<Route<any>> = [
   },
   {
     url: '/entities/dashboards',
+    onVisit,
+    onLeave,
     component: () => (
       <LazyLoad
         loader={<Loader />}
@@ -85,7 +104,13 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
                 <Router
                   routes={[
                     ...(hasAdminRole ? adminRoutes : []),
-                    { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
+                    {
+                      url: '/',
+                      routingOptions: { end: false },
+                      onVisit,
+                      onLeave,
+                      component: () => <DefaultDashboard />,
+                    },
                   ]}
                 />
               )

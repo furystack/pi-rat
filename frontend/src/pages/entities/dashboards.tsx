@@ -7,7 +7,7 @@ import { MonacoModelProvider } from '../../services/monaco-model-provider'
 import { dashboardSchemas } from 'common'
 
 export const DashboardsPage = Shade({
-  shadowDomName: 'shade-app-drives-page',
+  shadowDomName: 'shade-app-dashboards-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(DashboardsApiClient)
 

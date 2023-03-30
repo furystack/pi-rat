@@ -7,10 +7,19 @@ import type {
   RestApi,
 } from '@furystack/rest'
 import type { Dashboard } from '../models'
+import type { WithOptionalId } from '@furystack/core'
 
-type PostDashboardEndpoint = PostEndpoint<Dashboard, 'id', Omit<Dashboard, 'createdAt' | 'updatedAt'>>
+type PostDashboardEndpoint = PostEndpoint<
+  Dashboard,
+  'id',
+  Omit<WithOptionalId<Dashboard, 'id'>, 'createdAt' | 'updatedAt'>
+>
 
-type PatchDashboardEndpoint = PatchEndpoint<Dashboard, 'id', Omit<Dashboard, 'createdAt' | 'updatedAt'>>
+type PatchDashboardEndpoint = PatchEndpoint<
+  Dashboard,
+  'id',
+  Omit<WithOptionalId<Dashboard, 'id'>, 'createdAt' | 'updatedAt'>
+>
 
 export interface DashboardsApi extends RestApi {
   GET: {
