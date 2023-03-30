@@ -1,4 +1,4 @@
-import { createComponent, Shade } from '@furystack/shades'
+import { createComponent, RouteLink, Shade } from '@furystack/shades'
 import { Dashboard } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
@@ -62,10 +62,16 @@ export const DashboardsPage = Shade({
     return (
       <GenericEditor
         service={service}
-        columns={['name', 'description', 'createdAt', 'updatedAt']}
-        headerComponents={{}}
+        columns={['name', 'description', 'createdAt', 'updatedAt', 'id']}
+        headerComponents={{
+          id: () => <>Preview</>,
+        }}
         styles={{}}
-        rowComponents={{}}
+        rowComponents={{
+          id: ({ id }) => {
+            return <RouteLink href={`/dashboards/${id}`}>Preview</RouteLink>
+          },
+        }}
         model={model}
       />
     )

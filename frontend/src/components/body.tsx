@@ -4,6 +4,7 @@ import { SessionService } from '../services/session'
 import { Init, Offline, Login } from '../pages'
 import { Loader, fadeOut, fadeIn } from '@furystack/shades-common-components'
 import { DefaultDashboard } from './dashboard/default-dashboard'
+import { LoadableDashboard } from './dashboard/LoadableDashboard'
 
 const onLeave = async ({ element }: { element: HTMLElement }) => {
   await fadeOut(element, { easing: 'ease-in', duration: 200 })
@@ -104,6 +105,14 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
                 <Router
                   routes={[
                     ...(hasAdminRole ? adminRoutes : []),
+                    {
+                      url: '/dashboards/:id',
+                      onVisit,
+                      onLeave,
+                      component: ({ match }) => {
+                        return <LoadableDashboard id={match.params.id} />
+                      },
+                    },
                     {
                       url: '/',
                       routingOptions: { end: false },
