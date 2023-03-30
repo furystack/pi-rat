@@ -9,7 +9,7 @@ export const EntityShortcutWidget = Shade<EntityShortcutWidgetData>({
       case 'dasboard':
         return <IconUrlWidget {...rest} name="Dashboards" url="/entities/dashboards" icon={<>📔</>} />
       case 'drive':
-        return <IconUrlWidget {...rest} name="Browser" url="/entities/drives" icon={<>📦</>} />
+        return <IconUrlWidget {...rest} name="Drives" url="/entities/drives" icon={<>💽</>} />
       case 'user':
         return <IconUrlWidget {...rest} name="Users" url="/entities/users" icon={<>👤</>} />
       default:

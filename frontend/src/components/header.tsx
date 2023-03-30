@@ -19,10 +19,11 @@ const AdminLinks = Shade<{}>({
 
     return isAdmin ? (
       <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px', gap: '8px' }}>
-        <AppBarLink href="/drives" title="Drives">
-          💽 Browser
-        </AppBarLink>
-        <AppBarLink href="/entities/drives">💽 Drives</AppBarLink>
+        |
+        <AppBarLink href="/file-browser" title="Drives">
+          📂 File Browser
+        </AppBarLink>{' '}
+        |<AppBarLink href="/entities/drives">💽 Drives</AppBarLink>
         <AppBarLink href="/entities/users">👥 Users</AppBarLink>
         <AppBarLink href="/entities/dashboards">📔 Dashboards</AppBarLink>
       </div>

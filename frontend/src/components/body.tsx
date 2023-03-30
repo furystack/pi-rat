@@ -15,7 +15,7 @@ const onVisit = async ({ element }: { element: HTMLElement }) => {
 
 const adminRoutes: Array<Route<any>> = [
   {
-    url: '/drives',
+    url: '/file-browser',
     onVisit,
     onLeave,
     component: () => (
@@ -29,7 +29,7 @@ const adminRoutes: Array<Route<any>> = [
     ),
   },
   {
-    url: '/drives/openFile/:driveLetter/:path',
+    url: '/file-browser/openFile/:driveLetter/:path',
     onVisit,
     onLeave,
     component: ({ match }) => (
