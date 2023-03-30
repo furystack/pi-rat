@@ -3202,6 +3202,7 @@ __metadata:
     esbuild: ^0.17.14
     marked: ^4.3.0
     monaco-editor: ^0.36.1
+    semaphore-async-await: ^1.5.1
     typescript: ^5.0.2
   languageName: unknown
   linkType: soft

@@ -1,52 +1,45 @@
 import { createComponent, LazyLoad, Shade } from '@furystack/shades'
 import { Loader } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import { DrivesApiClient } from '../../services/drives-api-client'
 import { CreateDriveWizard } from './create-drive-wizard'
 import { FolderPanel } from './folder-panel'
+import { AvailableDrivesService } from './available-drives-service'
 
 export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
-  render: ({ useDisposable, injector }) => {
-    const loadDrives = async () =>
-      await injector.getInstance(DrivesApiClient).call({
-        method: 'GET',
-        action: '/volumes',
-        query: {
-          findOptions: {},
-        },
-      })
+  render: ({ useDisposable, injector, useObservable }) => {
+    const availableDrivesService = injector.getInstance(AvailableDrivesService)
+    const [drives] = useObservable('drives', availableDrivesService.getDrivesAsObservable())
+
+    if (drives.status !== 'loaded') {
+      return null
+    }
 
     return (
       <LazyLoad
         loader={<Loader />}
         component={async () => {
-          const drives = await loadDrives()
-
-          const availableDrives = useDisposable('availableDrives', () => new ObservableValue(drives.result.entries))
-          availableDrives.setValue(drives.result.entries)
-          if (!drives.result.entries.length) {
+          const availableDrives = useDisposable('availableDrives', () => new ObservableValue(drives.value.entries))
+          availableDrives.setValue(drives.value.entries)
+          if (!drives.value.entries.length) {
             return (
               <>
                 <div>No drive created yet.</div>
                 <CreateDriveWizard
                   onDriveAdded={async () => {
-                    const reloadedDrives = await loadDrives()
-                    availableDrives.setValue(reloadedDrives.result.entries)
+                    const reloadedDrives = await availableDrivesService.reload()
+                    availableDrives.setValue(reloadedDrives.entries)
                   }}
                 />
               </>
             )
           }
 
-          const currentLeftDrive = useDisposable(
-            'currentLeftDrive',
-            () => new ObservableValue(drives.result.entries[0]),
-          )
+          const currentLeftDrive = useDisposable('currentLeftDrive', () => new ObservableValue(drives.value.entries[0]))
 
           const currentRightDrive = useDisposable(
             'currentRightDrive',
-            () => new ObservableValue(drives.result.entries[0]),
+            () => new ObservableValue(drives.value.entries[0]),
           )
 
           return (
@@ -66,8 +59,8 @@ export const DrivesPage = Shade({
               <FolderPanel currentDrive={currentRightDrive} availableDrives={availableDrives} />
               <CreateDriveWizard
                 onDriveAdded={async () => {
-                  const reloadedDrives = await loadDrives()
-                  availableDrives.setValue(reloadedDrives.result.entries)
+                  const reloadedDrives = await availableDrivesService.reload()
+                  availableDrives.setValue(reloadedDrives.entries)
                 }}
               />
             </div>
