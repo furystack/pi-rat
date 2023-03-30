@@ -38,9 +38,9 @@ export const setupPatcher = async (injector: Injector) => {
       PatchModel.init(
         {
           id: {
-            type: DataTypes.UUID,
+            type: DataTypes.UUIDV4,
             primaryKey: true,
-            defaultValue: DataTypes.UUIDV4,
+            defaultValue: () => crypto.randomUUID(),
           },
           name: {
             type: DataTypes.STRING,
