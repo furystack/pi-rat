@@ -22,7 +22,7 @@ const AdminLinks = Shade<{}>({
         <AppBarLink href="/drives" title="Drives">
           💽 Browser
         </AppBarLink>
-        <AppBarLink href="/entities/drives">📦 Drives</AppBarLink>
+        <AppBarLink href="/entities/drives">💽 Drives</AppBarLink>
         <AppBarLink href="/entities/users">👥 Users</AppBarLink>
         <AppBarLink href="/entities/dashboards">📔 Dashboards</AppBarLink>
       </div>
