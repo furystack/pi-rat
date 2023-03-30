@@ -23,7 +23,7 @@ const adminRoutes: Array<Route<any>> = [
       <LazyLoad
         loader={<Loader />}
         component={async () => {
-          const { DrivesPage } = await import('../pages/drives')
+          const { DrivesPage } = await import('../pages/file-browser')
           return <DrivesPage />
         }}
       />

@@ -617,6 +617,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@furystack/cache@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@furystack/cache@npm:1.0.2"
+  dependencies:
+    "@furystack/inject": ^7.1.9
+    "@furystack/utils": ^3.1.8
+  checksum: 75565f327d4c63d0f4e621e4d01dd1c37d5ac9f12172388966593893717d35b695f2e966f801014132bbbd65d46b1438ac4347a40ddf4b2619e1a9673ada7dd6
+  languageName: node
+  linkType: hard
+
 "@furystack/core@npm:^11.3.1":
   version: 11.3.1
   resolution: "@furystack/core@npm:11.3.1"
@@ -3175,6 +3185,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "frontend@workspace:frontend"
   dependencies:
+    "@furystack/cache": ^1.0.2
     "@furystack/core": ^11.3.1
     "@furystack/inject": ^7.1.9
     "@furystack/logging": ^3.1.9
