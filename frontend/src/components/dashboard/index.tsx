@@ -13,8 +13,6 @@ export const Dashboard = Shade<DashboardData>({
           display: 'flex',
           flexDirection: 'column',
         }}>
-        <h1>{props.name}</h1>
-        <p>{props.description}</p>
         {props.widgets.map((w) => (
           <Widget {...w} />
         ))}
