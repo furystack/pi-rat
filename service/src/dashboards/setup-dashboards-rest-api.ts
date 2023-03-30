@@ -43,9 +43,6 @@ export const setupDashboardsRestApi = async (injector: Injector) => {
         ),
       },
       PATCH: {
-        // TODO
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         '/dashboards/:id': Validate({ schema: dashboardsApiSchema, schemaName: 'PatchDashboardEndpoint' })(
           createPatchEndpoint({
             model: Dashboard,
