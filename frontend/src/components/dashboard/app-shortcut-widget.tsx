@@ -9,7 +9,7 @@ export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
       case 'home':
         return <IconUrlWidget {...rest} name="Home" url="/" icon={<>🐀</>} />
       case 'browser':
-        return <IconUrlWidget {...rest} name="Browser" url="/drives" icon={<>📂</>} />
+        return <IconUrlWidget {...rest} name="Drives" url="/drives" icon={<>💽</>} />
       default:
         return <IconUrlWidget {...rest} name={appName} url={`/${appName}`} icon={<>🚫</>} />
     }
