@@ -1,10 +1,11 @@
 import { Shade, createComponent, ScreenService } from '@furystack/shades'
 import { Button, ThemeProviderService } from '@furystack/shades-common-components'
-
 import redCross from '../animations/error-red-cross.json'
 import deadSmiley from '../animations/error-dead-smiley.json'
 import { ErrorReporter } from '../services/error-reporter'
-import { getErrorMessage } from '../services/get-error-message'
+import { ErrorDisplay } from './error-display'
+import { Error404 } from './error-404'
+import { ResponseError } from '@furystack/rest-client-fetch'
 
 export interface GenericErrorProps {
   mainTitle?: string
@@ -17,6 +18,10 @@ export interface GenericErrorProps {
 export const GenericErrorPage = Shade<GenericErrorProps>({
   shadowDomName: 'multiverse-generic-error-page',
   render: ({ props, injector }) => {
+    if (props.error && props.error instanceof ResponseError && props.error.response.status === 404) {
+      return <Error404 />
+    }
+
     const isDesktop = injector.getInstance(ScreenService).screenSize.atLeast.md.getValue()
     const { theme } = injector.getInstance(ThemeProviderService)
     return (
@@ -50,15 +55,11 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                alignItems: 'center',
-                color: 'var(--error-color)',
               }}>
               <h1 style={{ marginTop: '0', whiteSpace: 'nowrap' }}> {props.mainTitle || 'WhoOoOops... 😱'}</h1>
               <h3> {props.subtitle || 'Something terrible happened 😓'}</h3>
 
-              {props.description ||
-                (props.error && getErrorMessage(props.error)) ||
-                "And you know what's worse? No further details are available... 😿"}
+              {props.description || <ErrorDisplay error={props.error} />}
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { InstallApiClient } from '../services/install-api-client'
 import { Body } from './body'
 import { Header } from './header'
 import { FullScreenLoader } from './fullscreen-loader'
+import { PiRatLazyLoad } from './pirat-lazy-load'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
@@ -26,15 +27,7 @@ export const Layout = Shade({
         <div style={{ zIndex: '2', position: 'fixed' }}>
           <NotyList />
         </div>
-        <LazyLoad
-          loader={<FullScreenLoader />}
-          error={(error, retry) => (
-            <Paper>
-              <h1>Cannot reach the service</h1>
-              <p>{error?.toString()}</p>
-              <Button onclick={retry}>Retry</Button>
-            </Paper>
-          )}
+        <PiRatLazyLoad
           component={async () => {
             const { result } = await injector.getInstance(InstallApiClient).call({
               method: 'GET',
@@ -47,9 +40,11 @@ export const Layout = Shade({
                   <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} />
                 </>
               )
-            } else {
+            } else if (result.state === 'needsInstall') {
               const { InstallerPage } = await import('../installer')
               return <InstallerPage />
+            } else {
+              throw Error(`Cannot fetch the service status. Maybe the backend is not running?`)
             }
           }}
         />
