@@ -1,0 +1,5810 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/MediaApi",
+  "definitions": {
+    "MediaApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "properties": {
+            "/movies": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CMovie%3E"
+            },
+            "/movies/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CMovie%2C%22_id%22%3E"
+            },
+            "/movies/:movieId/subtitles": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/movies/:movieId/subtitles/:subtitleName": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    },
+                    "subtitleName": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId",
+                    "subtitleName"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {}
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/movie-libraries": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CMovieLibrary%3E"
+            },
+            "/movie-libraries/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CMovieLibrary%2C%22_id%22%3E"
+            },
+            "/stream-original/:movieId/:accessToken?": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    },
+                    "accessToken": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {}
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/watch-stream/:id/:codec/:mode/:chunk?": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "codec": {
+                      "type": "string",
+                      "enum": [
+                        "libvpx-vp9",
+                        "x264"
+                      ]
+                    },
+                    "mode": {
+                      "type": "string",
+                      "const": "dash"
+                    },
+                    "chunk": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "codec",
+                    "mode"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {}
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/my-watch-progress": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CMovieWatchHistoryEntry%3E"
+            },
+            "/encode/tasks": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CEncodingTask%3E"
+            },
+            "/encode/tasks/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CEncodingTask%2C%22_id%22%3E"
+            },
+            "/encode/get-worker-task/:taskId": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "taskId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "taskId"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "$ref": "#/definitions/EncodingTask"
+                },
+                "headers": {
+                  "type": "object",
+                  "properties": {
+                    "task-token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "task-token"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "url",
+                "result",
+                "headers"
+              ],
+              "additionalProperties": false
+            },
+            "/series": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CSeries%3E"
+            },
+            "/series/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CSeries%2C%22_id%22%3E"
+            }
+          },
+          "required": [
+            "/movies",
+            "/movies/:id",
+            "/movies/:movieId/subtitles",
+            "/movies/:movieId/subtitles/:subtitleName",
+            "/movie-libraries",
+            "/movie-libraries/:id",
+            "/stream-original/:movieId/:accessToken?",
+            "/watch-stream/:id/:codec/:mode/:chunk?",
+            "/my-watch-progress",
+            "/encode/tasks",
+            "/encode/tasks/:id",
+            "/encode/get-worker-task/:taskId",
+            "/series",
+            "/series/:id"
+          ],
+          "additionalProperties": false
+        },
+        "POST": {
+          "type": "object",
+          "properties": {
+            "/movie-libraries": {
+              "$ref": "#/definitions/PostEndpoint%3CPick%3CMovieLibrary%2C(%22_id%22%7C%22name%22%7C%22path%22%7C%22icon%22)%3E%2C%22_id%22%3E"
+            },
+            "/save-watch-progress": {
+              "type": "object",
+              "properties": {
+                "body": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    },
+                    "watchedSeconds": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "movieId",
+                    "watchedSeconds"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "body",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/upload-encoded/:movieId/:accessToken": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    },
+                    "accessToken": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId",
+                    "accessToken"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/upload-subtitles/:movieId/:accessToken": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    },
+                    "accessToken": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId",
+                    "accessToken"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/finialize-encoding": {
+              "type": "object",
+              "properties": {
+                "body": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": {
+                      "type": "string"
+                    },
+                    "codec": {
+                      "type": "string",
+                      "enum": [
+                        "libvpx-vp9",
+                        "x264"
+                      ]
+                    },
+                    "mode": {
+                      "type": "string",
+                      "const": "dash"
+                    },
+                    "log": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "timestamp": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "timestamp",
+                          "message"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "accessToken",
+                    "codec",
+                    "mode",
+                    "log"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "body",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/save-encoding-failure": {
+              "type": "object",
+              "properties": {
+                "body": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": {
+                      "type": "string"
+                    },
+                    "error": {},
+                    "log": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "timestamp": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "timestamp",
+                          "message"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "accessToken",
+                    "error",
+                    "log"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "body",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/encode/reencode": {
+              "type": "object",
+              "properties": {
+                "body": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "$ref": "#/definitions/CreateResult%3CEncodingTask%3E"
+                }
+              },
+              "required": [
+                "body",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/movies/:movieId/re-fetch-metadata": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "/movies/:movieId/re-extract-subtitles": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "movieId"
+                  ],
+                  "additionalProperties": false
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "url",
+                "result"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "/movie-libraries",
+            "/save-watch-progress",
+            "/upload-encoded/:movieId/:accessToken",
+            "/upload-subtitles/:movieId/:accessToken",
+            "/finialize-encoding",
+            "/save-encoding-failure",
+            "/encode/reencode",
+            "/movies/:movieId/re-fetch-metadata",
+            "/movies/:movieId/re-extract-subtitles"
+          ],
+          "additionalProperties": false
+        },
+        "PATCH": {
+          "type": "object",
+          "properties": {
+            "/movies/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CMovie%2C%22_id%22%3E"
+            },
+            "/movie-libraries/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CMovieLibrary%2C%22_id%22%3E"
+            }
+          },
+          "required": [
+            "/movies/:id",
+            "/movie-libraries/:id"
+          ],
+          "additionalProperties": false
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "properties": {
+            "/encode/tasks/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CEncodingTask%2C%22_id%22%3E"
+            }
+          },
+          "required": [
+            "/encode/tasks/:id"
+          ],
+          "additionalProperties": false
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE"
+      ],
+      "additionalProperties": false
+    },
+    "GetCollectionEndpoint<Movie>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CMovie%2C(%22_id%22%7C%22volumeLetter%22%7C%22path%22%7C%22libraryId%22%7C%22omdbMeta%22%7C%22ffprobe%22%7C%22metadata%22%7C%22availableFormats%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CMovie%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<Movie,(\"_id\"|\"volumeLetter\"|\"path\"|\"libraryId\"|\"omdbMeta\"|\"ffprobe\"|\"metadata\"|\"availableFormats\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "volumeLetter": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "path": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "libraryId": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "omdbMeta": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "ffprobe": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "metadata": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "availableFormats": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "_id",
+              "volumeLetter",
+              "path",
+              "libraryId",
+              "omdbMeta",
+              "ffprobe",
+              "metadata",
+              "availableFormats"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CMovie%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<Movie>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovie%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovie%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovie%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovie%3E"
+          }
+        },
+        "_id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "volumeLetter": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "libraryId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "omdbMeta": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "$ref": "#/definitions/OmdbMetadata"
+                },
+                "$ne": {
+                  "$ref": "#/definitions/OmdbMetadata"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/definitions/OmdbMetadata"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/definitions/OmdbMetadata"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ffprobe": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "$ref": "#/definitions/getInfo.FFProbeResult"
+                },
+                "$ne": {
+                  "$ref": "#/definitions/getInfo.FFProbeResult"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/getInfo.FFProbeResult"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/getInfo.FFProbeResult"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "metadata": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "$ref": "#/definitions/MovieUniversalMetadata"
+                },
+                "$ne": {
+                  "$ref": "#/definitions/MovieUniversalMetadata"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MovieUniversalMetadata"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MovieUniversalMetadata"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "availableFormats": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "codec": {
+                        "type": "string",
+                        "enum": [
+                          "libvpx-vp9",
+                          "x264"
+                        ]
+                      },
+                      "mode": {
+                        "type": "string",
+                        "const": "dash"
+                      }
+                    },
+                    "required": [
+                      "codec",
+                      "mode"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "codec": {
+                        "type": "string",
+                        "enum": [
+                          "libvpx-vp9",
+                          "x264"
+                        ]
+                      },
+                      "mode": {
+                        "type": "string",
+                        "const": "dash"
+                      }
+                    },
+                    "required": [
+                      "codec",
+                      "mode"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "codec": {
+                              "type": "string",
+                              "enum": [
+                                "libvpx-vp9",
+                                "x264"
+                              ]
+                            },
+                            "mode": {
+                              "type": "string",
+                              "const": "dash"
+                            }
+                          },
+                          "required": [
+                            "codec",
+                            "mode"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "codec": {
+                              "type": "string",
+                              "enum": [
+                                "libvpx-vp9",
+                                "x264"
+                              ]
+                            },
+                            "mode": {
+                              "type": "string",
+                              "const": "dash"
+                            }
+                          },
+                          "required": [
+                            "codec",
+                            "mode"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "OmdbMetadata": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FailedOmdbMetadata"
+        },
+        {
+          "$ref": "#/definitions/FetchedOmdbMetadata"
+        }
+      ]
+    },
+    "FailedOmdbMetadata": {
+      "type": "object",
+      "properties": {
+        "Response": {
+          "type": "string",
+          "const": "False"
+        },
+        "Error": {}
+      },
+      "required": [
+        "Response",
+        "Error"
+      ],
+      "additionalProperties": false
+    },
+    "FetchedOmdbMetadata": {
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Year": {
+          "type": "string"
+        },
+        "Rated": {
+          "type": "string"
+        },
+        "Released": {
+          "type": "string"
+        },
+        "Runtime": {
+          "type": "string"
+        },
+        "Genre": {
+          "type": "string"
+        },
+        "Director": {
+          "type": "string"
+        },
+        "Writer": {
+          "type": "string"
+        },
+        "Actors": {
+          "type": "string"
+        },
+        "Plot": {
+          "type": "string"
+        },
+        "Language": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Awards": {
+          "type": "string"
+        },
+        "Poster": {
+          "type": "string"
+        },
+        "Ratings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Source": {
+                "type": "string"
+              },
+              "Value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "Source",
+              "Value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "Metascore": {
+          "type": "string"
+        },
+        "imdbRating": {
+          "type": "string"
+        },
+        "imdbVotes": {
+          "type": "string"
+        },
+        "imdbID": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "movie",
+            "episode"
+          ]
+        },
+        "DVD": {
+          "type": "string"
+        },
+        "BoxOffice": {
+          "type": "string"
+        },
+        "Production": {
+          "type": "string"
+        },
+        "Website": {
+          "type": "string"
+        },
+        "Response": {
+          "type": "string",
+          "const": "True"
+        },
+        "seriesID": {
+          "type": "string"
+        },
+        "Season": {
+          "type": "string"
+        },
+        "Episode": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Title",
+        "Year",
+        "Rated",
+        "Released",
+        "Runtime",
+        "Genre",
+        "Director",
+        "Writer",
+        "Actors",
+        "Plot",
+        "Language",
+        "Country",
+        "Awards",
+        "Poster",
+        "Ratings",
+        "Metascore",
+        "imdbRating",
+        "imdbVotes",
+        "imdbID",
+        "Type",
+        "Response"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.FFProbeResult": {
+      "type": "object",
+      "properties": {
+        "streams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/getInfo.FFProbeStream"
+          }
+        }
+      },
+      "required": [
+        "streams"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.FFProbeStream": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "number"
+        },
+        "codec_name": {
+          "type": "string"
+        },
+        "codec_long_name": {
+          "type": "string"
+        },
+        "profile": {
+          "type": "string"
+        },
+        "codec_type": {
+          "type": "string",
+          "enum": [
+            "video",
+            "audio",
+            "images"
+          ]
+        },
+        "codec_time_base": {
+          "type": "string"
+        },
+        "codec_tag_string": {
+          "type": "string"
+        },
+        "codec_tag": {
+          "type": "string"
+        },
+        "extradata": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "coded_width": {
+          "type": "number"
+        },
+        "coded_height": {
+          "type": "number"
+        },
+        "closed_captions": {
+          "$ref": "#/definitions/getInfo.FFProbeBoolean"
+        },
+        "has_b_frames": {
+          "type": "number"
+        },
+        "sample_aspect_ratio": {
+          "type": "string"
+        },
+        "display_aspect_ratio": {
+          "type": "string"
+        },
+        "pix_fmt": {
+          "type": "string"
+        },
+        "level": {
+          "type": "number"
+        },
+        "color_range": {
+          "type": "string"
+        },
+        "color_space": {
+          "type": "string"
+        },
+        "color_transfer": {
+          "type": "string"
+        },
+        "color_primaries": {
+          "type": "string"
+        },
+        "chroma_location": {
+          "type": "string"
+        },
+        "field_order": {
+          "type": "string"
+        },
+        "timecode": {
+          "type": "string"
+        },
+        "refs": {
+          "type": "number"
+        },
+        "sample_fmt": {
+          "type": "string"
+        },
+        "sample_rate": {
+          "type": "number"
+        },
+        "channels": {
+          "type": "number"
+        },
+        "channel_layout": {
+          "type": "string"
+        },
+        "bits_per_sample": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "r_frame_rate": {
+          "type": "string"
+        },
+        "avg_frame_rate": {
+          "type": "string"
+        },
+        "time_base": {
+          "type": "string"
+        },
+        "start_pts": {
+          "type": "number"
+        },
+        "start_time": {
+          "type": "number"
+        },
+        "duration_ts": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "bit_rate": {
+          "type": "number"
+        },
+        "max_bit_rate": {
+          "type": "number"
+        },
+        "bits_per_raw_sample": {
+          "type": "number"
+        },
+        "nb_frames": {
+          "type": "number"
+        },
+        "nb_read_frames": {
+          "type": "number"
+        },
+        "nb_read_packets": {
+          "type": "number"
+        },
+        "is_avc": {
+          "type": "number"
+        },
+        "nal_length_size": {
+          "type": "number"
+        },
+        "disposition": {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "number"
+            },
+            "dub": {
+              "type": "number"
+            },
+            "original": {
+              "type": "number"
+            },
+            "comment": {
+              "type": "number"
+            },
+            "lyrics": {
+              "type": "number"
+            },
+            "karaoke": {
+              "type": "number"
+            },
+            "forced": {
+              "type": "number"
+            },
+            "hearing_impaired": {
+              "type": "number"
+            },
+            "visual_impaired": {
+              "type": "number"
+            },
+            "clean_effects": {
+              "type": "number"
+            },
+            "attached_pic": {
+              "type": "number"
+            },
+            "timed_thumbnails": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "default",
+            "dub",
+            "original",
+            "comment",
+            "lyrics",
+            "karaoke",
+            "forced",
+            "hearing_impaired",
+            "visual_impaired",
+            "clean_effects",
+            "attached_pic"
+          ],
+          "additionalProperties": false
+        },
+        "tags": {
+          "type": "object",
+          "properties": {
+            "language": {
+              "type": "string"
+            },
+            "handler_name": {
+              "type": "string"
+            },
+            "creation_time": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "not": {}
+              }
+            ]
+          }
+        },
+        "side_data_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/getInfo.SideData"
+          }
+        }
+      },
+      "required": [
+        "index",
+        "codec_time_base",
+        "codec_tag_string",
+        "codec_tag",
+        "id",
+        "r_frame_rate",
+        "avg_frame_rate",
+        "time_base",
+        "disposition",
+        "tags"
+      ],
+      "additionalProperties": false,
+      "description": "Based on the XML definition of the ffprobe stream type {@see https://github.com/FFmpeg/FFmpeg/blob/master/doc/ffprobe.xsd#L206}"
+    },
+    "getInfo.FFProbeBoolean": {
+      "type": "string",
+      "enum": [
+        "0",
+        "1"
+      ]
+    },
+    "getInfo.SideData": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/getInfo.UnknownSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.DisplayMatrixSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.Stereo3dSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.SphericalMappingSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.SkipSamplesSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.MasteringDisplayMetadataSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.ContentLightLevelMetadataSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.DoviConfigurationRecordSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.AudioServiceTypeSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.MpegtsStreamIdSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.CpbPropertiesSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.WebvttSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.ActiveFormatDescriptionSideData"
+        }
+      ]
+    },
+    "getInfo.UnknownSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "unknown",
+          "description": "Based on the C code related to the default side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2298}"
+        }
+      },
+      "required": [
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.DisplayMatrixSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Display Matrix",
+          "description": "Based on the C code related to Display Matrix side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2300-L2304}"
+        },
+        "displaymatrix": {
+          "type": "string",
+          "description": "Mismatches the type linked earlier because ffprobe JSON output reads the printed integers for the display matrix as a string"
+        },
+        "rotation": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "displaymatrix",
+        "rotation",
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.Stereo3dSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Stereo 3D",
+          "description": "Based on the C code related to Stereo 3D side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2306-L2308}"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "unknown",
+            "2D",
+            "side by side",
+            "top and bottom",
+            "frame alternate",
+            "checkerboard",
+            "side by side (quincunx subsampling)",
+            "interleaved lines",
+            "interleaved columns"
+          ],
+          "description": "Based on the C code of the libauvutil stereo3d file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/stereo3d.c#L47-L56}"
+        },
+        "inverted": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "inverted",
+        "side_data_type",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.SphericalMappingSideData": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/getInfo.UnknownSphericalMappingSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.EquirectangularSphericalMappingSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.CubeMapSphericalMappingSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.TiltedEquirectangularSphericalMappingSideData"
+        }
+      ]
+    },
+    "getInfo.UnknownSphericalMappingSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Spherical Mapping",
+          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
+        },
+        "projection": {
+          "type": "string",
+          "const": "unknown",
+          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
+        },
+        "yaw": {
+          "type": "number"
+        },
+        "pitch": {
+          "type": "number"
+        },
+        "roll": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.EquirectangularSphericalMappingSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Spherical Mapping",
+          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
+        },
+        "projection": {
+          "type": "string",
+          "const": "equirectangular",
+          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
+        },
+        "yaw": {
+          "type": "number"
+        },
+        "pitch": {
+          "type": "number"
+        },
+        "roll": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.CubeMapSphericalMappingSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Spherical Mapping",
+          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
+        },
+        "projection": {
+          "type": "string",
+          "const": "cubemap",
+          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
+        },
+        "yaw": {
+          "type": "number"
+        },
+        "pitch": {
+          "type": "number"
+        },
+        "roll": {
+          "type": "number"
+        },
+        "padding": {
+          "type": "number",
+          "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2313}"
+        }
+      },
+      "required": [
+        "padding",
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.TiltedEquirectangularSphericalMappingSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Spherical Mapping",
+          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
+        },
+        "projection": {
+          "type": "string",
+          "const": "tiled equirectangular",
+          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
+        },
+        "yaw": {
+          "type": "number"
+        },
+        "pitch": {
+          "type": "number"
+        },
+        "roll": {
+          "type": "number"
+        },
+        "bound_left": {
+          "type": "number",
+          "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2315-L2321}"
+        },
+        "bound_top": {
+          "type": "number"
+        },
+        "bound_right": {
+          "type": "number"
+        },
+        "bound_bottom": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "bound_bottom",
+        "bound_left",
+        "bound_right",
+        "bound_top",
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.SkipSamplesSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Skip Samples",
+          "description": "Based on the C code related to Skip Samples side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2328-L2331}"
+        },
+        "skip_samples": {
+          "type": "number"
+        },
+        "discard_padding": {
+          "type": "number"
+        },
+        "skip_reason": {
+          "type": "number"
+        },
+        "discard_reason": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "discard_padding",
+        "discard_reason",
+        "side_data_type",
+        "skip_reason",
+        "skip_samples"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.MasteringDisplayMetadataSideData": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/getInfo.PrimariesMasteringDisplayMetadataSideData"
+        },
+        {
+          "$ref": "#/definitions/getInfo.LuminanceMasteringDisplayMetadataSideData"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "side_data_type": {
+              "type": "string",
+              "const": "Mastering display metadata",
+              "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
+            },
+            "min_luminance": {
+              "type": "string",
+              "description": "Based on the C code related to Luminance Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2348-L2349}"
+            },
+            "max_luminance": {
+              "type": "string"
+            },
+            "red_x": {
+              "type": "string",
+              "description": "Based on the C code related to Primaries Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2336-L2344}"
+            },
+            "red_y": {
+              "type": "string"
+            },
+            "green_x": {
+              "type": "string"
+            },
+            "green_y": {
+              "type": "string"
+            },
+            "blue_x": {
+              "type": "string"
+            },
+            "blue_y": {
+              "type": "string"
+            },
+            "white_point_x": {
+              "type": "string"
+            },
+            "white_point_y": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "blue_x",
+            "blue_y",
+            "green_x",
+            "green_y",
+            "max_luminance",
+            "min_luminance",
+            "red_x",
+            "red_y",
+            "side_data_type",
+            "white_point_x",
+            "white_point_y"
+          ]
+        }
+      ]
+    },
+    "getInfo.PrimariesMasteringDisplayMetadataSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Mastering display metadata",
+          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
+        },
+        "red_x": {
+          "type": "string",
+          "description": "Based on the C code related to Primaries Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2336-L2344}"
+        },
+        "red_y": {
+          "type": "string"
+        },
+        "green_x": {
+          "type": "string"
+        },
+        "green_y": {
+          "type": "string"
+        },
+        "blue_x": {
+          "type": "string"
+        },
+        "blue_y": {
+          "type": "string"
+        },
+        "white_point_x": {
+          "type": "string"
+        },
+        "white_point_y": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "blue_x",
+        "blue_y",
+        "green_x",
+        "green_y",
+        "red_x",
+        "red_y",
+        "side_data_type",
+        "white_point_x",
+        "white_point_y"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.LuminanceMasteringDisplayMetadataSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Mastering display metadata",
+          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
+        },
+        "min_luminance": {
+          "type": "string",
+          "description": "Based on the C code related to Luminance Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2348-L2349}"
+        },
+        "max_luminance": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "max_luminance",
+        "min_luminance",
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.ContentLightLevelMetadataSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Content light level metadata",
+          "description": "Based on the C code related to Content light level metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2352-L2354}"
+        },
+        "max_content": {
+          "type": "number"
+        },
+        "max_average": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "max_average",
+        "max_content",
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.DoviConfigurationRecordSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "DOVI configuration record",
+          "description": "Based on the C code related to DOVI configuration record side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2356-L2364}"
+        },
+        "dv_version_major": {
+          "type": "number"
+        },
+        "dv_version_minor": {
+          "type": "number"
+        },
+        "dv_profile": {
+          "type": "number"
+        },
+        "dv_level": {
+          "type": "number"
+        },
+        "rpu_present_flag": {
+          "type": "number"
+        },
+        "el_present_flag": {
+          "type": "number"
+        },
+        "bl_present_flag": {
+          "type": "number"
+        },
+        "dv_bl_signal_compatibility_id": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "bl_present_flag",
+        "dv_bl_signal_compatibility_id",
+        "dv_level",
+        "dv_profile",
+        "dv_version_major",
+        "dv_version_minor",
+        "el_present_flag",
+        "rpu_present_flag",
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.AudioServiceTypeSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Audio Service Type",
+          "description": "Based on the C code related to Audio Service Type side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2366-L2367}"
+        },
+        "service_type": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "service_type",
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.MpegtsStreamIdSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "MPEGTS Stream ID",
+          "description": "Based on the C code related to MPEGTS Stream ID side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2369}"
+        },
+        "id": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.CpbPropertiesSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "CPB properties",
+          "description": "Based on the C code related to CPB properties side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2371-L2376}"
+        },
+        "max_bitrate": {
+          "type": "number"
+        },
+        "min_bitrate": {
+          "type": "number"
+        },
+        "avg_bitrate": {
+          "type": "number"
+        },
+        "buffer_size": {
+          "type": "number"
+        },
+        "vbv_delay": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "avg_bitrate",
+        "buffer_size",
+        "max_bitrate",
+        "min_bitrate",
+        "side_data_type",
+        "vbv_delay"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.WebvttSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "enum": [
+            "WebVTT ID",
+            "WebVTT Settings"
+          ],
+          "description": "Based on the C code related to Webvtt side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2379-L2381}"
+        },
+        "data": {
+          "type": "string"
+        },
+        "data_hash": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "data_hash",
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "getInfo.ActiveFormatDescriptionSideData": {
+      "type": "object",
+      "properties": {
+        "side_data_type": {
+          "type": "string",
+          "const": "Active format description",
+          "description": "Based on the C code related to Active format description side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2383}"
+        },
+        "active_format": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "side_data_type"
+      ],
+      "additionalProperties": false
+    },
+    "MovieUniversalMetadata": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "year": {
+          "type": "number"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "genre": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "thumbnailImageUrl": {
+          "type": "string"
+        },
+        "plot": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "movie",
+            "episode"
+          ]
+        },
+        "seriesId": {
+          "type": "string"
+        },
+        "season": {
+          "type": "number"
+        },
+        "episode": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "title",
+        "genre",
+        "thumbnailImageUrl",
+        "plot",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "GetCollectionResult<Movie>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Movie"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "Movie": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "volumeLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "libraryId": {
+          "type": "string"
+        },
+        "omdbMeta": {
+          "$ref": "#/definitions/OmdbMetadata"
+        },
+        "ffprobe": {
+          "$ref": "#/definitions/getInfo.FFProbeResult"
+        },
+        "metadata": {
+          "$ref": "#/definitions/MovieUniversalMetadata"
+        },
+        "availableFormats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "codec": {
+                "type": "string",
+                "enum": [
+                  "libvpx-vp9",
+                  "x264"
+                ]
+              },
+              "mode": {
+                "type": "string",
+                "const": "dash"
+              }
+            },
+            "required": [
+              "codec",
+              "mode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "_id",
+        "volumeLetter",
+        "path",
+        "libraryId",
+        "ffprobe",
+        "metadata"
+      ],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<Movie,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "_id",
+                  "volumeLetter",
+                  "path",
+                  "libraryId",
+                  "omdbMeta",
+                  "ffprobe",
+                  "metadata",
+                  "availableFormats"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/Movie"
+        }
+      },
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetCollectionEndpoint<MovieLibrary>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CMovieLibrary%2C(%22_id%22%7C%22icon%22%7C%22name%22%7C%22path%22%7C%22owner%22%7C%22encoding%22%7C%22autoCreateEncodingTasks%22%7C%22autoExtractSubtitles%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CMovieLibrary%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<MovieLibrary,(\"_id\"|\"icon\"|\"name\"|\"path\"|\"owner\"|\"encoding\"|\"autoCreateEncodingTasks\"|\"autoExtractSubtitles\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "icon": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "path": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "owner": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "encoding": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "autoCreateEncodingTasks": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "autoExtractSubtitles": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "_id",
+              "icon",
+              "name",
+              "path",
+              "owner",
+              "encoding",
+              "autoCreateEncodingTasks",
+              "autoExtractSubtitles"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CMovieLibrary%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<MovieLibrary>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieLibrary%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieLibrary%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieLibrary%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieLibrary%3E"
+          }
+        },
+        "_id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "encoding": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/EncodingType"
+                    },
+                    {
+                      "type": "boolean",
+                      "const": false
+                    }
+                  ]
+                },
+                "$ne": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/EncodingType"
+                    },
+                    {
+                      "type": "boolean",
+                      "const": false
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/definitions/EncodingType"
+                      },
+                      {
+                        "type": "boolean",
+                        "const": false
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/definitions/EncodingType"
+                      },
+                      {
+                        "type": "boolean",
+                        "const": false
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "autoCreateEncodingTasks": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "boolean"
+                },
+                "$ne": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "autoExtractSubtitles": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "boolean"
+                },
+                "$ne": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "EncodingType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Vp9EncodingType"
+        },
+        {
+          "$ref": "#/definitions/X264EncodingType"
+        }
+      ]
+    },
+    "Vp9EncodingType": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "dash"
+        },
+        "codec": {
+          "type": "string",
+          "const": "libvpx-vp9"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Vp9EncodingFormat"
+          }
+        }
+      },
+      "required": [
+        "mode",
+        "codec",
+        "formats"
+      ],
+      "additionalProperties": false
+    },
+    "Vp9EncodingFormat": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bitrate": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "number"
+            },
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "quality": {
+          "type": "number"
+        },
+        "downScale": {
+          "type": "number"
+        }
+      }
+    },
+    "X264EncodingType": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "dash"
+        },
+        "codec": {
+          "type": "string",
+          "const": "x264"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/X264EncodingFormat"
+          }
+        }
+      },
+      "required": [
+        "mode",
+        "codec",
+        "formats"
+      ],
+      "additionalProperties": false
+    },
+    "X264EncodingFormat": {
+      "type": "object",
+      "properties": {
+        "downScale": {
+          "type": "number"
+        },
+        "bitRate": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "downScale",
+        "bitRate"
+      ],
+      "additionalProperties": false
+    },
+    "GetCollectionResult<MovieLibrary>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MovieLibrary"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "MovieLibrary": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "encoding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EncodingType"
+            },
+            {
+              "type": "boolean",
+              "const": false
+            }
+          ]
+        },
+        "autoCreateEncodingTasks": {
+          "type": "boolean"
+        },
+        "autoExtractSubtitles": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "_id",
+        "icon",
+        "name",
+        "path",
+        "owner",
+        "encoding"
+      ],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<MovieLibrary,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "_id",
+                  "icon",
+                  "name",
+                  "path",
+                  "owner",
+                  "encoding",
+                  "autoCreateEncodingTasks",
+                  "autoExtractSubtitles"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/MovieLibrary"
+        }
+      },
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetCollectionEndpoint<MovieWatchHistoryEntry>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CMovieWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22movieId%22%7C%22startDate%22%7C%22lastWatchDate%22%7C%22watchedSeconds%22%7C%22completed%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CMovieWatchHistoryEntry%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<MovieWatchHistoryEntry,(\"id\"|\"userName\"|\"movieId\"|\"startDate\"|\"lastWatchDate\"|\"watchedSeconds\"|\"completed\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "userName": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "movieId": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "startDate": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "lastWatchDate": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "watchedSeconds": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "completed": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id",
+              "userName",
+              "movieId",
+              "startDate",
+              "lastWatchDate",
+              "watchedSeconds",
+              "completed"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<MovieWatchHistoryEntry>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "userName": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "movieId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "startDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$like": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$regex": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$ne": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "lastWatchDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$like": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$regex": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$ne": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "watchedSeconds": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$gt": {
+                  "type": "number"
+                },
+                "$gte": {
+                  "type": "number"
+                },
+                "$lt": {
+                  "type": "number"
+                },
+                "$lte": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "completed": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "boolean"
+                },
+                "$ne": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<MovieWatchHistoryEntry>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MovieWatchHistoryEntry"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "MovieWatchHistoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "movieId": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastWatchDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "watchedSeconds": {
+          "type": "number"
+        },
+        "completed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "userName",
+        "movieId",
+        "startDate",
+        "lastWatchDate",
+        "watchedSeconds",
+        "completed"
+      ],
+      "additionalProperties": false
+    },
+    "GetCollectionEndpoint<EncodingTask>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CEncodingTask%2C(%22_id%22%7C%22authToken%22%7C%22mediaInfo%22%7C%22status%22%7C%22workerInfo%22%7C%22percent%22%7C%22creationDate%22%7C%22modificationDate%22%7C%22error%22%7C%22log%22%7C%22startDate%22%7C%22finishDate%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CEncodingTask%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<EncodingTask,(\"_id\"|\"authToken\"|\"mediaInfo\"|\"status\"|\"workerInfo\"|\"percent\"|\"creationDate\"|\"modificationDate\"|\"error\"|\"log\"|\"startDate\"|\"finishDate\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "authToken": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "mediaInfo": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "workerInfo": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "percent": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "creationDate": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "modificationDate": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "error": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "log": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "startDate": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "finishDate": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "_id",
+              "authToken",
+              "mediaInfo",
+              "status",
+              "workerInfo",
+              "percent",
+              "creationDate",
+              "modificationDate",
+              "error",
+              "log",
+              "startDate",
+              "finishDate"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CEncodingTask%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<EncodingTask>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CEncodingTask%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CEncodingTask%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CEncodingTask%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CEncodingTask%3E"
+          }
+        },
+        "_id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "authToken": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "mediaInfo": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "object",
+                  "properties": {
+                    "movie": {
+                      "$ref": "#/definitions/Movie",
+                      "description": "The Movie entity"
+                    },
+                    "library": {
+                      "$ref": "#/definitions/MovieLibrary",
+                      "description": "The related movie library"
+                    }
+                  },
+                  "required": [
+                    "movie",
+                    "library"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic info about the media to encode"
+                },
+                "$ne": {
+                  "type": "object",
+                  "properties": {
+                    "movie": {
+                      "$ref": "#/definitions/Movie",
+                      "description": "The Movie entity"
+                    },
+                    "library": {
+                      "$ref": "#/definitions/MovieLibrary",
+                      "description": "The related movie library"
+                    }
+                  },
+                  "required": [
+                    "movie",
+                    "library"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic info about the media to encode"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "movie": {
+                        "$ref": "#/definitions/Movie",
+                        "description": "The Movie entity"
+                      },
+                      "library": {
+                        "$ref": "#/definitions/MovieLibrary",
+                        "description": "The related movie library"
+                      }
+                    },
+                    "required": [
+                      "movie",
+                      "library"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Generic info about the media to encode"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "movie": {
+                        "$ref": "#/definitions/Movie",
+                        "description": "The Movie entity"
+                      },
+                      "library": {
+                        "$ref": "#/definitions/MovieLibrary",
+                        "description": "The related movie library"
+                      }
+                    },
+                    "required": [
+                      "movie",
+                      "library"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Generic info about the media to encode"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "status": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "inProgress",
+                    "finished",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "description": "The current status of the task"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "inProgress",
+                    "finished",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "description": "The current status of the task"
+                },
+                "$like": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "inProgress",
+                    "finished",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "description": "The current status of the task"
+                },
+                "$regex": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "inProgress",
+                    "finished",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "description": "The current status of the task"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "inProgress",
+                    "finished",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "description": "The current status of the task"
+                },
+                "$ne": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "inProgress",
+                    "finished",
+                    "failed",
+                    "cancelled"
+                  ],
+                  "description": "The current status of the task"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "inProgress",
+                      "finished",
+                      "failed",
+                      "cancelled"
+                    ],
+                    "description": "The current status of the task"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "inProgress",
+                      "finished",
+                      "failed",
+                      "cancelled"
+                    ],
+                    "description": "The current status of the task"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "workerInfo": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "object",
+                  "properties": {
+                    "ip": {
+                      "type": "string",
+                      "description": "The IP address"
+                    }
+                  },
+                  "required": [
+                    "ip"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic info about the worker who works on the task"
+                },
+                "$ne": {
+                  "type": "object",
+                  "properties": {
+                    "ip": {
+                      "type": "string",
+                      "description": "The IP address"
+                    }
+                  },
+                  "required": [
+                    "ip"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic info about the worker who works on the task"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "ip": {
+                            "type": "string",
+                            "description": "The IP address"
+                          }
+                        },
+                        "required": [
+                          "ip"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Generic info about the worker who works on the task"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "ip": {
+                            "type": "string",
+                            "description": "The IP address"
+                          }
+                        },
+                        "required": [
+                          "ip"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Generic info about the worker who works on the task"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "percent": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$gt": {
+                  "type": "number",
+                  "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                },
+                "$gte": {
+                  "type": "number",
+                  "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                },
+                "$lt": {
+                  "type": "number",
+                  "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                },
+                "$lte": {
+                  "type": "number",
+                  "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number",
+                  "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                },
+                "$ne": {
+                  "type": "number",
+                  "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "creationDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The task creation date"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The task creation date"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The task creation date"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The task creation date"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The task creation date"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The task creation date"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The task creation date"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The task creation date"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "modificationDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$ne": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "format": "date-time"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {},
+                "$ne": {}
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {},
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {},
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "log": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "timestamp": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "timestamp",
+                      "message"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "timestamp": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "timestamp",
+                      "message"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "timestamp": {
+                              "type": "string"
+                            },
+                            "message": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "timestamp",
+                            "message"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "timestamp": {
+                              "type": "string"
+                            },
+                            "message": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "timestamp",
+                            "message"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "startDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$ne": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "format": "date-time"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "finishDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "$ne": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "format": "date-time"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<EncodingTask>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EncodingTask"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "EncodingTask": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "authToken": {
+          "type": "string"
+        },
+        "mediaInfo": {
+          "type": "object",
+          "properties": {
+            "movie": {
+              "$ref": "#/definitions/Movie",
+              "description": "The Movie entity"
+            },
+            "library": {
+              "$ref": "#/definitions/MovieLibrary",
+              "description": "The related movie library"
+            }
+          },
+          "required": [
+            "movie",
+            "library"
+          ],
+          "additionalProperties": false,
+          "description": "Generic info about the media to encode"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "inProgress",
+            "finished",
+            "failed",
+            "cancelled"
+          ],
+          "description": "The current status of the task"
+        },
+        "workerInfo": {
+          "type": "object",
+          "properties": {
+            "ip": {
+              "type": "string",
+              "description": "The IP address"
+            }
+          },
+          "required": [
+            "ip"
+          ],
+          "additionalProperties": false,
+          "description": "Generic info about the worker who works on the task"
+        },
+        "percent": {
+          "type": "number",
+          "description": "Shows how the progress of the encoding goes, reported by the worker agent"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The task creation date"
+        },
+        "modificationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "error": {},
+        "log": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "timestamp",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finishDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "_id",
+        "authToken",
+        "mediaInfo",
+        "status",
+        "percent",
+        "creationDate"
+      ],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<EncodingTask,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "_id",
+                  "authToken",
+                  "mediaInfo",
+                  "status",
+                  "workerInfo",
+                  "percent",
+                  "creationDate",
+                  "modificationDate",
+                  "error",
+                  "log",
+                  "startDate",
+                  "finishDate"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/EncodingTask"
+        }
+      },
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetCollectionEndpoint<Series>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CSeries%2C(%22_id%22%7C%22imdbId%22%7C%22omdbMetadata%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CSeries%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<Series,(\"_id\"|\"imdbId\"|\"omdbMetadata\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "imdbId": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "omdbMetadata": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "_id",
+              "imdbId",
+              "omdbMetadata"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CSeries%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<Series>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeries%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeries%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeries%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeries%3E"
+          }
+        },
+        "_id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "imdbId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "omdbMetadata": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "$ref": "#/definitions/SeriesOmdbMetadata"
+                },
+                "$ne": {
+                  "$ref": "#/definitions/SeriesOmdbMetadata"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SeriesOmdbMetadata"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SeriesOmdbMetadata"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "SeriesOmdbMetadata": {
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Year": {
+          "type": "string"
+        },
+        "Rated": {
+          "type": "string"
+        },
+        "Released": {
+          "type": "string"
+        },
+        "Runtime": {
+          "type": "string"
+        },
+        "Genre": {
+          "type": "string"
+        },
+        "Director": {
+          "type": "string"
+        },
+        "Writer": {
+          "type": "string"
+        },
+        "Actors": {
+          "type": "string"
+        },
+        "Plot": {
+          "type": "string"
+        },
+        "Language": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Awards": {
+          "type": "string"
+        },
+        "Poster": {
+          "type": "string"
+        },
+        "Ratings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Source": {
+                "type": "string"
+              },
+              "Value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "Source",
+              "Value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "Metascore": {
+          "type": "string"
+        },
+        "imdbRating": {
+          "type": "string"
+        },
+        "imdbVotes": {
+          "type": "string"
+        },
+        "imdbID": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "totalSeasons": {
+          "type": "string"
+        },
+        "Response": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Title",
+        "Year",
+        "Rated",
+        "Released",
+        "Runtime",
+        "Genre",
+        "Director",
+        "Writer",
+        "Actors",
+        "Plot",
+        "Language",
+        "Country",
+        "Awards",
+        "Poster",
+        "Ratings",
+        "Metascore",
+        "imdbRating",
+        "imdbVotes",
+        "imdbID",
+        "Type",
+        "totalSeasons",
+        "Response"
+      ],
+      "additionalProperties": false
+    },
+    "GetCollectionResult<Series>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Series"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "Series": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "omdbMetadata": {
+          "$ref": "#/definitions/SeriesOmdbMetadata"
+        }
+      },
+      "required": [
+        "_id",
+        "imdbId",
+        "omdbMetadata"
+      ],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<Series,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "_id",
+                  "imdbId",
+                  "omdbMetadata"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/Series"
+        }
+      },
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "PostEndpoint<Pick<MovieLibrary,(\"_id\"|\"name\"|\"path\"|\"icon\")>,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CPick%3CMovieLibrary%2C(%22_id%22%7C%22name%22%7C%22path%22%7C%22icon%22)%3E%2C%22_id%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/Pick%3CMovieLibrary%2C(%22_id%22%7C%22name%22%7C%22path%22%7C%22icon%22)%3E"
+        }
+      },
+      "required": [
+        "body",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "WithOptionalId<Pick<MovieLibrary,(\"_id\"|\"name\"|\"path\"|\"icon\")>,\"_id\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "icon",
+        "name",
+        "path"
+      ]
+    },
+    "Pick<MovieLibrary,(\"_id\"|\"name\"|\"path\"|\"icon\")>": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "_id",
+        "name",
+        "path",
+        "icon"
+      ],
+      "additionalProperties": false
+    },
+    "CreateResult<EncodingTask>": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EncodingTask"
+          }
+        }
+      },
+      "required": [
+        "created"
+      ],
+      "additionalProperties": false
+    },
+    "PatchEndpoint<Movie,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CMovie%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "Partial<Movie>": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "volumeLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "libraryId": {
+          "type": "string"
+        },
+        "omdbMeta": {
+          "$ref": "#/definitions/OmdbMetadata"
+        },
+        "ffprobe": {
+          "$ref": "#/definitions/getInfo.FFProbeResult"
+        },
+        "metadata": {
+          "$ref": "#/definitions/MovieUniversalMetadata"
+        },
+        "availableFormats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "codec": {
+                "type": "string",
+                "enum": [
+                  "libvpx-vp9",
+                  "x264"
+                ]
+              },
+              "mode": {
+                "type": "string",
+                "const": "dash"
+              }
+            },
+            "required": [
+              "codec",
+              "mode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "PatchEndpoint<MovieLibrary,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CMovieLibrary%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "Partial<MovieLibrary>": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "encoding": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EncodingType"
+            },
+            {
+              "type": "boolean",
+              "const": false
+            }
+          ]
+        },
+        "autoCreateEncodingTasks": {
+          "type": "boolean"
+        },
+        "autoExtractSubtitles": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DeleteEndpoint<EncodingTask,\"_id\">": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for deleting entities"
+    }
+  }
+}

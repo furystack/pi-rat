@@ -1342,6 +1342,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/ffprobe@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "@types/ffprobe@npm:1.1.4"
+  checksum: 98ffd218a32e5707a92a557e822d9079083a0b8195e44213889be1293b51ac6e02de1a287c2fdc2271b231f77c7289024357fbf635a25428c8c8ab95f6f6d3c1
+  languageName: node
+  linkType: hard
+
 "@types/formidable@npm:^2.0.5":
   version: 2.0.5
   resolution: "@types/formidable@npm:2.0.5"
@@ -2345,6 +2352,7 @@ __metadata:
   dependencies:
     "@furystack/core": ^11.3.1
     "@furystack/rest": ^4.2.1
+    "@types/ffprobe": ^1.1.4
     "@types/node": ^18.15.11
     ts-json-schema-generator: ^1.2.0
   languageName: unknown
