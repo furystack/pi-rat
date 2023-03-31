@@ -56,7 +56,7 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
               history.pushState(
                 '',
                 '',
-                `/drives/openFile/${encodeURIComponent(currentLetter.getValue())}/${encodeURIComponent(
+                `/file-browser/openFile/${encodeURIComponent(currentLetter.getValue())}/${encodeURIComponent(
                   PathHelper.joinPaths(path, v.name),
                 )}`,
               )

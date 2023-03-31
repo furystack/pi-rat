@@ -1,6 +1,25 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "FurystackUser": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "username",
+        "roles"
+      ],
+      "additionalProperties": false
+    },
     "IsAuthenticatedAction": {
       "type": "object",
       "properties": {
@@ -26,7 +45,7 @@
       "type": "object",
       "properties": {
         "result": {
-          "$ref": "#/definitions/User"
+          "$ref": "#/definitions/FurystackUser"
         }
       },
       "required": [
@@ -34,33 +53,11 @@
       ],
       "additionalProperties": false
     },
-    "User": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string",
-          "description": "Name of the user"
-        },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of roles"
-        }
-      },
-      "required": [
-        "username",
-        "roles"
-      ],
-      "additionalProperties": false,
-      "description": "Class model that represents an application user"
-    },
     "LoginAction": {
       "type": "object",
       "properties": {
         "result": {
-          "$ref": "#/definitions/User"
+          "$ref": "#/definitions/FurystackUser"
         },
         "body": {
           "type": "object",
@@ -92,6 +89,85 @@
       },
       "required": [
         "result"
+      ],
+      "additionalProperties": false
+    },
+    "PostUserEndpoint": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/User"
+        },
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CFurystackUser%2C%22username%22%3E"
+        }
+      },
+      "required": [
+        "result",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "username",
+        "roles",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "WithOptionalId<FurystackUser,\"username\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "roles"
+      ]
+    },
+    "Omit<FurystackUser,\"username\">": {
+      "$ref": "#/definitions/Pick%3CFurystackUser%2CExclude%3C(%22username%22%7C%22roles%22)%2C%22username%22%3E%3E"
+    },
+    "Pick<FurystackUser,Exclude<(\"username\"|\"roles\"),\"username\">>": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "roles"
       ],
       "additionalProperties": false
     },
@@ -132,7 +208,7 @@
               "$ref": "#/definitions/LogoutAction"
             },
             "/users": {
-              "$ref": "#/definitions/PostEndpoint%3CUser%2C%22username%22%3E"
+              "$ref": "#/definitions/PostUserEndpoint"
             }
           },
           "required": [
@@ -146,7 +222,7 @@
           "type": "object",
           "properties": {
             "/users/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CUser%2C%22username%22%3E"
+              "$ref": "#/definitions/PatchEndpoint%3COmit%3CUser%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22username%22%3E"
             }
           },
           "required": [
@@ -426,7 +502,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CUser%2C(%22username%22%7C%22roles%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CUser%2C(%22username%22%7C%22roles%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -442,7 +518,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<User,(\"username\"|\"roles\")[]>": {
+    "FindOptions<User,(\"username\"|\"roles\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -469,6 +545,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -480,7 +570,9 @@
             "type": "string",
             "enum": [
               "username",
-              "roles"
+              "roles",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -527,20 +619,16 @@
               "type": "object",
               "properties": {
                 "$startsWith": {
-                  "type": "string",
-                  "description": "Name of the user"
+                  "type": "string"
                 },
                 "$endsWith": {
-                  "type": "string",
-                  "description": "Name of the user"
+                  "type": "string"
                 },
                 "$like": {
-                  "type": "string",
-                  "description": "Name of the user"
+                  "type": "string"
                 },
                 "$regex": {
-                  "type": "string",
-                  "description": "Name of the user"
+                  "type": "string"
                 }
               },
               "additionalProperties": false
@@ -549,12 +637,10 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "type": "string",
-                  "description": "Name of the user"
+                  "type": "string"
                 },
                 "$ne": {
-                  "type": "string",
-                  "description": "Name of the user"
+                  "type": "string"
                 }
               },
               "additionalProperties": false
@@ -565,15 +651,13 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "description": "Name of the user"
+                    "type": "string"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "description": "Name of the user"
+                    "type": "string"
                   }
                 }
               },
@@ -590,15 +674,13 @@
                   "type": "array",
                   "items": {
                     "type": "string"
-                  },
-                  "description": "List of roles"
+                  }
                 },
                 "$ne": {
                   "type": "array",
                   "items": {
                     "type": "string"
-                  },
-                  "description": "List of roles"
+                  }
                 }
               },
               "additionalProperties": false
@@ -612,8 +694,7 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    },
-                    "description": "List of roles"
+                    }
                   }
                 },
                 "$nin": {
@@ -622,8 +703,111 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    },
-                    "description": "List of roles"
+                    }
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
                 }
               },
@@ -667,7 +851,9 @@
                 "type": "string",
                 "enum": [
                   "username",
-                  "roles"
+                  "roles",
+                  "createdAt",
+                  "updatedAt"
                 ]
               },
               "description": "The list of fields to select"
@@ -700,74 +886,17 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "PostEndpoint<User,\"username\">": {
+    "PatchEndpoint<Omit<User,(\"createdAt\"|\"updatedAt\")>,\"username\">": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/WithOptionalId%3CUser%2C%22username%22%3E"
-        },
-        "result": {
-          "$ref": "#/definitions/User"
-        }
-      },
-      "required": [
-        "body",
-        "result"
-      ],
-      "additionalProperties": false,
-      "description": "Endpoint model for creating new entities"
-    },
-    "WithOptionalId<User,\"username\">": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "username": {
-          "type": "string",
-          "description": "Name of the user"
-        },
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of roles"
-        }
-      },
-      "required": [
-        "roles"
-      ]
-    },
-    "Omit<User,\"username\">": {
-      "$ref": "#/definitions/Pick%3CUser%2CExclude%3C(%22username%22%7C%22roles%22)%2C%22username%22%3E%3E"
-    },
-    "Pick<User,Exclude<(\"username\"|\"roles\"),\"username\">>": {
-      "type": "object",
-      "properties": {
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of roles"
-        }
-      },
-      "required": [
-        "roles"
-      ],
-      "additionalProperties": false
-    },
-    "PatchEndpoint<User,\"username\">": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/Partial%3CUser%3E"
+          "$ref": "#/definitions/Partial%3COmit%3CUser%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
         },
         "url": {
           "type": "object",
           "properties": {
             "id": {
-              "type": "string",
-              "description": "Name of the user"
+              "type": "string"
             }
           },
           "required": [
@@ -788,19 +917,17 @@
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
-    "Partial<User>": {
+    "Partial<Omit<User,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
         "username": {
-          "type": "string",
-          "description": "Name of the user"
+          "type": "string"
         },
         "roles": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "description": "List of roles"
+          }
         }
       },
       "additionalProperties": false
@@ -812,8 +939,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string",
-              "description": "Name of the user"
+              "type": "string"
             }
           },
           "required": [

@@ -71,7 +71,7 @@
     "outputDirectory": "./coverage"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=19.0.0"
   },
   "packageManager": "yarn@3.5.0"
 }

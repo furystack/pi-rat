@@ -7,9 +7,10 @@ test.describe('Pi-Rat Application', () => {
 
     await login(page)
 
-    const welcomeTitle = await page.locator('hello-world div h2')
-    await expect(welcomeTitle).toBeVisible()
-    await expect(welcomeTitle).toHaveText('Hello, testuser@gmail.com !')
+    const defaultDashboard = await page.locator('pi-rat-default-dashboard')
+    await expect(defaultDashboard).toBeVisible()
+    await expect(defaultDashboard).toContainText('Apps')
+    await expect(defaultDashboard).toContainText('Entities')
 
     await logout(page)
   })

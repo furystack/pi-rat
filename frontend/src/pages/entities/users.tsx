@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { User } from 'common'
-import { identityApiSchema } from 'common'
+import { identitySchemas } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { IdentityApiClient } from '../../services/identity-api-client'
@@ -15,7 +15,7 @@ export const UsersPage = Shade({
 
     const model = modelProvider.getModelForEntityType({
       schemaName: 'User',
-      jsonSchema: identityApiSchema.definitions.User,
+      jsonSchema: identitySchemas.definitions.User,
     })
 
     const service = useDisposable(
@@ -25,7 +25,7 @@ export const UsersPage = Shade({
           defaultSettings: {},
           model: User,
           keyProperty: 'username',
-          readonlyProperties: [],
+          readonlyProperties: ['createdAt', 'updatedAt'],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',

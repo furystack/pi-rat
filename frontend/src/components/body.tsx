@@ -1,24 +1,38 @@
 import type { Route } from '@furystack/shades'
 import { createComponent, Shade, Router, LazyLoad } from '@furystack/shades'
 import { SessionService } from '../services/session'
-import { Init, HelloWorld, Offline, Login } from '../pages'
-import { Loader } from '@furystack/shades-common-components'
+import { Init, Offline, Login } from '../pages'
+import { Loader, fadeOut, fadeIn } from '@furystack/shades-common-components'
+import { DefaultDashboard } from './dashboard/default-dashboard'
+import { LoadableDashboard } from './dashboard/LoadableDashboard'
+
+const onLeave = async ({ element }: { element: HTMLElement }) => {
+  await fadeOut(element, { easing: 'ease-in', duration: 200 })
+}
+
+const onVisit = async ({ element }: { element: HTMLElement }) => {
+  await fadeIn(element, { easing: 'ease-out', duration: 750 })
+}
 
 const adminRoutes: Array<Route<any>> = [
   {
-    url: '/drives',
+    url: '/file-browser',
+    onVisit,
+    onLeave,
     component: () => (
       <LazyLoad
         loader={<Loader />}
         component={async () => {
-          const { DrivesPage } = await import('../pages/drives')
+          const { DrivesPage } = await import('../pages/file-browser')
           return <DrivesPage />
         }}
       />
     ),
   },
   {
-    url: '/drives/openFile/:driveLetter/:path',
+    url: '/file-browser/openFile/:driveLetter/:path',
+    onVisit,
+    onLeave,
     component: ({ match }) => (
       <LazyLoad
         loader={<Loader />}
@@ -31,6 +45,8 @@ const adminRoutes: Array<Route<any>> = [
   },
   {
     url: '/entities/drives',
+    onVisit,
+    onLeave,
     component: () => (
       <LazyLoad
         loader={<Loader />}
@@ -43,12 +59,28 @@ const adminRoutes: Array<Route<any>> = [
   },
   {
     url: '/entities/users',
+    onVisit,
+    onLeave,
     component: () => (
       <LazyLoad
         loader={<Loader />}
         component={async () => {
           const { UsersPage } = await import('../pages/entities/users')
           return <UsersPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/dashboards',
+    onVisit,
+    onLeave,
+    component: () => (
+      <LazyLoad
+        loader={<Loader />}
+        component={async () => {
+          const { DashboardsPage } = await import('../pages/entities/dashboards')
+          return <DashboardsPage />
         }}
       />
     ),
@@ -73,7 +105,21 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
                 <Router
                   routes={[
                     ...(hasAdminRole ? adminRoutes : []),
-                    { url: '/', routingOptions: { end: false }, component: () => <HelloWorld /> },
+                    {
+                      url: '/dashboards/:id',
+                      onVisit,
+                      onLeave,
+                      component: ({ match }) => {
+                        return <LoadableDashboard id={match.params.id} />
+                      },
+                    },
+                    {
+                      url: '/',
+                      routingOptions: { end: false },
+                      onVisit,
+                      onLeave,
+                      component: () => <DefaultDashboard />,
+                    },
                   ]}
                 />
               )

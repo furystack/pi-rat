@@ -13,13 +13,33 @@ export interface SchemaGenerationSetting {
  */
 export const entityValues: SchemaGenerationSetting[] = [
   {
-    inputFile: './src/models/*.ts',
-    outputFile: './src/schemas/entities.json',
+    inputFile: './src/models/dashboard/*.ts',
+    outputFile: './src/schemas/entities-dashboard.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/models/drives/*.ts',
+    outputFile: './src/schemas/entities-drives.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/models/identity/*.ts',
+    outputFile: './src/schemas/entities-identity.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/models/install/*.ts',
+    outputFile: './src/schemas/entities-install.json',
     type: '*',
   },
 ]
 
 export const apiValues: SchemaGenerationSetting[] = [
+  {
+    inputFile: './src/apis/dashboards.ts',
+    outputFile: './src/schemas/apis/dashboards-api.json',
+    type: '*',
+  },
   {
     inputFile: './src/apis/drives.ts',
     outputFile: './src/schemas/apis/drives-api.json',

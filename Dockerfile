@@ -1,4 +1,4 @@
-FROM node:18-alpine as base
+FROM node:19-alpine as base
 
 COPY --chown=node:node /common /home/node/app/common
 COPY --chown=node:node /frontend /home/node/app/frontend
@@ -18,7 +18,7 @@ WORKDIR /home/node/app
 
 RUN yarn workspaces focus service --production
 
-FROM node:18-alpine as runner
+FROM node:19-alpine as runner
 
 COPY --chown=node:node --from=base /home/node/app /home/node/app
 

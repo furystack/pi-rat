@@ -20,6 +20,8 @@ export class ServiceStatusProvider {
     await this.storeManager.getStoreFor(User, 'username').add({
       username,
       roles: ['admin'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     })
     const credential = await this.authenticator.getHasher().createCredential(username, password)
     await this.storeManager.getStoreFor(PasswordCredential, 'userName').add(credential)
