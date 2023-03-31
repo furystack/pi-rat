@@ -61,8 +61,8 @@ export const apiValues: SchemaGenerationSetting[] = [
     type: '*',
   },
   {
-    inputFile: './src/apis/movie.ts',
-    outputFile: './src/schemas/apis/movie-api.json',
+    inputFile: './src/apis/movies.ts',
+    outputFile: './src/schemas/apis/movies-api.json',
     type: '*',
   },
 ]
