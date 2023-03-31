@@ -71,6 +71,14 @@ export const setupPatcher = async (injector: Injector) => {
           },
         },
         {
+          indexes: [
+            {
+              fields: ['patchId'],
+            },
+            {
+              fields: ['status'],
+            },
+          ],
           sequelize,
         },
       )

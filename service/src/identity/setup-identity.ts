@@ -37,13 +37,15 @@ export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
   await logger.verbose({ message: '👤  Setting up Identity stores and repository...' })
 
+  const options = getDefaultDbSettings('identity.sqlite', logger)
+
   useSequelize({
     injector,
     model: User,
     sequelizeModel: UserModel,
     primaryKey: 'username',
 
-    options: getDefaultDbSettings('users.sqlite', logger),
+    options,
     initModel: async (sequelize) => {
       UserModel.init(
         {
@@ -75,7 +77,7 @@ export const setupIdentity = async (injector: Injector) => {
     model: PasswordCredential,
     sequelizeModel: PasswordCredentialModel,
     primaryKey: 'userName',
-    options: getDefaultDbSettings('pwc.sqlite', logger),
+    options,
     initModel: async (sequelize) => {
       PasswordCredentialModel.init(
         {
@@ -106,7 +108,7 @@ export const setupIdentity = async (injector: Injector) => {
     model: DefaultSession,
     sequelizeModel: SessionModel,
     primaryKey: 'sessionId',
-    options: getDefaultDbSettings('sessions.sqlite', logger),
+    options,
     initModel: async (sequelize) => {
       SessionModel.init(
         {
