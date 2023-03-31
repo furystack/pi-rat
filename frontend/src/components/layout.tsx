@@ -1,9 +1,10 @@
 import { createComponent, Shade, LazyLoad } from '@furystack/shades'
 import { NotyList } from '@furystack/shades-common-components'
-import { Button, Loader, Paper, ThemeProviderService } from '@furystack/shades-common-components'
+import { Button, Paper, ThemeProviderService } from '@furystack/shades-common-components'
 import { InstallApiClient } from '../services/install-api-client'
 import { Body } from './body'
 import { Header } from './header'
+import { FullScreenLoader } from './fullscreen-loader'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
@@ -26,7 +27,7 @@ export const Layout = Shade({
           <NotyList />
         </div>
         <LazyLoad
-          loader={<Loader style={{ width: '100px', height: '100px', alignSelf: 'center', justifySelf: 'center' }} />}
+          loader={<FullScreenLoader />}
           error={(error, retry) => (
             <Paper>
               <h1>Cannot reach the service</h1>

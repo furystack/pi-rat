@@ -1,10 +1,11 @@
 import type { Route } from '@furystack/shades'
-import { createComponent, Shade, Router, LazyLoad } from '@furystack/shades'
+import { createComponent, Shade, Router } from '@furystack/shades'
 import { SessionService } from '../services/session'
 import { Init, Offline, Login } from '../pages'
-import { Loader, fadeOut, fadeIn } from '@furystack/shades-common-components'
+import { fadeOut, fadeIn } from '@furystack/shades-common-components'
 import { DefaultDashboard } from './dashboard/default-dashboard'
 import { LoadableDashboard } from './dashboard/LoadableDashboard'
+import { PiRatLazyLoad } from './pirat-lazy-load'
 
 const onLeave = async ({ element }: { element: HTMLElement }) => {
   await fadeOut(element, { easing: 'ease-in', duration: 200 })
@@ -20,8 +21,7 @@ const adminRoutes: Array<Route<any>> = [
     onVisit,
     onLeave,
     component: () => (
-      <LazyLoad
-        loader={<Loader />}
+      <PiRatLazyLoad
         component={async () => {
           const { DrivesPage } = await import('../pages/file-browser')
           return <DrivesPage />
@@ -34,8 +34,7 @@ const adminRoutes: Array<Route<any>> = [
     onVisit,
     onLeave,
     component: ({ match }) => (
-      <LazyLoad
-        loader={<Loader />}
+      <PiRatLazyLoad
         component={async () => {
           const { FilesPage } = await import('../pages/files')
           return <FilesPage letter={match.params.driveLetter} path={decodeURIComponent(match.params.path)} />
@@ -48,8 +47,7 @@ const adminRoutes: Array<Route<any>> = [
     onVisit,
     onLeave,
     component: () => (
-      <LazyLoad
-        loader={<Loader />}
+      <PiRatLazyLoad
         component={async () => {
           const { DrivesPage } = await import('../pages/entities/drives')
           return <DrivesPage />
@@ -62,8 +60,7 @@ const adminRoutes: Array<Route<any>> = [
     onVisit,
     onLeave,
     component: () => (
-      <LazyLoad
-        loader={<Loader />}
+      <PiRatLazyLoad
         component={async () => {
           const { UsersPage } = await import('../pages/entities/users')
           return <UsersPage />
@@ -76,8 +73,7 @@ const adminRoutes: Array<Route<any>> = [
     onVisit,
     onLeave,
     component: () => (
-      <LazyLoad
-        loader={<Loader />}
+      <PiRatLazyLoad
         component={async () => {
           const { DashboardsPage } = await import('../pages/entities/dashboards')
           return <DashboardsPage />

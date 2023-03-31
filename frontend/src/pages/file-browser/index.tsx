@@ -1,9 +1,9 @@
-import { createComponent, LazyLoad, Shade } from '@furystack/shades'
-import { Loader } from '@furystack/shades-common-components'
+import { createComponent, Shade } from '@furystack/shades'
 import { ObservableValue } from '@furystack/utils'
 import { CreateDriveWizard } from './create-drive-wizard'
 import { FolderPanel } from './folder-panel'
 import { AvailableDrivesService } from './available-drives-service'
+import { PiRatLazyLoad } from '../../components/pirat-lazy-load'
 
 export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
@@ -16,8 +16,7 @@ export const DrivesPage = Shade({
     }
 
     return (
-      <LazyLoad
-        loader={<Loader />}
+      <PiRatLazyLoad
         component={async () => {
           const availableDrives = useDisposable('availableDrives', () => new ObservableValue(drives.value.entries))
           availableDrives.setValue(drives.value.entries)
