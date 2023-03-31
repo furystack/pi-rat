@@ -1,10 +1,9 @@
-import { createComponent, Shade, LazyLoad } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import { NotyList } from '@furystack/shades-common-components'
-import { Button, Paper, ThemeProviderService } from '@furystack/shades-common-components'
+import { ThemeProviderService } from '@furystack/shades-common-components'
 import { InstallApiClient } from '../services/install-api-client'
 import { Body } from './body'
 import { Header } from './header'
-import { FullScreenLoader } from './fullscreen-loader'
 import { PiRatLazyLoad } from './pirat-lazy-load'
 
 export const Layout = Shade({
