@@ -50,6 +50,7 @@ export class DashboardService {
       url: { id },
     })
     this.dashboardCache.remove(id)
+    this.dashboardQueryCache.flushAll()
   }
 
   public updateDashboard = async (
@@ -63,6 +64,7 @@ export class DashboardService {
       body,
     })
     this.dashboardCache.setObsolete(id)
+    this.dashboardQueryCache.flushAll()
     return result
   }
 
@@ -73,6 +75,8 @@ export class DashboardService {
       body,
     })
     this.dashboardCache.setObsolete(result.id)
+
+    this.dashboardQueryCache.flushAll()
     return result
   }
 }
