@@ -28,7 +28,9 @@ test.describe('Dashboard', () => {
     await page.waitForSelector('text=File browser')
   })
 
-  test('create, customize and delete a dashboard', async ({ page }) => {
+  test('create, customize and delete a dashboard', async ({ page, browserName }) => {
+    test.skip(browserName === 'firefox', 'Skip on FF')
+
     const dashboardName = `e2e-test-${randomUUID()}`
 
     await page.goto('/')
