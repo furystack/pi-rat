@@ -16,6 +16,7 @@ export const DefaultDashboard = Shade({
           },
         },
       }),
+
     )
 
     if (dashboard.status === 'pending') {
