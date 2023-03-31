@@ -1,5 +1,4 @@
 import type { ChildrenList } from '@furystack/shades'
-import { LazyLoad } from '@furystack/shades'
 import { createComponent, LocationService, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
 import { NotyService } from '@furystack/shades-common-components'
@@ -9,6 +8,7 @@ import { DataGrid } from '@furystack/shades-common-components'
 import type { GenericEditorService } from './generic-editor-service'
 import type monaco from 'monaco-editor'
 import { GenericMonacoEditor } from './generic-monaco-editor'
+import { PiRatLazyLoad } from '../pirat-lazy-load'
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
@@ -45,8 +45,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 
     if (mode === 'edit' && currentId) {
       return (
-        <LazyLoad
-          loader={<></>}
+        <PiRatLazyLoad
           component={async () => {
             const entry = await service.getSingleEntry(currentId as any)
             return (

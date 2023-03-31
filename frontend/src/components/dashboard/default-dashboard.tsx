@@ -1,14 +1,13 @@
-import { LazyLoad, Shade, createComponent } from '@furystack/shades'
-import { Loader } from '@furystack/shades-common-components'
+import { Shade, createComponent } from '@furystack/shades'
 import { DashboardsApiClient } from '../../services/dashboards-api-client'
 import { Dashboard } from '.'
+import { PiRatLazyLoad } from '../pirat-lazy-load'
 
 export const DefaultDashboard = Shade({
   shadowDomName: 'pi-rat-default-dashboard',
   render: ({ injector }) => {
     return (
-      <LazyLoad
-        loader={<Loader />}
+      <PiRatLazyLoad
         component={async () => {
           const { result } = await injector.getInstance(DashboardsApiClient).call({
             method: 'GET',

@@ -1,9 +1,10 @@
-import { createComponent, Shade, LazyLoad } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import { NotyList } from '@furystack/shades-common-components'
-import { Button, Loader, Paper, ThemeProviderService } from '@furystack/shades-common-components'
+import { ThemeProviderService } from '@furystack/shades-common-components'
 import { InstallApiClient } from '../services/install-api-client'
 import { Body } from './body'
 import { Header } from './header'
+import { PiRatLazyLoad } from './pirat-lazy-load'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
@@ -25,15 +26,7 @@ export const Layout = Shade({
         <div style={{ zIndex: '2', position: 'fixed' }}>
           <NotyList />
         </div>
-        <LazyLoad
-          loader={<Loader style={{ width: '100px', height: '100px', alignSelf: 'center', justifySelf: 'center' }} />}
-          error={(error, retry) => (
-            <Paper>
-              <h1>Cannot reach the service</h1>
-              <p>{error?.toString()}</p>
-              <Button onclick={retry}>Retry</Button>
-            </Paper>
-          )}
+        <PiRatLazyLoad
           component={async () => {
             const { result } = await injector.getInstance(InstallApiClient).call({
               method: 'GET',
@@ -46,9 +39,11 @@ export const Layout = Shade({
                   <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} />
                 </>
               )
-            } else {
+            } else if (result.state === 'needsInstall') {
               const { InstallerPage } = await import('../installer')
               return <InstallerPage />
+            } else {
+              throw Error(`Cannot fetch the service status. Maybe the backend is not running?`)
             }
           }}
         />
