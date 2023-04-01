@@ -14,32 +14,32 @@ export interface SchemaGenerationSetting {
 export const entityValues: SchemaGenerationSetting[] = [
   {
     inputFile: './src/models/config/*.ts',
-    outputFile: './src/schemas/entities-config.json',
+    outputFile: './schemas/config-entities.json',
     type: '*',
   },
   {
     inputFile: './src/models/dashboard/*.ts',
-    outputFile: './src/schemas/entities-dashboard.json',
+    outputFile: './schemas/dashboard-entities.json',
     type: '*',
   },
   {
     inputFile: './src/models/drives/*.ts',
-    outputFile: './src/schemas/entities-drives.json',
+    outputFile: './schemas/drives-entities.json',
     type: '*',
   },
   {
     inputFile: './src/models/identity/*.ts',
-    outputFile: './src/schemas/entities-identity.json',
+    outputFile: './schemas/identity-entities.json',
     type: '*',
   },
   {
     inputFile: './src/models/install/*.ts',
-    outputFile: './src/schemas/entities-install.json',
+    outputFile: './schemas/install-entitis.json',
     type: '*',
   },
   {
     inputFile: './src/models/media/*.ts',
-    outputFile: './src/schemas/entities-media.json',
+    outputFile: './schemas/media-entities.json',
     type: '*',
   },
 ]
@@ -47,32 +47,32 @@ export const entityValues: SchemaGenerationSetting[] = [
 export const apiValues: SchemaGenerationSetting[] = [
   {
     inputFile: './src/apis/config.ts',
-    outputFile: './src/schemas/apis/config-api.json',
+    outputFile: './schemas/config-api.json',
     type: '*',
   },
   {
     inputFile: './src/apis/dashboards.ts',
-    outputFile: './src/schemas/apis/dashboards-api.json',
+    outputFile: './schemas/dashboards-api.json',
     type: '*',
   },
   {
     inputFile: './src/apis/drives.ts',
-    outputFile: './src/schemas/apis/drives-api.json',
+    outputFile: './schemas/drives-api.json',
     type: '*',
   },
   {
     inputFile: './src/apis/identity.ts',
-    outputFile: './src/schemas/apis/identity-api.json',
+    outputFile: './schemas/identity-api.json',
     type: '*',
   },
   {
     inputFile: './src/apis/install.ts',
-    outputFile: './src/schemas/apis/install-api.json',
+    outputFile: './schemas/install-api.json',
     type: '*',
   },
   {
     inputFile: './src/apis/media.ts',
-    outputFile: './src/schemas/apis/media-api.json',
+    outputFile: './schemas/media-api.json',
     type: '*',
   },
 ]

@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { User } from 'common'
-import { identitySchemas } from 'common'
+import identitySchemas from 'common/schemas/identity-entities.json'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { IdentityApiClient } from '../../services/identity-api-client'

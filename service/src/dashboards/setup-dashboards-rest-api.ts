@@ -9,7 +9,8 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { DashboardsApi } from 'common'
-import { Dashboard, dashboardsApiSchema } from 'common'
+import { Dashboard } from 'common'
+import dashboardsApiSchema from 'common/schemas/dashboards-api.json'
 import { getPort } from '../get-port'
 import { getCorsOptions } from '../get-cors-options'
 

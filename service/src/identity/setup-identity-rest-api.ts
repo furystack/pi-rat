@@ -16,7 +16,7 @@ import type { IdentityApi } from 'common'
 import { User } from 'common'
 import { getCorsOptions } from '../get-cors-options'
 import { getPort } from '../get-port'
-import { identityApiSchema } from 'common'
+import identityApiSchema from 'common/schemas/identity-api.json'
 
 export const setupIdentityRestApi = async (injector: Injector) => {
   await useRestService<IdentityApi>({
@@ -52,7 +52,10 @@ export const setupIdentityRestApi = async (injector: Injector) => {
         ),
       },
       PATCH: {
-        '/users/:id': Validate({ schema: identityApiSchema, schemaName: 'PatchEndpoint<User,"username">' })(
+        '/users/:id': Validate({
+          schema: identityApiSchema,
+          schemaName: 'PatchEndpoint<Omit<User,("createdAt"|"updatedAt")>,"username">',
+        })(
           createPatchEndpoint({
             model: User,
             primaryKey: 'username',

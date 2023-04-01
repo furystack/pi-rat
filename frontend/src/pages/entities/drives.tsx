@@ -4,7 +4,7 @@ import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { DrivesApiClient } from '../../services/drives-api-client'
 import { MonacoModelProvider } from '../../services/monaco-model-provider'
-import { drivesSchemas } from 'common'
+import drivesSchemas from 'common/schemas/drives-entities.json'
 
 export const DrivesPage = Shade({
   shadowDomName: 'shade-app-drives-page',

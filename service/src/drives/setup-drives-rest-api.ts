@@ -9,7 +9,8 @@ import {
   Validate,
 } from '@furystack/rest-service'
 import '@furystack/repository'
-import { Drive, drivesApiSchema } from 'common'
+import { Drive } from 'common'
+import drivesApiSchema from 'common/schemas/drives-api.json'
 import type { Injector } from '@furystack/inject'
 import { GetDirectoryEntriesAction } from './actions/get-directory-entries'
 import { getPort } from '../get-port'

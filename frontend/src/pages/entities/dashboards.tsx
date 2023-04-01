@@ -4,7 +4,7 @@ import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { DashboardsApiClient } from '../../services/dashboards-api-client'
 import { MonacoModelProvider } from '../../services/monaco-model-provider'
-import { dashboardSchemas } from 'common'
+import dashboardSchemas from 'common/schemas/dashboard-entities.json'
 
 export const DashboardsPage = Shade({
   shadowDomName: 'shade-app-dashboards-page',

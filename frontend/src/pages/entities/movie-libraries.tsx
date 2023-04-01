@@ -3,7 +3,7 @@ import { MovieLibrary } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
 import { MonacoModelProvider } from '../../services/monaco-model-provider'
-import { mediaSchemas } from 'common'
+import mediaSchemas from 'common/schemas/media-entities.json'
 import { MediaApiClient } from '../../services/media-api-client'
 
 export const MovieLibrariesPage = Shade({

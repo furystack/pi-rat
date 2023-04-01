@@ -8,7 +8,7 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { ConfigApi } from 'common'
-import { configApiSchema } from 'common'
+import configApiSchema from 'common/schemas/config-api.json'
 import { Config } from 'common'
 import { getCorsOptions } from '../get-cors-options'
 import { getPort } from '../get-port'

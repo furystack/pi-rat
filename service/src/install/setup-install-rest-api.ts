@@ -1,5 +1,5 @@
 import type { InstallApi } from 'common'
-import { installApiSchema } from 'common'
+import installApiSchema from 'common/schemas/install-api.json'
 import { useRestService, Validate } from '@furystack/rest-service'
 import '@furystack/repository'
 import { GetServiceStatus } from './actions/get-service-status'
