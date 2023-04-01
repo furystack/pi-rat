@@ -22,22 +22,50 @@ export const setupMoviesRestApi = async (injector: Injector) => {
     cors: getCorsOptions(),
     api: {
       GET: {
-        '/movie-libraries': createGetCollectionEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
-        '/movie-libraries/:id': createGetEntityEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
-        '/movies': createGetCollectionEndpoint({ model: Movie, primaryKey: 'id' }),
-        '/movies/:id': createGetEntityEndpoint({ model: Movie, primaryKey: 'id' }),
-        '/series': createGetCollectionEndpoint({ model: Series, primaryKey: 'id' }),
-        '/series/:id': createGetEntityEndpoint({ model: Series, primaryKey: 'id' }),
-        '/my-watch-progress': createGetCollectionEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' }),
+        '/movie-libraries': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieLibrary>' })(
+          createGetCollectionEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
+        ),
+        '/movie-libraries/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<MovieLibrary,"id">',
+        })(createGetEntityEndpoint({ model: MovieLibrary, primaryKey: 'id' })),
+        '/movies': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<Movie>' })(
+          createGetCollectionEndpoint({ model: Movie, primaryKey: 'id' }),
+        ),
+        '/movies/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<Movie>' })(
+          createGetEntityEndpoint({ model: Movie, primaryKey: 'id' }),
+        ),
+        '/series': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<Series>' })(
+          createGetCollectionEndpoint({ model: Series, primaryKey: 'id' }),
+        ),
+        '/series/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<Series>' })(
+          createGetEntityEndpoint({ model: Series, primaryKey: 'id' }),
+        ),
+        '/my-watch-progress': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetCollectionEndpoint<MovieWatchHistoryEntry>',
+        })(createGetCollectionEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
 
         // TODOs:
         '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
         '/movies/:movieId/subtitles/:subtitleName': () => null as any, // TODO: Implement
         '/stream-original/:movieId': () => null as any, // TODO: Implement
-        '/omdb-movie-metadata': createGetCollectionEndpoint({ model: OmdbMovieMetadata, primaryKey: 'imdbID' }),
-        '/omdb-movie-metadata/:id': createGetEntityEndpoint({ model: OmdbMovieMetadata, primaryKey: 'imdbID' }),
-        '/omdb-series-metadata': createGetCollectionEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' }),
-        '/omdb-series-metadata/:id': createGetEntityEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' }),
+        '/omdb-movie-metadata': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetCollectionEndpoint<OmdbMovieMetadata>',
+        })(createGetCollectionEndpoint({ model: OmdbMovieMetadata, primaryKey: 'imdbID' })),
+        '/omdb-movie-metadata/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<OmdbMovieMetadata,"imdbID">',
+        })(createGetEntityEndpoint({ model: OmdbMovieMetadata, primaryKey: 'imdbID' })),
+        '/omdb-series-metadata': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetCollectionEndpoint<OmdbSeriesMetadata>',
+        })(createGetCollectionEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' })),
+        '/omdb-series-metadata/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<OmdbSeriesMetadata,"imdbID">',
+        })(createGetEntityEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' })),
       },
       POST: {
         '/movie-libraries': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<MovieLibrary,"id">' })(
@@ -48,12 +76,20 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/movies/:movieId/save-watch-progress': () => null as any, // TODO: Implement
       },
       PATCH: {
-        '/movies/:id': createPatchEndpoint({ model: Movie, primaryKey: 'id' }),
-        '/movie-libraries/:id': createPatchEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
+        '/movies/:id': Validate({ schema: mediaApiSchema, schemaName: 'PatchEndpoint<Movie,"id">' })(
+          createPatchEndpoint({ model: Movie, primaryKey: 'id' }),
+        ),
+        '/movie-libraries/:id': Validate({ schema: mediaApiSchema, schemaName: 'PatchEndpoint<MovieLibrary,"id">' })(
+          createPatchEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
+        ),
       },
       DELETE: {
-        '/movie-libraries/:id': createDeleteEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
-        '/movies/:id': createDeleteEndpoint({ model: Movie, primaryKey: 'id' }),
+        '/movie-libraries/:id': Validate({ schema: mediaApiSchema, schemaName: 'DeleteEndpoint<MovieLibrary,"id">' })(
+          createDeleteEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
+        ),
+        '/movies/:id': Validate({ schema: mediaApiSchema, schemaName: 'DeleteEndpoint<Movie,"id">' })(
+          createDeleteEndpoint({ model: Movie, primaryKey: 'id' }),
+        ),
       },
     },
   })
