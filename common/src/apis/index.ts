@@ -1,3 +1,4 @@
+export * from './config'
 export * from './dashboards'
 export * from './drives'
 export * from './identity'

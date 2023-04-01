@@ -6,4 +6,6 @@ export class MovieWatchHistoryEntry {
   lastWatchDate!: Date
   watchedSeconds!: number
   completed!: boolean
+  createdAt!: string
+  updatedAt!: string
 }

@@ -13,6 +13,11 @@ export interface SchemaGenerationSetting {
  */
 export const entityValues: SchemaGenerationSetting[] = [
   {
+    inputFile: './src/models/config/*.ts',
+    outputFile: './src/schemas/entities-config.json',
+    type: '*',
+  },
+  {
     inputFile: './src/models/dashboard/*.ts',
     outputFile: './src/schemas/entities-dashboard.json',
     type: '*',
@@ -40,6 +45,11 @@ export const entityValues: SchemaGenerationSetting[] = [
 ]
 
 export const apiValues: SchemaGenerationSetting[] = [
+  {
+    inputFile: './src/apis/config.ts',
+    outputFile: './src/schemas/apis/config-api.json',
+    type: '*',
+  },
   {
     inputFile: './src/apis/dashboards.ts',
     outputFile: './src/schemas/apis/dashboards-api.json',

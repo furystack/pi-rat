@@ -18,6 +18,8 @@ class MovieLibraryModel extends Model<MovieLibrary, MovieLibrary> implements Mov
   declare name: string
   declare driveLetter: string
   declare owner: string
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
@@ -36,6 +38,8 @@ class MovieModel extends Model<Movie, Movie> implements Movie {
   declare seriesId?: string | undefined
   declare season?: number | undefined
   declare episode?: number | undefined
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 class MovieWatchHistoryEntryModel
@@ -50,6 +54,8 @@ class MovieWatchHistoryEntryModel
   declare lastWatchDate: Date
   declare watchedSeconds: number
   declare completed: boolean
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 class SeriesModel extends Model<Series, Series> implements Series {
@@ -59,6 +65,8 @@ class SeriesModel extends Model<Series, Series> implements Series {
   declare year: string
   declare thumbnailImageUrl?: string | undefined
   declare plot: string
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 class OmdbMovieMetadataModel extends Model<OmdbMovieMetadata, OmdbMovieMetadata> implements OmdbMovieMetadata {
@@ -89,6 +97,8 @@ class OmdbMovieMetadataModel extends Model<OmdbMovieMetadata, OmdbMovieMetadata>
   declare Response: 'True'
   Season?: string | undefined
   Episode?: string | undefined
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetadata> implements OmdbSeriesMetadata {
@@ -114,10 +124,15 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
   declare Type: string
   declare totalSeasons: string
   declare Response: string
+  declare createdAt: string
+  declare updatedAt: string
 }
 
 export const setupMovies = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Movies')
+
+  logger.verbose({ message: '🎥  Setting up Media store and repository...' })
+
   const dbOptions = getDefaultDbSettings('movies', logger)
 
   useSequelize({
@@ -150,6 +165,14 @@ export const setupMovies = async (injector: Injector) => {
           },
           owner: {
             type: DataTypes.STRING,
+            allowNull: false,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
             allowNull: false,
           },
         },
@@ -229,6 +252,14 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.ENUM('episode', 'movie'),
             allowNull: true,
           },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
         },
         { sequelize },
       )
@@ -280,6 +311,14 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
           },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
         },
         { sequelize },
       )
@@ -321,6 +360,14 @@ export const setupMovies = async (injector: Injector) => {
           },
           plot: {
             type: DataTypes.STRING,
+            allowNull: false,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
             allowNull: false,
           },
         },
@@ -448,6 +495,14 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.STRING,
             allowNull: false,
           },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
         },
         { sequelize },
       )
@@ -553,6 +608,14 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.STRING,
             allowNull: false,
           },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
         },
         { sequelize },
       )
@@ -642,7 +705,5 @@ export const setupMovies = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  logger.verbose({ message: '🍿  Setting up Movies store and repository...' })
-
-  logger.verbose({ message: '✅  Movies setup completed' })
+  logger.verbose({ message: '✅  Media setup completed' })
 }

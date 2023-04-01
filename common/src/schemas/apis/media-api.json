@@ -401,7 +401,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovie%2C(%22id%22%7C%22movieLibraryId%22%7C%22path%22%7C%22title%22%7C%22imdbId%22%7C%22year%22%7C%22duration%22%7C%22genre%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovie%2C(%22id%22%7C%22movieLibraryId%22%7C%22path%22%7C%22title%22%7C%22imdbId%22%7C%22year%22%7C%22duration%22%7C%22genre%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -417,7 +417,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<Movie,(\"id\"|\"movieLibraryId\"|\"path\"|\"title\"|\"imdbId\"|\"year\"|\"duration\"|\"genre\"|\"thumbnailImageUrl\"|\"plot\"|\"type\"|\"seriesId\"|\"season\"|\"episode\")[]>": {
+    "FindOptions<Movie,(\"id\"|\"movieLibraryId\"|\"path\"|\"title\"|\"imdbId\"|\"year\"|\"duration\"|\"genre\"|\"thumbnailImageUrl\"|\"plot\"|\"type\"|\"seriesId\"|\"season\"|\"episode\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -528,6 +528,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -551,7 +565,9 @@
               "type",
               "seriesId",
               "season",
-              "episode"
+              "episode",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -1309,6 +1325,110 @@
               "additionalProperties": false
             }
           ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       }
     },
@@ -1385,13 +1505,21 @@
         },
         "episode": {
           "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
         "id",
         "movieLibraryId",
         "path",
-        "title"
+        "title",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -1419,7 +1547,9 @@
                   "type",
                   "seriesId",
                   "season",
-                  "episode"
+                  "episode",
+                  "createdAt",
+                  "updatedAt"
                 ]
               },
               "description": "The list of fields to select"
@@ -1459,7 +1589,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieLibrary%2C(%22id%22%7C%22icon%22%7C%22name%22%7C%22driveLetter%22%7C%22owner%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieLibrary%2C(%22id%22%7C%22icon%22%7C%22name%22%7C%22driveLetter%22%7C%22owner%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -1475,7 +1605,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieLibrary,(\"id\"|\"icon\"|\"name\"|\"driveLetter\"|\"owner\")[]>": {
+    "FindOptions<MovieLibrary,(\"id\"|\"icon\"|\"name\"|\"driveLetter\"|\"owner\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1523,6 +1653,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -1537,7 +1681,9 @@
               "icon",
               "name",
               "driveLetter",
-              "owner"
+              "owner",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -1837,6 +1983,110 @@
               "additionalProperties": false
             }
           ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       }
     },
@@ -1879,6 +2129,12 @@
         },
         "owner": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -1886,7 +2142,9 @@
         "icon",
         "name",
         "driveLetter",
-        "owner"
+        "owner",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -1905,7 +2163,9 @@
                   "icon",
                   "name",
                   "driveLetter",
-                  "owner"
+                  "owner",
+                  "createdAt",
+                  "updatedAt"
                 ]
               },
               "description": "The list of fields to select"
@@ -1945,7 +2205,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22movieId%22%7C%22startDate%22%7C%22lastWatchDate%22%7C%22watchedSeconds%22%7C%22completed%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22movieId%22%7C%22startDate%22%7C%22lastWatchDate%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -1961,7 +2221,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieWatchHistoryEntry,(\"id\"|\"userName\"|\"movieId\"|\"startDate\"|\"lastWatchDate\"|\"watchedSeconds\"|\"completed\")[]>": {
+    "FindOptions<MovieWatchHistoryEntry,(\"id\"|\"userName\"|\"movieId\"|\"startDate\"|\"lastWatchDate\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -2023,6 +2283,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -2039,7 +2313,9 @@
               "startDate",
               "lastWatchDate",
               "watchedSeconds",
-              "completed"
+              "completed",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -2441,6 +2717,110 @@
               "additionalProperties": false
             }
           ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       }
     },
@@ -2491,6 +2871,12 @@
         },
         "completed": {
           "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -2500,7 +2886,9 @@
         "startDate",
         "lastWatchDate",
         "watchedSeconds",
-        "completed"
+        "completed",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -2511,7 +2899,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CSeries%2C(%22id%22%7C%22imdbId%22%7C%22title%22%7C%22year%22%7C%22thumbnailImageUrl%22%7C%22plot%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CSeries%2C(%22id%22%7C%22imdbId%22%7C%22title%22%7C%22year%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -2527,7 +2915,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<Series,(\"id\"|\"imdbId\"|\"title\"|\"year\"|\"thumbnailImageUrl\"|\"plot\")[]>": {
+    "FindOptions<Series,(\"id\"|\"imdbId\"|\"title\"|\"year\"|\"thumbnailImageUrl\"|\"plot\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -2582,6 +2970,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -2597,7 +2999,9 @@
               "title",
               "year",
               "thumbnailImageUrl",
-              "plot"
+              "plot",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -2945,6 +3349,110 @@
               "additionalProperties": false
             }
           ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       }
     },
@@ -2990,6 +3498,12 @@
         },
         "plot": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -2997,7 +3511,9 @@
         "imdbId",
         "title",
         "year",
-        "plot"
+        "plot",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -3017,7 +3533,9 @@
                   "title",
                   "year",
                   "thumbnailImageUrl",
-                  "plot"
+                  "plot",
+                  "createdAt",
+                  "updatedAt"
                 ]
               },
               "description": "The list of fields to select"
@@ -3057,7 +3575,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3COmdbMovieMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbID%22%7C%22Type%22%7C%22DVD%22%7C%22BoxOffice%22%7C%22Production%22%7C%22Website%22%7C%22Response%22%7C%22seriesID%22%7C%22Season%22%7C%22Episode%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3COmdbMovieMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbID%22%7C%22Type%22%7C%22DVD%22%7C%22BoxOffice%22%7C%22Production%22%7C%22Website%22%7C%22Response%22%7C%22seriesID%22%7C%22Season%22%7C%22Episode%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -3073,7 +3591,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<OmdbMovieMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbID\"|\"Type\"|\"DVD\"|\"BoxOffice\"|\"Production\"|\"Website\"|\"Response\"|\"seriesID\"|\"Season\"|\"Episode\")[]>": {
+    "FindOptions<OmdbMovieMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbID\"|\"Type\"|\"DVD\"|\"BoxOffice\"|\"Production\"|\"Website\"|\"Response\"|\"seriesID\"|\"Season\"|\"Episode\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -3282,6 +3800,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -3319,7 +3851,9 @@
               "Response",
               "seriesID",
               "Season",
-              "Episode"
+              "Episode",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -4873,6 +5407,110 @@
               "additionalProperties": false
             }
           ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       }
     },
@@ -5005,6 +5643,12 @@
         },
         "Episode": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -5028,7 +5672,9 @@
         "imdbVotes",
         "imdbID",
         "Type",
-        "Response"
+        "Response",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -5070,7 +5716,9 @@
                   "Response",
                   "seriesID",
                   "Season",
-                  "Episode"
+                  "Episode",
+                  "createdAt",
+                  "updatedAt"
                 ]
               },
               "description": "The list of fields to select"
@@ -5110,7 +5758,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3COmdbSeriesMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbID%22%7C%22Type%22%7C%22totalSeasons%22%7C%22Response%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3COmdbSeriesMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbID%22%7C%22Type%22%7C%22totalSeasons%22%7C%22Response%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -5126,7 +5774,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<OmdbSeriesMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbID\"|\"Type\"|\"totalSeasons\"|\"Response\")[]>": {
+    "FindOptions<OmdbSeriesMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbID\"|\"Type\"|\"totalSeasons\"|\"Response\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -5293,6 +5941,20 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -5324,7 +5986,9 @@
               "imdbID",
               "Type",
               "totalSeasons",
-              "Response"
+              "Response",
+              "createdAt",
+              "updatedAt"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -6554,6 +7218,110 @@
               "additionalProperties": false
             }
           ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       }
     },
@@ -6663,6 +7431,12 @@
         },
         "Response": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -6687,7 +7461,9 @@
         "imdbID",
         "Type",
         "totalSeasons",
-        "Response"
+        "Response",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -6723,7 +7499,9 @@
                   "imdbID",
                   "Type",
                   "totalSeasons",
-                  "Response"
+                  "Response",
+                  "createdAt",
+                  "updatedAt"
                 ]
               },
               "description": "The list of fields to select"
@@ -6791,13 +7569,21 @@
         },
         "owner": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
+        "createdAt",
         "driveLetter",
         "icon",
         "name",
-        "owner"
+        "owner",
+        "updatedAt"
       ]
     },
     "PatchEndpoint<Movie,\"id\">": {
@@ -6882,6 +7668,12 @@
         },
         "episode": {
           "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -6933,6 +7725,12 @@
           "type": "string"
         },
         "owner": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
           "type": "string"
         }
       },

@@ -4,4 +4,6 @@ export class MovieLibrary {
   name!: string
   driveLetter!: string
   owner!: string
+  createdAt!: string
+  updatedAt!: string
 }

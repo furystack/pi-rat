@@ -14,6 +14,7 @@ import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api'
 import { setupPatcher } from './patcher/setup-patcher'
 import { setupMovies } from './media/setup-media'
 import { setupMoviesRestApi } from './media/setup-media-api'
+import { setupConfig } from './config/setup-config'
 
 export const init = async (injector = rootInjector) => {
   const serviceLogger = getLogger(injector).withScope('service')
@@ -24,6 +25,7 @@ export const init = async (injector = rootInjector) => {
    */
   await serviceLogger.information({ message: '📦 Setting up stores and repositories...' })
   await Promise.all([
+    await setupConfig(injector),
     await setupIdentity(injector),
     await setupDrives(injector),
     await setupInstall(injector),

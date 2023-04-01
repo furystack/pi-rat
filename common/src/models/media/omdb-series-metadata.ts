@@ -24,4 +24,6 @@ export class OmdbSeriesMetadata {
   public Type!: string // 'series'
   public totalSeasons!: string // '15'
   public Response!: string //  'True'
+  createdAt!: string
+  updatedAt!: string
 }

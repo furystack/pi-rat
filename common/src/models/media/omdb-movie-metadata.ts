@@ -34,6 +34,8 @@ export class OmdbMovieMetadata {
   seriesID?: string
   Season?: string
   Episode?: string
+  createdAt!: string
+  updatedAt!: string
 }
 
 export const isValidOmdbMetadata = (metadata: any): metadata is OmdbMovieMetadata => {

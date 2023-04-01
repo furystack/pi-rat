@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "OmdbConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "OMDB_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "apiKey": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "apiKey"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "GithubConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "GITHUB_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "clientId": {
+              "type": "string"
+            },
+            "clientSecret": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "clientId",
+            "clientSecret"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "ConfigType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/OmdbConfig"
+        },
+        {
+          "$ref": "#/definitions/GithubConfig"
+        }
+      ]
+    },
+    "Config": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/ConfigType"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "value",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

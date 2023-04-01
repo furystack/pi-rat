@@ -18,6 +18,12 @@
         },
         "owner": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -25,7 +31,9 @@
         "icon",
         "name",
         "driveLetter",
-        "owner"
+        "owner",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -54,6 +62,12 @@
         },
         "completed": {
           "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -63,7 +77,9 @@
         "startDate",
         "lastWatchDate",
         "watchedSeconds",
-        "completed"
+        "completed",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -118,13 +134,21 @@
         },
         "episode": {
           "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
         "id",
         "movieLibraryId",
         "path",
-        "title"
+        "title",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -235,6 +259,12 @@
         },
         "Episode": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -258,7 +288,9 @@
         "imdbVotes",
         "imdbID",
         "Type",
-        "Response"
+        "Response",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -356,6 +388,12 @@
         },
         "Response": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -380,7 +418,9 @@
         "imdbID",
         "Type",
         "totalSeasons",
-        "Response"
+        "Response",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -404,6 +444,12 @@
         },
         "plot": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
         }
       },
       "required": [
@@ -411,7 +457,9 @@
         "imdbId",
         "title",
         "year",
-        "plot"
+        "plot",
+        "createdAt",
+        "updatedAt"
       ],
       "additionalProperties": false
     }

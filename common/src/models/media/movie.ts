@@ -13,4 +13,6 @@ export class Movie {
   seriesId?: string
   season?: number
   episode?: number
+  createdAt!: string
+  updatedAt!: string
 }
