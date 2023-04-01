@@ -12,6 +12,8 @@ import { setupDrivesRestApi } from './drives/setup-drives-rest-api'
 import { setupInstallRestApi } from './install/setup-install-rest-api'
 import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api'
 import { setupPatcher } from './patcher/setup-patcher'
+import { setupMovies } from './movies/setup-movies'
+import { setupMoviesRestApi } from './movies/setup-movies-api'
 
 export const init = async (injector = rootInjector) => {
   const serviceLogger = getLogger(injector).withScope('service')
@@ -26,6 +28,7 @@ export const init = async (injector = rootInjector) => {
     await setupDrives(injector),
     await setupInstall(injector),
     await setupDashboards(injector),
+    await setupMovies(injector),
   ])
 
   /**
@@ -41,6 +44,7 @@ export const init = async (injector = rootInjector) => {
     await setupDrivesRestApi(injector),
     await setupInstallRestApi(injector),
     await setupDashboardsRestApi(injector),
+    await setupMoviesRestApi(injector),
   ])
 
   await setupFrontendBundle(injector)
