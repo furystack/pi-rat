@@ -33,8 +33,8 @@ export const entityValues: SchemaGenerationSetting[] = [
     type: '*',
   },
   {
-    inputFile: './src/models/movies/*.ts',
-    outputFile: './src/schemas/entities-movies.json',
+    inputFile: './src/models/media/*.ts',
+    outputFile: './src/schemas/entities-media.json',
     type: '*',
   },
 ]
@@ -61,8 +61,8 @@ export const apiValues: SchemaGenerationSetting[] = [
     type: '*',
   },
   {
-    inputFile: './src/apis/movies.ts',
-    outputFile: './src/schemas/apis/movies-api.json',
+    inputFile: './src/apis/media.ts',
+    outputFile: './src/schemas/apis/media-api.json',
     type: '*',
   },
 ]

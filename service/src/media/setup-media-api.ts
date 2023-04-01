@@ -1,5 +1,6 @@
 import type { Injector } from '@furystack/inject'
 import {
+  Validate,
   createDeleteEndpoint,
   createGetCollectionEndpoint,
   createGetEntityEndpoint,
@@ -8,6 +9,7 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
+import { mediaApiSchema } from 'common'
 import { Movie, MovieLibrary, MovieWatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 import { getPort } from '../get-port'
 import { getCorsOptions } from '../get-cors-options'
@@ -15,7 +17,7 @@ import { getCorsOptions } from '../get-cors-options'
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
     injector,
-    root: 'api/identity',
+    root: 'api/media',
     port: getPort(),
     cors: getCorsOptions(),
     api: {
@@ -38,7 +40,9 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/omdb-series-metadata/:id': createGetEntityEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' }),
       },
       POST: {
-        '/movie-libraries': createPostEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
+        '/movie-libraries': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<MovieLibrary,"id">' })(
+          createPostEndpoint({ model: MovieLibrary, primaryKey: 'id' }),
+        ),
         '/movies/:movieId/re-extract-subtitles': () => null as any, // TODO: Implement
         '/movies/:movieId/re-fetch-metadata': () => null as any, // TODO: Implement
         '/movies/:movieId/save-watch-progress': () => null as any, // TODO: Implement

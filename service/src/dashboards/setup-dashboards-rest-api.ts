@@ -16,7 +16,7 @@ import { getCorsOptions } from '../get-cors-options'
 export const setupDashboardsRestApi = async (injector: Injector) => {
   await useRestService<DashboardsApi>({
     injector,
-    root: 'api',
+    root: 'api/dashboards',
     port: getPort(),
     cors: getCorsOptions(),
     api: {

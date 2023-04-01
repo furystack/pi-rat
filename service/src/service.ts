@@ -12,8 +12,8 @@ import { setupDrivesRestApi } from './drives/setup-drives-rest-api'
 import { setupInstallRestApi } from './install/setup-install-rest-api'
 import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api'
 import { setupPatcher } from './patcher/setup-patcher'
-import { setupMovies } from './movies/setup-movies'
-import { setupMoviesRestApi } from './movies/setup-movies-api'
+import { setupMovies } from './media/setup-media'
+import { setupMoviesRestApi } from './media/setup-media-api'
 
 export const init = async (injector = rootInjector) => {
   const serviceLogger = getLogger(injector).withScope('service')

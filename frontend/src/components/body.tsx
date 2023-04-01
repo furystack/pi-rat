@@ -81,6 +81,19 @@ const adminRoutes: Array<Route<any>> = [
       />
     ),
   },
+  {
+    url: '/entities/movie-libraries',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { MovieLibrariesPage } = await import('../pages/entities/movie-libraries')
+          return <MovieLibrariesPage />
+        }}
+      />
+    ),
+  },
 ]
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({

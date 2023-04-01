@@ -1,12 +1,12 @@
 import { createClient } from '@furystack/rest-client-fetch'
-import type { DashboardsApi } from 'common'
+import type { MediaApi } from 'common'
 import { Injectable } from '@furystack/inject'
 import { environmentOptions } from '../environment-options'
 
 @Injectable({ lifetime: 'singleton' })
-export class DashboardsApiClient {
-  public call = createClient<DashboardsApi>({
-    endpointUrl: `${environmentOptions.serviceUrl}/dashboards`,
+export class MediaApiClient {
+  public call = createClient<MediaApi>({
+    endpointUrl: `${environmentOptions.serviceUrl}/media`,
     requestInit: {
       credentials: 'include',
       mode: 'cors',

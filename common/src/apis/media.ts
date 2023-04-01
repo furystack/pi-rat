@@ -13,7 +13,7 @@ import type {
   OmdbMovieMetadata,
   OmdbSeriesMetadata,
   Series,
-} from '../models/movies'
+} from '../models/media'
 
 export interface MediaApi extends RestApi {
   GET: {
@@ -36,7 +36,7 @@ export interface MediaApi extends RestApi {
     '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
   }
   POST: {
-    '/movie-libraries': PostEndpoint<Pick<MovieLibrary, 'id' | 'name' | 'driveLetter' | 'icon'>, 'id'>
+    '/movie-libraries': PostEndpoint<MovieLibrary, 'id'>
     '/movies/:movieId/save-watch-progress': {
       url: { movieId: string }
       body: { watchProgressInSeconds: number }
