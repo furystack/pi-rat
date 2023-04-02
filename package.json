@@ -27,13 +27,13 @@
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-jsdoc": "^40.1.0",
+    "eslint-plugin-jsdoc": "^40.1.1",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "prettier": "^2.8.7",
     "rimraf": "^4.4.1",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.3"
   },
   "husky": {
     "hooks": {
@@ -63,7 +63,6 @@
     "lint": "eslint . --ext .tsx,.ts --cache",
     "bumpVersions": "yarn version check --interactive",
     "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
-    "assert-listening": "yarn node scripts/assert-listening.mjs",
     "dockerize": "docker build . --tag furystack/pi-rat:latest"
   },
   "jest-junit": {
