@@ -1,7 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { DashboardsApiClient } from '../../services/dashboards-api-client'
 import { Dashboard } from '.'
 import { PiRatLazyLoad } from '../pirat-lazy-load'
+import { DashboardService } from './dashboards-service'
 
 export const LoadableDashboard = Shade<{ id: string }>({
   shadowDomName: 'pi-rat-loadable-dashboard',
@@ -9,13 +9,8 @@ export const LoadableDashboard = Shade<{ id: string }>({
     return (
       <PiRatLazyLoad
         component={async () => {
-          const dashboard = await injector.getInstance(DashboardsApiClient).call({
-            method: 'GET',
-            action: '/dashboards/:id',
-            url: { id: props.id },
-            query: {},
-          })
-          return <Dashboard {...dashboard.result} />
+          const dashboard = await injector.getInstance(DashboardService).getDashboard(props.id)
+          return <Dashboard {...dashboard} />
         }}
       />
     )

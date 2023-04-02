@@ -2,14 +2,14 @@ import { createComponent, RouteLink, Shade } from '@furystack/shades'
 import { Dashboard } from 'common'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
-import { DashboardsApiClient } from '../../services/dashboards-api-client'
 import { MonacoModelProvider } from '../../services/monaco-model-provider'
 import dashboardSchemas from 'common/schemas/dashboard-entities.json'
+import { DashboardService } from '../../components/dashboard/dashboards-service'
 
 export const DashboardsPage = Shade({
   shadowDomName: 'shade-app-dashboards-page',
   render: ({ useDisposable, injector }) => {
-    const api = injector.getInstance(DashboardsApiClient)
+    const dashboardsService = injector.getInstance(DashboardService)
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
@@ -27,34 +27,21 @@ export const DashboardsPage = Shade({
           keyProperty: 'id',
           readonlyProperties: ['createdAt', 'updatedAt'],
           loader: async (findOptions) => {
-            const result = await api.call({
-              method: 'GET',
-              action: '/dashboards',
-              query: { findOptions },
-            })
-            return result.result
+            const result = await dashboardsService.findDashboard(findOptions)
+            return result
           },
           deleteEntities: async (id) => {
-            await api.call({ method: 'DELETE', action: `/dashboards/:id`, url: { id } })
+            await dashboardsService.deleteDashboard(id)
           },
           getEntity: async (id) => {
-            const result = await api.call({ method: 'GET', action: `/dashboards/:id`, url: { id }, query: {} })
-            return result.result
+            const result = dashboardsService.getDashboard(id)
+            return result
           },
           patchEntity: async (id, entity) => {
-            await api.call({
-              method: 'PATCH',
-              action: `/dashboards/:id`,
-              url: { id },
-              body: entity,
-            })
+            await dashboardsService.updateDashboard(id, entity)
           },
           postEntity: async (entity) => {
-            const { result } = await api.call({
-              method: 'POST',
-              action: `/dashboards`,
-              body: entity,
-            })
+            const result = await dashboardsService.createDashboard(entity)
             return result
           },
         }),

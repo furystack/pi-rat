@@ -15,21 +15,6 @@ export const GenericMonacoEditor = Shade<{
   render: ({ props, useDisposable }) => {
     const currentValue = useDisposable('currentValue', () => new ObservableValue(JSON.stringify(props.value, null, 2)))
 
-    // useObservable(
-    //   'currentValueChange',
-    //   currentValue,
-    //   (value) => {
-    //     if (value !== props.value) {
-    //       document.querySelector('.saveButton')?.removeAttribute('disabled')
-    //       document.querySelector('.resetButton')?.removeAttribute('disabled')
-    //     } else {
-    //       document.querySelector('.saveButton')?.setAttribute('disabled', 'disabled')
-    //       document.querySelector('.resetButton')?.setAttribute('disabled', 'disabled')
-    //     }
-    //   },
-    //   true,
-    // )
-
     useDisposable('saveShortcut', () => {
       const saveHandler = (e: KeyboardEvent) => {
         if (e.ctrlKey && e.key === 's') {

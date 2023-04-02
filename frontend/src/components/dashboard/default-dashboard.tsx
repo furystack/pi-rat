@@ -1,43 +1,35 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { DashboardsApiClient } from '../../services/dashboards-api-client'
 import { Dashboard } from '.'
-import { PiRatLazyLoad } from '../pirat-lazy-load'
+import { DashboardService } from './dashboards-service'
+import { FullScreenLoader } from '../fullscreen-loader'
+import { GenericErrorPage } from '../generic-error'
 
 export const DefaultDashboard = Shade({
   shadowDomName: 'pi-rat-default-dashboard',
-  render: ({ injector }) => {
-    return (
-      <PiRatLazyLoad
-        component={async () => {
-          const { result } = await injector.getInstance(DashboardsApiClient).call({
-            method: 'GET',
-            action: '/dashboards',
-
-            query: {
-              findOptions: {
-                filter: {
-                  name: {
-                    $eq: 'Default',
-                  },
-                },
-              },
-            },
-          })
-          const defaultDashboard = result.entries[0] || {
-            id: 'default',
-            name: 'Fallback',
-            description: 'Fallback Dashboard',
-            widgets: [
-              {
-                type: 'html',
-                content:
-                  '<h1>Fallback Dashboard</h1><p>This is the fallback dashboard. Failed to load the original one :( </p>',
-              },
-            ],
-          }
-          return <Dashboard {...defaultDashboard} />
-        }}
-      />
+  render: ({ injector, useObservable }) => {
+    const [dashboard] = useObservable(
+      'defaultDashboard',
+      injector.getInstance(DashboardService).getDashboardByNameAsObservable({
+        filter: {
+          name: {
+            $eq: 'Default',
+          },
+        },
+      }),
     )
+
+    if (dashboard.status === 'pending') {
+      return <FullScreenLoader />
+    }
+
+    if (dashboard.status === 'failed') {
+      return <GenericErrorPage error={dashboard.error} />
+    }
+
+    if (dashboard.status === 'loaded') {
+      return <Dashboard {...dashboard.value.entries[0]} />
+    }
+
+    return null
   },
 })
