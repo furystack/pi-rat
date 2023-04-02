@@ -74,8 +74,6 @@ export class DashboardService {
       action: '/dashboards',
       body,
     })
-    this.dashboardCache.setObsolete(result.id)
-
     this.dashboardQueryCache.flushAll()
     return result
   }
