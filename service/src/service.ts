@@ -15,6 +15,7 @@ import { setupPatcher } from './patcher/setup-patcher'
 import { setupMovies } from './media/setup-media'
 import { setupMoviesRestApi } from './media/setup-media-api'
 import { setupConfig } from './config/setup-config'
+import { setupConfigRestApi } from './config/setup-config-rest-api'
 
 export const init = async (injector = rootInjector) => {
   const serviceLogger = getLogger(injector).withScope('service')
@@ -42,6 +43,7 @@ export const init = async (injector = rootInjector) => {
    * Setup REST APIs
    */
   await Promise.all([
+    await setupConfigRestApi(injector),
     await setupIdentityRestApi(injector),
     await setupDrivesRestApi(injector),
     await setupInstallRestApi(injector),

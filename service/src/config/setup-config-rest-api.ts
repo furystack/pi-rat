@@ -14,30 +14,40 @@ import { getCorsOptions } from '../get-cors-options'
 import { getPort } from '../get-port'
 import type { Injector } from '@furystack/inject'
 
-type t = typeof configApiSchema
-
 export const setupConfigRestApi = async (injector: Injector) => {
   useRestService<ConfigApi>({
     injector,
-    root: 'api/media',
+    root: 'api/config',
     port: getPort(),
     cors: getCorsOptions(),
     api: {
       GET: {
-        '/config': Validate<t>({
+        '/config': Validate({
+          schema: configApiSchema,
+          schemaName: 'GetCollectionEndpoint<Config>',
+        })(createGetCollectionEndpoint({ model: Config, primaryKey: 'id' })),
+        '/config/:id': Validate({
           schema: configApiSchema,
           schemaName: 'GetEntityEndpoint<Config,"id">',
-        })(createGetCollectionEndpoint({ model: Config, primaryKey: 'id' })),
-        '/config/:id': createGetEntityEndpoint({ model: Config, primaryKey: 'id' }),
+        })(createGetEntityEndpoint({ model: Config, primaryKey: 'id' })),
       },
       POST: {
-        '/config': createPostEndpoint({ model: Config, primaryKey: 'id' }),
+        '/config': Validate({
+          schema: configApiSchema,
+          schemaName: 'PostEndpoint<Config,"id",Omit<WithOptionalId<Config,("createdAt"|"updatedAt")>,"id">>',
+        })(createPostEndpoint({ model: Config, primaryKey: 'id' })),
       },
       PATCH: {
-        '/config/:id': createPatchEndpoint({ model: Config, primaryKey: 'id' }),
+        '/config/:id': Validate({
+          schema: configApiSchema,
+          schemaName: 'PatchEndpoint<Config,"id">',
+        })(createPatchEndpoint({ model: Config, primaryKey: 'id' })),
       },
       DELETE: {
-        '/config/:id': createDeleteEndpoint({ model: Config, primaryKey: 'id' }),
+        '/config/:id': Validate({
+          schema: configApiSchema,
+          schemaName: 'DeleteEndpoint<Config,"id">',
+        })(createDeleteEndpoint({ model: Config, primaryKey: 'id' })),
       },
     },
   })

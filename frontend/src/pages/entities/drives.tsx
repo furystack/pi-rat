@@ -15,7 +15,7 @@ export const DrivesPage = Shade({
 
     const model = modelProvider.getModelForEntityType({
       schemaName: 'Drive',
-      jsonSchema: drivesSchemas.definitions.Drive,
+      jsonSchema: { ...drivesSchemas, type: 'object', $ref: '#/definitions/Drive' },
     })
 
     const service = useDisposable(

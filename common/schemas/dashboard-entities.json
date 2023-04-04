@@ -32,9 +32,10 @@
         "entityName": {
           "type": "string",
           "enum": [
+            "config",
+            "dasboard",
             "drive",
             "user",
-            "dasboard",
             "movie-library"
           ]
         }

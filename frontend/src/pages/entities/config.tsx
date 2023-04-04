@@ -1,21 +1,21 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { User } from 'common'
-import identitySchemas from 'common/schemas/identity-entities.json'
+import { Config } from 'common'
+import configSchemas from 'common/schemas/config-entities.json'
 import { GenericEditor } from '../../components/generic-editor'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
-import { IdentityApiClient } from '../../services/identity-api-client'
+import { ConfigApiClient } from '../../services/config-api-client'
 import { MonacoModelProvider } from '../../services/monaco-model-provider'
 
-export const UsersPage = Shade({
-  shadowDomName: 'shade-app-users-page',
+export const ConfigPage = Shade({
+  shadowDomName: 'shade-app-configs-page',
   render: ({ useDisposable, injector }) => {
-    const api = injector.getInstance(IdentityApiClient)
+    const api = injector.getInstance(ConfigApiClient)
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
     const model = modelProvider.getModelForEntityType({
-      schemaName: 'User',
-      jsonSchema: { ...identitySchemas, type: 'object', $ref: '#/definitions/User' },
+      schemaName: 'Config',
+      jsonSchema: { ...configSchemas, type: 'object', $ref: '#/definitions/Config' },
     })
 
     const service = useDisposable(
@@ -23,28 +23,28 @@ export const UsersPage = Shade({
       () =>
         new GenericEditorService({
           defaultSettings: {},
-          model: User,
-          keyProperty: 'username',
+          model: Config,
+          keyProperty: 'id',
           readonlyProperties: ['createdAt', 'updatedAt'],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',
-              action: '/users',
+              action: '/config',
               query: { findOptions },
             })
             return result.result
           },
           deleteEntities: async (id) => {
-            await api.call({ method: 'DELETE', action: `/users/:id`, url: { id } })
+            await api.call({ method: 'DELETE', action: `/config/:id`, url: { id } })
           },
           getEntity: async (id) => {
-            const result = await api.call({ method: 'GET', action: `/users/:id`, url: { id }, query: {} })
+            const result = await api.call({ method: 'GET', action: `/config/:id`, url: { id }, query: {} })
             return result.result
           },
           patchEntity: async (id, entity) => {
             await api.call({
               method: 'PATCH',
-              action: `/users/:id`,
+              action: `/config/:id`,
               url: { id },
               body: entity,
             })
@@ -52,7 +52,7 @@ export const UsersPage = Shade({
           postEntity: async (entity) => {
             const { result } = await api.call({
               method: 'POST',
-              action: `/users`,
+              action: `/config`,
               body: entity,
             })
             return result
@@ -62,10 +62,14 @@ export const UsersPage = Shade({
     return (
       <GenericEditor
         service={service}
-        columns={['username', 'roles']}
+        columns={['id', 'value', 'createdAt', 'updatedAt']}
         headerComponents={{}}
         styles={{}}
-        rowComponents={{}}
+        rowComponents={{
+          value: ({ value }) => {
+            return <>{value.id}</>
+          },
+        }}
         model={model}
       />
     )

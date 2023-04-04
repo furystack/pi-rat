@@ -25,7 +25,7 @@
           "type": "object",
           "properties": {
             "/config": {
-              "$ref": "#/definitions/PostEndpoint%3CConfig%2C%22id%22%3E"
+              "$ref": "#/definitions/PostEndpoint%3CConfig%2C%22id%22%2COmit%3CWithOptionalId%3CConfig%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22id%22%3E%3E"
             }
           },
           "required": [
@@ -638,11 +638,11 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "PostEndpoint<Config,\"id\">": {
+    "PostEndpoint<Config,\"id\",Omit<WithOptionalId<Config,(\"createdAt\"|\"updatedAt\")>,\"id\">>": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/WithOptionalId%3CConfig%2C%22id%22%3E"
+          "$ref": "#/definitions/Omit%3CWithOptionalId%3CConfig%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22id%22%3E"
         },
         "result": {
           "$ref": "#/definitions/Config"
@@ -655,13 +655,12 @@
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
-    "WithOptionalId<Config,\"id\">": {
+    "Omit<WithOptionalId<Config,(\"createdAt\"|\"updatedAt\")>,\"id\">": {
+      "$ref": "#/definitions/Pick%3CWithOptionalId%3CConfig%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2CExclude%3C(%22id%22%7C%22value%22%7C%22createdAt%22%7C%22updatedAt%22)%2C%22id%22%3E%3E"
+    },
+    "Pick<WithOptionalId<Config,(\"createdAt\"|\"updatedAt\")>,Exclude<(\"id\"|\"value\"|\"createdAt\"|\"updatedAt\"),\"id\">>": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "value": {
           "$ref": "#/definitions/ConfigType"
         },
@@ -675,10 +674,9 @@
         }
       },
       "required": [
-        "createdAt",
-        "updatedAt",
         "value"
-      ]
+      ],
+      "additionalProperties": false
     },
     "PatchEndpoint<Config,\"id\">": {
       "type": "object",

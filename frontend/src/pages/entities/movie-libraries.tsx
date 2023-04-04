@@ -15,7 +15,7 @@ export const MovieLibrariesPage = Shade({
 
     const model = modelProvider.getModelForEntityType({
       schemaName: 'MovieLibrary',
-      jsonSchema: mediaSchemas.definitions.MovieLibrary,
+      jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/MovieLibrary' },
     })
 
     const service = useDisposable(

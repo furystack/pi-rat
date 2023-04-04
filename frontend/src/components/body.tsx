@@ -94,6 +94,19 @@ const adminRoutes: Array<Route<any>> = [
       />
     ),
   },
+  {
+    url: '/entities/config',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { ConfigPage } = await import('../pages/entities/config')
+          return <ConfigPage />
+        }}
+      />
+    ),
+  },
 ]
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
