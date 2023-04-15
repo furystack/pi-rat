@@ -13,8 +13,8 @@
     "@furystack/rest": "^4.2.1",
     "@types/marked": "^4.0.8",
     "@yarnpkg/esbuild-plugin-pnp": "^3.0.0-rc.15",
-    "esbuild": "^0.17.14",
-    "typescript": "^5.0.3"
+    "esbuild": "^0.17.16",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "@furystack/cache": "^1.0.4",
@@ -23,13 +23,13 @@
     "@furystack/logging": "^3.1.9",
     "@furystack/rest-client-fetch": "^4.1.19",
     "@furystack/shades": "^7.2.6",
-    "@furystack/shades-common-components": "^4.0.16",
-    "@furystack/shades-lottie": "^3.0.14",
+    "@furystack/shades-common-components": "^4.0.17",
+    "@furystack/shades-lottie": "^3.0.15",
     "@furystack/utils": "^3.1.8",
     "@types/node": "^18.15.11",
     "common": "workspace:^",
     "marked": "^4.3.0",
-    "monaco-editor": "^0.36.1",
+    "monaco-editor": "^0.37.1",
     "semaphore-async-await": "^1.5.1"
   }
 }
