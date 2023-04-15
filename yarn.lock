@@ -718,22 +718,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/sequelize-store@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "@furystack/sequelize-store@npm:2.2.1"
+"@furystack/sequelize-store@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "@furystack/sequelize-store@npm:2.2.2"
   dependencies:
     "@furystack/core": ^11.3.1
     "@furystack/inject": ^7.1.9
     "@furystack/utils": ^3.1.8
     semaphore-async-await: ^1.5.1
-    sequelize: ^6.30.0
-  checksum: 3c7c39c502cdd42e54c96323e3b00b0d42cd30b4da6041b1efd450942bc446ce5279d11cc7b24be3a6aba90abbfc5c310ae840acd14560aa47c1d7fa0bc4013d
+    sequelize: ^6.31.0
+  checksum: 51234a0eab0869326ff2f383949f45a0bd99af4dd3701e8819c6c119e62a050ed8ef9b2c7f5b64feea17a7fe32d63177d952fac906be801ec077d224a64f4b89
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^4.0.16":
-  version: 4.0.16
-  resolution: "@furystack/shades-common-components@npm:4.0.16"
+"@furystack/shades-common-components@npm:^4.0.17":
+  version: 4.0.17
+  resolution: "@furystack/shades-common-components@npm:4.0.17"
   dependencies:
     "@furystack/core": ^11.3.1
     "@furystack/inject": ^7.1.9
@@ -741,17 +741,17 @@ __metadata:
     "@furystack/utils": ^3.1.8
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: f862fc01991883a962fe33ad486d5be70ea158d37d458e594a48b442342798dd4723d196a56220d5fe3fbe24f2a66ac589f176d9c15ed7543c50cff5ebf8e677
+  checksum: eec8dabd38fe6fa89049aa4e6c80ed6094940ff15885a22e68759ddaa1e60dd3629a5b73cf6a3b9cd1e0f5eb1e42b8a375566a53d3ba4214be22e332c23b7ca2
   languageName: node
   linkType: hard
 
-"@furystack/shades-lottie@npm:^3.0.14":
-  version: 3.0.14
-  resolution: "@furystack/shades-lottie@npm:3.0.14"
+"@furystack/shades-lottie@npm:^3.0.15":
+  version: 3.0.15
+  resolution: "@furystack/shades-lottie@npm:3.0.15"
   dependencies:
     "@furystack/shades": ^7.2.6
     "@lottiefiles/lottie-player": ^1.7.1
-  checksum: 99362cc45d2aa03ebd8f3caac8c6b41007351b9fba2651c5c598724730e9459d31e5e8a3d60979683a733240920257ece22e77386c1002a972cb57615f1d8943
+  checksum: afa7d11855f83977434fd496c8df1b11dcac571e2950949a142d809b5de1b7c0b6d4ee97c389dfe1bd175ec5278a3b238f5ac36edc5034f73949a6d1438c635b
   languageName: node
   linkType: hard
 
@@ -3178,7 +3178,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"formidable@npm:^2.1.1":
+"formidable@npm:^2.1.2":
   version: 2.1.2
   resolution: "formidable@npm:2.1.2"
   dependencies:
@@ -3201,8 +3201,8 @@ __metadata:
     "@furystack/rest": ^4.2.1
     "@furystack/rest-client-fetch": ^4.1.19
     "@furystack/shades": ^7.2.6
-    "@furystack/shades-common-components": ^4.0.16
-    "@furystack/shades-lottie": ^3.0.14
+    "@furystack/shades-common-components": ^4.0.17
+    "@furystack/shades-lottie": ^3.0.15
     "@furystack/utils": ^3.1.8
     "@types/marked": ^4.0.8
     "@types/node": ^18.15.11
@@ -5877,49 +5877,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize@npm:^6.30.0":
-  version: 6.30.0
-  resolution: "sequelize@npm:6.30.0"
-  dependencies:
-    "@types/debug": ^4.1.7
-    "@types/validator": ^13.7.1
-    debug: ^4.3.3
-    dottie: ^2.0.2
-    inflection: ^1.13.2
-    lodash: ^4.17.21
-    moment: ^2.29.1
-    moment-timezone: ^0.5.35
-    pg-connection-string: ^2.5.0
-    retry-as-promised: ^7.0.3
-    semver: ^7.3.5
-    sequelize-pool: ^7.1.0
-    toposort-class: ^1.0.1
-    uuid: ^8.3.2
-    validator: ^13.7.0
-    wkx: ^0.5.0
-  peerDependenciesMeta:
-    ibm_db:
-      optional: true
-    mariadb:
-      optional: true
-    mysql2:
-      optional: true
-    oracledb:
-      optional: true
-    pg:
-      optional: true
-    pg-hstore:
-      optional: true
-    snowflake-sdk:
-      optional: true
-    sqlite3:
-      optional: true
-    tedious:
-      optional: true
-  checksum: a99ae86eb48ec0704e8f5173265c17578b69bd9659e21789e0f0f551c69e597d3efe7d365c417542a7cc5023b9ceaf75948650aeab6b7321c09295f17342f6d1
-  languageName: node
-  linkType: hard
-
 "sequelize@npm:^6.31.0":
   version: 6.31.0
   resolution: "sequelize@npm:6.31.0"
@@ -5974,7 +5931,7 @@ __metadata:
     "@furystack/rest": ^4.2.1
     "@furystack/rest-service": ^6.2.23
     "@furystack/security": ^2.1.16
-    "@furystack/sequelize-store": ^2.2.1
+    "@furystack/sequelize-store": ^2.2.2
     "@furystack/utils": ^3.1.8
     "@furystack/websocket-api": ^8.1.23
     "@types/formidable": ^2.0.5
@@ -5982,7 +5939,7 @@ __metadata:
     "@types/node": ^18.15.11
     chokidar: ^3.5.3
     common: "workspace:^"
-    formidable: ^2.1.1
+    formidable: ^2.1.2
     sequelize: ^6.31.0
     sqlite3: ^5.1.6
     typescript: ^5.0.4
