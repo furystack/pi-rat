@@ -4,11 +4,10 @@ import type { ObservableValue } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options'
-import { DrivesApiClient } from '../../services/drives-api-client'
-import { DrivesFilesystemNotificationsService } from '../../services/drives-filesystem-notifications-service'
 import { SessionService } from '../../services/session'
 import { BreadCrumbs } from './breadcrumbs'
 import { DirectoryEntryIcon } from './directory-entry-icon'
+import { DrivesService } from '../../services/drives-service'
 
 export const FileList = Shade<{
   currentDriveLetter: ObservableValue<string>
@@ -19,22 +18,8 @@ export const FileList = Shade<{
   render: ({ useDisposable, props, injector, useObservable }) => {
     const { currentDriveLetter, currentPath } = props
 
-    const client = injector.getInstance(DrivesApiClient)
+    const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
-    const refetch = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
-
-    useDisposable('DrivesFilesystemNotificationsService', () =>
-      injector.getInstance(DrivesFilesystemNotificationsService).onFilesystemChanged.subscribe((e) => {
-        const currentPathValue = currentPath.getValue()
-        const currentDrive = currentDriveLetter.getValue()
-        if (
-          e.drive === currentDrive &&
-          (e.path === currentPathValue || PathHelper.isAncestorOf(currentPathValue, e.path))
-        ) {
-          refetch()
-        }
-      }),
-    )
 
     const service = useDisposable(
       'service',
@@ -56,22 +41,16 @@ export const FileList = Shade<{
               isSymbolicLink: false,
             }
 
-            const result = await client.call({
-              method: 'GET',
-              action: '/files/:letter/:path',
-              url: {
-                letter: currentDriveLetter.getValue(),
-                path: encodeURIComponent(currentPath.getValue()),
-              },
-            })
+            const result = await drivesService.getFileList(currentDriveLetter.getValue(), currentPath.getValue())
             if (currentPath.getValue() !== '/') {
-              return { ...result.result, entries: [up, ...result.result.entries.sortBy('isDirectory', 'desc')] }
+              return { ...result, entries: [up, ...result.entries.sortBy('isDirectory', 'desc')] }
             }
-            return { ...result.result, entries: result.result.entries.sortBy('isDirectory', 'desc') }
+            return { ...result, entries: result.entries.sortBy('isDirectory', 'desc') }
           },
           defaultSettings: {},
         }),
     )
+    const refetch = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
 
     useObservable('onDriveChange', props.currentDriveLetter, refetch)
     useObservable('onFolderChange', props.currentPath, refetch)
@@ -110,17 +89,12 @@ export const FileList = Shade<{
         if (ev.key === 'Delete') {
           const focused = service.focusedEntry.getValue()
           focused &&
-            client
-              .call({
-                method: 'DELETE',
-                action: '/files/:letter/:path',
-                url: {
-                  letter: currentDriveLetter.getValue(),
-                  path: encodeURIComponent(`${currentPath.getValue()}/${focused.name}`),
-                },
-              })
+            drivesService
+              .removeFile(
+                currentDriveLetter.getValue(),
+                encodeURIComponent(`${currentPath.getValue()}/${focused.name}`),
+              )
               .then(() => {
-                refetch()
                 notyService.addNoty({
                   type: 'success',
                   title: 'Delete completed',
@@ -170,7 +144,6 @@ export const FileList = Shade<{
               },
             )
               .then(() => {
-                refetch()
                 notyService.addNoty({
                   type: 'success',
                   title: 'Upload completed',

@@ -5,7 +5,7 @@ import type { Drive } from 'common'
 import { DriveSelector } from './drive-selector'
 import { FileList } from './file-list'
 
-export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availableDrives: ObservableValue<Drive[]> }>({
+export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive> }>({
   shadowDomName: 'folder-panel',
   render: ({ props, useObservable, element, useDisposable, injector }) => {
     const currentLetter = useDisposable(
@@ -37,7 +37,7 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
           flexShrink: '0',
           height: 'calc(100% - 42px)',
         }}>
-        <DriveSelector currentDrive={props.currentDrive} availableDrives={props.availableDrives} />
+        <DriveSelector currentDrive={props.currentDrive} />
         <FileList
           currentDriveLetter={currentLetter}
           currentPath={currentPath}

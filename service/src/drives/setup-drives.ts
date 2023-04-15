@@ -50,9 +50,12 @@ export const setupDrives = async (injector: Injector) => {
           letter: {
             type: DataTypes.STRING,
             primaryKey: true,
+            allowNull: false,
           },
           physicalPath: {
             type: DataTypes.STRING,
+            unique: true,
+            allowNull: false,
           },
           createdAt: {
             type: DataTypes.DATE,

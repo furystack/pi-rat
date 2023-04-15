@@ -4,8 +4,7 @@ import { Button, fadeIn, fadeOut, Input, Modal, Wizard } from '@furystack/shades
 import { ObservableValue } from '@furystack/utils'
 import { NotyService } from '@furystack/shades-common-components'
 import { WizardStep } from '../../components/wizard-step'
-import { DrivesApiClient } from '../../services/drives-api-client'
-import type { Drive } from 'common'
+import { DrivesService } from '../../services/drives-service'
 
 export const AddDriveStep = Shade<WizardStepProps>({
   shadowDomName: 'add-drive-step',
@@ -22,13 +21,9 @@ export const AddDriveStep = Shade<WizardStepProps>({
 
           const values = Object.fromEntries(formData.entries())
           try {
-            await injector.getInstance(DrivesApiClient).call({
-              method: 'POST',
-              action: '/volumes',
-              body: {
-                letter: values.letter.toString(),
-                physicalPath: values.physicalPath.toString(),
-              } as Drive,
+            await injector.getInstance(DrivesService).addVolume({
+              letter: values.letter.toString(),
+              physicalPath: values.physicalPath.toString(),
             })
             await props.onNext?.()
             injector.getInstance(NotyService).addNoty({
@@ -68,7 +63,7 @@ export const AddDriveStep = Shade<WizardStepProps>({
   },
 })
 
-export const CreateDriveWizard = Shade<{ onDriveAdded: () => void }>({
+export const CreateDriveWizard = Shade<{ onDriveAdded?: () => void }>({
   shadowDomName: 'create-drive-wizard',
   render: ({ useDisposable, props }) => {
     const isOpened = useDisposable('isOpened', () => new ObservableValue(false))
@@ -84,7 +79,7 @@ export const CreateDriveWizard = Shade<{ onDriveAdded: () => void }>({
             steps={[AddDriveStep]}
             onFinish={() => {
               isOpened.setValue(false)
-              props.onDriveAdded()
+              props.onDriveAdded?.()
             }}></Wizard>
         </Modal>
         <Button
