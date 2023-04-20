@@ -2,6 +2,7 @@ import { IdentityContext } from '@furystack/core'
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
 import { authorizedOnly } from './authorized-only'
+import { describe, expect, it } from 'vitest'
 
 describe('authorizedOnly', () => {
   it('Should fail if not authorized', async () => {

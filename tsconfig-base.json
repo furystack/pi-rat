@@ -2,7 +2,8 @@
   "compilerOptions": {
     "pretty": true,
     "target": "ES2021",
-    "module": "commonjs",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "declaration": true,
     "sourceMap": true,
     "strict": true,
@@ -24,5 +25,15 @@
     "jsxFactory": "createComponent",
     "jsxFragmentFactory": "createComponent",
     "resolveJsonModule": true
-  }
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.d.ts",
+    "node_modules",
+    "dist",
+    "coverage"
+  ]
 }

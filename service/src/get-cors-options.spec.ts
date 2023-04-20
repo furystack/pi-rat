@@ -1,4 +1,5 @@
 import { getCorsOptions } from './get-cors-options'
+import { describe, expect, it } from 'vitest'
 
 describe('getCorsOptions', () => {
   it('Should match the default options', () => {

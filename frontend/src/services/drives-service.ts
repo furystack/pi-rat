@@ -131,7 +131,12 @@ export class DrivesService {
         this.onFilesystemChanged.setValue(messageData)
 
         this.fileListCache.obsoleteRange((fileList) => {
-          return fileList.letter === messageData.drive && fileList.path === PathHelper.getParentPath(messageData.path)
+          const parentPath = PathHelper.getParentPath(messageData.path)
+          const currentPath = PathHelper.normalize(fileList.path)
+          return (
+            fileList.letter === messageData.drive &&
+            (currentPath === parentPath || (!currentPath && PathHelper.normalize(messageData.path)) === parentPath)
+          )
         })
       }
     }

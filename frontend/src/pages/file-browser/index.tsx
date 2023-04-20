@@ -2,8 +2,6 @@ import { createComponent, Shade } from '@furystack/shades'
 import { ObservableValue } from '@furystack/utils'
 import { CreateDriveWizard } from './create-drive-wizard'
 import { FolderPanel } from './folder-panel'
-
-import { PiRatLazyLoad } from '../../components/pirat-lazy-load'
 import { DrivesService } from '../../services/drives-service'
 
 export const DrivesPage = Shade({

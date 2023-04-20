@@ -1,6 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
-import type { ObservableValue } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options'
@@ -10,23 +9,26 @@ import { DirectoryEntryIcon } from './directory-entry-icon'
 import { DrivesService } from '../../services/drives-service'
 
 export const FileList = Shade<{
-  currentDriveLetter: ObservableValue<string>
-  currentPath: ObservableValue<string>
+  currentDriveLetter: string
+  currentPath: string
+  onChangePath: (newPath: string) => void
   onActivate?: (entry: DirectoryEntry) => void
 }>({
   shadowDomName: 'file-list',
-  render: ({ useDisposable, props, injector, useObservable }) => {
+  render: ({ useDisposable, props, injector }) => {
     const { currentDriveLetter, currentPath } = props
 
     const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
+
+    // const [entries] = useObservable('entries', drivesService.getFileListAsObservable(currentDriveLetter, currentPath))
 
     const service = useDisposable(
       'service',
       () =>
         new CollectionService<DirectoryEntry>({
           loader: async () => {
-            if (!currentDriveLetter.getValue() || !props.currentPath.getValue()) {
+            if (!props.currentDriveLetter || !props.currentPath) {
               return { count: 0, entries: [] }
             }
 
@@ -41,8 +43,8 @@ export const FileList = Shade<{
               isSymbolicLink: false,
             }
 
-            const result = await drivesService.getFileList(currentDriveLetter.getValue(), currentPath.getValue())
-            if (currentPath.getValue() !== '/') {
+            const result = await drivesService.getFileList(currentDriveLetter, currentPath)
+            if (currentPath !== '/') {
               return { ...result, entries: [up, ...result.entries.sortBy('isDirectory', 'desc')] }
             }
             return { ...result, entries: result.entries.sortBy('isDirectory', 'desc') }
@@ -50,10 +52,6 @@ export const FileList = Shade<{
           defaultSettings: {},
         }),
     )
-    const refetch = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
-
-    useObservable('onDriveChange', props.currentDriveLetter, refetch)
-    useObservable('onFolderChange', props.currentPath, refetch)
 
     const activate = () => {
       const focused = service.focusedEntry.getValue()
@@ -71,8 +69,8 @@ export const FileList = Shade<{
         if (ev.key === 'F3') {
           const focused = service.focusedEntry.getValue()
           if (focused) {
-            const letter = currentDriveLetter.getValue()
-            const path = props.currentPath.getValue()
+            const letter = currentDriveLetter
+            const path = props.currentPath
             const url = `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
               letter,
             )}/${encodeURIComponent(PathHelper.joinPaths(path, focused.name))}/download`
@@ -90,10 +88,7 @@ export const FileList = Shade<{
           const focused = service.focusedEntry.getValue()
           focused &&
             drivesService
-              .removeFile(
-                currentDriveLetter.getValue(),
-                encodeURIComponent(`${currentPath.getValue()}/${focused.name}`),
-              )
+              .removeFile(currentDriveLetter, encodeURIComponent(`${currentPath}/${focused.name}`))
               .then(() => {
                 notyService.addNoty({
                   type: 'success',
@@ -135,8 +130,8 @@ export const FileList = Shade<{
             }
             await fetch(
               `${environmentOptions.serviceUrl}/drives/volumes/${encodeURIComponent(
-                currentDriveLetter.getValue(),
-              )}/${encodeURIComponent(currentPath.getValue())}/upload`,
+                currentDriveLetter,
+              )}/${encodeURIComponent(currentPath)}/upload`,
               {
                 method: 'POST',
                 credentials: 'include',
@@ -166,7 +161,13 @@ export const FileList = Shade<{
           autofocus
           columns={['id']}
           headerComponents={{
-            id: () => <BreadCrumbs currentDrive={currentDriveLetter} currentPath={currentPath} />,
+            id: () => (
+              <BreadCrumbs
+                currentDrive={currentDriveLetter}
+                currentPath={currentPath}
+                onChangePath={props.onChangePath}
+              />
+            ),
           }}
           styles={{}}
           rowComponents={{
