@@ -1,5 +1,5 @@
-import type { OmdbConfig } from './omdb-config'
-import type { GithubConfig } from './github-config'
+import type { OmdbConfig } from './omdb-config.js'
+import type { GithubConfig } from './github-config.js'
 
 export type ConfigType = OmdbConfig | GithubConfig
 

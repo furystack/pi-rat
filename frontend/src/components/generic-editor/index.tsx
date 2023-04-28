@@ -5,10 +5,10 @@ import { NotyService } from '@furystack/shades-common-components'
 import { Button, SelectionCell } from '@furystack/shades-common-components'
 import { Fab } from '@furystack/shades-common-components'
 import { DataGrid } from '@furystack/shades-common-components'
-import type { GenericEditorService } from './generic-editor-service'
+import type { GenericEditorService } from './generic-editor-service.js'
 import type monaco from 'monaco-editor'
-import { GenericMonacoEditor } from './generic-monaco-editor'
-import { PiRatLazyLoad } from '../pirat-lazy-load'
+import { GenericMonacoEditor } from './generic-monaco-editor.js'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>

@@ -2,9 +2,9 @@ import { Shade, createComponent, ScreenService } from '@furystack/shades'
 import { Button, ThemeProviderService } from '@furystack/shades-common-components'
 import redCross from '../animations/error-red-cross.json'
 import deadSmiley from '../animations/error-dead-smiley.json'
-import { ErrorReporter } from '../services/error-reporter'
-import { ErrorDisplay } from './error-display'
-import { Error404 } from './error-404'
+import { ErrorReporter } from '../services/error-reporter.js'
+import { ErrorDisplay } from './error-display.js'
+import { Error404 } from './error-404.js'
 import { ResponseError } from '@furystack/rest-client-fetch'
 
 export interface GenericErrorProps {

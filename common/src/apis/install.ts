@@ -1,5 +1,5 @@
 import type { RestApi } from '@furystack/rest'
-import type { ServiceStatus } from '../models'
+import type { ServiceStatus } from '../models/install/index.js'
 
 export type GetServiceStatusAction = { result: { state: ServiceStatus } }
 

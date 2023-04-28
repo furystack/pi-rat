@@ -1,5 +1,5 @@
 import { StoreManager } from '@furystack/core'
-import type { Patch } from './patch'
+import type { Patch } from './patch.js'
 import { Dashboard } from 'common'
 
 export const addDefaultDashboardPatcher: Patch = {

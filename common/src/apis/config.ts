@@ -6,7 +6,7 @@ import type {
   PostEndpoint,
 } from '@furystack/rest'
 import type { RestApi } from '@furystack/rest'
-import type { Config } from '../models'
+import type { Config } from '../models/config/index.js'
 import type { WithOptionalId } from '@furystack/core'
 
 export interface ConfigApi extends RestApi {

@@ -1,5 +1,5 @@
 import { Injectable, Injected } from '@furystack/inject'
-import { DashboardsApiClient } from '../../services/dashboards-api-client'
+import { DashboardsApiClient } from '../../services/dashboards-api-client.js'
 import { Cache } from '@furystack/cache'
 import type { Dashboard } from 'common'
 import type { FindOptions, WithOptionalId } from '@furystack/core'

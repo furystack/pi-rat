@@ -2,9 +2,9 @@ import { Injectable, Injected } from '@furystack/inject'
 import type { FindOptions, WithOptionalId } from '@furystack/core'
 import { ObservableValue, PathHelper } from '@furystack/utils'
 import { Cache } from '@furystack/cache'
-import { DrivesApiClient } from './drives-api-client'
+import { DrivesApiClient } from './drives-api-client.js'
 import type { Drive } from 'common'
-import { environmentOptions } from '../environment-options'
+import { environmentOptions } from '../environment-options.js'
 
 type DrivesFilesystemChangedEvent = {
   type: 'file-change'

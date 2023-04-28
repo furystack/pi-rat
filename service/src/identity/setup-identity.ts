@@ -7,8 +7,8 @@ import { usePasswordPolicy } from '@furystack/security'
 import { User } from 'common'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
 import { Model, DataTypes } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options'
-import { withRole } from '../authorization/with-role'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { withRole } from '../authorization/with-role.js'
 import { getCurrentUser } from '@furystack/core'
 
 class UserModel extends Model<User, User> implements User {

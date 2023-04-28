@@ -2,11 +2,11 @@ import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
-import { environmentOptions } from '../../environment-options'
-import { SessionService } from '../../services/session'
-import { BreadCrumbs } from './breadcrumbs'
-import { DirectoryEntryIcon } from './directory-entry-icon'
-import { DrivesService } from '../../services/drives-service'
+import { environmentOptions } from '../../environment-options.js'
+import { SessionService } from '../../services/session.js'
+import { BreadCrumbs } from './breadcrumbs.js'
+import { DirectoryEntryIcon } from './directory-entry-icon.js'
+import { DrivesService } from '../../services/drives-service.js'
 
 export const FileList = Shade<{
   currentDriveLetter: string

@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { WidgetGroup as WidgetGroupData } from 'common'
-import { Widget } from './widget'
+import { Widget } from './widget.js'
 
 export const WidgetGroup = Shade<WidgetGroupData>({
   shadowDomName: 'pi-rat-widget-group',

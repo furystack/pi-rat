@@ -6,9 +6,9 @@ import { access, mkdir } from 'fs/promises'
 import { constants } from 'fs'
 import { Drive } from 'common'
 import { Model, DataTypes } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options'
-import { useFileWatchers } from './file-watcher-service'
-import { withRole } from '../authorization/with-role'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { useFileWatchers } from './file-watcher-service.js'
+import { withRole } from '../authorization/with-role.js'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {

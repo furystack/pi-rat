@@ -3,7 +3,7 @@ import { ObservableValue, usingAsync } from '@furystack/utils'
 import { Injectable, Injected } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
 import type { User } from '@furystack/core'
-import { IdentityApiClient } from './identity-api-client'
+import { IdentityApiClient } from './identity-api-client.js'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
 

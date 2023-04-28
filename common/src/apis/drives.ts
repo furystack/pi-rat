@@ -6,8 +6,8 @@ import type {
   PatchEndpoint,
   RestApi,
 } from '@furystack/rest'
-import type { DirectoryEntry } from '../models/drives/directory-entry'
-import type { Drive } from '../models/drives/drive'
+import type { DirectoryEntry } from '../models/drives/directory-entry.js'
+import type { Drive } from '../models/drives/drive.js'
 import type { WithOptionalId } from '@furystack/core'
 
 export type GetDirectoryEntries = {

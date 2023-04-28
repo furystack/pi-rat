@@ -13,7 +13,7 @@ import type {
   OmdbMovieMetadata,
   OmdbSeriesMetadata,
   Series,
-} from '../models/media'
+} from '../models/media/index.js'
 
 export interface MediaApi extends RestApi {
   GET: {

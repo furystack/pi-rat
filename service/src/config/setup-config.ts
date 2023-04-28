@@ -1,12 +1,12 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { useSequelize } from '@furystack/sequelize-store'
+import { getRepository } from '@furystack/repository'
 import { Config } from 'common'
 import type { ConfigType } from 'common'
 import { DataTypes, Model } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options'
-import { getRepository } from '@furystack/repository'
-import { withRole } from '../authorization/with-role'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { withRole } from '../authorization/with-role.js'
 
 class ConfigModel extends Model<Config, Config> implements Config {
   declare id: string

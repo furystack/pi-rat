@@ -1,8 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { ObservableValue } from '@furystack/utils'
 import type { Drive } from 'common'
-import { DrivesService } from '../../services/drives-service'
-import { ErrorDisplay } from '../../components/error-display'
+import { DrivesService } from '../../services/drives-service.js'
+import { ErrorDisplay } from '../../components/error-display.js'
 
 export const DriveSelector = Shade<{ currentDrive: ObservableValue<Drive> }>({
   shadowDomName: 'drive-selector',

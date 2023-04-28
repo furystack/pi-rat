@@ -3,8 +3,8 @@ import { Paper } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
 import type { Drive } from 'common'
-import { DriveSelector } from './drive-selector'
-import { FileList } from './file-list'
+import { DriveSelector } from './drive-selector.js'
+import { FileList } from './file-list.js'
 
 export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive> }>({
   shadowDomName: 'folder-panel',

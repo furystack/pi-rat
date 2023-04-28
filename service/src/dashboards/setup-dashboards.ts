@@ -4,9 +4,9 @@ import type { Widget } from 'common'
 import { getLogger } from '@furystack/logging'
 import type { Injector } from '@furystack/inject'
 import { useSequelize } from '@furystack/sequelize-store'
-import { getDefaultDbSettings } from '../get-default-db-options'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { getRepository } from '@furystack/repository'
-import { withRole } from '../authorization/with-role'
+import { withRole } from '../authorization/with-role.js'
 import { getCurrentUser } from '@furystack/core'
 
 class DashboardModel extends Model<Dashboard, Dashboard> implements Dashboard {

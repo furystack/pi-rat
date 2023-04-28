@@ -10,8 +10,8 @@ import {
 import type { ConfigApi } from 'common'
 import configApiSchema from 'common/schemas/config-api.json'
 import { Config } from 'common'
-import { getCorsOptions } from '../get-cors-options'
-import { getPort } from '../get-port'
+import { getCorsOptions } from '../get-cors-options.js'
+import { getPort } from '../get-port.js'
 import type { Injector } from '@furystack/inject'
 
 export const setupConfigRestApi = async (injector: Injector) => {

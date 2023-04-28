@@ -3,14 +3,16 @@ import { getLogger } from '@furystack/logging'
 
 import { MovieLibrary, MovieWatchHistoryEntry, Movie, Series } from 'common'
 import { OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
-import { getDefaultDbSettings } from '../get-default-db-options'
+
 import { DataTypes, Model } from 'sequelize'
 import { useSequelize } from '@furystack/sequelize-store'
 import type { AuthorizationResult } from '@furystack/repository'
 import { getRepository } from '@furystack/repository'
-import { authorizedOnly } from '../authorization/authorized-only'
-import { withRole } from '../authorization/with-role'
 import { getCurrentUser, isAuthorized } from '@furystack/core'
+
+import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { authorizedOnly } from '../authorization/authorized-only.js'
+import { withRole } from '../authorization/with-role.js'
 
 class MovieLibraryModel extends Model<MovieLibrary, MovieLibrary> implements MovieLibrary {
   declare id: string

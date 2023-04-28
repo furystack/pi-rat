@@ -1,8 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { ObservableValue } from '@furystack/utils'
-import { CreateDriveWizard } from './create-drive-wizard'
-import { FolderPanel } from './folder-panel'
-import { DrivesService } from '../../services/drives-service'
+import { CreateDriveWizard } from './create-drive-wizard.js'
+import { FolderPanel } from './folder-panel.js'
+import { DrivesService } from '../../services/drives-service.js'
 
 export const DrivesPage = Shade({
   shadowDomName: 'drives-page',

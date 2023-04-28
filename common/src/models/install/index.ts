@@ -1,1 +1,1 @@
-export * from './service-status'
+export * from './service-status.js'

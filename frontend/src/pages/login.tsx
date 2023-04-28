@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { SessionService } from '../services/session'
+import { SessionService } from '../services/session.js'
 import { Button, Form, Input, Loader, Paper } from '@furystack/shades-common-components'
 
 export const LoginButton = Shade({

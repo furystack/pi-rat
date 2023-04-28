@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { MovieLibrary } from 'common'
-import { GenericEditor } from '../../components/generic-editor'
-import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
-import { MonacoModelProvider } from '../../services/monaco-model-provider'
+import { GenericEditor } from '../../components/generic-editor/index.js'
+import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
+import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 import mediaSchemas from 'common/schemas/media-entities.json'
-import { MediaApiClient } from '../../services/media-api-client'
+import { MediaApiClient } from '../../services/media-api-client.js'
 
 export const MovieLibrariesPage = Shade({
   shadowDomName: 'shade-app-movie-libraries-page',

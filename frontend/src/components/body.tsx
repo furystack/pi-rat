@@ -1,11 +1,11 @@
 import type { Route } from '@furystack/shades'
 import { createComponent, Shade, Router } from '@furystack/shades'
-import { SessionService } from '../services/session'
-import { Init, Offline, Login } from '../pages'
 import { fadeOut, fadeIn } from '@furystack/shades-common-components'
-import { DefaultDashboard } from './dashboard/default-dashboard'
-import { LoadableDashboard } from './dashboard/LoadableDashboard'
-import { PiRatLazyLoad } from './pirat-lazy-load'
+import { SessionService } from '../services/session.js'
+import { Init, Offline, Login } from '../pages/index.js'
+import { DefaultDashboard } from './dashboard/default-dashboard.js'
+import { LoadableDashboard } from './dashboard/LoadableDashboard.js'
+import { PiRatLazyLoad } from './pirat-lazy-load.js'
 
 const onLeave = async ({ element }: { element: HTMLElement }) => {
   await fadeOut(element, { easing: 'ease-in', duration: 200 })
@@ -23,7 +23,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { DrivesPage } = await import('../pages/file-browser')
+          const { DrivesPage } = await import('../pages/file-browser/index.js')
           return <DrivesPage />
         }}
       />
@@ -36,7 +36,7 @@ const adminRoutes: Array<Route<any>> = [
     component: ({ match }) => (
       <PiRatLazyLoad
         component={async () => {
-          const { FilesPage } = await import('../pages/files')
+          const { FilesPage } = await import('../pages/files/index.js')
           return <FilesPage letter={match.params.driveLetter} path={decodeURIComponent(match.params.path)} />
         }}
       />
@@ -49,7 +49,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { DrivesPage } = await import('../pages/entities/drives')
+          const { DrivesPage } = await import('../pages/entities/drives.js')
           return <DrivesPage />
         }}
       />
@@ -62,7 +62,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { UsersPage } = await import('../pages/entities/users')
+          const { UsersPage } = await import('../pages/entities/users.js')
           return <UsersPage />
         }}
       />
@@ -75,7 +75,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { DashboardsPage } = await import('../pages/entities/dashboards')
+          const { DashboardsPage } = await import('../pages/entities/dashboards.js')
           return <DashboardsPage />
         }}
       />
@@ -88,7 +88,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { MovieLibrariesPage } = await import('../pages/entities/movie-libraries')
+          const { MovieLibrariesPage } = await import('../pages/entities/movie-libraries.js')
           return <MovieLibrariesPage />
         }}
       />
@@ -101,7 +101,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { ConfigPage } = await import('../pages/entities/config')
+          const { ConfigPage } = await import('../pages/entities/config.js')
           return <ConfigPage />
         }}
       />

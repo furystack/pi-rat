@@ -1,9 +1,9 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { AppBar, AppBarLink, Button } from '@furystack/shades-common-components'
-import { environmentOptions } from '../environment-options'
-import { SessionService } from '../services/session'
-import { GithubLogo } from './github-logo'
-import { ThemeSwitch } from './theme-switch'
+import { environmentOptions } from '../environment-options.js'
+import { SessionService } from '../services/session.js'
+import { GithubLogo } from './github-logo/index.js'
+import { ThemeSwitch } from './theme-switch/index.js'
 
 export interface HeaderProps {
   title: string

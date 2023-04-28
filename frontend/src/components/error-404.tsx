@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { GenericErrorPage } from './generic-error'
+import { GenericErrorPage } from './generic-error.js'
 
 export const Error404 = Shade({
   shadowDomName: 'shade-404-not-found',

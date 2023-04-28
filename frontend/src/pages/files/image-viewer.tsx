@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { environmentOptions } from '../../environment-options'
+import { environmentOptions } from '../../environment-options.js'
 
 export const ImageViewer = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-image-viewer',

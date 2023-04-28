@@ -11,8 +11,8 @@ import {
 import type { MediaApi } from 'common'
 import mediaApiSchema from 'common/schemas/media-api.json'
 import { Movie, MovieLibrary, MovieWatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
-import { getPort } from '../get-port'
-import { getCorsOptions } from '../get-cors-options'
+import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../get-cors-options.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({

@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { environmentOptions } from '../../environment-options'
+import { environmentOptions } from '../../environment-options.js'
 
 export const VideoPlayer = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-video-player',

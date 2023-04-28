@@ -12,12 +12,12 @@ import '@furystack/repository'
 import { Drive } from 'common'
 import drivesApiSchema from 'common/schemas/drives-api.json'
 import type { Injector } from '@furystack/inject'
-import { GetDirectoryEntriesAction } from './actions/get-directory-entries'
-import { getPort } from '../get-port'
-import { getCorsOptions } from '../get-cors-options'
-import { UploadAction } from './actions/upload-action'
-import { DeleteFileAction } from './actions/delete-file-action'
-import { DownloadAction } from './actions/download-action'
+import { GetDirectoryEntriesAction } from './actions/get-directory-entries.js'
+import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../get-cors-options.js'
+import { UploadAction } from './actions/upload-action.js'
+import { DeleteFileAction } from './actions/delete-file-action.js'
+import { DownloadAction } from './actions/download-action.js'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({

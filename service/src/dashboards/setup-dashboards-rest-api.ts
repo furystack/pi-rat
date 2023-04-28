@@ -11,8 +11,8 @@ import {
 import type { DashboardsApi } from 'common'
 import { Dashboard } from 'common'
 import dashboardsApiSchema from 'common/schemas/dashboards-api.json'
-import { getPort } from '../get-port'
-import { getCorsOptions } from '../get-cors-options'
+import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../get-cors-options.js'
 
 export const setupDashboardsRestApi = async (injector: Injector) => {
   await useRestService<DashboardsApi>({

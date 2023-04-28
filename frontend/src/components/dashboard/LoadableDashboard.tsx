@@ -1,7 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Dashboard } from '.'
-import { PiRatLazyLoad } from '../pirat-lazy-load'
-import { DashboardService } from './dashboards-service'
+import { Dashboard } from './index.js'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import { DashboardService } from './dashboards-service.js'
 
 export const LoadableDashboard = Shade<{ id: string }>({
   shadowDomName: 'pi-rat-loadable-dashboard',

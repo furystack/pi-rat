@@ -3,8 +3,8 @@ import type { WizardStepProps } from '@furystack/shades-common-components'
 import { Button, fadeIn, fadeOut, Input, Modal, Wizard } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import { NotyService } from '@furystack/shades-common-components'
-import { WizardStep } from '../../components/wizard-step'
-import { DrivesService } from '../../services/drives-service'
+import { WizardStep } from '../../components/wizard-step.js'
+import { DrivesService } from '../../services/drives-service.js'
 
 export const AddDriveStep = Shade<WizardStepProps>({
   shadowDomName: 'add-drive-step',

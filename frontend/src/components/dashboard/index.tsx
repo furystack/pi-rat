@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { Dashboard as DashboardData } from 'common'
-import { Widget } from './widget'
+import { Widget } from './widget.js'
 import { Paper } from '@furystack/shades-common-components'
 
 export const Dashboard = Shade<DashboardData>({
