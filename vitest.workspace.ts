@@ -4,26 +4,20 @@ const cfg = defineWorkspace([
   {
     test: {
       name: 'Common',
-      include: [
-        'common/src/**/*.spec.ts',
-      ],
+      include: ['common/src/**/*.spec.ts'],
     },
   },
   {
     test: {
       name: 'Service',
-      include: [
-        'service/src/**/*.spec.ts',
-      ],
+      include: ['service/src/**/*.spec.ts'],
     },
   },
   {
     test: {
       name: 'Frontend',
       environment: 'jsdom',
-      include: [
-        'frontend/src/**/*.spec.(ts|tsx)',
-      ],
+      include: ['frontend/src/**/*.spec.(ts|tsx)'],
     },
   },
 ])

@@ -5,17 +5,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "yarn node scripts/build.mjs",
-    "start": "yarn node scripts/start.mjs"
+    "build": "tsc -b && yarn vite build",
+    "start": "yarn vite --port 8080"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@furystack/rest": "^5.0.1",
     "@types/marked": "^4.0.8",
-    "@yarnpkg/esbuild-plugin-pnp": "^3.0.0-rc.15",
-    "esbuild": "^0.17.17",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vite": "^4.3.3"
   },
   "dependencies": {
     "@furystack/cache": "^2.0.1",

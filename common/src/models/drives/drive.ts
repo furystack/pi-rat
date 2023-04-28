@@ -10,13 +10,11 @@ export class Drive {
   letter!: string
   /**
    * The drive creation date
-   *
    * @format date-time
    */
   createdAt!: string
   /**
    * Last update date
-   *
    * @format date-time
    */
   updatedAt!: string
