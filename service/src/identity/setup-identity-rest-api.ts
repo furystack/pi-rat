@@ -16,7 +16,7 @@ import type { IdentityApi } from 'common'
 import { User } from 'common'
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
-import identityApiSchema from 'common/schemas/identity-api.json'
+import identityApiSchema from 'common/schemas/identity-api.json' assert { type: 'json' }
 
 export const setupIdentityRestApi = async (injector: Injector) => {
   await useRestService<IdentityApi>({

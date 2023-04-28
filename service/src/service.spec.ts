@@ -1,4 +1,4 @@
-import { init } from './service'
+import { init } from './service.js'
 import { injector as rootInjector } from './root-injector'
 import { describe, expect, it } from 'vitest'
 

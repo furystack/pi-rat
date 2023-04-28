@@ -307,9 +307,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/rest-service@npm:^7.0.2":
-  version: 7.0.2
-  resolution: "@furystack/rest-service@npm:7.0.2"
+"@furystack/rest-service@npm:^7.0.3":
+  version: 7.0.3
+  resolution: "@furystack/rest-service@npm:7.0.3"
   dependencies:
     "@furystack/core": ^12.0.2
     "@furystack/inject": ^8.0.2
@@ -321,7 +321,7 @@ __metadata:
     ajv-formats: ^2.1.1
     path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
-  checksum: ae55a0682bb0728ce240a05b376e8115ab96cc43db3b64db296162dd4db7e9fe16f7825db26380e0b6f4cc092e2ce41e09326023208336964c045edc0b9c529e
+  checksum: 9ab50396a5e05149f7ed6c2e94700b35f1cb47ceb2efd674b310edbaee25b1979b73b180be6d3a5303270a44f18eba927c32cbbcde4a1995bf6556092e0b9c8b
   languageName: node
   linkType: hard
 
@@ -403,16 +403,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/websocket-api@npm:^9.0.2":
-  version: 9.0.2
-  resolution: "@furystack/websocket-api@npm:9.0.2"
+"@furystack/websocket-api@npm:^9.0.3":
+  version: 9.0.3
+  resolution: "@furystack/websocket-api@npm:9.0.3"
   dependencies:
     "@furystack/core": ^12.0.2
     "@furystack/inject": ^8.0.2
-    "@furystack/rest-service": ^7.0.2
+    "@furystack/rest-service": ^7.0.3
     "@furystack/utils": ^4.0.2
     ws: ^8.13.0
-  checksum: 5b964393df12fd87e8879d5d58880b4910cc46857dd0d37c3d02a959ace65b656589e0f95d9430665f3e8956b500c44fe87e4c4884a7b964677794054aca37d5
+  checksum: 06409484fdff969e7661c17723a9a0bf70bdb030a32eaa45ceb5075aac1603eb3bd2a6b355617941181142327891243be2578b4da381acdebcdfcf4ac2c8b851
   languageName: node
   linkType: hard
 
@@ -2444,7 +2444,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"formidable@npm:^2.1.2":
+"formidable@npm:^2.1.1":
   version: 2.1.2
   resolution: "formidable@npm:2.1.2"
   dependencies:
@@ -4694,17 +4694,17 @@ __metadata:
     "@furystack/logging": ^4.0.2
     "@furystack/repository": ^7.0.2
     "@furystack/rest": ^5.0.2
-    "@furystack/rest-service": ^7.0.2
+    "@furystack/rest-service": ^7.0.3
     "@furystack/security": ^3.0.2
     "@furystack/sequelize-store": ^3.0.2
     "@furystack/utils": ^4.0.2
-    "@furystack/websocket-api": ^9.0.2
+    "@furystack/websocket-api": ^9.0.3
     "@types/formidable": ^2.0.5
     "@types/jest": ^29.5.1
     "@types/node": ^18.16.2
     chokidar: ^3.5.3
     common: "workspace:^"
-    formidable: ^2.1.2
+    formidable: ^2.1.1
     sequelize: ^6.31.0
     sqlite3: ^5.1.6
     typescript: ^5.0.4
