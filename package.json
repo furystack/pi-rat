@@ -63,10 +63,6 @@
     "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
     "dockerize": "docker build . --tag furystack/pi-rat:latest"
   },
-  "jest-junit": {
-    "suiteName": "FuryStack Jest tests",
-    "outputDirectory": "./coverage"
-  },
   "engines": {
     "node": ">=19.0.0"
   },
