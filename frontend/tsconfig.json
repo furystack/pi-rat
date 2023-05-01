@@ -8,7 +8,8 @@
     "jsx": "react",
     "jsxFactory": "createComponent",
     "jsxFragmentFactory": "createComponent",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": ["WebWorker", "DOM", "ES2021", "DOM.Iterable"]
   },
   "include": ["src", "src/**/*.json", "src/*.json"],
   "references": [{ "path": "../common" }]

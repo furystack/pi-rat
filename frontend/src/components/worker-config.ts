@@ -1,12 +1,7 @@
-// @ts-expect-error - Monaco doesn't have types for this
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-// @ts-expect-error - Monaco doesn't have types for this
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
-// @ts-expect-error - Monaco doesn't have types for this
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
-// @ts-expect-error - Monaco doesn't have types for this
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
-// @ts-expect-error - Monaco doesn't have types for this
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
 self.MonacoEnvironment = {
