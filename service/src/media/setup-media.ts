@@ -135,7 +135,7 @@ export const setupMovies = async (injector: Injector) => {
 
   logger.verbose({ message: '🎥  Setting up Media store and repository...' })
 
-  const dbOptions = getDefaultDbSettings('movies', logger)
+  const dbOptions = getDefaultDbSettings('movies.sqlite', logger)
 
   useSequelize({
     injector,

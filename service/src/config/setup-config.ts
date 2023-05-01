@@ -20,7 +20,7 @@ export const setupConfig = async (injector: Injector) => {
 
   logger.verbose({ message: '🔧  Setting up Config models and repository' })
 
-  const dbOptions = getDefaultDbSettings('config', logger)
+  const dbOptions = getDefaultDbSettings('config.sqlite', logger)
 
   useSequelize({
     injector,
