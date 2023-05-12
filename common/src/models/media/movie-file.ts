@@ -2,7 +2,7 @@ import type { FFProbeResult } from 'ffprobe'
 
 export class MovieFile {
   id!: string
-  movieId!: string
+  imdbId!: string
   driveLetter!: string
   path!: string
   ffprobe?: FFProbeResult | null = null

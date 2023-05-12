@@ -44,6 +44,10 @@ export const addDefaultDashboardPatcher: Patch = {
               type: 'entity-shortcut',
               entityName: 'user',
             },
+            {
+              type: 'entity-shortcut',
+              entityName: 'config',
+            },
           ],
         },
         {

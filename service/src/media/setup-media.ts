@@ -33,7 +33,7 @@ class MovieModel extends Model<Movie, Movie> implements Movie {
 
 class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare id: string
-  declare movieId: string
+  declare imdbId: string
   declare driveLetter: string
   declare path: string
   declare ffprobe?: FFProbeResult | null | undefined
@@ -218,7 +218,7 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: false,
             defaultValue: () => crypto.randomUUID(),
           },
-          movieId: {
+          imdbId: {
             type: DataTypes.STRING,
             allowNull: false,
           },
