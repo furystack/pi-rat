@@ -24,7 +24,7 @@ export class OmdbMovieMetadata {
   public Metascore!: string // '61'
   public imdbRating!: string // '6.7'
   public imdbVotes!: string // '422,380'
-  public imdbID!: string // 'tt0800080'
+  public imdbId!: string // 'tt0800080'
   public Type!: 'movie' | 'episode' // 'movie'
   DVD?: string // 'N/A'
   BoxOffice?: string // 'N/A'

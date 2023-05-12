@@ -1,9 +1,6 @@
 export class Movie {
-  id!: string
-  movieLibraryId!: string
-  path!: string
+  imdbId!: string
   title!: string
-  imdbId?: string
   year?: number
   duration?: number
   genre?: string[]

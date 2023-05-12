@@ -2,13 +2,13 @@ import type {
   RestApi,
   GetCollectionEndpoint,
   GetEntityEndpoint,
-  PostEndpoint,
   PatchEndpoint,
   DeleteEndpoint,
+  PostEndpoint,
 } from '@furystack/rest'
 import type {
   Movie,
-  MovieLibrary,
+  MovieFile,
   MovieWatchHistoryEntry,
   OmdbMovieMetadata,
   OmdbSeriesMetadata,
@@ -18,25 +18,25 @@ import type {
 export interface MediaApi extends RestApi {
   GET: {
     '/movies': GetCollectionEndpoint<Movie>
-    '/movies/:id': GetEntityEndpoint<Movie, 'id'>
+    '/movies/:id': GetEntityEndpoint<Movie, 'imdbId'>
     '/movies/:movieId/subtitles': { url: { movieId: string }; result: string[] }
     '/movies/:movieId/subtitles/:subtitleName': {
       url: { movieId: string; subtitleName: string }
       result: unknown
     }
-    '/movie-libraries': GetCollectionEndpoint<MovieLibrary>
-    '/movie-libraries/:id': GetEntityEndpoint<MovieLibrary, 'id'>
     '/stream-original/:movieId': { url: { movieId: string }; result: unknown }
     '/my-watch-progress': GetCollectionEndpoint<MovieWatchHistoryEntry>
     '/series': GetCollectionEndpoint<Series>
     '/series/:id': GetEntityEndpoint<Series, 'id'>
     '/omdb-movie-metadata': GetCollectionEndpoint<OmdbMovieMetadata>
-    '/omdb-movie-metadata/:id': GetEntityEndpoint<OmdbMovieMetadata, 'imdbID'>
+    '/omdb-movie-metadata/:id': GetEntityEndpoint<OmdbMovieMetadata, 'imdbId'>
     '/omdb-series-metadata': GetCollectionEndpoint<OmdbSeriesMetadata>
-    '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
+    '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbId'>
+    '/movie-files': GetCollectionEndpoint<MovieFile>
+    '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
   }
   POST: {
-    '/movie-libraries': PostEndpoint<MovieLibrary, 'id'>
+    '/movies': PostEndpoint<Movie, 'imdbId'>
     '/movies/:movieId/save-watch-progress': {
       url: { movieId: string }
       body: { watchProgressInSeconds: number }
@@ -44,13 +44,14 @@ export interface MediaApi extends RestApi {
     }
     '/movies/:movieId/re-fetch-metadata': { url: { movieId: string }; result: { success: boolean } }
     '/movies/:movieId/re-extract-subtitles': { url: { movieId: string }; result: { success: boolean } }
+    '/movie-files': PostEndpoint<MovieFile, 'id'>
   }
   PATCH: {
-    '/movies/:id': PatchEndpoint<Movie, 'id'>
-    '/movie-libraries/:id': PatchEndpoint<MovieLibrary, 'id'>
+    '/movies/:id': PatchEndpoint<Movie, 'imdbId'>
+    '/movie-files/:id': PatchEndpoint<MovieFile, 'id'>
   }
   DELETE: {
-    '/movies/:id': DeleteEndpoint<Movie, 'id'>
-    '/movie-libraries/:id': DeleteEndpoint<MovieLibrary, 'id'>
+    '/movies/:id': DeleteEndpoint<Movie, 'imdbId'>
+    '/movie-files/:id': DeleteEndpoint<MovieFile, 'id'>
   }
 }

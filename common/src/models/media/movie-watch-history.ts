@@ -1,9 +1,9 @@
 export class MovieWatchHistoryEntry {
   id!: string
   userName!: string
-  movieId!: string
-  startDate!: Date
-  lastWatchDate!: Date
+  imdbId!: string
+  driveLetter!: string
+  path!: string
   watchedSeconds!: number
   completed!: boolean
   createdAt!: string

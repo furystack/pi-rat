@@ -108,7 +108,10 @@
             "dasboard",
             "drive",
             "user",
-            "movie-library"
+            "movie",
+            "movie-file",
+            "omdb-movie-metadata",
+            "omdb-series-metadata"
           ]
         }
       },

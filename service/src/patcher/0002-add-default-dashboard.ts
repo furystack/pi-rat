@@ -30,7 +30,7 @@ export const addDefaultDashboardPatcher: Patch = {
         },
         {
           type: 'group',
-          title: 'Entities',
+          title: 'Main Entities',
           widgets: [
             {
               type: 'entity-shortcut',
@@ -43,6 +43,28 @@ export const addDefaultDashboardPatcher: Patch = {
             {
               type: 'entity-shortcut',
               entityName: 'user',
+            },
+          ],
+        },
+        {
+          type: 'group',
+          title: 'Media Entities',
+          widgets: [
+            {
+              type: 'entity-shortcut',
+              entityName: 'movie',
+            },
+            {
+              type: 'entity-shortcut',
+              entityName: 'movie-file',
+            },
+            {
+              type: 'entity-shortcut',
+              entityName: 'omdb-movie-metadata',
+            },
+            {
+              type: 'entity-shortcut',
+              entityName: 'omdb-series-metadata',
             },
           ],
         },

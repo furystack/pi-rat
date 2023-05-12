@@ -1,21 +1,21 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { MovieLibrary } from 'common'
+import { OmdbSeriesMetadata } from 'common'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 import mediaSchemas from 'common/schemas/media-entities.json'
 import { MediaApiClient } from '../../services/media-api-client.js'
 
-export const MovieLibrariesPage = Shade({
-  shadowDomName: 'shade-app-movie-libraries-page',
+export const OmdbSeriesMetadataPage = Shade({
+  shadowDomName: 'shade-app-omdb-series-metadata-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(MediaApiClient)
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
     const model = modelProvider.getModelForEntityType({
-      schemaName: 'MovieLibrary',
-      jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/MovieLibrary' },
+      schemaName: 'OmdbSeriesMetadata',
+      jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/OmdbSeriesMetadata' },
     })
 
     const service = useDisposable(
@@ -23,46 +23,43 @@ export const MovieLibrariesPage = Shade({
       () =>
         new GenericEditorService({
           defaultSettings: {},
-          model: MovieLibrary,
-          keyProperty: 'id',
+          model: OmdbSeriesMetadata,
+          keyProperty: 'imdbId',
           readonlyProperties: [],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',
-              action: '/movie-libraries',
+              action: '/omdb-series-metadata',
               query: { findOptions },
             })
             return result.result
           },
-          deleteEntities: async (id) => {
-            await api.call({ method: 'DELETE', action: `/movie-libraries/:id`, url: { id } })
+          deleteEntities: async () => {
+            // await api.call({ method: 'DELETE', action: `/om/:id`, url: { id } })
+            alert('Not supported')
           },
           getEntity: async (id) => {
-            const result = await api.call({ method: 'GET', action: `/movie-libraries/:id`, url: { id }, query: {} })
+            const result = await api.call({
+              method: 'GET',
+              action: `/omdb-series-metadata/:id`,
+              url: { id },
+              query: {},
+            })
             return result.result
           },
-          patchEntity: async (id, entity) => {
-            await api.call({
-              method: 'PATCH',
-              action: `/movie-libraries/:id`,
-              url: { id },
-              body: entity,
-            })
+          patchEntity: async () => {
+            alert('Not supported!')
           },
           postEntity: async (entity) => {
-            const { result } = await api.call({
-              method: 'POST',
-              action: `/movie-libraries`,
-              body: entity,
-            })
-            return result
+            alert('Not supported!')
+            return entity
           },
         }),
     )
     return (
       <GenericEditor
         service={service}
-        columns={['icon', 'name']}
+        columns={['imdbId', 'Title', 'Year', 'updatedAt']}
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}

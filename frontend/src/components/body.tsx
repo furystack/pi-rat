@@ -82,14 +82,53 @@ const adminRoutes: Array<Route<any>> = [
     ),
   },
   {
-    url: '/entities/movie-libraries',
+    url: '/entities/movies',
     onVisit,
     onLeave,
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { MovieLibrariesPage } = await import('../pages/entities/movie-libraries.js')
-          return <MovieLibrariesPage />
+          const { MoviesPage } = await import('../pages/entities/movies.js')
+          return <MoviesPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/movie-files',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { MovieFilesPage } = await import('../pages/entities/movie-files.js')
+          return <MovieFilesPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/omdb-movie-metadata',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { OmdbMovieMetadataPage } = await import('../pages/entities/omdb-movie-metadata.js')
+          return <OmdbMovieMetadataPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/omdb-series-metadata',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { OmdbSeriesMetadataPage } = await import('../pages/entities/omdb-series-metadata.js')
+          return <OmdbSeriesMetadataPage />
         }}
       />
     ),
