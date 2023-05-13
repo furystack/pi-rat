@@ -6721,7 +6721,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22movieId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -6737,7 +6737,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieFile,(\"id\"|\"movieId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\")[]>": {
+    "FindOptions<MovieFile,(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -6758,7 +6758,7 @@
                 "DESC"
               ]
             },
-            "movieId": {
+            "imdbId": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -6803,7 +6803,7 @@
             "type": "string",
             "enum": [
               "id",
-              "movieId",
+              "imdbId",
               "driveLetter",
               "path",
               "ffprobe",
@@ -6900,7 +6900,7 @@
             }
           ]
         },
-        "movieId": {
+        "imdbId": {
           "anyOf": [
             {
               "type": "object",
@@ -8194,7 +8194,7 @@
         "id": {
           "type": "string"
         },
-        "movieId": {
+        "imdbId": {
           "type": "string"
         },
         "driveLetter": {
@@ -8242,7 +8242,7 @@
       },
       "required": [
         "id",
-        "movieId",
+        "imdbId",
         "driveLetter",
         "path"
       ],
@@ -8260,7 +8260,7 @@
                 "type": "string",
                 "enum": [
                   "id",
-                  "movieId",
+                  "imdbId",
                   "driveLetter",
                   "path",
                   "ffprobe",
@@ -8395,7 +8395,7 @@
         "id": {
           "type": "string"
         },
-        "movieId": {
+        "imdbId": {
           "type": "string"
         },
         "driveLetter": {
@@ -8443,7 +8443,7 @@
       },
       "required": [
         "driveLetter",
-        "movieId",
+        "imdbId",
         "path"
       ]
     },
@@ -8567,7 +8567,7 @@
         "id": {
           "type": "string"
         },
-        "movieId": {
+        "imdbId": {
           "type": "string"
         },
         "driveLetter": {
