@@ -1,5 +1,5 @@
 export interface OmdbConfig {
-  id: 'OMDB_CONFIG'
+  type: 'OMDB_CONFIG'
   value: {
     apiKey: string
   }

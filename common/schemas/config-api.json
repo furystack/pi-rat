@@ -158,7 +158,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CConfig%2C(%22id%22%7C%22value%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CConfig%2C(%22type%22%7C%22value%22%7C%22id%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -174,7 +174,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<Config,(\"id\"|\"value\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<Config,(\"type\"|\"value\"|\"id\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -188,7 +188,7 @@
         "order": {
           "type": "object",
           "properties": {
-            "id": {
+            "type": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -196,6 +196,13 @@
               ]
             },
             "value": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "id": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -225,8 +232,9 @@
           "items": {
             "type": "string",
             "enum": [
-              "id",
+              "type",
               "value",
+              "id",
               "createdAt",
               "updatedAt"
             ]
@@ -268,6 +276,240 @@
           "items": {
             "$ref": "#/definitions/FilterType%3CConfig%3E"
           }
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "enum": [
+                    "OMDB_CONFIG",
+                    "GITHUB_CONFIG"
+                  ]
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "enum": [
+                    "OMDB_CONFIG",
+                    "GITHUB_CONFIG"
+                  ]
+                },
+                "$like": {
+                  "type": "string",
+                  "enum": [
+                    "OMDB_CONFIG",
+                    "GITHUB_CONFIG"
+                  ]
+                },
+                "$regex": {
+                  "type": "string",
+                  "enum": [
+                    "OMDB_CONFIG",
+                    "GITHUB_CONFIG"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "enum": [
+                    "OMDB_CONFIG",
+                    "GITHUB_CONFIG"
+                  ]
+                },
+                "$ne": {
+                  "type": "string",
+                  "enum": [
+                    "OMDB_CONFIG",
+                    "GITHUB_CONFIG"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "OMDB_CONFIG",
+                      "GITHUB_CONFIG"
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "OMDB_CONFIG",
+                      "GITHUB_CONFIG"
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "apiKey": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "apiKey"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "clientId": {
+                          "type": "string"
+                        },
+                        "clientSecret": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "clientId",
+                        "clientSecret"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "$ne": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "apiKey": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "apiKey"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "clientId": {
+                          "type": "string"
+                        },
+                        "clientSecret": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "clientId",
+                        "clientSecret"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "apiKey": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "apiKey"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "clientId": {
+                            "type": "string"
+                          },
+                          "clientSecret": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "clientId",
+                          "clientSecret"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "apiKey": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "apiKey"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "clientId": {
+                            "type": "string"
+                          },
+                          "clientSecret": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "clientId",
+                          "clientSecret"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         },
         "id": {
           "anyOf": [
@@ -314,40 +556,6 @@
                   "type": "array",
                   "items": {
                     "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "value": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "$ref": "#/definitions/ConfigType"
-                },
-                "$ne": {
-                  "$ref": "#/definitions/ConfigType"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/ConfigType"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/ConfigType"
                   }
                 }
               },
@@ -477,72 +685,6 @@
         }
       }
     },
-    "ConfigType": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/OmdbConfig"
-        },
-        {
-          "$ref": "#/definitions/GithubConfig"
-        }
-      ]
-    },
-    "OmdbConfig": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "const": "OMDB_CONFIG"
-        },
-        "value": {
-          "type": "object",
-          "properties": {
-            "apiKey": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "apiKey"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "id",
-        "value"
-      ],
-      "additionalProperties": false
-    },
-    "GithubConfig": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "const": "GITHUB_CONFIG"
-        },
-        "value": {
-          "type": "object",
-          "properties": {
-            "clientId": {
-              "type": "string"
-            },
-            "clientSecret": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "clientId",
-            "clientSecret"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "id",
-        "value"
-      ],
-      "additionalProperties": false
-    },
     "GetCollectionResult<Config>": {
       "type": "object",
       "properties": {
@@ -568,11 +710,47 @@
     "Config": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "type": {
+          "type": "string",
+          "enum": [
+            "OMDB_CONFIG",
+            "GITHUB_CONFIG"
+          ]
         },
         "value": {
-          "$ref": "#/definitions/ConfigType"
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "apiKey"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "clientId": {
+                  "type": "string"
+                },
+                "clientSecret": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -584,8 +762,9 @@
         }
       },
       "required": [
-        "id",
+        "type",
         "value",
+        "id",
         "createdAt",
         "updatedAt"
       ],
@@ -602,8 +781,9 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "id",
+                  "type",
                   "value",
+                  "id",
                   "createdAt",
                   "updatedAt"
                 ]
@@ -656,13 +836,49 @@
       "description": "Endpoint model for creating new entities"
     },
     "Omit<WithOptionalId<Config,(\"createdAt\"|\"updatedAt\")>,\"id\">": {
-      "$ref": "#/definitions/Pick%3CWithOptionalId%3CConfig%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2CExclude%3C(%22id%22%7C%22value%22%7C%22createdAt%22%7C%22updatedAt%22)%2C%22id%22%3E%3E"
+      "$ref": "#/definitions/Pick%3CWithOptionalId%3CConfig%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2CExclude%3C(%22type%22%7C%22value%22%7C%22id%22%7C%22createdAt%22%7C%22updatedAt%22)%2C%22id%22%3E%3E"
     },
-    "Pick<WithOptionalId<Config,(\"createdAt\"|\"updatedAt\")>,Exclude<(\"id\"|\"value\"|\"createdAt\"|\"updatedAt\"),\"id\">>": {
+    "Pick<WithOptionalId<Config,(\"createdAt\"|\"updatedAt\")>,Exclude<(\"type\"|\"value\"|\"id\"|\"createdAt\"|\"updatedAt\"),\"id\">>": {
       "type": "object",
       "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "OMDB_CONFIG",
+            "GITHUB_CONFIG"
+          ]
+        },
         "value": {
-          "$ref": "#/definitions/ConfigType"
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "apiKey"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "clientId": {
+                  "type": "string"
+                },
+                "clientSecret": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
+              "additionalProperties": false
+            }
+          ]
         },
         "createdAt": {
           "type": "string",
@@ -674,6 +890,7 @@
         }
       },
       "required": [
+        "type",
         "value"
       ],
       "additionalProperties": false
@@ -712,11 +929,47 @@
     "Partial<Config>": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "type": {
+          "type": "string",
+          "enum": [
+            "OMDB_CONFIG",
+            "GITHUB_CONFIG"
+          ]
         },
         "value": {
-          "$ref": "#/definitions/ConfigType"
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "apiKey"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "clientId": {
+                  "type": "string"
+                },
+                "clientSecret": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
         },
         "createdAt": {
           "type": "string",

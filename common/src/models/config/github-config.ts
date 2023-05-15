@@ -1,5 +1,5 @@
 export interface GithubConfig {
-  id: 'GITHUB_CONFIG'
+  type: 'GITHUB_CONFIG'
   value: {
     clientId: string
     clientSecret: string

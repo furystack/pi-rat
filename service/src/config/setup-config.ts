@@ -9,8 +9,9 @@ import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { withRole } from '../authorization/with-role.js'
 
 class ConfigModel extends Model<Config, Config> implements Config {
+  declare type: ConfigType['type']
   declare id: string
-  declare value: ConfigType
+  declare value: ConfigType['value']
   declare createdAt: Date
   declare updatedAt: Date
 }
@@ -48,8 +49,12 @@ export const setupConfig = async (injector: Injector) => {
             type: DataTypes.DATE,
             allowNull: false,
           },
+          type: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
         },
-        { sequelize },
+        { sequelize, indexes: [{ unique: true, fields: ['type'] }] },
       )
       await sequelize.sync()
     },

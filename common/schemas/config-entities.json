@@ -4,7 +4,7 @@
     "OmdbConfig": {
       "type": "object",
       "properties": {
-        "id": {
+        "type": {
           "type": "string",
           "const": "OMDB_CONFIG"
         },
@@ -22,7 +22,7 @@
         }
       },
       "required": [
-        "id",
+        "type",
         "value"
       ],
       "additionalProperties": false
@@ -30,7 +30,7 @@
     "GithubConfig": {
       "type": "object",
       "properties": {
-        "id": {
+        "type": {
           "type": "string",
           "const": "GITHUB_CONFIG"
         },
@@ -52,7 +52,7 @@
         }
       },
       "required": [
-        "id",
+        "type",
         "value"
       ],
       "additionalProperties": false
@@ -70,11 +70,47 @@
     "Config": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "type": {
+          "type": "string",
+          "enum": [
+            "OMDB_CONFIG",
+            "GITHUB_CONFIG"
+          ]
         },
         "value": {
-          "$ref": "#/definitions/ConfigType"
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "apiKey"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "clientId": {
+                  "type": "string"
+                },
+                "clientSecret": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -86,8 +122,9 @@
         }
       },
       "required": [
-        "id",
+        "type",
         "value",
+        "id",
         "createdAt",
         "updatedAt"
       ],

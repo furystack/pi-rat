@@ -25,7 +25,7 @@ export const ConfigPage = Shade({
           defaultSettings: {},
           model: Config,
           keyProperty: 'id',
-          readonlyProperties: ['createdAt', 'updatedAt'],
+          readonlyProperties: ['id', 'createdAt', 'updatedAt'],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',
@@ -53,7 +53,10 @@ export const ConfigPage = Shade({
             const { result } = await api.call({
               method: 'POST',
               action: `/config`,
-              body: entity,
+              body: {
+                type: entity.type,
+                value: entity.value,
+              },
             })
             return result
           },
@@ -62,14 +65,10 @@ export const ConfigPage = Shade({
     return (
       <GenericEditor
         service={service}
-        columns={['id', 'value', 'createdAt', 'updatedAt']}
+        columns={['id', 'type', 'value', 'createdAt', 'updatedAt']}
         headerComponents={{}}
         styles={{}}
-        rowComponents={{
-          value: ({ value }) => {
-            return <>{value.id}</>
-          },
-        }}
+        rowComponents={{}}
         model={model}
       />
     )
