@@ -1,8 +1,8 @@
 import { Injectable, Injected } from '@furystack/inject'
-import { DashboardsApiClient } from '../../services/api-clients/dashboards-api-client.js'
 import { Cache } from '@furystack/cache'
 import type { Dashboard } from 'common'
 import type { FindOptions, WithOptionalId } from '@furystack/core'
+import { DashboardsApiClient } from './api-clients/dashboards-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class DashboardService {

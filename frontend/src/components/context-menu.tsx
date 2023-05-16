@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { ClickAwayService, Paper, expand, collapse } from '@furystack/shades-common-components'
+import { Paper, expand, collapse } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 
 type MenuItemProps = {
@@ -13,7 +13,13 @@ const MenuItem = Shade<MenuItemProps>({
   render: ({ props }) => {
     return (
       <div
-        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '8px', cursor: 'pointer' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: '8px',
+          cursor: 'pointer',
+        }}
         onmouseenter={(ev) => {
           ;(ev.target as HTMLElement).style.backgroundColor = 'rgba(0,0,0,0.1)'
         }}
@@ -21,30 +27,41 @@ const MenuItem = Shade<MenuItemProps>({
           ;(ev.target as HTMLElement).style.backgroundColor = 'transparent'
         }}
         onclick={props.onClick}>
-        <div style={{ paddingRight: '8px' }}>{props.icon}</div>
-        <div>{props.label}</div>
+        <div
+          style={{
+            minWidth: '24px',
+            paddingRight: '8px',
+            textAlign: 'center',
+            lineHeight: '100%',
+          }}>
+          {props.icon}
+        </div>
+        <div style={{ lineHeight: '100%' }}>{props.label}</div>
       </div>
     )
   },
 })
 
 type ContextMenuProps = {
-  // content: JSX.Element
   items: MenuItemProps[]
 }
 
 export const ContextMenu = Shade<ContextMenuProps>({
   shadowDomName: 'shade-app-context-menu',
-  constructed: ({ element, useDisposable }) => {
+  constructed: ({ useDisposable }) => {
     const isOpen = useDisposable('isOpen', () => new ObservableValue(false))
 
-    useDisposable(
-      'clickAway',
-      () =>
-        new ClickAwayService(element.querySelector('.menuItems') as HTMLElement, () => {
-          isOpen.setValue(false)
-        }),
-    )
+    const listener = (_ev: MouseEvent) => {
+      isOpen.setValue(false)
+    }
+
+    window.addEventListener('click', listener)
+    window.addEventListener('contextmenu', listener)
+
+    return () => {
+      window.removeEventListener('click', listener)
+      window.removeEventListener('contextmenu', listener)
+    }
   },
   render: ({ props, useDisposable, children, element }) => {
     const { items } = props
@@ -74,11 +91,13 @@ export const ContextMenu = Shade<ContextMenuProps>({
       <div
         oncontextmenu={(ev) => {
           ev.preventDefault()
-          const menu = element.querySelector('.menuItems') as HTMLUListElement
-          menu.style.display = 'block'
-          menu.style.top = `${ev.clientY}px`
-          menu.style.left = `${ev.clientX}px`
-          isOpen.setValue(true)
+          setTimeout(() => {
+            const menu = element.querySelector('.menuItems') as HTMLUListElement
+            menu.style.display = 'block'
+            menu.style.top = `${ev.clientY}px`
+            menu.style.left = `${ev.clientX}px`
+            isOpen.setValue(true)
+          })
         }}>
         <Paper
           className="menuItems"

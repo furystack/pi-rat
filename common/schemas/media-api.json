@@ -142,7 +142,7 @@
           "type": "object",
           "properties": {
             "/movies": {
-              "$ref": "#/definitions/PostEndpoint%3CMovie%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/PostEndpoint%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22imdbId%22%3E"
             },
             "/movies/:movieId/save-watch-progress": {
               "type": "object",
@@ -276,7 +276,7 @@
           "type": "object",
           "properties": {
             "/movies/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CMovie%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/PatchEndpoint%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22imdbId%22%3E"
             },
             "/movie-files/:id": {
               "$ref": "#/definitions/PatchEndpoint%3CMovieFile%2C%22id%22%3E"
@@ -8297,14 +8297,14 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "PostEndpoint<Movie,\"imdbId\">": {
+    "PostEndpoint<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/WithOptionalId%3CMovie%2C%22imdbId%22%3E"
+          "$ref": "#/definitions/WithOptionalId%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22imdbId%22%3E"
         },
         "result": {
-          "$ref": "#/definitions/Movie"
+          "$ref": "#/definitions/Omit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
         }
       },
       "required": [
@@ -8314,7 +8314,7 @@
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
-    "WithOptionalId<Movie,\"imdbId\">": {
+    "WithOptionalId<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -8357,19 +8357,64 @@
         },
         "episode": {
           "type": "number"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
         }
       },
       "required": [
-        "createdAt",
-        "title",
-        "updatedAt"
+        "title"
       ]
+    },
+    "Omit<Movie,(\"createdAt\"|\"updatedAt\")>": {
+      "$ref": "#/definitions/Pick%3CMovie%2CExclude%3C(%22imdbId%22%7C%22title%22%7C%22year%22%7C%22duration%22%7C%22genre%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+    },
+    "Pick<Movie,Exclude<(\"imdbId\"|\"title\"|\"year\"|\"duration\"|\"genre\"|\"thumbnailImageUrl\"|\"plot\"|\"type\"|\"seriesId\"|\"season\"|\"episode\"|\"createdAt\"|\"updatedAt\"),(\"createdAt\"|\"updatedAt\")>>": {
+      "type": "object",
+      "properties": {
+        "imdbId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "year": {
+          "type": "number"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "genre": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "thumbnailImageUrl": {
+          "type": "string"
+        },
+        "plot": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "movie",
+            "episode"
+          ]
+        },
+        "seriesId": {
+          "type": "string"
+        },
+        "season": {
+          "type": "number"
+        },
+        "episode": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "imdbId",
+        "title"
+      ],
+      "additionalProperties": false
     },
     "PostEndpoint<MovieFile,\"id\">": {
       "type": "object",
@@ -8447,11 +8492,11 @@
         "path"
       ]
     },
-    "PatchEndpoint<Movie,\"imdbId\">": {
+    "PatchEndpoint<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/Partial%3CMovie%3E"
+          "$ref": "#/definitions/Partial%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
         },
         "url": {
           "type": "object",
@@ -8478,7 +8523,7 @@
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
-    "Partial<Movie>": {
+    "Partial<Omit<Movie,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
         "imdbId": {
@@ -8520,12 +8565,6 @@
         },
         "episode": {
           "type": "number"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
         }
       },
       "additionalProperties": false

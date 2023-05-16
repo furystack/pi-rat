@@ -36,7 +36,7 @@ export interface MediaApi extends RestApi {
     '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
   }
   POST: {
-    '/movies': PostEndpoint<Movie, 'imdbId'>
+    '/movies': PostEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
     '/movies/:movieId/save-watch-progress': {
       url: { movieId: string }
       body: { watchProgressInSeconds: number }
@@ -47,7 +47,7 @@ export interface MediaApi extends RestApi {
     '/movie-files': PostEndpoint<MovieFile, 'id'>
   }
   PATCH: {
-    '/movies/:id': PatchEndpoint<Movie, 'imdbId'>
+    '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
     '/movie-files/:id': PatchEndpoint<MovieFile, 'id'>
   }
   DELETE: {
