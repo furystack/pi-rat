@@ -4,6 +4,7 @@ import { environmentOptions } from '../environment-options.js'
 import { SessionService } from '../services/session.js'
 import { GithubLogo } from './github-logo/index.js'
 import { ThemeSwitch } from './theme-switch/index.js'
+import { PiRatCommandPalette } from './command-palette/index.js'
 
 export interface HeaderProps {
   title: string
@@ -46,7 +47,10 @@ export const Header = Shade<HeaderProps>({
             <AdminLinks />
           </>
         ) : null}
-        <div style={{ flex: '1' }} />
+
+        <div style={{ flex: '1' }}>
+          <PiRatCommandPalette />
+        </div>
         <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
           <ThemeSwitch variant="outlined" />
           <a href={environmentOptions.repository} target="_blank">

@@ -3,7 +3,7 @@ import { User } from 'common'
 import identitySchemas from 'common/schemas/identity-entities.json'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
-import { IdentityApiClient } from '../../services/identity-api-client.js'
+import { IdentityApiClient } from '../../services/api-clients/identity-api-client.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const UsersPage = Shade({

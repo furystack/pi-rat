@@ -2,7 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
 import { Input } from '@furystack/shades-common-components'
 import { WizardStep } from '../components/wizard-step.js'
-import { InstallApiClient } from '../services/install-api-client.js'
+import { InstallApiClient } from '../services/api-clients/install-api-client.js'
 
 export const CreateAdminStep = Shade<WizardStepProps>({
   shadowDomName: 'create-admin-step',

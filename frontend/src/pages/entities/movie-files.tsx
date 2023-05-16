@@ -4,7 +4,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 import mediaSchemas from 'common/schemas/media-entities.json'
-import { MediaApiClient } from '../../services/media-api-client.js'
+import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
 
 export const MovieFilesPage = Shade({
   shadowDomName: 'shade-app-movie-files-page',

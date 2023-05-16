@@ -3,7 +3,7 @@ import { Config } from 'common'
 import configSchemas from 'common/schemas/config-entities.json'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
-import { ConfigApiClient } from '../../services/config-api-client.js'
+import { ConfigApiClient } from '../../services/api-clients/config-api-client.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const ConfigPage = Shade({
