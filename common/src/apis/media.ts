@@ -15,6 +15,23 @@ import type {
   Series,
 } from '../models/media/index.js'
 
+export type FetchOmdbMovie = {
+  body: {
+    title: string
+    year?: number
+    season?: number
+    episode?: number
+  }
+  result: OmdbMovieMetadata
+}
+
+export type FetchOmdbSeries = {
+  body: {
+    imdbId: string
+  }
+  result: OmdbSeriesMetadata
+}
+
 export interface MediaApi extends RestApi {
   GET: {
     '/movies': GetCollectionEndpoint<Movie>
@@ -36,7 +53,7 @@ export interface MediaApi extends RestApi {
     '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
   }
   POST: {
-    '/movies': PostEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
+    '/movies': PostEndpoint<Movie, 'imdbId', Omit<Movie, 'createdAt' | 'updatedAt'>>
     '/movies/:movieId/save-watch-progress': {
       url: { movieId: string }
       body: { watchProgressInSeconds: number }
@@ -45,6 +62,8 @@ export interface MediaApi extends RestApi {
     '/movies/:movieId/re-fetch-metadata': { url: { movieId: string }; result: { success: boolean } }
     '/movies/:movieId/re-extract-subtitles': { url: { movieId: string }; result: { success: boolean } }
     '/movie-files': PostEndpoint<MovieFile, 'id'>
+    '/omdb/movie': FetchOmdbMovie
+    '/omdb/series': FetchOmdbSeries
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>

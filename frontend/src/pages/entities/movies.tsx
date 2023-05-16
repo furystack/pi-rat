@@ -25,7 +25,7 @@ export const MoviesPage = Shade({
           defaultSettings: {},
           model: Movie,
           keyProperty: 'imdbId',
-          readonlyProperties: [],
+          readonlyProperties: ['createdAt', 'updatedAt'],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',

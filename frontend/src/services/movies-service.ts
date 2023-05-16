@@ -65,7 +65,7 @@ export class MoviesService {
     return result
   }
 
-  public createMovie = async (body: Omit<WithOptionalId<Movie, 'imdbId'>, 'createdAt' | 'updatedAt'>) => {
+  public createMovie = async (body: Omit<Movie, 'createdAt' | 'updatedAt'>) => {
     const { result } = await this.mediaApiClient.call({
       method: 'POST',
       action: '/movies',

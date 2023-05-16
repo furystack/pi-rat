@@ -1,10 +1,6 @@
 export class FallbackMetadata {
   title!: string
   year?: number
-  duration?: number
-  genre!: string[]
-  thumbnailImageUrl!: string
-  plot!: string
   type!: 'movie' | 'episode'
   seriesId?: string
   season?: number
@@ -27,9 +23,6 @@ export const getFallbackMetaWithScore = (segment: string): { meta: FallbackMetad
       score: -1,
       meta: {
         title: '',
-        genre: [],
-        thumbnailImageUrl: '',
-        plot: '',
         type: 'movie',
       },
     }
@@ -54,10 +47,6 @@ export const getFallbackMetaWithScore = (segment: string): { meta: FallbackMetad
     meta: {
       title,
       year,
-      genre: [],
-      duration: 0,
-      thumbnailImageUrl: '',
-      plot: '',
       ...(season && episode
         ? {
             type: 'episode',

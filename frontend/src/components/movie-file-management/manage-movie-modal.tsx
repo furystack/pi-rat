@@ -89,7 +89,7 @@ export const ManageMovieModal = Shade<ManageMovieModalProps>({
               </div>
             )}
             <div style={{ width: '100%', borderBottom: '1px solid rgba(128,128,128,0.5)', margin: '1em 0' }} />
-            <MovieStatus status={movieStatus} />
+            <MovieStatus movie={movieStatus} metadata={movieMetadata} />
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
               <Button onclick={() => isOpened.setValue(false)}>Close</Button>
             </div>

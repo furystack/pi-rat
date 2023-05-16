@@ -1,5 +1,6 @@
 import type { Injector } from '@furystack/inject'
 import {
+  Authorize,
   Validate,
   createDeleteEndpoint,
   createGetCollectionEndpoint,
@@ -14,6 +15,8 @@ import mediaApiSchema from 'common/schemas/media-api.json' assert { type: 'json'
 import { Movie, MovieWatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
+import { FetchOmdbMovieAction } from './actions/fetch-omdb-movie.js'
+import { FetchOmdbSeriesAction } from './actions/fetch-omdb-series.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -68,20 +71,28 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         ),
       },
       POST: {
-        '/movies': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<Movie,"imdbId">' })(
-          createPostEndpoint({ model: Movie, primaryKey: 'imdbId' }),
-        ),
+        '/movies': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'PostEndpoint<Omit<Movie,("createdAt"|"updatedAt")>,"imdbId">',
+        })(createPostEndpoint({ model: Movie, primaryKey: 'imdbId' })),
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<MovieFile,"id">' })(
           createPostEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
         '/movies/:movieId/re-extract-subtitles': () => null as any, // TODO: Implement
         '/movies/:movieId/re-fetch-metadata': () => null as any, // TODO: Implement
         '/movies/:movieId/save-watch-progress': () => null as any, // TODO: Implement
+        '/omdb/movie': Authorize('admin')(
+          Validate({ schema: mediaApiSchema, schemaName: 'FetchOmdbMovie' })(FetchOmdbMovieAction),
+        ),
+        '/omdb/series': Authorize('admin')(
+          Validate({ schema: mediaApiSchema, schemaName: 'FetchOmdbSeries' })(FetchOmdbSeriesAction),
+        ),
       },
       PATCH: {
-        '/movies/:id': Validate({ schema: mediaApiSchema, schemaName: 'PatchEndpoint<Movie,"imdbId">' })(
-          createPatchEndpoint({ model: Movie, primaryKey: 'imdbId' }),
-        ),
+        '/movies/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'PatchEndpoint<Omit<Movie,("createdAt"|"updatedAt")>,"imdbId">',
+        })(createPatchEndpoint({ model: Movie, primaryKey: 'imdbId' })),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'PatchEndpoint<MovieFile,"id">' })(
           createPatchEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),

@@ -3,8 +3,8 @@ import { Dashboard } from 'common'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
-import { DashboardService } from '../../components/dashboard/dashboards-service.js'
 import dashboardSchemas from 'common/schemas/dashboard-entities.json'
+import { DashboardService } from '../../services/dashboards-service.js'
 
 export const DashboardsPage = Shade({
   shadowDomName: 'shade-app-dashboards-page',
