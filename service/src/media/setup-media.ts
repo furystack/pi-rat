@@ -14,6 +14,7 @@ import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
 import type { FFProbeResult } from 'ffprobe'
+import { OmdbClientService } from './metadata-services/omdb-client-service.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
   declare title: string
@@ -677,6 +678,8 @@ export const setupMovies = async (injector: Injector) => {
     authorizeUpdate: withRole('admin'),
     authorizeRemove: withRole('admin'),
   })
+
+  await injector.getInstance(OmdbClientService).init(injector)
 
   logger.verbose({ message: '✅  Media setup completed' })
 }
