@@ -16,18 +16,17 @@ interface ManageMovieModalProps {
 
 export const ManageMovieModal = Shade<ManageMovieModalProps>({
   shadowDomName: 'shade-app-manage-movie-modal',
-  render: ({ props, injector, useObservable, useDisposable }) => {
+  render: ({ props, injector, useObservable }) => {
     const { isOpened, drive, file, path } = props
-
-    const [isOpenedValue] = useObservable('isOpened', isOpened)
 
     const fullPath = `${drive}:${path}/${file.name}`
     const movieMetadata = isMovieFile(fullPath) && getFallbackMetadata(fullPath)
 
-    if (!movieMetadata || !isOpenedValue) return null
+    if (!movieMetadata) return null
 
     const movieService = injector.getInstance(MoviesService)
-    const movieStatus = useDisposable('movieStatus', () =>
+    const [movieStatus] = useObservable(
+      'movieStatus',
       movieService.findMovieAsObservable({
         filter: {
           title: { $eq: movieMetadata.title },

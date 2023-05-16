@@ -2,19 +2,19 @@ import type { CacheResult } from '@furystack/cache'
 import type { GetCollectionResult } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Skeleton } from '@furystack/shades-common-components'
-import type { ObservableValue } from '@furystack/utils'
 import type { Movie } from 'common'
 import { ErrorDisplay } from '../error-display.js'
 import { InstallService } from '../../services/install-service.js'
 
-export const MovieStatus = Shade<{ status: ObservableValue<CacheResult<GetCollectionResult<Movie>>> }>({
+export const MovieStatus = Shade<{ status: CacheResult<GetCollectionResult<Movie>> }>({
   shadowDomName: 'shade-app-movie-status',
   render: ({ props, injector, useObservable }) => {
-    const [movie] = useObservable('status', props.status)
     const [serviceStatus] = useObservable(
       'serviceStatus',
       injector.getInstance(InstallService).getServiceStatusAsObservable(),
     )
+
+    const movie = props.status
 
     return (
       <div>
