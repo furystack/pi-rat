@@ -2,8 +2,35 @@ import { createComponent, Shade } from '@furystack/shades'
 import { ClickAwayService, Paper, expand, collapse } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 
+type MenuItemProps = {
+  icon: string
+  label: string
+  onClick: () => void
+}
+
+const MenuItem = Shade<MenuItemProps>({
+  shadowDomName: 'shade-app-menu-item',
+  render: ({ props }) => {
+    return (
+      <div
+        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '8px', cursor: 'pointer' }}
+        onmouseenter={(ev) => {
+          ;(ev.target as HTMLElement).style.backgroundColor = 'rgba(0,0,0,0.1)'
+        }}
+        onmouseleave={(ev) => {
+          ;(ev.target as HTMLElement).style.backgroundColor = 'transparent'
+        }}
+        onclick={props.onClick}>
+        <div style={{ paddingRight: '8px' }}>{props.icon}</div>
+        <div>{props.label}</div>
+      </div>
+    )
+  },
+})
+
 type ContextMenuProps = {
-  content: JSX.Element
+  // content: JSX.Element
+  items: MenuItemProps[]
 }
 
 export const ContextMenu = Shade<ContextMenuProps>({
@@ -20,7 +47,7 @@ export const ContextMenu = Shade<ContextMenuProps>({
     )
   },
   render: ({ props, useDisposable, children, element }) => {
-    const { content } = props
+    const { items } = props
 
     const isOpen = useDisposable('isOpen', () => new ObservableValue(false))
 
@@ -66,7 +93,9 @@ export const ContextMenu = Shade<ContextMenuProps>({
             background: 'rgba(0,0,0,0.07)',
             backdropFilter: 'blur(20px)',
           }}>
-          {content}
+          {items.map((itemProps) => (
+            <MenuItem {...itemProps} />
+          ))}
         </Paper>
         {children}
       </div>

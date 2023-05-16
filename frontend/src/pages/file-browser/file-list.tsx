@@ -7,6 +7,7 @@ import { SessionService } from '../../services/session.js'
 import { BreadCrumbs } from './breadcrumbs.js'
 import { DirectoryEntryIcon } from './directory-entry-icon.js'
 import { DrivesService } from '../../services/drives-service.js'
+import { FileContextMenu } from './file-context-menu.js'
 
 export const FileList = Shade<{
   currentDriveLetter: string
@@ -20,8 +21,6 @@ export const FileList = Shade<{
 
     const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
-
-    // const [entries] = useObservable('entries', drivesService.getFileListAsObservable(currentDriveLetter, currentPath))
 
     const service = useDisposable(
       'service',
@@ -172,25 +171,31 @@ export const FileList = Shade<{
           styles={{}}
           rowComponents={{
             id: (entry) => (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  gap: '16px',
-                }}
-                title={entry.name}>
-                <div>
-                  <SelectionCell entry={entry} service={service} />
+              <FileContextMenu
+                entry={entry}
+                currentDriveLetter={currentDriveLetter}
+                currentPath={currentPath}
+                open={activate}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: '16px',
+                  }}
+                  title={entry.name}>
+                  <div>
+                    <SelectionCell entry={entry} service={service} />
+                  </div>
+                  <div>
+                    <DirectoryEntryIcon entry={entry} />
+                  </div>
+                  <div style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '35vw', overflow: 'hidden' }}>
+                    {entry.name}
+                  </div>
                 </div>
-                <div>
-                  <DirectoryEntryIcon entry={entry} />
-                </div>
-                <div style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '35vw', overflow: 'hidden' }}>
-                  {entry.name}
-                </div>
-              </div>
+              </FileContextMenu>
             ),
           }}
         />
