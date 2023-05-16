@@ -15,9 +15,11 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
   constructed: ({ element, props, injector, useState }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
 
-    const [theme] = useState<'light' | 'dark'>(
+    const [theme] = useState<'vs-light' | 'vs-dark'>(
       'theme',
-      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default ? 'dark' : 'light',
+      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
+        ? 'vs-dark'
+        : 'vs-light',
     )
 
     const editorInstance = editor.create(element as HTMLElement, { ...props.options, theme })

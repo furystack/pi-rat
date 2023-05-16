@@ -56,7 +56,16 @@ export const ContextMenu = Shade<ContextMenuProps>({
         <Paper
           className="menuItems"
           elevation={3}
-          style={{ display: 'none', opacity: '0', position: 'fixed', zIndex: '1', margin: '0' }}>
+          style={{
+            display: 'none',
+            opacity: '0',
+            position: 'fixed',
+            zIndex: '1',
+            margin: '0',
+            padding: '0',
+            background: 'rgba(0,0,0,0.07)',
+            backdropFilter: 'blur(20px)',
+          }}>
           {content}
         </Paper>
         {children}

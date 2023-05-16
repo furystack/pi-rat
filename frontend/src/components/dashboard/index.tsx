@@ -10,7 +10,11 @@ export const Dashboard = Shade<DashboardData>({
     return (
       <ContextMenu
         content={
-          <RouteLink href={`/entities/dashboards?mode=edit&currentId=${props.id}`}>📝 Edit this dashboard</RouteLink>
+          <div style={{ display: 'flex' }}>
+            <RouteLink style={{ padding: '16px' }} href={`/entities/dashboards?mode=edit&currentId=${props.id}`}>
+              📝 Edit this dashboard
+            </RouteLink>
+          </div>
         }>
         <Paper
           style={{
