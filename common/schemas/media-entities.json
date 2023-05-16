@@ -106,9 +106,6 @@
     "MovieFile": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "imdbId": {
           "type": "string"
         },
@@ -116,6 +113,9 @@
           "type": "string"
         },
         "path": {
+          "type": "string"
+        },
+        "fileName": {
           "type": "string"
         },
         "ffprobe": {
@@ -156,10 +156,10 @@
         }
       },
       "required": [
-        "id",
         "imdbId",
         "driveLetter",
-        "path"
+        "path",
+        "fileName"
       ],
       "additionalProperties": false
     },
@@ -1193,7 +1193,7 @@
         "imdbVotes": {
           "type": "string"
         },
-        "imdbId": {
+        "imdbID": {
           "type": "string"
         },
         "Type": {
@@ -1254,7 +1254,7 @@
         "Metascore",
         "imdbRating",
         "imdbVotes",
-        "imdbId",
+        "imdbID",
         "Type",
         "Response",
         "createdAt",
@@ -1345,7 +1345,7 @@
         "imdbVotes": {
           "type": "string"
         },
-        "imdbId": {
+        "imdbID": {
           "type": "string"
         },
         "Type": {
@@ -1383,7 +1383,7 @@
         "Metascore",
         "imdbRating",
         "imdbVotes",
-        "imdbId",
+        "imdbID",
         "Type",
         "totalSeasons",
         "Response",
@@ -1395,9 +1395,6 @@
     "Series": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "imdbId": {
           "type": "string"
         },
@@ -1421,7 +1418,6 @@
         }
       },
       "required": [
-        "id",
         "imdbId",
         "title",
         "year",

@@ -4,7 +4,7 @@ import type { DirectoryEntry } from 'common'
 import { isMovieFile, getFallbackMetadata } from 'common'
 import { ObservableValue } from '@furystack/utils'
 import { FileInfoModal } from './file-info-modal.js'
-import { ManageMovieModal } from '../../components/movie-file-management/manage-movie-modal.js'
+import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
 
 export const FileContextMenu = Shade<{
   entry: DirectoryEntry
@@ -16,10 +16,10 @@ export const FileContextMenu = Shade<{
   render: ({ children, props, useDisposable }) => {
     const { entry, currentDriveLetter, currentPath, open } = props
     const isInfoVisible = useDisposable('isInfoVisible', () => new ObservableValue(false))
-    const isManageMovieVisible = useDisposable('isManageMovieVisible', () => new ObservableValue(false))
+    const isRelatedMoviesVisible = useDisposable('isRelatedMoviesVisible', () => new ObservableValue(false))
 
     const path = `${currentDriveLetter}:${currentPath}/${entry.name}`
-    const movieMetadata = isMovieFile(path) && getFallbackMetadata(path)
+    const movieMetadata = props.entry.isFile && isMovieFile(path) && getFallbackMetadata(path)
 
     return (
       <>
@@ -37,9 +37,9 @@ export const FileContextMenu = Shade<{
               ? [
                   {
                     icon: '🎥',
-                    label: `Manage Movie: ${movieMetadata.title}`,
+                    label: `Related Movies (${movieMetadata.title})`,
                     onClick: () => {
-                      isManageMovieVisible.setValue(true)
+                      isRelatedMoviesVisible.setValue(true)
                     },
                   },
                 ]
@@ -61,11 +61,11 @@ export const FileContextMenu = Shade<{
           currentPath={currentPath}
         />
         {movieMetadata && (
-          <ManageMovieModal
+          <RelatedMoviesModal
             drive={currentDriveLetter}
             path={currentPath}
             file={entry}
-            isOpened={isManageMovieVisible}
+            isOpened={isRelatedMoviesVisible}
           />
         )}
       </>

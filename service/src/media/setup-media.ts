@@ -33,10 +33,10 @@ class MovieModel extends Model<Movie, Movie> implements Movie {
 }
 
 class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
-  declare id: string
   declare imdbId: string
   declare driveLetter: string
   declare path: string
+  declare fileName: string
   declare ffprobe?: FFProbeResult | null | undefined
   declare relatedFiles?: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> | undefined
 }
@@ -50,7 +50,6 @@ class MovieWatchHistoryEntryModel
   declare path: string
   declare id: string
   declare userName: string
-  declare movieId: string
   declare movie: Movie
   declare watchedSeconds: number
   declare completed: boolean
@@ -59,7 +58,6 @@ class MovieWatchHistoryEntryModel
 }
 
 class SeriesModel extends Model<Series, Series> implements Series {
-  declare id: string
   declare imdbId: string
   declare title: string
   declare year: string
@@ -88,13 +86,14 @@ class OmdbMovieMetadataModel extends Model<OmdbMovieMetadata, OmdbMovieMetadata>
   declare Metascore: string
   declare imdbRating: string
   declare imdbVotes: string
-  declare imdbId: string
+  declare imdbID: string
   declare Type: 'episode' | 'movie'
   DVD?: string | undefined
   BoxOffice?: string | undefined
   Production?: string | undefined
   Website?: string | undefined
   declare Response: 'True'
+  seriesID?: string | undefined
   Season?: string | undefined
   Episode?: string | undefined
   declare createdAt: string
@@ -120,7 +119,7 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
   declare Metascore: string
   declare imdbRating: string
   declare imdbVotes: string
-  declare imdbId: string
+  declare imdbID: string
   declare Type: string
   declare totalSeasons: string
   declare Response: string
@@ -208,18 +207,13 @@ export const setupMovies = async (injector: Injector) => {
     injector,
     model: MovieFile,
     sequelizeModel: MovieFileModel,
-    primaryKey: 'id',
+    primaryKey: 'imdbId',
     options: dbOptions,
     initModel: async (sequelize) => {
       MovieFileModel.init(
         {
-          id: {
-            type: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-            defaultValue: () => crypto.randomUUID(),
-          },
           imdbId: {
+            primaryKey: true,
             type: DataTypes.STRING,
             allowNull: false,
           },
@@ -228,6 +222,10 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: false,
           },
           path: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          fileName: {
             type: DataTypes.STRING,
             allowNull: false,
           },
@@ -240,7 +238,7 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: true,
           },
         },
-        { sequelize, indexes: [{ fields: ['movieId'] }, { fields: ['driveLetter', 'path'] }] },
+        { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path', 'fileName'], unique: true }] },
       )
       await sequelize.sync()
     },
@@ -304,21 +302,14 @@ export const setupMovies = async (injector: Injector) => {
     injector,
     model: Series,
     sequelizeModel: SeriesModel,
-    primaryKey: 'id',
+    primaryKey: 'imdbId',
     options: dbOptions,
     initModel: async (sequelize) => {
       SeriesModel.init(
         {
-          id: {
-            type: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-            defaultValue: () => crypto.randomUUID(),
-          },
           imdbId: {
             type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
+            primaryKey: true,
           },
           title: {
             type: DataTypes.STRING,
@@ -355,12 +346,12 @@ export const setupMovies = async (injector: Injector) => {
     injector,
     model: OmdbMovieMetadata,
     sequelizeModel: OmdbMovieMetadataModel,
-    primaryKey: 'imdbId',
+    primaryKey: 'imdbID',
     options: dbOptions,
     initModel: async (sequelize) => {
       OmdbMovieMetadataModel.init(
         {
-          imdbId: {
+          imdbID: {
             type: DataTypes.STRING,
             primaryKey: true,
             allowNull: false,
@@ -375,31 +366,31 @@ export const setupMovies = async (injector: Injector) => {
           },
           Rated: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Released: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Runtime: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Genre: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Director: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Writer: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Actors: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Plot: {
             type: DataTypes.STRING,
@@ -407,15 +398,15 @@ export const setupMovies = async (injector: Injector) => {
           },
           Language: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Country: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Awards: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Poster: {
             type: DataTypes.STRING,
@@ -423,19 +414,19 @@ export const setupMovies = async (injector: Injector) => {
           },
           Ratings: {
             type: DataTypes.JSON,
-            allowNull: false,
+            allowNull: true,
           },
           Metascore: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           imdbRating: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           imdbVotes: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Response: {
             type: DataTypes.STRING,
@@ -447,27 +438,27 @@ export const setupMovies = async (injector: Injector) => {
           },
           DVD: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           BoxOffice: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Production: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Episode: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Season: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           Website: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           createdAt: {
             type: DataTypes.DATE,
@@ -476,6 +467,10 @@ export const setupMovies = async (injector: Injector) => {
           updatedAt: {
             type: DataTypes.DATE,
             allowNull: false,
+          },
+          seriesID: {
+            type: DataTypes.STRING,
+            allowNull: true,
           },
         },
         { sequelize },
@@ -488,12 +483,12 @@ export const setupMovies = async (injector: Injector) => {
     injector,
     model: OmdbSeriesMetadata,
     sequelizeModel: OmdbSeriesMetadataModel,
-    primaryKey: 'imdbId',
+    primaryKey: 'imdbID',
     options: dbOptions,
     initModel: async (sequelize) => {
       OmdbSeriesMetadataModel.init(
         {
-          imdbId: {
+          imdbID: {
             type: DataTypes.STRING,
             primaryKey: true,
             allowNull: false,
@@ -606,7 +601,7 @@ export const setupMovies = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  repo.createDataSet(MovieFile, 'id', {
+  repo.createDataSet(MovieFile, 'imdbId', {
     authorizeGet: authorizedOnly,
     authorizeAdd: withRole('admin'),
     authorizeUpdate: withRole('admin'),
@@ -658,21 +653,21 @@ export const setupMovies = async (injector: Injector) => {
     authroizeRemoveEntity: onlyOwned,
   })
 
-  repo.createDataSet(Series, 'id', {
+  repo.createDataSet(Series, 'imdbId', {
     authorizeGet: authorizedOnly,
     authorizeAdd: withRole('admin'),
     authorizeUpdate: withRole('admin'),
     authorizeRemove: withRole('admin'),
   })
 
-  repo.createDataSet(OmdbMovieMetadata, 'imdbId', {
+  repo.createDataSet(OmdbMovieMetadata, 'imdbID', {
     authorizeGet: authorizedOnly,
     authorizeAdd: withRole('admin'),
     authorizeUpdate: withRole('admin'),
     authorizeRemove: withRole('admin'),
   })
 
-  repo.createDataSet(OmdbSeriesMetadata, 'imdbId', {
+  repo.createDataSet(OmdbSeriesMetadata, 'imdbID', {
     authorizeGet: authorizedOnly,
     authorizeAdd: withRole('admin'),
     authorizeUpdate: withRole('admin'),

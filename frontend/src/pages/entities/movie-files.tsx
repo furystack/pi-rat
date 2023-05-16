@@ -4,12 +4,12 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 import mediaSchemas from 'common/schemas/media-entities.json'
-import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
+import { MovieFilesService } from '../../services/movie-files-service.js'
 
 export const MovieFilesPage = Shade({
   shadowDomName: 'shade-app-movie-files-page',
   render: ({ useDisposable, injector }) => {
-    const api = injector.getInstance(MediaApiClient)
+    const movieFilesService = injector.getInstance(MovieFilesService)
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
@@ -24,45 +24,21 @@ export const MovieFilesPage = Shade({
         new GenericEditorService({
           defaultSettings: {},
           model: MovieFile,
-          keyProperty: 'id',
+          keyProperty: 'imdbId',
           readonlyProperties: [],
-          loader: async (findOptions) => {
-            const result = await api.call({
-              method: 'GET',
-              action: '/movie-files',
-              query: { findOptions },
-            })
-            return result.result
-          },
-          deleteEntities: async (id) => {
-            await api.call({ method: 'DELETE', action: `/movie-files/:id`, url: { id } })
-          },
-          getEntity: async (id) => {
-            const result = await api.call({ method: 'GET', action: `/movie-files/:id`, url: { id }, query: {} })
-            return result.result
-          },
+          loader: async (findOptions) => await movieFilesService.findMovieFile(findOptions),
+          deleteEntities: async (id) => await movieFilesService.deleteMovieFile(id),
+          getEntity: async (id) => await movieFilesService.getMovieFile(id),
           patchEntity: async (id, entity) => {
-            await api.call({
-              method: 'PATCH',
-              action: `/movie-files/:id`,
-              url: { id },
-              body: entity,
-            })
+            await movieFilesService.updateMovieFile(id, entity)
           },
-          postEntity: async (entity) => {
-            const { result } = await api.call({
-              method: 'POST',
-              action: `/movie-files`,
-              body: entity,
-            })
-            return result
-          },
+          postEntity: async (entity) => await movieFilesService.createMovieFile(entity),
         }),
     )
     return (
       <GenericEditor
         service={service}
-        columns={['driveLetter', 'path', 'id', 'imdbId']}
+        columns={['driveLetter', 'path', 'fileName', 'imdbId']}
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}

@@ -1,179 +1,50 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "FetchOmdbMovie": {
+    "LinkMovie": {
       "type": "object",
       "properties": {
         "body": {
           "type": "object",
           "properties": {
-            "title": {
+            "drive": {
               "type": "string"
             },
-            "year": {
-              "type": "number"
+            "path": {
+              "type": "string"
             },
-            "season": {
-              "type": "number"
-            },
-            "episode": {
-              "type": "number"
+            "fileName": {
+              "type": "string"
             }
           },
           "required": [
-            "title"
+            "drive",
+            "path",
+            "fileName"
           ],
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/OmdbMovieMetadata"
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "already-linked",
+                "linked",
+                "failed"
+              ]
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
         "body",
         "result"
-      ],
-      "additionalProperties": false
-    },
-    "OmdbMovieMetadata": {
-      "type": "object",
-      "properties": {
-        "Title": {
-          "type": "string"
-        },
-        "Year": {
-          "type": "string"
-        },
-        "Rated": {
-          "type": "string"
-        },
-        "Released": {
-          "type": "string"
-        },
-        "Runtime": {
-          "type": "string"
-        },
-        "Genre": {
-          "type": "string"
-        },
-        "Director": {
-          "type": "string"
-        },
-        "Writer": {
-          "type": "string"
-        },
-        "Actors": {
-          "type": "string"
-        },
-        "Plot": {
-          "type": "string"
-        },
-        "Language": {
-          "type": "string"
-        },
-        "Country": {
-          "type": "string"
-        },
-        "Awards": {
-          "type": "string"
-        },
-        "Poster": {
-          "type": "string"
-        },
-        "Ratings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "Source": {
-                "type": "string"
-              },
-              "Value": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "Source",
-              "Value"
-            ],
-            "additionalProperties": false
-          }
-        },
-        "Metascore": {
-          "type": "string"
-        },
-        "imdbRating": {
-          "type": "string"
-        },
-        "imdbVotes": {
-          "type": "string"
-        },
-        "imdbId": {
-          "type": "string"
-        },
-        "Type": {
-          "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
-        },
-        "DVD": {
-          "type": "string"
-        },
-        "BoxOffice": {
-          "type": "string"
-        },
-        "Production": {
-          "type": "string"
-        },
-        "Website": {
-          "type": "string"
-        },
-        "Response": {
-          "type": "string",
-          "const": "True"
-        },
-        "seriesID": {
-          "type": "string"
-        },
-        "Season": {
-          "type": "string"
-        },
-        "Episode": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Title",
-        "Year",
-        "Rated",
-        "Released",
-        "Runtime",
-        "Genre",
-        "Director",
-        "Writer",
-        "Actors",
-        "Plot",
-        "Language",
-        "Country",
-        "Awards",
-        "Poster",
-        "Ratings",
-        "Metascore",
-        "imdbRating",
-        "imdbVotes",
-        "imdbId",
-        "Type",
-        "Response",
-        "createdAt",
-        "updatedAt"
       ],
       "additionalProperties": false
     },
@@ -275,7 +146,7 @@
         "imdbVotes": {
           "type": "string"
         },
-        "imdbId": {
+        "imdbID": {
           "type": "string"
         },
         "Type": {
@@ -313,7 +184,7 @@
         "Metascore",
         "imdbRating",
         "imdbVotes",
-        "imdbId",
+        "imdbID",
         "Type",
         "totalSeasons",
         "Response",
@@ -419,25 +290,25 @@
               "$ref": "#/definitions/GetCollectionEndpoint%3CSeries%3E"
             },
             "/series/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CSeries%2C%22id%22%3E"
+              "$ref": "#/definitions/GetEntityEndpoint%3CSeries%2C%22imdbId%22%3E"
             },
             "/omdb-movie-metadata": {
               "$ref": "#/definitions/GetCollectionEndpoint%3COmdbMovieMetadata%3E"
             },
             "/omdb-movie-metadata/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3COmdbMovieMetadata%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/GetEntityEndpoint%3COmdbMovieMetadata%2C%22imdbID%22%3E"
             },
             "/omdb-series-metadata": {
               "$ref": "#/definitions/GetCollectionEndpoint%3COmdbSeriesMetadata%3E"
             },
             "/omdb-series-metadata/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3COmdbSeriesMetadata%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/GetEntityEndpoint%3COmdbSeriesMetadata%2C%22imdbID%22%3E"
             },
             "/movie-files": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieFile%3E"
             },
             "/movie-files/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22id%22%3E"
+              "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22imdbId%22%3E"
             }
           },
           "required": [
@@ -462,7 +333,7 @@
           "type": "object",
           "properties": {
             "/movies": {
-              "$ref": "#/definitions/PostEndpoint%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/PostEndpoint%3CMovie%2C%22imdbId%22%2COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
             },
             "/movies/:movieId/save-watch-progress": {
               "type": "object",
@@ -580,13 +451,10 @@
               "additionalProperties": false
             },
             "/movie-files": {
-              "$ref": "#/definitions/PostEndpoint%3CMovieFile%2C%22id%22%3E"
+              "$ref": "#/definitions/PostEndpoint%3CMovieFile%2C%22imdbId%22%3E"
             },
-            "/omdb/movie": {
-              "$ref": "#/definitions/FetchOmdbMovie"
-            },
-            "/omdb/series": {
-              "$ref": "#/definitions/FetchOmdbSeries"
+            "/link-movie": {
+              "$ref": "#/definitions/LinkMovie"
             }
           },
           "required": [
@@ -595,8 +463,7 @@
             "/movies/:movieId/re-fetch-metadata",
             "/movies/:movieId/re-extract-subtitles",
             "/movie-files",
-            "/omdb/movie",
-            "/omdb/series"
+            "/link-movie"
           ],
           "additionalProperties": false
         },
@@ -607,7 +474,7 @@
               "$ref": "#/definitions/PatchEndpoint%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22imdbId%22%3E"
             },
             "/movie-files/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CMovieFile%2C%22id%22%3E"
+              "$ref": "#/definitions/PatchEndpoint%3CMovieFile%2C%22imdbId%22%3E"
             }
           },
           "required": [
@@ -640,7 +507,7 @@
               "$ref": "#/definitions/DeleteEndpoint%3CMovie%2C%22imdbId%22%3E"
             },
             "/movie-files/:id": {
-              "$ref": "#/definitions/DeleteEndpoint%3CMovieFile%2C%22id%22%3E"
+              "$ref": "#/definitions/DeleteEndpoint%3CMovieFile%2C%22imdbId%22%3E"
             }
           },
           "required": [
@@ -2566,7 +2433,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CSeries%2C(%22id%22%7C%22imdbId%22%7C%22title%22%7C%22year%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CSeries%2C(%22imdbId%22%7C%22title%22%7C%22year%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -2582,7 +2449,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<Series,(\"id\"|\"imdbId\"|\"title\"|\"year\"|\"thumbnailImageUrl\"|\"plot\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<Series,(\"imdbId\"|\"title\"|\"year\"|\"thumbnailImageUrl\"|\"plot\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -2596,13 +2463,6 @@
         "order": {
           "type": "object",
           "properties": {
-            "id": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
             "imdbId": {
               "type": "string",
               "enum": [
@@ -2661,7 +2521,6 @@
           "items": {
             "type": "string",
             "enum": [
-              "id",
               "imdbId",
               "title",
               "year",
@@ -2708,58 +2567,6 @@
           "items": {
             "$ref": "#/definitions/FilterType%3CSeries%3E"
           }
-        },
-        "id": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
         },
         "imdbId": {
           "anyOf": [
@@ -3148,9 +2955,6 @@
     "Series": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "imdbId": {
           "type": "string"
         },
@@ -3174,7 +2978,6 @@
         }
       },
       "required": [
-        "id",
         "imdbId",
         "title",
         "year",
@@ -3184,7 +2987,7 @@
       ],
       "additionalProperties": false
     },
-    "GetEntityEndpoint<Series,\"id\">": {
+    "GetEntityEndpoint<Series,\"imdbId\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -3195,7 +2998,6 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "id",
                   "imdbId",
                   "title",
                   "year",
@@ -3242,7 +3044,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3COmdbMovieMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbId%22%7C%22Type%22%7C%22DVD%22%7C%22BoxOffice%22%7C%22Production%22%7C%22Website%22%7C%22Response%22%7C%22seriesID%22%7C%22Season%22%7C%22Episode%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3COmdbMovieMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbID%22%7C%22Type%22%7C%22DVD%22%7C%22BoxOffice%22%7C%22Production%22%7C%22Website%22%7C%22Response%22%7C%22seriesID%22%7C%22Season%22%7C%22Episode%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -3258,7 +3060,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<OmdbMovieMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbId\"|\"Type\"|\"DVD\"|\"BoxOffice\"|\"Production\"|\"Website\"|\"Response\"|\"seriesID\"|\"Season\"|\"Episode\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<OmdbMovieMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbID\"|\"Type\"|\"DVD\"|\"BoxOffice\"|\"Production\"|\"Website\"|\"Response\"|\"seriesID\"|\"Season\"|\"Episode\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -3398,7 +3200,7 @@
                 "DESC"
               ]
             },
-            "imdbId": {
+            "imdbID": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -3509,7 +3311,7 @@
               "Metascore",
               "imdbRating",
               "imdbVotes",
-              "imdbId",
+              "imdbID",
               "Type",
               "DVD",
               "BoxOffice",
@@ -4543,7 +4345,7 @@
             }
           ]
         },
-        "imdbId": {
+        "imdbID": {
           "anyOf": [
             {
               "type": "object",
@@ -5203,7 +5005,149 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "GetEntityEndpoint<OmdbMovieMetadata,\"imdbId\">": {
+    "OmdbMovieMetadata": {
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Year": {
+          "type": "string"
+        },
+        "Rated": {
+          "type": "string"
+        },
+        "Released": {
+          "type": "string"
+        },
+        "Runtime": {
+          "type": "string"
+        },
+        "Genre": {
+          "type": "string"
+        },
+        "Director": {
+          "type": "string"
+        },
+        "Writer": {
+          "type": "string"
+        },
+        "Actors": {
+          "type": "string"
+        },
+        "Plot": {
+          "type": "string"
+        },
+        "Language": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Awards": {
+          "type": "string"
+        },
+        "Poster": {
+          "type": "string"
+        },
+        "Ratings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Source": {
+                "type": "string"
+              },
+              "Value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "Source",
+              "Value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "Metascore": {
+          "type": "string"
+        },
+        "imdbRating": {
+          "type": "string"
+        },
+        "imdbVotes": {
+          "type": "string"
+        },
+        "imdbID": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "movie",
+            "episode"
+          ]
+        },
+        "DVD": {
+          "type": "string"
+        },
+        "BoxOffice": {
+          "type": "string"
+        },
+        "Production": {
+          "type": "string"
+        },
+        "Website": {
+          "type": "string"
+        },
+        "Response": {
+          "type": "string",
+          "const": "True"
+        },
+        "seriesID": {
+          "type": "string"
+        },
+        "Season": {
+          "type": "string"
+        },
+        "Episode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Title",
+        "Year",
+        "Rated",
+        "Released",
+        "Runtime",
+        "Genre",
+        "Director",
+        "Writer",
+        "Actors",
+        "Plot",
+        "Language",
+        "Country",
+        "Awards",
+        "Poster",
+        "Ratings",
+        "Metascore",
+        "imdbRating",
+        "imdbVotes",
+        "imdbID",
+        "Type",
+        "Response",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<OmdbMovieMetadata,\"imdbID\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -5232,7 +5176,7 @@
                   "Metascore",
                   "imdbRating",
                   "imdbVotes",
-                  "imdbId",
+                  "imdbID",
                   "Type",
                   "DVD",
                   "BoxOffice",
@@ -5283,7 +5227,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3COmdbSeriesMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbId%22%7C%22Type%22%7C%22totalSeasons%22%7C%22Response%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3COmdbSeriesMetadata%2C(%22Title%22%7C%22Year%22%7C%22Rated%22%7C%22Released%22%7C%22Runtime%22%7C%22Genre%22%7C%22Director%22%7C%22Writer%22%7C%22Actors%22%7C%22Plot%22%7C%22Language%22%7C%22Country%22%7C%22Awards%22%7C%22Poster%22%7C%22Ratings%22%7C%22Metascore%22%7C%22imdbRating%22%7C%22imdbVotes%22%7C%22imdbID%22%7C%22Type%22%7C%22totalSeasons%22%7C%22Response%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -5299,7 +5243,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<OmdbSeriesMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbId\"|\"Type\"|\"totalSeasons\"|\"Response\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<OmdbSeriesMetadata,(\"Title\"|\"Year\"|\"Rated\"|\"Released\"|\"Runtime\"|\"Genre\"|\"Director\"|\"Writer\"|\"Actors\"|\"Plot\"|\"Language\"|\"Country\"|\"Awards\"|\"Poster\"|\"Ratings\"|\"Metascore\"|\"imdbRating\"|\"imdbVotes\"|\"imdbID\"|\"Type\"|\"totalSeasons\"|\"Response\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -5439,7 +5383,7 @@
                 "DESC"
               ]
             },
-            "imdbId": {
+            "imdbID": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -5508,7 +5452,7 @@
               "Metascore",
               "imdbRating",
               "imdbVotes",
-              "imdbId",
+              "imdbID",
               "Type",
               "totalSeasons",
               "Response",
@@ -6536,7 +6480,7 @@
             }
           ]
         },
-        "imdbId": {
+        "imdbID": {
           "anyOf": [
             {
               "type": "object",
@@ -6872,7 +6816,7 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "GetEntityEndpoint<OmdbSeriesMetadata,\"imdbId\">": {
+    "GetEntityEndpoint<OmdbSeriesMetadata,\"imdbID\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -6901,7 +6845,7 @@
                   "Metascore",
                   "imdbRating",
                   "imdbVotes",
-                  "imdbId",
+                  "imdbID",
                   "Type",
                   "totalSeasons",
                   "Response",
@@ -6946,7 +6890,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -6962,7 +6906,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieFile,(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\")[]>": {
+    "FindOptions<MovieFile,(\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -6976,13 +6920,6 @@
         "order": {
           "type": "object",
           "properties": {
-            "id": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
             "imdbId": {
               "type": "string",
               "enum": [
@@ -6998,6 +6935,13 @@
               ]
             },
             "path": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "fileName": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -7027,10 +6971,10 @@
           "items": {
             "type": "string",
             "enum": [
-              "id",
               "imdbId",
               "driveLetter",
               "path",
+              "fileName",
               "ffprobe",
               "relatedFiles"
             ]
@@ -7072,58 +7016,6 @@
           "items": {
             "$ref": "#/definitions/FilterType%3CMovieFile%3E"
           }
-        },
-        "id": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
         },
         "imdbId": {
           "anyOf": [
@@ -7230,6 +7122,58 @@
           ]
         },
         "path": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileName": {
           "anyOf": [
             {
               "type": "object",
@@ -8473,9 +8417,6 @@
     "MovieFile": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "imdbId": {
           "type": "string"
         },
@@ -8483,6 +8424,9 @@
           "type": "string"
         },
         "path": {
+          "type": "string"
+        },
+        "fileName": {
           "type": "string"
         },
         "ffprobe": {
@@ -8523,14 +8467,14 @@
         }
       },
       "required": [
-        "id",
         "imdbId",
         "driveLetter",
-        "path"
+        "path",
+        "fileName"
       ],
       "additionalProperties": false
     },
-    "GetEntityEndpoint<MovieFile,\"id\">": {
+    "GetEntityEndpoint<MovieFile,\"imdbId\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -8541,10 +8485,10 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "id",
                   "imdbId",
                   "driveLetter",
                   "path",
+                  "fileName",
                   "ffprobe",
                   "relatedFiles"
                 ]
@@ -8579,14 +8523,14 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "PostEndpoint<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
+    "PostEndpoint<Movie,\"imdbId\",Omit<Movie,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/WithOptionalId%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22imdbId%22%3E"
+          "$ref": "#/definitions/Omit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
         },
         "result": {
-          "$ref": "#/definitions/Omit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
+          "$ref": "#/definitions/Movie"
         }
       },
       "required": [
@@ -8595,104 +8539,6 @@
       ],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
-    },
-    "WithOptionalId<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "imdbId": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "year": {
-          "type": "number"
-        },
-        "duration": {
-          "type": "number"
-        },
-        "genre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
-        },
-        "seriesId": {
-          "type": "string"
-        },
-        "season": {
-          "type": "number"
-        },
-        "episode": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "title"
-      ]
-    },
-    "Omit<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
-      "$ref": "#/definitions/Pick%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2CExclude%3C(%22imdbId%22%7C%22title%22%7C%22year%22%7C%22duration%22%7C%22genre%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22)%2C%22imdbId%22%3E%3E"
-    },
-    "Pick<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,Exclude<(\"imdbId\"|\"title\"|\"year\"|\"duration\"|\"genre\"|\"thumbnailImageUrl\"|\"plot\"|\"type\"|\"seriesId\"|\"season\"|\"episode\"),\"imdbId\">>": {
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "year": {
-          "type": "number"
-        },
-        "duration": {
-          "type": "number"
-        },
-        "genre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
-        },
-        "seriesId": {
-          "type": "string"
-        },
-        "season": {
-          "type": "number"
-        },
-        "episode": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "title"
-      ],
-      "additionalProperties": false
     },
     "Omit<Movie,(\"createdAt\"|\"updatedAt\")>": {
       "$ref": "#/definitions/Pick%3CMovie%2CExclude%3C(%22imdbId%22%7C%22title%22%7C%22year%22%7C%22duration%22%7C%22genre%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
@@ -8747,11 +8593,11 @@
       ],
       "additionalProperties": false
     },
-    "PostEndpoint<MovieFile,\"id\">": {
+    "PostEndpoint<MovieFile,\"imdbId\">": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/WithOptionalId%3CMovieFile%2C%22id%22%3E"
+          "$ref": "#/definitions/WithOptionalId%3CMovieFile%2C%22imdbId%22%3E"
         },
         "result": {
           "$ref": "#/definitions/MovieFile"
@@ -8764,13 +8610,10 @@
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
-    "WithOptionalId<MovieFile,\"id\">": {
+    "WithOptionalId<MovieFile,\"imdbId\">": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "imdbId": {
           "type": "string"
         },
@@ -8778,6 +8621,9 @@
           "type": "string"
         },
         "path": {
+          "type": "string"
+        },
+        "fileName": {
           "type": "string"
         },
         "ffprobe": {
@@ -8819,23 +8665,23 @@
       },
       "required": [
         "driveLetter",
-        "imdbId",
+        "fileName",
         "path"
       ]
     },
-    "Omit<MovieFile,\"id\">": {
-      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22id%22%3E%3E"
+    "Omit<MovieFile,\"imdbId\">": {
+      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22imdbId%22%3E%3E"
     },
-    "Pick<MovieFile,Exclude<(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\"),\"id\">>": {
+    "Pick<MovieFile,Exclude<(\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\"),\"imdbId\">>": {
       "type": "object",
       "properties": {
-        "imdbId": {
-          "type": "string"
-        },
         "driveLetter": {
           "type": "string"
         },
         "path": {
+          "type": "string"
+        },
+        "fileName": {
           "type": "string"
         },
         "ffprobe": {
@@ -8876,9 +8722,9 @@
         }
       },
       "required": [
-        "imdbId",
         "driveLetter",
-        "path"
+        "path",
+        "fileName"
       ],
       "additionalProperties": false
     },
@@ -8959,7 +8805,7 @@
       },
       "additionalProperties": false
     },
-    "PatchEndpoint<MovieFile,\"id\">": {
+    "PatchEndpoint<MovieFile,\"imdbId\">": {
       "type": "object",
       "properties": {
         "body": {
@@ -8993,9 +8839,6 @@
     "Partial<MovieFile>": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "imdbId": {
           "type": "string"
         },
@@ -9003,6 +8846,9 @@
           "type": "string"
         },
         "path": {
+          "type": "string"
+        },
+        "fileName": {
           "type": "string"
         },
         "ffprobe": {
@@ -9071,7 +8917,7 @@
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
-    "DeleteEndpoint<MovieFile,\"id\">": {
+    "DeleteEndpoint<MovieFile,\"imdbId\">": {
       "type": "object",
       "properties": {
         "url": {

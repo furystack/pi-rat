@@ -15,14 +15,13 @@ import type {
   Series,
 } from '../models/media/index.js'
 
-export type FetchOmdbMovie = {
+export type LinkMovie = {
   body: {
-    title: string
-    year?: number
-    season?: number
-    episode?: number
+    drive: string
+    path: string
+    fileName: string
   }
-  result: OmdbMovieMetadata
+  result: { status: 'already-linked' | 'linked' | 'failed' }
 }
 
 export type FetchOmdbSeries = {
@@ -44,13 +43,13 @@ export interface MediaApi extends RestApi {
     '/stream-original/:movieId': { url: { movieId: string }; result: unknown }
     '/my-watch-progress': GetCollectionEndpoint<MovieWatchHistoryEntry>
     '/series': GetCollectionEndpoint<Series>
-    '/series/:id': GetEntityEndpoint<Series, 'id'>
+    '/series/:id': GetEntityEndpoint<Series, 'imdbId'>
     '/omdb-movie-metadata': GetCollectionEndpoint<OmdbMovieMetadata>
-    '/omdb-movie-metadata/:id': GetEntityEndpoint<OmdbMovieMetadata, 'imdbId'>
+    '/omdb-movie-metadata/:id': GetEntityEndpoint<OmdbMovieMetadata, 'imdbID'>
     '/omdb-series-metadata': GetCollectionEndpoint<OmdbSeriesMetadata>
-    '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbId'>
+    '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
     '/movie-files': GetCollectionEndpoint<MovieFile>
-    '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
+    '/movie-files/:id': GetEntityEndpoint<MovieFile, 'imdbId'>
   }
   POST: {
     '/movies': PostEndpoint<Movie, 'imdbId', Omit<Movie, 'createdAt' | 'updatedAt'>>
@@ -61,16 +60,15 @@ export interface MediaApi extends RestApi {
     }
     '/movies/:movieId/re-fetch-metadata': { url: { movieId: string }; result: { success: boolean } }
     '/movies/:movieId/re-extract-subtitles': { url: { movieId: string }; result: { success: boolean } }
-    '/movie-files': PostEndpoint<MovieFile, 'id'>
-    '/omdb/movie': FetchOmdbMovie
-    '/omdb/series': FetchOmdbSeries
+    '/movie-files': PostEndpoint<MovieFile, 'imdbId'>
+    '/link-movie': LinkMovie
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
-    '/movie-files/:id': PatchEndpoint<MovieFile, 'id'>
+    '/movie-files/:id': PatchEndpoint<MovieFile, 'imdbId'>
   }
   DELETE: {
     '/movies/:id': DeleteEndpoint<Movie, 'imdbId'>
-    '/movie-files/:id': DeleteEndpoint<MovieFile, 'id'>
+    '/movie-files/:id': DeleteEndpoint<MovieFile, 'imdbId'>
   }
 }

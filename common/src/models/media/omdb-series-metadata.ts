@@ -20,7 +20,7 @@ export class OmdbSeriesMetadata {
   public Metascore!: string // 'N/A'
   public imdbRating!: string // '8.4'
   public imdbVotes!: string // '410,560'
-  public imdbId!: string // 'tt0460681'
+  public imdbID!: string // 'tt0460681'
   public Type!: string // 'series'
   public totalSeasons!: string // '15'
   public Response!: string //  'True'

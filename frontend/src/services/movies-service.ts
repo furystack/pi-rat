@@ -9,7 +9,7 @@ export class MoviesService {
   @Injected(MediaApiClient)
   private readonly mediaApiClient!: MediaApiClient
 
-  private movieCache = new Cache({
+  public movieCache = new Cache({
     capacity: 100,
     load: async (id: string) => {
       const { result } = await this.mediaApiClient.call({
@@ -22,7 +22,7 @@ export class MoviesService {
     },
   })
 
-  private movieQueryCache = new Cache({
+  public movieQueryCache = new Cache({
     capacity: 100,
     load: async (findOptions: FindOptions<Movie, Array<keyof Movie>>) => {
       const { result } = await this.mediaApiClient.call({

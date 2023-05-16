@@ -4,12 +4,12 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 import mediaSchemas from 'common/schemas/media-entities.json'
-import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
+import { MoviesService } from '../../services/movies-service.js'
 
 export const MoviesPage = Shade({
   shadowDomName: 'shade-app-movies-page',
   render: ({ useDisposable, injector }) => {
-    const api = injector.getInstance(MediaApiClient)
+    const moviesService = injector.getInstance(MoviesService)
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
@@ -27,35 +27,21 @@ export const MoviesPage = Shade({
           keyProperty: 'imdbId',
           readonlyProperties: ['createdAt', 'updatedAt'],
           loader: async (findOptions) => {
-            const result = await api.call({
-              method: 'GET',
-              action: '/movies',
-              query: { findOptions },
-            })
-            return result.result
+            const result = await moviesService.findMovie(findOptions)
+            return result
           },
           deleteEntities: async (id) => {
-            await api.call({ method: 'DELETE', action: `/movies/:id`, url: { id } })
+            await moviesService.deleteMovie(id)
           },
           getEntity: async (id) => {
-            const result = await api.call({ method: 'GET', action: `/movies/:id`, url: { id }, query: {} })
-            return result.result
+            const result = await moviesService.getMovie(id)
+            return result
           },
           patchEntity: async (id, entity) => {
-            await api.call({
-              method: 'PATCH',
-              action: `/movies/:id`,
-              url: { id },
-              body: entity,
-            })
+            await moviesService.updateMovie(id, entity)
           },
           postEntity: async (entity) => {
-            const { result } = await api.call({
-              method: 'POST',
-              action: `/movies`,
-              body: entity,
-            })
-            return result
+            return await moviesService.createMovie(entity)
           },
         }),
     )

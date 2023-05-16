@@ -24,7 +24,7 @@ export const OmdbSeriesMetadataPage = Shade({
         new GenericEditorService({
           defaultSettings: {},
           model: OmdbSeriesMetadata,
-          keyProperty: 'imdbId',
+          keyProperty: 'imdbID',
           readonlyProperties: [],
           loader: async (findOptions) => {
             const result = await api.call({
@@ -59,7 +59,7 @@ export const OmdbSeriesMetadataPage = Shade({
     return (
       <GenericEditor
         service={service}
-        columns={['imdbId', 'Title', 'Year', 'updatedAt']}
+        columns={['imdbID', 'Title', 'Year', 'updatedAt']}
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
