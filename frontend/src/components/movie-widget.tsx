@@ -1,8 +1,9 @@
-import { Shade, RouteLink, createComponent, LocationService } from '@furystack/shades'
+import { Shade, RouteLink, createComponent, LocationService, LazyLoad } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { SessionService } from '../services/session.js'
 import { MoviesService } from '../services/movies-service.js'
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import { WatchProgressService } from '../services/watch-progress-service.js'
 
 const focus = (el: HTMLElement) => {
   promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
@@ -54,6 +55,8 @@ export const MovieWidget = Shade<{
     const { imdbId, size = 256 } = props
 
     const movieService = injector.getInstance(MoviesService)
+
+    const watchProgressService = injector.getInstance(WatchProgressService)
 
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
 
@@ -159,30 +162,23 @@ export const MovieWidget = Shade<{
                 background: 'rgba(0,0,0,0.7)',
               }}>
               {movie.value.title}
-              {/* <LazyLoad
+              <LazyLoad
                 loader={<div />}
                 component={async () => {
-                  const watchProgress =
-                    props.watchHistory ||
-                    (movie.metadata.duration &&
-                      (
-                        await useMediaApi(injector)({
-                          method: 'GET',
-                          action: '/my-watch-progress',
-                          query: {
-                            findOptions: {
-                              filter: {
-                                movieId: { $eq: movie._id },
-                              },
-                              select: ['watchedSeconds'],
-                            },
-                          },
-                        })
-                      ).result.entries[0])
+                  const {
+                    entries: [lastRecentWatchProgress],
+                  } = await watchProgressService.findWatchProgress({
+                    filter: {
+                      imdbId: { $eq: imdbId },
+                    },
+                    order: {
+                      updatedAt: 'DESC',
+                    },
+                  })
 
                   const percent =
-                    watchProgress &&
-                    Math.round(100 * (watchProgress.watchedSeconds / (movie.value.duration || Infinity)))
+                    lastRecentWatchProgress &&
+                    Math.round(100 * (lastRecentWatchProgress.watchedSeconds / (movie.value.duration || Infinity)))
 
                   return (
                     <div
@@ -197,7 +193,7 @@ export const MovieWidget = Shade<{
                     />
                   )
                 }}
-              /> */}
+              />
             </div>
           </div>
         </RouteLink>

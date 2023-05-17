@@ -7,6 +7,7 @@ import { DefaultDashboard } from './dashboard/default-dashboard.js'
 import { LoadableDashboard } from './dashboard/LoadableDashboard.js'
 import { PiRatLazyLoad } from './pirat-lazy-load.js'
 import { decode } from 'common'
+import { MovieList } from '../pages/movies/movie-list.js'
 
 const onLeave = async ({ element }: { element: HTMLElement }) => {
   await fadeOut(element, { easing: 'ease-in', duration: 200 })
@@ -38,7 +39,7 @@ const adminRoutes: Array<Route<any>> = [
       <PiRatLazyLoad
         component={async () => {
           const { FilesPage } = await import('../pages/files/index.js')
-          return <FilesPage letter={match.params.driveLetter} path={decode(match.params.path)} />
+          return <FilesPage letter={decode(match.params.driveLetter)} path={decode(match.params.path)} />
         }}
       />
     ),
@@ -174,6 +175,12 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
                       component: ({ match }) => {
                         return <LoadableDashboard id={match.params.id} />
                       },
+                    },
+                    {
+                      url: '/movies',
+                      onVisit,
+                      onLeave,
+                      component: () => <MovieList />,
                     },
                     {
                       url: '/',

@@ -19,6 +19,9 @@
         "path": {
           "type": "string"
         },
+        "fileName": {
+          "type": "string"
+        },
         "watchedSeconds": {
           "type": "number"
         },
@@ -38,6 +41,7 @@
         "imdbId",
         "driveLetter",
         "path",
+        "fileName",
         "watchedSeconds",
         "completed",
         "createdAt",

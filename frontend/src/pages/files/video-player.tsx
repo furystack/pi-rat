@@ -3,44 +3,94 @@ import { environmentOptions } from '../../environment-options.js'
 import 'video.js'
 import 'video.js/dist/video-js.css'
 import videojsDefault from 'video.js'
-import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
-import { encode } from 'common'
+import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
+import { MovieFilesService } from '../../services/movie-files-service.js'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default & any
 
 export const VideoPlayer = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-video-player',
-  render: ({ props, element, injector }) => {
-    const drivesApi = injector.getInstance(DrivesApiClient)
+  render: ({ props, element, injector, useDisposable }) => {
+    const movieFilesService = injector.getInstance(MovieFilesService)
+    const watchProgressService = injector.getInstance(WatchProgressService)
 
     const { letter, path } = props
+    const fileName = path.split('/').pop() as string
+    const parentPath = path.split('/').slice(0, -1).join('/') || '/'
 
-    drivesApi
-      .call({
-        method: 'GET',
-        action: '/files/:letter/:path/ffprobe',
-        url: {
-          path: encodeURIComponent(path),
-          letter: encodeURIComponent(letter),
+    Promise.all([
+      movieFilesService.findMovieFile({
+        filter: {
+          path: { $eq: parentPath },
+          fileName: { $eq: fileName },
+          driveLetter: { $eq: letter },
         },
-      })
-      .then((ffprobe) => {
+        top: 1,
+      }),
+      watchProgressService.findWatchProgress({
+        filter: {
+          path: { $eq: parentPath },
+          fileName: { $eq: fileName },
+          driveLetter: { $eq: letter },
+        },
+      }),
+    ]).then(
+      ([
+        {
+          entries: [file],
+        },
+        {
+          entries: [watchProgress],
+        },
+      ]) => {
         const video = element.querySelector('video') as HTMLVideoElement
-        const player = videojs(video)
 
-        ffprobe.result.streams
-          .filter((stream) => (stream.codec_type as any) === 'subtitle')
-          .forEach((subtitle) => {
-            player.addRemoteTextTrack({
-              kind: 'subtitles',
-              label: subtitle.tags.title || subtitle.tags.language || subtitle.tags.filename,
-              src: `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
-                `${path}-subtitle-${subtitle.index}.vtt`,
-              )}/download`,
-              srcLang: subtitle.tags.language,
+        if (watchProgress) {
+          watchProgress && (video.currentTime = watchProgress.watchedSeconds)
+        }
+
+        if (file) {
+          const { ffprobe } = file
+          const player = videojs(video)
+
+          ffprobe.streams
+            .filter((stream) => (stream.codec_type as any) === 'subtitle')
+            .forEach((subtitle) => {
+              player.addRemoteTextTrack({
+                kind: 'subtitles',
+                label: subtitle.tags.title || subtitle.tags.language || subtitle.tags.filename,
+                src: `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
+                  `${path}-subtitle-${subtitle.index}.vtt`,
+                )}/download`,
+                srcLang: subtitle.tags.language,
+              })
             })
-          })
-      })
+
+          useDisposable(
+            'watchProgressUpdater',
+            () =>
+              new WatchProgressUpdater({
+                intervalMs: 10 * 1000,
+                onSave: async (progress) => {
+                  watchProgressService.updateWatchEntry({
+                    completed: video.duration - progress < 10,
+                    driveLetter: letter,
+                    path: parentPath,
+                    fileName: path.split('/').pop() as string,
+                    imdbId: file.imdbId,
+                    watchedSeconds: progress,
+                  })
+                },
+                saveTresholdSeconds: 10,
+                videoElement: video,
+              }),
+          )
+        } else {
+          console.warn("Movie is not linked. Watch progress won't be saved.")
+        }
+      },
+    )
 
     return (
       <video
@@ -52,12 +102,13 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         }}
         className="video-js"
         crossOrigin="use-credentials"
-        data-setup={JSON.stringify({
-          controls: true,
-          autoplay: true,
-          preload: 'auto',
-          withCredentials: true,
-        })}
+        // data-setup={JSON.stringify({
+        //   controls: true,
+        //   autoplay: true,
+        //   preload: 'auto',
+        //   withCredentials: true,
+        // })}
+        autoplay
         controls>
         <source
           src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(

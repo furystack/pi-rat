@@ -44,6 +44,10 @@ export const Header = Shade<HeaderProps>({
           </>
         ) : null}
 
+        <AppBarLink title="Movies" href="/movies">
+          🎥 Movies
+        </AppBarLink>
+
         <div style={{ flex: '1' }}>
           <PiRatCommandPalette />
         </div>

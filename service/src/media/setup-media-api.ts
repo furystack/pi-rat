@@ -1,5 +1,6 @@
 import type { Injector } from '@furystack/inject'
 import {
+  Authenticate,
   Authorize,
   Validate,
   createDeleteEndpoint,
@@ -17,6 +18,7 @@ import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
+import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -38,10 +40,14 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/series/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<Series>' })(
           createGetEntityEndpoint({ model: Series, primaryKey: 'imdbId' }),
         ),
-        '/my-watch-progress': Validate({
+        '/my-watch-progresses': Validate({
           schema: mediaApiSchema,
           schemaName: 'GetCollectionEndpoint<MovieWatchHistoryEntry>',
         })(createGetCollectionEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
+        '/my-watch-progresses/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<MovieWatchHistoryEntry,"id">',
+        })(createGetEntityEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
 
         // TODOs:
         '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
@@ -78,14 +84,14 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<MovieFile,"imdbId">' })(
           createPostEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
         ),
-        '/movies/:movieId/re-extract-subtitles': () => null as any, // TODO: Implement
-        '/movies/:movieId/re-fetch-metadata': () => null as any, // TODO: Implement
-        '/movies/:movieId/save-watch-progress': () => null as any, // TODO: Implement
         '/link-movie': Authorize('admin')(
           Validate({ schema: mediaApiSchema, schemaName: 'LinkMovie' })(LinkMovieAction),
         ),
         '/extract-subtitles': Authorize('admin')(
           Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(ExtractSubtitlesAction), // TODO: Implement
+        ),
+        '/save-watch-progress': Authenticate()(
+          Validate({ schema: mediaApiSchema, schemaName: 'SaveWatchProgress' })(SaveWatchProgressAction),
         ),
       },
       PATCH: {
@@ -104,6 +110,10 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'DeleteEndpoint<MovieFile,"imdbId">' })(
           createDeleteEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
         ),
+        '/my-watch-progresses/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'DeleteEndpoint<MovieWatchHistoryEntry,"id">',
+        })(createDeleteEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
       },
     },
   })

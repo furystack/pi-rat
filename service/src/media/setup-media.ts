@@ -37,7 +37,7 @@ class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare driveLetter: string
   declare path: string
   declare fileName: string
-  declare ffprobe?: FFProbeResult | null | undefined
+  declare ffprobe: FFProbeResult
   declare relatedFiles?: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> | undefined
 }
 
@@ -48,6 +48,7 @@ class MovieWatchHistoryEntryModel
   declare imdbId: string
   declare driveLetter: string
   declare path: string
+  declare fileName: string
   declare id: string
   declare userName: string
   declare movie: Movie
@@ -275,6 +276,10 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.STRING,
             allowNull: false,
           },
+          fileName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
           watchedSeconds: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -292,7 +297,7 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: false,
           },
         },
-        { sequelize },
+        { sequelize, indexes: [{ fields: ['userName', 'driveLetter', 'path', 'fileName'], unique: true }] },
       )
       await sequelize.sync()
     },

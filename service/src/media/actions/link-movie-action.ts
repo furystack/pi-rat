@@ -1,6 +1,7 @@
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { LinkMovie } from 'common'
+import { Drive } from 'common'
 import { OmdbSeriesMetadata, Series } from 'common'
 import { MovieFile } from 'common'
 import { getFallbackMetadata } from 'common'
@@ -11,6 +12,9 @@ import { RequestError } from '@furystack/rest'
 import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { extractSubtitles } from '../utils/extract-subtitles.js'
+import ffprobe from 'ffprobe'
+import { join } from 'path'
+import { getDataSetFor } from '@furystack/repository'
 
 const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
   const movieStore = getStoreManager(injector).getStoreFor(Movie, 'imdbId')
@@ -106,6 +110,14 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
     return JsonResult({ status: 'already-linked' })
   }
 
+  const loadedDrive = await getDataSetFor(injector, Drive, 'letter').get(injector, drive)
+
+  if (!loadedDrive) {
+    throw new RequestError(`Drive ${drive} not found`, 404)
+  }
+
+  const ffprobeResult = await ffprobe(join(loadedDrive.physicalPath, path, fileName), { path: 'ffprobe' })
+
   const omdbStore = getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
 
   const storedResult = await omdbStore.find({
@@ -131,6 +143,7 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
       path,
       fileName,
       imdbId: storedResult[0].imdbID,
+      ffprobe: ffprobeResult,
     })
 
     return JsonResult({ status: 'linked' })
@@ -158,6 +171,7 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
     path,
     fileName,
     imdbId: added.imdbID,
+    ffprobe: ffprobeResult,
   })
 
   await extractSubtitles({ driveLetter: drive, path, fileName, injector })

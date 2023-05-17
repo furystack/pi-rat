@@ -4,6 +4,7 @@ export class MovieWatchHistoryEntry {
   imdbId!: string
   driveLetter!: string
   path!: string
+  fileName!: string
   watchedSeconds!: number
   completed!: boolean
   createdAt!: string

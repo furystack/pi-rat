@@ -5,7 +5,7 @@ export class MovieFile {
   driveLetter!: string
   path!: string
   fileName!: string
-  ffprobe?: FFProbeResult | null = null
+  ffprobe!: FFProbeResult
   relatedFiles?: Array<{
     type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'
     path: string
