@@ -20,6 +20,10 @@ RUN yarn workspaces focus service --production
 
 FROM node:19-alpine as runner
 
+RUN apk upgrade -U \ 
+    && apk add ffmpeg \
+    && rm -rf /var/cache/*
+
 COPY --chown=node:node --from=base /home/node/app /home/node/app
 
 USER node
