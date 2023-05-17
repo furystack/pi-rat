@@ -9,7 +9,7 @@ const navigateToDashboardList = async (page: Page) => {
 }
 
 const setMonacoValue = async (page: Page, value: any) => {
-  const monaco = await page.getByRole('textbox')
+  const monaco = await page.locator('textarea')
   await monaco.press('Control+a')
   await monaco.fill(JSON.stringify(value, null, 2), {})
   await monaco.press('Control+End')
@@ -79,7 +79,7 @@ test.describe('Dashboard', () => {
     await trySaveDashboard(page)
     await assertAndDismissNoty(page, 'Entity updated successfully')
 
-    await page.getByRole('link', { name: '📔 Dashboards' }).click()
+    await navigateToDashboardList(page)
 
     await page
       .locator('shades-data-grid-row')
