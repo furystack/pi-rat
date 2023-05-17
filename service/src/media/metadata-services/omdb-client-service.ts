@@ -3,6 +3,7 @@ import type { Injector } from '@furystack/inject'
 import { Injectable } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 import { Config } from 'common'
 
@@ -42,6 +43,18 @@ export class OmdbClientService {
       })
     }
     this.config = config[0] as OmdbConfig
+
+    const dataSet = getDataSetFor(injector, Config, 'id')
+    dataSet.onEntityRemoved.subscribe(({ key }) => {
+      key === config[0].id && this.init(injector)
+    })
+    dataSet.onEntityUpdated.subscribe(({ id }) => {
+      id === config[0].id && this.init(injector)
+    })
+
+    dataSet.onEntityAdded.subscribe(({ entity }) => {
+      entity.type === 'OMDB_CONFIG' && this.init(injector)
+    })
   }
 
   public async fetchOmdbMovieMetadata({
