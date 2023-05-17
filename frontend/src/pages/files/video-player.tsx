@@ -36,9 +36,7 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
                 kind: 'translation',
                 label: stream.tags.title || stream.tags.language || stream.tags.filename || stream.index,
                 language: stream.tags.language,
-                src: `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
-                  `${path}-audio-${stream.index}.aac`,
-                )}/download`,
+                enabled: i === 0,
               }),
           )
         audioTracks.forEach((track) => player.audioTracks().addTrack(track))
@@ -46,15 +44,6 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         player.audioTracks().addEventListener('change', () => {
           const enabledTrack = player.audioTracks().tracks_.find((track: any) => track.enabled)
           console.log(enabledTrack)
-          // Log the currently enabled AudioTrack label.
-          // for (var i = 0; i < audioTrackList.length; i++) {
-          //   var track = audioTrackList[i]
-
-          //   if (track.enabled) {
-          //     videojs.log(track.label)
-          //     return
-          //   }
-          // }
         })
 
         ffprobe.result.streams
@@ -92,7 +81,7 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         <source
           src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
             path,
-          )}/download`}
+          )}/stream`}
           type="video/mp4"
         />
       </video>

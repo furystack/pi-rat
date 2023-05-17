@@ -206,6 +206,33 @@
       ],
       "additionalProperties": false
     },
+    "StreamEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "letter",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
     "PostDriveEndpoint": {
       "type": "object",
       "properties": {
@@ -1321,6 +1348,9 @@
             "/files/:letter/:path/download": {
               "$ref": "#/definitions/DownloadEndpoint"
             },
+            "/files/:letter/:path/stream": {
+              "$ref": "#/definitions/StreamEndpoint"
+            },
             "/files/:letter/:path/ffprobe": {
               "$ref": "#/definitions/FfprobeEndpoint"
             }
@@ -1330,6 +1360,7 @@
             "/volumes/:id",
             "/files/:letter/:path",
             "/files/:letter/:path/download",
+            "/files/:letter/:path/stream",
             "/files/:letter/:path/ffprobe"
           ],
           "additionalProperties": false
