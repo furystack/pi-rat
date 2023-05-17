@@ -3,6 +3,7 @@ import { Paper } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
 import type { Drive } from 'common'
+import { encode } from 'common'
 import { DriveSelector } from './drive-selector.js'
 import { FileList } from './file-list.js'
 
@@ -47,9 +48,7 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive> }>({
               history.pushState(
                 '',
                 '',
-                `/file-browser/openFile/${encodeURIComponent(currentDrive.letter)}/${encodeURIComponent(
-                  PathHelper.joinPaths(path, v.name),
-                )}`,
+                `/file-browser/openFile/${encode(currentDrive.letter)}/${encode(PathHelper.joinPaths(path, v.name))}`,
               )
               injector.getInstance(LocationService).updateState()
             }

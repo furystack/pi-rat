@@ -63,11 +63,11 @@ export class FileAssociationsService {
 
   public async getServiceForFile(_letter: string, path: string) {
     const extension = path.split('.').pop()
+
     if (extension) {
       if (this.videoPlayerExtensions.includes(extension)) {
         return 'video-player' as const
       }
-
       if (this.musicPlayerExtensions.includes(extension)) {
         return 'music-player' as const
       }

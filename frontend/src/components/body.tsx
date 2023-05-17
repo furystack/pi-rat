@@ -6,6 +6,7 @@ import { Init, Offline, Login } from '../pages/index.js'
 import { DefaultDashboard } from './dashboard/default-dashboard.js'
 import { LoadableDashboard } from './dashboard/LoadableDashboard.js'
 import { PiRatLazyLoad } from './pirat-lazy-load.js'
+import { decode } from 'common'
 
 const onLeave = async ({ element }: { element: HTMLElement }) => {
   await fadeOut(element, { easing: 'ease-in', duration: 200 })
@@ -37,7 +38,7 @@ const adminRoutes: Array<Route<any>> = [
       <PiRatLazyLoad
         component={async () => {
           const { FilesPage } = await import('../pages/files/index.js')
-          return <FilesPage letter={match.params.driveLetter} path={decodeURIComponent(match.params.path)} />
+          return <FilesPage letter={match.params.driveLetter} path={decode(match.params.path)} />
         }}
       />
     ),

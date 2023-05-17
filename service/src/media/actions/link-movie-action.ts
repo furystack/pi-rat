@@ -98,6 +98,7 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
     filter: {
       driveLetter: { $eq: drive },
       path: { $eq: path },
+      fileName: { $eq: fileName },
     },
   })
 
