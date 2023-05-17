@@ -1,4 +1,5 @@
 import { isSampleFile } from './is-sample-file'
+import { describe, it, expect } from 'vitest'
 
 describe('isSampleFile', () => {
   it('Should indicate true if the file name contains the sample word', () => {
