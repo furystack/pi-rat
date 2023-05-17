@@ -10,6 +10,7 @@ import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { RequestError } from '@furystack/rest'
 import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
+import { extractSubtitles } from '../utils/extract-subtitles.js'
 
 const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
   const movieStore = getStoreManager(injector).getStoreFor(Movie, 'imdbId')
@@ -149,6 +150,8 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
     fileName,
     imdbId: added.imdbID,
   })
+
+  await extractSubtitles({ driveLetter: drive, path, fileName, injector })
 
   return JsonResult({ status: 'linked' })
 }

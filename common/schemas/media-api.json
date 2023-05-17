@@ -48,6 +48,48 @@
       ],
       "additionalProperties": false
     },
+    "ExtractSubtitles": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "properties": {
+            "drive": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "fileName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "drive",
+            "path",
+            "fileName"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "body",
+        "result"
+      ],
+      "additionalProperties": false
+    },
     "FetchOmdbSeries": {
       "type": "object",
       "properties": {
@@ -455,6 +497,9 @@
             },
             "/link-movie": {
               "$ref": "#/definitions/LinkMovie"
+            },
+            "/extract-subtitles": {
+              "$ref": "#/definitions/ExtractSubtitles"
             }
           },
           "required": [
@@ -463,7 +508,8 @@
             "/movies/:movieId/re-fetch-metadata",
             "/movies/:movieId/re-extract-subtitles",
             "/movie-files",
-            "/link-movie"
+            "/link-movie",
+            "/extract-subtitles"
           ],
           "additionalProperties": false
         },

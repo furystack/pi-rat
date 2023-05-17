@@ -5,6 +5,8 @@ import { isMovieFile, getFallbackMetadata } from 'common'
 import { ObservableValue } from '@furystack/utils'
 import { FileInfoModal } from './file-info-modal.js'
 import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
+import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
+import { NotyList, NotyService } from '@furystack/shades-common-components'
 
 export const FileContextMenu = Shade<{
   entry: DirectoryEntry
@@ -13,7 +15,7 @@ export const FileContextMenu = Shade<{
   open: () => void
 }>({
   shadowDomName: 'file-context-menu',
-  render: ({ children, props, useDisposable }) => {
+  render: ({ children, props, useDisposable, injector }) => {
     const { entry, currentDriveLetter, currentPath, open } = props
     const isInfoVisible = useDisposable('isInfoVisible', () => new ObservableValue(false))
     const isRelatedMoviesVisible = useDisposable('isRelatedMoviesVisible', () => new ObservableValue(false))
@@ -40,6 +42,38 @@ export const FileContextMenu = Shade<{
                     label: `Related Movies (${movieMetadata.title})`,
                     onClick: () => {
                       isRelatedMoviesVisible.setValue(true)
+                    },
+                  },
+                  {
+                    icon: '📝',
+                    label: 'Extract Subtitles',
+                    onClick: () => {
+                      const notyService = injector.getInstance(NotyService)
+                      injector
+                        .getInstance(MediaApiClient)
+                        .call({
+                          method: 'POST',
+                          action: '/extract-subtitles',
+                          body: {
+                            drive: currentDriveLetter,
+                            path: currentPath,
+                            fileName: entry.name,
+                          },
+                        })
+                        .then(() => {
+                          notyService.addNoty({
+                            type: 'success',
+                            title: 'Subtitles extracted',
+                            body: <>Subtitles extracted successfully for file {entry.name}</>,
+                          })
+                        })
+                        .catch(() => {
+                          notyService.addNoty({
+                            type: 'error',
+                            title: 'Subtitles extraction failed',
+                            body: <>Subtitles extraction failed for file {entry.name}</>,
+                          })
+                        })
                     },
                   },
                 ]

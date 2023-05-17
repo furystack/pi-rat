@@ -34,7 +34,7 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
               new videojs.AudioTrack({
                 index: stream.index,
                 id: `audio-track-${stream.index}`,
-                label: stream.tags.language || stream.tags.title || stream.tags.filename || stream.index,
+                label: stream.tags.title || stream.tags.language || stream.tags.filename || stream.index,
               }),
           )
         audioTracks.forEach((track) => player.audioTracks().addTrack(track))
@@ -42,11 +42,14 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         ffprobe.result.streams
           .filter((stream) => (stream.codec_type as any) === 'subtitle')
           .forEach((subtitle) => {
-            player.addTextTrack(
-              'subtitles',
-              subtitle.tags.language || subtitle.tags.title || subtitle.tags.filename,
-              subtitle.tags.language,
-            )
+            player.addRemoteTextTrack({
+              kind: 'subtitles',
+              label: subtitle.tags.title || subtitle.tags.language || subtitle.tags.filename,
+              src: `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
+                `${path}-subtitle-${subtitle.index}.vtt`,
+              )}/download`,
+              srcLang: subtitle.tags.language,
+            })
           })
       })
 
@@ -59,11 +62,13 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
           marginTop: '64px',
         }}
         className="video-js"
+        crossOrigin="use-credentials"
         data-setup={JSON.stringify({
           controls: true,
           autoplay: true,
           preload: 'auto',
           audioTracks: [],
+          withCredentials: true,
         })}
         controls>
         <source

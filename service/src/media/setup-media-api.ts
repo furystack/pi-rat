@@ -16,6 +16,7 @@ import { Movie, MovieWatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMet
 import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
+import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -82,6 +83,9 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/movies/:movieId/save-watch-progress': () => null as any, // TODO: Implement
         '/link-movie': Authorize('admin')(
           Validate({ schema: mediaApiSchema, schemaName: 'LinkMovie' })(LinkMovieAction),
+        ),
+        '/extract-subtitles': Authorize('admin')(
+          Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(ExtractSubtitlesAction), // TODO: Implement
         ),
       },
       PATCH: {

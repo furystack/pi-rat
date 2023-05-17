@@ -24,6 +24,15 @@ export type LinkMovie = {
   result: { status: 'already-linked' | 'linked' | 'failed' }
 }
 
+export type ExtractSubtitles = {
+  body: {
+    drive: string
+    path: string
+    fileName: string
+  }
+  result: { success: boolean }
+}
+
 export type FetchOmdbSeries = {
   body: {
     imdbId: string
@@ -62,6 +71,7 @@ export interface MediaApi extends RestApi {
     '/movies/:movieId/re-extract-subtitles': { url: { movieId: string }; result: { success: boolean } }
     '/movie-files': PostEndpoint<MovieFile, 'imdbId'>
     '/link-movie': LinkMovie
+    '/extract-subtitles': ExtractSubtitles
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
