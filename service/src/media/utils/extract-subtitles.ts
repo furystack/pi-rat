@@ -59,7 +59,7 @@ export const extractSubtitles = async ({
   await execAsync(
     `ffmpeg -i ${fullPath} -f webvtt ${subtitles
       .map((s, i) => `-map 0:s:${i} ${fileName}-subtitle-${s.streamIndex}.vtt`)
-      .join(' ')}`,
+      .join(' ')} -y`,
     {
       cwd,
     },
