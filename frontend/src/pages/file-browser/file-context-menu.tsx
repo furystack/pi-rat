@@ -6,7 +6,7 @@ import { ObservableValue } from '@furystack/utils'
 import { FileInfoModal } from './file-info-modal.js'
 import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
-import { NotyList, NotyService } from '@furystack/shades-common-components'
+import { NotyService } from '@furystack/shades-common-components'
 
 export const FileContextMenu = Shade<{
   entry: DirectoryEntry
@@ -45,7 +45,7 @@ export const FileContextMenu = Shade<{
                     },
                   },
                   {
-                    icon: '📝',
+                    icon: '💬',
                     label: 'Extract Subtitles',
                     onClick: () => {
                       const notyService = injector.getInstance(NotyService)

@@ -34,6 +34,18 @@ const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector
   }
 }
 
+const ensureOmdbMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
+  const store = await getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
+  const existing = await store.get(omdbMeta.imdbID)
+  if (existing) {
+    return existing
+  }
+  const {
+    created: [added],
+  } = await store.add(omdbMeta)
+  return added
+}
+
 const ensureSeriesExists = async (omdbMeta: OmdbSeriesMetadata, injector: Injector) => {
   const seriesStore = getStoreManager(injector).getStoreFor(Series, 'imdbId')
   const existingSeries = await seriesStore.get(omdbMeta.imdbID)
@@ -113,8 +125,6 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
     await ensureMovieExists(storedResult[0], injector)
     await ensureOmdbSeriesExists(storedResult[0], injector)
 
-    // TODO: Check for series
-
     await movieFileStore.add({
       driveLetter: drive,
       path,
@@ -137,9 +147,7 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
     throw new RequestError('Metadata not found', 404)
   }
 
-  const {
-    created: [added],
-  } = await omdbStore.add(result)
+  const added = await ensureOmdbMovieExists(result, injector)
 
   await ensureMovieExists(added, injector)
   await ensureOmdbSeriesExists(added, injector)

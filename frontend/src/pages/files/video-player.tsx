@@ -30,14 +30,32 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         const audioTracks = ffprobe.result.streams
           .filter((stream) => stream.codec_type === 'audio')
           .map(
-            (stream) =>
+            (stream, i) =>
               new videojs.AudioTrack({
-                index: stream.index,
                 id: `audio-track-${stream.index}`,
+                kind: 'translation',
                 label: stream.tags.title || stream.tags.language || stream.tags.filename || stream.index,
+                language: stream.tags.language,
+                src: `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
+                  `${path}-audio-${stream.index}.aac`,
+                )}/download`,
               }),
           )
         audioTracks.forEach((track) => player.audioTracks().addTrack(track))
+
+        player.audioTracks().addEventListener('change', () => {
+          const enabledTrack = player.audioTracks().tracks_.find((track: any) => track.enabled)
+          console.log(enabledTrack)
+          // Log the currently enabled AudioTrack label.
+          // for (var i = 0; i < audioTrackList.length; i++) {
+          //   var track = audioTrackList[i]
+
+          //   if (track.enabled) {
+          //     videojs.log(track.label)
+          //     return
+          //   }
+          // }
+        })
 
         ffprobe.result.streams
           .filter((stream) => (stream.codec_type as any) === 'subtitle')

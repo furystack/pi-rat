@@ -14,9 +14,7 @@ export const RelatedMoviesModalContent = Shade<{
 }>({
   shadowDomName: 'shade-app-related-movies-modal-content',
   render: ({ useObservable, injector, props }) => {
-    const { drive, path: parentPath, file } = props
-
-    const path = `${parentPath}/${file.name}`
+    const { drive, path, file } = props
 
     const linkedFilesService = injector.getInstance(MovieFilesService)
     const [linkedFiles] = useObservable(
