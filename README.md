@@ -10,5 +10,5 @@ Home cloud and media solutions that runs even on a cutting board
 
 # Testing
 
-- You can execute the example Jest tests with `yarn test:unit`
+- You can execute the example unit tests with `yarn test:unit`
 - You can execute E2E tests with `yarn test:e2e`

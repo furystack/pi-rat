@@ -11,7 +11,7 @@ export const setupFrontendBundle = async (injector: Injector) => {
     injector,
     baseUrl: '',
     fallback: 'index.html',
-    path: join(process.cwd(), '..', 'frontend', 'bundle') + sep,
+    path: join(process.cwd(), '..', 'frontend', 'dist') + sep,
     port: 9090,
   })
   logger.information({ message: '✅  Frontend bundle setup completed' })

@@ -1,8 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
 import { Input } from '@furystack/shades-common-components'
-import { WizardStep } from '../components/wizard-step'
-import { InstallApiClient } from '../services/install-api-client'
+import { WizardStep } from '../components/wizard-step.js'
+import { InstallApiClient } from '../services/api-clients/install-api-client.js'
 
 export const CreateAdminStep = Shade<WizardStepProps>({
   shadowDomName: 'create-admin-step',
@@ -22,7 +22,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
             method: 'POST',
             action: '/install',
             body: {
-              username: values.username.toString(),
+              username: values.userName.toString(),
               password: values.password.toString(),
             },
           })
@@ -31,7 +31,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
         }}>
         You have to create a super admin user.
         <Input
-          name="username"
+          name="userName"
           variant="outlined"
           autofocus
           autocomplete="false"

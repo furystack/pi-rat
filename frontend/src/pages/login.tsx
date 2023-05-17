@@ -1,29 +1,14 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { SessionService } from '../services/session'
-import { Button, Input, Loader, Paper } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
+import { SessionService } from '../services/session.js'
+import { Button, Form, Input, Loader, Paper } from '@furystack/shades-common-components'
 
 export const LoginButton = Shade({
   shadowDomName: 'shade-login-button',
-  render: ({ useObservable, injector, element }) => {
+  render: ({ useObservable, injector }) => {
     const sessionService = injector.getInstance(SessionService)
-    const [isOperationInProgress] = useObservable(
-      'isOperationInProgress',
-      sessionService.isOperationInProgress,
-      () => {
-        element
-          .querySelectorAll('input')
-          .forEach((input) => input.setAttribute('disabled', isOperationInProgress.toString()))
-      },
-      true,
-    )
+    const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
     return (
-      <Button
-        variant="contained"
-        className="login-button"
-        disabled={isOperationInProgress}
-        type="submit"
-        onclick={(ev) => (ev.target as HTMLElement)?.closest('form')?.requestSubmit()}>
+      <Button variant="contained" className="login-button" disabled={isOperationInProgress} type="submit">
         <div
           style={{
             display: 'flex',
@@ -45,13 +30,15 @@ export const LoginButton = Shade({
   },
 })
 
+type LoginPayload = {
+  userName: string
+  password: string
+}
+
 export const Login = Shade({
   shadowDomName: 'shade-login',
-  render: ({ injector, useDisposable, useObservable }) => {
+  render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService)
-
-    const postData = useDisposable('postData', () => new ObservableValue({ userName: '', password: '' }))
-
     const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
     const [error] = useObservable('loginError', sessionService.loginError)
 
@@ -67,23 +54,20 @@ export const Login = Shade({
           paddingTop: '100px',
         }}>
         <Paper elevation={3}>
-          <form
+          <Form<LoginPayload>
+            validate={(plainData: any): plainData is LoginPayload => {
+              return plainData?.userName?.length && plainData?.password?.length
+            }}
             className="login-form"
-            onsubmit={(ev) => {
-              ev.preventDefault()
-              const { userName, password } = postData.getValue()
-              sessionService.login(userName, password)
-            }}>
+            onSubmit={({ userName, password }) => sessionService.login(userName, password)}>
             <h2>Login</h2>
             <Input
               labelTitle="User name"
-              name="username"
+              name="userName"
               autofocus
               required
               disabled={isOperationInProgress}
-              placeholder="The user's login name"
-              value={postData.getValue().userName}
-              onTextChange={(value) => postData.setValue({ ...postData.getValue(), userName: value })}
+              getHelperText={() => "The user's login name"}
               type="text"
             />
             <Input
@@ -91,10 +75,8 @@ export const Login = Shade({
               name="password"
               required
               disabled={isOperationInProgress}
-              placeholder="The password for the user"
-              value={postData.getValue().password}
+              getHelperText={() => 'The password for the user'}
               type="password"
-              onTextChange={(value) => postData.setValue({ ...postData.getValue(), password: value })}
             />
             <div
               style={{
@@ -109,7 +91,7 @@ export const Login = Shade({
               <button type="submit" style={{ display: 'none' }} />
             </div>
             <p style={{ fontSize: '10px' }}>You can login with the default 'testuser' / 'password' credentials</p>
-          </form>
+          </Form>
         </Paper>
       </div>
     )

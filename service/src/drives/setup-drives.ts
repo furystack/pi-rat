@@ -5,11 +5,10 @@ import { getRepository } from '@furystack/repository'
 import { access, mkdir } from 'fs/promises'
 import { constants } from 'fs'
 import { Drive } from 'common'
-import { setupDrivesRestApi } from './setup-drives-rest-api'
 import { Model, DataTypes } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options'
-import { useFileWatchers } from './file-watcher-service'
-import { withRole } from '../with-role'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { useFileWatchers } from './file-watcher-service.js'
+import { withRole } from '../authorization/with-role.js'
 
 export const existsAsync = async (path: string, mode?: number) => {
   try {
@@ -37,7 +36,7 @@ class DriveModel extends Model<Drive, Drive> implements Drive {
 
 export const setupDrives = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Drives')
-  await logger.information({ message: '📁  Setting up drives...' })
+  await logger.verbose({ message: '📁  Setting up drives store and repository...' })
 
   useSequelize({
     injector,
@@ -51,9 +50,12 @@ export const setupDrives = async (injector: Injector) => {
           letter: {
             type: DataTypes.STRING,
             primaryKey: true,
+            allowNull: false,
           },
           physicalPath: {
             type: DataTypes.STRING,
+            unique: true,
+            allowNull: false,
           },
           createdAt: {
             type: DataTypes.DATE,
@@ -64,7 +66,6 @@ export const setupDrives = async (injector: Injector) => {
         },
         {
           sequelize,
-          modelName: 'Drive',
         },
       )
       await sequelize.sync()
@@ -74,7 +75,23 @@ export const setupDrives = async (injector: Injector) => {
   await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(Drive, 'letter', {
     authorizeGet: withRole('admin'),
-    authorizeUpdate: withRole('admin'),
+    authorizeUpdate: async (args) => {
+      const internalFields = ['createdAt', 'updatedAt', 'letter']
+
+      const isAuthorized = await withRole('admin')(args)
+      if (isAuthorized?.isAllowed === false) {
+        return isAuthorized
+      }
+
+      if (Object.keys(args.change).some((key) => internalFields.includes(key))) {
+        return {
+          isAllowed: false,
+          message: `You are not allowed to change the following properties: ${internalFields.join(', ')}`,
+        }
+      }
+
+      return { isAllowed: true }
+    },
     authorizeRemove: withRole('admin'),
     authorizeAdd: async (args) => {
       const isAuthorized = await withRole('admin')(args)
@@ -96,11 +113,8 @@ export const setupDrives = async (injector: Injector) => {
     },
   })
 
-  await logger.verbose({ message: 'Setting up REST API...' })
-  await setupDrivesRestApi(injector)
-
   await logger.verbose({ message: '💾  Setting up FileWatchers...' })
   await useFileWatchers(injector)
 
-  await logger.information({ message: '✅  Drives has been set up' })
+  await logger.verbose({ message: '✅  Drives store and repository has been set up' })
 }

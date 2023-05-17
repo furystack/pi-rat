@@ -2,7 +2,7 @@ module.exports = {
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier', 'plugin:jsdoc/recommended'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'prettier', 'jsdoc'],
-  env: { browser: true, node: true, es6: true, jest: true },
+  env: { browser: true, node: true, es6: true },
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module',
@@ -58,6 +58,7 @@ module.exports = {
     'default-case': 'error',
     'jsdoc/require-param-type': 'off',
     'jsdoc/require-returns-type': 'off',
+    'jsdoc/check-tag-names': 'off',
   },
   overrides: [
     {

@@ -1,6 +1,7 @@
-import { createComponent, LazyLoad, Shade } from '@furystack/shades'
-import { MonacoEditor } from '../../components/monaco-editor'
-import { environmentOptions } from '../../environment-options'
+import { createComponent, Shade } from '@furystack/shades'
+import { MonacoEditor } from '../../components/monaco-editor.js'
+import { environmentOptions } from '../../environment-options.js'
+import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 
 const getMonacoLanguage = (path: string) => {
   const extension = path.split('.').pop()
@@ -25,8 +26,7 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
     const { letter, path } = props
 
     return (
-      <LazyLoad
-        loader={<div>Loading...</div>}
+      <PiRatLazyLoad
         component={async () => {
           const result = await fetch(
             `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(

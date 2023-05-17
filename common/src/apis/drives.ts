@@ -4,11 +4,12 @@ import type {
   GetCollectionResult,
   GetEntityEndpoint,
   PatchEndpoint,
-  PostEndpoint,
   RestApi,
 } from '@furystack/rest'
-import type { DirectoryEntry } from '../models/directory-entry'
-import type { Drive } from '../models/drive'
+import type { DirectoryEntry } from '../models/drives/directory-entry.js'
+import type { Drive } from '../models/drives/drive.js'
+import type { WithOptionalId } from '@furystack/core'
+import type { FFProbeResult } from 'ffprobe'
 
 export type GetDirectoryEntries = {
   url: {
@@ -43,15 +44,46 @@ export type DownloadEndpoint = {
   result: unknown
 }
 
+export type StreamEndpoint = {
+  url: {
+    letter: string
+    path: string
+  }
+  result: unknown
+}
+
+export type PostDriveEndpoint = {
+  body: Omit<WithOptionalId<Drive, 'letter'>, 'createdAt' | 'updatedAt'>
+  result: Drive
+}
+
+export type PatchDriveEndpoint = {
+  body: Partial<Omit<Drive, 'createdAt' | 'updatedAt'>>
+  url: {
+    id: Drive['letter']
+  }
+  result: {}
+}
+
+export type FfprobeEndpoint = {
+  url: {
+    letter: string
+    path: string
+  }
+  result: FFProbeResult
+}
+
 export interface DrivesApi extends RestApi {
   GET: {
     '/volumes': GetCollectionEndpoint<Drive>
     '/volumes/:id': GetEntityEndpoint<Drive, 'letter'>
     '/files/:letter/:path': GetDirectoryEntries
     '/files/:letter/:path/download': DownloadEndpoint
+    '/files/:letter/:path/stream': StreamEndpoint
+    '/files/:letter/:path/ffprobe': FfprobeEndpoint
   }
   POST: {
-    '/volumes': PostEndpoint<Drive, 'letter'>
+    '/volumes': PostDriveEndpoint
     '/volumes/:letter/:path/upload': UploadEndpoint
   }
   PATCH: {

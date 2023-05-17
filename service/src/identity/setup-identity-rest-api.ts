@@ -14,9 +14,9 @@ import {
 } from '@furystack/rest-service'
 import type { IdentityApi } from 'common'
 import { User } from 'common'
-import { getCorsOptions } from '../get-cors-options'
-import { getPort } from '../get-port'
-import { identityApiSchema } from 'common'
+import { getCorsOptions } from '../get-cors-options.js'
+import { getPort } from '../get-port.js'
+import identityApiSchema from 'common/schemas/identity-api.json' assert { type: 'json' }
 
 export const setupIdentityRestApi = async (injector: Injector) => {
   await useRestService<IdentityApi>({
@@ -44,7 +44,7 @@ export const setupIdentityRestApi = async (injector: Injector) => {
       POST: {
         '/login': LoginAction,
         '/logout': LogoutAction,
-        '/users': Validate({ schema: identityApiSchema, schemaName: 'PostEndpoint<User,"username">' })(
+        '/users': Validate({ schema: identityApiSchema, schemaName: 'PostUserEndpoint' })(
           createPostEndpoint({
             model: User,
             primaryKey: 'username',
@@ -52,7 +52,10 @@ export const setupIdentityRestApi = async (injector: Injector) => {
         ),
       },
       PATCH: {
-        '/users/:id': Validate({ schema: identityApiSchema, schemaName: 'PatchEndpoint<User,"username">' })(
+        '/users/:id': Validate({
+          schema: identityApiSchema,
+          schemaName: 'PatchEndpoint<Omit<User,("createdAt"|"updatedAt")>,"username">',
+        })(
           createPatchEndpoint({
             model: User,
             primaryKey: 'username',

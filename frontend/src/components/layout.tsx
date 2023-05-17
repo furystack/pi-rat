@@ -1,9 +1,10 @@
-import { createComponent, Shade, LazyLoad } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import { NotyList } from '@furystack/shades-common-components'
-import { Button, Loader, Paper, ThemeProviderService } from '@furystack/shades-common-components'
-import { InstallApiClient } from '../services/install-api-client'
-import { Body } from './body'
-import { Header } from './header'
+import { ThemeProviderService } from '@furystack/shades-common-components'
+import { Body } from './body.js'
+import { Header } from './header.js'
+import { PiRatLazyLoad } from './pirat-lazy-load.js'
+import { InstallService } from '../services/install-service.js'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
@@ -25,20 +26,9 @@ export const Layout = Shade({
         <div style={{ zIndex: '2', position: 'fixed' }}>
           <NotyList />
         </div>
-        <LazyLoad
-          loader={<Loader style={{ width: '100px', height: '100px', alignSelf: 'center', justifySelf: 'center' }} />}
-          error={(error, retry) => (
-            <Paper>
-              <h1>Cannot reach the service</h1>
-              <p>{error?.toString()}</p>
-              <Button onclick={retry}>Retry</Button>
-            </Paper>
-          )}
+        <PiRatLazyLoad
           component={async () => {
-            const { result } = await injector.getInstance(InstallApiClient).call({
-              method: 'GET',
-              action: '/serviceStatus',
-            })
+            const result = await injector.getInstance(InstallService).getServiceStatus()
             if (result.state === 'installed') {
               return (
                 <>
@@ -46,9 +36,11 @@ export const Layout = Shade({
                   <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} />
                 </>
               )
-            } else {
-              const { InstallerPage } = await import('../installer')
+            } else if (result.state === 'needsInstall') {
+              const { InstallerPage } = await import('../installer/index.js')
               return <InstallerPage />
+            } else {
+              throw Error(`Cannot fetch the service status. Maybe the backend is not running?`)
             }
           }}
         />

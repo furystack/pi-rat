@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { User } from 'common'
-import { identityApiSchema } from 'common'
-import { GenericEditor } from '../../components/generic-editor'
-import { GenericEditorService } from '../../components/generic-editor/generic-editor-service'
-import { IdentityApiClient } from '../../services/identity-api-client'
-import { MonacoModelProvider } from '../../services/monaco-model-provider'
+import { User } from 'common'
+import identitySchemas from 'common/schemas/identity-entities.json'
+import { GenericEditor } from '../../components/generic-editor/index.js'
+import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
+import { IdentityApiClient } from '../../services/api-clients/identity-api-client.js'
+import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const UsersPage = Shade({
   shadowDomName: 'shade-app-users-page',
@@ -15,15 +15,17 @@ export const UsersPage = Shade({
 
     const model = modelProvider.getModelForEntityType({
       schemaName: 'User',
-      jsonSchema: identityApiSchema.definitions.User,
+      jsonSchema: { ...identitySchemas, type: 'object', $ref: '#/definitions/User' },
     })
 
     const service = useDisposable(
       'service',
       () =>
-        new GenericEditorService<User, 'username'>({
+        new GenericEditorService({
           defaultSettings: {},
+          model: User,
           keyProperty: 'username',
+          readonlyProperties: ['createdAt', 'updatedAt'],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',

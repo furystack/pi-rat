@@ -1,17 +1,17 @@
 import type { ChildrenList } from '@furystack/shades'
-import { LazyLoad } from '@furystack/shades'
 import { createComponent, LocationService, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
 import { NotyService } from '@furystack/shades-common-components'
 import { Button, SelectionCell } from '@furystack/shades-common-components'
 import { Fab } from '@furystack/shades-common-components'
 import { DataGrid } from '@furystack/shades-common-components'
-import type { GenericEditorService } from './generic-editor-service'
+import type { GenericEditorService } from './generic-editor-service.js'
 import type monaco from 'monaco-editor'
-import { GenericMonacoEditor } from './generic-monaco-editor'
+import { GenericMonacoEditor } from './generic-monaco-editor.js'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 
-type GenericEditorProps<T, TKey extends keyof T> = {
-  service: GenericEditorService<T, TKey>
+type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
+  service: GenericEditorService<T, TKey, TReadonlyProperties>
   columns: DataGridProps<T>['columns']
   headerComponents: DataGridProps<T>['headerComponents']
   rowComponents: DataGridProps<T>['rowComponents']
@@ -19,8 +19,8 @@ type GenericEditorProps<T, TKey extends keyof T> = {
   model?: monaco.editor.ITextModel
 }
 
-export const GenericEditor: <T, TKey extends keyof T>(
-  props: GenericEditorProps<T, TKey>,
+export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T>(
+  props: GenericEditorProps<T, TKey, TReadonlyProperties>,
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
@@ -45,8 +45,7 @@ export const GenericEditor: <T, TKey extends keyof T>(
 
     if (mode === 'edit' && currentId) {
       return (
-        <LazyLoad
-          loader={<></>}
+        <PiRatLazyLoad
           component={async () => {
             const entry = await service.getSingleEntry(currentId as any)
             return (

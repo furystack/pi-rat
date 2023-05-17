@@ -63,7 +63,6 @@ dist
 *.tsbuildinfo
 frontend/bundle/js
 
-service/data.sqlite
 testresults
 
 .pnp.*
@@ -74,3 +73,6 @@ testresults
 !.yarn/sdks
 !.yarn/versions
 service/data/*.sqlite
+data/*.sqlite
+
+browser-temp
