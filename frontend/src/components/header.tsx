@@ -1,9 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { AppBar, AppBarLink, Button } from '@furystack/shades-common-components'
-import { environmentOptions } from '../environment-options'
-import { SessionService } from '../services/session'
-import { GithubLogo } from './github-logo'
-import { ThemeSwitch } from './theme-switch'
+import { environmentOptions } from '../environment-options.js'
+import { SessionService } from '../services/session.js'
+import { GithubLogo } from './github-logo/index.js'
+import { ThemeSwitch } from './theme-switch/index.js'
+import { PiRatCommandPalette } from './command-palette/index.js'
 
 export interface HeaderProps {
   title: string
@@ -19,13 +20,9 @@ const AdminLinks = Shade<{}>({
 
     return isAdmin ? (
       <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px', gap: '8px' }}>
-        |
         <AppBarLink href="/file-browser" title="Drives">
-          📂 File Browser
-        </AppBarLink>{' '}
-        |<AppBarLink href="/entities/drives">💽 Drives</AppBarLink>
-        <AppBarLink href="/entities/users">👥 Users</AppBarLink>
-        <AppBarLink href="/entities/dashboards">📔 Dashboards</AppBarLink>
+          📂 Files
+        </AppBarLink>
       </div>
     ) : null
   },
@@ -46,7 +43,14 @@ export const Header = Shade<HeaderProps>({
             <AdminLinks />
           </>
         ) : null}
-        <div style={{ flex: '1' }} />
+
+        <AppBarLink title="Movies" href="/movies">
+          🎥 Movies
+        </AppBarLink>
+
+        <div style={{ flex: '1' }}>
+          <PiRatCommandPalette />
+        </div>
         <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
           <ThemeSwitch variant="outlined" />
           <a href={environmentOptions.repository} target="_blank">

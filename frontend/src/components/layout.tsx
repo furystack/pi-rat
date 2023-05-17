@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { NotyList } from '@furystack/shades-common-components'
 import { ThemeProviderService } from '@furystack/shades-common-components'
-import { InstallApiClient } from '../services/install-api-client'
-import { Body } from './body'
-import { Header } from './header'
-import { PiRatLazyLoad } from './pirat-lazy-load'
+import { Body } from './body.js'
+import { Header } from './header.js'
+import { PiRatLazyLoad } from './pirat-lazy-load.js'
+import { InstallService } from '../services/install-service.js'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
@@ -28,10 +28,7 @@ export const Layout = Shade({
         </div>
         <PiRatLazyLoad
           component={async () => {
-            const { result } = await injector.getInstance(InstallApiClient).call({
-              method: 'GET',
-              action: '/serviceStatus',
-            })
+            const result = await injector.getInstance(InstallService).getServiceStatus()
             if (result.state === 'installed') {
               return (
                 <>
@@ -40,7 +37,7 @@ export const Layout = Shade({
                 </>
               )
             } else if (result.state === 'needsInstall') {
-              const { InstallerPage } = await import('../installer')
+              const { InstallerPage } = await import('../installer/index.js')
               return <InstallerPage />
             } else {
               throw Error(`Cannot fetch the service status. Maybe the backend is not running?`)

@@ -1,4 +1,4 @@
-import type { Widget } from './widget'
+import type { Widget } from './widget.js'
 
 export class Dashboard {
   id!: string

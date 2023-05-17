@@ -4,11 +4,11 @@ import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { Layout } from './components/layout'
-import { environmentOptions } from './environment-options'
+import { Layout } from './components/layout.js'
+import { environmentOptions } from './environment-options.js'
 import { defaultDarkTheme, ThemeProviderService } from '@furystack/shades-common-components'
-import { SessionService } from './services/session'
-import { AvailableDrivesService } from './pages/file-browser/available-drives-service'
+import { SessionService } from './services/session.js'
+import { IdentityContext } from '@furystack/core'
 
 const shadeInjector = new Injector()
 
@@ -18,7 +18,7 @@ shadeInjector.getInstance(ThemeProviderService).set(defaultDarkTheme)
 
 shadeInjector.getInstance(SessionService).init()
 
-shadeInjector.getInstance(AvailableDrivesService)
+shadeInjector.setExplicitInstance(shadeInjector.getInstance(SessionService), IdentityContext)
 
 getLogger(shadeInjector).withScope('Startup').verbose({
   message: 'Initializing Shade Frontend...',

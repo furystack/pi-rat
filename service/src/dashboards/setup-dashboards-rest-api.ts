@@ -9,14 +9,15 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { DashboardsApi } from 'common'
-import { Dashboard, dashboardsApiSchema } from 'common'
-import { getPort } from '../get-port'
-import { getCorsOptions } from '../get-cors-options'
+import { Dashboard } from 'common'
+import dashboardsApiSchema from 'common/schemas/dashboards-api.json' assert { type: 'json' }
+import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../get-cors-options.js'
 
 export const setupDashboardsRestApi = async (injector: Injector) => {
   await useRestService<DashboardsApi>({
     injector,
-    root: 'api',
+    root: 'api/dashboards',
     port: getPort(),
     cors: getCorsOptions(),
     api: {

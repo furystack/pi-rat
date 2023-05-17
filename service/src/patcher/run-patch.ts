@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
-import type { Patch } from './patch'
+import type { Patch } from './patch.js'
 import { getLogger } from '@furystack/logging'
-import type { PatchRunStore } from './patch-run-store'
+import type { PatchRunStore } from './patch-run-store.js'
 
 export const runPatch = async (injector: Injector, patch: Patch, patchRunStore: PatchRunStore) => {
   const logger = getLogger(injector).withScope('Patch Runner')

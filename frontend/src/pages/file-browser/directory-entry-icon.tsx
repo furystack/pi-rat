@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { DirectoryEntry } from 'common'
-import { FileIcon } from './file-icon'
+import { FileIcon } from './file-icon.js'
 
 export const DirectoryEntryIcon = Shade<{ entry: DirectoryEntry }>({
   shadowDomName: 'directory-entry-icon',

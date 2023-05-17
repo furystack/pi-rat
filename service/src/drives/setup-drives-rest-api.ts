@@ -9,14 +9,17 @@ import {
   Validate,
 } from '@furystack/rest-service'
 import '@furystack/repository'
-import { Drive, drivesApiSchema } from 'common'
+import { Drive } from 'common'
+import drivesApiSchema from 'common/schemas/drives-api.json' assert { type: 'json' }
 import type { Injector } from '@furystack/inject'
-import { GetDirectoryEntriesAction } from './actions/get-directory-entries'
-import { getPort } from '../get-port'
-import { getCorsOptions } from '../get-cors-options'
-import { UploadAction } from './actions/upload-action'
-import { DeleteFileAction } from './actions/delete-file-action'
-import { DownloadAction } from './actions/download-action'
+import { GetDirectoryEntriesAction } from './actions/get-directory-entries.js'
+import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../get-cors-options.js'
+import { UploadAction } from './actions/upload-action.js'
+import { DeleteFileAction } from './actions/delete-file-action.js'
+import { DownloadAction } from './actions/download-action.js'
+import { FfprobeAction } from './actions/ffprobe-action.js'
+import { StreamAction } from './actions/stream-action.js'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({
@@ -48,6 +51,10 @@ export const setupDrivesRestApi = async (injector: Injector) => {
           GetDirectoryEntriesAction,
         ),
         '/files/:letter/:path/download': DownloadAction,
+        '/files/:letter/:path/stream': StreamAction,
+        '/files/:letter/:path/ffprobe': Validate({ schema: drivesApiSchema, schemaName: 'FfprobeEndpoint' })(
+          FfprobeAction,
+        ),
       },
       POST: {
         '/volumes/:letter/:path/upload': UploadAction,

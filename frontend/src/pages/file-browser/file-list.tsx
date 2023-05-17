@@ -1,47 +1,33 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
-import type { ObservableValue } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
-import { environmentOptions } from '../../environment-options'
-import { DrivesApiClient } from '../../services/drives-api-client'
-import { DrivesFilesystemNotificationsService } from '../../services/drives-filesystem-notifications-service'
-import { SessionService } from '../../services/session'
-import { BreadCrumbs } from './breadcrumbs'
-import { DirectoryEntryIcon } from './directory-entry-icon'
+import { environmentOptions } from '../../environment-options.js'
+import { SessionService } from '../../services/session.js'
+import { BreadCrumbs } from './breadcrumbs.js'
+import { DirectoryEntryIcon } from './directory-entry-icon.js'
+import { DrivesService } from '../../services/drives-service.js'
+import { FileContextMenu } from './file-context-menu.js'
 
 export const FileList = Shade<{
-  currentDriveLetter: ObservableValue<string>
-  currentPath: ObservableValue<string>
+  currentDriveLetter: string
+  currentPath: string
+  onChangePath: (newPath: string) => void
   onActivate?: (entry: DirectoryEntry) => void
 }>({
   shadowDomName: 'file-list',
-  render: ({ useDisposable, props, injector, useObservable }) => {
+  render: ({ useDisposable, props, injector }) => {
     const { currentDriveLetter, currentPath } = props
 
-    const client = injector.getInstance(DrivesApiClient)
+    const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
-    const refetch = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
-
-    useDisposable('DrivesFilesystemNotificationsService', () =>
-      injector.getInstance(DrivesFilesystemNotificationsService).onFilesystemChanged.subscribe((e) => {
-        const currentPathValue = currentPath.getValue()
-        const currentDrive = currentDriveLetter.getValue()
-        if (
-          e.drive === currentDrive &&
-          (e.path === currentPathValue || PathHelper.isAncestorOf(currentPathValue, e.path))
-        ) {
-          refetch()
-        }
-      }),
-    )
 
     const service = useDisposable(
       'service',
       () =>
         new CollectionService<DirectoryEntry>({
           loader: async () => {
-            if (!currentDriveLetter.getValue() || !props.currentPath.getValue()) {
+            if (!props.currentDriveLetter || !props.currentPath) {
               return { count: 0, entries: [] }
             }
 
@@ -56,25 +42,15 @@ export const FileList = Shade<{
               isSymbolicLink: false,
             }
 
-            const result = await client.call({
-              method: 'GET',
-              action: '/files/:letter/:path',
-              url: {
-                letter: currentDriveLetter.getValue(),
-                path: encodeURIComponent(currentPath.getValue()),
-              },
-            })
-            if (currentPath.getValue() !== '/') {
-              return { ...result.result, entries: [up, ...result.result.entries.sortBy('isDirectory', 'desc')] }
+            const result = await drivesService.getFileList(currentDriveLetter, currentPath)
+            if (currentPath !== '/') {
+              return { ...result, entries: [up, ...result.entries.sortBy('isDirectory', 'desc')] }
             }
-            return { ...result.result, entries: result.result.entries.sortBy('isDirectory', 'desc') }
+            return { ...result, entries: result.entries.sortBy('isDirectory', 'desc') }
           },
           defaultSettings: {},
         }),
     )
-
-    useObservable('onDriveChange', props.currentDriveLetter, refetch)
-    useObservable('onFolderChange', props.currentPath, refetch)
 
     const activate = () => {
       const focused = service.focusedEntry.getValue()
@@ -92,8 +68,8 @@ export const FileList = Shade<{
         if (ev.key === 'F3') {
           const focused = service.focusedEntry.getValue()
           if (focused) {
-            const letter = currentDriveLetter.getValue()
-            const path = props.currentPath.getValue()
+            const letter = currentDriveLetter
+            const path = props.currentPath
             const url = `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
               letter,
             )}/${encodeURIComponent(PathHelper.joinPaths(path, focused.name))}/download`
@@ -110,17 +86,9 @@ export const FileList = Shade<{
         if (ev.key === 'Delete') {
           const focused = service.focusedEntry.getValue()
           focused &&
-            client
-              .call({
-                method: 'DELETE',
-                action: '/files/:letter/:path',
-                url: {
-                  letter: currentDriveLetter.getValue(),
-                  path: encodeURIComponent(`${currentPath.getValue()}/${focused.name}`),
-                },
-              })
+            drivesService
+              .removeFile(currentDriveLetter, encodeURIComponent(`${currentPath}/${focused.name}`))
               .then(() => {
-                refetch()
                 notyService.addNoty({
                   type: 'success',
                   title: 'Delete completed',
@@ -161,8 +129,8 @@ export const FileList = Shade<{
             }
             await fetch(
               `${environmentOptions.serviceUrl}/drives/volumes/${encodeURIComponent(
-                currentDriveLetter.getValue(),
-              )}/${encodeURIComponent(currentPath.getValue())}/upload`,
+                currentDriveLetter,
+              )}/${encodeURIComponent(currentPath)}/upload`,
               {
                 method: 'POST',
                 credentials: 'include',
@@ -170,7 +138,6 @@ export const FileList = Shade<{
               },
             )
               .then(() => {
-                refetch()
                 notyService.addNoty({
                   type: 'success',
                   title: 'Upload completed',
@@ -193,30 +160,42 @@ export const FileList = Shade<{
           autofocus
           columns={['id']}
           headerComponents={{
-            id: () => <BreadCrumbs currentDrive={currentDriveLetter} currentPath={currentPath} />,
+            id: () => (
+              <BreadCrumbs
+                currentDrive={currentDriveLetter}
+                currentPath={currentPath}
+                onChangePath={props.onChangePath}
+              />
+            ),
           }}
           styles={{}}
           rowComponents={{
             id: (entry) => (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  gap: '16px',
-                }}
-                title={entry.name}>
-                <div>
-                  <SelectionCell entry={entry} service={service} />
+              <FileContextMenu
+                entry={entry}
+                currentDriveLetter={currentDriveLetter}
+                currentPath={currentPath}
+                open={activate}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: '16px',
+                  }}
+                  title={entry.name}>
+                  <div>
+                    <SelectionCell entry={entry} service={service} />
+                  </div>
+                  <div>
+                    <DirectoryEntryIcon entry={entry} />
+                  </div>
+                  <div style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '35vw', overflow: 'hidden' }}>
+                    {entry.name}
+                  </div>
                 </div>
-                <div>
-                  <DirectoryEntryIcon entry={entry} />
-                </div>
-                <div style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '35vw', overflow: 'hidden' }}>
-                  {entry.name}
-                </div>
-              </div>
+              </FileContextMenu>
             ),
           }}
         />

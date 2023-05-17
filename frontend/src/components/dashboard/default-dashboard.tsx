@@ -1,8 +1,8 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Dashboard } from '.'
-import { DashboardService } from './dashboards-service'
-import { FullScreenLoader } from '../fullscreen-loader'
-import { GenericErrorPage } from '../generic-error'
+import { Dashboard } from './index.js'
+import { FullScreenLoader } from '../fullscreen-loader.js'
+import { GenericErrorPage } from '../generic-error.js'
+import { DashboardService } from '../../services/dashboards-service.js'
 
 export const DefaultDashboard = Shade({
   shadowDomName: 'pi-rat-default-dashboard',

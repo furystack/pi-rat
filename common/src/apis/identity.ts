@@ -1,5 +1,5 @@
 import type { DeleteEndpoint, GetCollectionEndpoint, GetEntityEndpoint, PatchEndpoint, RestApi } from '@furystack/rest'
-import type { User } from '../models'
+import type { User } from '../models/identity/user.js'
 import type { WithOptionalId } from '@furystack/core'
 
 type FurystackUser = { username: string; roles: string[] }

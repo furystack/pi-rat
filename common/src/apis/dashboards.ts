@@ -6,7 +6,7 @@ import type {
   PostEndpoint,
   RestApi,
 } from '@furystack/rest'
-import type { Dashboard } from '../models'
+import type { Dashboard } from '../models/dashboard/index.js'
 import type { WithOptionalId } from '@furystack/core'
 
 type PostDashboardEndpoint = PostEndpoint<

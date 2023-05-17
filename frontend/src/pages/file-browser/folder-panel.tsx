@@ -1,28 +1,19 @@
 import { createComponent, LocationService, Shade } from '@furystack/shades'
 import { Paper } from '@furystack/shades-common-components'
-import { ObservableValue, PathHelper } from '@furystack/utils'
+import type { ObservableValue } from '@furystack/utils'
+import { PathHelper } from '@furystack/utils'
 import type { Drive } from 'common'
-import { DriveSelector } from './drive-selector'
-import { FileList } from './file-list'
+import { encode } from 'common'
+import { DriveSelector } from './drive-selector.js'
+import { FileList } from './file-list.js'
 
-export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availableDrives: ObservableValue<Drive[]> }>({
+export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive> }>({
   shadowDomName: 'folder-panel',
-  render: ({ props, useObservable, element, useDisposable, injector }) => {
-    const currentLetter = useDisposable(
-      'currentLetter',
-      () => new ObservableValue(props.currentDrive.getValue().letter),
-    )
-    const currentPath = useDisposable('currentPath', () => new ObservableValue('/'))
+  render: ({ props, useObservable, element, useState, injector }) => {
+    const [currentDrive] = useObservable('currentLetter', props.currentDrive)
 
-    useObservable(
-      'currentLetterObservable',
-      props.currentDrive,
-      (entry) => {
-        entry && currentLetter.setValue(entry.letter)
-        currentPath.setValue('/')
-      },
-      true,
-    )
+    const [currentPath, setCurrentPath] = useState('currentPath', '/')
+
     element.style.height = '100%'
     element.style.width = '50%'
     element.style.flexGrow = '0'
@@ -37,12 +28,13 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
           flexShrink: '0',
           height: 'calc(100% - 42px)',
         }}>
-        <DriveSelector currentDrive={props.currentDrive} availableDrives={props.availableDrives} />
+        <DriveSelector currentDrive={props.currentDrive} />
         <FileList
-          currentDriveLetter={currentLetter}
+          currentDriveLetter={currentDrive.letter}
           currentPath={currentPath}
+          onChangePath={setCurrentPath}
           onActivate={(v) => {
-            const path = currentPath.getValue()
+            const path = currentPath
 
             if (v.isDirectory) {
               const newPath =
@@ -51,14 +43,12 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive>; availab
                     ? PathHelper.getParentPath(path)
                     : '/'
                   : PathHelper.joinPaths(path || '/', v.name)
-              currentPath.setValue(newPath)
+              setCurrentPath(newPath)
             } else {
               history.pushState(
                 '',
                 '',
-                `/file-browser/openFile/${encodeURIComponent(currentLetter.getValue())}/${encodeURIComponent(
-                  PathHelper.joinPaths(path, v.name),
-                )}`,
+                `/file-browser/openFile/${encode(currentDrive.letter)}/${encode(PathHelper.joinPaths(path, v.name))}`,
               )
               injector.getInstance(LocationService).updateState()
             }

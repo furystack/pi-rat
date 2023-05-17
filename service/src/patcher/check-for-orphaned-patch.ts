@@ -1,6 +1,6 @@
 import { getLogger } from '@furystack/logging'
 import type { Injector } from '@furystack/inject'
-import type { PatchRunStore } from './patch-run-store'
+import type { PatchRunStore } from './patch-run-store.js'
 
 export const checkForOrphanedPatch = async (injector: Injector, store: PatchRunStore) => {
   const logger = getLogger(injector).withScope('Orphaned Patch Checker')

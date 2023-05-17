@@ -1,4 +1,5 @@
 import { getPort } from './get-port'
+import { describe, expect, it } from 'vitest'
 
 describe('getPort', () => {
   it('Should return the default 9090 from env', () => {

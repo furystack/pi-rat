@@ -1,35 +1,12 @@
 import { Shade } from '@furystack/shades'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
+import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import 'monaco-editor/esm/vs/editor/editor.main'
 
-import type { EditorLanguage } from 'monaco-editor/esm/metadata'
-import { defaultDarkTheme, getCssVariable, ThemeProviderService } from '@furystack/shades-common-components'
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-self.MonacoEnvironment = {
-  getWorkerUrl(_moduleId: any, label: EditorLanguage) {
-    if (label === 'json') {
-      return '/js/monaco-editor/language/json/json.worker.js'
-    }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return '/js/monaco-editor/language/css/css.worker.js'
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return '/js/monaco-editor/language/html/html.worker.js'
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return '/js/monaco-editor/language/typescript/ts.worker.js'
-    }
-    return '/js/monaco-editor/editor/editor.worker.js'
-  },
-  getWorker: (moduleId: string, label: string) => {
-    return new Worker((self as any).MonacoEnvironment.getWorkerUrl(moduleId, label), { type: 'module' })
-  },
-}
+import './worker-config'
+import { ThemeProviderService, defaultDarkTheme, getCssVariable } from '@furystack/shades-common-components'
 
 export interface MonacoEditorProps {
-  options: monaco.editor.IStandaloneEditorConstructionOptions
+  options: editor.IStandaloneEditorConstructionOptions
   value?: string
   onchange?: (value: string) => void
 }
@@ -37,20 +14,16 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
   constructed: ({ element, props, injector, useState }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
-    const [theme] = useState<'light' | 'dark'>(
+
+    const [theme] = useState<'vs-light' | 'vs-dark'>(
       'theme',
-      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default ? 'dark' : 'light',
+      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
+        ? 'vs-dark'
+        : 'vs-light',
     )
 
-    element.style.display = 'block'
-    element.style.height = '100%'
-    element.style.width = '100%'
-    element.style.position = 'relative'
-    const editorInstance = monaco.editor.create(element as HTMLElement, {
-      automaticLayout: true,
-      theme: theme === 'dark' ? 'vs-dark' : 'vs',
-      ...props.options,
-    })
+    const editorInstance = editor.create(element as HTMLElement, { ...props.options, theme })
+
     editorInstance.setValue(props.value || '')
     props.onchange &&
       editorInstance.onKeyUp(() => {
@@ -59,7 +32,11 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
       })
     return () => editorInstance.dispose()
   },
-  render: () => {
+  render: ({ element }) => {
+    element.style.display = 'block'
+    element.style.height = 'calc(100% - 96px)'
+    element.style.width = '100%'
+    element.style.position = 'relative'
     return null
   },
 })

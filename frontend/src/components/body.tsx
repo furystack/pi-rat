@@ -1,11 +1,13 @@
 import type { Route } from '@furystack/shades'
 import { createComponent, Shade, Router } from '@furystack/shades'
-import { SessionService } from '../services/session'
-import { Init, Offline, Login } from '../pages'
 import { fadeOut, fadeIn } from '@furystack/shades-common-components'
-import { DefaultDashboard } from './dashboard/default-dashboard'
-import { LoadableDashboard } from './dashboard/LoadableDashboard'
-import { PiRatLazyLoad } from './pirat-lazy-load'
+import { SessionService } from '../services/session.js'
+import { Init, Offline, Login } from '../pages/index.js'
+import { DefaultDashboard } from './dashboard/default-dashboard.js'
+import { LoadableDashboard } from './dashboard/LoadableDashboard.js'
+import { PiRatLazyLoad } from './pirat-lazy-load.js'
+import { decode } from 'common'
+import { MovieList } from '../pages/movies/movie-list.js'
 
 const onLeave = async ({ element }: { element: HTMLElement }) => {
   await fadeOut(element, { easing: 'ease-in', duration: 200 })
@@ -23,7 +25,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { DrivesPage } = await import('../pages/file-browser')
+          const { DrivesPage } = await import('../pages/file-browser/index.js')
           return <DrivesPage />
         }}
       />
@@ -36,8 +38,8 @@ const adminRoutes: Array<Route<any>> = [
     component: ({ match }) => (
       <PiRatLazyLoad
         component={async () => {
-          const { FilesPage } = await import('../pages/files')
-          return <FilesPage letter={match.params.driveLetter} path={decodeURIComponent(match.params.path)} />
+          const { FilesPage } = await import('../pages/files/index.js')
+          return <FilesPage letter={decode(match.params.driveLetter)} path={decode(match.params.path)} />
         }}
       />
     ),
@@ -49,7 +51,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { DrivesPage } = await import('../pages/entities/drives')
+          const { DrivesPage } = await import('../pages/entities/drives.js')
           return <DrivesPage />
         }}
       />
@@ -62,7 +64,7 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { UsersPage } = await import('../pages/entities/users')
+          const { UsersPage } = await import('../pages/entities/users.js')
           return <UsersPage />
         }}
       />
@@ -75,8 +77,73 @@ const adminRoutes: Array<Route<any>> = [
     component: () => (
       <PiRatLazyLoad
         component={async () => {
-          const { DashboardsPage } = await import('../pages/entities/dashboards')
+          const { DashboardsPage } = await import('../pages/entities/dashboards.js')
           return <DashboardsPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/movies',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { MoviesPage } = await import('../pages/entities/movies.js')
+          return <MoviesPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/movie-files',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { MovieFilesPage } = await import('../pages/entities/movie-files.js')
+          return <MovieFilesPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/omdb-movie-metadata',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { OmdbMovieMetadataPage } = await import('../pages/entities/omdb-movie-metadata.js')
+          return <OmdbMovieMetadataPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/omdb-series-metadata',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { OmdbSeriesMetadataPage } = await import('../pages/entities/omdb-series-metadata.js')
+          return <OmdbSeriesMetadataPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/entities/config',
+    onVisit,
+    onLeave,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { ConfigPage } = await import('../pages/entities/config.js')
+          return <ConfigPage />
         }}
       />
     ),
@@ -108,6 +175,12 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
                       component: ({ match }) => {
                         return <LoadableDashboard id={match.params.id} />
                       },
+                    },
+                    {
+                      url: '/movies',
+                      onVisit,
+                      onLeave,
+                      component: () => <MovieList />,
                     },
                     {
                       url: '/',

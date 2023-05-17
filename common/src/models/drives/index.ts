@@ -1,2 +1,2 @@
-export * from './drive'
-export * from './directory-entry'
+export * from './drive.js'
+export * from './directory-entry.js'

@@ -1,5 +1,6 @@
 import { join } from 'path'
 import { getDataFolder } from './get-data-folder'
+import { describe, expect, it } from 'vitest'
 
 describe('getDataFolder', () => {
   it('should use the env by default', () => {

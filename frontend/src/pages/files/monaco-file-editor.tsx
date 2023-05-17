@@ -1,7 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { MonacoEditor } from '../../components/monaco-editor'
-import { environmentOptions } from '../../environment-options'
-import { PiRatLazyLoad } from '../../components/pirat-lazy-load'
+import { MonacoEditor } from '../../components/monaco-editor.js'
+import { environmentOptions } from '../../environment-options.js'
+import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 
 const getMonacoLanguage = (path: string) => {
   const extension = path.split('.').pop()

@@ -6,7 +6,7 @@ import { Drive } from 'common'
 import type { FSWatcher } from 'chokidar'
 import { watch } from 'chokidar'
 import { useWebsockets, WebSocketApi } from '@furystack/websocket-api'
-import { getPort } from '../get-port'
+import { getPort } from '../get-port.js'
 import { sep } from 'path'
 
 export const useFileWatchers = async (injector: Injector) => {

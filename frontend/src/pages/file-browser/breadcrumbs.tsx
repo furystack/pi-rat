@@ -1,12 +1,14 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
-import type { ObservableValue } from '@furystack/utils'
 
-export const BreadCrumbs = Shade<{ currentDrive: ObservableValue<string>; currentPath: ObservableValue<string> }>({
+export const BreadCrumbs = Shade<{
+  currentDrive: string
+  currentPath: string
+  onChangePath: (newPath: string) => void
+}>({
   shadowDomName: 'drives-breadcrumbs',
-  render: ({ props, useObservable, injector }) => {
-    const [path, setPath] = useObservable('currentPath', props.currentPath)
-    const [drive] = useObservable('currentDirectory', props.currentDrive)
+  render: ({ props, injector }) => {
+    const { currentDrive: drive, currentPath: path, onChangePath: setPath } = props
 
     const segments = path.split('/').filter((s) => !!s)
     const { theme } = injector.getInstance(ThemeProviderService)

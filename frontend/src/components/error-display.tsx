@@ -1,5 +1,5 @@
 import { LazyLoad, Shade, createComponent } from '@furystack/shades'
-import { getErrorMessage } from '../services/get-error-message'
+import { getErrorMessage } from '../services/get-error-message.js'
 
 export const ErrorDisplay = Shade<{ error?: unknown }>({
   shadowDomName: 'shade-error-display',

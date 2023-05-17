@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { GenericEditorService } from './generic-editor-service'
-import { MonacoEditor } from '../monaco-editor'
+import type { GenericEditorService } from './generic-editor-service.js'
+import { MonacoEditor } from '../monaco-editor.js'
 import type monaco from 'monaco-editor'
 import { Button } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'

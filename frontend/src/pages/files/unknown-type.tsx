@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Paper } from '@furystack/shades-common-components'
-import { environmentOptions } from '../../environment-options'
+import { environmentOptions } from '../../environment-options.js'
 
 export const UnknownType = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-file-unknown-type-page',

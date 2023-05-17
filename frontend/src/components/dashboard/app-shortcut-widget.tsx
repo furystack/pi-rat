@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { AppShortcutWidget as AppShortcutWidgetData } from 'common'
-import { IconUrlWidget } from './icon-url-widget'
+import { IconUrlWidget } from './icon-url-widget.js'
 export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
   shadowDomName: 'pi-rat-app-shortcut-widget',
   render: ({ props }) => {

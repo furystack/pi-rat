@@ -1,7 +1,7 @@
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { InstallAction } from 'common'
-import { ServiceStatusProvider } from '../service-installer'
+import { ServiceStatusProvider } from '../service-installer.js'
 
 export const PostInstallAction: RequestAction<InstallAction> = async ({ injector, getBody }) => {
   const { username, password } = await getBody()

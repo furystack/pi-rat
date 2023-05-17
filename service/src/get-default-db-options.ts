@@ -2,7 +2,7 @@ import type { ScopedLogger } from '@furystack/logging'
 import { join } from 'path'
 import type { Options } from 'sequelize'
 import sqlite from 'sqlite3'
-import { getDataFolder } from './get-data-folder'
+import { getDataFolder } from './get-data-folder.js'
 
 export const getDefaultDbSettings = (fileName: string, _logger: ScopedLogger): Options => ({
   dialect: 'sqlite',

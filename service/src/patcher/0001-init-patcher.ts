@@ -1,4 +1,4 @@
-import type { Patch } from './patch'
+import type { Patch } from './patch.js'
 
 export const initPatcher: Patch = {
   id: '001-init-patcher',

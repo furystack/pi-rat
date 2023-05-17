@@ -1,9 +1,9 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Wizard } from '@furystack/shades-common-components'
-import { BubbleBackground } from '../components/bubble-background'
-import { AllDoneStep } from './all-done-step'
-import { CreateAdminStep } from './create-admin-step'
-import { WelcomeStep } from './welcome-step'
+import { BubbleBackground } from '../components/bubble-background.js'
+import { AllDoneStep } from './all-done-step.js'
+import { CreateAdminStep } from './create-admin-step.js'
+import { WelcomeStep } from './welcome-step.js'
 
 export const InstallerPage = Shade({
   shadowDomName: 'shade-installer-page',
