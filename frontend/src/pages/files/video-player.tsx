@@ -102,18 +102,12 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         }}
         className="video-js"
         crossOrigin="use-credentials"
-        // data-setup={JSON.stringify({
-        //   controls: true,
-        //   autoplay: true,
-        //   preload: 'auto',
-        //   withCredentials: true,
-        // })}
         autoplay
         controls>
         <source
           src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
             path,
-          )}/stream`}
+          )}/download`}
           type="video/mp4"
         />
       </video>

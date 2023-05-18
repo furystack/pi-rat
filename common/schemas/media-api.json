@@ -242,16 +242,7 @@
           "$ref": "#/definitions/Omit%3CMovieWatchHistoryEntry%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E"
         },
         "result": {
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "success"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/MovieWatchHistoryEntry"
         }
       },
       "required": [
@@ -292,6 +283,77 @@
         "fileName",
         "watchedSeconds",
         "completed"
+      ],
+      "additionalProperties": false
+    },
+    "MovieWatchHistoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "driveLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "watchedSeconds": {
+          "type": "number"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "userName",
+        "imdbId",
+        "driveLetter",
+        "path",
+        "fileName",
+        "watchedSeconds",
+        "completed",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "StreamEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": [
+        "url",
+        "result"
       ],
       "additionalProperties": false
     },
@@ -362,29 +424,6 @@
               ],
               "additionalProperties": false
             },
-            "/stream-original/:movieId": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "movieId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "movieId"
-                  ],
-                  "additionalProperties": false
-                },
-                "result": {}
-              },
-              "required": [
-                "url",
-                "result"
-              ],
-              "additionalProperties": false
-            },
             "/my-watch-progresses": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieWatchHistoryEntry%3E"
             },
@@ -412,6 +451,9 @@
             "/movie-files": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieFile%3E"
             },
+            "/movie-files/:id/stream": {
+              "$ref": "#/definitions/StreamEndpoint"
+            },
             "/movie-files/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22imdbId%22%3E"
             }
@@ -421,7 +463,6 @@
             "/movies/:id",
             "/movies/:movieId/subtitles",
             "/movies/:movieId/subtitles/:subtitleName",
-            "/stream-original/:movieId",
             "/my-watch-progresses",
             "/my-watch-progresses/:id",
             "/series",
@@ -431,6 +472,7 @@
             "/omdb-series-metadata",
             "/omdb-series-metadata/:id",
             "/movie-files",
+            "/movie-files/:id/stream",
             "/movie-files/:id"
           ],
           "additionalProperties": false
@@ -2441,54 +2483,6 @@
       ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
-    },
-    "MovieWatchHistoryEntry": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "userName": {
-          "type": "string"
-        },
-        "imdbId": {
-          "type": "string"
-        },
-        "driveLetter": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "fileName": {
-          "type": "string"
-        },
-        "watchedSeconds": {
-          "type": "number"
-        },
-        "completed": {
-          "type": "boolean"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "userName",
-        "imdbId",
-        "driveLetter",
-        "path",
-        "fileName",
-        "watchedSeconds",
-        "completed",
-        "createdAt",
-        "updatedAt"
-      ],
-      "additionalProperties": false
     },
     "GetEntityEndpoint<MovieWatchHistoryEntry,\"id\">": {
       "type": "object",
@@ -7348,24 +7342,10 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/definitions/getInfo.FFProbeResult"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "$ref": "#/definitions/getInfo.FFProbeResult"
                 },
                 "$ne": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/definitions/getInfo.FFProbeResult"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "$ref": "#/definitions/getInfo.FFProbeResult"
                 }
               },
               "additionalProperties": false
@@ -7376,33 +7356,13 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/definitions/getInfo.FFProbeResult"
-                      },
-                      {
-                        "type": "null"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
+                    "$ref": "#/definitions/getInfo.FFProbeResult"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/definitions/getInfo.FFProbeResult"
-                      },
-                      {
-                        "type": "null"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
+                    "$ref": "#/definitions/getInfo.FFProbeResult"
                   }
                 }
               },
@@ -8547,14 +8507,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",
@@ -8587,7 +8540,8 @@
         "imdbId",
         "driveLetter",
         "path",
-        "fileName"
+        "fileName",
+        "ffprobe"
       ],
       "additionalProperties": false
     },
@@ -8744,14 +8698,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",
@@ -8782,6 +8729,7 @@
       },
       "required": [
         "driveLetter",
+        "ffprobe",
         "fileName",
         "path"
       ]
@@ -8802,14 +8750,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",
@@ -8841,7 +8782,8 @@
       "required": [
         "driveLetter",
         "path",
-        "fileName"
+        "fileName",
+        "ffprobe"
       ],
       "additionalProperties": false
     },
@@ -8969,14 +8911,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",

@@ -19,7 +19,6 @@ import { UploadAction } from './actions/upload-action.js'
 import { DeleteFileAction } from './actions/delete-file-action.js'
 import { DownloadAction } from './actions/download-action.js'
 import { FfprobeAction } from './actions/ffprobe-action.js'
-import { StreamAction } from './actions/stream-action.js'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({
@@ -51,7 +50,6 @@ export const setupDrivesRestApi = async (injector: Injector) => {
           GetDirectoryEntriesAction,
         ),
         '/files/:letter/:path/download': DownloadAction,
-        '/files/:letter/:path/stream': StreamAction,
         '/files/:letter/:path/ffprobe': Validate({ schema: drivesApiSchema, schemaName: 'FfprobeEndpoint' })(
           FfprobeAction,
         ),

@@ -19,6 +19,7 @@ import { getCorsOptions } from '../get-cors-options.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
+import { StreamAction } from './actions/stream-action.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -52,7 +53,6 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         // TODOs:
         '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
         '/movies/:movieId/subtitles/:subtitleName': () => null as any, // TODO: Implement
-        '/stream-original/:movieId': () => null as any, // TODO: Implement
         '/omdb-movie-metadata': Validate({
           schema: mediaApiSchema,
           schemaName: 'GetCollectionEndpoint<OmdbMovieMetadata>',
@@ -72,6 +72,9 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
         ),
+        '/movie-files/:id/stream': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'StreamEndpoint' })(StreamAction),
+        ),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"imdbId">' })(
           createGetEntityEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
         ),
@@ -88,7 +91,7 @@ export const setupMoviesRestApi = async (injector: Injector) => {
           Validate({ schema: mediaApiSchema, schemaName: 'LinkMovie' })(LinkMovieAction),
         ),
         '/extract-subtitles': Authorize('admin')(
-          Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(ExtractSubtitlesAction), // TODO: Implement
+          Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(ExtractSubtitlesAction),
         ),
         '/save-watch-progress': Authenticate()(
           Validate({ schema: mediaApiSchema, schemaName: 'SaveWatchProgress' })(SaveWatchProgressAction),

@@ -117,7 +117,7 @@ export const MovieWidget = Shade<{
                   onclick={(ev) => {
                     ev.stopImmediatePropagation()
                     ev.preventDefault()
-                    navigateToRoute(injector, watchMovieRoute, { imdbId })
+                    navigateToRoute(injector, watchMovieRoute, { id: imdbId })
                   }}>
                   ▶️
                 </div>

@@ -2,6 +2,7 @@ import { createComponent } from '@furystack/shades'
 import { onLeave, onVisit } from './route-animations.js'
 import { MovieList } from '../../pages/movies/movie-list.js'
 import type { MatchResult } from 'path-to-regexp'
+import { MoviePlayer } from '../../pages/movies/movie-player.js'
 
 export const movieListRoute = {
   url: '/movies',
@@ -13,12 +14,30 @@ export const movieListRoute = {
 }
 
 export const watchMovieRoute = {
-  url: '/movies/:imdbId',
+  url: '/movies/:id/watch',
   onVisit,
   onLeave,
-  component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => {
-    return <>Watch movie with imdb id {match.params.imdbId}</>
+  component: ({ match }: { match: MatchResult<{ id: string }> }) => {
+    return <MoviePlayer imdbId={match.params.id} />
   },
 }
 
-export const movieRoutes = [movieListRoute] as const
+export const movieOverviewRoute = {
+  url: '/movies/:imdbId/overview',
+  onVisit,
+  onLeave,
+  component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => {
+    return <>Overview movie with imdb id {match.params.imdbId}</>
+  },
+}
+
+const seriesOverviewRoute = {
+  url: '/series/:imdbId/overview',
+  onVisit,
+  onLeave,
+  component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => {
+    return <>Overview series with imdb id {match.params.imdbId}</>
+  },
+}
+
+export const movieRoutes = [movieListRoute, watchMovieRoute, movieOverviewRoute, seriesOverviewRoute] as const
