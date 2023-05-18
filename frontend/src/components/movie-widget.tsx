@@ -65,7 +65,7 @@ export const MovieWidget = Shade<{
 
     const [movie] = useObservable('movie', movieService.getMovieAsObservable(imdbId))
 
-    const url = `/movies/overview/${imdbId}`
+    const url = `/movies/${imdbId}/overview`
 
     if (isLoadedCacheResult(movie)) {
       return (

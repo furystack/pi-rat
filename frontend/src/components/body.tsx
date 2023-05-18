@@ -5,6 +5,7 @@ import { fileBrowserRoutes } from './routes/file-browser-routes.js'
 import { entityRoutes } from './routes/entity-routes.js'
 import { movieRoutes } from './routes/movie-routes.js'
 import { dashboardRoutes } from './routes/dashboard-routes.js'
+import { ThemeProviderService } from '@furystack/shades-common-components'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
@@ -12,11 +13,16 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
     const session = injector.getInstance(SessionService)
     const [sessionState] = useObservable('sessionState', session.state)
     const [currentUser] = useObservable('currentUser', session.currentUser)
+    const { theme } = injector.getInstance(ThemeProviderService)
 
     const hasAdminRole = currentUser?.roles?.includes('admin') ?? false
 
     return (
-      <div id="Body">
+      <div
+        id="Body"
+        style={{
+          color: theme.text.secondary,
+        }}>
         {(() => {
           switch (sessionState) {
             case 'authenticated':

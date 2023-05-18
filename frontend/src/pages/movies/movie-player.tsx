@@ -83,10 +83,9 @@ export const MoviePlayer = Shade<{ imdbId: string }>({
           return (
             <video
               style={{
-                objectFit: 'contain',
                 width: '100%',
-                height: 'calc(100vh - 64px)',
-                marginTop: '64px',
+                height: '100%',
+                position: 'fixed',
               }}
               className="video-js"
               crossOrigin="use-credentials"

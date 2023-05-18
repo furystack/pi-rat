@@ -3,6 +3,7 @@ import { onLeave, onVisit } from './route-animations.js'
 import { MovieList } from '../../pages/movies/movie-list.js'
 import type { MatchResult } from 'path-to-regexp'
 import { MoviePlayer } from '../../pages/movies/movie-player.js'
+import { MovieOverview } from '../../pages/movies/movie-overview.js'
 
 export const movieListRoute = {
   url: '/movies',
@@ -27,7 +28,7 @@ export const movieOverviewRoute = {
   onVisit,
   onLeave,
   component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => {
-    return <>Overview movie with imdb id {match.params.imdbId}</>
+    return <MovieOverview imdbId={match.params.imdbId} />
   },
 }
 

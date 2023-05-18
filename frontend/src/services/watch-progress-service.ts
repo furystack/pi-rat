@@ -38,7 +38,7 @@ export class WatchProgressService {
 
   public getWatchProgress = this.watchProgressCache.get.bind(this.watchProgressCache)
 
-  public getDashboardAsObservable = this.watchProgressCache.getObservable.bind(this.watchProgressCache)
+  public getWatchProgressAsObservable = this.watchProgressCache.getObservable.bind(this.watchProgressCache)
 
   public findWatchProgress = this.watchProgressQueryCache.get.bind(this.watchProgressQueryCache)
 
