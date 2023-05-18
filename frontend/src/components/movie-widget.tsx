@@ -1,9 +1,12 @@
-import { Shade, RouteLink, createComponent, LocationService, LazyLoad } from '@furystack/shades'
+import { Shade, RouteLink, createComponent, LazyLoad } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { SessionService } from '../services/session.js'
 import { MoviesService } from '../services/movies-service.js'
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { WatchProgressService } from '../services/watch-progress-service.js'
+import { navigateToRoute } from '../navigate-to-route.js'
+import { watchMovieRoute } from './routes/movie-routes.js'
+import { entityMoviesRoute } from './routes/entity-routes.js'
 
 const focus = (el: HTMLElement) => {
   promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
@@ -114,21 +117,19 @@ export const MovieWidget = Shade<{
                   onclick={(ev) => {
                     ev.stopImmediatePropagation()
                     ev.preventDefault()
-                    window.history.pushState({}, '', `/movies/watch/${imdbId}`)
-                    injector.getInstance(LocationService).updateState()
+                    navigateToRoute(injector, watchMovieRoute, { imdbId })
                   }}>
                   ▶️
                 </div>
               </div>
-              {currentUser?.roles.includes('movie-admin') ? (
+              {currentUser?.roles.includes('admin') ? (
                 <div style={{ display: 'flex' }}>
                   <div
                     style={{ width: '16px', height: '16px', marginLeft: '1em' }}
                     onclick={(ev) => {
                       ev.preventDefault()
                       ev.stopImmediatePropagation()
-                      history.pushState('', '', `/entities/movies?mode=edit&currentId=${imdbId}`)
-                      injector.getInstance(LocationService).updateState()
+                      navigateToRoute(injector, entityMoviesRoute, {}, `mode=edit&currentId=${imdbId}`)
                     }}
                     title="Edit movie details">
                     ✏️

@@ -2,7 +2,17 @@ import type { CommandProvider } from '@furystack/shades-common-components'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 import { getCurrentUser } from '@furystack/core'
-import { LocationService } from '@furystack/shades'
+import {
+  entityConfigRoute,
+  entityDashboardsRoute,
+  entityDrivesRoute,
+  entityMovieFilesRoute,
+  entityMoviesRoute,
+  entityOmdbMovieMetadataRoute,
+  entityOmdbSeriesMetadataRoute,
+  entityUsersRoute,
+} from '../../routes/entity-routes.js'
+import { navigateToRoute } from '../../../navigate-to-route.js'
 
 const EntitySuggestions: SuggestionOptions[] = [
   {
@@ -11,8 +21,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '⚙️',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/config')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityConfigRoute, {})
     },
   },
   {
@@ -21,8 +30,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '📔',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/dashboards')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityDashboardsRoute, {})
     },
   },
   {
@@ -31,8 +39,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '💽',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/drives')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityDrivesRoute, {})
     },
   },
   {
@@ -41,8 +48,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '👤',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/users')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityUsersRoute, {})
     },
   },
   {
@@ -51,8 +57,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🎥',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/movies')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityMoviesRoute, {})
     },
   },
   {
@@ -61,8 +66,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🎞️',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/movie-files')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityMovieFilesRoute, {})
     },
   },
   {
@@ -71,8 +75,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🌐',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/omdb-movie-metadata')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityOmdbMovieMetadataRoute, {})
     },
   },
   {
@@ -81,8 +84,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🌐',
     score: 1,
     onSelected: ({ injector }) => {
-      history.pushState({}, '', '/entities/omdb-series-metadata')
-      injector.getInstance(LocationService).updateState()
+      navigateToRoute(injector, entityOmdbSeriesMetadataRoute, {})
     },
   },
 ]

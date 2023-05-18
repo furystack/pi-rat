@@ -1,4 +1,4 @@
-import { createComponent, LocationService, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import { Paper } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
@@ -6,6 +6,8 @@ import type { Drive } from 'common'
 import { encode } from 'common'
 import { DriveSelector } from './drive-selector.js'
 import { FileList } from './file-list.js'
+import { navigateToRoute } from '../../navigate-to-route.js'
+import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
 
 export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive> }>({
   shadowDomName: 'folder-panel',
@@ -45,12 +47,10 @@ export const FolderPanel = Shade<{ currentDrive: ObservableValue<Drive> }>({
                   : PathHelper.joinPaths(path || '/', v.name)
               setCurrentPath(newPath)
             } else {
-              history.pushState(
-                '',
-                '',
-                `/file-browser/openFile/${encode(currentDrive.letter)}/${encode(PathHelper.joinPaths(path, v.name))}`,
-              )
-              injector.getInstance(LocationService).updateState()
+              navigateToRoute(injector, fileBrowserOpenFileRoute, {
+                driveLetter: encode(currentDrive.letter),
+                path: encode(PathHelper.joinPaths(path, v.name)),
+              })
             }
           }}
         />
