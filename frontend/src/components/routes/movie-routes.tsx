@@ -10,7 +10,7 @@ export const movieListRoute = {
   component: () => {
     return <MovieList />
   },
-} as const
+}
 
 export const watchMovieRoute = {
   url: '/movies/:imdbId',
@@ -22,5 +22,3 @@ export const watchMovieRoute = {
 }
 
 export const movieRoutes = [movieListRoute] as const
-
-export type MovieUrl = (typeof movieRoutes)[number]['url']

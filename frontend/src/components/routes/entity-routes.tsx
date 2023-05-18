@@ -14,7 +14,7 @@ export const entityDrivesRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityUsersRoute = {
   url: '/entities/users',
@@ -28,7 +28,7 @@ export const entityUsersRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityDashboardsRoute = {
   url: '/entities/dashboards',
@@ -42,7 +42,7 @@ export const entityDashboardsRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityMoviesRoute = {
   url: '/entities/movies',
@@ -56,7 +56,7 @@ export const entityMoviesRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityMovieFilesRoute = {
   url: '/entities/movie-files',
@@ -70,7 +70,7 @@ export const entityMovieFilesRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityOmdbMovieMetadataRoute = {
   url: '/entities/omdb-movie-metadata',
@@ -84,7 +84,7 @@ export const entityOmdbMovieMetadataRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityOmdbSeriesMetadataRoute = {
   url: '/entities/omdb-series-metadata',
@@ -98,7 +98,7 @@ export const entityOmdbSeriesMetadataRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityConfigRoute = {
   url: '/entities/config',
@@ -112,7 +112,7 @@ export const entityConfigRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const entityRoutes = [
   entityDrivesRoute,
@@ -123,6 +123,4 @@ export const entityRoutes = [
   entityOmdbMovieMetadataRoute,
   entityOmdbSeriesMetadataRoute,
   entityConfigRoute,
-] as const
-
-export type EntityUrl = (typeof entityRoutes)[number]['url']
+]

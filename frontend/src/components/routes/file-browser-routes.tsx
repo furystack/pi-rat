@@ -16,7 +16,7 @@ export const fileBrowserRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const fileBrowserOpenFileRoute = {
   url: '/file-browser/openFile/:driveLetter/:path',
@@ -30,8 +30,6 @@ export const fileBrowserOpenFileRoute = {
       }}
     />
   ),
-} as const
+}
 
 export const fileBrowserRoutes = [fileBrowserRoute, fileBrowserOpenFileRoute] as const
-
-export type FileBrowserUrl = (typeof fileBrowserRoutes)[number]['url']

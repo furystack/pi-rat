@@ -11,7 +11,7 @@ export const loadableDashboardRoute = {
   component: ({ match }: { match: MatchResult<{ id: string }> }) => {
     return <LoadableDashboard id={match.params.id} />
   },
-} as const
+}
 
 export const defaultDashboardRoute = {
   url: '/',
@@ -19,8 +19,6 @@ export const defaultDashboardRoute = {
   onVisit,
   onLeave,
   component: () => <DefaultDashboard />,
-} as const
+}
 
 export const dashboardRoutes = [loadableDashboardRoute, defaultDashboardRoute] as const
-
-export type DashboardUrl = (typeof dashboardRoutes)[number]['url']
