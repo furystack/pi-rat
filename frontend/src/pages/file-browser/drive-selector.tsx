@@ -11,7 +11,7 @@ export const DriveSelector = Shade<{ currentDrive: ObservableValue<Drive> }>({
     const [availableDrives] = useObservable('availableDrives', drivesService.getVolumesAsObservable({}))
     const [currentDrive, setCurrentDrive] = useObservable('currentDrive', props.currentDrive)
 
-    if (availableDrives.status === 'pending' || availableDrives.status === 'uninitialized') {
+    if (availableDrives.status === 'loading' || availableDrives.status === 'uninitialized') {
       return null // TODO: Skeleton
     }
 
