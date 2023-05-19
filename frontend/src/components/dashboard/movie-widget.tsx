@@ -1,13 +1,13 @@
 import { Shade, RouteLink, createComponent, LazyLoad } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
-import { SessionService } from '../services/session.js'
-import { MoviesService } from '../services/movies-service.js'
+import { SessionService } from '../../services/session.js'
+import { MoviesService } from '../../services/movies-service.js'
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
-import { WatchProgressService } from '../services/watch-progress-service.js'
-import { navigateToRoute } from '../navigate-to-route.js'
-import { watchMovieRoute } from './routes/movie-routes.js'
-import { entityMoviesRoute } from './routes/entity-routes.js'
-import { MovieFilesService } from '../services/movie-files-service.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
+import { navigateToRoute } from '../../navigate-to-route.js'
+import { watchMovieRoute } from '../routes/movie-routes.js'
+import { entityMoviesRoute } from '../routes/entity-routes.js'
+import { MovieFilesService } from '../../services/movie-files-service.js'
 
 const focus = (el: HTMLElement) => {
   promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {

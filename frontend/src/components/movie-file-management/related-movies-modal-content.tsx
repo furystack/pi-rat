@@ -5,7 +5,7 @@ import { isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { Button, Skeleton } from '@furystack/shades-common-components'
 import { InstallService } from '../../services/install-service.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
-import { MovieWidget } from '../movie-widget.js'
+import { MovieWidget } from '../dashboard/movie-widget.js'
 
 export const RelatedMoviesModalContent = Shade<{
   file: DirectoryEntry

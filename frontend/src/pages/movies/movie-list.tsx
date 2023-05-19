@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { MoviesService } from '../../services/movies-service.js'
-import { MovieWidget } from '../../components/movie-widget.js'
+import { MovieWidget } from '../../components/dashboard/movie-widget.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
