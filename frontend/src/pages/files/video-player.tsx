@@ -28,12 +28,10 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         },
         top: 1,
       }),
-      watchProgressService.findWatchProgress({
-        filter: {
-          path: { $eq: parentPath },
-          fileName: { $eq: fileName },
-          driveLetter: { $eq: letter },
-        },
+      watchProgressService.findWatchProgressForFile({
+        path: parentPath,
+        driveLetter: letter,
+        fileName,
       }),
     ]).then(
       ([
@@ -97,23 +95,17 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         style={{
           objectFit: 'contain',
           width: '100%',
-          height: 'calc(100vh - 64px)',
-          marginTop: '64px',
+          height: 'calc(100vh - 40px)',
+          marginTop: '40px',
         }}
         className="video-js"
         crossOrigin="use-credentials"
-        // data-setup={JSON.stringify({
-        //   controls: true,
-        //   autoplay: true,
-        //   preload: 'auto',
-        //   withCredentials: true,
-        // })}
         autoplay
         controls>
         <source
           src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
             path,
-          )}/stream`}
+          )}/download`}
           type="video/mp4"
         />
       </video>

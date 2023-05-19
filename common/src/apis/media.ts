@@ -45,6 +45,13 @@ export type SaveWatchProgress = {
   result: MovieWatchHistoryEntry
 }
 
+export type StreamEndpoint = {
+  url: {
+    id: string
+  }
+  result: unknown
+}
+
 export interface MediaApi extends RestApi {
   GET: {
     '/movies': GetCollectionEndpoint<Movie>
@@ -54,7 +61,6 @@ export interface MediaApi extends RestApi {
       url: { movieId: string; subtitleName: string }
       result: unknown
     }
-    '/stream-original/:movieId': { url: { movieId: string }; result: unknown }
     '/my-watch-progresses': GetCollectionEndpoint<MovieWatchHistoryEntry>
     '/my-watch-progresses/:id': GetEntityEndpoint<MovieWatchHistoryEntry, 'id'>
     '/series': GetCollectionEndpoint<Series>
@@ -64,22 +70,23 @@ export interface MediaApi extends RestApi {
     '/omdb-series-metadata': GetCollectionEndpoint<OmdbSeriesMetadata>
     '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
     '/movie-files': GetCollectionEndpoint<MovieFile>
-    '/movie-files/:id': GetEntityEndpoint<MovieFile, 'imdbId'>
+    '/movie-files/:id/stream': StreamEndpoint
+    '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
   }
   POST: {
     '/movies': PostEndpoint<Movie, 'imdbId', Omit<Movie, 'createdAt' | 'updatedAt'>>
-    '/movie-files': PostEndpoint<MovieFile, 'imdbId'>
+    '/movie-files': PostEndpoint<MovieFile, 'id'>
     '/link-movie': LinkMovie
     '/extract-subtitles': ExtractSubtitles
     '/save-watch-progress': SaveWatchProgress
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
-    '/movie-files/:id': PatchEndpoint<MovieFile, 'imdbId'>
+    '/movie-files/:id': PatchEndpoint<MovieFile, 'id'>
   }
   DELETE: {
     '/movies/:id': DeleteEndpoint<Movie, 'imdbId'>
-    '/movie-files/:id': DeleteEndpoint<MovieFile, 'imdbId'>
+    '/movie-files/:id': DeleteEndpoint<MovieFile, 'id'>
     '/my-watch-progresses/:id': DeleteEndpoint<MovieWatchHistoryEntry, 'id'>
   }
 }

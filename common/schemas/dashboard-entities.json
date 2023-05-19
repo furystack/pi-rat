@@ -12,13 +12,34 @@
           "type": "string",
           "enum": [
             "home",
-            "browser"
+            "browser",
+            "movies",
+            "series"
           ]
         }
       },
       "required": [
         "type",
         "appName"
+      ],
+      "additionalProperties": false
+    },
+    "ContinueWatchingWidgetGroup": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "continue-watching"
+        },
+        "count": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type"
       ],
       "additionalProperties": false
     },
@@ -83,6 +104,52 @@
       ],
       "additionalProperties": false
     },
+    "MovieWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "movie"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "imdbId"
+      ],
+      "additionalProperties": false
+    },
+    "SeriesWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "series"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "imdbId"
+      ],
+      "additionalProperties": false
+    },
     "WidgetGroup": {
       "type": "object",
       "properties": {
@@ -122,7 +189,16 @@
           "$ref": "#/definitions/MarkdownWidget"
         },
         {
+          "$ref": "#/definitions/MovieWidget"
+        },
+        {
+          "$ref": "#/definitions/SeriesWidget"
+        },
+        {
           "$ref": "#/definitions/WidgetGroup"
+        },
+        {
+          "$ref": "#/definitions/ContinueWatchingWidgetGroup"
         }
       ]
     },

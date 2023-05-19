@@ -19,6 +19,7 @@ import { getCorsOptions } from '../get-cors-options.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
+import { StreamAction } from './actions/stream-action.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -52,7 +53,6 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         // TODOs:
         '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
         '/movies/:movieId/subtitles/:subtitleName': () => null as any, // TODO: Implement
-        '/stream-original/:movieId': () => null as any, // TODO: Implement
         '/omdb-movie-metadata': Validate({
           schema: mediaApiSchema,
           schemaName: 'GetCollectionEndpoint<OmdbMovieMetadata>',
@@ -70,10 +70,13 @@ export const setupMoviesRestApi = async (injector: Injector) => {
           schemaName: 'GetEntityEndpoint<OmdbSeriesMetadata,"imdbID">',
         })(createGetEntityEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' })),
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
-          createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
+          createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
-        '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"imdbId">' })(
-          createGetEntityEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
+        '/movie-files/:id/stream': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'StreamEndpoint' })(StreamAction),
+        ),
+        '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"id">' })(
+          createGetEntityEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
       },
       POST: {
@@ -81,14 +84,14 @@ export const setupMoviesRestApi = async (injector: Injector) => {
           schema: mediaApiSchema,
           schemaName: 'PostEndpoint<Movie,"imdbId",Omit<Movie,("createdAt"|"updatedAt")>>',
         })(createPostEndpoint({ model: Movie, primaryKey: 'imdbId' })),
-        '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<MovieFile,"imdbId">' })(
-          createPostEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
+        '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<MovieFile,"id">' })(
+          createPostEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
         '/link-movie': Authorize('admin')(
           Validate({ schema: mediaApiSchema, schemaName: 'LinkMovie' })(LinkMovieAction),
         ),
         '/extract-subtitles': Authorize('admin')(
-          Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(ExtractSubtitlesAction), // TODO: Implement
+          Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(ExtractSubtitlesAction),
         ),
         '/save-watch-progress': Authenticate()(
           Validate({ schema: mediaApiSchema, schemaName: 'SaveWatchProgress' })(SaveWatchProgressAction),
@@ -99,16 +102,16 @@ export const setupMoviesRestApi = async (injector: Injector) => {
           schema: mediaApiSchema,
           schemaName: 'PatchEndpoint<Omit<Movie,("createdAt"|"updatedAt")>,"imdbId">',
         })(createPatchEndpoint({ model: Movie, primaryKey: 'imdbId' })),
-        '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'PatchEndpoint<MovieFile,"imdbId">' })(
-          createPatchEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
+        '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'PatchEndpoint<MovieFile,"id">' })(
+          createPatchEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
       },
       DELETE: {
         '/movies/:id': Validate({ schema: mediaApiSchema, schemaName: 'DeleteEndpoint<Movie,"imdbId">' })(
           createDeleteEndpoint({ model: Movie, primaryKey: 'imdbId' }),
         ),
-        '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'DeleteEndpoint<MovieFile,"imdbId">' })(
-          createDeleteEndpoint({ model: MovieFile, primaryKey: 'imdbId' }),
+        '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'DeleteEndpoint<MovieFile,"id">' })(
+          createDeleteEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
         '/my-watch-progresses/:id': Validate({
           schema: mediaApiSchema,

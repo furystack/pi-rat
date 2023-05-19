@@ -19,7 +19,7 @@ const AdminLinks = Shade<{}>({
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
     return isAdmin ? (
-      <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px', gap: '8px' }}>
+      <div style={{ display: 'flex', placeContent: 'center', gap: '8px' }}>
         <AppBarLink href="/file-browser" title="Drives">
           📂 Files
         </AppBarLink>
@@ -38,14 +38,14 @@ export const Header = Shade<HeaderProps>({
         <AppBarLink title={props.title} href="/">
           {props.title}
         </AppBarLink>
-        {sessionState === 'authenticated' ? (
-          <>
-            <AdminLinks />
-          </>
-        ) : null}
+        {sessionState === 'authenticated' ? <AdminLinks /> : null}
 
         <AppBarLink title="Movies" href="/movies">
           🎥 Movies
+        </AppBarLink>
+
+        <AppBarLink title="Movies" href="/series">
+          📺 Series
         </AppBarLink>
 
         <div style={{ flex: '1' }}>

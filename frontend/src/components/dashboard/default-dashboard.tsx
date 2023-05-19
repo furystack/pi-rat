@@ -18,7 +18,7 @@ export const DefaultDashboard = Shade({
       }),
     )
 
-    if (dashboard.status === 'pending') {
+    if (dashboard.status === 'loading') {
       return <FullScreenLoader />
     }
 

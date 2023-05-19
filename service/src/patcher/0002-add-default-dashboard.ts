@@ -26,6 +26,10 @@ export const addDefaultDashboardPatcher: Patch = {
               type: 'app-shortcut',
               appName: 'browser',
             },
+            {
+              type: 'app-shortcut',
+              appName: 'movies',
+            },
           ],
         },
         {

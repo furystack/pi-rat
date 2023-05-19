@@ -24,7 +24,7 @@ export const MovieFilesPage = Shade({
         new GenericEditorService({
           defaultSettings: {},
           model: MovieFile,
-          keyProperty: 'imdbId',
+          keyProperty: 'id',
           readonlyProperties: [],
           loader: async (findOptions) => await movieFilesService.findMovieFile(findOptions),
           deleteEntities: async (id) => await movieFilesService.deleteMovieFile(id),

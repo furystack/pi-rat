@@ -96,7 +96,7 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
 
   const { title, year, season, episode } = getFallbackMetadata(`${path}/${fileName}`)
 
-  const movieFileStore = getStoreManager(injector).getStoreFor(MovieFile, 'imdbId')
+  const movieFileStore = getStoreManager(injector).getStoreFor(MovieFile, 'id')
 
   const storedMovieFile = await movieFileStore.find({
     filter: {
