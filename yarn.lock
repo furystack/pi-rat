@@ -2666,6 +2666,7 @@ __metadata:
     common: "workspace:^"
     marked: ^5.0.2
     monaco-editor: ^0.38.0
+    path-to-regexp: ^6.2.1
     semaphore-async-await: ^1.5.1
     typescript: ^5.0.4
     video.js: ^8.3.0

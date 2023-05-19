@@ -3,24 +3,33 @@ import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult, getMimeForFile } from '@furystack/rest-service'
 import type { StreamEndpoint } from 'common'
+import { MovieFile } from 'common'
 import { Drive } from 'common'
 import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
 import { join } from 'path'
 
 export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, request, response }) => {
-  const { letter, path } = getUrlParams()
+  const { id: movieFileId } = getUrlParams()
 
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
-  if (!drive) {
-    throw new RequestError(`Drive ${letter} not found`, 404)
+  const movieFile = await getDataSetFor(injector, MovieFile, 'id').get(injector, movieFileId)
+
+  if (!movieFile) {
+    throw new RequestError(`Movie file with imdbId '${movieFileId}' not found`, 404)
   }
 
-  const fullPath = join(drive.physicalPath, path)
+  const { driveLetter, path, fileName } = movieFile
+
+  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, driveLetter)
+  if (!drive) {
+    throw new RequestError(`Drive ${driveLetter} not found`, 404)
+  }
+
+  const fullPath = join(drive.physicalPath, path, fileName)
 
   const fileStats = await stat(fullPath)
   const fileSize = fileStats.size
-  const mime = getMimeForFile(path)
+  const mime = getMimeForFile(fullPath)
   const { range } = request.headers
   if (range) {
     const parts = range.replace(/bytes=/, '').split('-')

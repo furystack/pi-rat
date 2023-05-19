@@ -110,6 +110,9 @@
     "MovieFile": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "imdbId": {
           "type": "string"
         },
@@ -123,14 +126,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",
@@ -160,10 +156,12 @@
         }
       },
       "required": [
+        "id",
         "imdbId",
         "driveLetter",
         "path",
-        "fileName"
+        "fileName",
+        "ffprobe"
       ],
       "additionalProperties": false
     },

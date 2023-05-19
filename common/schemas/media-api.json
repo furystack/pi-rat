@@ -242,16 +242,7 @@
           "$ref": "#/definitions/Omit%3CMovieWatchHistoryEntry%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E"
         },
         "result": {
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "success"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/MovieWatchHistoryEntry"
         }
       },
       "required": [
@@ -292,6 +283,77 @@
         "fileName",
         "watchedSeconds",
         "completed"
+      ],
+      "additionalProperties": false
+    },
+    "MovieWatchHistoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "driveLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "watchedSeconds": {
+          "type": "number"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "userName",
+        "imdbId",
+        "driveLetter",
+        "path",
+        "fileName",
+        "watchedSeconds",
+        "completed",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "StreamEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": [
+        "url",
+        "result"
       ],
       "additionalProperties": false
     },
@@ -362,29 +424,6 @@
               ],
               "additionalProperties": false
             },
-            "/stream-original/:movieId": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "movieId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "movieId"
-                  ],
-                  "additionalProperties": false
-                },
-                "result": {}
-              },
-              "required": [
-                "url",
-                "result"
-              ],
-              "additionalProperties": false
-            },
             "/my-watch-progresses": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieWatchHistoryEntry%3E"
             },
@@ -412,8 +451,11 @@
             "/movie-files": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieFile%3E"
             },
+            "/movie-files/:id/stream": {
+              "$ref": "#/definitions/StreamEndpoint"
+            },
             "/movie-files/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22id%22%3E"
             }
           },
           "required": [
@@ -421,7 +463,6 @@
             "/movies/:id",
             "/movies/:movieId/subtitles",
             "/movies/:movieId/subtitles/:subtitleName",
-            "/stream-original/:movieId",
             "/my-watch-progresses",
             "/my-watch-progresses/:id",
             "/series",
@@ -431,6 +472,7 @@
             "/omdb-series-metadata",
             "/omdb-series-metadata/:id",
             "/movie-files",
+            "/movie-files/:id/stream",
             "/movie-files/:id"
           ],
           "additionalProperties": false
@@ -442,7 +484,7 @@
               "$ref": "#/definitions/PostEndpoint%3CMovie%2C%22imdbId%22%2COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
             },
             "/movie-files": {
-              "$ref": "#/definitions/PostEndpoint%3CMovieFile%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/PostEndpoint%3CMovieFile%2C%22id%22%3E"
             },
             "/link-movie": {
               "$ref": "#/definitions/LinkMovie"
@@ -470,7 +512,7 @@
               "$ref": "#/definitions/PatchEndpoint%3COmit%3CMovie%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22imdbId%22%3E"
             },
             "/movie-files/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CMovieFile%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/PatchEndpoint%3CMovieFile%2C%22id%22%3E"
             }
           },
           "required": [
@@ -503,7 +545,7 @@
               "$ref": "#/definitions/DeleteEndpoint%3CMovie%2C%22imdbId%22%3E"
             },
             "/movie-files/:id": {
-              "$ref": "#/definitions/DeleteEndpoint%3CMovieFile%2C%22imdbId%22%3E"
+              "$ref": "#/definitions/DeleteEndpoint%3CMovieFile%2C%22id%22%3E"
             },
             "/my-watch-progresses/:id": {
               "$ref": "#/definitions/DeleteEndpoint%3CMovieWatchHistoryEntry%2C%22id%22%3E"
@@ -2441,54 +2483,6 @@
       ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
-    },
-    "MovieWatchHistoryEntry": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "userName": {
-          "type": "string"
-        },
-        "imdbId": {
-          "type": "string"
-        },
-        "driveLetter": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "fileName": {
-          "type": "string"
-        },
-        "watchedSeconds": {
-          "type": "number"
-        },
-        "completed": {
-          "type": "boolean"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "userName",
-        "imdbId",
-        "driveLetter",
-        "path",
-        "fileName",
-        "watchedSeconds",
-        "completed",
-        "createdAt",
-        "updatedAt"
-      ],
-      "additionalProperties": false
     },
     "GetEntityEndpoint<MovieWatchHistoryEntry,\"id\">": {
       "type": "object",
@@ -7007,7 +7001,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -7023,7 +7017,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieFile,(\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\")[]>": {
+    "FindOptions<MovieFile,(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -7037,6 +7031,13 @@
         "order": {
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
             "imdbId": {
               "type": "string",
               "enum": [
@@ -7088,6 +7089,7 @@
           "items": {
             "type": "string",
             "enum": [
+              "id",
               "imdbId",
               "driveLetter",
               "path",
@@ -7133,6 +7135,58 @@
           "items": {
             "$ref": "#/definitions/FilterType%3CMovieFile%3E"
           }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         },
         "imdbId": {
           "anyOf": [
@@ -7348,24 +7402,10 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/definitions/getInfo.FFProbeResult"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "$ref": "#/definitions/getInfo.FFProbeResult"
                 },
                 "$ne": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/definitions/getInfo.FFProbeResult"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                  "$ref": "#/definitions/getInfo.FFProbeResult"
                 }
               },
               "additionalProperties": false
@@ -7376,33 +7416,13 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/definitions/getInfo.FFProbeResult"
-                      },
-                      {
-                        "type": "null"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
+                    "$ref": "#/definitions/getInfo.FFProbeResult"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/definitions/getInfo.FFProbeResult"
-                      },
-                      {
-                        "type": "null"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
+                    "$ref": "#/definitions/getInfo.FFProbeResult"
                   }
                 }
               },
@@ -8534,6 +8554,9 @@
     "MovieFile": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "imdbId": {
           "type": "string"
         },
@@ -8547,14 +8570,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",
@@ -8584,14 +8600,16 @@
         }
       },
       "required": [
+        "id",
         "imdbId",
         "driveLetter",
         "path",
-        "fileName"
+        "fileName",
+        "ffprobe"
       ],
       "additionalProperties": false
     },
-    "GetEntityEndpoint<MovieFile,\"imdbId\">": {
+    "GetEntityEndpoint<MovieFile,\"id\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -8602,6 +8620,7 @@
               "items": {
                 "type": "string",
                 "enum": [
+                  "id",
                   "imdbId",
                   "driveLetter",
                   "path",
@@ -8710,11 +8729,11 @@
       ],
       "additionalProperties": false
     },
-    "PostEndpoint<MovieFile,\"imdbId\">": {
+    "PostEndpoint<MovieFile,\"id\">": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/WithOptionalId%3CMovieFile%2C%22imdbId%22%3E"
+          "$ref": "#/definitions/WithOptionalId%3CMovieFile%2C%22id%22%3E"
         },
         "result": {
           "$ref": "#/definitions/MovieFile"
@@ -8727,9 +8746,68 @@
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
-    "WithOptionalId<MovieFile,\"imdbId\">": {
+    "WithOptionalId<MovieFile,\"id\">": {
       "type": "object",
       "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "driveLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "ffprobe": {
+          "$ref": "#/definitions/getInfo.FFProbeResult"
+        },
+        "relatedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "subtitle",
+                  "audio",
+                  "trailer",
+                  "info",
+                  "other"
+                ]
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "path"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "driveLetter",
+        "ffprobe",
+        "fileName",
+        "imdbId",
+        "path"
+      ]
+    },
+    "Omit<MovieFile,\"id\">": {
+      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22id%22%3E%3E"
+    },
+    "Pick<MovieFile,Exclude<(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\"),\"id\">>": {
+      "type": "object",
       "properties": {
         "imdbId": {
           "type": "string"
@@ -8744,14 +8822,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",
@@ -8781,67 +8852,11 @@
         }
       },
       "required": [
-        "driveLetter",
-        "fileName",
-        "path"
-      ]
-    },
-    "Omit<MovieFile,\"imdbId\">": {
-      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22imdbId%22%3E%3E"
-    },
-    "Pick<MovieFile,Exclude<(\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\"),\"imdbId\">>": {
-      "type": "object",
-      "properties": {
-        "driveLetter": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "fileName": {
-          "type": "string"
-        },
-        "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "relatedFiles": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
-              },
-              "path": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "type",
-              "path"
-            ],
-            "additionalProperties": false
-          }
-        }
-      },
-      "required": [
+        "imdbId",
         "driveLetter",
         "path",
-        "fileName"
+        "fileName",
+        "ffprobe"
       ],
       "additionalProperties": false
     },
@@ -8922,7 +8937,7 @@
       },
       "additionalProperties": false
     },
-    "PatchEndpoint<MovieFile,\"imdbId\">": {
+    "PatchEndpoint<MovieFile,\"id\">": {
       "type": "object",
       "properties": {
         "body": {
@@ -8956,6 +8971,9 @@
     "Partial<MovieFile>": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "imdbId": {
           "type": "string"
         },
@@ -8969,14 +8987,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/getInfo.FFProbeResult"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/getInfo.FFProbeResult"
         },
         "relatedFiles": {
           "type": "array",
@@ -9034,7 +9045,7 @@
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
-    "DeleteEndpoint<MovieFile,\"imdbId\">": {
+    "DeleteEndpoint<MovieFile,\"id\">": {
       "type": "object",
       "properties": {
         "url": {

@@ -32,6 +32,14 @@ export class MoviesService {
           findOptions,
         },
       })
+
+      result.entries.forEach((entry) => {
+        this.movieCache.setExplicitValue({
+          loadArgs: [entry.imdbId],
+          value: { status: 'loaded', value: entry, updatedAt: new Date() },
+        })
+      })
+
       return result
     },
   })

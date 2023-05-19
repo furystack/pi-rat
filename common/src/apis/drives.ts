@@ -44,14 +44,6 @@ export type DownloadEndpoint = {
   result: unknown
 }
 
-export type StreamEndpoint = {
-  url: {
-    letter: string
-    path: string
-  }
-  result: unknown
-}
-
 export type PostDriveEndpoint = {
   body: Omit<WithOptionalId<Drive, 'letter'>, 'createdAt' | 'updatedAt'>
   result: Drive
@@ -79,7 +71,6 @@ export interface DrivesApi extends RestApi {
     '/volumes/:id': GetEntityEndpoint<Drive, 'letter'>
     '/files/:letter/:path': GetDirectoryEntries
     '/files/:letter/:path/download': DownloadEndpoint
-    '/files/:letter/:path/stream': StreamEndpoint
     '/files/:letter/:path/ffprobe': FfprobeEndpoint
   }
   POST: {

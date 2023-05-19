@@ -4,6 +4,8 @@ import { Widget } from './widget.js'
 import { Paper } from '@furystack/shades-common-components'
 import { ContextMenu } from '../context-menu.js'
 import { SessionService } from '../../services/session.js'
+import { navigateToRoute } from '../../navigate-to-route.js'
+import { entityDashboardsRoute } from '../routes/entity-routes.js'
 
 export const Dashboard = Shade<DashboardData>({
   shadowDomName: 'pi-rat-dashboard',
@@ -19,7 +21,8 @@ export const Dashboard = Shade<DashboardData>({
                   icon: '📝',
                   label: 'Edit this dashboard',
                   onClick: () => {
-                    history.pushState({}, '', `/entities/dashboards?mode=edit&currentId=${props.id}`)
+                    navigateToRoute(injector, entityDashboardsRoute, {}, `mode=edit&currentId=${props.id}`)
+
                     injector.getInstance(LocationService).updateState()
                   },
                 },
