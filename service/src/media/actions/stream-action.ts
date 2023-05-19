@@ -10,12 +10,12 @@ import { stat } from 'fs/promises'
 import { join } from 'path'
 
 export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, request, response }) => {
-  const { id: imdbId } = getUrlParams()
+  const { id: movieFileId } = getUrlParams()
 
-  const movieFile = await getDataSetFor(injector, MovieFile, 'imdbId').get(injector, imdbId)
+  const movieFile = await getDataSetFor(injector, MovieFile, 'id').get(injector, movieFileId)
 
   if (!movieFile) {
-    throw new RequestError(`Movie file with imdbId '${imdbId}' not found`, 404)
+    throw new RequestError(`Movie file with imdbId '${movieFileId}' not found`, 404)
   }
 
   const { driveLetter, path, fileName } = movieFile

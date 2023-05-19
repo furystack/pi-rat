@@ -10,31 +10,26 @@ import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default & any
 
-export const MoviePlayer = Shade<{ imdbId: string }>({
+export const MoviePlayer = Shade<{ movieFileId: string }>({
   shadowDomName: 'pirat-movie-player',
   render: ({ props, element, injector, useDisposable }) => {
     const movieFilesService = injector.getInstance(MovieFilesService)
     const watchProgressService = injector.getInstance(WatchProgressService)
-    const { imdbId } = props
+    const { movieFileId } = props
 
     return (
       <PiRatLazyLoad
         component={async () => {
-          const {
-            entries: [movieFile],
-          } = await movieFilesService.findMovieFile({ filter: { imdbId: { $eq: imdbId } }, top: 1 })
+          const movieFile = await movieFilesService.getMovieFile(movieFileId)
           if (!movieFile) {
-            throw new Error(`Movie file with id ${imdbId} not found`)
+            throw new Error(`Movie file with id ${movieFileId} not found`)
           }
-
-          const fileName = movieFile.path.split('/').pop() as string
-          const parentPath = movieFile.path.split('/').slice(0, -1).join('/') || '/'
-
+          const { fileName, path } = movieFile
           const {
             entries: [watchProgress],
           } = await watchProgressService.findWatchProgress({
             filter: {
-              path: { $eq: parentPath },
+              path: { $eq: path },
               fileName: { $eq: fileName },
               driveLetter: { $eq: movieFile.driveLetter },
             },
@@ -68,7 +63,7 @@ export const MoviePlayer = Shade<{ imdbId: string }>({
                     watchProgressService.updateWatchEntry({
                       completed: video.duration - progress < 10,
                       driveLetter: movieFile.driveLetter,
-                      path: parentPath,
+                      path,
                       fileName,
                       imdbId: movieFile.imdbId,
                       watchedSeconds: progress,
@@ -99,7 +94,7 @@ export const MoviePlayer = Shade<{ imdbId: string }>({
               currentTime={watchProgress?.watchedSeconds || 0}
               controls>
               <source
-                src={`${environmentOptions.serviceUrl}/media/movie-files/${encodeURIComponent(imdbId)}/stream`}
+                src={`${environmentOptions.serviceUrl}/media/movie-files/${encodeURIComponent(movieFileId)}/stream`}
                 type="video/mp4"
               />
             </video>

@@ -32,6 +32,13 @@ export class WatchProgressService {
           findOptions,
         },
       })
+      result.entries.forEach((entry) =>
+        this.watchProgressCache.setExplicitValue({
+          loadArgs: [entry.id],
+          value: { status: 'loaded', value: entry, updatedAt: new Date() },
+        }),
+      )
+
       return result
     },
   })
@@ -61,8 +68,11 @@ export class WatchProgressService {
       action: '/save-watch-progress',
       body,
     })
-    this.watchProgressCache.remove(result.id)
-    this.watchProgressQueryCache.flushAll()
+    this.watchProgressCache.setExplicitValue({
+      loadArgs: [result.id],
+      value: { status: 'loaded', value: result, updatedAt: new Date() },
+    })
+    this.watchProgressQueryCache.obsoleteRange((values) => values.entries.some((entry) => entry.id === result.id))
     return result
   }
 }

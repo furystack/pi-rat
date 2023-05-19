@@ -71,22 +71,22 @@ export interface MediaApi extends RestApi {
     '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
     '/movie-files': GetCollectionEndpoint<MovieFile>
     '/movie-files/:id/stream': StreamEndpoint
-    '/movie-files/:id': GetEntityEndpoint<MovieFile, 'imdbId'>
+    '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
   }
   POST: {
     '/movies': PostEndpoint<Movie, 'imdbId', Omit<Movie, 'createdAt' | 'updatedAt'>>
-    '/movie-files': PostEndpoint<MovieFile, 'imdbId'>
+    '/movie-files': PostEndpoint<MovieFile, 'id'>
     '/link-movie': LinkMovie
     '/extract-subtitles': ExtractSubtitles
     '/save-watch-progress': SaveWatchProgress
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
-    '/movie-files/:id': PatchEndpoint<MovieFile, 'imdbId'>
+    '/movie-files/:id': PatchEndpoint<MovieFile, 'id'>
   }
   DELETE: {
     '/movies/:id': DeleteEndpoint<Movie, 'imdbId'>
-    '/movie-files/:id': DeleteEndpoint<MovieFile, 'imdbId'>
+    '/movie-files/:id': DeleteEndpoint<MovieFile, 'id'>
     '/my-watch-progresses/:id': DeleteEndpoint<MovieWatchHistoryEntry, 'id'>
   }
 }

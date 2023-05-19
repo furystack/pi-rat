@@ -19,7 +19,7 @@ export const watchMovieRoute = {
   onVisit,
   onLeave,
   component: ({ match }: { match: MatchResult<{ id: string }> }) => {
-    return <MoviePlayer imdbId={match.params.id} />
+    return <MoviePlayer movieFileId={match.params.id} />
   },
 }
 

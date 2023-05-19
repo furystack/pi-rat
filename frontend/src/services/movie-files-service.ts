@@ -32,6 +32,18 @@ export class MovieFilesService {
           findOptions,
         },
       })
+
+      result.entries.forEach((entry) => {
+        this.movieFileCache.setExplicitValue({
+          loadArgs: [entry.id],
+          value: {
+            status: 'loaded',
+            value: entry,
+            updatedAt: new Date(),
+          },
+        })
+      })
+
       return result
     },
   })
@@ -55,7 +67,7 @@ export class MovieFilesService {
 
   public updateMovieFile = async (
     id: string,
-    body: Omit<WithOptionalId<MovieFile, 'imdbId'>, 'createdAt' | 'updatedAt'>,
+    body: Omit<WithOptionalId<MovieFile, 'id'>, 'createdAt' | 'updatedAt'>,
   ) => {
     const { result } = await this.mediaApiClient.call({
       method: 'PATCH',

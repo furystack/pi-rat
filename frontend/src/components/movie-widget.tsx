@@ -7,6 +7,7 @@ import { WatchProgressService } from '../services/watch-progress-service.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { watchMovieRoute } from './routes/movie-routes.js'
 import { entityMoviesRoute } from './routes/entity-routes.js'
+import { MovieFilesService } from '../services/movie-files-service.js'
 
 const focus = (el: HTMLElement) => {
   promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
@@ -58,12 +59,15 @@ export const MovieWidget = Shade<{
     const { imdbId, size = 256 } = props
 
     const movieService = injector.getInstance(MoviesService)
-
+    const movieFileService = injector.getInstance(MovieFilesService)
     const watchProgressService = injector.getInstance(WatchProgressService)
 
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
-
     const [movie] = useObservable('movie', movieService.getMovieAsObservable(imdbId))
+    const [movieFile] = useObservable(
+      'movieFile',
+      movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: imdbId } }, top: 1 }),
+    )
 
     const url = `/movies/${imdbId}/overview`
 
@@ -110,18 +114,21 @@ export const MovieWidget = Shade<{
                 justifyContent: 'space-between',
                 filter: 'drop-shadow(black 0px 0px 5px) drop-shadow(black 0px 0px 8px) drop-shadow(black 0px 0px 10px)',
               }}>
-              <div style={{ display: 'flex' }}>
-                <div
-                  title="Play movie"
-                  style={{ width: '16px' }}
-                  onclick={(ev) => {
-                    ev.stopImmediatePropagation()
-                    ev.preventDefault()
-                    navigateToRoute(injector, watchMovieRoute, { id: imdbId })
-                  }}>
-                  ▶️
+              {isLoadedCacheResult(movieFile) && movieFile.value.entries[0] ? (
+                <div style={{ display: 'flex' }}>
+                  <div
+                    title="Play movie"
+                    style={{ width: '16px' }}
+                    onclick={(ev) => {
+                      ev.stopImmediatePropagation()
+                      ev.preventDefault()
+                      navigateToRoute(injector, watchMovieRoute, { id: movieFile.value.entries[0].id })
+                    }}>
+                    ▶️
+                  </div>
                 </div>
-              </div>
+              ) : null}
+
               {currentUser?.roles.includes('admin') ? (
                 <div style={{ display: 'flex' }}>
                   <div
@@ -166,16 +173,14 @@ export const MovieWidget = Shade<{
               <LazyLoad
                 loader={<div />}
                 component={async () => {
-                  const {
-                    entries: [lastRecentWatchProgress],
-                  } = await watchProgressService.findWatchProgress({
-                    filter: {
-                      imdbId: { $eq: imdbId },
-                    },
+                  const { entries: watchProgresses } = await watchProgressService.findWatchProgress({
+                    top: 100,
                     order: {
                       updatedAt: 'DESC',
                     },
                   })
+
+                  const lastRecentWatchProgress = watchProgresses.find((w) => w.imdbId === imdbId)
 
                   const percent =
                     lastRecentWatchProgress &&

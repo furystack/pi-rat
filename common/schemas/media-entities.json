@@ -110,6 +110,9 @@
     "MovieFile": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "imdbId": {
           "type": "string"
         },
@@ -153,6 +156,7 @@
         }
       },
       "required": [
+        "id",
         "imdbId",
         "driveLetter",
         "path",

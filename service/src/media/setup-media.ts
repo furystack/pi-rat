@@ -33,6 +33,7 @@ class MovieModel extends Model<Movie, Movie> implements Movie {
 }
 
 class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
+  declare id: string
   declare imdbId: string
   declare driveLetter: string
   declare path: string
@@ -208,13 +209,18 @@ export const setupMovies = async (injector: Injector) => {
     injector,
     model: MovieFile,
     sequelizeModel: MovieFileModel,
-    primaryKey: 'imdbId',
+    primaryKey: 'id',
     options: dbOptions,
     initModel: async (sequelize) => {
       MovieFileModel.init(
         {
-          imdbId: {
+          id: {
+            type: DataTypes.UUIDV4,
             primaryKey: true,
+            allowNull: false,
+            defaultValue: () => crypto.randomUUID(),
+          },
+          imdbId: {
             type: DataTypes.STRING,
             allowNull: false,
           },
@@ -606,7 +612,7 @@ export const setupMovies = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  repo.createDataSet(MovieFile, 'imdbId', {
+  repo.createDataSet(MovieFile, 'id', {
     authorizeGet: authorizedOnly,
     authorizeAdd: withRole('admin'),
     authorizeUpdate: withRole('admin'),
@@ -642,17 +648,13 @@ export const setupMovies = async (injector: Injector) => {
     authorizeGetEntity: onlyOwned,
     addFilter: async ({ filter, injector: i }) => {
       const user = await getCurrentUser(i)
-      const isAdmin = await isAuthorized(i, 'admin')
-      if (isAdmin) {
-        return filter
-      }
       return {
         ...filter,
         filter: {
           ...filter.filter,
-          userName: { $eq: user.username },
+          userName: { $eq: user.username as string },
         },
-      }
+      } as typeof filter
     },
     authorizeUpdateEntity: onlyOwned,
     authroizeRemoveEntity: onlyOwned,

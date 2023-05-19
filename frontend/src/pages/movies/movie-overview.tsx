@@ -1,5 +1,5 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
-import { Button, promisifyAnimation } from '@furystack/shades-common-components'
+import { Button, promisifyAnimation, Skeleton } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
 import { MoviesService } from '../../services/movies-service.js'
 import { isLoadedCacheResult } from '@furystack/cache'
@@ -7,6 +7,87 @@ import { WatchProgressService } from '../../services/watch-progress-service.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { watchMovieRoute } from '../../components/routes/movie-routes.js'
 import { entityMoviesRoute } from '../../components/routes/entity-routes.js'
+import { MovieFilesService } from '../../services/movie-files-service.js'
+import { PathHelper } from '@furystack/utils'
+
+export const PlayButtons = Shade<{ imdbId: string }>({
+  shadowDomName: 'shade-movie-play-buttons',
+  render: ({ props, useObservable, injector }) => {
+    const watchProgressService = injector.getInstance(WatchProgressService)
+    const movieFileService = injector.getInstance(MovieFilesService)
+    const [movieFilesResult] = useObservable(
+      'movieFiles',
+      movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: props.imdbId } } }),
+    )
+    const [watchProgressResult] = useObservable(
+      'watchProgress',
+      watchProgressService.findWatchProgressAsObservable({ filter: { imdbId: { $eq: props.imdbId } } }),
+    )
+
+    watchProgressService.findWatchProgress({ filter: { imdbId: { $eq: props.imdbId } } })
+
+    if (isLoadedCacheResult(movieFilesResult) && isLoadedCacheResult(watchProgressResult)) {
+      return (
+        <>
+          {movieFilesResult.value.entries.map((movieFile) => {
+            const watchProgress = watchProgressResult.value.entries.find(
+              (wp) =>
+                wp.driveLetter === movieFile.driveLetter &&
+                wp.path === movieFile.path &&
+                wp.fileName === movieFile.fileName,
+            )
+            if (watchProgress) {
+              return (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onclick={() => {
+                      navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
+                    }}>
+                    Continue from{' '}
+                    {(() => {
+                      const date = new Date(0)
+                      date.setSeconds(watchProgressResult.value.entries[0].watchedSeconds)
+                      return date.toISOString().substr(11, 8)
+                    })()}
+                  </Button>
+                  <Button
+                    onclick={async () => {
+                      await watchProgressService.deleteWatchEntry(watchProgressResult.value.entries[0].id)
+                      navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
+                    }}>
+                    Watch from the beginning
+                  </Button>
+                  {movieFilesResult.value.count > 1 ? (
+                    <>{`${movieFile.driveLetter}:${PathHelper.joinPaths(movieFile.path, movieFile.fileName)}`}</>
+                  ) : null}
+                </div>
+              )
+            }
+            return (
+              <div>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onclick={() => {
+                    navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
+                  }}>
+                  Start watching
+                </Button>
+                {movieFilesResult.value.count > 1 ? (
+                  <>{`${movieFile.driveLetter}:${PathHelper.joinPaths(movieFile.path, movieFile.fileName)}`}</>
+                ) : null}
+              </div>
+            )
+          })}
+        </>
+      )
+    }
+
+    return <Skeleton />
+  },
+})
 
 export const MovieOverview = Shade<{ imdbId: string }>({
   shadowDomName: 'shade-movie-overview',
@@ -14,13 +95,8 @@ export const MovieOverview = Shade<{ imdbId: string }>({
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
     const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
     const movieService = injector.getInstance(MoviesService)
-    const watchProgressService = injector.getInstance(WatchProgressService)
 
     const [movieResult] = useObservable('movie', movieService.getMovieAsObservable(props.imdbId))
-    const [watchProgressResult] = useObservable(
-      'watchProgress',
-      watchProgressService.findWatchProgressAsObservable({ filter: { imdbId: { $eq: props.imdbId } }, top: 1 }),
-    )
 
     if (isLoadedCacheResult(movieResult)) {
       setTimeout(() => {
@@ -64,39 +140,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
               </p>
               <p style={{ textAlign: 'justify' }}>{movie.plot}</p>
               <div>
-                {isLoadedCacheResult(watchProgressResult) && watchProgressResult.value.entries[0] ? (
-                  <span>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onclick={() => {
-                        navigateToRoute(injector, watchMovieRoute, { id: props.imdbId })
-                      }}>
-                      Continue from{' '}
-                      {(() => {
-                        const date = new Date(0)
-                        date.setSeconds(watchProgressResult.value.entries[0].watchedSeconds)
-                        return date.toISOString().substr(11, 8)
-                      })()}
-                    </Button>
-                    <Button
-                      onclick={async () => {
-                        await watchProgressService.deleteWatchEntry(watchProgressResult.value.entries[0].id)
-                        navigateToRoute(injector, watchMovieRoute, { id: props.imdbId })
-                      }}>
-                      Watch from the beginning
-                    </Button>
-                  </span>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onclick={() => {
-                      navigateToRoute(injector, watchMovieRoute, { id: props.imdbId })
-                    }}>
-                    Start watching{' '}
-                  </Button>
-                )}
+                <PlayButtons imdbId={movie.imdbId} />
                 {currentUser?.roles.includes('movie-admin') ? (
                   <span>
                     <Button
