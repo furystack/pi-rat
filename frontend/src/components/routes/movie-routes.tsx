@@ -41,7 +41,7 @@ export const seriesListRoute = {
   component: () => <SeriesList />,
 }
 
-const seriesOverviewRoute = {
+export const seriesOverviewRoute = {
   url: '/series/:imdbId',
   onVisit,
   onLeave,

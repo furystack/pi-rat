@@ -5,7 +5,7 @@ import type { CommandPaletteSuggestionResult } from '@furystack/shades-common-co
 export interface SuggestionOptions {
   name: string
   description: string
-  icon: string
+  icon: JSX.Element | string
   score: number
   onSelected: (options: { injector: Injector }) => void
 }
