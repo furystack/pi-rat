@@ -125,7 +125,7 @@ export class WatchProgressService {
       loadArgs: [result.id],
       value: { status: 'loaded', value: result, updatedAt: new Date() },
     })
-    this.watchProgressQueryCache.obsoleteRange((values) => values.entries.some((entry) => entry.id === result.id))
+    this.watchProgressQueryCache.flushAll()
     return result
   }
 

@@ -23,6 +23,25 @@
       ],
       "additionalProperties": false
     },
+    "ContinueWatchingWidgetGroup": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "continue-watching"
+        },
+        "count": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
     "EntityShortcutWidget": {
       "type": "object",
       "properties": {
@@ -150,6 +169,9 @@
         },
         {
           "$ref": "#/definitions/WidgetGroup"
+        },
+        {
+          "$ref": "#/definitions/ContinueWatchingWidgetGroup"
         }
       ]
     },
