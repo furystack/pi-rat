@@ -69,6 +69,9 @@
           "$ref": "#/definitions/MarkdownWidget"
         },
         {
+          "$ref": "#/definitions/MovieWidget"
+        },
+        {
           "$ref": "#/definitions/WidgetGroup"
         }
       ]
@@ -84,7 +87,8 @@
           "type": "string",
           "enum": [
             "home",
-            "browser"
+            "browser",
+            "movies"
           ]
         }
       },
@@ -152,6 +156,29 @@
       "required": [
         "type",
         "content"
+      ],
+      "additionalProperties": false
+    },
+    "MovieWidget": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "movie"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        },
+        "index": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "imdbId"
       ],
       "additionalProperties": false
     },

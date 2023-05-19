@@ -5,6 +5,7 @@ import { MarkdownWidget } from './markdown-widget.js'
 import { AppShortcutWidget } from './app-shortcut-widget.js'
 import { WidgetGroup } from './widget-group.js'
 import { EntityShortcutWidget } from './entity-shortcut-widget.js'
+import { MovieWidget } from './movie-widget.js'
 
 export const Widget = Shade<WidgetData>({
   shadowDomName: 'pi-rat-widget',
@@ -23,6 +24,9 @@ export const Widget = Shade<WidgetData>({
       }
       case 'group':
         return <WidgetGroup {...props} />
+      case 'movie': {
+        return <MovieWidget {...props} />
+      }
       default: {
         return <div>{(props as any).type}</div>
       }
