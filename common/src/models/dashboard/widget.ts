@@ -4,6 +4,7 @@ import type { EntityShortcutWidget } from './entity-shortcut-widget.js'
 import type { HtmlWidget } from './html-widget.js'
 import type { MarkdownWidget } from './markdown-widget.js'
 import type { MovieWidget } from './movie-widget.js'
+import type { SeriesWidget } from './series-widget.js'
 import type { WidgetGroup } from './widget-group.js'
 
 export type Widget =
@@ -12,5 +13,6 @@ export type Widget =
   | HtmlWidget
   | MarkdownWidget
   | MovieWidget
+  | SeriesWidget
   | WidgetGroup
   | ContinueWatchingWidgetGroup

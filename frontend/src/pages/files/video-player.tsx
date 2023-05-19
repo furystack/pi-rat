@@ -95,8 +95,8 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         style={{
           objectFit: 'contain',
           width: '100%',
-          height: 'calc(100vh - 64px)',
-          marginTop: '64px',
+          height: 'calc(100vh - 40px)',
+          marginTop: '40px',
         }}
         className="video-js"
         crossOrigin="use-credentials"

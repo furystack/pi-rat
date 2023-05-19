@@ -6,7 +6,7 @@ import { MovieFilesService } from '../../services/movie-files-service.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
 
 export const MovieList = Shade({
-  shadowDomName: 'shade-movie-list',
+  shadowDomName: 'shade-series-list',
   render: ({ injector }) => {
     const movieService = injector.getInstance(MoviesService)
     const movieFilesService = injector.getInstance(MovieFilesService)
@@ -23,9 +23,11 @@ export const MovieList = Shade({
           return (
             <div
               style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {movies.entries.map((movie, index) => (
-                <MovieWidget index={index} imdbId={movie.imdbId} />
-              ))}
+              {movies.entries
+                .filter((m) => !m.seriesId)
+                .map((movie, index) => (
+                  <MovieWidget index={index} imdbId={movie.imdbId} />
+                ))}
             </div>
           )
         }}

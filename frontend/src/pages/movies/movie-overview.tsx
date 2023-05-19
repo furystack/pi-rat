@@ -114,7 +114,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
       }, 100)
       const movie = movieResult.value
       return (
-        <div style={{ width: '100%', height: 'calc(100% - 64px', paddingTop: '64px' }}>
+        <div style={{ width: '100%', height: 'calc(100% - 40px', paddingTop: '40px' }}>
           <div
             style={{
               width: '100%',

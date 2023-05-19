@@ -4,6 +4,8 @@ import { MovieList } from '../../pages/movies/movie-list.js'
 import type { MatchResult } from 'path-to-regexp'
 import { MoviePlayer } from '../../pages/movies/movie-player.js'
 import { MovieOverview } from '../../pages/movies/movie-overview.js'
+import { SeriesList } from '../../pages/movies/series-list.js'
+import { SeriesOverview } from '../../pages/movies/series-overview.js'
 
 export const movieListRoute = {
   url: '/movies',
@@ -32,13 +34,26 @@ export const movieOverviewRoute = {
   },
 }
 
+export const seriesListRoute = {
+  url: '/series',
+  onVisit,
+  onLeave,
+  component: () => <SeriesList />,
+}
+
 const seriesOverviewRoute = {
-  url: '/series/:imdbId/overview',
+  url: '/series/:imdbId',
   onVisit,
   onLeave,
   component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => {
-    return <>Overview series with imdb id {match.params.imdbId}</>
+    return <SeriesOverview imdbId={match.params.imdbId} />
   },
 }
 
-export const movieRoutes = [movieListRoute, watchMovieRoute, movieOverviewRoute, seriesOverviewRoute] as const
+export const movieRoutes = [
+  movieListRoute,
+  watchMovieRoute,
+  movieOverviewRoute,
+  seriesListRoute,
+  seriesOverviewRoute,
+] as const
