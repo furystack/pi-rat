@@ -4,7 +4,8 @@ import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { SeriesService } from '../../services/series-service.js'
 import { MoviesService } from '../../services/movies-service.js'
 import { WidgetGroup } from '../../components/dashboard/widget-group.js'
-import { MovieWidget } from '../../components/dashboard/movie-widget.js'
+import { MovieFilesService } from '../../services/movie-files-service.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
 
 export interface SeriesListProps {
   imdbId: string
@@ -16,12 +17,21 @@ export const SeriesOverview = Shade<SeriesListProps>({
     const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
     const seriesService = injector.getInstance(SeriesService)
     const moviesService = injector.getInstance(MoviesService)
+    const movieFileService = injector.getInstance(MovieFilesService)
+    const watchProgresses = injector.getInstance(WatchProgressService)
 
     return (
       <PiRatLazyLoad
         component={async () => {
-          const series = await seriesService.getSeries(props.imdbId)
-          const relatedMovies = await moviesService.findMovie({ filter: { seriesId: { $eq: props.imdbId } } })
+          const [series, relatedMovies] = await Promise.all([
+            seriesService.getSeries(props.imdbId),
+            moviesService.findMovie({ filter: { seriesId: { $eq: props.imdbId } } }),
+          ])
+
+          await Promise.all([
+            movieFileService.prefetchMovieFilesForMovies(relatedMovies.entries),
+            watchProgresses.prefetchWatchProgressForMovies(relatedMovies.entries),
+          ])
 
           const seasons = Array.from(
             new Set(relatedMovies.entries.map((m) => m.season).filter((s) => !isNaN(s as number))),
