@@ -28,12 +28,10 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
         },
         top: 1,
       }),
-      watchProgressService.findWatchProgress({
-        filter: {
-          path: { $eq: parentPath },
-          fileName: { $eq: fileName },
-          driveLetter: { $eq: letter },
-        },
+      watchProgressService.findWatchProgressForFile({
+        path: parentPath,
+        driveLetter: letter,
+        fileName,
       }),
     ]).then(
       ([

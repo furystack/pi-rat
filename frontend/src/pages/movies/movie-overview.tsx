@@ -24,8 +24,6 @@ export const PlayButtons = Shade<{ imdbId: string }>({
       watchProgressService.findWatchProgressAsObservable({ filter: { imdbId: { $eq: props.imdbId } } }),
     )
 
-    watchProgressService.findWatchProgress({ filter: { imdbId: { $eq: props.imdbId } } })
-
     if (isLoadedCacheResult(movieFilesResult) && isLoadedCacheResult(watchProgressResult)) {
       return (
         <>

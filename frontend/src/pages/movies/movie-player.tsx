@@ -27,12 +27,10 @@ export const MoviePlayer = Shade<{ movieFileId: string }>({
           const { fileName, path } = movieFile
           const {
             entries: [watchProgress],
-          } = await watchProgressService.findWatchProgress({
-            filter: {
-              path: { $eq: path },
-              fileName: { $eq: fileName },
-              driveLetter: { $eq: movieFile.driveLetter },
-            },
+          } = await watchProgressService.findWatchProgressForFile({
+            path,
+            driveLetter: movieFile.driveLetter,
+            fileName,
           })
 
           setTimeout(() => {

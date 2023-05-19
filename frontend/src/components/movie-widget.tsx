@@ -66,7 +66,7 @@ export const MovieWidget = Shade<{
     const [movie] = useObservable('movie', movieService.getMovieAsObservable(imdbId))
     const [movieFile] = useObservable(
       'movieFile',
-      movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: imdbId } }, top: 1 }),
+      movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: imdbId } } }),
     )
 
     const url = `/movies/${imdbId}/overview`
@@ -173,12 +173,9 @@ export const MovieWidget = Shade<{
               <LazyLoad
                 loader={<div />}
                 component={async () => {
-                  const { entries: watchProgresses } = await watchProgressService.findWatchProgress({
-                    top: 100,
-                    order: {
-                      updatedAt: 'DESC',
-                    },
-                  })
+                  const { entries: watchProgresses } = await watchProgressService.findWatchProgressesForMovie(
+                    movie.value,
+                  )
 
                   const lastRecentWatchProgress = watchProgresses.find((w) => w.imdbId === imdbId)
 
