@@ -12,7 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@furystack/rest": "^5.0.4",
-    "@types/marked": "^4.3.0",
+    "@types/marked": "^5.0.0",
     "typescript": "^5.0.4",
     "vite": "^4.3.8"
   },
