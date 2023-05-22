@@ -75,6 +75,11 @@ export const apiValues: SchemaGenerationSetting[] = [
     outputFile: './schemas/media-api.json',
     type: '*',
   },
+  {
+    inputFile: './src/apis/torrent.ts',
+    outputFile: './schemas/torrent-api.json',
+    type: '*',
+  },
 ]
 
 export const exec = async (): Promise<void> => {
