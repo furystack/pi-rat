@@ -4,6 +4,10 @@ import type { TorrentApi } from 'common'
 import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
 import { TorrentClient } from './torrent-client.js'
+import { PostTorrentAction } from './actions/post-torrent-action.js'
+import { DeleteTorrentAction } from './actions/delete-torrent-action.js'
+import { PauseTorrentAction } from './actions/pause-torrent-action.js'
+import { ResumeTorrentAction } from './actions/resume-torrent-action.js'
 
 export const setupTorrentApi = async (injector: Injector) => {
   await useRestService<TorrentApi>({
@@ -18,7 +22,14 @@ export const setupTorrentApi = async (injector: Injector) => {
           return JsonResult(torrentClient.torrents.map(torrentClient.toApiTorrent))
         },
       },
-      POST: {} as any,
+      POST: {
+        '/torrents': PostTorrentAction,
+        '/torrents/:id/pause': PauseTorrentAction,
+        '/torrents/:id/resume': ResumeTorrentAction,
+      },
+      DELETE: {
+        '/torrents/:id': DeleteTorrentAction,
+      },
     },
   })
 }

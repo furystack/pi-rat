@@ -1,6 +1,8 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { TorrentClient } from './torrent-client.js'
+import { getDataSetFor } from '@furystack/repository'
+import { Config } from 'common'
 
 export const setupTorrent = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Torrent')
@@ -11,9 +13,9 @@ export const setupTorrent = async (injector: Injector) => {
     tracker: true,
   })
 
-  ;(client as any).torrentsPath = ''
-
   injector.setExplicitInstance(client, TorrentClient)
-
-  await client.init()
+  await client.init(injector)
+  const configDataSet = getDataSetFor(injector, Config, 'id')
+  configDataSet.onEntityAdded.subscribe(({ entity }) => entity.type === 'TORRENT_CONFIG' && client.init(injector))
+  configDataSet.onEntityUpdated.subscribe(({ change }) => change.type === 'TORRENT_CONFIG' && client.init(injector))
 }

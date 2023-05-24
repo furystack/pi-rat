@@ -62,6 +62,7 @@ export type ResumeTorrentEndpoint = {
 
 export type DeleteTorrentEndpoint = {
   path: { id: string }
+  query: { deleteFiles: boolean }
   result: { success: true }
 }
 
@@ -73,6 +74,8 @@ export interface TorrentApi extends RestApi {
     '/torrents': UploadTorrentEndpoint
     '/torrents/:id/pause': PauseTorrentEndpoint
     '/torrents/:id/resume': ResumeTorrentEndpoint
-    '/torrents/:id/delete': DeleteTorrentEndpoint
+  }
+  DELETE: {
+    '/torrents/:id': DeleteTorrentEndpoint
   }
 }

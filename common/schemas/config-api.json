@@ -286,28 +286,32 @@
                   "type": "string",
                   "enum": [
                     "OMDB_CONFIG",
-                    "GITHUB_CONFIG"
+                    "GITHUB_CONFIG",
+                    "TORRENT_CONFIG"
                   ]
                 },
                 "$endsWith": {
                   "type": "string",
                   "enum": [
                     "OMDB_CONFIG",
-                    "GITHUB_CONFIG"
+                    "GITHUB_CONFIG",
+                    "TORRENT_CONFIG"
                   ]
                 },
                 "$like": {
                   "type": "string",
                   "enum": [
                     "OMDB_CONFIG",
-                    "GITHUB_CONFIG"
+                    "GITHUB_CONFIG",
+                    "TORRENT_CONFIG"
                   ]
                 },
                 "$regex": {
                   "type": "string",
                   "enum": [
                     "OMDB_CONFIG",
-                    "GITHUB_CONFIG"
+                    "GITHUB_CONFIG",
+                    "TORRENT_CONFIG"
                   ]
                 }
               },
@@ -320,14 +324,16 @@
                   "type": "string",
                   "enum": [
                     "OMDB_CONFIG",
-                    "GITHUB_CONFIG"
+                    "GITHUB_CONFIG",
+                    "TORRENT_CONFIG"
                   ]
                 },
                 "$ne": {
                   "type": "string",
                   "enum": [
                     "OMDB_CONFIG",
-                    "GITHUB_CONFIG"
+                    "GITHUB_CONFIG",
+                    "TORRENT_CONFIG"
                   ]
                 }
               },
@@ -342,7 +348,8 @@
                     "type": "string",
                     "enum": [
                       "OMDB_CONFIG",
-                      "GITHUB_CONFIG"
+                      "GITHUB_CONFIG",
+                      "TORRENT_CONFIG"
                     ]
                   }
                 },
@@ -352,7 +359,8 @@
                     "type": "string",
                     "enum": [
                       "OMDB_CONFIG",
-                      "GITHUB_CONFIG"
+                      "GITHUB_CONFIG",
+                      "TORRENT_CONFIG"
                     ]
                   }
                 }
@@ -395,6 +403,22 @@
                         "clientSecret"
                       ],
                       "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "torrentDriveLetter": {
+                          "type": "string"
+                        },
+                        "torrentPath": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "torrentDriveLetter",
+                        "torrentPath"
+                      ],
+                      "additionalProperties": false
                     }
                   ]
                 },
@@ -425,6 +449,22 @@
                       "required": [
                         "clientId",
                         "clientSecret"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "torrentDriveLetter": {
+                          "type": "string"
+                        },
+                        "torrentPath": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "torrentDriveLetter",
+                        "torrentPath"
                       ],
                       "additionalProperties": false
                     }
@@ -467,6 +507,22 @@
                           "clientSecret"
                         ],
                         "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "torrentDriveLetter": {
+                            "type": "string"
+                          },
+                          "torrentPath": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "torrentDriveLetter",
+                          "torrentPath"
+                        ],
+                        "additionalProperties": false
                       }
                     ]
                   }
@@ -500,6 +556,22 @@
                         "required": [
                           "clientId",
                           "clientSecret"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "torrentDriveLetter": {
+                            "type": "string"
+                          },
+                          "torrentPath": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "torrentDriveLetter",
+                          "torrentPath"
                         ],
                         "additionalProperties": false
                       }
@@ -714,7 +786,8 @@
           "type": "string",
           "enum": [
             "OMDB_CONFIG",
-            "GITHUB_CONFIG"
+            "GITHUB_CONFIG",
+            "TORRENT_CONFIG"
           ]
         },
         "value": {
@@ -744,6 +817,22 @@
               "required": [
                 "clientId",
                 "clientSecret"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "torrentDriveLetter": {
+                  "type": "string"
+                },
+                "torrentPath": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "torrentDriveLetter",
+                "torrentPath"
               ],
               "additionalProperties": false
             }
@@ -845,7 +934,8 @@
           "type": "string",
           "enum": [
             "OMDB_CONFIG",
-            "GITHUB_CONFIG"
+            "GITHUB_CONFIG",
+            "TORRENT_CONFIG"
           ]
         },
         "value": {
@@ -875,6 +965,22 @@
               "required": [
                 "clientId",
                 "clientSecret"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "torrentDriveLetter": {
+                  "type": "string"
+                },
+                "torrentPath": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "torrentDriveLetter",
+                "torrentPath"
               ],
               "additionalProperties": false
             }
@@ -933,7 +1039,8 @@
           "type": "string",
           "enum": [
             "OMDB_CONFIG",
-            "GITHUB_CONFIG"
+            "GITHUB_CONFIG",
+            "TORRENT_CONFIG"
           ]
         },
         "value": {
@@ -963,6 +1070,22 @@
               "required": [
                 "clientId",
                 "clientSecret"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "torrentDriveLetter": {
+                  "type": "string"
+                },
+                "torrentPath": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "torrentDriveLetter",
+                "torrentPath"
               ],
               "additionalProperties": false
             }
