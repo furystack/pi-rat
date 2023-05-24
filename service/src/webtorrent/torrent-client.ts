@@ -12,9 +12,15 @@ import { StoreManager } from '@furystack/core'
 
 @Injectable({ lifetime: 'singleton' })
 export class TorrentClient extends WebTorrent {
-  private readonly torrentsPath = join(getDataFolder(), 'torrents')
+  public readonly torrentsPath = join(getDataFolder(), 'torrents')
+  public readonly inProgressPath = join(this.torrentsPath, 'in-progress')
 
-  private readonly inProgressPath = join(this.torrentsPath, 'in-progress')
+  private config!: TorrentConfig
+  private physicalPath!: string
+
+  public getPhysicalPath = () => this.physicalPath
+
+  public getConfig = () => this.config
 
   public async dispose() {
     await new Promise<void>((resolve, reject) => this.destroy((err) => (err ? reject(err) : resolve())))
@@ -83,7 +89,9 @@ export class TorrentClient extends WebTorrent {
       return logger.warning({ message: "❗ No torrent config found, torrents won't be initialized" })
     }
 
-    const { torrentDriveLetter, torrentPath } = (config as TorrentConfig).value
+    this.config = config as TorrentConfig
+
+    const { torrentDriveLetter, torrentPath } = this.getConfig().value
 
     const drive = await storeManager.getStoreFor(Drive, 'letter').get(torrentDriveLetter)
 
@@ -93,7 +101,7 @@ export class TorrentClient extends WebTorrent {
       })
     }
 
-    const path = join(drive?.physicalPath, torrentPath)
+    this.physicalPath = join(drive?.physicalPath, torrentPath)
 
     await Promise.all(
       this.torrents.map(
@@ -113,7 +121,7 @@ export class TorrentClient extends WebTorrent {
         .map(async (file) => {
           console.log('Adding running torrent', file)
           const fileContent = await readFile(join(this.inProgressPath, file))
-          this.add(fileContent, { path })
+          this.add(fileContent, { path: this.physicalPath })
         }),
     ])
 
@@ -123,7 +131,7 @@ export class TorrentClient extends WebTorrent {
         .map(async (file) => {
           console.log('Adding paused torrent', file)
           const fileContent = await readFile(join(this.torrentsPath, file))
-          const instance = this.add(fileContent, { path })
+          const instance = this.add(fileContent, { path: this.physicalPath })
           instance.pause()
         }),
     ])

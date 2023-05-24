@@ -51,18 +51,18 @@ export type UploadTorrentEndpoint = {
 }
 
 export type PauseTorrentEndpoint = {
-  path: { id: string }
+  url: { id: string }
   result: { success: true }
 }
 
 export type ResumeTorrentEndpoint = {
-  path: { id: string }
+  url: { id: string }
   result: { success: true }
 }
 
 export type DeleteTorrentEndpoint = {
-  path: { id: string }
-  query: { deleteFiles: boolean }
+  url: { id: string }
+  query: { deleteFiles?: boolean }
   result: { success: true }
 }
 
