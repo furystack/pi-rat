@@ -50,6 +50,7 @@ export const PostTorrentAction: RequestAction<UploadTorrentEndpoint> = async ({ 
   const fileArray: File[] = Object.values(parseResult.files).flatMap((value) => value)
 
   const entries = fileArray
+    .filter((file) => file.mimetype === 'application/x-bittorrent')
     .map((file) =>
       torrentClient.add(file.filepath, {
         path: torrentClient.getPhysicalPath(),
