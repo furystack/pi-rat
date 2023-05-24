@@ -14,6 +14,7 @@
     "@types/ffprobe": "^1.1.4",
     "@types/formidable": "^2.0.6",
     "@types/node": "^20.2.1",
+    "@types/webtorrent": "^0.109.3",
     "typescript": "^5.0.4"
   },
   "dependencies": {
@@ -34,6 +35,7 @@
     "formidable": "^2.1.2",
     "sequelize": "^6.31.1",
     "sqlite3": "^5.1.6",
-    "vitest": "^0.31.1"
+    "vitest": "^0.31.1",
+    "webtorrent": "^2.0.18"
   }
 }

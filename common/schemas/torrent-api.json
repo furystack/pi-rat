@@ -1,0 +1,745 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ApiTorrentFile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "length": {
+          "type": "number"
+        },
+        "downloaded": {
+          "type": "number"
+        },
+        "progress": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "path",
+        "length",
+        "downloaded",
+        "progress"
+      ],
+      "additionalProperties": false
+    },
+    "ApiTorrentPiece": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number"
+        },
+        "missing": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "length",
+        "missing"
+      ],
+      "additionalProperties": false
+    },
+    "ApiTorrent": {
+      "type": "object",
+      "properties": {
+        "infoHash": {
+          "type": "string"
+        },
+        "magnetURI": {
+          "type": "string"
+        },
+        "torrentFile": {
+          "$ref": "#/definitions/global.Buffer"
+        },
+        "torrentFileBlobURL": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApiTorrentFile"
+          }
+        },
+        "announce": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "announce-list": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "pieces": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/ApiTorrentPiece"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "timeRemaining": {
+          "type": "number"
+        },
+        "received": {
+          "type": "number"
+        },
+        "downloaded": {
+          "type": "number"
+        },
+        "uploaded": {
+          "type": "number"
+        },
+        "downloadSpeed": {
+          "type": "number"
+        },
+        "uploadSpeed": {
+          "type": "number"
+        },
+        "progress": {
+          "type": "number"
+        },
+        "ratio": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        },
+        "pieceLength": {
+          "type": "number"
+        },
+        "lastPieceLength": {
+          "type": "number"
+        },
+        "numPeers": {
+          "type": "number"
+        },
+        "path": {
+          "type": "string"
+        },
+        "ready": {
+          "type": "boolean"
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "done": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "maxWebConns": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "infoHash",
+        "magnetURI",
+        "torrentFile",
+        "torrentFileBlobURL",
+        "files",
+        "announce",
+        "announce-list",
+        "pieces",
+        "timeRemaining",
+        "received",
+        "downloaded",
+        "uploaded",
+        "downloadSpeed",
+        "uploadSpeed",
+        "progress",
+        "ratio",
+        "length",
+        "pieceLength",
+        "lastPieceLength",
+        "numPeers",
+        "path",
+        "ready",
+        "paused",
+        "done",
+        "name",
+        "created",
+        "createdBy",
+        "comment",
+        "maxWebConns"
+      ],
+      "additionalProperties": false
+    },
+    "global.Buffer": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      },
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "$ref": "#/definitions/ArrayBufferLike"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "BYTES_PER_ELEMENT",
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length"
+      ]
+    },
+    "Uint8Array": {
+      "type": "object",
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "$ref": "#/definitions/ArrayBufferLike"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "BYTES_PER_ELEMENT",
+        "buffer",
+        "byteLength",
+        "byteOffset",
+        "length"
+      ],
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "ArrayBufferLike": {
+      "$ref": "#/definitions/ArrayBuffer"
+    },
+    "ArrayBuffer": {
+      "type": "object",
+      "properties": {
+        "byteLength": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "byteLength"
+      ],
+      "additionalProperties": false
+    },
+    "UploadTorrentEndpoint": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            },
+            "entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ApiTorrent"
+              }
+            }
+          },
+          "required": [
+            "success",
+            "entries"
+          ],
+          "additionalProperties": false
+        },
+        "body": {}
+      },
+      "required": [
+        "result",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "PauseTorrentEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "ResumeTorrentEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "DeleteTorrentEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "deleteFiles": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "query",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "TorrentApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "properties": {
+            "/torrents": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/ApiTorrent"
+                  }
+                }
+              },
+              "required": [
+                "result"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "/torrents"
+          ],
+          "additionalProperties": false
+        },
+        "POST": {
+          "type": "object",
+          "properties": {
+            "/torrents": {
+              "$ref": "#/definitions/UploadTorrentEndpoint"
+            },
+            "/torrents/:id/pause": {
+              "$ref": "#/definitions/PauseTorrentEndpoint"
+            },
+            "/torrents/:id/resume": {
+              "$ref": "#/definitions/ResumeTorrentEndpoint"
+            }
+          },
+          "required": [
+            "/torrents",
+            "/torrents/:id/pause",
+            "/torrents/:id/resume"
+          ],
+          "additionalProperties": false
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "properties": {
+            "/torrents/:id": {
+              "$ref": "#/definitions/DeleteTorrentEndpoint"
+            }
+          },
+          "required": [
+            "/torrents/:id"
+          ],
+          "additionalProperties": false
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "additionalProperties": false
+    },
+    "RestApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "POST": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

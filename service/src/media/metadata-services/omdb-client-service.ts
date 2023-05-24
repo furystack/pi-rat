@@ -45,15 +45,32 @@ export class OmdbClientService {
     this.config = config[0] as OmdbConfig
 
     const dataSet = getDataSetFor(injector, Config, 'id')
-    dataSet.onEntityRemoved.subscribe(({ key }) => {
-      key === config[0].id && this.init(injector)
+    const removeObserver = dataSet.onEntityRemoved.subscribe(({ key }) => {
+      if (key === config[0].id) {
+        addObserver.dispose()
+        updateObserver.dispose()
+        removeObserver.dispose()
+        this.init(injector)
+      }
     })
-    dataSet.onEntityUpdated.subscribe(({ id }) => {
-      id === config[0].id && this.init(injector)
+    const updateObserver = dataSet.onEntityUpdated.subscribe(({ id }) => {
+      if (id === config[0].id) {
+        addObserver.dispose()
+        updateObserver.dispose()
+        removeObserver.dispose()
+
+        this.init(injector)
+      }
     })
 
-    dataSet.onEntityAdded.subscribe(({ entity }) => {
-      entity.type === 'OMDB_CONFIG' && this.init(injector)
+    const addObserver = dataSet.onEntityAdded.subscribe(({ entity }) => {
+      if (entity.type === 'OMDB_CONFIG') {
+        addObserver.dispose()
+        updateObserver.dispose()
+        removeObserver.dispose()
+
+        this.init(injector)
+      }
     })
   }
 

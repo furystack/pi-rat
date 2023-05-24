@@ -16,6 +16,8 @@ import { setupMovies } from './media/setup-media.js'
 import { setupMoviesRestApi } from './media/setup-media-api.js'
 import { setupConfig } from './config/setup-config.js'
 import { setupConfigRestApi } from './config/setup-config-rest-api.js'
+import { setupTorrentApi } from './webtorrent/setup-torrent-api.js'
+import { setupTorrent } from './webtorrent/setup-torrent.js'
 
 export const init = async (injector = rootInjector) => {
   const serviceLogger = getLogger(injector).withScope('service')
@@ -32,6 +34,7 @@ export const init = async (injector = rootInjector) => {
     await setupInstall(injector),
     await setupDashboards(injector),
     await setupMovies(injector),
+    await setupTorrent(injector),
   ])
 
   /**
@@ -49,6 +52,7 @@ export const init = async (injector = rootInjector) => {
     await setupInstallRestApi(injector),
     await setupDashboardsRestApi(injector),
     await setupMoviesRestApi(injector),
+    await setupTorrentApi(injector),
   ])
 
   await setupFrontendBundle(injector)
