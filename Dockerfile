@@ -16,6 +16,9 @@ COPY --chown=node:node /.yarnrc.yml /home/node/app/.yarnrc.yml
 
 WORKDIR /home/node/app
 
+# Needed for webtorrent dependency install
+RUN apk add python3 make g++
+
 RUN yarn workspaces focus service --production
 
 FROM node:19-alpine as runner
