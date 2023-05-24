@@ -57,6 +57,36 @@
       ],
       "additionalProperties": false
     },
+    "TorrentConfig": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "TORRENT_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "torrentDriveLetter": {
+              "type": "string"
+            },
+            "torrentPath": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "torrentDriveLetter",
+            "torrentPath"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "additionalProperties": false
+    },
     "ConfigType": {
       "anyOf": [
         {
@@ -64,6 +94,9 @@
         },
         {
           "$ref": "#/definitions/GithubConfig"
+        },
+        {
+          "$ref": "#/definitions/TorrentConfig"
         }
       ]
     },
@@ -74,7 +107,8 @@
           "type": "string",
           "enum": [
             "OMDB_CONFIG",
-            "GITHUB_CONFIG"
+            "GITHUB_CONFIG",
+            "TORRENT_CONFIG"
           ]
         },
         "value": {
@@ -104,6 +138,22 @@
               "required": [
                 "clientId",
                 "clientSecret"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "torrentDriveLetter": {
+                  "type": "string"
+                },
+                "torrentPath": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "torrentDriveLetter",
+                "torrentPath"
               ],
               "additionalProperties": false
             }
