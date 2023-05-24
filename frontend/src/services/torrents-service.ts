@@ -35,6 +35,8 @@ export class TorrentService {
       credentials: 'include',
       body: formData,
     })
+    this.torrentsCache.setObsolete()
+    this.getTorrents()
   }
 
   public async resumeTorrent(torrentId: string) {
@@ -43,6 +45,8 @@ export class TorrentService {
       action: `/torrents/:id/resume`,
       url: { id: torrentId },
     })
+    this.torrentsCache.setObsolete()
+    this.getTorrents()
   }
 
   public async pauseTorrent(torrentId: string) {
@@ -51,6 +55,8 @@ export class TorrentService {
       action: `/torrents/:id/pause`,
       url: { id: torrentId },
     })
+    this.torrentsCache.setObsolete()
+    this.getTorrents()
   }
 
   public async deleteTorrent(torrentId: string, deleteFiles = false) {
@@ -60,5 +66,7 @@ export class TorrentService {
       url: { id: torrentId },
       query: { deleteFiles },
     })
+    this.torrentsCache.setObsolete()
+    this.getTorrents()
   }
 }

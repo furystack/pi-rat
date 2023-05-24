@@ -21,7 +21,7 @@ export type LinkMovie = {
     path: string
     fileName: string
   }
-  result: { status: 'already-linked' | 'linked' | 'failed' }
+  result: { status: 'already-linked' | 'linked' | 'failed' | 'not-movie-file' }
 }
 
 export type ExtractSubtitles = {

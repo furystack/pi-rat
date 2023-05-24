@@ -8,7 +8,7 @@ import { watch } from 'chokidar'
 import { useWebsockets, WebSocketApi } from '@furystack/websocket-api'
 import { getPort } from '../get-port.js'
 import { sep } from 'path'
-import { onUnlink, onUnlinkDir } from '../media/actions/movie-file-maintainer.js'
+import { onAdd, onUnlink, onUnlinkDir } from '../media/actions/movie-file-maintainer.js'
 
 export const useFileWatchers = async (injector: Injector) => {
   const watchers: { [key: string]: FSWatcher } = {}
@@ -42,6 +42,13 @@ export const useFileWatchers = async (injector: Injector) => {
     watcher.on('unlinkDir', (path) => {
       const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
       movieMaintainerUnlinkDirHandler(drive, relativePath)
+    })
+
+    const movieMaintainerOnAddHandler = onAdd(injector)
+
+    watcher.on('add', (path) => {
+      const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
+      movieMaintainerOnAddHandler(drive, relativePath)
     })
 
     watchers[drive.letter] = watcher

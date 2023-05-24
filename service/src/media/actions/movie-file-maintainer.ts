@@ -4,6 +4,7 @@ import { getLogger } from '@furystack/logging'
 import { PathHelper } from '@furystack/utils'
 import type { Drive } from 'common'
 import { MovieFile } from 'common'
+import { linkMovie } from './link-movie-action.js'
 
 export const onUnlink = (injector: Injector) => {
   const logger = getLogger(injector).withScope('MovieFileMaintainer')
@@ -57,5 +58,13 @@ export const onUnlinkDir = (injector: Injector) => {
       })
       await store.remove(existingMovies[0].id)
     }
+  }
+}
+
+export const onAdd = (injector: Injector) => {
+  return async (drive: Drive, path: string) => {
+    const parentPath = PathHelper.getParentPath(path) || ''
+    const fileName = path.split('/').slice(-1)[0]
+    await linkMovie({ injector, drive: drive.letter, fileName, path: parentPath })
   }
 }

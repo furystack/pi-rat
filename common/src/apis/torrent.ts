@@ -16,8 +16,8 @@ export interface ApiTorrentPiece {
 export interface ApiTorrent {
   infoHash: string
   magnetURI: string
-  torrentFile: Buffer
-  torrentFileBlobURL: string
+  // torrentFile: Buffer
+  // torrentFileBlobURL: string
   files: ApiTorrentFile[]
   announce: string[]
   ['announce-list']: string[][]
@@ -34,7 +34,6 @@ export interface ApiTorrent {
   pieceLength: number
   lastPieceLength: number
   numPeers: number
-  path: string
   ready: boolean
   paused: boolean
   done: boolean

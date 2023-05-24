@@ -1,12 +1,17 @@
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { LinkMovie } from 'common'
-import { Drive } from 'common'
-import { OmdbSeriesMetadata, Series } from 'common'
-import { MovieFile } from 'common'
-import { getFallbackMetadata } from 'common'
-import { Movie } from 'common'
-import { OmdbMovieMetadata } from 'common'
+import {
+  getFallbackMetadata,
+  MovieFile,
+  Drive,
+  OmdbSeriesMetadata,
+  Series,
+  isMovieFile,
+  isSampleFile,
+  Movie,
+  OmdbMovieMetadata,
+} from 'common'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { RequestError } from '@furystack/rest'
 import { getStoreManager } from '@furystack/core'
@@ -91,8 +96,16 @@ const ensureOmdbSeriesExists = async (omdbMeta: OmdbMovieMetadata, injector: Inj
   }
 }
 
-export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injector }) => {
-  const { drive, fileName, path } = await getBody()
+export const linkMovie = async (options: { injector: Injector; drive: string; fileName: string; path: string }) => {
+  const { injector, drive, fileName, path } = options
+
+  if (!isMovieFile(fileName)) {
+    return { status: 'not-movie-file' } as const
+  }
+
+  if (isSampleFile(fileName)) {
+    return { status: 'not-movie-file' } as const
+  }
 
   const { title, year, season, episode } = getFallbackMetadata(`${path}/${fileName}`)
 
@@ -107,7 +120,7 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
   })
 
   if (storedMovieFile.length > 0) {
-    return JsonResult({ status: 'already-linked' })
+    return { status: 'already-linked' } as const
   }
 
   const loadedDrive = await getDataSetFor(injector, Drive, 'letter').get(injector, drive)
@@ -146,7 +159,7 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
       ffprobe: ffprobeResult,
     })
 
-    return JsonResult({ status: 'linked' })
+    return { status: 'linked' } as const
   }
 
   const omdbClientService = injector.getInstance(OmdbClientService)
@@ -175,6 +188,13 @@ export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injec
   })
 
   await extractSubtitles({ driveLetter: drive, path, fileName, injector })
+  return { status: 'linked' } as const
+}
 
-  return JsonResult({ status: 'linked' })
+export const LinkMovieAction: RequestAction<LinkMovie> = async ({ getBody, injector }) => {
+  const body = await getBody()
+
+  const result = await linkMovie({ injector, ...body })
+
+  return JsonResult(result)
 }

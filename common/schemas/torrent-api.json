@@ -301,7 +301,7 @@
     "PauseTorrentEndpoint": {
       "type": "object",
       "properties": {
-        "path": {
+        "url": {
           "type": "object",
           "properties": {
             "id": {
@@ -328,7 +328,7 @@
         }
       },
       "required": [
-        "path",
+        "url",
         "result"
       ],
       "additionalProperties": false
@@ -336,7 +336,7 @@
     "ResumeTorrentEndpoint": {
       "type": "object",
       "properties": {
-        "path": {
+        "url": {
           "type": "object",
           "properties": {
             "id": {
@@ -363,7 +363,7 @@
         }
       },
       "required": [
-        "path",
+        "url",
         "result"
       ],
       "additionalProperties": false
@@ -371,7 +371,7 @@
     "DeleteTorrentEndpoint": {
       "type": "object",
       "properties": {
-        "path": {
+        "url": {
           "type": "object",
           "properties": {
             "id": {
@@ -390,9 +390,6 @@
               "type": "boolean"
             }
           },
-          "required": [
-            "deleteFiles"
-          ],
           "additionalProperties": false
         },
         "result": {
@@ -410,7 +407,7 @@
         }
       },
       "required": [
-        "path",
+        "url",
         "query",
         "result"
       ],

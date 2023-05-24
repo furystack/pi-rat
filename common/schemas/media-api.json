@@ -32,7 +32,8 @@
               "enum": [
                 "already-linked",
                 "linked",
-                "failed"
+                "failed",
+                "not-movie-file"
               ]
             }
           },
