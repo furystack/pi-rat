@@ -9,8 +9,7 @@ import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { withRole } from '../authorization/with-role.js'
 
 class ConfigModel extends Model<Config, Config> implements Config {
-  declare type: ConfigType['type']
-  declare id: string
+  declare id: ConfigType['id']
   declare value: ConfigType['value']
   declare createdAt: Date
   declare updatedAt: Date
@@ -33,10 +32,9 @@ export const setupConfig = async (injector: Injector) => {
       ConfigModel.init(
         {
           id: {
-            type: DataTypes.UUIDV4,
+            type: DataTypes.STRING,
             primaryKey: true,
             allowNull: false,
-            defaultValue: crypto.randomUUID(),
           },
           value: {
             type: DataTypes.JSON,
@@ -49,12 +47,8 @@ export const setupConfig = async (injector: Injector) => {
             type: DataTypes.DATE,
             allowNull: false,
           },
-          type: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
         },
-        { sequelize, indexes: [{ unique: true, fields: ['type'] }] },
+        { sequelize },
       )
       await sequelize.sync()
     },

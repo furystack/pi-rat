@@ -54,12 +54,6 @@
         "magnetURI": {
           "type": "string"
         },
-        "torrentFile": {
-          "$ref": "#/definitions/global.Buffer"
-        },
-        "torrentFileBlobURL": {
-          "type": "string"
-        },
         "files": {
           "type": "array",
           "items": {
@@ -130,9 +124,6 @@
         "numPeers": {
           "type": "number"
         },
-        "path": {
-          "type": "string"
-        },
         "ready": {
           "type": "boolean"
         },
@@ -162,8 +153,6 @@
       "required": [
         "infoHash",
         "magnetURI",
-        "torrentFile",
-        "torrentFileBlobURL",
         "files",
         "announce",
         "announce-list",
@@ -180,7 +169,6 @@
         "pieceLength",
         "lastPieceLength",
         "numPeers",
-        "path",
         "ready",
         "paused",
         "done",
@@ -189,81 +177,6 @@
         "createdBy",
         "comment",
         "maxWebConns"
-      ],
-      "additionalProperties": false
-    },
-    "global.Buffer": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "number"
-      },
-      "properties": {
-        "BYTES_PER_ELEMENT": {
-          "type": "number"
-        },
-        "buffer": {
-          "$ref": "#/definitions/ArrayBufferLike"
-        },
-        "byteLength": {
-          "type": "number"
-        },
-        "byteOffset": {
-          "type": "number"
-        },
-        "length": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "BYTES_PER_ELEMENT",
-        "buffer",
-        "byteLength",
-        "byteOffset",
-        "length"
-      ]
-    },
-    "Uint8Array": {
-      "type": "object",
-      "properties": {
-        "BYTES_PER_ELEMENT": {
-          "type": "number"
-        },
-        "buffer": {
-          "$ref": "#/definitions/ArrayBufferLike"
-        },
-        "byteLength": {
-          "type": "number"
-        },
-        "byteOffset": {
-          "type": "number"
-        },
-        "length": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "BYTES_PER_ELEMENT",
-        "buffer",
-        "byteLength",
-        "byteOffset",
-        "length"
-      ],
-      "additionalProperties": {
-        "type": "number"
-      }
-    },
-    "ArrayBufferLike": {
-      "$ref": "#/definitions/ArrayBuffer"
-    },
-    "ArrayBuffer": {
-      "type": "object",
-      "properties": {
-        "byteLength": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "byteLength"
       ],
       "additionalProperties": false
     },

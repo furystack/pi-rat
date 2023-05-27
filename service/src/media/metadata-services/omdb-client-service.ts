@@ -17,36 +17,23 @@ export class OmdbClientService {
     this.logger = getLogger(injector).withScope('OMDB Client Service')
     this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
     const config = await getStoreManager(injector)
-      .getStoreFor(Config, 'id')
-      .find({
-        top: 2,
-        filter: {
-          type: {
-            $eq: 'OMDB_CONFIG',
-          },
-        },
-        order: {
-          updatedAt: 'DESC',
-        },
-      })
-    if (!config.length) {
-      this.logger.information({
+      .getStoreFor<OmdbConfig, 'id'>(Config as any, 'id')
+      .get('OMDB_CONFIG')
+    if (!config) {
+      this.config = undefined
+      return await this.logger.information({
         message: '🚫   No config found, OMDB Service will not be initialized',
       })
-    } else if (config.length > 1) {
-      this.logger.warning({
-        message: '⚠️   More than one config found, the last recent one will be used',
-      })
     } else {
-      this.logger.verbose({
+      await this.logger.verbose({
         message: '✅   OMDB Service initialized',
       })
     }
-    this.config = config[0] as OmdbConfig
+    this.config = config as OmdbConfig
 
     const dataSet = getDataSetFor(injector, Config, 'id')
     const removeObserver = dataSet.onEntityRemoved.subscribe(({ key }) => {
-      if (key === config[0].id) {
+      if (key === config.id) {
         addObserver.dispose()
         updateObserver.dispose()
         removeObserver.dispose()
@@ -54,7 +41,7 @@ export class OmdbClientService {
       }
     })
     const updateObserver = dataSet.onEntityUpdated.subscribe(({ id }) => {
-      if (id === config[0].id) {
+      if (id === config.id) {
         addObserver.dispose()
         updateObserver.dispose()
         removeObserver.dispose()
@@ -64,7 +51,7 @@ export class OmdbClientService {
     })
 
     const addObserver = dataSet.onEntityAdded.subscribe(({ entity }) => {
-      if (entity.type === 'OMDB_CONFIG') {
+      if (entity.id === 'OMDB_CONFIG') {
         addObserver.dispose()
         updateObserver.dispose()
         removeObserver.dispose()

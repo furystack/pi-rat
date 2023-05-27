@@ -15,7 +15,7 @@ export class TorrentClient extends WebTorrent {
   public readonly torrentsPath = join(getDataFolder(), 'torrents')
   public readonly inProgressPath = join(this.torrentsPath, 'in-progress')
 
-  private config!: TorrentConfig
+  private config?: TorrentConfig
   private physicalPath!: string
 
   public getPhysicalPath = () => this.physicalPath
@@ -70,25 +70,16 @@ export class TorrentClient extends WebTorrent {
 
     const storeManager = injector.getInstance(StoreManager)
 
-    const [config] = await storeManager.getStoreFor(Config, 'id').find({
-      filter: {
-        type: {
-          $eq: 'TORRENT_CONFIG',
-        },
-      },
-      order: {
-        updatedAt: 'DESC',
-      },
-      top: 1,
-    })
+    const config = await storeManager.getStoreFor<TorrentConfig, 'id'>(Config as any, 'id').get('TORRENT_CONFIG')
 
     if (!config) {
+      this.config = undefined
       return logger.warning({ message: "❗ No torrent config found, torrents won't be initialized" })
     }
 
     this.config = config as TorrentConfig
 
-    const { torrentDriveLetter, torrentPath } = this.getConfig().value
+    const { torrentDriveLetter, torrentPath } = config.value
 
     const drive = await storeManager.getStoreFor(Drive, 'letter').get(torrentDriveLetter)
 

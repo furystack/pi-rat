@@ -5,9 +5,8 @@ import type { TorrentConfig } from './torrent-config.js'
 export type ConfigType = OmdbConfig | GithubConfig | TorrentConfig
 
 export class Config {
-  type!: ConfigType['type']
+  id!: ConfigType['id']
   value!: ConfigType['value']
-  id!: string
 
   declare createdAt: Date
   declare updatedAt: Date
