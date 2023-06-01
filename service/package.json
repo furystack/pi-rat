@@ -13,29 +13,29 @@
   "devDependencies": {
     "@types/ffprobe": "^1.1.4",
     "@types/formidable": "^2.0.6",
-    "@types/node": "^20.2.1",
+    "@types/node": "^20.2.5",
     "@types/webtorrent": "^0.109.3",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@furystack/core": "^12.0.4",
-    "@furystack/inject": "^8.0.4",
-    "@furystack/logging": "^4.0.4",
-    "@furystack/repository": "^7.0.4",
-    "@furystack/rest": "^5.0.4",
-    "@furystack/rest-service": "^7.0.5",
-    "@furystack/security": "^3.0.4",
-    "@furystack/sequelize-store": "^3.0.4",
-    "@furystack/utils": "^4.0.4",
-    "@furystack/websocket-api": "^9.0.5",
-    "@types/jest": "^29.5.1",
+    "@furystack/core": "^12.0.5",
+    "@furystack/inject": "^8.0.5",
+    "@furystack/logging": "^4.0.5",
+    "@furystack/repository": "^7.0.5",
+    "@furystack/rest": "^5.0.5",
+    "@furystack/rest-service": "^7.0.6",
+    "@furystack/security": "^3.0.5",
+    "@furystack/sequelize-store": "^3.0.5",
+    "@furystack/utils": "^4.0.5",
+    "@furystack/websocket-api": "^9.0.6",
+    "@types/jest": "^29.5.2",
     "chokidar": "^3.5.3",
     "common": "workspace:^",
     "ffprobe": "^1.1.2",
     "formidable": "^2.1.2",
     "sequelize": "^6.31.1",
     "sqlite3": "^5.1.6",
-    "vitest": "^0.31.1",
-    "webtorrent": "^2.0.18"
+    "vitest": "^0.31.4",
+    "webtorrent": "^2.0.27"
   }
 }
