@@ -21,7 +21,7 @@ export class OmdbClientService {
       .get('OMDB_CONFIG')
     if (!config) {
       this.config = undefined
-      return await this.logger.information({
+      await this.logger.information({
         message: '🚫   No config found, OMDB Service will not be initialized',
       })
     } else {
@@ -33,7 +33,7 @@ export class OmdbClientService {
 
     const dataSet = getDataSetFor(injector, Config, 'id')
     const removeObserver = dataSet.onEntityRemoved.subscribe(({ key }) => {
-      if (key === config.id) {
+      if (key === 'OMDB_CONFIG') {
         addObserver.dispose()
         updateObserver.dispose()
         removeObserver.dispose()
@@ -41,7 +41,7 @@ export class OmdbClientService {
       }
     })
     const updateObserver = dataSet.onEntityUpdated.subscribe(({ id }) => {
-      if (id === config.id) {
+      if (id === 'OMDB_CONFIG') {
         addObserver.dispose()
         updateObserver.dispose()
         removeObserver.dispose()
