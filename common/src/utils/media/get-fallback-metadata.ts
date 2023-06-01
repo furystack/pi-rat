@@ -10,7 +10,7 @@ export class FallbackMetadata {
 const getYear = (segment: string) => {
   const yearStr = segment.split(/['.'|' ']/).find((v) => {
     const no = parseInt(v, 10)
-    return (no > 1900 && no < new Date().getFullYear()) || false
+    return (no > 1900 && no <= new Date().getFullYear()) || false
   })
   return (yearStr && parseInt(yearStr, 10)) || undefined
 }
