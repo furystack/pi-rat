@@ -13,24 +13,7 @@ export class OmdbClientService {
 
   private logger!: ScopedLogger
 
-  public async init(injector: Injector) {
-    this.logger = getLogger(injector).withScope('OMDB Client Service')
-    this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
-    const config = await getStoreManager(injector)
-      .getStoreFor<OmdbConfig, 'id'>(Config as any, 'id')
-      .get('OMDB_CONFIG')
-    if (!config) {
-      this.config = undefined
-      await this.logger.information({
-        message: '🚫   No config found, OMDB Service will not be initialized',
-      })
-    } else {
-      await this.logger.verbose({
-        message: '✅   OMDB Service initialized',
-      })
-    }
-    this.config = config as OmdbConfig
-
+  private setupReinitTriggers(injector: Injector) {
     const dataSet = getDataSetFor(injector, Config, 'id')
     const removeObserver = dataSet.onEntityRemoved.subscribe(({ key }) => {
       if (key === 'OMDB_CONFIG') {
@@ -45,7 +28,6 @@ export class OmdbClientService {
         addObserver.dispose()
         updateObserver.dispose()
         removeObserver.dispose()
-
         this.init(injector)
       }
     })
@@ -55,10 +37,29 @@ export class OmdbClientService {
         addObserver.dispose()
         updateObserver.dispose()
         removeObserver.dispose()
-
         this.init(injector)
       }
     })
+  }
+
+  public async init(injector: Injector) {
+    this.logger = getLogger(injector).withScope('OMDB Client Service')
+    this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
+    this.setupReinitTriggers(injector)
+    const config = await getStoreManager(injector)
+      .getStoreFor<OmdbConfig, 'id'>(Config as any, 'id')
+      .get('OMDB_CONFIG')
+    if (!config) {
+      this.config = undefined
+      await this.logger.information({
+        message: '🚫   No config found, OMDB Service will not be initialized',
+      })
+    } else {
+      await this.logger.verbose({
+        message: '✅   OMDB Service initialized',
+      })
+    }
+    this.config = config as OmdbConfig
   }
 
   public async fetchOmdbMovieMetadata({

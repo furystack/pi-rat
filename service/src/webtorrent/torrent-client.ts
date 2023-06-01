@@ -9,6 +9,7 @@ import { Drive } from 'common'
 import { Config } from 'common'
 import { getLogger } from '@furystack/logging'
 import { StoreManager } from '@furystack/core'
+import { getDataSetFor } from '@furystack/repository'
 
 @Injectable({ lifetime: 'singleton' })
 export class TorrentClient extends WebTorrent {
@@ -63,8 +64,38 @@ export class TorrentClient extends WebTorrent {
     }
   }
 
+  private setupReinitTriggers(injector: Injector) {
+    const configDataSet = getDataSetFor(injector, Config, 'id')
+    const onAdd = configDataSet.onEntityAdded.subscribe(async ({ entity }) => {
+      if (entity.id === 'TORRENT_CONFIG') {
+        onAdd.dispose()
+        onUpdate.dispose()
+        onRemove.dispose()
+        this.init(injector)
+      }
+    })
+    const onUpdate = configDataSet.onEntityUpdated.subscribe(async ({ id }) => {
+      if (id === 'TORRENT_CONFIG') {
+        onAdd.dispose()
+        onUpdate.dispose()
+        onRemove.dispose()
+        this.init(injector)
+      }
+    })
+    const onRemove = configDataSet.onEntityRemoved.subscribe(async ({ key }) => {
+      if (key === 'TORRENT_CONFIG') {
+        onAdd.dispose()
+        onUpdate.dispose()
+        onRemove.dispose()
+        this.init(injector)
+      }
+    })
+  }
+
   public async init(injector: Injector) {
     const logger = getLogger(injector).withScope('TorrentClient config')
+
+    this.setupReinitTriggers(injector)
 
     await logger.verbose({ message: '🫴  Setting up Torrents...' })
 
