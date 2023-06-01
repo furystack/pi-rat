@@ -5,6 +5,7 @@ import { SessionService } from '../services/session.js'
 import { GithubLogo } from './github-logo/index.js'
 import { ThemeSwitch } from './theme-switch/index.js'
 import { PiRatCommandPalette } from './command-palette/index.js'
+import { InstallService } from '../services/install-service.js'
 
 export interface HeaderProps {
   title: string
@@ -33,24 +34,39 @@ export const Header = Shade<HeaderProps>({
   render: ({ props, injector, useObservable }) => {
     const [sessionState] = useObservable('sessionState', injector.getInstance(SessionService).state)
 
+    const [serviceState] = useObservable(
+      'serviceState',
+      injector.getInstance(InstallService).getServiceStatusAsObservable(),
+    )
+
     return (
       <AppBar id="header">
         <AppBarLink title={props.title} href="/">
           {props.title}
         </AppBarLink>
-        {sessionState === 'authenticated' ? <AdminLinks /> : null}
+        {sessionState === 'authenticated' ? (
+          <>
+            <AdminLinks />
 
-        <AppBarLink title="Movies" href="/movies">
-          🎥 Movies
-        </AppBarLink>
-
-        <AppBarLink title="Movies" href="/series">
-          📺 Series
-        </AppBarLink>
-
-        <AppBarLink title="Torrents" href="/torrents">
-          🧲 Torrents
-        </AppBarLink>
+            {serviceState.value?.services.omdb ? (
+              <>
+                <AppBarLink title="Movies" href="/movies">
+                  🎥 Movies
+                </AppBarLink>
+                <AppBarLink title="Movies" href="/series">
+                  📺 Series
+                </AppBarLink>
+              </>
+            ) : null}
+            {serviceState.value?.services.torrent ? (
+              <>
+                <AppBarLink title="Torrents" href="/torrents">
+                  🧲 Torrents
+                </AppBarLink>
+              </>
+            ) : null}
+          </>
+        ) : null}
 
         <div style={{ flex: '1' }}>
           <PiRatCommandPalette />

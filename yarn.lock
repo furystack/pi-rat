@@ -5925,6 +5925,7 @@ __metadata:
     common: "workspace:^"
     ffprobe: ^1.1.2
     formidable: ^2.1.2
+    semaphore-async-await: ^1.5.1
     sequelize: ^6.31.1
     sqlite3: ^5.1.6
     typescript: ^5.0.4

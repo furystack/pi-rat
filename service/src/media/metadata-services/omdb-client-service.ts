@@ -45,7 +45,6 @@ export class OmdbClientService {
   public async init(injector: Injector) {
     this.logger = getLogger(injector).withScope('OMDB Client Service')
     this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
-    this.setupReinitTriggers(injector)
     const config = await getStoreManager(injector)
       .getStoreFor<OmdbConfig, 'id'>(Config as any, 'id')
       .get('OMDB_CONFIG')
@@ -60,6 +59,7 @@ export class OmdbClientService {
       })
     }
     this.config = config as OmdbConfig
+    this.setupReinitTriggers(injector)
   }
 
   public async fetchOmdbMovieMetadata({

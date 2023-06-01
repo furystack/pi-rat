@@ -10,6 +10,7 @@ import { Config } from 'common'
 import { getLogger } from '@furystack/logging'
 import { StoreManager } from '@furystack/core'
 import { getDataSetFor } from '@furystack/repository'
+import { Lock } from 'semaphore-async-await'
 
 @Injectable({ lifetime: 'singleton' })
 export class TorrentClient extends WebTorrent {
@@ -18,6 +19,8 @@ export class TorrentClient extends WebTorrent {
 
   private config?: TorrentConfig
   private physicalPath!: string
+
+  private readonly lock = new Lock()
 
   public getPhysicalPath = () => this.physicalPath
 
@@ -64,95 +67,66 @@ export class TorrentClient extends WebTorrent {
     }
   }
 
-  private setupReinitTriggers(injector: Injector) {
-    const configDataSet = getDataSetFor(injector, Config, 'id')
-    const onAdd = configDataSet.onEntityAdded.subscribe(async ({ entity }) => {
-      if (entity.id === 'TORRENT_CONFIG') {
-        onAdd.dispose()
-        onUpdate.dispose()
-        onRemove.dispose()
-        this.init(injector)
-      }
-    })
-    const onUpdate = configDataSet.onEntityUpdated.subscribe(async ({ id }) => {
-      if (id === 'TORRENT_CONFIG') {
-        onAdd.dispose()
-        onUpdate.dispose()
-        onRemove.dispose()
-        this.init(injector)
-      }
-    })
-    const onRemove = configDataSet.onEntityRemoved.subscribe(async ({ key }) => {
-      if (key === 'TORRENT_CONFIG') {
-        onAdd.dispose()
-        onUpdate.dispose()
-        onRemove.dispose()
-        this.init(injector)
-      }
-    })
-  }
-
   public async init(injector: Injector) {
-    const logger = getLogger(injector).withScope('TorrentClient config')
+    await this.lock.acquire()
+    try {
+      const logger = getLogger(injector).withScope('TorrentClient config')
 
-    this.setupReinitTriggers(injector)
+      await logger.verbose({ message: '🫴  Setting up Torrents...' })
+      const storeManager = injector.getInstance(StoreManager)
+      const config = await storeManager.getStoreFor<TorrentConfig, 'id'>(Config as any, 'id').get('TORRENT_CONFIG')
 
-    await logger.verbose({ message: '🫴  Setting up Torrents...' })
+      if (!config) {
+        this.config = undefined
+        await logger.warning({ message: "❗ No torrent config found, torrents won't be initialized" })
+      } else {
+        this.config = config as TorrentConfig
 
-    const storeManager = injector.getInstance(StoreManager)
+        const { torrentDriveLetter, torrentPath } = config.value
 
-    const config = await storeManager.getStoreFor<TorrentConfig, 'id'>(Config as any, 'id').get('TORRENT_CONFIG')
+        const drive = await storeManager.getStoreFor(Drive, 'letter').get(torrentDriveLetter)
 
-    if (!config) {
-      this.config = undefined
-      return logger.warning({ message: "❗ No torrent config found, torrents won't be initialized" })
-    }
+        if (!drive) {
+          return logger.warning({
+            message: `❗ No drive found for letter ${torrentDriveLetter}, torrents won't be initialized`,
+          })
+        }
 
-    this.config = config as TorrentConfig
+        this.physicalPath = join(drive?.physicalPath, torrentPath)
 
-    const { torrentDriveLetter, torrentPath } = config.value
-
-    const drive = await storeManager.getStoreFor(Drive, 'letter').get(torrentDriveLetter)
-
-    if (!drive) {
-      return logger.warning({
-        message: `❗ No drive found for letter ${torrentDriveLetter}, torrents won't be initialized`,
-      })
-    }
-
-    this.physicalPath = join(drive?.physicalPath, torrentPath)
-
-    await Promise.all(
-      this.torrents.map(
-        (torrent) =>
-          new Promise<void>((resolve, reject) =>
-            torrent.destroy({ destroyStore: false }, (err) => (err ? reject(err) : resolve())),
+        await Promise.all(
+          this.torrents.map(
+            (torrent) =>
+              new Promise<void>((resolve, reject) =>
+                torrent.destroy({ destroyStore: false }, (err) => (err ? reject(err) : resolve())),
+              ),
           ),
-      ),
-    )
+        )
 
-    const torrentFiles = await readdir(this.torrentsPath)
-    const inProgressFiles = await readdir(this.inProgressPath)
+        const torrentFiles = await readdir(this.torrentsPath)
+        const inProgressFiles = await readdir(this.inProgressPath)
 
-    await Promise.all([
-      inProgressFiles
-        .filter((file) => extname(file) === '.torrent')
-        .map(async (file) => {
-          console.log('Adding running torrent', file)
-          const fileContent = await readFile(join(this.inProgressPath, file))
-          this.add(fileContent, { path: this.physicalPath })
-        }),
-    ])
+        await Promise.all([
+          inProgressFiles
+            .filter((file) => extname(file) === '.torrent')
+            .map(async (file) => {
+              const fileContent = await readFile(join(this.inProgressPath, file))
+              this.add(fileContent, { path: this.physicalPath })
+            }),
+        ])
 
-    await Promise.all([
-      torrentFiles
-        .filter((file) => extname(file) === '.torrent')
-        .map(async (file) => {
-          console.log('Adding paused torrent', file)
-          const fileContent = await readFile(join(this.torrentsPath, file))
-          const instance = this.add(fileContent, { path: this.physicalPath })
-          instance.pause()
-        }),
-    ])
+        await Promise.all([
+          torrentFiles
+            .filter((file) => extname(file) === '.torrent')
+            .map(async (file) => {
+              const fileContent = await readFile(join(this.torrentsPath, file))
+              const instance = this.add(fileContent, { path: this.physicalPath })
+              instance.pause()
+            }),
+        ])
+      }
+    } finally {
+      this.lock.release()
+    }
   }
 }
