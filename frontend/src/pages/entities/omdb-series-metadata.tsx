@@ -13,7 +13,7 @@ export const OmdbSeriesMetadataPage = Shade({
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const model = modelProvider.getModelForEntityType({
+    const modelUri = modelProvider.getModelUriForEntityType({
       schemaName: 'OmdbSeriesMetadata',
       jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/OmdbSeriesMetadata' },
     })
@@ -63,7 +63,7 @@ export const OmdbSeriesMetadataPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        model={model}
+        modelUri={modelUri}
       />
     )
   },

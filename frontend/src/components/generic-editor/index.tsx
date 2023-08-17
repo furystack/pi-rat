@@ -6,9 +6,9 @@ import { Button, SelectionCell } from '@furystack/shades-common-components'
 import { Fab } from '@furystack/shades-common-components'
 import { DataGrid } from '@furystack/shades-common-components'
 import type { GenericEditorService } from './generic-editor-service.js'
-import type monaco from 'monaco-editor'
 import { GenericMonacoEditor } from './generic-monaco-editor.js'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import type { Uri } from 'monaco-editor'
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
@@ -16,7 +16,7 @@ type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends key
   headerComponents: DataGridProps<T>['headerComponents']
   rowComponents: DataGridProps<T>['rowComponents']
   styles: DataGridProps<T>['styles']
-  model?: monaco.editor.ITextModel
+  modelUri?: Uri
 }
 
 export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T>(
@@ -25,7 +25,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
   render: ({ props, injector, useObservable }) => {
-    const { service, columns, headerComponents, rowComponents, styles, model } = props
+    const { service, columns, headerComponents, rowComponents, styles, modelUri } = props
 
     const refresh = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
 
@@ -61,7 +61,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                   }
                 }}
                 service={service}
-                model={model}
+                modelUri={modelUri}
               />
             )
           }}
@@ -73,7 +73,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       return (
         <GenericMonacoEditor
           service={service}
-          model={model}
+          modelUri={modelUri}
           value={{}}
           onSave={async (value) => {
             try {

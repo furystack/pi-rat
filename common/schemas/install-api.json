@@ -17,11 +17,16 @@
             "github": {
               "type": "boolean",
               "description": "Github API Installation Status for external authentication"
+            },
+            "torrent": {
+              "type": "boolean",
+              "description": "Torrent Client Installation Status"
             }
           },
           "required": [
             "omdb",
-            "github"
+            "github",
+            "torrent"
           ],
           "additionalProperties": false
         }

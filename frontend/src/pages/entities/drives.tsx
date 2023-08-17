@@ -13,7 +13,7 @@ export const DrivesPage = Shade({
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const model = modelProvider.getModelForEntityType({
+    const modelUri = modelProvider.getModelUriForEntityType({
       schemaName: 'Drive',
       jsonSchema: { ...drivesSchemas, type: 'object', $ref: '#/definitions/Drive' },
     })
@@ -53,7 +53,7 @@ export const DrivesPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        model={model}
+        modelUri={modelUri}
       />
     )
   },
