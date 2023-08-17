@@ -1,15 +1,15 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { GenericEditorService } from './generic-editor-service.js'
 import { MonacoEditor } from '../monaco-editor.js'
-import type monaco from 'monaco-editor'
 import { Button } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
+import type { Uri } from 'monaco-editor'
 
 export const GenericMonacoEditor = Shade<{
   value: any
   onSave: (value: any) => Promise<void>
   service: GenericEditorService<any, any, any>
-  model?: monaco.editor.ITextModel
+  modelUri?: Uri
 }>({
   shadowDomName: 'shade-generic-monaco-editor',
   render: ({ props, useDisposable }) => {
@@ -35,8 +35,8 @@ export const GenericMonacoEditor = Shade<{
         <MonacoEditor
           options={{
             language: 'json',
-            model: props.model,
           }}
+          modelUri={props.modelUri}
           onchange={currentValue.setValue.bind(currentValue)}
           value={currentValue.getValue()}
         />

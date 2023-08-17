@@ -13,7 +13,7 @@ export const ConfigPage = Shade({
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const model = modelProvider.getModelForEntityType({
+    const modelUri = modelProvider.getModelUriForEntityType({
       schemaName: 'Config',
       jsonSchema: { ...configSchemas, type: 'object', $ref: '#/definitions/Config' },
     })
@@ -69,7 +69,7 @@ export const ConfigPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        model={model}
+        modelUri={modelUri}
       />
     )
   },

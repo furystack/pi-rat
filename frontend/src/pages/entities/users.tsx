@@ -13,7 +13,7 @@ export const UsersPage = Shade({
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const model = modelProvider.getModelForEntityType({
+    const modelUri = modelProvider.getModelUriForEntityType({
       schemaName: 'User',
       jsonSchema: { ...identitySchemas, type: 'object', $ref: '#/definitions/User' },
     })
@@ -66,7 +66,7 @@ export const UsersPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        model={model}
+        modelUri={modelUri}
       />
     )
   },

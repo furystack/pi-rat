@@ -1,5 +1,6 @@
-import { Shade, createComponent } from '@furystack/shades'
+import { Shade } from '@furystack/shades'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
+import type { Uri } from 'monaco-editor'
 import 'monaco-editor/esm/vs/editor/editor.main'
 
 import './worker-config'
@@ -9,10 +10,11 @@ export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
   value?: string
   onchange?: (value: string) => void
+  modelUri?: Uri
 }
 export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
-  constructed: ({ element, props, injector, useState }) => {
+  constructed: ({ element, props, injector, useState, useDisposable }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
 
     const [theme] = useState<'vs-light' | 'vs-dark'>(
@@ -30,6 +32,18 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
         const value = editorInstance.getValue()
         props.onchange && props.onchange(value)
       })
+
+    if (props.modelUri) {
+      useDisposable('monacoModelUri', () => {
+        const model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
+        editorInstance.setModel(model)
+        return {
+          dispose: () => {
+            model.dispose()
+          },
+        }
+      })
+    }
     return () => editorInstance.dispose()
   },
   render: ({ element }) => {

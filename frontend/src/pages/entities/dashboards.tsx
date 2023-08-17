@@ -13,7 +13,7 @@ export const DashboardsPage = Shade({
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const model = modelProvider.getModelForEntityType({
+    const modelUri = modelProvider.getModelUriForEntityType({
       schemaName: 'Dashboard',
       jsonSchema: { ...dashboardSchemas, type: 'object', $ref: '#/definitions/Dashboard' },
     })
@@ -59,7 +59,7 @@ export const DashboardsPage = Shade({
             return <RouteLink href={`/dashboards/${id}`}>Preview</RouteLink>
           },
         }}
-        model={model}
+        modelUri={modelUri}
       />
     )
   },
