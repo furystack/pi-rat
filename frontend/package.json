@@ -32,6 +32,6 @@
     "monaco-editor": "^0.41.0",
     "path-to-regexp": "^6.2.1",
     "semaphore-async-await": "^1.5.1",
-    "video.js": "^8.3.0"
+    "video.js": "^8.5.2"
   }
 }
