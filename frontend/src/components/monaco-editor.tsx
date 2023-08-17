@@ -1,4 +1,4 @@
-import { Shade } from '@furystack/shades'
+import { Shade, createComponent } from '@furystack/shades'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import 'monaco-editor/esm/vs/editor/editor.main'
 

@@ -14,6 +14,7 @@ export class MonacoModelProvider {
     languages.json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
       schemas: [
+        ...(languages.json.jsonDefaults.diagnosticsOptions.schemas || []),
         {
           uri: `pi-rat://shades/model-schemas-${schemaName}.json`,
           fileMatch: [modelUri.toString()],
