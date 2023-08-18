@@ -3,7 +3,6 @@ import type { Injector } from '@furystack/inject'
 import { Injectable } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
-import { getDataSetFor } from '@furystack/repository'
 import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 import { Config } from 'common'
 
@@ -13,39 +12,9 @@ export class OmdbClientService {
 
   private logger!: ScopedLogger
 
-  private setupReinitTriggers(injector: Injector) {
-    const dataSet = getDataSetFor(injector, Config, 'id')
-    const removeObserver = dataSet.onEntityRemoved.subscribe(({ key }) => {
-      if (key === 'OMDB_CONFIG') {
-        addObserver.dispose()
-        updateObserver.dispose()
-        removeObserver.dispose()
-        this.init(injector)
-      }
-    })
-    const updateObserver = dataSet.onEntityUpdated.subscribe(({ id }) => {
-      if (id === 'OMDB_CONFIG') {
-        addObserver.dispose()
-        updateObserver.dispose()
-        removeObserver.dispose()
-        this.init(injector)
-      }
-    })
-
-    const addObserver = dataSet.onEntityAdded.subscribe(({ entity }) => {
-      if (entity.id === 'OMDB_CONFIG') {
-        addObserver.dispose()
-        updateObserver.dispose()
-        removeObserver.dispose()
-        this.init(injector)
-      }
-    })
-  }
-
   public async init(injector: Injector) {
     this.logger = getLogger(injector).withScope('OMDB Client Service')
     this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
-    this.setupReinitTriggers(injector)
     const config = await getStoreManager(injector)
       .getStoreFor<OmdbConfig, 'id'>(Config as any, 'id')
       .get('OMDB_CONFIG')

@@ -18,4 +18,5 @@ export const setupTorrent = async (injector: Injector) => {
   const configDataSet = getDataSetFor(injector, Config, 'id')
   configDataSet.onEntityAdded.subscribe(({ entity }) => entity.id === 'TORRENT_CONFIG' && client.init(injector))
   configDataSet.onEntityUpdated.subscribe(({ change }) => change.id === 'TORRENT_CONFIG' && client.init(injector))
+  configDataSet.onEntityRemoved.subscribe(({ key }) => key === 'TORRENT_CONFIG' && client.init(injector))
 }
