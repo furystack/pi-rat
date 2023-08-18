@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 
-import { MovieWatchHistoryEntry, Movie, Series, MovieFile } from 'common'
+import { MovieWatchHistoryEntry, Movie, Series, MovieFile, Config } from 'common'
 import { OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 
 import { DataTypes, Model } from 'sequelize'
@@ -681,7 +681,17 @@ export const setupMovies = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  await injector.getInstance(OmdbClientService).init(injector)
+  const omdbClientService = injector.getInstance(OmdbClientService)
+  await omdbClientService.init(injector)
+
+  const configDataSet = repo.getDataSetFor(Config, 'id')
+
+  configDataSet.onEntityAdded.subscribe(({ entity }) => entity.id === 'OMDB_CONFIG' && omdbClientService.init(injector))
+  configDataSet.onEntityUpdated.subscribe(
+    ({ change }) => change.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
+  )
+
+  configDataSet.onEntityRemoved.subscribe(({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
 
   logger.verbose({ message: '✅  Media setup completed' })
 }
