@@ -1,12 +1,16 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { ObservableValue } from '@furystack/utils'
 import { CreateDriveWizard } from './create-drive-wizard.js'
 import { FolderPanel } from './folder-panel.js'
 import { DrivesService } from '../../services/drives-service.js'
 
+export type DriveLocation = {
+  letter: string
+  path: string
+}
+
 export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
-  render: ({ useDisposable, injector, useObservable }) => {
+  render: ({ injector, useObservable, useSearchState }) => {
     const drivesService = injector.getInstance(DrivesService)
     const [drives] = useObservable('drives', drivesService.getVolumesAsObservable({}))
 
@@ -23,9 +27,15 @@ export const DrivesPage = Shade({
       )
     }
 
-    const currentLeftDrive = useDisposable('currentLeftDrive', () => new ObservableValue(drives.value.entries[0]))
+    const [currentLeftDrive, setCurrentLeftDrive] = useSearchState('ld', {
+      letter: drives.value.entries[0].letter,
+      path: '/',
+    })
 
-    const currentRightDrive = useDisposable('currentRightDrive', () => new ObservableValue(drives.value.entries[0]))
+    const [currentRightDrive, setCurrentRightDrive] = useSearchState('rd', {
+      letter: drives.value.entries[0].letter,
+      path: '/',
+    })
 
     return (
       <div
@@ -40,8 +50,8 @@ export const DrivesPage = Shade({
           height: 'calc(100% - 48px)',
           width: '100%',
         }}>
-        <FolderPanel currentDrive={currentLeftDrive} />
-        <FolderPanel currentDrive={currentRightDrive} />
+        <FolderPanel currentDrive={currentLeftDrive} setCurrentDrive={setCurrentLeftDrive} />
+        <FolderPanel currentDrive={currentRightDrive} setCurrentDrive={setCurrentRightDrive} />
         <CreateDriveWizard />
       </div>
     )
