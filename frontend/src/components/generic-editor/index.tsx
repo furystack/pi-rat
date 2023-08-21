@@ -54,10 +54,14 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 onSave={async (value) => {
                   try {
                     await service.patchEntry(currentId as any, value)
-                    noty.addNoty({ type: 'success', title: 'Entity updated', body: 'Entity updated successfully' })
+                    noty.addNoty({ type: 'success', title: '📝 Entity updated', body: 'Entity updated successfully' })
                     refresh()
                   } catch (error) {
-                    noty.addNoty({ type: 'error', title: 'Failed to update entity', body: (error as Error).toString() })
+                    noty.addNoty({
+                      type: 'error',
+                      title: '❗ Failed to update entity',
+                      body: (error as Error).toString(),
+                    })
                   }
                 }}
                 service={service}
@@ -80,10 +84,10 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
               const response = await service.postEntry(value)
               setMode('edit')
               setCurrentId(response[service.extendedOptions.keyProperty] as string)
-              noty.addNoty({ type: 'success', title: 'Entity created', body: 'Entity created successfully' })
+              noty.addNoty({ type: 'success', title: '✨ Entity created', body: 'Entity created successfully' })
               refresh()
             } catch (error) {
-              noty.addNoty({ type: 'error', title: 'Failed to create entity', body: (error as Error).toString() })
+              noty.addNoty({ type: 'error', title: '❗ Failed to create entity', body: (error as Error).toString() })
             }
           }}
         />
@@ -113,13 +117,17 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                     service
                       .removeEntries(entry[service.extendedOptions.keyProperty] as any)
                       .then(() => {
-                        noty.addNoty({ type: 'success', title: 'Entity deleted', body: 'Entity deleted successfully' })
+                        noty.addNoty({
+                          type: 'success',
+                          title: 'Entity deleted',
+                          body: '🗑️ The selected entity deleted successfully',
+                        })
                         refresh()
                       })
                       .catch((error) => {
                         noty.addNoty({
                           type: 'error',
-                          title: 'Failed to delete entity',
+                          title: '❗ Failed to delete entity',
                           body: (error as Error).toString(),
                         })
                       })
