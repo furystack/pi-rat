@@ -5465,6 +5465,9 @@ __metadata:
     typescript: ^5.1.6
     vite: ^4.4.9
     vitest: ^0.34.2
+  dependenciesMeta:
+    prettier@3.0.2:
+      unplugged: true
   languageName: unknown
   linkType: soft
 
