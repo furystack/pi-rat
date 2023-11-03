@@ -155,12 +155,12 @@ export const FileList = Shade<{
             activate()
           }
         }}>
-        <DataGrid<DirectoryEntry & { id: any }>
-          service={service as any}
+        <DataGrid<DirectoryEntry>
+          service={service}
           autofocus
-          columns={['id']}
+          columns={['name']}
           headerComponents={{
-            id: () => (
+            name: () => (
               <BreadCrumbs
                 currentDrive={currentDriveLetter}
                 currentPath={currentPath}
@@ -170,7 +170,7 @@ export const FileList = Shade<{
           }}
           styles={{}}
           rowComponents={{
-            id: (entry) => (
+            name: (entry) => (
               <FileContextMenu
                 entry={entry}
                 currentDriveLetter={currentDriveLetter}
