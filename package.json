@@ -64,7 +64,7 @@
     "dockerize": "docker build . --tag furystack/pi-rat:latest"
   },
   "engines": {
-    "node": ">=19.0.0"
+    "node": ">=20.0.0"
   },
   "packageManager": "yarn@4.0.1",
   "dependenciesMeta": {
