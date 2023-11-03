@@ -47,7 +47,7 @@ export const PostTorrentAction: RequestAction<UploadTorrentEndpoint> = async ({ 
 
   logger.debug({ message: 'Upload finished', data: parseResult })
 
-  const fileArray: File[] = Object.values(parseResult.files).flatMap((value) => value)
+  const fileArray = Object.values(parseResult.files).flatMap((value) => value) as File[]
 
   const entries = fileArray
     .filter((file) => file.mimetype === 'application/x-bittorrent')
