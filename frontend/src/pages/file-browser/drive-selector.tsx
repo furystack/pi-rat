@@ -1,5 +1,4 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { Drive } from 'common'
 import { DrivesService } from '../../services/drives-service.js'
 import { ErrorDisplay } from '../../components/error-display.js'
 import type { DriveLocation } from './index.js'
@@ -25,10 +24,13 @@ export const DriveSelector = Shade<{
       <select
         onchange={(ev) => {
           const { value } = ev.target as HTMLOptionElement
-          props.setCurrentDrive({
-            letter: (availableDrives.value?.entries.find((e) => e.letter === value) as Drive).letter,
-            path: '/',
-          })
+
+          if (props.currentDrive.letter !== value && availableDrives.value?.entries.find((e) => e.letter === value)) {
+            props.setCurrentDrive({
+              letter: value,
+              path: '/',
+            })
+          }
         }}>
         {availableDrives.value.entries.map((r) => (
           <option value={r.letter} selected={props.currentDrive.letter === r.letter}>

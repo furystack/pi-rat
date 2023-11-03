@@ -34,7 +34,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           name="userName"
           variant="outlined"
           autofocus
-          autocomplete="false"
+          autocomplete="off"
           labelTitle="E-mail address"
           type="email"
           required
@@ -45,7 +45,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           variant="outlined"
           type="password"
           labelTitle="Password"
-          autocomplete="false"
+          autocomplete="off"
           minLength={5}
           pattern="[a-zA-Z0-9]{3,}"
           required
@@ -62,7 +62,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           type="password"
           labelTitle="Confirm Password"
           required
-          autocomplete="false"
+          autocomplete="off"
         />
         <input type="submit" style={{ display: 'none' }} />
       </WizardStep>

@@ -6,7 +6,7 @@ import { JsonResult } from '@furystack/rest-service'
 import type { UploadTorrentEndpoint } from 'common'
 import { TorrentClient } from '../torrent-client.js'
 import type { Fields, File, Files } from 'formidable'
-import formidable from 'formidable'
+import { IncomingForm } from 'formidable'
 
 export const PostTorrentAction: RequestAction<UploadTorrentEndpoint> = async ({ injector, request }) => {
   if (!isAuthorized(injector, 'admin')) {
@@ -19,7 +19,7 @@ export const PostTorrentAction: RequestAction<UploadTorrentEndpoint> = async ({ 
 
   const targetPath = torrentClient.inProgressPath
 
-  const form = new formidable.IncomingForm({
+  const form = new IncomingForm({
     uploadDir: targetPath,
     keepExtensions: true,
     multiples: true,
@@ -47,7 +47,7 @@ export const PostTorrentAction: RequestAction<UploadTorrentEndpoint> = async ({ 
 
   logger.debug({ message: 'Upload finished', data: parseResult })
 
-  const fileArray: File[] = Object.values(parseResult.files).flatMap((value) => value)
+  const fileArray = Object.values(parseResult.files).flatMap((value) => value) as File[]
 
   const entries = fileArray
     .filter((file) => file.mimetype === 'application/x-bittorrent')

@@ -1,5 +1,5 @@
 import type { ChildrenList } from '@furystack/shades'
-import { createComponent, LocationService, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
 import { NotyService } from '@furystack/shades-common-components'
 import { Button, SelectionCell } from '@furystack/shades-common-components'
@@ -9,6 +9,21 @@ import type { GenericEditorService } from './generic-editor-service.js'
 import { GenericMonacoEditor } from './generic-monaco-editor.js'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import type { Uri } from 'monaco-editor'
+
+type CreateEditorState = {
+  mode: 'create'
+}
+
+type ListEditorState = {
+  mode: 'list'
+}
+
+type EditEditorState = {
+  mode: 'edit'
+  currentId: string
+}
+
+type GenericEditorState = CreateEditorState | ListEditorState | EditEditorState
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
@@ -24,36 +39,28 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
-  render: ({ props, injector, useObservable }) => {
+  render: ({ props, injector, useSearchState }) => {
     const { service, columns, headerComponents, rowComponents, styles, modelUri } = props
 
     const refresh = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
 
     const noty = injector.getInstance(NotyService)
 
-    const locationService = injector.getInstance(LocationService)
+    const [editorState, setEditorState] = useSearchState<GenericEditorState>('gedst', {
+      mode: 'list',
+    })
 
-    const [mode, setMode] = useObservable(
-      'mode',
-      locationService.useSearchParam('mode', 'list' as 'list' | 'create' | 'edit'),
-    )
-
-    const [currentId, setCurrentId] = useObservable(
-      'currentId',
-      locationService.useSearchParam('currentId', null as string | null),
-    )
-
-    if (mode === 'edit' && currentId) {
+    if (editorState.mode === 'edit' && editorState.currentId) {
       return (
         <PiRatLazyLoad
           component={async () => {
-            const entry = await service.getSingleEntry(currentId as any)
+            const entry = await service.getSingleEntry(editorState.currentId as any)
             return (
               <GenericMonacoEditor
                 value={entry}
                 onSave={async (value) => {
                   try {
-                    await service.patchEntry(currentId as any, value)
+                    await service.patchEntry(editorState.currentId as any, value)
                     noty.addNoty({ type: 'success', title: '📝 Entity updated', body: 'Entity updated successfully' })
                     refresh()
                   } catch (error) {
@@ -73,7 +80,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       )
     }
 
-    if (mode === 'create') {
+    if (editorState.mode === 'create') {
       return (
         <GenericMonacoEditor
           service={service}
@@ -82,8 +89,10 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
           onSave={async (value) => {
             try {
               const response = await service.postEntry(value)
-              setMode('edit')
-              setCurrentId(response[service.extendedOptions.keyProperty] as string)
+              setEditorState({
+                mode: 'edit',
+                currentId: response[service.extendedOptions.keyProperty] as string,
+              })
               noty.addNoty({ type: 'success', title: '✨ Entity created', body: 'Entity created successfully' })
               refresh()
             } catch (error) {
@@ -106,8 +115,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
               <div style={{ width: '156px' }}>
                 <Button
                   onclick={() => {
-                    setMode('edit')
-                    setCurrentId(entry[service.extendedOptions.keyProperty] as string)
+                    setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] as string })
                     refresh()
                   }}>
                   ✏️
@@ -147,7 +155,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         />
         <Fab
           onclick={() => {
-            setMode('create')
+            setEditorState({ mode: 'create' })
           }}>
           ➕
         </Fab>

@@ -5,7 +5,6 @@ COPY --chown=node:node /frontend /home/node/app/frontend
 COPY --chown=node:node /service /home/node/app/service
 
 COPY --chown=node:node /package.json /home/node/app/package.json
-COPY --chown=node:node /.yarn/plugins /home/node/app/.yarn/plugins
 COPY --chown=node:node /.yarn/releases /home/node/app/.yarn/releases
 COPY --chown=node:node /.yarn/sdks /home/node/app/.yarn/sdks
 COPY --chown=node:node /.pnp.cjs /home/node/app/.pnp.cjs
