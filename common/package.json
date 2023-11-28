@@ -25,9 +25,9 @@
     "create-schemas": "node ./dist/bin/create-schemas.js"
   },
   "devDependencies": {
-    "@types/ffprobe": "^1.1.7",
-    "@types/node": "^20.8.10",
-    "ts-json-schema-generator": "^1.4.0",
+    "@types/ffprobe": "^1.1.8",
+    "@types/node": "^20.10.0",
+    "ts-json-schema-generator": "^1.4.1",
     "vitest": "^0.34.6"
   },
   "dependencies": {

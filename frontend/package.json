@@ -13,8 +13,8 @@
   "devDependencies": {
     "@furystack/rest": "^5.0.12",
     "@types/marked": "^6.0.0",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "typescript": "^5.3.2",
+    "vite": "^5.0.2"
   },
   "dependencies": {
     "@furystack/cache": "^2.1.6",
@@ -26,9 +26,9 @@
     "@furystack/shades-common-components": "^5.0.12",
     "@furystack/shades-lottie": "^4.0.12",
     "@furystack/utils": "^4.0.10",
-    "@types/node": "^20.8.10",
+    "@types/node": "^20.10.0",
     "common": "workspace:^",
-    "marked": "^9.1.5",
+    "marked": "^10.0.0",
     "monaco-editor": "^0.44.0",
     "path-to-regexp": "^6.2.1",
     "semaphore-async-await": "^1.5.1",
