@@ -8,6 +8,23 @@ import { BreadCrumbs } from './breadcrumbs.js'
 import { DirectoryEntryIcon } from './directory-entry-icon.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { FileContextMenu } from './file-context-menu.js'
+import type { GetCollectionResult } from '@furystack/rest'
+
+const emptyResponse: GetCollectionResult<DirectoryEntry> = {
+  count: 0,
+  entries: [],
+}
+
+const upEntry: DirectoryEntry = {
+  name: '..',
+  isDirectory: true,
+  isBlockDevice: false,
+  isCharacterDevice: false,
+  isFIFO: false,
+  isFile: false,
+  isSocket: false,
+  isSymbolicLink: false,
+}
 
 export const FileList = Shade<{
   currentDriveLetter: string
@@ -22,29 +39,28 @@ export const FileList = Shade<{
     const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
 
+    useDisposable('fileChanges', () =>
+      drivesService.getFileListAsObservable(currentDriveLetter, currentPath).subscribe((result) => {
+        if (result.status === 'obsolete') {
+          drivesService.getFileList(currentDriveLetter, currentPath)
+          return
+        }
+        result.value && service.data.setValue(result.value)
+      }),
+    )
+
     const service = useDisposable(
       'service',
       () =>
         new CollectionService<DirectoryEntry>({
           loader: async () => {
             if (!props.currentDriveLetter || !props.currentPath) {
-              return { count: 0, entries: [] }
-            }
-
-            const up: DirectoryEntry = {
-              name: '..',
-              isDirectory: true,
-              isBlockDevice: false,
-              isCharacterDevice: false,
-              isFIFO: false,
-              isFile: false,
-              isSocket: false,
-              isSymbolicLink: false,
+              return emptyResponse
             }
 
             const result = await drivesService.getFileList(currentDriveLetter, currentPath)
             if (currentPath !== '/') {
-              return { ...result, entries: [up, ...result.entries.sortBy('isDirectory', 'desc')] }
+              return { ...result, entries: [upEntry, ...result.entries.sortBy('isDirectory', 'desc')] }
             }
             return { ...result, entries: result.entries.sortBy('isDirectory', 'desc') }
           },
