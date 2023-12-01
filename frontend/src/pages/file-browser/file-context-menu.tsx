@@ -1,7 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { ContextMenu } from '../../components/context-menu.js'
 import type { DirectoryEntry } from 'common'
-import { isMovieFile, getFallbackMetadata } from 'common'
+import { isMovieFile, getFallbackMetadata, isSampleFile } from 'common'
 import { ObservableValue } from '@furystack/utils'
 import { FileInfoModal } from './file-info-modal.js'
 import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
@@ -21,7 +21,7 @@ export const FileContextMenu = Shade<{
     const isRelatedMoviesVisible = useDisposable('isRelatedMoviesVisible', () => new ObservableValue(false))
 
     const path = `${currentDriveLetter}:${currentPath}/${entry.name}`
-    const movieMetadata = props.entry.isFile && isMovieFile(path) && getFallbackMetadata(path)
+    const movieMetadata = props.entry.isFile && !isSampleFile(path) && isMovieFile(path) && getFallbackMetadata(path)
 
     return (
       <>
@@ -39,7 +39,9 @@ export const FileContextMenu = Shade<{
               ? [
                   {
                     icon: '🎥',
-                    label: `Related Movies (${movieMetadata.title})`,
+                    label: `Related movie: ${movieMetadata.title} ${
+                      movieMetadata.type === 'episode' ? `S${movieMetadata.season}E${movieMetadata.episode}` : ''
+                    }`,
                     onClick: () => {
                       isRelatedMoviesVisible.setValue(true)
                     },
