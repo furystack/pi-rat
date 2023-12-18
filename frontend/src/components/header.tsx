@@ -31,34 +31,40 @@ const AdminLinks = Shade<{}>({
 export const Header = Shade<HeaderProps>({
   shadowDomName: 'shade-app-header',
   render: ({ props, injector, useObservable }) => {
-    const [sessionState] = useObservable('sessionState', injector.getInstance(SessionService).state)
+    const session = injector.getInstance(SessionService)
+    const [sessionState] = useObservable('sessionState', session.state)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
 
     return (
       <AppBar id="header">
         <AppBarLink title={props.title} href="/">
           {props.title}
         </AppBarLink>
-        {sessionState === 'authenticated' ? <AdminLinks /> : null}
+        {sessionState === 'authenticated' ? (
+          <>
+            {currentUser?.roles?.includes('admin') ? <AdminLinks /> : null}
 
-        <AppBarLink title="Movies" href="/movies">
-          🎥 Movies
-        </AppBarLink>
+            <AppBarLink title="Movies" href="/movies">
+              🎥 Movies
+            </AppBarLink>
 
-        <AppBarLink title="Movies" href="/series">
-          📺 Series
-        </AppBarLink>
+            <AppBarLink title="Movies" href="/series">
+              📺 Series
+            </AppBarLink>
 
-        <AppBarLink title="Torrents" href="/torrents">
-          🧲 Torrents
-        </AppBarLink>
+            <AppBarLink title="Torrents" href="/torrents">
+              🧲 Torrents
+            </AppBarLink>
+          </>
+        ) : null}
 
         <div style={{ flex: '1' }}>
           <PiRatCommandPalette />
         </div>
         <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
           <ThemeSwitch variant="outlined" />
-          <a href={environmentOptions.repository} target="_blank">
-            <Button variant="outlined" style={{ verticalAlign: 'baseline' }}>
+          <a href={environmentOptions.repository} target="_blank" style={{ display: 'flex' }}>
+            <Button variant="outlined" style={{ verticalAlign: 'baseline', display: 'flex' }}>
               <GithubLogo style={{ height: '1em' }} />
             </Button>
           </a>
