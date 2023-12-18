@@ -4,7 +4,7 @@
     "OmdbConfig": {
       "type": "object",
       "properties": {
-        "type": {
+        "id": {
           "type": "string",
           "const": "OMDB_CONFIG"
         },
@@ -22,7 +22,7 @@
         }
       },
       "required": [
-        "type",
+        "id",
         "value"
       ],
       "additionalProperties": false
@@ -30,7 +30,7 @@
     "GithubConfig": {
       "type": "object",
       "properties": {
-        "type": {
+        "id": {
           "type": "string",
           "const": "GITHUB_CONFIG"
         },
@@ -52,7 +52,7 @@
         }
       },
       "required": [
-        "type",
+        "id",
         "value"
       ],
       "additionalProperties": false
@@ -60,7 +60,7 @@
     "TorrentConfig": {
       "type": "object",
       "properties": {
-        "type": {
+        "id": {
           "type": "string",
           "const": "TORRENT_CONFIG"
         },
@@ -82,7 +82,7 @@
         }
       },
       "required": [
-        "type",
+        "id",
         "value"
       ],
       "additionalProperties": false
@@ -103,7 +103,7 @@
     "Config": {
       "type": "object",
       "properties": {
-        "type": {
+        "id": {
           "type": "string",
           "enum": [
             "OMDB_CONFIG",
@@ -159,9 +159,6 @@
             }
           ]
         },
-        "id": {
-          "type": "string"
-        },
         "createdAt": {
           "type": "string",
           "format": "date-time"
@@ -172,9 +169,8 @@
         }
       },
       "required": [
-        "type",
-        "value",
         "id",
+        "value",
         "createdAt",
         "updatedAt"
       ],

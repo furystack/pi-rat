@@ -7,7 +7,6 @@ import type {
 } from '@furystack/rest'
 import type { RestApi } from '@furystack/rest'
 import type { Config } from '../models/config/index.js'
-import type { WithOptionalId } from '@furystack/core'
 
 export interface ConfigApi extends RestApi {
   GET: {
@@ -15,7 +14,7 @@ export interface ConfigApi extends RestApi {
     '/config/:id': GetEntityEndpoint<Config, 'id'>
   }
   POST: {
-    '/config': PostEndpoint<Config, 'id', Omit<WithOptionalId<Config, 'createdAt' | 'updatedAt'>, 'id'>>
+    '/config': PostEndpoint<Config, 'id', Pick<Config, 'id' | 'value'>>
   }
   PATCH: {
     '/config/:id': PatchEndpoint<Config, 'id'>

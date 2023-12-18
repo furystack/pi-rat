@@ -1,15 +1,16 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { ObservableValue } from '@furystack/utils'
-import type { Drive } from 'common'
 import { DrivesService } from '../../services/drives-service.js'
 import { ErrorDisplay } from '../../components/error-display.js'
+import type { DriveLocation } from './index.js'
 
-export const DriveSelector = Shade<{ currentDrive: ObservableValue<Drive> }>({
+export const DriveSelector = Shade<{
+  currentDrive: DriveLocation
+  setCurrentDrive: (newDriveLetter: DriveLocation) => void
+}>({
   shadowDomName: 'drive-selector',
   render: ({ props, useObservable, injector }) => {
     const drivesService = injector.getInstance(DrivesService)
     const [availableDrives] = useObservable('availableDrives', drivesService.getVolumesAsObservable({}))
-    const [currentDrive, setCurrentDrive] = useObservable('currentDrive', props.currentDrive)
 
     if (availableDrives.status === 'loading' || availableDrives.status === 'uninitialized') {
       return null // TODO: Skeleton
@@ -23,10 +24,16 @@ export const DriveSelector = Shade<{ currentDrive: ObservableValue<Drive> }>({
       <select
         onchange={(ev) => {
           const { value } = ev.target as HTMLOptionElement
-          setCurrentDrive(availableDrives.value?.entries.find((e) => e.letter === value) as Drive)
+
+          if (props.currentDrive.letter !== value && availableDrives.value?.entries.find((e) => e.letter === value)) {
+            props.setCurrentDrive({
+              letter: value,
+              path: '/',
+            })
+          }
         }}>
         {availableDrives.value.entries.map((r) => (
-          <option value={r.letter} selected={currentDrive.letter === r.letter}>
+          <option value={r.letter} selected={props.currentDrive.letter === r.letter}>
             {r.letter}
           </option>
         ))}

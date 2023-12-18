@@ -8,6 +8,7 @@ import { navigateToRoute } from '../../navigate-to-route.js'
 import { watchMovieRoute } from '../routes/movie-routes.js'
 import { entityMoviesRoute } from '../routes/entity-routes.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
+import { serializeToQueryString } from '@furystack/rest'
 
 const focus = (el: HTMLElement) => {
   promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
@@ -136,7 +137,12 @@ export const MovieWidget = Shade<{
                     onclick={(ev) => {
                       ev.preventDefault()
                       ev.stopImmediatePropagation()
-                      navigateToRoute(injector, entityMoviesRoute, {}, `mode=edit&currentId=${imdbId}`)
+                      navigateToRoute(
+                        injector,
+                        entityMoviesRoute,
+                        {},
+                        serializeToQueryString({ mode: 'edit', currentId: imdbId }),
+                      )
                     }}
                     title="Edit movie details">
                     ✏️

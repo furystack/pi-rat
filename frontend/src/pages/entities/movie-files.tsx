@@ -13,7 +13,7 @@ export const MovieFilesPage = Shade({
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const model = modelProvider.getModelForEntityType({
+    const modelUri = modelProvider.getModelUriForEntityType({
       schemaName: 'MovieFile',
       jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/MovieFile' },
     })
@@ -42,7 +42,7 @@ export const MovieFilesPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        model={model}
+        modelUri={modelUri}
       />
     )
   },

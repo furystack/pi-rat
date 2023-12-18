@@ -1,14 +1,29 @@
 import type { ChildrenList } from '@furystack/shades'
-import { createComponent, LocationService, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
 import { NotyService } from '@furystack/shades-common-components'
 import { Button, SelectionCell } from '@furystack/shades-common-components'
 import { Fab } from '@furystack/shades-common-components'
 import { DataGrid } from '@furystack/shades-common-components'
 import type { GenericEditorService } from './generic-editor-service.js'
-import type monaco from 'monaco-editor'
 import { GenericMonacoEditor } from './generic-monaco-editor.js'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import type { Uri } from 'monaco-editor'
+
+type CreateEditorState = {
+  mode: 'create'
+}
+
+type ListEditorState = {
+  mode: 'list'
+}
+
+type EditEditorState = {
+  mode: 'edit'
+  currentId: string
+}
+
+type GenericEditorState = CreateEditorState | ListEditorState | EditEditorState
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
@@ -16,7 +31,7 @@ type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends key
   headerComponents: DataGridProps<T>['headerComponents']
   rowComponents: DataGridProps<T>['rowComponents']
   styles: DataGridProps<T>['styles']
-  model?: monaco.editor.ITextModel
+  modelUri?: Uri
 }
 
 export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T>(
@@ -24,44 +39,40 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
-  render: ({ props, injector, useObservable }) => {
-    const { service, columns, headerComponents, rowComponents, styles, model } = props
+  render: ({ props, injector, useSearchState }) => {
+    const { service, columns, headerComponents, rowComponents, styles, modelUri } = props
 
     const refresh = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
 
     const noty = injector.getInstance(NotyService)
 
-    const locationService = injector.getInstance(LocationService)
+    const [editorState, setEditorState] = useSearchState<GenericEditorState>('gedst', {
+      mode: 'list',
+    })
 
-    const [mode, setMode] = useObservable(
-      'mode',
-      locationService.useSearchParam('mode', 'list' as 'list' | 'create' | 'edit'),
-    )
-
-    const [currentId, setCurrentId] = useObservable(
-      'currentId',
-      locationService.useSearchParam('currentId', null as string | null),
-    )
-
-    if (mode === 'edit' && currentId) {
+    if (editorState.mode === 'edit' && editorState.currentId) {
       return (
         <PiRatLazyLoad
           component={async () => {
-            const entry = await service.getSingleEntry(currentId as any)
+            const entry = await service.getSingleEntry(editorState.currentId as any)
             return (
               <GenericMonacoEditor
                 value={entry}
                 onSave={async (value) => {
                   try {
-                    await service.patchEntry(currentId as any, value)
-                    noty.addNoty({ type: 'success', title: 'Entity updated', body: 'Entity updated successfully' })
+                    await service.patchEntry(editorState.currentId as any, value)
+                    noty.addNoty({ type: 'success', title: '📝 Entity updated', body: 'Entity updated successfully' })
                     refresh()
                   } catch (error) {
-                    noty.addNoty({ type: 'error', title: 'Failed to update entity', body: (error as Error).toString() })
+                    noty.addNoty({
+                      type: 'error',
+                      title: '❗ Failed to update entity',
+                      body: (error as Error).toString(),
+                    })
                   }
                 }}
                 service={service}
-                model={model}
+                modelUri={modelUri}
               />
             )
           }}
@@ -69,21 +80,23 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       )
     }
 
-    if (mode === 'create') {
+    if (editorState.mode === 'create') {
       return (
         <GenericMonacoEditor
           service={service}
-          model={model}
+          modelUri={modelUri}
           value={{}}
           onSave={async (value) => {
             try {
               const response = await service.postEntry(value)
-              setMode('edit')
-              setCurrentId(response[service.extendedOptions.keyProperty] as string)
-              noty.addNoty({ type: 'success', title: 'Entity created', body: 'Entity created successfully' })
+              setEditorState({
+                mode: 'edit',
+                currentId: response[service.extendedOptions.keyProperty] as string,
+              })
+              noty.addNoty({ type: 'success', title: '✨ Entity created', body: 'Entity created successfully' })
               refresh()
             } catch (error) {
-              noty.addNoty({ type: 'error', title: 'Failed to create entity', body: (error as Error).toString() })
+              noty.addNoty({ type: 'error', title: '❗ Failed to create entity', body: (error as Error).toString() })
             }
           }}
         />
@@ -102,8 +115,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
               <div style={{ width: '156px' }}>
                 <Button
                   onclick={() => {
-                    setMode('edit')
-                    setCurrentId(entry[service.extendedOptions.keyProperty] as string)
+                    setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] as string })
                     refresh()
                   }}>
                   ✏️
@@ -113,13 +125,17 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                     service
                       .removeEntries(entry[service.extendedOptions.keyProperty] as any)
                       .then(() => {
-                        noty.addNoty({ type: 'success', title: 'Entity deleted', body: 'Entity deleted successfully' })
+                        noty.addNoty({
+                          type: 'success',
+                          title: 'Entity deleted',
+                          body: '🗑️ The selected entity deleted successfully',
+                        })
                         refresh()
                       })
                       .catch((error) => {
                         noty.addNoty({
                           type: 'error',
-                          title: 'Failed to delete entity',
+                          title: '❗ Failed to delete entity',
                           body: (error as Error).toString(),
                         })
                       })
@@ -139,7 +155,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         />
         <Fab
           onclick={() => {
-            setMode('create')
+            setEditorState({ mode: 'create' })
           }}>
           ➕
         </Fab>

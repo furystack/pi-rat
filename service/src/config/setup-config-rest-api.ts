@@ -34,7 +34,7 @@ export const setupConfigRestApi = async (injector: Injector) => {
       POST: {
         '/config': Validate({
           schema: configApiSchema,
-          schemaName: 'PostEndpoint<Config,"id",Omit<WithOptionalId<Config,("createdAt"|"updatedAt")>,"id">>',
+          schemaName: 'PostEndpoint<Config,"id",Pick<Config,("id"|"value")>>',
         })(createPostEndpoint({ model: Config, primaryKey: 'id' })),
       },
       PATCH: {

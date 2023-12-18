@@ -37,10 +37,14 @@ type LoginPayload = {
 
 export const Login = Shade({
   shadowDomName: 'shade-login',
-  render: ({ injector, useObservable }) => {
+  render: ({ injector, useObservable, element }) => {
     const sessionService = injector.getInstance(SessionService)
-    const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
-    const [error] = useObservable('loginError', sessionService.loginError)
+    useObservable('isOperationInProgress', sessionService.isOperationInProgress, (isOperationInProgress) => {
+      const els = [...element.querySelectorAll('input').values(), ...element.querySelectorAll('button').values()]
+      els.forEach((el) => {
+        el.disabled = isOperationInProgress
+      })
+    })
 
     return (
       <div
@@ -66,7 +70,7 @@ export const Login = Shade({
               name="userName"
               autofocus
               required
-              disabled={isOperationInProgress}
+              // disabled={isOperationInProgress}
               getHelperText={() => "The user's login name"}
               type="text"
             />
@@ -74,7 +78,7 @@ export const Login = Shade({
               labelTitle="Password"
               name="password"
               required
-              disabled={isOperationInProgress}
+              // disabled={isOperationInProgress}
               getHelperText={() => 'The password for the user'}
               type="password"
             />
@@ -86,11 +90,10 @@ export const Login = Shade({
                 flexDirection: 'row',
                 padding: '1em 0',
               }}>
-              {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />}
+              {/* {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />} */}
               <LoginButton />
               <button type="submit" style={{ display: 'none' }} />
             </div>
-            <p style={{ fontSize: '10px' }}>You can login with the default 'testuser' / 'password' credentials</p>
           </Form>
         </Paper>
       </div>

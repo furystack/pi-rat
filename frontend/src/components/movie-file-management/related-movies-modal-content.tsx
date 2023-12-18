@@ -42,7 +42,7 @@ export const RelatedMoviesModalContent = Shade<{
         return (
           <>
             <p>
-              No related movies found
+              No related movie is linked to this file
               <>
                 {serviceStatus.status === 'loaded' && serviceStatus.value.services.omdb ? (
                   <Button
@@ -59,7 +59,7 @@ export const RelatedMoviesModalContent = Shade<{
                       })
                       linkedFilesService.movieFileQueryCache.obsoleteRange(() => true)
                     }}>
-                    🔍 Search on OMDB
+                    🔗 Link movie
                   </Button>
                 ) : (
                   <Button disabled>OMDB not available</Button>

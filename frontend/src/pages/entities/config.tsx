@@ -13,7 +13,7 @@ export const ConfigPage = Shade({
 
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
-    const model = modelProvider.getModelForEntityType({
+    const modelUri = modelProvider.getModelUriForEntityType({
       schemaName: 'Config',
       jsonSchema: { ...configSchemas, type: 'object', $ref: '#/definitions/Config' },
     })
@@ -25,7 +25,7 @@ export const ConfigPage = Shade({
           defaultSettings: {},
           model: Config,
           keyProperty: 'id',
-          readonlyProperties: ['id', 'createdAt', 'updatedAt'],
+          readonlyProperties: ['createdAt', 'updatedAt'],
           loader: async (findOptions) => {
             const result = await api.call({
               method: 'GET',
@@ -54,7 +54,7 @@ export const ConfigPage = Shade({
               method: 'POST',
               action: `/config`,
               body: {
-                type: entity.type,
+                id: entity.id,
                 value: entity.value,
               },
             })
@@ -65,11 +65,11 @@ export const ConfigPage = Shade({
     return (
       <GenericEditor
         service={service}
-        columns={['id', 'type', 'value', 'createdAt', 'updatedAt']}
+        columns={['id', 'value', 'createdAt', 'updatedAt']}
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        model={model}
+        modelUri={modelUri}
       />
     )
   },

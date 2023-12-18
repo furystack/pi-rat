@@ -3,7 +3,7 @@ import type { RequestAction } from '@furystack/rest-service'
 import { RequestError } from '@furystack/rest'
 import { JsonResult } from '@furystack/rest-service'
 import type { Fields, Files } from 'formidable'
-import formidable from 'formidable'
+import { IncomingForm } from 'formidable'
 import type { UploadEndpoint } from 'common'
 import { Drive } from 'common'
 import { getDataSetFor } from '@furystack/repository'
@@ -36,7 +36,7 @@ export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, ge
     throw new RequestError(`Target path ${targetPath} does not exists`, 400)
   }
 
-  const form = new formidable.IncomingForm({
+  const form = new IncomingForm({
     uploadDir: targetPath,
     keepExtensions: true,
     multiples: true,

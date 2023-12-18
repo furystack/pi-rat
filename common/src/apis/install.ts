@@ -12,6 +12,10 @@ export type ServiceStatusResponse = {
      * Github API Installation Status for external authentication
      */
     github: boolean
+    /**
+     * Torrent Client Installation Status
+     */
+    torrent: boolean
   }
 }
 

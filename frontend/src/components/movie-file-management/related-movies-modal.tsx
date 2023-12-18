@@ -45,7 +45,8 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
           <Paper style={{ display: 'flex', flexDirection: 'column', minWidth: '300px', fontWeight: 'lighter' }}>
             <div>
               <h3 style={{ marginBottom: '0' }}>
-                <FileIcon entry={file} /> &nbsp;{fallbackMeta.title} ({fallbackMeta.year})
+                <FileIcon entry={file} /> &nbsp;{fallbackMeta.title}
+                {fallbackMeta.year && ` (${fallbackMeta.year})`}
               </h3>
               <div
                 style={{
