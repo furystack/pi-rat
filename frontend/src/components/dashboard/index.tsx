@@ -6,6 +6,7 @@ import { ContextMenu } from '../context-menu.js'
 import { SessionService } from '../../services/session.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { entityDashboardsRoute } from '../routes/entity-routes.js'
+import { serializeToQueryString } from '@furystack/rest'
 
 export const Dashboard = Shade<DashboardData>({
   shadowDomName: 'pi-rat-dashboard',
@@ -21,7 +22,12 @@ export const Dashboard = Shade<DashboardData>({
                   icon: '📝',
                   label: 'Edit this dashboard',
                   onClick: () => {
-                    navigateToRoute(injector, entityDashboardsRoute, {}, `mode=edit&currentId=${props.id}`)
+                    navigateToRoute(
+                      injector,
+                      entityDashboardsRoute,
+                      {},
+                      serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
+                    )
 
                     injector.getInstance(LocationService).updateState()
                   },
