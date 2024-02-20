@@ -13,9 +13,8 @@ export const DeleteTorrentAction: RequestAction<DeleteTorrentEndpoint> = async (
   const torrentClient = injector.getInstance(TorrentClient)
   const relatedTorrent = torrentClient.torrents.find((torrent) => torrent.infoHash === id)
 
-  await new Promise<void>(
-    (resolve, reject) =>
-      relatedTorrent?.destroy({ destroyStore: deleteFiles }, (err) => (err ? reject(err) : resolve())),
+  await new Promise<void>((resolve, reject) =>
+    relatedTorrent?.destroy({ destroyStore: deleteFiles }, (err) => (err ? reject(err) : resolve())),
   )
 
   return JsonResult({ success: true })

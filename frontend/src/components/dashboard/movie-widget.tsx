@@ -141,7 +141,7 @@ export const MovieWidget = Shade<{
                         injector,
                         entityMoviesRoute,
                         {},
-                        serializeToQueryString({ mode: 'edit', currentId: imdbId }),
+                        serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
                       )
                     }}
                     title="Edit movie details">

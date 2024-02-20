@@ -9,6 +9,7 @@ import { watchMovieRoute } from '../../components/routes/movie-routes.js'
 import { entityMoviesRoute } from '../../components/routes/entity-routes.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { PathHelper } from '@furystack/utils'
+import { serializeToQueryString } from '@furystack/rest'
 
 export const PlayButtons = Shade<{ imdbId: string }>({
   shadowDomName: 'shade-movie-play-buttons',
@@ -143,7 +144,12 @@ export const MovieOverview = Shade<{ imdbId: string }>({
                   <span>
                     <Button
                       onclick={() => {
-                        navigateToRoute(injector, entityMoviesRoute, {}, `mode=edit&currentId=${movie.imdbId}`)
+                        navigateToRoute(
+                          injector,
+                          entityMoviesRoute,
+                          {},
+                          serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
+                        )
                       }}>
                       Edit
                     </Button>
