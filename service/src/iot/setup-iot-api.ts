@@ -48,7 +48,7 @@ export const setupIotApi = async (injector: Injector) =>
       PATCH: {
         '/devices/:id': Validate({
           schema: iotApiSchema,
-          schemaName: 'PatchEndpoint<Device,"name",("name"|"ipAddress"|"macAddress")>',
+          schemaName: 'PatchDeviceEndpoint',
         })(
           createPatchEndpoint({
             model: Device,

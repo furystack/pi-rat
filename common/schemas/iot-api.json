@@ -80,6 +80,62 @@
       ],
       "additionalProperties": false
     },
+    "PatchDeviceEndpoint": {
+      "$ref": "#/definitions/PatchEndpoint%3CDevice%2C%22name%22%2CPick%3CDevice%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E%3E"
+    },
+    "PatchEndpoint<Device,\"name\",Pick<Device,(\"name\"|\"ipAddress\"|\"macAddress\")>>": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Pick%3CDevice%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Should be used as primary key"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "Pick<Device,(\"name\"|\"ipAddress\"|\"macAddress\")>": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Optional IP address, used to check availability with ping"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Optional MAC address, used to awake the device with WOL"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
     "AwakeEndpoint": {
       "type": "object",
       "properties": {
@@ -202,7 +258,7 @@
           "type": "object",
           "properties": {
             "/devices/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CDevice%2C%22name%22%2CPick%3CDevice%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E%3E"
+              "$ref": "#/definitions/PatchDeviceEndpoint"
             }
           },
           "required": [
@@ -1825,59 +1881,6 @@
         "name",
         "success",
         "createdAt"
-      ],
-      "additionalProperties": false
-    },
-    "PatchEndpoint<Device,\"name\",Pick<Device,(\"name\"|\"ipAddress\"|\"macAddress\")>>": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/Pick%3CDevice%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E"
-        },
-        "url": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "Should be used as primary key"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object",
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
-      "additionalProperties": false,
-      "description": "Endpoint model for updating entities"
-    },
-    "Pick<Device,(\"name\"|\"ipAddress\"|\"macAddress\")>": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Should be used as primary key"
-        },
-        "ipAddress": {
-          "type": "string",
-          "description": "Optional IP address, used to check availability with ping"
-        },
-        "macAddress": {
-          "type": "string",
-          "description": "Optional MAC address, used to awake the device with WOL"
-        }
-      },
-      "required": [
-        "name"
       ],
       "additionalProperties": false
     },

@@ -9,7 +9,7 @@ import type {
 import type { Device, DeviceAwakeHistory, DevicePingHistory } from '../index.js'
 
 export type PostDeviceEndpoint = PostEndpoint<Omit<Device, 'createdAt' | 'updatedAt'>, 'name'>
-
+export type PatchDeviceEndpoint = PatchEndpoint<Device, 'name', Pick<Device, 'name' | 'ipAddress' | 'macAddress'>>
 export type AwakeEndpoint = { url: { id: string }; result: { success: boolean } }
 export type PingEndpoint = { url: { id: string }; result: { success: boolean; ping?: number } }
 
@@ -26,7 +26,7 @@ export interface IotApi extends RestApi {
     '/devices/:id/ping': PingEndpoint
   }
   PATCH: {
-    '/devices/:id': PatchEndpoint<Device, 'name', Pick<Device, 'name' | 'ipAddress' | 'macAddress'>>
+    '/devices/:id': PatchDeviceEndpoint
   }
   DELETE: {
     '/devices/:id': DeleteEndpoint<Device, 'name'>
