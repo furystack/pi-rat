@@ -1,6 +1,6 @@
 {
   "name": "pi-rat",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "example web app based on furystack",
   "main": "service/src/index.ts",
   "repository": "https://github.com/furystack/pi-rat.git",
