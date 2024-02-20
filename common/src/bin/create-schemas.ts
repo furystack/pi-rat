@@ -38,6 +38,11 @@ export const entityValues: SchemaGenerationSetting[] = [
     type: '*',
   },
   {
+    inputFile: './src/models/iot/*.ts',
+    outputFile: './schemas/iot-entities.json',
+    type: '*',
+  },
+  {
     inputFile: './src/models/media/*.ts',
     outputFile: './schemas/media-entities.json',
     type: '*',

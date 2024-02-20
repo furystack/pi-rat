@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "DeviceAwakeHistory": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "Flag that indicates if the package was successfully sent"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Entry creation timestamp"
+        }
+      },
+      "required": [
+        "name",
+        "success",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "DevicePingHistory": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The device name"
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Flag that indicates if the device was available"
+        },
+        "ping": {
+          "type": "number",
+          "description": "Ping time in MS"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Entry creation timestamp"
+        }
+      },
+      "required": [
+        "name",
+        "isAvailable",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "Device": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Optional IP address, used to check availability with ping"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Optional MAC address, used to awake the device with WOL"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Entry creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Entry update timestamp"
+        }
+      },
+      "required": [
+        "name",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
