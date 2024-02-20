@@ -1,5 +1,10 @@
 export class DevicePingHistory {
   /**
+   * The log entry id
+   */
+  public id!: string
+
+  /**
    * The device name
    */
   public name!: string

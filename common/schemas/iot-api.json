@@ -1,0 +1,1751 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "PostDeviceEndpoint": {
+      "$ref": "#/definitions/PostEndpoint%3COmit%3CDevice%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22name%22%3E"
+    },
+    "PostEndpoint<Omit<Device,(\"createdAt\"|\"updatedAt\")>,\"name\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3COmit%3CDevice%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22name%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/Omit%3CDevice%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
+        }
+      },
+      "required": [
+        "body",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "WithOptionalId<Omit<Device,(\"createdAt\"|\"updatedAt\")>,\"name\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Optional IP address, used to check availability with ping"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Optional MAC address, used to awake the device with WOL"
+        }
+      }
+    },
+    "Omit<Omit<Device,(\"createdAt\"|\"updatedAt\")>,\"name\">": {
+      "$ref": "#/definitions/Pick%3COmit%3CDevice%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2CExclude%3C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%2C%22name%22%3E%3E"
+    },
+    "Pick<Omit<Device,(\"createdAt\"|\"updatedAt\")>,Exclude<(\"name\"|\"ipAddress\"|\"macAddress\"),\"name\">>": {
+      "type": "object",
+      "properties": {
+        "ipAddress": {
+          "type": "string",
+          "description": "Optional IP address, used to check availability with ping"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Optional MAC address, used to awake the device with WOL"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Omit<Device,(\"createdAt\"|\"updatedAt\")>": {
+      "$ref": "#/definitions/Pick%3CDevice%2CExclude%3C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+    },
+    "Pick<Device,Exclude<(\"name\"|\"ipAddress\"|\"macAddress\"|\"createdAt\"|\"updatedAt\"),(\"createdAt\"|\"updatedAt\")>>": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Optional IP address, used to check availability with ping"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Optional MAC address, used to awake the device with WOL"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "AwakeEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "PingEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "ping": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "IotApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "properties": {
+            "/devices": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CDevice%3E"
+            },
+            "/devices/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CDevice%2C%22name%22%3E"
+            },
+            "/device-ping-history": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CDevicePingHistory%3E"
+            },
+            "/device-awake-history": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CDeviceAwakeHistory%3E"
+            }
+          },
+          "required": [
+            "/devices",
+            "/devices/:id",
+            "/device-ping-history",
+            "/device-awake-history"
+          ],
+          "additionalProperties": false
+        },
+        "POST": {
+          "type": "object",
+          "properties": {
+            "/devices": {
+              "$ref": "#/definitions/PostDeviceEndpoint"
+            },
+            "/devices/:id/awake": {
+              "$ref": "#/definitions/AwakeEndpoint"
+            },
+            "/devices/:id/ping": {
+              "$ref": "#/definitions/PingEndpoint"
+            }
+          },
+          "required": [
+            "/devices",
+            "/devices/:id/awake",
+            "/devices/:id/ping"
+          ],
+          "additionalProperties": false
+        },
+        "PATCH": {
+          "type": "object",
+          "properties": {
+            "/devices/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CDevice%2C%22name%22%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E"
+            }
+          },
+          "required": [
+            "/devices/:id"
+          ],
+          "additionalProperties": false
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "properties": {
+            "/devices/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CDevice%2C%22name%22%3E"
+            }
+          },
+          "required": [
+            "/devices/:id"
+          ],
+          "additionalProperties": false
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE"
+      ],
+      "additionalProperties": false
+    },
+    "RestApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "POST": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "GetCollectionEndpoint<Device>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CDevice%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CDevice%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<Device,(\"name\"|\"ipAddress\"|\"macAddress\"|\"createdAt\"|\"updatedAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "ipAddress": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "macAddress": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "name",
+              "ipAddress",
+              "macAddress",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CDevice%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<Device>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevice%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevice%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevice%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevice%3E"
+          }
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Should be used as primary key"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Should be used as primary key"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipAddress": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Optional IP address, used to check availability with ping"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Optional IP address, used to check availability with ping"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Optional IP address, used to check availability with ping"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Optional IP address, used to check availability with ping"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "macAddress": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Optional MAC address, used to awake the device with WOL"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Optional MAC address, used to awake the device with WOL"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Optional MAC address, used to awake the device with WOL"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Optional MAC address, used to awake the device with WOL"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry creation timestamp"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry creation timestamp"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Entry update timestamp"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Entry update timestamp"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Entry update timestamp"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Entry update timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Entry update timestamp"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Entry update timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry update timestamp"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry update timestamp"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<Device>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Device"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "Device": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Optional IP address, used to check availability with ping"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Optional MAC address, used to awake the device with WOL"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Entry creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Entry update timestamp"
+        }
+      },
+      "required": [
+        "name",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<Device,\"name\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "name",
+                  "ipAddress",
+                  "macAddress",
+                  "createdAt",
+                  "updatedAt"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/Device"
+        }
+      },
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetCollectionEndpoint<DevicePingHistory>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CDevicePingHistory%2C(%22name%22%7C%22isAvailable%22%7C%22ping%22%7C%22createdAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CDevicePingHistory%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<DevicePingHistory,(\"name\"|\"isAvailable\"|\"ping\"|\"createdAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "isAvailable": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "ping": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "name",
+              "isAvailable",
+              "ping",
+              "createdAt"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CDevicePingHistory%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<DevicePingHistory>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevicePingHistory%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevicePingHistory%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevicePingHistory%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDevicePingHistory%3E"
+          }
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The device name"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The device name"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The device name"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The device name"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The device name"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The device name"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The device name"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The device name"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "isAvailable": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "boolean",
+                  "description": "Flag that indicates if the device was available"
+                },
+                "$ne": {
+                  "type": "boolean",
+                  "description": "Flag that indicates if the device was available"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean",
+                    "description": "Flag that indicates if the device was available"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean",
+                    "description": "Flag that indicates if the device was available"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ping": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number",
+                  "description": "Ping time in MS"
+                },
+                "$ne": {
+                  "type": "number",
+                  "description": "Ping time in MS"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Ping time in MS"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "Ping time in MS"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry creation timestamp"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry creation timestamp"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<DevicePingHistory>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DevicePingHistory"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "DevicePingHistory": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The device name"
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Flag that indicates if the device was available"
+        },
+        "ping": {
+          "type": "number",
+          "description": "Ping time in MS"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Entry creation timestamp"
+        }
+      },
+      "required": [
+        "name",
+        "isAvailable",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "GetCollectionEndpoint<DeviceAwakeHistory>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CDeviceAwakeHistory%2C(%22name%22%7C%22success%22%7C%22createdAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CDeviceAwakeHistory%3E"
+        }
+      },
+      "required": [
+        "query",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<DeviceAwakeHistory,(\"name\"|\"success\"|\"createdAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "success": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "name",
+              "success",
+              "createdAt"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CDeviceAwakeHistory%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<DeviceAwakeHistory>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDeviceAwakeHistory%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDeviceAwakeHistory%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDeviceAwakeHistory%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CDeviceAwakeHistory%3E"
+          }
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Should be used as primary key"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Should be used as primary key"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Should be used as primary key"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "success": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "boolean",
+                  "description": "Flag that indicates if the package was successfully sent"
+                },
+                "$ne": {
+                  "type": "boolean",
+                  "description": "Flag that indicates if the package was successfully sent"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean",
+                    "description": "Flag that indicates if the package was successfully sent"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "boolean",
+                    "description": "Flag that indicates if the package was successfully sent"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Entry creation timestamp"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry creation timestamp"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Entry creation timestamp"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<DeviceAwakeHistory>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DeviceAwakeHistory"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": [
+        "count",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "DeviceAwakeHistory": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "Flag that indicates if the package was successfully sent"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Entry creation timestamp"
+        }
+      },
+      "required": [
+        "name",
+        "success",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "PatchEndpoint<Device,\"name\",(\"name\"|\"ipAddress\"|\"macAddress\")>": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "enum": [
+            "name",
+            "ipAddress",
+            "macAddress"
+          ]
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Should be used as primary key"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "DeleteEndpoint<Device,\"name\">": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Should be used as primary key"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "result"
+      ],
+      "additionalProperties": false,
+      "description": "Endpoint model for deleting entities"
+    }
+  }
+}

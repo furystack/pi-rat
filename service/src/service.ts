@@ -1,7 +1,6 @@
 import '@furystack/repository'
 import { getLogger } from '@furystack/logging'
 import { injector as rootInjector } from './root-injector.js'
-import { attachShutdownHandler } from './shutdown-handler.js'
 import { setupDrives } from './drives/setup-drives.js'
 import { setupIdentity } from './identity/setup-identity.js'
 import { setupFrontendBundle } from './setup-frontend-bundle.js'
@@ -18,11 +17,11 @@ import { setupConfig } from './config/setup-config.js'
 import { setupConfigRestApi } from './config/setup-config-rest-api.js'
 import { setupTorrentApi } from './webtorrent/setup-torrent-api.js'
 import { setupTorrent } from './webtorrent/setup-torrent.js'
+import { setupIot } from './iot/setup-iot.js'
 
 export const init = async (injector = rootInjector) => {
   const serviceLogger = getLogger(injector).withScope('service')
   await serviceLogger.information({ message: '🐀 Starting PI-RAT service...' })
-  attachShutdownHandler(injector)
   /**
    * Set up stores and repositories
    */
@@ -35,6 +34,7 @@ export const init = async (injector = rootInjector) => {
     await setupDashboards(injector),
     await setupMovies(injector),
     await setupTorrent(injector),
+    await setupIot(injector),
   ])
 
   /**
