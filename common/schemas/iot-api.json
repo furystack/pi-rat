@@ -202,7 +202,7 @@
           "type": "object",
           "properties": {
             "/devices/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CDevice%2C%22name%22%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E"
+              "$ref": "#/definitions/PatchEndpoint%3CDevice%2C%22name%22%2CPick%3CDevice%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E%3E"
             }
           },
           "required": [
@@ -995,7 +995,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CDevicePingHistory%2C(%22name%22%7C%22isAvailable%22%7C%22ping%22%7C%22createdAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CDevicePingHistory%2C(%22id%22%7C%22name%22%7C%22isAvailable%22%7C%22ping%22%7C%22createdAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -1011,7 +1011,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<DevicePingHistory,(\"name\"|\"isAvailable\"|\"ping\"|\"createdAt\")[]>": {
+    "FindOptions<DevicePingHistory,(\"id\"|\"name\"|\"isAvailable\"|\"ping\"|\"createdAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1025,6 +1025,13 @@
         "order": {
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
             "name": {
               "type": "string",
               "enum": [
@@ -1062,6 +1069,7 @@
           "items": {
             "type": "string",
             "enum": [
+              "id",
               "name",
               "isAvailable",
               "ping",
@@ -1105,6 +1113,66 @@
           "items": {
             "$ref": "#/definitions/FilterType%3CDevicePingHistory%3E"
           }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The log entry id"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The log entry id"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The log entry id"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The log entry id"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The log entry id"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The log entry id"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The log entry id"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The log entry id"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         },
         "name": {
           "anyOf": [
@@ -1343,6 +1411,10 @@
     "DevicePingHistory": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The log entry id"
+        },
         "name": {
           "type": "string",
           "description": "The device name"
@@ -1361,6 +1433,7 @@
         }
       },
       "required": [
+        "id",
         "name",
         "isAvailable",
         "createdAt"
@@ -1374,7 +1447,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CDeviceAwakeHistory%2C(%22name%22%7C%22success%22%7C%22createdAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CDeviceAwakeHistory%2C(%22id%22%7C%22name%22%7C%22success%22%7C%22createdAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -1390,7 +1463,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<DeviceAwakeHistory,(\"name\"|\"success\"|\"createdAt\")[]>": {
+    "FindOptions<DeviceAwakeHistory,(\"id\"|\"name\"|\"success\"|\"createdAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1404,6 +1477,13 @@
         "order": {
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
             "name": {
               "type": "string",
               "enum": [
@@ -1434,6 +1514,7 @@
           "items": {
             "type": "string",
             "enum": [
+              "id",
               "name",
               "success",
               "createdAt"
@@ -1477,26 +1558,26 @@
             "$ref": "#/definitions/FilterType%3CDeviceAwakeHistory%3E"
           }
         },
-        "name": {
+        "id": {
           "anyOf": [
             {
               "type": "object",
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "description": "Should be used as primary key"
+                  "description": "The log entry id"
                 },
                 "$endsWith": {
                   "type": "string",
-                  "description": "Should be used as primary key"
+                  "description": "The log entry id"
                 },
                 "$like": {
                   "type": "string",
-                  "description": "Should be used as primary key"
+                  "description": "The log entry id"
                 },
                 "$regex": {
                   "type": "string",
-                  "description": "Should be used as primary key"
+                  "description": "The log entry id"
                 }
               },
               "additionalProperties": false
@@ -1506,11 +1587,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "description": "Should be used as primary key"
+                  "description": "The log entry id"
                 },
                 "$ne": {
                   "type": "string",
-                  "description": "Should be used as primary key"
+                  "description": "The log entry id"
                 }
               },
               "additionalProperties": false
@@ -1522,14 +1603,74 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "Should be used as primary key"
+                    "description": "The log entry id"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "Should be used as primary key"
+                    "description": "The log entry id"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The related device name"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The related device name"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The related device name"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The related device name"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The related device name"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The related device name"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The related device name"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The related device name"
                   }
                 }
               },
@@ -1662,9 +1803,13 @@
     "DeviceAwakeHistory": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The log entry id"
+        },
         "name": {
           "type": "string",
-          "description": "Should be used as primary key"
+          "description": "The related device name"
         },
         "success": {
           "type": "boolean",
@@ -1676,22 +1821,18 @@
         }
       },
       "required": [
+        "id",
         "name",
         "success",
         "createdAt"
       ],
       "additionalProperties": false
     },
-    "PatchEndpoint<Device,\"name\",(\"name\"|\"ipAddress\"|\"macAddress\")>": {
+    "PatchEndpoint<Device,\"name\",Pick<Device,(\"name\"|\"ipAddress\"|\"macAddress\")>>": {
       "type": "object",
       "properties": {
         "body": {
-          "type": "string",
-          "enum": [
-            "name",
-            "ipAddress",
-            "macAddress"
-          ]
+          "$ref": "#/definitions/Pick%3CDevice%2C(%22name%22%7C%22ipAddress%22%7C%22macAddress%22)%3E"
         },
         "url": {
           "type": "object",
@@ -1718,6 +1859,27 @@
       ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
+    },
+    "Pick<Device,(\"name\"|\"ipAddress\"|\"macAddress\")>": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Should be used as primary key"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Optional IP address, used to check availability with ping"
+        },
+        "macAddress": {
+          "type": "string",
+          "description": "Optional MAC address, used to awake the device with WOL"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
     },
     "DeleteEndpoint<Device,\"name\">": {
       "type": "object",

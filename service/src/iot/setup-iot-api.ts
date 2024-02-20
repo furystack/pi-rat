@@ -18,7 +18,7 @@ import { PingAction } from './actions/ping-action.js'
 export const setupIotApi = async (injector: Injector) =>
   await useRestService<IotApi>({
     injector,
-    root: 'api/torrent',
+    root: 'api/iot',
     port: getPort(),
     cors: getCorsOptions(),
     api: {

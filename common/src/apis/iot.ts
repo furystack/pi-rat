@@ -26,7 +26,7 @@ export interface IotApi extends RestApi {
     '/devices/:id/ping': PingEndpoint
   }
   PATCH: {
-    '/devices/:id': PatchEndpoint<Device, 'name', 'name' | 'ipAddress' | 'macAddress'>
+    '/devices/:id': PatchEndpoint<Device, 'name', Pick<Device, 'name' | 'ipAddress' | 'macAddress'>>
   }
   DELETE: {
     '/devices/:id': DeleteEndpoint<Device, 'name'>

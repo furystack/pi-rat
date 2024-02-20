@@ -5,6 +5,7 @@ import { getCurrentUser } from '@furystack/core'
 import {
   entityConfigRoute,
   entityDashboardsRoute,
+  entityDeviceRoute,
   entityDrivesRoute,
   entityMovieFilesRoute,
   entityMoviesRoute,
@@ -85,6 +86,15 @@ const EntitySuggestions: SuggestionOptions[] = [
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, entityOmdbSeriesMetadataRoute, {})
+    },
+  },
+  {
+    name: 'IOT Device Entities',
+    description: 'List, edit and create IOT Device entities',
+    icon: '📡',
+    score: 1,
+    onSelected: ({ injector }) => {
+      navigateToRoute(injector, entityDeviceRoute, {})
     },
   },
 ]

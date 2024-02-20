@@ -9,4 +9,5 @@ export interface EntityShortcutWidget {
     | 'movie-file'
     | 'omdb-movie-metadata'
     | 'omdb-series-metadata'
+    | 'device'
 }
