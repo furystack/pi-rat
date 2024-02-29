@@ -65,13 +65,16 @@ export class IotDevicesService {
 
   private devicePingHistoryCache = new Cache({
     capacity: 100,
-    load: async (query?: FindOptions<DevicePingHistory, Array<keyof DevicePingHistory>>) => {
+    load: async (deviceName: string, query?: FindOptions<DevicePingHistory, Array<keyof DevicePingHistory>>) => {
       const { result } = await this.iotApiClient.call({
         method: 'GET',
         action: '/device-ping-history',
         query: {
           findOptions: {
             ...query,
+            filter: {
+              $and: [...(query?.filter ? [query.filter] : []), { name: { $eq: deviceName } }],
+            },
           },
         },
       })
@@ -146,9 +149,7 @@ export class IotDevicesService {
       url: { id: device.name },
     })
     // TODO: Obsolete based on ARGS
-    this.deviceAwakeHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
-    this.deviceAwakeHistoryCache.reload(device.name, { order: { createdAt: 'DESC' }, top: 1 })
-    this.devicePingHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
-    this.devicePingHistoryCache.reload({ filter: { name: { $eq: device.name } }, order: { createdAt: 'DESC' }, top: 1 })
+    this.deviceAwakeHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
+    this.devicePingHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
   }
 }

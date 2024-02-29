@@ -11,8 +11,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
 
     const [lastPingState] = useObservable(
       'pingState',
-      iotService.findPingHistoryAsObservable({
-        filter: { name: { $eq: props.name } },
+      iotService.findPingHistoryAsObservable(props.name, {
         order: { createdAt: 'DESC' },
         top: 1,
       }),
