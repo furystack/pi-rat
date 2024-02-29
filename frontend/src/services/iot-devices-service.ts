@@ -65,16 +65,13 @@ export class IotDevicesService {
 
   private devicePingHistoryCache = new Cache({
     capacity: 100,
-    load: async (name: string, query?: FindOptions<DevicePingHistory, Array<keyof DevicePingHistory>>) => {
+    load: async (query?: FindOptions<DevicePingHistory, Array<keyof DevicePingHistory>>) => {
       const { result } = await this.iotApiClient.call({
         method: 'GET',
         action: '/device-ping-history',
         query: {
           findOptions: {
             ...query,
-            filter: {
-              $and: [{ name: { $eq: name } }, ...(query?.filter ? [query.filter] : [])],
-            },
           },
         },
       })
@@ -87,6 +84,12 @@ export class IotDevicesService {
 
   public findDevice = this.deviceQueryCache.get.bind(this.deviceQueryCache)
   public findDeviceAsObservable = this.deviceQueryCache.getObservable.bind(this.deviceQueryCache)
+
+  public findPingHistory = this.devicePingHistoryCache.get.bind(this.devicePingHistoryCache)
+  public findPingHistoryAsObservable = this.devicePingHistoryCache.getObservable.bind(this.devicePingHistoryCache)
+
+  public findAwakeHistory = this.deviceAwakeHistoryCache.get.bind(this.deviceAwakeHistoryCache)
+  public findAwakeHistoryAsObservable = this.deviceAwakeHistoryCache.getObservable.bind(this.deviceAwakeHistoryCache)
 
   public deleteDevice = async (name: string) => {
     await this.iotApiClient.call({
@@ -122,5 +125,30 @@ export class IotDevicesService {
     })
     this.deviceQueryCache.flushAll()
     return result
+  }
+
+  public wakeUpDevice = async (device: Device) => {
+    await this.iotApiClient.call({
+      method: 'POST',
+      action: '/devices/:id/awake',
+      url: { id: device.name },
+    })
+    this.deviceQueryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
+    this.deviceCache.obsoleteRange((entity) => entity.name === device.name)
+    this.deviceAwakeHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
+    this.devicePingHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
+  }
+
+  public pingDevice = async (device: Device) => {
+    await this.iotApiClient.call({
+      method: 'POST',
+      action: '/devices/:id/ping',
+      url: { id: device.name },
+    })
+    // TODO: Obsolete based on ARGS
+    this.deviceAwakeHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
+    this.deviceAwakeHistoryCache.reload(device.name, { order: { createdAt: 'DESC' }, top: 1 })
+    this.devicePingHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
+    this.devicePingHistoryCache.reload({ filter: { name: { $eq: device.name } }, order: { createdAt: 'DESC' }, top: 1 })
   }
 }

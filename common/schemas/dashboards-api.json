@@ -79,6 +79,9 @@
         },
         {
           "$ref": "#/definitions/ContinueWatchingWidgetGroup"
+        },
+        {
+          "$ref": "#/definitions/DeviceAvailability"
         }
       ]
     },
@@ -96,7 +99,8 @@
             "browser",
             "movies",
             "series",
-            "torrents"
+            "torrents",
+            "iot"
           ]
         }
       },
@@ -254,6 +258,162 @@
       },
       "required": [
         "type"
+      ],
+      "additionalProperties": false
+    },
+    "DeviceAvailability": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "device-availability"
+        },
+        "deviceName": {
+          "type": "string"
+        },
+        "enableWakeUp": {
+          "type": "boolean"
+        },
+        "icon": {
+          "$ref": "#/definitions/Icon"
+        }
+      },
+      "required": [
+        "type",
+        "deviceName"
+      ],
+      "additionalProperties": false
+    },
+    "Icon": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/FontIcon"
+        },
+        {
+          "$ref": "#/definitions/Base64Icon"
+        },
+        {
+          "$ref": "#/definitions/LottieIcon"
+        },
+        {
+          "$ref": "#/definitions/UrlIcon"
+        }
+      ]
+    },
+    "FontIcon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "font"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "Base64Icon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "base64"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "LottieIcon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "lottie"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "autoplay": {
+              "type": "boolean"
+            },
+            "src": {
+              "type": "string"
+            },
+            "background": {
+              "type": "string"
+            },
+            "controls": {
+              "type": "boolean"
+            },
+            "count": {
+              "type": "number"
+            },
+            "direction": {
+              "type": "number"
+            },
+            "hover": {
+              "type": "boolean"
+            },
+            "loop": {
+              "type": "boolean"
+            },
+            "mode": {
+              "type": "string"
+            },
+            "renderer": {
+              "type": "string",
+              "enum": [
+                "svg",
+                "canvas"
+              ]
+            },
+            "speed": {
+              "type": "number"
+            },
+            "style": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "src"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "UrlIcon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "url"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "value"
       ],
       "additionalProperties": false
     },

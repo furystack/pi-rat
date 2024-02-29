@@ -7,6 +7,7 @@ import { movieRoutes } from './routes/movie-routes.js'
 import { dashboardRoutes } from './routes/dashboard-routes.js'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { torrentRoutes } from './routes/torrent-routes.js'
+import { iotRoutes } from './routes/iot-routes.js'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
@@ -31,7 +32,7 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
                 <Router
                   routes={[
                     ...movieRoutes,
-                    ...(hasAdminRole ? [...entityRoutes, ...fileBrowserRoutes] : []),
+                    ...(hasAdminRole ? [...entityRoutes, ...fileBrowserRoutes, ...iotRoutes] : []),
                     ...torrentRoutes,
                     ...dashboardRoutes,
                   ]}
