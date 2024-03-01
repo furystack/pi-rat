@@ -6,6 +6,7 @@ import '@furystack/shades-lottie'
 type IconProps = IconModel & {
   title?: string
   onclick?: (ev: MouseEvent) => void
+  style?: Partial<CSSStyleDeclaration>
 }
 
 export const Icon: (props: IconProps, children: ChildrenList) => JSX.Element = (props, children) => {

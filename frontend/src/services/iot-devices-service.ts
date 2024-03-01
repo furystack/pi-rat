@@ -136,10 +136,8 @@ export class IotDevicesService {
       action: '/devices/:id/awake',
       url: { id: device.name },
     })
-    this.deviceQueryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
-    this.deviceCache.obsoleteRange((entity) => entity.name === device.name)
-    this.deviceAwakeHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
-    this.devicePingHistoryCache.obsoleteRange((entity) => entity.entries.some((e) => e.name === device.name))
+    this.deviceAwakeHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
+    this.devicePingHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
   }
 
   public pingDevice = async (device: Device) => {
@@ -148,7 +146,6 @@ export class IotDevicesService {
       action: '/devices/:id/ping',
       url: { id: device.name },
     })
-    // TODO: Obsolete based on ARGS
     this.deviceAwakeHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
     this.devicePingHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
   }

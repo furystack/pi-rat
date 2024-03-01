@@ -1,6 +1,6 @@
 import type { DeviceAvailability as DeviceAvailabilityProps } from '../../../../common/src/models/dashboard/device-availability.js'
-import { LazyLoad, Shade, createComponent } from '@furystack/shades'
-import { Loader, Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
+import { Shade, createComponent } from '@furystack/shades'
+import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { navigateToRoute } from '../../navigate-to-route.js'
@@ -10,7 +10,6 @@ import { iotDeviceRoute } from '../routes/iot-routes.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 import { RouteLink } from '../RouteLink.js'
 import { Icon } from '../Icon.js'
-import { sleepAsync } from '@furystack/utils'
 import { DeviceAvailabilityPanel } from '../iot-devices/device-availability-panel.js'
 
 const focus = (el: HTMLElement) => {

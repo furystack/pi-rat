@@ -187,23 +187,76 @@
         },
         "result": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
-            "success": {
-              "type": "boolean"
+            "id": {
+              "type": "string",
+              "description": "The log entry id"
+            },
+            "name": {
+              "type": "string",
+              "description": "The device name"
+            },
+            "isAvailable": {
+              "type": "boolean",
+              "description": "Flag that indicates if the device was available"
             },
             "ping": {
-              "type": "number"
+              "type": "number",
+              "description": "Ping time in MS"
+            },
+            "createdAt": {
+              "type": "string",
+              "description": "Entry creation timestamp"
+            },
+            "success": {
+              "type": "boolean"
             }
           },
           "required": [
+            "createdAt",
+            "id",
+            "isAvailable",
+            "name",
             "success"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
         "url",
         "result"
+      ],
+      "additionalProperties": false
+    },
+    "DevicePingHistory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The log entry id"
+        },
+        "name": {
+          "type": "string",
+          "description": "The device name"
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Flag that indicates if the device was available"
+        },
+        "ping": {
+          "type": "number",
+          "description": "Ping time in MS"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Entry creation timestamp"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "isAvailable",
+        "createdAt"
       ],
       "additionalProperties": false
     },
@@ -1463,38 +1516,6 @@
       ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
-    },
-    "DevicePingHistory": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The log entry id"
-        },
-        "name": {
-          "type": "string",
-          "description": "The device name"
-        },
-        "isAvailable": {
-          "type": "boolean",
-          "description": "Flag that indicates if the device was available"
-        },
-        "ping": {
-          "type": "number",
-          "description": "Ping time in MS"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Entry creation timestamp"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "isAvailable",
-        "createdAt"
-      ],
-      "additionalProperties": false
     },
     "GetCollectionEndpoint<DeviceAwakeHistory>": {
       "type": "object",

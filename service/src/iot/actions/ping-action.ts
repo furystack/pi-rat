@@ -1,13 +1,40 @@
 import type { RequestAction } from '@furystack/rest-service'
 import { AuthorizationError, isAuthorized } from '@furystack/core'
 import { JsonResult } from '@furystack/rest-service'
-import type { PingEndpoint } from 'common'
+import { Device, DevicePingHistory, type PingEndpoint } from 'common'
+import ping from 'ping'
+import { getDataSetFor } from '@furystack/repository'
+import { RequestError } from '@furystack/rest'
 
-export const PingAction: RequestAction<PingEndpoint> = async ({ injector }) => {
+export const PingAction: RequestAction<PingEndpoint> = async ({ injector, getUrlParams }) => {
   if (!isAuthorized(injector, 'admin')) {
     throw new AuthorizationError('Needs admin access')
   }
 
-  // TODO: Implement action
-  return JsonResult({ success: true, ping: 123 })
+  const { id } = getUrlParams()
+  const device = await getDataSetFor(injector, Device, 'name').get(injector, id)
+
+  if (!device) {
+    throw new RequestError(`device with name '${id}' not found`, 404)
+  }
+
+  if (!device.ipAddress) {
+    throw new RequestError(`device with name '${id}' has no ip address`, 400)
+  }
+
+  const result = await ping.promise.probe(device.ipAddress)
+
+  const pingEntry = await getDataSetFor(injector, DevicePingHistory, 'id').add(injector, {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    name: device.name,
+    isAvailable: result.alive,
+    ping: isNaN(result.time as number) ? 0 : parseFloat(result.time as string),
+  })
+
+  if (!result.alive) {
+    return JsonResult({ success: true, ...pingEntry.created[0] })
+  } else {
+    return JsonResult({ success: true, ...pingEntry.created[0] })
+  }
 }
