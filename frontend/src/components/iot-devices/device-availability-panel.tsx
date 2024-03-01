@@ -7,13 +7,21 @@ import { hasCacheValue } from '@furystack/cache'
 
 export const DeviceAvailabilityPanel = Shade<Device>({
   shadowDomName: 'device-availability-panel',
-  render: ({ props, useObservable, injector }) => {
+  render: ({ props, useObservable, injector, useDisposable }) => {
     const iotService = injector.getInstance(IotDevicesService)
 
     const pingArgs: Parameters<typeof iotService.findPingHistoryAsObservable> = [
       props.name,
       { order: { createdAt: 'DESC' }, top: 1 },
     ]
+
+    useDisposable('refresher', () => {
+      const interval = setInterval(() => {
+        iotService.findPingHistory(...pingArgs)
+      }, 1000)
+
+      return { dispose: () => clearInterval(interval) }
+    })
 
     const [lastPingState] = useObservable('pingState', iotService.findPingHistoryAsObservable(...pingArgs))
 
