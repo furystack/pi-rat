@@ -65,6 +65,7 @@ export class IotDevicesService {
 
   private devicePingHistoryCache = new Cache({
     capacity: 100,
+    staleTimeMs: 15 * 1000,
     load: async (deviceName: string, query?: FindOptions<DevicePingHistory, Array<keyof DevicePingHistory>>) => {
       const { result } = await this.iotApiClient.call({
         method: 'GET',
@@ -149,4 +150,7 @@ export class IotDevicesService {
     this.deviceAwakeHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
     this.devicePingHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
   }
+
+  public observeLastPingForDevice = (device: Device) =>
+    this.findPingHistoryAsObservable(device.name, { top: 1, order: { createdAt: 'DESC' } })
 }

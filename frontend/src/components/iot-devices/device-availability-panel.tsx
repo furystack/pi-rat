@@ -23,7 +23,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
       return { dispose: () => clearInterval(interval) }
     })
 
-    const [lastPingState] = useObservable('pingState', iotService.findPingHistoryAsObservable(...pingArgs))
+    const [lastPingState] = useObservable('pingState', iotService.observeLastPingForDevice(props))
 
     if (lastPingState.status === 'uninitialized' || lastPingState.status === 'loading') {
       return <Loader />
@@ -58,12 +58,18 @@ export const DeviceAvailabilityPanel = Shade<Device>({
         )
       }
 
-      if (new Date(lastPing.createdAt).valueOf() - new Date().valueOf() < -1000 * 60 * 5) {
-        return <Icon type="font" value="🟡" title="The last ping is a bit old..." />
-      }
-
       if (lastPing.isAvailable) {
-        return <Icon type="font" value="🟢" title="Device is available" />
+        return (
+          <Icon
+            type="font"
+            value="🟢"
+            title="Device is available"
+            style={{
+              cursor: 'pointer',
+              opacity: lastPingState.status === 'obsolete' ? '0.5' : '1',
+            }}
+          />
+        )
       } else {
         return (
           <>
