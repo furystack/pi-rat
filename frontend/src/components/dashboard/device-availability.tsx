@@ -1,5 +1,5 @@
 import type { DeviceAvailability as DeviceAvailabilityProps } from '../../../../common/src/models/dashboard/device-availability.js'
-import { Shade, createComponent } from '@furystack/shades'
+import { LinkToRoute, Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
@@ -8,7 +8,6 @@ import { entityDeviceRoute } from '../routes/entity-routes.js'
 import { serializeToQueryString } from '@furystack/rest'
 import { iotDeviceRoute } from '../routes/iot-routes.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
-import { RouteLink } from '../RouteLink.js'
 import { Icon } from '../Icon.js'
 import { DeviceAvailabilityPanel } from '../iot-devices/device-availability-panel.js'
 
@@ -67,7 +66,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
 
     if (isLoadedCacheResult(device)) {
       return (
-        <RouteLink tabIndex={0} title={device.value.name} route={iotDeviceRoute} params={{ id: props.deviceName }}>
+        <LinkToRoute tabIndex={0} title={device.value.name} route={iotDeviceRoute} params={{ id: props.deviceName }}>
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -154,12 +153,12 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               {device.value.name}
             </div>
           </div>
-        </RouteLink>
+        </LinkToRoute>
       )
     } else if (isPendingCacheResult(device)) {
       return <Skeleton />
     } else if (isFailedCacheResult(device)) {
-      return <>:(</>
+      return <>{`:(`}</>
     }
 
     return null
