@@ -286,14 +286,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/cache@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "@furystack/cache@npm:2.2.0"
+"@furystack/cache@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@furystack/cache@npm:2.3.0"
   dependencies:
     "@furystack/inject": "npm:^8.1.7"
     "@furystack/utils": "npm:^4.0.16"
     semaphore-async-await: "npm:^1.5.1"
-  checksum: 10/30f901d83b5d96c829bc33ad1ff91a6ca2d7d2e3737191ea05b2035ef17bd0048b16968b4979d7264b12008bb4b5fd486b4ed96522811c5d088c9aa5b722b66b
+  checksum: 10/e5b63480b352f83fecb97db542b4f15245eb9d624fe12dbf34909614faabbd69b0f579ed73c024805cb95583a5b03ba338d8591948f7f5c6ae8bc38a4acf37b3
   languageName: node
   linkType: hard
 
@@ -399,40 +399,40 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^5.0.18":
-  version: 5.0.18
-  resolution: "@furystack/shades-common-components@npm:5.0.18"
+"@furystack/shades-common-components@npm:^5.0.19":
+  version: 5.0.19
+  resolution: "@furystack/shades-common-components@npm:5.0.19"
   dependencies:
     "@furystack/core": "npm:^12.0.17"
     "@furystack/inject": "npm:^8.1.7"
-    "@furystack/shades": "npm:^8.0.18"
+    "@furystack/shades": "npm:^8.1.0"
     "@furystack/utils": "npm:^4.0.16"
     path-to-regexp: "npm:^6.2.1"
     semaphore-async-await: "npm:^1.5.1"
-  checksum: 10/4576e94dbb6ca465c70837f33973de44447d1997d5aacf7dfb7d0c1f49c54928009a94a53cc3e1b0bbc11eda312238d2c64ff2f8b4a30150d69b042e7e1484ec
+  checksum: 10/13b1c3499bbf990c7977720a601b2c632010bdef150998d3acb4232bfdfd30c575c5023f970124c3475ae1f0cfed3ebb66694e7e6bd6d695a7e5f376917b72c2
   languageName: node
   linkType: hard
 
-"@furystack/shades-lottie@npm:^4.0.18":
-  version: 4.0.18
-  resolution: "@furystack/shades-lottie@npm:4.0.18"
+"@furystack/shades-lottie@npm:^4.0.19":
+  version: 4.0.19
+  resolution: "@furystack/shades-lottie@npm:4.0.19"
   dependencies:
-    "@furystack/shades": "npm:^8.0.18"
+    "@furystack/shades": "npm:^8.1.0"
     "@lottiefiles/lottie-player": "npm:^2.0.3"
-  checksum: 10/45cc3ed15f67009be1c00277213c3dfa413cd9472da4397a3664568fd64018bfbb3d27de29c4eeb1c7afb1c1d0e1d620d82595061261ebfe52469162d8563b6f
+  checksum: 10/bfceb48f7eec5c1c024db9d4a1e2bbbb3a0a3af05d7d10f07691b664af218a2c8062ff811359b97d3e2edc520655769ba6fb2b983f5c85206f98c6ee499a3598
   languageName: node
   linkType: hard
 
-"@furystack/shades@npm:^8.0.18":
-  version: 8.0.18
-  resolution: "@furystack/shades@npm:8.0.18"
+"@furystack/shades@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "@furystack/shades@npm:8.1.0"
   dependencies:
     "@furystack/inject": "npm:^8.1.7"
     "@furystack/rest": "npm:^5.0.18"
     "@furystack/utils": "npm:^4.0.16"
     path-to-regexp: "npm:^6.2.1"
     semaphore-async-await: "npm:^1.5.1"
-  checksum: 10/be0f41e47acc44966facd9ea934069ed4f637348473414db11e023d7c501c10d3e6a7e7ee93305a31c3f64d3bd8a185b1f44a59b9810eb681cdf3e9d74129e57
+  checksum: 10/f7f4d42d3c0a3d6c7ba83c2a738d6f359b643ac955036e5a48907680293f82c7277c7868d1a573cd30d10ae48bd961b33498d240175a25ebc70963ab28f0c11e
   languageName: node
   linkType: hard
 
@@ -672,14 +672,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.42.0":
-  version: 1.42.0
-  resolution: "@playwright/test@npm:1.42.0"
+"@playwright/test@npm:^1.42.1":
+  version: 1.42.1
+  resolution: "@playwright/test@npm:1.42.1"
   dependencies:
-    playwright: "npm:1.42.0"
+    playwright: "npm:1.42.1"
   bin:
     playwright: cli.js
-  checksum: 10/bb696e89da47dd1ab46201fa4652f331bea3b75e9c804e358f83216f69d83a972a302d249a8e4c08cbc8fc72110a6e62562e679a474b5ed6246f09a9fc9bda6b
+  checksum: 10/5bd7f1c77963cacc6f44cf4c1ef46f9ad41e79a3e6f34eb81398afaa09b1b08a4cbe0f7064f03c71c094414d1c4507d6183b61c63aa4b6a93846d386f7c651a2
   languageName: node
   linkType: hard
 
@@ -971,7 +971,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ping@npm:^0":
+"@types/ping@npm:^0.4.4":
   version: 0.4.4
   resolution: "@types/ping@npm:0.4.4"
   checksum: 10/48233c0c8a82d25bf91c6102201be295406a9831119f7797660dfcd73d6831971753b61aaefe3981c898a2d7a8f097dee04fe50dea166f91ab138d241bb584d8
@@ -3212,15 +3212,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "frontend@workspace:frontend"
   dependencies:
-    "@furystack/cache": "npm:^2.2.0"
+    "@furystack/cache": "npm:^2.3.0"
     "@furystack/core": "npm:^12.0.17"
     "@furystack/inject": "npm:^8.1.7"
     "@furystack/logging": "npm:^4.0.16"
     "@furystack/rest": "npm:^5.0.18"
     "@furystack/rest-client-fetch": "npm:^5.0.18"
-    "@furystack/shades": "npm:^8.0.18"
-    "@furystack/shades-common-components": "npm:^5.0.18"
-    "@furystack/shades-lottie": "npm:^4.0.18"
+    "@furystack/shades": "npm:^8.1.0"
+    "@furystack/shades-common-components": "npm:^5.0.19"
+    "@furystack/shades-lottie": "npm:^4.0.19"
     "@furystack/utils": "npm:^4.0.16"
     "@types/marked": "npm:^6.0.0"
     "@types/node": "npm:^20.11.24"
@@ -5432,7 +5432,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "pi-rat@workspace:."
   dependencies:
-    "@playwright/test": "npm:^1.42.0"
+    "@playwright/test": "npm:^1.42.1"
     "@types/node": "npm:^20.11.24"
     "@typescript-eslint/eslint-plugin": "npm:^7.1.0"
     "@typescript-eslint/parser": "npm:^7.1.0"
@@ -5514,27 +5514,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.42.0":
-  version: 1.42.0
-  resolution: "playwright-core@npm:1.42.0"
+"playwright-core@npm:1.42.1":
+  version: 1.42.1
+  resolution: "playwright-core@npm:1.42.1"
   bin:
     playwright-core: cli.js
-  checksum: 10/18caeb7e0a1194be7a0c6178d49a5960c55230958dea16be14da2c1f5426427f9f195b59a4c481d0f530d585fa381fc5fc7c82f2a45edd3628ee745df63e9e69
+  checksum: 10/6a71d2e2aa5b054d6e83836f09e139a0ff4de3aa9b6aebe0e03de3ab828c735d23a20a60fafcee91c1658da490cc390f05af463325ac842beaff58a173f7ad9e
   languageName: node
   linkType: hard
 
-"playwright@npm:1.42.0":
-  version: 1.42.0
-  resolution: "playwright@npm:1.42.0"
+"playwright@npm:1.42.1":
+  version: 1.42.1
+  resolution: "playwright@npm:1.42.1"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.42.0"
+    playwright-core: "npm:1.42.1"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10/a900d377e20106f539ae3fde0e89468089d1bcdb766ecf00b883de49f6f164254df568971994eecec339238430656a17c8cbf28f881ceea42a62a143347bfa5c
+  checksum: 10/1f866a6820e19feaaeb12cd87bfa93299d6d72e1287413098c5ae0349c7e7953eb0a303bdfbb99c12173a3493e6fdb642f89a166cfcfd8295254a520abf6eb7f
   languageName: node
   linkType: hard
 
@@ -6153,7 +6153,7 @@ __metadata:
     "@types/ffprobe": "npm:^1.1.8"
     "@types/formidable": "npm:^3.4.5"
     "@types/node": "npm:^20.11.24"
-    "@types/ping": "npm:^0"
+    "@types/ping": "npm:^0.4.4"
     "@types/webtorrent": "npm:^0.109.8"
     chokidar: "npm:^3.6.0"
     common: "workspace:^"
