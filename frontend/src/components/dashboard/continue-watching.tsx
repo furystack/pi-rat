@@ -49,9 +49,9 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
               }}>
               <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
                 <h3>Continue watching</h3>
-                <div style={{ display: 'flex', overflow: 'auto', scrollSnapType: 'x mandatory' } as any}>
+                <div style={{ display: 'flex', overflow: 'auto', scrollSnapType: 'x mandatory' }}>
                   {watchEntries.entries.map((entry, index) => (
-                    <div style={{ scrollSnapAlign: 'start' } as any}>
+                    <div style={{ scrollSnapAlign: 'start' }}>
                       <MovieWidget imdbId={entry.imdbId} index={index} size={size || 256} />
                     </div>
                   ))}

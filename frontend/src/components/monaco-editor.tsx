@@ -27,7 +27,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
     const editorInstance = editor.create(element as HTMLElement, { ...props.options, theme })
 
     editorInstance.setValue(props.value || '')
-    props.onchange &&
+    props.onValueChange &&
       editorInstance.onKeyUp(() => {
         props.onValueChange?.(editorInstance.getValue())
       })
