@@ -971,13 +971,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ping@npm:^0.4.4":
-  version: 0.4.4
-  resolution: "@types/ping@npm:0.4.4"
-  checksum: 10/48233c0c8a82d25bf91c6102201be295406a9831119f7797660dfcd73d6831971753b61aaefe3981c898a2d7a8f097dee04fe50dea166f91ab138d241bb584d8
-  languageName: node
-  linkType: hard
-
 "@types/semver@npm:^7.5.0":
   version: 7.5.8
   resolution: "@types/semver@npm:7.5.8"
