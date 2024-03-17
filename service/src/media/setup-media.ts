@@ -686,12 +686,16 @@ export const setupMovies = async (injector: Injector) => {
 
   const configDataSet = repo.getDataSetFor(Config, 'id')
 
-  configDataSet.onEntityAdded.subscribe(({ entity }) => entity.id === 'OMDB_CONFIG' && omdbClientService.init(injector))
-  configDataSet.onEntityUpdated.subscribe(
+  configDataSet.subscribe(
+    'onEntityAdded',
+    ({ entity }) => entity.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
+  )
+  configDataSet.subscribe(
+    'onEntityUpdated',
     ({ change }) => change.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
   )
 
-  configDataSet.onEntityRemoved.subscribe(({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
+  configDataSet.subscribe('onEntityRemoved', ({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
 
   logger.verbose({ message: '✅  Media setup completed' })
 }

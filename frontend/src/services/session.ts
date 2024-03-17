@@ -47,14 +47,14 @@ export class SessionService implements IdentityContext {
         const { result: usr } = await this.api.call({ method: 'POST', action: '/login', body: { username, password } })
         this.currentUser.setValue({ username: usr.username, roles: usr.roles })
         this.state.setValue('authenticated')
-        this.notys.addNoty({
+        this.notys.emit('onNotyAdded', {
           body: 'Welcome back ;)',
           title: 'You have been logged in',
           type: 'success',
         })
       } catch (error) {
         this.loginError.setValue(error instanceof Error ? error.message : '')
-        this.notys.addNoty({
+        this.notys.emit('onNotyAdded', {
           body: 'Please check your credentials',
           title: 'Login failed',
           type: 'warning',
@@ -68,7 +68,7 @@ export class SessionService implements IdentityContext {
       this.api.call({ method: 'POST', action: '/logout' })
       this.currentUser.setValue(null)
       this.state.setValue('unauthenticated')
-      this.notys.addNoty({
+      this.notys.emit('onNotyAdded', {
         body: 'Come back soon...',
         title: 'You have been logged out',
         type: 'info',
@@ -91,7 +91,7 @@ export class SessionService implements IdentityContext {
   public async getCurrentUser<TUser extends User>(): Promise<TUser> {
     const currentUser = this.currentUser.getValue()
     if (!currentUser) {
-      this.notys.addNoty({
+      this.notys.emit('onNotyAdded', {
         body: ':(((',
         title: 'No User available',
         type: 'warning',

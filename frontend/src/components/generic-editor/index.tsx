@@ -61,10 +61,14 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 onSave={async (value) => {
                   try {
                     await service.patchEntry(editorState.currentId as any, value)
-                    noty.addNoty({ type: 'success', title: '📝 Entity updated', body: 'Entity updated successfully' })
+                    noty.emit('onNotyAdded', {
+                      type: 'success',
+                      title: '📝 Entity updated',
+                      body: 'Entity updated successfully',
+                    })
                     refresh()
                   } catch (error) {
-                    noty.addNoty({
+                    noty.emit('onNotyAdded', {
                       type: 'error',
                       title: '❗ Failed to update entity',
                       body: (error as Error).toString(),
@@ -93,10 +97,18 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 mode: 'edit',
                 currentId: response[service.extendedOptions.keyProperty] as string,
               })
-              noty.addNoty({ type: 'success', title: '✨ Entity created', body: 'Entity created successfully' })
+              noty.emit('onNotyAdded', {
+                type: 'success',
+                title: '✨ Entity created',
+                body: 'Entity created successfully',
+              })
               refresh()
             } catch (error) {
-              noty.addNoty({ type: 'error', title: '❗ Failed to create entity', body: (error as Error).toString() })
+              noty.emit('onNotyAdded', {
+                type: 'error',
+                title: '❗ Failed to create entity',
+                body: (error as Error).toString(),
+              })
             }
           }}
         />
@@ -125,7 +137,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                     service
                       .removeEntries(entry[service.extendedOptions.keyProperty] as any)
                       .then(() => {
-                        noty.addNoty({
+                        noty.emit('onNotyAdded', {
                           type: 'success',
                           title: 'Entity deleted',
                           body: '🗑️ The selected entity deleted successfully',
@@ -133,7 +145,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                         refresh()
                       })
                       .catch((error) => {
-                        noty.addNoty({
+                        noty.emit('onNotyAdded', {
                           type: 'error',
                           title: '❗ Failed to delete entity',
                           body: (error as Error).toString(),
