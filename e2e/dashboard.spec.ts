@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto'
 
 const navigateToDashboardList = async (page: Page) => {
   await page.goto('/')
-  await page.locator('#Body').getByRole('link', { name: '📔 Dashboards' }).click()
+  await page.locator('shade-app-body').getByRole('link', { name: '📔 Dashboards' }).click()
 }
 
 const setMonacoValue = async (page: Page, value: any) => {
