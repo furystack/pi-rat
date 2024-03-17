@@ -105,14 +105,14 @@ export const FileList = Shade<{
             drivesService
               .removeFile(currentDriveLetter, encodeURIComponent(`${currentPath}/${focused.name}`))
               .then(() => {
-                notyService.addNoty({
+                notyService.emit('onNotyAdded', {
                   type: 'success',
                   title: 'Delete completed',
                   body: <>The file is deleted succesfully</>,
                 })
               })
               .catch((err) =>
-                notyService.addNoty({ title: 'Delete failed', body: <>{err.toString()}</>, type: 'error' }),
+                notyService.emit('onNotyAdded', { title: 'Delete failed', body: <>{err.toString()}</>, type: 'error' }),
               )
         }
       }
@@ -132,7 +132,7 @@ export const FileList = Shade<{
           if (ev.dataTransfer?.files) {
             const session = injector.getInstance(SessionService)
             if (!(await session.isAuthorized('admin'))) {
-              return notyService.addNoty({
+              return notyService.emit('onNotyAdded', {
                 type: 'warning',
                 title: 'Not authorized',
                 body: <>You are not authorized to upload files</>,
@@ -154,14 +154,14 @@ export const FileList = Shade<{
               },
             )
               .then(() => {
-                notyService.addNoty({
+                notyService.emit('onNotyAdded', {
                   type: 'success',
                   title: 'Upload completed',
                   body: <>The files are upploaded succesfully</>,
                 })
               })
               .catch((err) =>
-                notyService.addNoty({ title: 'Upload failed', body: <>{err.toString()}</>, type: 'error' }),
+                notyService.emit('onNotyAdded', { title: 'Upload failed', body: <>{err.toString()}</>, type: 'error' }),
               )
           }
         }}

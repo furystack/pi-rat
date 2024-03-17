@@ -1,6 +1,6 @@
 import { Injectable, Injected } from '@furystack/inject'
 import type { FindOptions, WithOptionalId } from '@furystack/core'
-import { ObservableValue, PathHelper } from '@furystack/utils'
+import { EventHub, PathHelper } from '@furystack/utils'
 import { Cache } from '@furystack/cache'
 import { DrivesApiClient } from './api-clients/drives-api-client.js'
 import type { Drive } from 'common'
@@ -23,7 +23,10 @@ type DrivesFilesystemChangedEvent = {
 }
 
 @Injectable({ lifetime: 'singleton' })
-export class DrivesService {
+export class DrivesService extends EventHub<
+  'onFilesystemChanged',
+  { onFilesystemChanged: DrivesFilesystemChangedEvent }
+> {
   @Injected(DrivesApiClient)
   private readonly drivesApiClient!: DrivesApiClient
 
@@ -114,8 +117,6 @@ export class DrivesService {
     return removeResult
   }
 
-  public readonly onFilesystemChanged = new ObservableValue<DrivesFilesystemChangedEvent>()
-
   private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
 
   public socket = new WebSocket(this.wsUrl.toString().replace('http', 'ws'))
@@ -125,10 +126,11 @@ export class DrivesService {
   }
 
   constructor() {
+    super()
     this.socket.onmessage = (ev) => {
       const messageData = JSON.parse(ev.data)
       if (messageData.type === 'file-change') {
-        this.onFilesystemChanged.setValue(messageData)
+        this.emit('onFilesystemChanged', messageData)
 
         this.fileListCache.obsoleteRange((fileList) => {
           const parentPath = PathHelper.getParentPath(messageData.path)

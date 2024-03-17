@@ -64,8 +64,8 @@ export const useFileWatchers = async (injector: Injector) => {
 
   const driveStore = injector.getInstance(StoreManager).getStoreFor(Drive, 'letter')
   const dataSet = getDataSetFor(injector, Drive, 'letter')
-  dataSet.onEntityAdded.subscribe(({ entity }) => addWatcher(entity))
-  dataSet.onEntityRemoved.subscribe(({ key }) => removeWatcher(key))
+  dataSet.subscribe('onEntityAdded', ({ entity }) => addWatcher(entity))
+  dataSet.subscribe('onEntityRemoved', ({ key }) => removeWatcher(key))
   const allDrives = await driveStore.find({})
   allDrives.forEach((drive) => addWatcher(drive))
 }
