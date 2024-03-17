@@ -63,14 +63,14 @@ export const FileContextMenu = Shade<{
                           },
                         })
                         .then(() => {
-                          notyService.addNoty({
+                          notyService.emit('onNotyAdded', {
                             type: 'success',
                             title: 'Subtitles extracted',
                             body: <>Subtitles extracted successfully for file {entry.name}</>,
                           })
                         })
                         .catch(() => {
-                          notyService.addNoty({
+                          notyService.emit('onNotyAdded', {
                             type: 'error',
                             title: 'Subtitles extraction failed',
                             body: <>Subtitles extraction failed for file {entry.name}</>,

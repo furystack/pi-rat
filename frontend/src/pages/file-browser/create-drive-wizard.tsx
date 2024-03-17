@@ -26,15 +26,17 @@ export const AddDriveStep = Shade<WizardStepProps>({
               physicalPath: values.physicalPath.toString(),
             })
             await props.onNext?.()
-            injector.getInstance(NotyService).addNoty({
+            injector.getInstance(NotyService).emit('onNotyAdded', {
               type: 'success',
               body: `Drive '${values.letter.toString()}' has been created succesfully`,
               title: 'Drive created',
             })
           } catch (error) {
-            injector
-              .getInstance(NotyService)
-              .addNoty({ type: 'error', title: 'Error during drive creation', body: (error as any).toString() })
+            injector.getInstance(NotyService).emit('onNotyAdded', {
+              type: 'error',
+              title: 'Error during drive creation',
+              body: (error as any).toString(),
+            })
           }
         }}>
         <div style={{ padding: '1em 0' }}>
