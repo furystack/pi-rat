@@ -1,9 +1,11 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Paper, expand, collapse } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
+import type { Icon as IconModel } from 'common'
+import { Icon } from './Icon.js'
 
 type MenuItemProps = {
-  icon: string
+  icon: IconModel
   label: string
   onClick: () => void
 }
@@ -34,7 +36,7 @@ const MenuItem = Shade<MenuItemProps>({
             textAlign: 'center',
             lineHeight: '100%',
           }}>
-          {props.icon}
+          <Icon {...props.icon} />
         </div>
         <div style={{ lineHeight: '100%' }}>{props.label}</div>
       </div>

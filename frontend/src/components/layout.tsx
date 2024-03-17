@@ -1,6 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { NotyList } from '@furystack/shades-common-components'
-import { ThemeProviderService } from '@furystack/shades-common-components'
+import { cssVariableTheme, NotyList } from '@furystack/shades-common-components'
 import { Body } from './body.js'
 import { Header } from './header.js'
 import { PiRatLazyLoad } from './pirat-lazy-load.js'
@@ -8,24 +7,20 @@ import { InstallService } from '../services/install-service.js'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
+  style: {
+    width: '100%',
+    height: '100%',
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    padding: '0',
+    margin: '0',
+    background: cssVariableTheme.background.default,
+  },
   render: ({ injector }) => {
-    const { theme } = injector.getInstance(ThemeProviderService)
     return (
-      <div
-        id="Layout"
-        style={{
-          width: '100%',
-          height: '100%',
-          position: 'fixed',
-          top: '0',
-          left: '0',
-          padding: '0',
-          margin: '0',
-          background: theme.background.default,
-        }}>
-        <div style={{ zIndex: '2', position: 'fixed' }}>
-          <NotyList />
-        </div>
+      <>
+        <NotyList style={{ zIndex: '2', position: 'fixed' }} />
         <PiRatLazyLoad
           component={async () => {
             const result = await injector.getInstance(InstallService).getServiceStatus()
@@ -33,7 +28,7 @@ export const Layout = Shade({
               return (
                 <>
                   <Header title="🐀 PI-Rat" />
-                  <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} />
+                  <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} id="body" />
                 </>
               )
             } else if (result.state === 'needsInstall') {
@@ -44,7 +39,7 @@ export const Layout = Shade({
             }
           }}
         />
-      </div>
+      </>
     )
   },
 })

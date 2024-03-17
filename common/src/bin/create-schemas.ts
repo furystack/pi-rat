@@ -76,6 +76,11 @@ export const apiValues: SchemaGenerationSetting[] = [
     type: '*',
   },
   {
+    inputFile: './src/apis/iot.ts',
+    outputFile: './schemas/iot-api.json',
+    type: '*',
+  },
+  {
     inputFile: './src/apis/media.ts',
     outputFile: './schemas/media-api.json',
     type: '*',

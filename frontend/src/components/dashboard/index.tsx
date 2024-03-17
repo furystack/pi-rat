@@ -19,7 +19,7 @@ export const Dashboard = Shade<DashboardData>({
           ...(currentUser?.username === props.owner || currentUser?.roles.includes('admin')
             ? [
                 {
-                  icon: '📝',
+                  icon: { type: 'font', value: '📝' } as const,
                   label: 'Edit this dashboard',
                   onClick: () => {
                     navigateToRoute(

@@ -37,7 +37,7 @@ export const GenericMonacoEditor = Shade<{
             language: 'json',
           }}
           modelUri={props.modelUri}
-          onChange={currentValue.setValue.bind(currentValue)}
+          onValueChange={currentValue.setValue.bind(currentValue)}
           value={currentValue.getValue()}
         />
         <div

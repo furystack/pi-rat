@@ -8,6 +8,7 @@ import { EntityShortcutWidget } from './entity-shortcut-widget.js'
 import { MovieWidget } from './movie-widget.js'
 import { ContinueWatchingWidgetGroup } from './continue-watching.js'
 import { SeriesWidget } from './series-widget.js'
+import { DeviceAvailability } from './device-availability.js'
 
 export const Widget = Shade<WidgetData>({
   shadowDomName: 'pi-rat-widget',
@@ -35,6 +36,8 @@ export const Widget = Shade<WidgetData>({
       case 'continue-watching': {
         return <ContinueWatchingWidgetGroup {...props} />
       }
+      case 'device-availability':
+        return <DeviceAvailability {...props} />
       default: {
         return <div>{(props as any).type}</div>
       }

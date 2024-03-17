@@ -4,9 +4,13 @@
     "DeviceAwakeHistory": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The log entry id"
+        },
         "name": {
           "type": "string",
-          "description": "Should be used as primary key"
+          "description": "The related device name"
         },
         "success": {
           "type": "boolean",
@@ -18,6 +22,7 @@
         }
       },
       "required": [
+        "id",
         "name",
         "success",
         "createdAt"
@@ -27,6 +32,10 @@
     "DevicePingHistory": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The log entry id"
+        },
         "name": {
           "type": "string",
           "description": "The device name"
@@ -45,6 +54,7 @@
         }
       },
       "required": [
+        "id",
         "name",
         "isAvailable",
         "createdAt"

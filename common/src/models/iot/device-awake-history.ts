@@ -1,6 +1,11 @@
 export class DeviceAwakeHistory {
   /**
-   * Should be used as primary key
+   * The log entry id
+   */
+  public id!: string
+
+  /**
+   * The related device name
    */
   public name!: string
   /**
