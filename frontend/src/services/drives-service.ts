@@ -4,10 +4,10 @@ import { EventHub, PathHelper } from '@furystack/utils'
 import { Cache } from '@furystack/cache'
 import { DrivesApiClient } from './api-clients/drives-api-client.js'
 import type { Drive } from 'common'
-import { environmentOptions } from '../environment-options.js'
+import { WebsocketNotificationsService } from './websocket-events.js'
 
 type DrivesFilesystemChangedEvent = {
-  type: 'file-change'
+  type: 'fileChange'
   /**
    * The type of the filesystem event
    */
@@ -117,30 +117,29 @@ export class DrivesService extends EventHub<
     return removeResult
   }
 
-  private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
+  @Injected(WebsocketNotificationsService)
+  private readonly socket!: WebsocketNotificationsService
 
-  public socket = new WebSocket(this.wsUrl.toString().replace('http', 'ws'))
+  private onMessage = ((messageData: any) => {
+    if ((messageData as any).type === 'fileChange') {
+      this.emit('onFilesystemChanged', messageData as DrivesFilesystemChangedEvent)
 
-  public dispose() {
-    this.socket.close()
+      this.fileListCache.obsoleteRange((fileList) => {
+        const parentPath = PathHelper.getParentPath(messageData.path)
+        const currentPath = PathHelper.normalize(fileList.path)
+        return (
+          fileList.letter === messageData.drive &&
+          (currentPath === parentPath || (!currentPath && PathHelper.normalize(messageData.path)) === parentPath)
+        )
+      })
+    }
+  }).bind(this)
+
+  public init() {
+    this.socket.addListener('onMessage', this.onMessage)
   }
 
-  constructor() {
-    super()
-    this.socket.onmessage = (ev) => {
-      const messageData = JSON.parse(ev.data)
-      if (messageData.type === 'file-change') {
-        this.emit('onFilesystemChanged', messageData)
-
-        this.fileListCache.obsoleteRange((fileList) => {
-          const parentPath = PathHelper.getParentPath(messageData.path)
-          const currentPath = PathHelper.normalize(fileList.path)
-          return (
-            fileList.letter === messageData.drive &&
-            (currentPath === parentPath || (!currentPath && PathHelper.normalize(messageData.path)) === parentPath)
-          )
-        })
-      }
-    }
+  public dispose() {
+    this.socket.removeListener('onMessage', this.onMessage)
   }
 }

@@ -153,4 +153,13 @@ export class IotDevicesService {
 
   public observeLastPingForDevice = (device: Device) =>
     this.findPingHistoryAsObservable(device.name, { top: 1, order: { createdAt: 'DESC' } })
+
+  public reloadLastPingForDevice = (device: Device) =>
+    this.devicePingHistoryCache.reload(device.name, { top: 1, order: { createdAt: 'DESC' } })
+
+  public observeLastAwakeEntryForDevice = (device: Device) =>
+    this.findAwakeHistoryAsObservable(device.name, { top: 1, order: { createdAt: 'DESC' } })
+
+  public reloadLastAwakeEntryForDevice = (device: Device) =>
+    this.deviceAwakeHistoryCache.reload(device.name, { top: 1, order: { createdAt: 'DESC' } })
 }

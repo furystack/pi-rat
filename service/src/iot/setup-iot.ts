@@ -2,6 +2,7 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { setupIotApi } from './setup-iot-api.js'
 import { setupIotStore } from './setup-store.js'
+import { DeviceAvailabilityHub } from './device-availability-hub.js'
 
 export const setupIot = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('IOT')
@@ -12,6 +13,9 @@ export const setupIot = async (injector: Injector) => {
 
   await logger.verbose({ message: '☁️  Setting up IOT REST and WebSocket API...' })
   await setupIotApi(injector)
+
+  await logger.verbose({ message: '☁️  Setting up IOT device availability hub...' })
+  await injector.getInstance(DeviceAvailabilityHub)
 
   await logger.verbose({ message: '✅  IOT setup complete' })
 }
