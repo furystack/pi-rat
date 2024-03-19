@@ -39,11 +39,13 @@ export const Login = Shade({
   shadowDomName: 'shade-login',
   render: ({ injector, useObservable, element }) => {
     const sessionService = injector.getInstance(SessionService)
-    useObservable('isOperationInProgress', sessionService.isOperationInProgress, (isOperationInProgress) => {
-      const els = [...element.querySelectorAll('input').values(), ...element.querySelectorAll('button').values()]
-      els.forEach((el) => {
-        el.disabled = isOperationInProgress
-      })
+    useObservable('isOperationInProgress', sessionService.isOperationInProgress, {
+      onChange: (isOperationInProgress) => {
+        const els = [...element.querySelectorAll('input').values(), ...element.querySelectorAll('button').values()]
+        els.forEach((el) => {
+          el.disabled = isOperationInProgress
+        })
+      },
     })
 
     return (
