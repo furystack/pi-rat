@@ -2,6 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { CreateDriveWizard } from './create-drive-wizard.js'
 import { FolderPanel } from './folder-panel.js'
 import { DrivesService } from '../../services/drives-service.js'
+import { hasCacheValue } from '@furystack/cache'
 
 export type DriveLocation = {
   letter: string
@@ -14,7 +15,9 @@ export const DrivesPage = Shade({
     const drivesService = injector.getInstance(DrivesService)
     const [drives] = useObservable('drives', drivesService.getVolumesAsObservable({}))
 
-    if (drives.status !== 'loaded') {
+    const [focused] = useSearchState('focused', 'ld' as 'ld' | 'rd')
+
+    if (!hasCacheValue(drives)) {
       return null
     }
 
@@ -26,16 +29,6 @@ export const DrivesPage = Shade({
         </>
       )
     }
-
-    const [currentLeftDrive, setCurrentLeftDrive] = useSearchState('ld', {
-      letter: drives.value.entries[0].letter,
-      path: '/',
-    })
-
-    const [currentRightDrive, setCurrentRightDrive] = useSearchState('rd', {
-      letter: drives.value.entries[0].letter,
-      path: '/',
-    })
 
     return (
       <div
@@ -50,8 +43,16 @@ export const DrivesPage = Shade({
           height: 'calc(100% - 48px)',
           width: '100%',
         }}>
-        <FolderPanel currentDrive={currentLeftDrive} setCurrentDrive={setCurrentLeftDrive} />
-        <FolderPanel currentDrive={currentRightDrive} setCurrentDrive={setCurrentRightDrive} />
+        <FolderPanel
+          focused={focused === 'ld'}
+          searchStateKey="ld"
+          defaultDriveLetter={drives.value.entries[0].letter}
+        />
+        <FolderPanel
+          focused={focused === 'rd'}
+          searchStateKey="rd"
+          defaultDriveLetter={drives.value.entries[0].letter}
+        />
         <CreateDriveWizard />
       </div>
     )
