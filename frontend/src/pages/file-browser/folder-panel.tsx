@@ -7,8 +7,8 @@ import { DriveSelector } from './drive-selector.js'
 import { FileList } from './file-list.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
-import type { DriveLocation } from './index.js'
 import { DrivesService } from '../../services/drives-service.js'
+import { hasCacheValue, type CacheResult } from '@furystack/cache'
 
 const upEntry: DirectoryEntry = {
   name: '..',
@@ -33,7 +33,7 @@ export const FolderPanel = Shade<{
     const [currentDrive, setCurrentDrive] = useSearchState(props.searchStateKey, {
       path: '/',
       letter: props.defaultDriveLetter,
-    } as DriveLocation)
+    })
 
     const { letter, path } = currentDrive
 
@@ -41,40 +41,33 @@ export const FolderPanel = Shade<{
       return null
     }
 
-    const isRoot = path === '/'
+    const service = useDisposable(`service-${letter}-${path}`, () => new CollectionService<DirectoryEntry>())
 
-    const service = useDisposable(
-      `service ${letter} ${path}`,
-      () =>
-        new CollectionService<DirectoryEntry>({
-          loader: async () => {
-            const currentFiles = await drivesService.getFileList(letter, path)
-            if (!isRoot) {
-              return { ...currentFiles, entries: [upEntry, ...currentFiles.entries.sortBy('isDirectory', 'desc')] }
-            }
-            return { ...currentFiles, entries: currentFiles.entries.sortBy('isDirectory', 'desc') }
-          },
-          defaultSettings: {},
-        }),
-    )
+    const onFileListChange = (result: CacheResult<Awaited<ReturnType<typeof drivesService.getFileList>>>) => {
+      if (result.status === 'obsolete') {
+        drivesService.getFileList(letter, path)
+        return
+      }
+      if (hasCacheValue(result)) {
+        const isRoot = result.value.path === '/'
+        const newValue = isRoot ? result.value : { ...result.value, entries: [upEntry, ...result.value.entries] }
+        const oldFocusedEntryName = service.focusedEntry.getValue()?.name
+        service.data.setValue(newValue)
 
-    if (props.focused) {
-      service.hasFocus.setValue(true)
+        if (service.hasFocus.getValue()) {
+          service.focusedEntry.setValue(
+            newValue.entries.find((e) => e.name === oldFocusedEntryName) || newValue.entries[0],
+          )
+        }
+      }
     }
 
-    useObservable('files', drivesService.getFileListAsObservable(letter, path), {
-      onChange: (result) => {
-        if (result.status === 'obsolete') {
-          drivesService.getFileList(letter, path)
-          return
-        }
-        if (result.value) {
-          const newValue = isRoot ? result.value : { ...result.value, entries: [upEntry, ...result.value.entries] }
-          service.focusedEntry.setValue(newValue.entries[0])
-          service.data.setValue(newValue)
-        }
-      },
+    const [fileList] = useObservable(`files-${letter}-${path}`, drivesService.getFileListAsObservable(letter, path), {
+      onChange: onFileListChange,
     })
+    onFileListChange(fileList)
+
+    service.hasFocus.setValue(!!props.focused)
 
     element.style.height = '100%'
     element.style.width = '50%'

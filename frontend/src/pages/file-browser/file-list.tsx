@@ -1,7 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService } from '@furystack/shades-common-components'
 import { DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
-import { PathHelper } from '@furystack/utils'
+import { ObservableValue, PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options.js'
 import { SessionService } from '../../services/session.js'
@@ -24,15 +24,7 @@ export const FileList = Shade<{
     const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
 
-    useDisposable('fileChanges', () =>
-      drivesService.getFileListAsObservable(currentDriveLetter, currentPath).subscribe((result) => {
-        if (result.status === 'obsolete') {
-          drivesService.getFileList(currentDriveLetter, currentPath)
-          return
-        }
-        result.value && service.data.setValue(result.value)
-      }),
-    )
+    const findOptions = useDisposable('findOptions', () => new ObservableValue({}))
 
     const activate = () => {
       const focused = service.focusedEntry.getValue()
@@ -138,7 +130,8 @@ export const FileList = Shade<{
           }
         }}>
         <DataGrid<DirectoryEntry>
-          service={service}
+          collectionService={service}
+          findOptions={findOptions}
           columns={['name']}
           headerComponents={{
             name: () => (

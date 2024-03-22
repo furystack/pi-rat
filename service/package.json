@@ -17,7 +17,7 @@
     "@types/node": "^20.11.30",
     "@types/ping": "^0.4.4",
     "@types/webtorrent": "^0.109.8",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.3"
   },
   "dependencies": {
     "@furystack/core": "^14.0.0",

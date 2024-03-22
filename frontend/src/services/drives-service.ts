@@ -94,11 +94,30 @@ export class DrivesService extends EventHub<
 
   private fileListCache = new Cache({
     load: async (letter: string, path: string) => {
-      const { result } = await this.drivesApiClient.call({
-        method: 'GET',
-        action: '/files/:letter/:path',
-        url: { letter, path: encodeURIComponent(path) },
-      })
+      const { result } = await this.drivesApiClient
+        .call({
+          method: 'GET',
+          action: '/files/:letter/:path',
+          url: { letter, path: encodeURIComponent(path) },
+        })
+        .then((response) => {
+          const orderedResult: typeof response = {
+            ...response,
+            result: {
+              ...response.result,
+              entries: response.result.entries.sort((a, b) => {
+                if (a.isDirectory && !b.isDirectory) {
+                  return -1
+                }
+                if (!a.isDirectory && b.isDirectory) {
+                  return 1
+                }
+                return a.name.localeCompare(b.name)
+              }),
+            },
+          }
+          return orderedResult
+        })
       return { ...result, letter, path }
     },
   })

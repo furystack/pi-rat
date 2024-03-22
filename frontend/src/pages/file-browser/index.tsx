@@ -11,11 +11,11 @@ export type DriveLocation = {
 
 export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
-  render: ({ injector, useObservable, useSearchState }) => {
+  render: ({ injector, useObservable, useSearchState, useDisposable }) => {
     const drivesService = injector.getInstance(DrivesService)
     const [drives] = useObservable('drives', drivesService.getVolumesAsObservable({}))
 
-    const [focused] = useSearchState('focused', 'ld' as 'ld' | 'rd')
+    const [focused, setFocused] = useSearchState('focused', 'ld' as 'ld' | 'rd')
 
     if (!hasCacheValue(drives)) {
       return null
@@ -47,11 +47,27 @@ export const DrivesPage = Shade({
           focused={focused === 'ld'}
           searchStateKey="ld"
           defaultDriveLetter={drives.value.entries[0].letter}
+          onclick={() => setFocused('ld')}
+          onkeyup={(ev) => {
+            if (ev.key === 'Tab') {
+              ev.preventDefault()
+              ev.stopImmediatePropagation()
+              setFocused('rd')
+            }
+          }}
         />
         <FolderPanel
           focused={focused === 'rd'}
           searchStateKey="rd"
           defaultDriveLetter={drives.value.entries[0].letter}
+          onclick={() => setFocused('rd')}
+          onkeyup={(ev) => {
+            if (ev.key === 'Tab') {
+              ev.preventDefault()
+              ev.stopImmediatePropagation()
+              setFocused('ld')
+            }
+          }}
         />
         <CreateDriveWizard />
       </div>
