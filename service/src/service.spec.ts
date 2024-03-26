@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 describe('Service', () => {
   it('should be initialized', async () => {
     const instance = rootInjector.getInstance(PiRatRootService)
-    await new Promise((resolve) => instance.on('initialized', resolve))
+    await new Promise((resolve) => instance.addListener('initialized', resolve))
 
     expect(instance).toBeDefined()
 
