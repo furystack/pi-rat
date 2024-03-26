@@ -19,6 +19,7 @@ import { setupTorrent } from './webtorrent/setup-torrent.js'
 import { setupIot } from './iot/setup-iot.js'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
+import { setupIotApi } from './iot/setup-iot-api.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class PiRatRootService {
@@ -58,6 +59,7 @@ export class PiRatRootService {
       await setupDashboardsRestApi(injector),
       await setupMoviesRestApi(injector),
       await setupTorrentApi(injector),
+      await setupIotApi(injector),
     ])
 
     await setupFrontendBundle(injector)
