@@ -11,7 +11,7 @@ export type DriveLocation = {
 
 export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
-  render: ({ injector, useObservable, useSearchState, useDisposable }) => {
+  render: ({ injector, useObservable, useSearchState }) => {
     const drivesService = injector.getInstance(DrivesService)
     const [drives] = useObservable('drives', drivesService.getVolumesAsObservable({}))
 

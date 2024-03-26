@@ -1,6 +1,6 @@
 import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
-import { Injectable } from '@furystack/inject'
+import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
@@ -10,10 +10,10 @@ import { Config } from 'common'
 export class OmdbClientService {
   public config?: OmdbConfig
 
-  private logger!: ScopedLogger
+  @Injected((injector) => getLogger(injector).withScope('OMDB Client Service'))
+  private declare logger: ScopedLogger
 
   public async init(injector: Injector) {
-    this.logger = getLogger(injector).withScope('OMDB Client Service')
     this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
     const config = await getStoreManager(injector)
       .getStoreFor<OmdbConfig, 'id'>(Config as any, 'id')

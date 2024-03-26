@@ -20,16 +20,16 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "@furystack/core": "^14.0.0",
-    "@furystack/inject": "^10.0.0",
-    "@furystack/logging": "^6.0.0",
-    "@furystack/repository": "^9.0.0",
-    "@furystack/rest": "^7.0.0",
-    "@furystack/rest-service": "^9.0.0",
-    "@furystack/security": "^5.0.0",
-    "@furystack/sequelize-store": "^5.0.0",
-    "@furystack/utils": "^6.0.0",
-    "@furystack/websocket-api": "^11.0.0",
+    "@furystack/core": "^14.0.1",
+    "@furystack/inject": "^11.0.0",
+    "@furystack/logging": "^6.0.1",
+    "@furystack/repository": "^9.0.1",
+    "@furystack/rest": "^7.0.1",
+    "@furystack/rest-service": "^9.0.1",
+    "@furystack/security": "^5.0.1",
+    "@furystack/sequelize-store": "^5.0.1",
+    "@furystack/utils": "^6.0.1",
+    "@furystack/websocket-api": "^12.0.0",
     "chokidar": "^3.6.0",
     "common": "workspace:^",
     "ffprobe": "^1.1.2",
@@ -38,6 +38,6 @@
     "sequelize": "^6.37.1",
     "sqlite3": "^5.1.7",
     "vitest": "^1.4.0",
-    "webtorrent": "^2.1.37"
+    "webtorrent": "^2.2.0"
   }
 }

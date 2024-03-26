@@ -28,7 +28,7 @@ export class DrivesService extends EventHub<
   { onFilesystemChanged: DrivesFilesystemChangedEvent }
 > {
   @Injected(DrivesApiClient)
-  private readonly drivesApiClient!: DrivesApiClient
+  private declare readonly drivesApiClient: DrivesApiClient
 
   private volumesCache = new Cache({
     load: async ({ findOptions }: { findOptions?: FindOptions<Drive, Array<keyof Drive>> }) => {
@@ -137,7 +137,7 @@ export class DrivesService extends EventHub<
   }
 
   @Injected(WebsocketNotificationsService)
-  private readonly socket!: WebsocketNotificationsService
+  private declare readonly socket: WebsocketNotificationsService
 
   private onMessage = ((messageData: any) => {
     if ((messageData as any).type === 'fileChange') {
