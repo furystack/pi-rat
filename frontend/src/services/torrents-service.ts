@@ -6,7 +6,7 @@ import { environmentOptions } from '../environment-options.js'
 @Injectable({ lifetime: 'singleton' })
 export class TorrentService {
   @Injected(TorrentsApiClient)
-  private readonly torrentsApiClient!: TorrentsApiClient
+  private declare readonly torrentsApiClient: TorrentsApiClient
 
   public torrentsCache = new Cache({
     capacity: 100,

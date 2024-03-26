@@ -22,20 +22,19 @@ export const IotDevicesPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: Device,
           keyProperty: 'name',
           readonlyProperties: [],
-          loader: async (findOptions) => {
-            const result = await iotService.findDevice(findOptions)
-            return result
-          },
           deleteEntities: async (...entities) => {
             // TODO: Bulk?
             await Promise.all(entities.map((entity) => iotService.deleteDevice(entity)))
           },
           getEntity: async (id) => {
             const result = await iotService.getDevice(id)
+            return result
+          },
+          getEntities: async (findOptions) => {
+            const result = await iotService.findDevice(findOptions)
             return result
           },
           patchEntity: async (key, update) => {

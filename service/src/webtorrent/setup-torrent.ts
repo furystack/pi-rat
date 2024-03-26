@@ -9,12 +9,8 @@ export const setupTorrent = async (injector: Injector) => {
 
   await logger.verbose({ message: '🎥  Setting up Torrents...' })
 
-  const client = new TorrentClient({
-    tracker: true,
-  })
+  const client = injector.getInstance(TorrentClient)
 
-  injector.setExplicitInstance(client, TorrentClient)
-  await client.init(injector)
   const configDataSet = getDataSetFor(injector, Config, 'id')
   configDataSet.subscribe('onEntityAdded', ({ entity }) => entity.id === 'TORRENT_CONFIG' && client.init(injector))
   configDataSet.subscribe('onEntityUpdated', ({ change }) => change.id === 'TORRENT_CONFIG' && client.init(injector))

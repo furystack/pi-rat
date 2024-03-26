@@ -1,5 +1,5 @@
 import type { Injector } from '@furystack/inject'
-import { Injectable } from '@furystack/inject'
+import { Injectable, Injected } from '@furystack/inject'
 import WebTorrent from 'webtorrent'
 import { getDataFolder } from '../get-data-folder.js'
 import { extname, join } from 'path'
@@ -7,6 +7,7 @@ import { readFile, readdir } from 'fs/promises'
 import type { ApiTorrent, TorrentConfig } from 'common'
 import { Drive } from 'common'
 import { Config } from 'common'
+import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { StoreManager } from '@furystack/core'
 
@@ -63,10 +64,11 @@ export class TorrentClient extends WebTorrent {
     }
   }
 
-  public async init(injector: Injector) {
-    const logger = getLogger(injector).withScope('TorrentClient config')
+  @Injected((injector) => getLogger(injector).withScope('TorrentClient Config'))
+  private declare logger: ScopedLogger
 
-    await logger.verbose({ message: '🫴  Setting up Torrents...' })
+  public async init(injector: Injector) {
+    await this.logger.verbose({ message: '🫴  Setting up Torrents...' })
 
     const storeManager = injector.getInstance(StoreManager)
 
@@ -74,7 +76,7 @@ export class TorrentClient extends WebTorrent {
 
     if (!config) {
       this.config = undefined
-      return logger.warning({ message: "❗ No torrent config found, torrents won't be initialized" })
+      return this.logger.warning({ message: "❗ No torrent config found, torrents won't be initialized" })
     }
 
     this.config = config as TorrentConfig
@@ -84,7 +86,7 @@ export class TorrentClient extends WebTorrent {
     const drive = await storeManager.getStoreFor(Drive, 'letter').get(torrentDriveLetter)
 
     if (!drive) {
-      return logger.warning({
+      return this.logger.warning({
         message: `❗ No drive found for letter ${torrentDriveLetter}, torrents won't be initialized`,
       })
     }

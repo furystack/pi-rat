@@ -15,30 +15,33 @@ export const DeviceAvailabilityPanel = Shade<Device>({
       { order: { createdAt: 'DESC' }, top: 1 },
     ]
 
+    const wolEntryArgs: Parameters<typeof iotService.findAwakeHistoryAsObservable> = [
+      props.name,
+      { order: { createdAt: 'DESC' }, top: 1 },
+    ]
+
     useDisposable('refresher', () => {
       const interval = setInterval(() => {
         iotService.findPingHistory(...pingArgs)
+        iotService.findAwakeHistory(...wolEntryArgs)
       }, 1000)
 
       return { dispose: () => clearInterval(interval) }
     })
 
-    const [lastPingState] = useObservable('pingState', iotService.observeLastPingForDevice(props))
-
-    if (lastPingState.status === 'uninitialized' || lastPingState.status === 'loading') {
-      return <Loader />
-    }
+    const [lastPingState] = useObservable('pingState', iotService.findPingHistoryAsObservable(...pingArgs))
 
     if (lastPingState.status === 'failed') {
       return <Icon type="font" value="⚠️" title="Failed to load ping state" />
     }
 
-    if (hasCacheValue(lastPingState)) {
-      if (lastPingState.status === 'obsolete') {
-        iotService.findPingHistory(...pingArgs) // reload
-      }
+    if (!hasCacheValue(lastPingState)) {
+      return <Loader />
+    }
 
-      const [lastPing] = lastPingState.value.entries
+    if (hasCacheValue(lastPingState)) {
+      const lastPing = lastPingState.value.entries[0]
+
       if (!lastPing) {
         return (
           <Icon
@@ -49,7 +52,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
             }}
             type="font"
             value="❓"
-            title="No ping found, status unknown"
+            title="No ping found, status unknown. Will refresh soon"
             style={{
               cursor: 'pointer',
               opacity: lastPingState.status === 'obsolete' ? '0.5' : '1',
@@ -58,7 +61,13 @@ export const DeviceAvailabilityPanel = Shade<Device>({
         )
       }
 
-      if (lastPing.isAvailable) {
+      const hasFreshPingEntry = new Date(lastPing.createdAt) > new Date(Date.now() - 1000 * 60 * 1)
+
+      if (!hasFreshPingEntry) {
+        iotService.pingDevice(props).then(() => iotService.findPingHistory(...pingArgs))
+      }
+
+      if (lastPing.isAvailable && hasFreshPingEntry) {
         return (
           <Icon
             type="font"
@@ -71,13 +80,48 @@ export const DeviceAvailabilityPanel = Shade<Device>({
           />
         )
       } else {
+        const [lastWolEntryState] = useObservable(
+          'wolEntryState',
+          iotService.findAwakeHistoryAsObservable(...wolEntryArgs),
+        )
+
+        const hasFreshAwakeEntry =
+          hasCacheValue(lastWolEntryState) &&
+          lastWolEntryState.value.entries[0] &&
+          new Date(lastWolEntryState.value.entries[0].createdAt) > new Date(Date.now() - 1000 * 60 * 1)
+
+        if (hasFreshAwakeEntry) {
+          return (
+            <Icon
+              type="font"
+              value="😪"
+              title="Device is not available, but was woken up recently"
+              style={{
+                cursor: 'pointer',
+              }}
+              onclick={(ev) => {
+                ev.preventDefault()
+                ev.stopPropagation()
+                iotService.pingDevice(props)
+              }}
+            />
+          )
+        }
+
         return (
-          <>
-            <Icon type="font" value="🔴" title="Device is not available" />
-            <div title="Wake up device" style={{ width: '16px' }} onclick={() => iotService.wakeUpDevice(props)}>
-              ⏰
-            </div>
-          </>
+          <Icon
+            type="font"
+            value="🔴"
+            title="Device is not available. Click here to wake it up"
+            onclick={(ev) => {
+              ev.preventDefault()
+              ev.stopPropagation()
+              iotService
+                .wakeUpDevice(props)
+                .then(() => iotService.pingDevice(props))
+                .then(() => iotService.findPingHistory(...pingArgs))
+            }}
+          />
         )
       }
     }

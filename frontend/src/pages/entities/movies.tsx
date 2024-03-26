@@ -22,11 +22,10 @@ export const MoviesPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: Movie,
           keyProperty: 'imdbId',
           readonlyProperties: ['createdAt', 'updatedAt'],
-          loader: async (findOptions) => {
+          getEntities: async (findOptions) => {
             const result = await moviesService.findMovie(findOptions)
             return result
           },

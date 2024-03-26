@@ -7,7 +7,7 @@ import type { Movie, MovieWatchHistoryEntry } from 'common'
 @Injectable({ lifetime: 'singleton' })
 export class WatchProgressService {
   @Injected(MediaApiClient)
-  private readonly mediaApiClient!: MediaApiClient
+  private declare readonly mediaApiClient: MediaApiClient
 
   private watchProgressCache = new Cache({
     capacity: 100,

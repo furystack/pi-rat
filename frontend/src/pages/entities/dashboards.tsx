@@ -22,11 +22,10 @@ export const DashboardsPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: Dashboard,
           keyProperty: 'id',
           readonlyProperties: ['createdAt', 'updatedAt'],
-          loader: async (findOptions) => {
+          getEntities: async (findOptions) => {
             const result = await dashboardsService.findDashboard(findOptions)
             return result
           },

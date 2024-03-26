@@ -22,11 +22,10 @@ export const DrivesPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: Drive,
           keyProperty: 'letter',
           readonlyProperties: ['createdAt', 'updatedAt'],
-          loader: async (findOptions) => {
+          getEntities: async (findOptions) => {
             const result = await drivesService.getVolumes({ findOptions })
             return result
           },

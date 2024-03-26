@@ -22,11 +22,10 @@ export const MovieFilesPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: MovieFile,
           keyProperty: 'id',
           readonlyProperties: [],
-          loader: async (findOptions) => await movieFilesService.findMovieFile(findOptions),
+          getEntities: async (findOptions) => await movieFilesService.findMovieFile(findOptions),
           deleteEntities: async (id) => await movieFilesService.deleteMovieFile(id),
           getEntity: async (id) => await movieFilesService.getMovieFile(id),
           patchEntity: async (id, entity) => {

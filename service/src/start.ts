@@ -1,6 +1,4 @@
-import { init } from './service.js'
+import { PiRatRootService } from './service.js'
+import { injector as rootInjector } from './root-injector.js'
 
-init().catch((err) => {
-  console.error('Error during service initialization', err)
-  process.exit(1)
-})
+rootInjector.getInstance(PiRatRootService)

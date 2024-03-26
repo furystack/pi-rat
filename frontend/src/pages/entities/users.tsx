@@ -22,11 +22,10 @@ export const UsersPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: User,
           keyProperty: 'username',
           readonlyProperties: ['createdAt', 'updatedAt'],
-          loader: async (findOptions) => {
+          getEntities: async (findOptions) => {
             const result = await api.call({
               method: 'GET',
               action: '/users',

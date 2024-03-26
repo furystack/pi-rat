@@ -172,9 +172,4 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
     authorizeGet: withRole('admin'),
     authorizeUpdate: withRole('admin'),
   })
-
-  // DeviceAwakeHistoryModel.belongsTo(DeviceModel, { foreignKey: 'name' })
-  // DeviceModel.hasMany(DeviceAwakeHistoryModel, { foreignKey: 'name' })
-  // DevicePingHistoryModel.belongsTo(DeviceModel, { foreignKey: 'name' })
-  // DeviceModel.hasMany(DevicePingHistoryModel, { foreignKey: 'name' })
 }

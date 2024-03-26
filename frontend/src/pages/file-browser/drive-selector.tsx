@@ -4,11 +4,16 @@ import { ErrorDisplay } from '../../components/error-display.js'
 import type { DriveLocation } from './index.js'
 
 export const DriveSelector = Shade<{
-  currentDrive: DriveLocation
-  setCurrentDrive: (newDriveLetter: DriveLocation) => void
+  searchStateKey: string
+  defaultDriveLetter: string
 }>({
   shadowDomName: 'drive-selector',
-  render: ({ props, useObservable, injector }) => {
+  render: ({ props, useObservable, injector, useSearchState }) => {
+    const [currentDrive, setCurrentDrive] = useSearchState(props.searchStateKey, {
+      path: '/',
+      letter: props.defaultDriveLetter,
+    } as DriveLocation)
+
     const drivesService = injector.getInstance(DrivesService)
     const [availableDrives] = useObservable('availableDrives', drivesService.getVolumesAsObservable({}))
 
@@ -25,15 +30,15 @@ export const DriveSelector = Shade<{
         onchange={(ev) => {
           const { value } = ev.target as HTMLOptionElement
 
-          if (props.currentDrive.letter !== value && availableDrives.value?.entries.find((e) => e.letter === value)) {
-            props.setCurrentDrive({
+          if (currentDrive.letter !== value && availableDrives.value?.entries.find((e) => e.letter === value)) {
+            setCurrentDrive({
               letter: value,
               path: '/',
             })
           }
         }}>
         {availableDrives.value.entries.map((r) => (
-          <option value={r.letter} selected={props.currentDrive.letter === r.letter}>
+          <option value={r.letter} selected={currentDrive.letter === r.letter}>
             {r.letter}
           </option>
         ))}
