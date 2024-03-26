@@ -20,9 +20,10 @@ import { setupIot } from './iot/setup-iot.js'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import { setupIotApi } from './iot/setup-iot-api.js'
+import { EventHub } from '@furystack/utils'
 
 @Injectable({ lifetime: 'singleton' })
-export class PiRatRootService {
+export class PiRatRootService extends EventHub<'initialized', { initialized: undefined }> {
   @Injected((injector) => getLogger(injector).withScope('service'))
   private declare logger: ScopedLogger
 
@@ -63,5 +64,7 @@ export class PiRatRootService {
     ])
 
     await setupFrontendBundle(injector)
+
+    this.emit('initialized', undefined)
   }
 }
