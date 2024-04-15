@@ -72,7 +72,7 @@ export class TorrentClient extends WebTorrent {
 
     const storeManager = injector.getInstance(StoreManager)
 
-    const config = await storeManager.getStoreFor<TorrentConfig, 'id'>(Config as any, 'id').get('TORRENT_CONFIG')
+    const config = await storeManager.getStoreFor(Config, 'id').get('TORRENT_CONFIG')
 
     if (!config) {
       this.config = undefined
@@ -81,7 +81,7 @@ export class TorrentClient extends WebTorrent {
 
     this.config = config as TorrentConfig
 
-    const { torrentDriveLetter, torrentPath } = config.value
+    const { torrentDriveLetter, torrentPath } = this.config.value
 
     const drive = await storeManager.getStoreFor(Drive, 'letter').get(torrentDriveLetter)
 

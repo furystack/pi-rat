@@ -23,10 +23,7 @@ type DrivesFilesystemChangedEvent = {
 }
 
 @Injectable({ lifetime: 'singleton' })
-export class DrivesService extends EventHub<
-  'onFilesystemChanged',
-  { onFilesystemChanged: DrivesFilesystemChangedEvent }
-> {
+export class DrivesService extends EventHub<{ onFilesystemChanged: DrivesFilesystemChangedEvent }> {
   @Injected(DrivesApiClient)
   private declare readonly drivesApiClient: DrivesApiClient
 

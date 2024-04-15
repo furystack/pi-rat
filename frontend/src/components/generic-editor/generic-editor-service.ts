@@ -9,7 +9,7 @@ import type { Uri } from 'monaco-editor/esm/vs/editor/editor.api.js'
 
 type GenericEditorServiceOptions<
   T,
-  TKey extends keyof T,
+  TKey extends keyof T & string,
   TRedonlyProperties extends keyof T,
 > = CollectionServiceOptions<T> & {
   model: Constructable<T>
@@ -24,7 +24,7 @@ type GenericEditorServiceOptions<
   schema?: any
 }
 
-export class GenericEditorService<T, TKey extends keyof T, TOmittedProperties extends keyof T>
+export class GenericEditorService<T, TKey extends keyof T & string, TOmittedProperties extends keyof T>
   extends CollectionService<T>
   implements Disposable
 {

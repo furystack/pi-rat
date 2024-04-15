@@ -3,7 +3,7 @@ import { environmentOptions } from '../environment-options.js'
 import { Injectable } from '@furystack/inject'
 
 @Injectable({ lifetime: 'singleton' })
-export class WebsocketNotificationsService extends EventHub<'onMessage', { onMessage: unknown }> {
+export class WebsocketNotificationsService extends EventHub<{ onMessage: unknown }> {
   private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
 
   public socket = new WebSocket(this.wsUrl.toString().replace('http', 'ws'))

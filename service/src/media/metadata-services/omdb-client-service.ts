@@ -15,9 +15,7 @@ export class OmdbClientService {
 
   public async init(injector: Injector) {
     this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
-    const config = await getStoreManager(injector)
-      .getStoreFor<OmdbConfig, 'id'>(Config as any, 'id')
-      .get('OMDB_CONFIG')
+    const config = await getStoreManager(injector).getStoreFor(Config, 'id').get('OMDB_CONFIG')
     if (!config) {
       this.config = undefined
       await this.logger.information({

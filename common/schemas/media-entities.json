@@ -1264,15 +1264,21 @@
       ],
       "additionalProperties": false
     },
-    "NamedParameters<typeof isValidOmdbMetadata>": {
+    "isValidOmdbMetadata": {
+      "$comment": "(metadata: any) => metadata is OmdbMovieMetadata",
       "type": "object",
       "properties": {
-        "metadata": {}
-      },
-      "required": [
-        "metadata"
-      ],
-      "additionalProperties": false
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "metadata": {}
+          },
+          "required": [
+            "metadata"
+          ],
+          "additionalProperties": false
+        }
+      }
     },
     "OmdbSeriesMetadata": {
       "type": "object",

@@ -7,10 +7,7 @@ import { Device } from 'common'
 import ping from 'ping'
 
 @Injectable({ lifetime: 'singleton' })
-export class DeviceAvailabilityHub extends EventHub<
-  'connected' | 'disconnected',
-  { connected: Device; disconnected: Device }
-> {
+export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconnected: Device }> {
   private devices: Device[] = []
   public updateDevices = (devices: Device[]) => {
     this.devices = [...devices]
