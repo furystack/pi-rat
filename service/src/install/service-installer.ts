@@ -23,17 +23,17 @@ export class ServiceStatusProvider {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })
-    const credential = await this.authenticator.getHasher().createCredential(username, password)
+    const credential = await this.authenticator.hasher.createCredential(username, password)
     await this.storeManager.getStoreFor(PasswordCredential, 'userName').add(credential)
     this.logger.withScope(this.constructor.name).information({ message: `Service installed for user '${username}'` })
   }
 
   @Injected(StoreManager)
-  public storeManager!: StoreManager
+  public declare storeManager: StoreManager
 
   @Injected(PasswordAuthenticator)
-  public authenticator!: PasswordAuthenticator
+  public declare authenticator: PasswordAuthenticator
 
   @Injected(LoggerCollection)
-  public logger!: LoggerCollection
+  public declare logger: LoggerCollection
 }

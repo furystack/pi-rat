@@ -22,11 +22,10 @@ export const OmdbMovieMetadataPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: OmdbMovieMetadata,
           keyProperty: 'imdbID',
           readonlyProperties: [],
-          loader: async (findOptions) => {
+          getEntities: async (findOptions) => {
             const result = await api.call({
               method: 'GET',
               action: '/omdb-movie-metadata',

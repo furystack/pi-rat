@@ -1,6 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { CollectionService, DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
-import { PathHelper } from '@furystack/utils'
+import type { CollectionService } from '@furystack/shades-common-components'
+import { DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
+import { ObservableValue, PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options.js'
 import { SessionService } from '../../services/session.js'
@@ -8,65 +9,22 @@ import { BreadCrumbs } from './breadcrumbs.js'
 import { DirectoryEntryIcon } from './directory-entry-icon.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { FileContextMenu } from './file-context-menu.js'
-import type { GetCollectionResult } from '@furystack/rest'
-
-const emptyResponse: GetCollectionResult<DirectoryEntry> = {
-  count: 0,
-  entries: [],
-}
-
-const upEntry: DirectoryEntry = {
-  name: '..',
-  isDirectory: true,
-  isBlockDevice: false,
-  isCharacterDevice: false,
-  isFIFO: false,
-  isFile: false,
-  isSocket: false,
-  isSymbolicLink: false,
-}
 
 export const FileList = Shade<{
   currentDriveLetter: string
   currentPath: string
   onChangePath: (newPath: string) => void
   onActivate?: (entry: DirectoryEntry) => void
+  service: CollectionService<DirectoryEntry>
 }>({
   shadowDomName: 'file-list',
   render: ({ useDisposable, props, injector }) => {
-    const { currentDriveLetter, currentPath } = props
+    const { currentDriveLetter, currentPath, service } = props
 
     const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
 
-    useDisposable('fileChanges', () =>
-      drivesService.getFileListAsObservable(currentDriveLetter, currentPath).subscribe((result) => {
-        if (result.status === 'obsolete') {
-          drivesService.getFileList(currentDriveLetter, currentPath)
-          return
-        }
-        result.value && service.data.setValue(result.value)
-      }),
-    )
-
-    const service = useDisposable(
-      'service',
-      () =>
-        new CollectionService<DirectoryEntry>({
-          loader: async () => {
-            if (!props.currentDriveLetter || !props.currentPath) {
-              return emptyResponse
-            }
-
-            const result = await drivesService.getFileList(currentDriveLetter, currentPath)
-            if (currentPath !== '/') {
-              return { ...result, entries: [upEntry, ...result.entries.sortBy('isDirectory', 'desc')] }
-            }
-            return { ...result, entries: result.entries.sortBy('isDirectory', 'desc') }
-          },
-          defaultSettings: {},
-        }),
-    )
+    const findOptions = useDisposable('findOptions', () => new ObservableValue({}))
 
     const activate = () => {
       const focused = service.focusedEntry.getValue()
@@ -172,8 +130,8 @@ export const FileList = Shade<{
           }
         }}>
         <DataGrid<DirectoryEntry>
-          service={service}
-          autofocus
+          collectionService={service}
+          findOptions={findOptions}
           columns={['name']}
           headerComponents={{
             name: () => (

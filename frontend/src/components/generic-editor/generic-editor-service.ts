@@ -1,4 +1,6 @@
+import type { FindOptions } from '@furystack/core'
 import type { Constructable } from '@furystack/inject'
+import type { GetCollectionResult } from '@furystack/rest'
 import type { CollectionServiceOptions } from '@furystack/shades-common-components'
 import { CollectionService } from '@furystack/shades-common-components'
 import type { Disposable } from '@furystack/utils'
@@ -13,6 +15,7 @@ type GenericEditorServiceOptions<
   model: Constructable<T>
   keyProperty: TKey
   readonlyProperties: TRedonlyProperties[]
+  getEntities: (options: FindOptions<T, Array<keyof T>>) => Promise<GetCollectionResult<T>>
   getEntity: (entityKey: T[TKey]) => Promise<T | null>
   patchEntity: (entityKey: T[TKey], update: Omit<T, TRedonlyProperties>) => Promise<void>
   postEntity: (entity: Omit<T, TRedonlyProperties>) => Promise<T>
@@ -27,9 +30,19 @@ export class GenericEditorService<T, TKey extends keyof T, TOmittedProperties ex
 {
   public editedEntry = new ObservableValue<T | null>(null)
 
+  public findOptions: ObservableValue<FindOptions<T, Array<keyof T>>> = new ObservableValue({})
+
+  private async onRefresh(findOptions: FindOptions<T, Array<keyof T>>) {
+    const entities = await this.extendedOptions.getEntities(findOptions)
+    this.data.setValue(entities)
+  }
+
+  private refreshSubscription = this.findOptions.subscribe(this.onRefresh.bind(this))
+
   public dispose(): void {
     this.editedEntry.dispose()
     super.dispose()
+    this.refreshSubscription.dispose()
   }
 
   public patchEntry = async (key: T[TKey], patch: T) => {
@@ -62,5 +75,6 @@ export class GenericEditorService<T, TKey extends keyof T, TOmittedProperties ex
 
   constructor(public readonly extendedOptions: GenericEditorServiceOptions<T, TKey, TOmittedProperties>) {
     super(extendedOptions)
+    this.onRefresh(this.findOptions.getValue())
   }
 }

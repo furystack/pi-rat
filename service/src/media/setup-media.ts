@@ -682,7 +682,6 @@ export const setupMovies = async (injector: Injector) => {
   })
 
   const omdbClientService = injector.getInstance(OmdbClientService)
-  await omdbClientService.init(injector)
 
   const configDataSet = repo.getDataSetFor(Config, 'id')
 
