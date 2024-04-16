@@ -34,7 +34,7 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
             await this.devicePingHistoryStore.add({
               name: device.name,
               isAvailable: newStatus,
-              ping: newStatus ? parseFloat(avg) : undefined,
+              ping: parseFloat(avg) || undefined,
               createdAt: new Date().toISOString(),
             })
             this.deviceStatusMap.set(device.name, newStatus)
@@ -42,6 +42,11 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
             this.logger.verbose({ message: `Device ${device.name} is ${newStatus ? 'connected' : 'disconnected'}` })
           }
         })
+    } catch (error) {
+      await this.logger.warning({
+        message: `Error while refreshing device connections: ${error?.toString()}`,
+        data: { error },
+      })
     } finally {
       await sleepAsync(3000)
       await this.refreshConnections()
