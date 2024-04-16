@@ -8,7 +8,7 @@ import { DataTypes, Model } from 'sequelize'
 import { useSequelize } from '@furystack/sequelize-store'
 import type { AuthorizationResult } from '@furystack/repository'
 import { getRepository } from '@furystack/repository'
-import { getCurrentUser, isAuthorized } from '@furystack/core'
+import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
 
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { authorizedOnly } from '../authorization/authorized-only.js'
@@ -683,18 +683,18 @@ export const setupMovies = async (injector: Injector) => {
 
   const omdbClientService = injector.getInstance(OmdbClientService)
 
-  const configDataSet = repo.getDataSetFor(Config, 'id')
+  const configStore = getStoreManager(injector).getStoreFor(Config, 'id')
 
-  configDataSet.subscribe(
+  configStore.subscribe(
     'onEntityAdded',
     ({ entity }) => entity.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
   )
-  configDataSet.subscribe(
+  configStore.subscribe(
     'onEntityUpdated',
     ({ change }) => change.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
   )
 
-  configDataSet.subscribe('onEntityRemoved', ({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
+  configStore.subscribe('onEntityRemoved', ({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
 
   logger.verbose({ message: '✅  Media setup completed' })
 }
