@@ -1,16 +1,12 @@
 import { StoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { Injectable } from '@furystack/inject'
-import { getDataSetFor } from '@furystack/repository'
 import { EventHub, sleepAsync } from '@furystack/utils'
 import { Device } from 'common'
 import ping from 'ping'
 
 @Injectable({ lifetime: 'singleton' })
-export class DeviceAvailabilityHub extends EventHub<
-  'connected' | 'disconnected',
-  { connected: Device; disconnected: Device }
-> {
+export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconnected: Device }> {
   private devices: Device[] = []
   public updateDevices = (devices: Device[]) => {
     this.devices = [...devices]
@@ -40,17 +36,17 @@ export class DeviceAvailabilityHub extends EventHub<
   }
 
   public async init(injector: Injector) {
-    const currentDevices = await injector.getInstance(StoreManager).getStoreFor(Device, 'name').find({})
+    const deviceStore = injector.getInstance(StoreManager).getStoreFor(Device, 'name')
+    const currentDevices = await deviceStore.find({})
     this.updateDevices(currentDevices)
 
-    const devices = getDataSetFor(injector, Device, 'name')
-    devices.subscribe('onEntityAdded', ({ entity }) => {
+    deviceStore.subscribe('onEntityAdded', ({ entity }) => {
       this.updateDevices([...this.devices, entity])
     })
-    devices.subscribe('onEntityRemoved', ({ key }) => {
+    deviceStore.subscribe('onEntityRemoved', ({ key }) => {
       this.updateDevices(this.devices.filter((device) => device.name !== key))
     })
-    devices.subscribe('onEntityUpdated', ({ id, change }) => {
+    deviceStore.subscribe('onEntityUpdated', ({ id, change }) => {
       this.updateDevices(this.devices.map((device) => (device.name === id ? { ...device, ...change } : device)))
     })
   }

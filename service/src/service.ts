@@ -23,7 +23,7 @@ import { setupIotApi } from './iot/setup-iot-api.js'
 import { EventHub } from '@furystack/utils'
 
 @Injectable({ lifetime: 'singleton' })
-export class PiRatRootService extends EventHub<'initialized', { initialized: undefined }> {
+export class PiRatRootService extends EventHub<{ initialized: undefined }> {
   @Injected((injector) => getLogger(injector).withScope('service'))
   private declare logger: ScopedLogger
 

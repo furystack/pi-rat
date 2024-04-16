@@ -129,7 +129,7 @@ export const FileList = Shade<{
             activate()
           }
         }}>
-        <DataGrid<DirectoryEntry>
+        <DataGrid
           collectionService={service}
           findOptions={findOptions}
           columns={['name']}

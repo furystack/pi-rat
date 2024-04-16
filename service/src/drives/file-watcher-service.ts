@@ -1,7 +1,6 @@
 import { isAuthorized, StoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { getDataSetFor } from '@furystack/repository'
 import { Drive } from 'common'
 import type { FSWatcher } from 'chokidar'
 import { watch } from 'chokidar'
@@ -63,9 +62,8 @@ export const useFileWatchers = async (injector: Injector) => {
   }
 
   const driveStore = injector.getInstance(StoreManager).getStoreFor(Drive, 'letter')
-  const dataSet = getDataSetFor(injector, Drive, 'letter')
-  dataSet.subscribe('onEntityAdded', ({ entity }) => addWatcher(entity))
-  dataSet.subscribe('onEntityRemoved', ({ key }) => removeWatcher(key))
+  driveStore.subscribe('onEntityAdded', ({ entity }) => addWatcher(entity))
+  driveStore.subscribe('onEntityRemoved', ({ key }) => removeWatcher(key))
   const allDrives = await driveStore.find({})
   allDrives.forEach((drive) => addWatcher(drive))
 }
