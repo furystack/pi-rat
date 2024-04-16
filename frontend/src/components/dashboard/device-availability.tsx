@@ -43,18 +43,16 @@ const blur = (el: HTMLElement) => {
 
 export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: number; size?: number }>({
   shadowDomName: 'pi-rat-device-availability-widget',
+  elementBase: HTMLDivElement,
+  elementBaseName: 'div',
   constructed: ({ props, element }) => {
-    setTimeout(
-      () => {
-        promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-          fill: 'forwards',
-          delay: (props.index || 0) * 160 + Math.random() * 100,
-          duration: 700,
-          easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-        })
-      },
-      (props.index || 1) * 100,
-    )
+    element.style.transform = 'scale(0)'
+    promisifyAnimation(element, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+      fill: 'forwards',
+      delay: (props.index || 0) * 160 + Math.random() * 100,
+      duration: 700,
+      easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+    })
   },
   render: ({ props, injector, useObservable }) => {
     const { size = 256 } = props
@@ -66,7 +64,14 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
 
     if (isLoadedCacheResult(device)) {
       return (
-        <LinkToRoute tabIndex={0} title={device.value.name} route={iotDeviceRoute} params={{ id: props.deviceName }}>
+        <LinkToRoute
+          tabIndex={0}
+          title={device.value.name}
+          route={iotDeviceRoute}
+          params={{ id: props.deviceName }}
+          style={{
+            textDecoration: 'none',
+          }}>
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -81,7 +86,6 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               height: `${size}px`,
               filter: 'saturate(0.3)brightness(0.6)',
               background: 'rgba(128,128,128,0.1)',
-              transform: 'scale(0)',
               borderRadius: '4px',
               margin: '8px',
               overflow: 'hidden',
@@ -161,6 +165,6 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
       return <>{`:(`}</>
     }
 
-    return null
+    return <>{JSON.stringify(device)}</>
   },
 })

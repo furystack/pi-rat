@@ -3,9 +3,13 @@ import { IotApiClient } from './api-clients/iot-api-client.js'
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
 import type { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
+import { WebsocketNotificationsService } from './websocket-events.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class IotDevicesService {
+  @Injected(WebsocketNotificationsService)
+  declare readonly websocketNotificationsService: WebsocketNotificationsService
+
   @Injected(IotApiClient)
   private declare readonly iotApiClient: IotApiClient
 
@@ -65,7 +69,6 @@ export class IotDevicesService {
 
   private devicePingHistoryCache = new Cache({
     capacity: 100,
-    staleTimeMs: 15 * 1000,
     load: async (deviceName: string, query?: FindOptions<DevicePingHistory, Array<keyof DevicePingHistory>>) => {
       const { result } = await this.iotApiClient.call({
         method: 'GET',
@@ -142,13 +145,14 @@ export class IotDevicesService {
   }
 
   public pingDevice = async (device: Device) => {
+    this.deviceAwakeHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
+    this.devicePingHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
+
     await this.iotApiClient.call({
       method: 'POST',
       action: '/devices/:id/ping',
       url: { id: device.name },
     })
-    this.deviceAwakeHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
-    this.devicePingHistoryCache.obsoleteRange((_, args) => args[0] === device.name)
   }
 
   public observeLastPingForDevice = (device: Device) =>
@@ -162,4 +166,15 @@ export class IotDevicesService {
 
   public reloadLastAwakeEntryForDevice = (device: Device) =>
     this.deviceAwakeHistoryCache.reload(device.name, { top: 1, order: { createdAt: 'DESC' } })
+
+  public init() {
+    this.websocketNotificationsService.addListener('onMessage', (message: any) => {
+      if (['device-connected', 'device-disconnected'].includes(message.type)) {
+        this.deviceCache.reload(message.device.name)
+        this.deviceAwakeHistoryCache.obsoleteRange((v) => v.entries.some((e) => e.name === message.device.name))
+        this.devicePingHistoryCache.obsoleteRange((v) => v.entries.some((e) => e.name === message.device.name))
+        this.devicePingHistoryCache.reload(message.device.name, { top: 1, order: { createdAt: 'DESC' } })
+      }
+    })
+  }
 }

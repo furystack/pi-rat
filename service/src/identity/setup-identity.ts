@@ -150,6 +150,7 @@ export const setupIdentity = async (injector: Injector) => {
   useHttpAuthentication(injector, {
     getUserStore: (sm) => sm.getStoreFor(User, 'username'),
     getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
+    enableBasicAuth: false,
   })
   await logger.verbose({ message: '✅  Identity stores and repo setup completed' })
 }
