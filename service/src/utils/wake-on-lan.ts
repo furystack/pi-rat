@@ -1,7 +1,7 @@
 import { createSocket } from 'dgram'
 
 const getMacBytes = (plainMacAddress: string) =>
-  plainMacAddress.match(/(?<byte>[a-fA-F0-9]{2})/gm)?.map((byte) => parseInt(byte, 16))
+  plainMacAddress.match(/(?<byte>[a-fA-F0-9]{2})/gm)?.map((byte) => parseInt(byte.toLowerCase(), 16))
 
 export const wakeOnLan = async (mac: string, broadcast: string = '255.255.255.255', port = 9) => {
   const macBytes = getMacBytes(mac)
@@ -22,6 +22,7 @@ export const wakeOnLan = async (mac: string, broadcast: string = '255.255.255.25
   await new Promise<void>((resolve, reject) => {
     client.bind(() => {
       client.setBroadcast(true)
+
       client.send(magicPacket, 0, magicPacket.length, port, broadcast, (error) => {
         if (error) {
           reject(error)

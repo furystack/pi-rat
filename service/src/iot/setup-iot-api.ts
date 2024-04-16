@@ -82,7 +82,7 @@ export const setupIotApi = async (injector: Injector) => {
     ws.broadcast(async (options) => {
       const shouldNotify = await isAuthorized(options.injector, 'admin')
       if (shouldNotify) {
-        options.ws.send({ type: 'device-connected', device })
+        options.ws.send(JSON.stringify({ type: 'device-connected', device }))
       }
     })
   })
@@ -91,7 +91,7 @@ export const setupIotApi = async (injector: Injector) => {
     ws.broadcast(async (options) => {
       const shouldNotify = await isAuthorized(options.injector, 'admin')
       if (shouldNotify) {
-        options.ws.send({ type: 'device-disconnected', device })
+        options.ws.send(JSON.stringify({ type: 'device-disconnected', device }))
       }
     })
   })

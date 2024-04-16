@@ -61,13 +61,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
         )
       }
 
-      const hasFreshPingEntry = new Date(lastPing.createdAt) > new Date(Date.now() - 1000 * 60 * 1)
-
-      if (!hasFreshPingEntry) {
-        iotService.pingDevice(props).then(() => iotService.findPingHistory(...pingArgs))
-      }
-
-      if (lastPing.isAvailable && hasFreshPingEntry) {
+      if (lastPing.isAvailable) {
         return (
           <Icon
             type="font"
@@ -80,34 +74,6 @@ export const DeviceAvailabilityPanel = Shade<Device>({
           />
         )
       } else {
-        const [lastWolEntryState] = useObservable(
-          'wolEntryState',
-          iotService.findAwakeHistoryAsObservable(...wolEntryArgs),
-        )
-
-        const hasFreshAwakeEntry =
-          hasCacheValue(lastWolEntryState) &&
-          lastWolEntryState.value.entries[0] &&
-          new Date(lastWolEntryState.value.entries[0].createdAt) > new Date(Date.now() - 1000 * 60 * 1)
-
-        if (hasFreshAwakeEntry) {
-          return (
-            <Icon
-              type="font"
-              value="😪"
-              title="Device is not available, but was woken up recently"
-              style={{
-                cursor: 'pointer',
-              }}
-              onclick={(ev) => {
-                ev.preventDefault()
-                ev.stopPropagation()
-                iotService.pingDevice(props)
-              }}
-            />
-          )
-        }
-
         return (
           <Icon
             type="font"
