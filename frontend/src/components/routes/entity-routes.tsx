@@ -114,6 +114,20 @@ export const entityConfigRoute = {
   ),
 }
 
+export const entityDeviceRoute = {
+  url: '/entities/iot-devices',
+  onVisit,
+  onLeave,
+  component: () => (
+    <PiRatLazyLoad
+      component={async () => {
+        const { IotDevicesPage } = await import('../../pages/entities/iot-devices.js')
+        return <IotDevicesPage />
+      }}
+    />
+  ),
+}
+
 export const entityRoutes = [
   entityDrivesRoute,
   entityUsersRoute,
@@ -123,4 +137,5 @@ export const entityRoutes = [
   entityOmdbMovieMetadataRoute,
   entityOmdbSeriesMetadataRoute,
   entityConfigRoute,
+  entityDeviceRoute,
 ]

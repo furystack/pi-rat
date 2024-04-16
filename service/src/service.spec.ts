@@ -1,12 +1,13 @@
-import { init } from './service.js'
 import { injector as rootInjector } from './root-injector'
+import { PiRatRootService } from './service.js'
 import { describe, expect, it } from 'vitest'
 
 describe('Service', () => {
-  it('should be initialized with the root injector', async () => {
-    const i = await init()
+  it('should be initialized', async () => {
+    const instance = rootInjector.getInstance(PiRatRootService)
+    await new Promise((resolve) => instance.addListener('initialized', resolve))
 
-    expect(i).toBe(rootInjector)
+    expect(instance).toBeDefined()
 
     await rootInjector.dispose()
   })

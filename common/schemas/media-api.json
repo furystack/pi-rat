@@ -7711,10 +7711,10 @@
           "type": "number"
         },
         "duration_ts": {
-          "type": "string"
+          "type": "number"
         },
         "duration": {
-          "type": "number"
+          "type": "string"
         },
         "bit_rate": {
           "type": "number"

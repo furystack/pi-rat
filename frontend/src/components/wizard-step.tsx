@@ -4,24 +4,28 @@ import { showParallax, Button } from '@furystack/shades-common-components'
 
 export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) => void } & WizardStepProps>({
   shadowDomName: 'wizard-step',
-  resources: ({ injector, element }) => {
-    return [
-      injector.getInstance(ScreenService).screenSize.atLeast.md.subscribe((isLargeScreen) => {
-        const form = element?.querySelector('form')
-        if (form) {
-          form.style.padding = '16px'
-          form.style.width = isLargeScreen ? '800px' : `${window.innerWidth - 16}px`
-          form.style.height = isLargeScreen ? '500px' : `${window.innerHeight - 192}px`
-        }
-      }, true),
-    ]
-  },
-  render: ({ props, element, children }) => {
+  render: ({ props, element, children, useObservable, injector }) => {
     setTimeout(() => {
       showParallax(element.querySelector('h1'))
       showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
       showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
     }, 1)
+
+    const updateScreenSize = (isLargeScreen: boolean) => {
+      const form = element?.querySelector('form')
+      if (form) {
+        form.style.padding = '16px'
+        form.style.width = isLargeScreen ? '800px' : `${window.innerWidth - 16}px`
+        form.style.height = isLargeScreen ? '500px' : `${window.innerHeight - 192}px`
+      }
+    }
+
+    const [isLargeScreen] = useObservable('screenSize', injector.getInstance(ScreenService).screenSize.atLeast.md, {
+      onChange: updateScreenSize,
+    })
+
+    updateScreenSize(isLargeScreen)
+
     return (
       <form
         onsubmit={(ev) => {

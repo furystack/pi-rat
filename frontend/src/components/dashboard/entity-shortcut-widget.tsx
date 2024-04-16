@@ -24,6 +24,8 @@ export const EntityShortcutWidget = Shade<EntityShortcutWidgetData>({
         )
       case 'config':
         return <IconUrlWidget {...rest} name="Config" url="/entities/config" icon={<>⚙️</>} />
+      case 'device':
+        return <IconUrlWidget {...rest} name="IOT Devices" url="/entities/iot-devices" icon={<>📡</>} />
       default:
         return <IconUrlWidget {...rest} name={'Unknown'} url={`/`} icon={<>🚫</>} />
     }

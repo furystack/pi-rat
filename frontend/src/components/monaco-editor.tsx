@@ -9,7 +9,7 @@ import { ThemeProviderService, defaultDarkTheme, getCssVariable } from '@furysta
 export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
   value?: string
-  onchange?: (value: string) => void
+  onValueChange?: (value: string) => void
   modelUri?: Uri
 }
 export const MonacoEditor = Shade<MonacoEditorProps>({
@@ -27,10 +27,9 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
     const editorInstance = editor.create(element as HTMLElement, { ...props.options, theme })
 
     editorInstance.setValue(props.value || '')
-    props.onchange &&
+    props.onValueChange &&
       editorInstance.onKeyUp(() => {
-        const value = editorInstance.getValue()
-        props.onchange && props.onchange(value)
+        props.onValueChange?.(editorInstance.getValue())
       })
 
     if (props.modelUri) {

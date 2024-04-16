@@ -7,7 +7,7 @@ import { DashboardsApiClient } from './api-clients/dashboards-api-client.js'
 @Injectable({ lifetime: 'singleton' })
 export class DashboardService {
   @Injected(DashboardsApiClient)
-  private readonly dashboardsApiClient!: DashboardsApiClient
+  private declare readonly dashboardsApiClient: DashboardsApiClient
 
   private dashboardCache = new Cache({
     capacity: 100,

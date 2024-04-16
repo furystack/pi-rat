@@ -22,17 +22,16 @@ export const ConfigPage = Shade({
       'service',
       () =>
         new GenericEditorService({
-          defaultSettings: {},
           model: Config,
           keyProperty: 'id',
           readonlyProperties: ['createdAt', 'updatedAt'],
-          loader: async (findOptions) => {
-            const result = await api.call({
+          getEntities: async (options) => {
+            const { result } = await api.call({
               method: 'GET',
-              action: '/config',
-              query: { findOptions },
+              action: `/config`,
+              query: { findOptions: options },
             })
-            return result.result
+            return result
           },
           deleteEntities: async (id) => {
             await api.call({ method: 'DELETE', action: `/config/:id`, url: { id } })

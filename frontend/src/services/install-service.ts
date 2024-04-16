@@ -5,7 +5,7 @@ import { Cache } from '@furystack/cache'
 @Injectable({ lifetime: 'singleton' })
 export class InstallService {
   @Injected(InstallApiClient)
-  private readonly apiClient!: InstallApiClient
+  private declare readonly apiClient: InstallApiClient
 
   private cache = new Cache({
     load: async () => {

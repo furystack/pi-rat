@@ -10,7 +10,7 @@ export interface HeaderProps {
   title: string
 }
 
-const AdminLinks = Shade<{}>({
+const AdminLinks = Shade({
   shadowDomName: 'shade-app-header-admin-links',
   render: ({ injector, useObservable }) => {
     const session = injector.getInstance(SessionService)

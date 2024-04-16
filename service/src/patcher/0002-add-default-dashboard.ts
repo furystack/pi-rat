@@ -7,7 +7,7 @@ export const addDefaultDashboardPatcher: Patch = {
   description: 'Adds a default dashboard to the Dashboards DB',
   name: 'Add default dashboard',
   run: async (injector, addLogEntry) => {
-    const dashboardStore = injector.getInstance(StoreManager).getStoreFor<Dashboard, 'id'>(Dashboard, 'id')
+    const dashboardStore = injector.getInstance(StoreManager).getStoreFor(Dashboard, 'id')
 
     await dashboardStore.add({
       name: 'Default',

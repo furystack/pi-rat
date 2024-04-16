@@ -1,6 +1,6 @@
 {
   "name": "service",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "main": "dist/index.js",
   "license": "GPL-2.0-only",
   "private": true,
@@ -14,28 +14,30 @@
   "devDependencies": {
     "@types/ffprobe": "^1.1.8",
     "@types/formidable": "^3.4.5",
-    "@types/node": "^20.11.19",
-    "@types/webtorrent": "^0.109.7",
-    "typescript": "^5.3.3"
+    "@types/node": "^20.12.7",
+    "@types/ping": "^0.4.4",
+    "@types/webtorrent": "^0.109.8",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@furystack/core": "^12.0.16",
-    "@furystack/inject": "^8.1.6",
-    "@furystack/logging": "^4.0.15",
-    "@furystack/repository": "^7.0.16",
-    "@furystack/rest": "^5.0.17",
-    "@furystack/rest-service": "^7.0.18",
-    "@furystack/security": "^3.0.16",
-    "@furystack/sequelize-store": "^3.0.16",
-    "@furystack/utils": "^4.0.15",
-    "@furystack/websocket-api": "^9.0.18",
+    "@furystack/core": "^14.0.2",
+    "@furystack/inject": "^11.0.1",
+    "@furystack/logging": "^7.0.0",
+    "@furystack/repository": "^9.0.2",
+    "@furystack/rest": "^7.0.2",
+    "@furystack/rest-service": "^9.0.2",
+    "@furystack/security": "^5.0.2",
+    "@furystack/sequelize-store": "^5.0.2",
+    "@furystack/utils": "^7.0.0",
+    "@furystack/websocket-api": "^12.0.2",
     "chokidar": "^3.6.0",
     "common": "workspace:^",
     "ffprobe": "^1.1.2",
     "formidable": "^3.5.1",
-    "sequelize": "^6.37.1",
+    "ping": "^0.4.4",
+    "sequelize": "^6.37.3",
     "sqlite3": "^5.1.7",
-    "vitest": "^1.3.0",
-    "webtorrent": "^2.1.36"
+    "vitest": "^1.5.0",
+    "webtorrent": "^2.2.1"
   }
 }

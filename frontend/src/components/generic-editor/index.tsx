@@ -25,24 +25,24 @@ type EditEditorState = {
 
 type GenericEditorState = CreateEditorState | ListEditorState | EditEditorState
 
-type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
+type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
-  columns: DataGridProps<T>['columns']
-  headerComponents: DataGridProps<T>['headerComponents']
-  rowComponents: DataGridProps<T>['rowComponents']
-  styles: DataGridProps<T>['styles']
+  columns: DataGridProps<T, TColumns>['columns']
+  headerComponents: DataGridProps<T, TColumns>['headerComponents']
+  rowComponents: DataGridProps<T, TColumns>['rowComponents']
+  styles: DataGridProps<T, TColumns>['styles']
   modelUri?: Uri
 }
 
-export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T>(
-  props: GenericEditorProps<T, TKey, TReadonlyProperties>,
+export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string>(
+  props: GenericEditorProps<T, TKey, TReadonlyProperties, TColumns>,
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
   render: ({ props, injector, useSearchState }) => {
     const { service, columns, headerComponents, rowComponents, styles, modelUri } = props
 
-    const refresh = () => service.querySettings.setValue({ ...service.querySettings.getValue() })
+    const refresh = () => service.findOptions.setValue({ ...service.findOptions.getValue() })
 
     const noty = injector.getInstance(NotyService)
 
@@ -61,10 +61,14 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 onSave={async (value) => {
                   try {
                     await service.patchEntry(editorState.currentId as any, value)
-                    noty.addNoty({ type: 'success', title: '📝 Entity updated', body: 'Entity updated successfully' })
+                    noty.emit('onNotyAdded', {
+                      type: 'success',
+                      title: '📝 Entity updated',
+                      body: 'Entity updated successfully',
+                    })
                     refresh()
                   } catch (error) {
-                    noty.addNoty({
+                    noty.emit('onNotyAdded', {
                       type: 'error',
                       title: '❗ Failed to update entity',
                       body: (error as Error).toString(),
@@ -93,10 +97,18 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 mode: 'edit',
                 currentId: response[service.extendedOptions.keyProperty] as string,
               })
-              noty.addNoty({ type: 'success', title: '✨ Entity created', body: 'Entity created successfully' })
+              noty.emit('onNotyAdded', {
+                type: 'success',
+                title: '✨ Entity created',
+                body: 'Entity created successfully',
+              })
               refresh()
             } catch (error) {
-              noty.addNoty({ type: 'error', title: '❗ Failed to create entity', body: (error as Error).toString() })
+              noty.emit('onNotyAdded', {
+                type: 'error',
+                title: '❗ Failed to create entity',
+                body: (error as Error).toString(),
+              })
             }
           }}
         />
@@ -106,7 +118,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
     return (
       <>
         <DataGrid
-          service={service}
+          collectionService={service}
+          findOptions={service.findOptions}
           columns={['selection' as any, ...columns, 'actions' as any]}
           headerComponents={{ actions: () => null, ...headerComponents }}
           rowComponents={{
@@ -125,7 +138,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                     service
                       .removeEntries(entry[service.extendedOptions.keyProperty] as any)
                       .then(() => {
-                        noty.addNoty({
+                        noty.emit('onNotyAdded', {
                           type: 'success',
                           title: 'Entity deleted',
                           body: '🗑️ The selected entity deleted successfully',
@@ -133,7 +146,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                         refresh()
                       })
                       .catch((error) => {
-                        noty.addNoty({
+                        noty.emit('onNotyAdded', {
                           type: 'error',
                           title: '❗ Failed to delete entity',
                           body: (error as Error).toString(),
