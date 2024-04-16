@@ -25,17 +25,17 @@ type EditEditorState = {
 
 type GenericEditorState = CreateEditorState | ListEditorState | EditEditorState
 
-type GenericEditorProps<T, TKey extends keyof T & string, TReadonlyProperties extends keyof T> = {
+type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
-  columns: DataGridProps<T, TKey>['columns']
-  headerComponents: DataGridProps<T, TKey>['headerComponents']
-  rowComponents: DataGridProps<T, TKey>['rowComponents']
-  styles: DataGridProps<T, TKey>['styles']
+  columns: DataGridProps<T, TColumns>['columns']
+  headerComponents: DataGridProps<T, TColumns>['headerComponents']
+  rowComponents: DataGridProps<T, TColumns>['rowComponents']
+  styles: DataGridProps<T, TColumns>['styles']
   modelUri?: Uri
 }
 
-export const GenericEditor: <T, TKey extends keyof T & string, TReadonlyProperties extends keyof T>(
-  props: GenericEditorProps<T, TKey, TReadonlyProperties>,
+export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string>(
+  props: GenericEditorProps<T, TKey, TReadonlyProperties, TColumns>,
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
