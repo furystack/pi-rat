@@ -90,6 +90,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               margin: '8px',
               overflow: 'hidden',
               color: 'white',
+              boxShadow: 'rgba(0, 0, 0, 0.3) 1px 3px 6px',
             }}>
             <div
               style={{
@@ -130,7 +131,6 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               className="cover"
               style={{
                 display: 'inline-block',
-                backgroundColor: '#666',
                 objectFit: 'cover',
                 width: '100%',
                 height: '100%',

@@ -4,7 +4,8 @@ import type { Uri } from 'monaco-editor'
 import 'monaco-editor/esm/vs/editor/editor.main'
 
 import './worker-config'
-import { ThemeProviderService, defaultDarkTheme, getCssVariable } from '@furystack/shades-common-components'
+import { ThemeProviderService, getCssVariable } from '@furystack/shades-common-components'
+import { darkTheme } from '../themes/dark.js'
 
 export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
@@ -19,9 +20,7 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
 
     const [theme] = useState<'vs-light' | 'vs-dark'>(
       'theme',
-      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
-        ? 'vs-dark'
-        : 'vs-light',
+      getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'vs-dark' : 'vs-light',
     )
 
     const editorInstance = editor.create(element as HTMLElement, { ...props.options, theme })
