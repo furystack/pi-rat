@@ -93,21 +93,25 @@ export const apiValues: SchemaGenerationSetting[] = [
 ]
 
 export const exec = async (): Promise<void> => {
-  for (const schemaValue of [...entityValues, ...apiValues]) {
-    try {
-      console.log(`Create schema from ${schemaValue.inputFile} to ${schemaValue.outputFile}`)
-      const schema = createGenerator({
-        path: join(process.cwd(), schemaValue.inputFile),
-        tsconfig: join(process.cwd(), './tsconfig.json'),
-        skipTypeCheck: true,
-        expose: 'all',
-      }).createSchema(schemaValue.type)
-      await promises.writeFile(join(process.cwd(), schemaValue.outputFile), JSON.stringify(schema, null, 2))
-    } catch (error) {
-      console.error(`There was an error generating schema from ${schemaValue.inputFile}`, error)
-      process.exit(1)
-    }
-  }
+  await Promise.all(
+    [...entityValues, ...apiValues].map(async (schemaValue) => {
+      try {
+        const inputFile = join(process.cwd(), schemaValue.inputFile)
+        const outputFile = join(process.cwd(), schemaValue.outputFile)
+
+        console.log(`Create schema from ${inputFile} to ${outputFile}`)
+        const schema = createGenerator({
+          path: inputFile,
+          tsconfig: join(process.cwd(), './tsconfig.json'),
+          skipTypeCheck: true,
+          expose: 'all',
+        }).createSchema(schemaValue.type)
+        await promises.writeFile(outputFile, JSON.stringify(schema, null, 2))
+      } catch (error) {
+        console.error(`There was an error generating schema from ${schemaValue.inputFile}`, error)
+      }
+    }),
+  )
 }
 
 exec()
