@@ -65,6 +65,19 @@ export type FfprobeEndpoint = {
   result: FFProbeResult
 }
 
+export type SaveTextFileEndpoint = {
+  url: {
+    letter: string
+    path: string
+  }
+  body: {
+    text: string
+  }
+  result: {
+    success: true
+  }
+}
+
 export interface DrivesApi extends RestApi {
   GET: {
     '/volumes': GetCollectionEndpoint<Drive>
@@ -76,6 +89,9 @@ export interface DrivesApi extends RestApi {
   POST: {
     '/volumes': PostDriveEndpoint
     '/volumes/:letter/:path/upload': UploadEndpoint
+  }
+  PUT: {
+    '/files/:letter/:path': SaveTextFileEndpoint
   }
   PATCH: {
     '/volumes/:id': PatchEndpoint<Drive, 'letter'>
