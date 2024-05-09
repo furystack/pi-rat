@@ -73,7 +73,7 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         ),
       },
       PUT: {
-        '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'PatchDriveEndpoint' })(
+        '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'SaveTextFileEndpoint' })(
           SaveTextFileAction,
         ),
       },
