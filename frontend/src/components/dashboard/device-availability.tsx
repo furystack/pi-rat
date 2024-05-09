@@ -103,7 +103,6 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                 display: 'flex',
                 margin: '1em',
                 justifyContent: 'space-between',
-                filter: 'drop-shadow(black 0px 0px 5px) drop-shadow(black 0px 0px 8px) drop-shadow(black 0px 0px 10px)',
               }}>
               <DeviceAvailabilityPanel {...device.value} />
 
