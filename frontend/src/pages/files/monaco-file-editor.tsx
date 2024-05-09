@@ -4,6 +4,7 @@ import { environmentOptions } from '../../environment-options.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { ObservableValue } from '@furystack/utils'
 import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
+import { Button, NotyService } from '@furystack/shades-common-components'
 
 const getMonacoLanguage = (path: string) => {
   const extension = path.split('.').pop()
@@ -49,14 +50,29 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
             <MonacoTextFileEditor
               initialValue={text}
               language={getMonacoLanguage(path)}
-              onSave={() => {
+              onSave={(newValue) => {
                 const client = injector.getInstance(DrivesApiClient)
-                client.call({
-                  method: 'POST',
-                  action: '/volumes/:letter/:path/upload',
-                  url: { letter: encodeURIComponent(letter), path: encodeURIComponent(path) },
-                  body: text,
-                })
+                client
+                  .call({
+                    method: 'PUT',
+                    action: '/files/:letter/:path',
+                    url: { letter: encodeURIComponent(letter), path: encodeURIComponent(path) },
+                    body: { text: newValue },
+                  })
+                  .then(() => {
+                    injector.getInstance(NotyService).emit('onNotyAdded', {
+                      title: 'File saved',
+                      body: `File ${path} has been saved successfully.`,
+                      type: 'success',
+                    })
+                  })
+                  .catch((error) => {
+                    injector.getInstance(NotyService).emit('onNotyAdded', {
+                      title: 'Failed to save file',
+                      body: `Failed to save file ${path}: ${error.message}`,
+                      type: 'error',
+                    })
+                  })
               }}
             />
           )
@@ -102,6 +118,15 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
           value={value.getValue()}
           onValueChange={(newValue) => value.setValue(newValue)}
         />
+        <div style={{ display: 'flex', gap: '16px', padding: '8px' }}>
+          <div style={{ flex: '1' }} />
+          <Button className="revert" onclick={() => value.setValue(initialValue)}>
+            Revert
+          </Button>
+          <Button className="save" variant="contained" color="primary" onclick={() => props.onSave(value.getValue())}>
+            Save
+          </Button>
+        </div>
       </div>
     )
   },
