@@ -19,10 +19,10 @@ test.describe('File Browser', () => {
 
     const letterInput = await page.getByRole('textbox', { name: 'letter' })
 
-    await letterInput.type(browserName[0])
+    await letterInput.fill(browserName[0])
 
     const pathInput = await page.getByRole('textbox', { name: 'Physical path' })
-    await pathInput.type(tempPath)
+    await pathInput.fill(tempPath)
 
     const submitButton = await page.getByRole('button', { name: 'Finish' })
     await submitButton.click()

@@ -28,9 +28,9 @@ test('Setup Project @install', async ({ page }) => {
   await expect(submitButton).toBeEnabled()
   await expect(submitButton).toHaveText('Next')
 
-  await usernameInput.type('testuser@gmail.com')
-  await passwordInput.type('password')
-  await confirmPasswordInput.type('password')
+  await usernameInput.fill('testuser@gmail.com')
+  await passwordInput.fill('password')
+  await confirmPasswordInput.fill('password')
 
   await submitButton.click()
 
