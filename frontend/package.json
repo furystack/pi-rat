@@ -11,27 +11,27 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@furystack/rest": "^7.0.2",
+    "@furystack/rest": "^7.0.3",
     "@types/marked": "^6.0.0",
     "typescript": "^5.4.5",
-    "vite": "^5.2.9"
+    "vite": "^5.2.11"
   },
   "dependencies": {
-    "@furystack/cache": "^4.0.2",
-    "@furystack/core": "^14.0.2",
-    "@furystack/inject": "^11.0.1",
-    "@furystack/logging": "^7.0.0",
-    "@furystack/rest-client-fetch": "^7.0.2",
-    "@furystack/shades": "^10.0.2",
-    "@furystack/shades-common-components": "^8.1.0",
-    "@furystack/shades-lottie": "^6.0.2",
-    "@furystack/utils": "^7.0.0",
-    "@types/node": "^20.12.7",
+    "@furystack/cache": "^4.0.3",
+    "@furystack/core": "^14.0.3",
+    "@furystack/inject": "^11.0.2",
+    "@furystack/logging": "^7.0.1",
+    "@furystack/rest-client-fetch": "^7.0.3",
+    "@furystack/shades": "^10.0.3",
+    "@furystack/shades-common-components": "^8.1.1",
+    "@furystack/shades-lottie": "^6.0.3",
+    "@furystack/utils": "^7.0.1",
+    "@types/node": "^20.12.11",
     "common": "workspace:^",
-    "marked": "^12.0.1",
-    "monaco-editor": "^0.47.0",
+    "marked": "^12.0.2",
+    "monaco-editor": "^0.48.0",
     "path-to-regexp": "^6.2.2",
     "semaphore-async-await": "^1.5.1",
-    "video.js": "8.11.8"
+    "video.js": "8.14.0"
   }
 }
