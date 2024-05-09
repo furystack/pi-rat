@@ -9,6 +9,9 @@ type LoginPayload = {
 
 export const Login = Shade({
   shadowDomName: 'shade-login',
+  constructed: ({ element }) => {
+    element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
+  },
   render: ({ injector, useObservable, element }) => {
     const sessionService = injector.getInstance(SessionService)
     useObservable('isOperationInProgress', sessionService.isOperationInProgress, {
