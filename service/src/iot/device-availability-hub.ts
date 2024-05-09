@@ -48,7 +48,7 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
         data: { error },
       })
     } finally {
-      await sleepAsync(3000)
+      await sleepAsync(15000)
       await this.refreshConnections()
     }
   }

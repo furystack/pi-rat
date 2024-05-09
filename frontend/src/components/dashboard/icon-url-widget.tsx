@@ -5,13 +5,22 @@ const focus = (el: HTMLElement) => {
   promisifyAnimation(
     el,
     [
-      { opacity: '.5', boxShadow: '1px 3px 6px rgba(0,0,0,0.3)' },
+      { opacity: '.7', boxShadow: '1px 3px 6px rgba(0,0,0,0.3)' },
       { opacity: '1', boxShadow: '0px 1px 2px rgba(0,0,0,0.3)' },
     ],
     {
       duration: 1000,
       fill: 'forwards',
       easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
+    },
+  )
+  promisifyAnimation(
+    el.querySelector('.cover') as HTMLImageElement,
+    [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
+    {
+      fill: 'forwards',
+      easing: 'cubic-bezier(0.310, 0.805, 0.605, 1.145)',
+      duration: 850,
     },
   )
 }
@@ -21,13 +30,18 @@ const blur = (el: HTMLElement) => {
     el,
     [
       { opacity: '1', boxShadow: '0px 1px 2px rgba(0,0,0,0.3)' },
-      { opacity: '.5', boxShadow: '1px 3px 6px rgba(0,0,0,0.3)' },
+      { opacity: '.7', boxShadow: '1px 3px 6px rgba(0,0,0,0.3)' },
     ],
     {
       duration: 1200,
       fill: 'forwards',
       easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
     },
+  )
+  promisifyAnimation(
+    el.querySelector('.cover') as HTMLImageElement,
+    [{ transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
+    { fill: 'forwards', duration: 150 },
   )
 }
 
@@ -71,7 +85,7 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
             justifyContent: 'space-evenly',
             boxShadow: '1px 3px 6px rgba(0,0,0,0.3)',
             background: 'rgba(128,128,128,0.15)',
-            opacity: '.5',
+            opacity: '.7',
           }}
           onclick={(ev) => {
             if (props.url.startsWith('http') && new URL(props.url).href !== window.location.href) {
@@ -81,6 +95,7 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
             }
           }}>
           <div
+            className="cover"
             style={{
               height: '128px',
               fontSize: '96px',

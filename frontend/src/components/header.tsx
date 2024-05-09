@@ -58,16 +58,16 @@ export const Header = Shade<HeaderProps>({
           </>
         ) : null}
 
-        <div style={{ flex: '1' }}>
-          <PiRatCommandPalette />
-        </div>
+        <div style={{ flex: '1' }}>{sessionState === 'authenticated' && <PiRatCommandPalette />}</div>
+
         <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
-          <ThemeSwitch variant="outlined" />
-          <a href={environmentOptions.repository} target="_blank" style={{ display: 'flex' }}>
-            <Button variant="outlined" style={{ verticalAlign: 'baseline', display: 'flex' }}>
-              <GithubLogo style={{ height: '1em' }} />
-            </Button>
-          </a>
+          <ThemeSwitch />
+          <Button
+            onclick={() => {
+              window.open(environmentOptions.repository)
+            }}>
+            <GithubLogo style={{ height: '1rem' }} />
+          </Button>
           {sessionState === 'authenticated' ? (
             <Button variant="outlined" onclick={() => injector.getInstance(SessionService).logout()}>
               Log Out
