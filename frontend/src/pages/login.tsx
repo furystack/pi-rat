@@ -1,34 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { SessionService } from '../services/session.js'
-import { Button, Form, Input, Loader, Paper } from '@furystack/shades-common-components'
-
-export const LoginButton = Shade({
-  shadowDomName: 'shade-login-button',
-  render: ({ useObservable, injector }) => {
-    const sessionService = injector.getInstance(SessionService)
-    const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
-    return (
-      <Button variant="contained" className="login-button" disabled={isOperationInProgress} type="submit">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyItems: 'center',
-          }}>
-          Login
-          {isOperationInProgress ? (
-            <Loader
-              style={{
-                width: '20px',
-                height: '20px',
-              }}
-            />
-          ) : null}
-        </div>
-      </Button>
-    )
-  },
-})
+import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
 
 type LoginPayload = {
   userName: string
@@ -45,17 +17,17 @@ export const Login = Shade({
         els.forEach((el) => {
           el.disabled = isOperationInProgress
         })
+        if (!isOperationInProgress) {
+          element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
+        }
       },
     })
-
     return (
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           height: 'calc(100% - 64px)',
-          alignItems: 'center',
-          justifyContent: 'center',
           padding: '0 100px',
           paddingTop: '100px',
         }}>
@@ -67,23 +39,8 @@ export const Login = Shade({
             className="login-form"
             onSubmit={({ userName, password }) => sessionService.login(userName, password)}>
             <h2>Login</h2>
-            <Input
-              labelTitle="User name"
-              name="userName"
-              autofocus
-              required
-              // disabled={isOperationInProgress}
-              getHelperText={() => "The user's login name"}
-              type="text"
-            />
-            <Input
-              labelTitle="Password"
-              name="password"
-              required
-              // disabled={isOperationInProgress}
-              getHelperText={() => 'The password for the user'}
-              type="password"
-            />
+            <Input labelTitle="E-mail address" name="userName" required autofocus type="email" />
+            <Input labelTitle="Password" name="password" required minLength={4} type="password" />
             <div
               style={{
                 display: 'flex',
@@ -92,9 +49,9 @@ export const Login = Shade({
                 flexDirection: 'row',
                 padding: '1em 0',
               }}>
-              {/* {error ? <div style={{ color: 'red', fontSize: '12px' }}>{error}</div> : <div />} */}
-              <LoginButton />
-              <button type="submit" style={{ display: 'none' }} />
+              <Button variant="contained" color="primary" type="submit">
+                Login
+              </Button>
             </div>
           </Form>
         </Paper>

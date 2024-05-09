@@ -23,8 +23,8 @@ export const login = async (page: Page, username = 'testuser@gmail.com', passwor
   await expect(submitButton).toBeEnabled()
   await expect(submitButton).toHaveText('Login')
 
-  await usernameInput.type(username)
-  await passwordInput.type(password)
+  await usernameInput.fill(username)
+  await passwordInput.fill(password)
 
   await submitButton.click()
 
