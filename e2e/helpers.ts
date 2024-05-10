@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test'
 import { expect } from '@playwright/test'
+import { basename } from 'path'
+import { readFile } from 'fs/promises'
 
 export const assertAndDismissNoty = async (page: Page, text: string) => {
   const noty = await page.locator('shade-noty', { hasText: text })
@@ -42,4 +44,26 @@ export const logout = async (page: Page) => {
 
   const loggedOutLoginForm = await page.locator('shade-login form.login-form')
   await expect(loggedOutLoginForm).toBeVisible()
+}
+
+export const uploadFile = async (page: Page, filePath: string, mime: string) => {
+  const fileContent = await readFile(filePath, { encoding: 'utf-8' })
+  const fileName = basename(filePath)
+
+  const dataTransfer = await page.evaluateHandle(
+    async ([fileNameToUpload, type, content]) => {
+      const dt = new DataTransfer()
+      const file = new File([content], fileNameToUpload, { type })
+      dt.items.add(file)
+      return dt
+    },
+    [fileName, mime, fileContent],
+  )
+
+  const fileDrop = await page.getByTestId('file-drop').first()
+  await fileDrop.dispatchEvent('drop', { dataTransfer })
+
+  await assertAndDismissNoty(page, `The files are upploaded succesfully`)
+
+  await dataTransfer.dispose()
 }

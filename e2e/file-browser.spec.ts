@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { assertAndDismissNoty, login } from './helpers'
+import { assertAndDismissNoty, login, uploadFile } from './helpers'
 import { join } from 'path'
 import { readFileSync } from 'fs'
 
 test.describe('File Browser', () => {
-  test.skip('Should be able to create a drive in the temp directory', async ({ page, browserName }) => {
+  test('Should be able to create a drive in the temp directory', async ({ page, browserName }) => {
     const tempPath = join((process as any).env?.E2E_TEMP || process.cwd(), 'browser-temp', browserName)
 
     await page.goto('/')
@@ -38,20 +38,6 @@ test.describe('File Browser', () => {
     await login(page)
     await page.locator('icon-url-widget', { hasText: 'File Browser' }).click()
 
-    const buffer = readFileSync('./e2e/test-files/upload.md')
-
-    // Create the DataTransfer and File
-    const dataTransfer = await page.evaluateHandle((data) => {
-      const dt = new DataTransfer()
-      // Convert the buffer to a hex array
-      const file = new File([data.toString('hex')], 'upload.md', { type: 'text/markdown' })
-      dt.items.add(file)
-      return dt
-    }, buffer)
-
-    // Now dispatch
-    await page.dispatchEvent('.file-drop', 'drop', { dataTransfer })
-
-    await assertAndDismissNoty(page, `The files are upploaded succesfully`)
+    await uploadFile(page, './e2e/test-files/upload.md', 'text/markdown')
   })
 })
