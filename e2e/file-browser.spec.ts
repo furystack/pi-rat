@@ -30,14 +30,14 @@ test.describe('File Browser', () => {
 
     await assertAndDismissNoty(page, `Drive '${browserName[0]}' has been created succesfully`)
     await page.getByText('- No Data -')
-    // TODO: Upload files
   })
 
-  test.only('Should able to upload a file', async ({ page }) => {
+  test('Should able to upload a file', async ({ page }) => {
     await page.goto('/')
     await login(page)
     await page.locator('icon-url-widget', { hasText: 'File Browser' }).click()
-
     await uploadFile(page, './e2e/test-files/upload.md', 'text/markdown')
+
+    await expect(page.getByText('upload.md')).toBeVisible()
   })
 })
