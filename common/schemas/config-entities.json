@@ -18,17 +18,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "torrentDriveLetter",
-            "torrentPath"
-          ],
+          "required": ["torrentDriveLetter", "torrentPath"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "id",
-        "value"
-      ],
+      "required": ["id", "value"],
       "additionalProperties": false
     },
     "OmdbConfig": {
@@ -45,16 +39,54 @@
               "type": "string"
             }
           },
-          "required": [
-            "apiKey"
-          ],
+          "required": ["apiKey"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "id",
-        "value"
-      ],
+      "required": ["id", "value"],
+      "additionalProperties": false
+    },
+    "MoviesConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "MOVIES_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "watchFiles": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "all"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "drive": {
+                        "type": "string"
+                      },
+                      "path": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["drive", "path"],
+                    "additionalProperties": false
+                  }
+                }
+              ],
+              "description": "'all' or a list of directories to watch for new movies."
+            }
+          },
+          "required": ["watchFiles"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["id", "value"],
       "additionalProperties": false
     },
     "IotConfig": {
@@ -76,17 +108,11 @@
               "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
             }
           },
-          "required": [
-            "pingIntervalMs",
-            "pingTimeoutMs"
-          ],
+          "required": ["pingIntervalMs", "pingTimeoutMs"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "id",
-        "value"
-      ],
+      "required": ["id", "value"],
       "additionalProperties": false
     },
     "GithubConfig": {
@@ -106,17 +132,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "clientId",
-            "clientSecret"
-          ],
+          "required": ["clientId", "clientSecret"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "id",
-        "value"
-      ],
+      "required": ["id", "value"],
       "additionalProperties": false
     },
     "ConfigType": {
@@ -132,6 +152,9 @@
         },
         {
           "$ref": "#/definitions/IotConfig"
+        },
+        {
+          "$ref": "#/definitions/MoviesConfig"
         }
       ]
     },
@@ -140,12 +163,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "enum": [
-            "OMDB_CONFIG",
-            "GITHUB_CONFIG",
-            "TORRENT_CONFIG",
-            "IOT_CONFIG"
-          ]
+          "enum": ["OMDB_CONFIG", "GITHUB_CONFIG", "TORRENT_CONFIG", "IOT_CONFIG", "MOVIES_CONFIG"]
         },
         "value": {
           "anyOf": [
@@ -156,9 +174,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "apiKey"
-              ],
+              "required": ["apiKey"],
               "additionalProperties": false
             },
             {
@@ -171,10 +187,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "clientId",
-                "clientSecret"
-              ],
+              "required": ["clientId", "clientSecret"],
               "additionalProperties": false
             },
             {
@@ -187,10 +200,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "torrentDriveLetter",
-                "torrentPath"
-              ],
+              "required": ["torrentDriveLetter", "torrentPath"],
               "additionalProperties": false
             },
             {
@@ -205,10 +215,39 @@
                   "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                 }
               },
-              "required": [
-                "pingIntervalMs",
-                "pingTimeoutMs"
-              ],
+              "required": ["pingIntervalMs", "pingTimeoutMs"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "watchFiles": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "all"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "drive": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["drive", "path"],
+                        "additionalProperties": false
+                      }
+                    }
+                  ],
+                  "description": "'all' or a list of directories to watch for new movies."
+                }
+              },
+              "required": ["watchFiles"],
               "additionalProperties": false
             }
           ]
@@ -222,12 +261,7 @@
           "format": "date-time"
         }
       },
-      "required": [
-        "id",
-        "value",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["id", "value", "createdAt", "updatedAt"],
       "additionalProperties": false
     }
   }

@@ -23,12 +23,7 @@
           "format": "date-time"
         }
       },
-      "required": [
-        "physicalPath",
-        "letter",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["physicalPath", "letter", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "DirectoryEntry": {
