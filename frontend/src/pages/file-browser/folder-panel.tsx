@@ -67,6 +67,10 @@ export const FolderPanel = Shade<{
     })
     onFileListChange(fileList)
 
+    useDisposable('onFilesystemChanged', () =>
+      drivesService.subscribe('onFilesystemChanged', () => drivesService.getFileList(letter, path)),
+    )
+
     service.hasFocus.setValue(!!props.focused)
 
     element.style.height = '100%'

@@ -129,7 +129,6 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: DrivesFilesys
       action: '/files/:letter/:path',
       url: { letter, path },
     })
-    this.fileListCache.flushAll()
     return removeResult
   }
 
