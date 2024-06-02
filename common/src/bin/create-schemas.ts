@@ -107,11 +107,16 @@ export const exec = async (): Promise<void> => {
           expose: 'all',
         }).createSchema(schemaValue.type)
         await promises.writeFile(outputFile, JSON.stringify(schema, null, 2))
+        console.log(`Schema generated succesfully.`)
       } catch (error) {
         console.error(`There was an error generating schema from ${schemaValue.inputFile}`, error)
+        throw error
       }
     }),
   )
 }
 
-exec()
+exec().catch((error) => {
+  console.error('Schema generation failed', error)
+  process.exit(1)
+})
