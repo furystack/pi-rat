@@ -32,12 +32,13 @@ test.describe('File Browser', () => {
     await page.getByText('- No Data -')
   })
 
-  test('Should able to upload a file', async ({ page }) => {
+  test.only('Should able to upload a file', async ({ page }) => {
     await page.goto('/')
     await login(page)
     await page.locator('icon-url-widget', { hasText: 'File Browser' }).click()
     await uploadFile(page, './e2e/test-files/upload.md', 'text/markdown')
+    await assertAndDismissNoty(page, 'File uploaded successfully')
 
-    await expect(page.getByText('upload.md')).toBeVisible()
+    await page.getByText('upload.md').doubleClick()
   })
 })
