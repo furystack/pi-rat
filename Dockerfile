@@ -1,4 +1,4 @@
-FROM node:19-alpine as base
+FROM node:lts-alpine as base
 
 COPY --chown=node:node /common /home/node/app/common
 COPY --chown=node:node /frontend /home/node/app/frontend
@@ -20,7 +20,7 @@ RUN apk add python3 make g++
 
 RUN yarn workspaces focus service --production
 
-FROM node:19-alpine as runner
+FROM node:lts-alpine as runner
 
 RUN apk upgrade -U \ 
     && apk add ffmpeg \
