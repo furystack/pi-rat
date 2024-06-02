@@ -1303,6 +1303,58 @@
       ],
       "additionalProperties": false
     },
+    "SaveTextFileEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "letter",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": [
+            "success"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "url",
+        "body",
+        "result"
+      ],
+      "additionalProperties": false
+    },
     "DrivesApi": {
       "type": "object",
       "properties": {
@@ -1364,20 +1416,15 @@
         },
         "PUT": {
           "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": [
-              "result"
-            ],
-            "additionalProperties": false
-          }
+          "properties": {
+            "/files/:letter/:path": {
+              "$ref": "#/definitions/SaveTextFileEndpoint"
+            }
+          },
+          "required": [
+            "/files/:letter/:path"
+          ],
+          "additionalProperties": false
         },
         "DELETE": {
           "type": "object",
@@ -1467,6 +1514,7 @@
       "required": [
         "GET",
         "POST",
+        "PUT",
         "PATCH",
         "DELETE"
       ],

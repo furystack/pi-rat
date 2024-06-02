@@ -129,7 +129,6 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: DrivesFilesys
       action: '/files/:letter/:path',
       url: { letter, path },
     })
-    this.fileListCache.flushAll()
     return removeResult
   }
 
@@ -137,7 +136,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: DrivesFilesys
   private declare readonly socket: WebsocketNotificationsService
 
   private onMessage = ((messageData: any) => {
-    if ((messageData as any).type === 'fileChange') {
+    if ((messageData as any).type === 'file-change') {
       this.emit('onFilesystemChanged', messageData as DrivesFilesystemChangedEvent)
 
       this.fileListCache.obsoleteRange((fileList) => {
