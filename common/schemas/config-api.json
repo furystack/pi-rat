@@ -279,7 +279,8 @@
                   "enum": [
                     "OMDB_CONFIG",
                     "GITHUB_CONFIG",
-                    "TORRENT_CONFIG"
+                    "TORRENT_CONFIG",
+                    "IOT_CONFIG"
                   ]
                 },
                 "$endsWith": {
@@ -287,7 +288,8 @@
                   "enum": [
                     "OMDB_CONFIG",
                     "GITHUB_CONFIG",
-                    "TORRENT_CONFIG"
+                    "TORRENT_CONFIG",
+                    "IOT_CONFIG"
                   ]
                 },
                 "$like": {
@@ -295,7 +297,8 @@
                   "enum": [
                     "OMDB_CONFIG",
                     "GITHUB_CONFIG",
-                    "TORRENT_CONFIG"
+                    "TORRENT_CONFIG",
+                    "IOT_CONFIG"
                   ]
                 },
                 "$regex": {
@@ -303,7 +306,8 @@
                   "enum": [
                     "OMDB_CONFIG",
                     "GITHUB_CONFIG",
-                    "TORRENT_CONFIG"
+                    "TORRENT_CONFIG",
+                    "IOT_CONFIG"
                   ]
                 }
               },
@@ -317,7 +321,8 @@
                   "enum": [
                     "OMDB_CONFIG",
                     "GITHUB_CONFIG",
-                    "TORRENT_CONFIG"
+                    "TORRENT_CONFIG",
+                    "IOT_CONFIG"
                   ]
                 },
                 "$ne": {
@@ -325,7 +330,8 @@
                   "enum": [
                     "OMDB_CONFIG",
                     "GITHUB_CONFIG",
-                    "TORRENT_CONFIG"
+                    "TORRENT_CONFIG",
+                    "IOT_CONFIG"
                   ]
                 }
               },
@@ -341,7 +347,8 @@
                     "enum": [
                       "OMDB_CONFIG",
                       "GITHUB_CONFIG",
-                      "TORRENT_CONFIG"
+                      "TORRENT_CONFIG",
+                      "IOT_CONFIG"
                     ]
                   }
                 },
@@ -352,7 +359,8 @@
                     "enum": [
                       "OMDB_CONFIG",
                       "GITHUB_CONFIG",
-                      "TORRENT_CONFIG"
+                      "TORRENT_CONFIG",
+                      "IOT_CONFIG"
                     ]
                   }
                 }
@@ -411,6 +419,24 @@
                         "torrentPath"
                       ],
                       "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "pingIntervalMs": {
+                          "type": "number",
+                          "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                        },
+                        "pingTimeoutMs": {
+                          "type": "number",
+                          "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                        }
+                      },
+                      "required": [
+                        "pingIntervalMs",
+                        "pingTimeoutMs"
+                      ],
+                      "additionalProperties": false
                     }
                   ]
                 },
@@ -457,6 +483,24 @@
                       "required": [
                         "torrentDriveLetter",
                         "torrentPath"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "pingIntervalMs": {
+                          "type": "number",
+                          "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                        },
+                        "pingTimeoutMs": {
+                          "type": "number",
+                          "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                        }
+                      },
+                      "required": [
+                        "pingIntervalMs",
+                        "pingTimeoutMs"
                       ],
                       "additionalProperties": false
                     }
@@ -515,6 +559,24 @@
                           "torrentPath"
                         ],
                         "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "pingIntervalMs": {
+                            "type": "number",
+                            "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                          },
+                          "pingTimeoutMs": {
+                            "type": "number",
+                            "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                          }
+                        },
+                        "required": [
+                          "pingIntervalMs",
+                          "pingTimeoutMs"
+                        ],
+                        "additionalProperties": false
                       }
                     ]
                   }
@@ -564,6 +626,24 @@
                         "required": [
                           "torrentDriveLetter",
                           "torrentPath"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "pingIntervalMs": {
+                            "type": "number",
+                            "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                          },
+                          "pingTimeoutMs": {
+                            "type": "number",
+                            "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                          }
+                        },
+                        "required": [
+                          "pingIntervalMs",
+                          "pingTimeoutMs"
                         ],
                         "additionalProperties": false
                       }
@@ -727,7 +807,8 @@
           "enum": [
             "OMDB_CONFIG",
             "GITHUB_CONFIG",
-            "TORRENT_CONFIG"
+            "TORRENT_CONFIG",
+            "IOT_CONFIG"
           ]
         },
         "value": {
@@ -773,6 +854,24 @@
               "required": [
                 "torrentDriveLetter",
                 "torrentPath"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "pingIntervalMs": {
+                  "type": "number",
+                  "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                },
+                "pingTimeoutMs": {
+                  "type": "number",
+                  "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                }
+              },
+              "required": [
+                "pingIntervalMs",
+                "pingTimeoutMs"
               ],
               "additionalProperties": false
             }
@@ -825,7 +924,8 @@
               "enum": [
                 "OMDB_CONFIG",
                 "GITHUB_CONFIG",
-                "TORRENT_CONFIG"
+                "TORRENT_CONFIG",
+                "IOT_CONFIG"
               ],
               "description": "The entity's unique identifier"
             }
@@ -872,7 +972,8 @@
           "enum": [
             "OMDB_CONFIG",
             "GITHUB_CONFIG",
-            "TORRENT_CONFIG"
+            "TORRENT_CONFIG",
+            "IOT_CONFIG"
           ]
         },
         "value": {
@@ -920,6 +1021,24 @@
                 "torrentPath"
               ],
               "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "pingIntervalMs": {
+                  "type": "number",
+                  "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                },
+                "pingTimeoutMs": {
+                  "type": "number",
+                  "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                }
+              },
+              "required": [
+                "pingIntervalMs",
+                "pingTimeoutMs"
+              ],
+              "additionalProperties": false
             }
           ]
         }
@@ -944,7 +1063,8 @@
               "enum": [
                 "OMDB_CONFIG",
                 "GITHUB_CONFIG",
-                "TORRENT_CONFIG"
+                "TORRENT_CONFIG",
+                "IOT_CONFIG"
               ]
             }
           },
@@ -974,7 +1094,8 @@
           "enum": [
             "OMDB_CONFIG",
             "GITHUB_CONFIG",
-            "TORRENT_CONFIG"
+            "TORRENT_CONFIG",
+            "IOT_CONFIG"
           ]
         },
         "value": {
@@ -1022,6 +1143,24 @@
                 "torrentPath"
               ],
               "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "pingIntervalMs": {
+                  "type": "number",
+                  "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                },
+                "pingTimeoutMs": {
+                  "type": "number",
+                  "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                }
+              },
+              "required": [
+                "pingIntervalMs",
+                "pingTimeoutMs"
+              ],
+              "additionalProperties": false
             }
           ]
         },
@@ -1047,7 +1186,8 @@
               "enum": [
                 "OMDB_CONFIG",
                 "GITHUB_CONFIG",
-                "TORRENT_CONFIG"
+                "TORRENT_CONFIG",
+                "IOT_CONFIG"
               ]
             }
           },
