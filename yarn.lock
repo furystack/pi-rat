@@ -6195,7 +6195,7 @@ __metadata:
     sqlite3: "npm:^5.1.7"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.6.0"
-    webtorrent: "npm:^2.3.6"
+    webtorrent: "npm:^2.2.1"
   languageName: unknown
   linkType: soft
 
@@ -7324,7 +7324,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webtorrent@npm:^2.3.6":
+"webtorrent@npm:^2.2.1":
   version: 2.3.6
   resolution: "webtorrent@npm:2.3.6"
   dependencies:

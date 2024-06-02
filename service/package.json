@@ -38,6 +38,6 @@
     "sequelize": "^6.37.3",
     "sqlite3": "^5.1.7",
     "vitest": "^1.6.0",
-    "webtorrent": "^2.3.6"
+    "webtorrent": "^2.2.1"
   }
 }
