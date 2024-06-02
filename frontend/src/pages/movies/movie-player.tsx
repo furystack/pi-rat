@@ -42,7 +42,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
               driveLetter: movieFile.driveLetter,
               path,
               fileName,
-              imdbId: movieFile.imdbId,
+              movieFileId: movieFile.id,
               watchedSeconds: progress,
             })
           },

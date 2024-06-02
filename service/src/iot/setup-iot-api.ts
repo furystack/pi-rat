@@ -14,9 +14,10 @@ import iotApiSchema from 'common/schemas/iot-api.json' assert { type: 'json' }
 import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
 import { AwakeAction } from './actions/awake-action.js'
 import { PingAction } from './actions/ping-action.js'
-import { WebSocketApi, useWebsockets } from '@furystack/websocket-api'
+import { useWebsockets } from '@furystack/websocket-api'
 import { DeviceAvailabilityHub } from './device-availability-hub.js'
 import { isAuthorized } from '@furystack/core'
+import { WebsocketService } from '../websocket-service.js'
 
 export const setupIotApi = async (injector: Injector) => {
   await useRestService<IotApi>({
@@ -76,23 +77,13 @@ export const setupIotApi = async (injector: Injector) => {
   })
 
   const hub = injector.getInstance(DeviceAvailabilityHub)
-  const ws = injector.getInstance(WebSocketApi)
+  const ws = injector.getInstance(WebsocketService)
 
   hub.subscribe('connected', async (device) => {
-    ws.broadcast(async (options) => {
-      const shouldNotify = await isAuthorized(options.injector, 'admin')
-      if (shouldNotify) {
-        options.ws.send(JSON.stringify({ type: 'device-connected', device }))
-      }
-    })
+    ws.announce({ type: 'device-connected', device }, async (options) => isAuthorized(options.injector, 'admin'))
   })
 
   hub.subscribe('disconnected', async (device) => {
-    ws.broadcast(async (options) => {
-      const shouldNotify = await isAuthorized(options.injector, 'admin')
-      if (shouldNotify) {
-        options.ws.send(JSON.stringify({ type: 'device-disconnected', device }))
-      }
-    })
+    ws.announce({ type: 'device-disconnected', device }, async (options) => isAuthorized(options.injector, 'admin'))
   })
 }

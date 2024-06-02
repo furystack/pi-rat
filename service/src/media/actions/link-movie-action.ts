@@ -19,8 +19,7 @@ import type { Injector } from '@furystack/inject'
 import { extractSubtitles } from '../utils/extract-subtitles.js'
 import ffprobe from 'ffprobe'
 import { join } from 'path'
-import { getDataSetFor } from '@furystack/repository'
-import { WebSocketApi } from '@furystack/websocket-api'
+import { WebsocketService } from '../../websocket-service.js'
 
 const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
   const movieStore = getStoreManager(injector).getStoreFor(Movie, 'imdbId')
@@ -116,11 +115,11 @@ const announceNewMovie = async ({
   movie: Movie
   movieFile: MovieFile
 }) => {
-  injector.getInstance(WebSocketApi).broadcast(async (options) => {
-    if (await isAuthorized(options.injector, 'admin')) {
-      options.ws.send(JSON.stringify({ type: 'add-movie', driveLetter, path, fileName, movie, movieFile }))
-    }
-  })
+  injector
+    .getInstance(WebsocketService)
+    .announce({ type: 'add-movie', driveLetter, path, fileName, movie, movieFile }, async ({ injector: i }) =>
+      isAuthorized(i, 'admin'),
+    )
 }
 
 export const linkMovie = async (options: { injector: Injector; drive: string; fileName: string; path: string }) => {
@@ -150,7 +149,7 @@ export const linkMovie = async (options: { injector: Injector; drive: string; fi
     return { status: 'already-linked' } as const
   }
 
-  const loadedDrive = await getDataSetFor(injector, Drive, 'letter').get(injector, drive)
+  const loadedDrive = await getStoreManager(injector).getStoreFor(Drive, 'letter').get(drive)
 
   if (!loadedDrive) {
     throw new RequestError(`Drive ${drive} not found`, 404)
@@ -159,7 +158,6 @@ export const linkMovie = async (options: { injector: Injector; drive: string; fi
   const ffprobeResult = await ffprobe(join(loadedDrive.physicalPath, path, fileName), { path: 'ffprobe' })
 
   const omdbStore = getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
-
   const storedResult = await omdbStore.find({
     filter: {
       Title: { $eq: title },

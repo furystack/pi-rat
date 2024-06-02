@@ -15,6 +15,7 @@ import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
 import type { FFProbeResult } from 'ffprobe'
 import { OmdbClientService } from './metadata-services/omdb-client-service.js'
+import { useMovieFileMaintainer } from './actions/movie-file-maintainer.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
   declare title: string
@@ -34,7 +35,7 @@ class MovieModel extends Model<Movie, Movie> implements Movie {
 
 class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare id: string
-  declare imdbId: string
+  declare imdbId?: string
   declare driveLetter: string
   declare path: string
   declare fileName: string
@@ -46,7 +47,7 @@ class MovieWatchHistoryEntryModel
   extends Model<MovieWatchHistoryEntry, MovieWatchHistoryEntry>
   implements MovieWatchHistoryEntry
 {
-  declare imdbId: string
+  declare movieFileId: string
   declare driveLetter: string
   declare path: string
   declare fileName: string
@@ -201,7 +202,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await MovieModel.sync()
     },
   })
 
@@ -222,7 +223,7 @@ export const setupMovies = async (injector: Injector) => {
           },
           imdbId: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           driveLetter: {
             type: DataTypes.STRING,
@@ -247,7 +248,8 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path', 'fileName'], unique: true }] },
       )
-      await sequelize.sync()
+
+      await sequelize.sync({})
     },
   })
 
@@ -274,7 +276,7 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.STRING,
             allowNull: false,
           },
-          imdbId: {
+          movieFileId: {
             type: DataTypes.STRING,
             allowNull: false,
           },
@@ -303,9 +305,15 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: false,
           },
         },
-        { sequelize, indexes: [{ fields: ['userName', 'driveLetter', 'path', 'fileName'], unique: true }] },
+        {
+          sequelize,
+          indexes: [
+            { fields: ['userName', 'driveLetter', 'path', 'fileName'], unique: true },
+            { fields: ['movieFileId'] },
+          ],
+        },
       )
-      await sequelize.sync()
+      await MovieWatchHistoryEntryModel.sync()
     },
   })
 
@@ -349,7 +357,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await SeriesModel.sync()
     },
   })
 
@@ -486,7 +494,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await OmdbMovieMetadataModel.sync()
     },
   })
 
@@ -599,7 +607,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await OmdbSeriesMetadataModel.sync()
     },
   })
 
@@ -695,6 +703,8 @@ export const setupMovies = async (injector: Injector) => {
   )
 
   configStore.subscribe('onEntityRemoved', ({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
+
+  useMovieFileMaintainer(injector)
 
   logger.verbose({ message: '✅  Media setup completed' })
 }

@@ -23,14 +23,15 @@ export const SeriesOverview = Shade<SeriesListProps>({
     return (
       <PiRatLazyLoad
         component={async () => {
-          const [series, relatedMovies] = await Promise.all([
+          const [series, relatedMovies, relatedMovieFiles] = await Promise.all([
             seriesService.getSeries(props.imdbId),
             moviesService.findMovie({ filter: { seriesId: { $eq: props.imdbId } } }),
+            movieFileService.findMovieFile({ filter: { imdbId: { $in: [props.imdbId] } } }),
           ])
 
           await Promise.all([
             movieFileService.prefetchMovieFilesForMovies(relatedMovies.entries),
-            watchProgresses.prefetchWatchProgressForMovies(relatedMovies.entries),
+            watchProgresses.prefetchWatchProgressForMovieFiles(relatedMovieFiles.entries),
           ])
 
           const seasons = Array.from(

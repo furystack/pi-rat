@@ -76,7 +76,7 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
                     driveLetter: letter,
                     path: parentPath,
                     fileName: path.split('/').pop() as string,
-                    imdbId: file.imdbId,
+                    movieFileId: file.id,
                     watchedSeconds: progress,
                   })
                 },

@@ -68,7 +68,7 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await UserModel.sync()
     },
   })
 
@@ -99,7 +99,7 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await PasswordCredentialModel.sync()
     },
   })
 
@@ -124,7 +124,7 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await SessionModel.sync()
     },
   })
 

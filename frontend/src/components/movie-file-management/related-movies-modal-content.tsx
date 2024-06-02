@@ -73,7 +73,7 @@ export const RelatedMoviesModalContent = Shade<{
           <>
             {`Found ${linkedFiles.value.count} related movies`}
             {linkedFiles.value.entries.map((linkedFile) => (
-              <MovieWidget imdbId={linkedFile.imdbId} />
+              <MovieWidget imdbId={linkedFile.imdbId as string} />
             ))}
           </>
         )

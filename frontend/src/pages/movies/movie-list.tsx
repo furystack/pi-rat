@@ -15,9 +15,10 @@ export const MovieList = Shade({
       <PiRatLazyLoad
         component={async () => {
           const movies = await movieService.findMovie({})
+          const movieFiles = await movieFilesService.findMovieFile({})
           await Promise.all([
             movieFilesService.prefetchMovieFilesForMovies(movies.entries),
-            watchProgressService.prefetchWatchProgressForMovies(movies.entries),
+            watchProgressService.prefetchWatchProgressForMovieFiles(movieFiles.entries),
           ])
 
           return (

@@ -1,69 +1,79 @@
 import { isAuthorized, StoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
+import { Injectable, Injected } from '@furystack/inject'
+import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { Drive } from 'common'
 import type { FSWatcher } from 'chokidar'
 import { watch } from 'chokidar'
-import { useWebsockets, WebSocketApi } from '@furystack/websocket-api'
-import { getPort } from '../get-port.js'
 import { sep } from 'path'
-import { onAdd, onUnlink, onUnlinkDir } from '../media/actions/movie-file-maintainer.js'
+import { EventHub } from '@furystack/utils'
+import { WebsocketService } from '../websocket-service.js'
 
-export const useFileWatchers = async (injector: Injector) => {
-  const watchers: { [key: string]: FSWatcher } = {}
-  const logger = getLogger(injector).withScope('FileWatchers')
+type EventParam = { path: string; drive: Drive }
 
-  useWebsockets(injector, {
-    port: getPort(),
-    path: '/api/ws',
-  })
+@Injectable({ lifetime: 'singleton' })
+export class FileWatcherService extends EventHub<{
+  add: EventParam
+  addDir: EventParam
+  change: EventParam
+  unlink: EventParam
+  unlinkDir: EventParam
+}> {
+  private watchers: { [key: string]: FSWatcher } = {}
 
-  const addWatcher = async (drive: Drive) => {
-    logger.verbose({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
+  @Injected((injector) => getLogger(injector).withScope('FileWatchers'))
+  private declare logger: ScopedLogger
+
+  @Injected(WebsocketService)
+  private declare webSocketService: WebsocketService
+
+  private addWatcher = async (drive: Drive) => {
+    if (this.watchers[drive.letter]) {
+      throw new Error(`Watcher for drive '${drive.letter}' already exists`)
+    }
+
+    this.logger.verbose({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
     const watcher = watch(drive.physicalPath, { ignoreInitial: true })
     watcher.on('all', (event, path) => {
       const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
-      logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
-      injector.getInstance(WebSocketApi).broadcast(async (options) => {
-        if (await isAuthorized(options.injector, 'admin')) {
-          options.ws.send(JSON.stringify({ type: 'file-change', event, path: relativePath, drive: drive.letter }))
-        }
-      })
+      this.logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
+      this.emit(event, { path: relativePath, drive })
+
+      this.webSocketService.announce(
+        { type: 'file-change', event, path: relativePath, drive: drive.letter },
+        ({ injector }) => isAuthorized(injector, 'admin'),
+      )
     })
 
-    const movieMaintainerUnlinkHandler = onUnlink(injector)
-    watcher.on('unlink', (path) => {
-      const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
-      movieMaintainerUnlinkHandler(drive, relativePath)
-    })
-
-    const movieMaintainerUnlinkDirHandler = onUnlinkDir(injector)
-    watcher.on('unlinkDir', (path) => {
-      const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
-      movieMaintainerUnlinkDirHandler(drive, relativePath)
-    })
-
-    const movieMaintainerOnAddHandler = onAdd(injector)
-
-    watcher.on('add', (path) => {
-      const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
-      movieMaintainerOnAddHandler(drive, relativePath)
-    })
-
-    watchers[drive.letter] = watcher
+    this.watchers[drive.letter] = watcher
   }
 
-  const removeWatcher = (letter: string) => {
-    if (watchers[letter]) {
-      watchers[letter].close()
-      delete watchers[letter]
-      logger.information({ message: `🔍  Stopping File Watcher on volume '${letter}'...` })
+  private removeWatcher = async (letter: string) => {
+    if (this.watchers[letter]) {
+      await this.watchers[letter].close()
+      delete this.watchers[letter]
+      await this.logger.information({ message: `🔍  Stopping File Watcher on volume '${letter}'...` })
+    } else {
+      throw new Error(`Watcher for drive '${letter}' does not exist`)
     }
   }
 
-  const driveStore = injector.getInstance(StoreManager).getStoreFor(Drive, 'letter')
-  driveStore.subscribe('onEntityAdded', ({ entity }) => addWatcher(entity))
-  driveStore.subscribe('onEntityRemoved', ({ key }) => removeWatcher(key))
-  const allDrives = await driveStore.find({})
-  allDrives.forEach((drive) => addWatcher(drive))
+  private declare injector: Injector
+
+  public init() {
+    this.startWatchCurrentDirectories()
+  }
+
+  private async startWatchCurrentDirectories() {
+    const driveStore = this.injector.getInstance(StoreManager).getStoreFor(Drive, 'letter')
+    driveStore.subscribe('onEntityAdded', ({ entity }) => this.addWatcher(entity))
+    driveStore.subscribe('onEntityRemoved', ({ key }) => this.removeWatcher(key))
+    const allDrives = await driveStore.find({})
+    allDrives.forEach((drive) => this.addWatcher(drive))
+  }
+}
+
+export const useFileWatchers = async (injector: Injector) => {
+  injector.getInstance(FileWatcherService)
 }

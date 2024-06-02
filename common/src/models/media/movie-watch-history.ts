@@ -1,7 +1,7 @@
 export class MovieWatchHistoryEntry {
   id!: string
   userName!: string
-  imdbId!: string
+  movieFileId!: string
   driveLetter!: string
   path!: string
   fileName!: string

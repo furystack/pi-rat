@@ -2,7 +2,7 @@ import { Injectable, Injected } from '@furystack/inject'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
-import type { Movie, MovieWatchHistoryEntry } from 'common'
+import type { MovieFile, MovieWatchHistoryEntry } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class WatchProgressService {
@@ -94,10 +94,10 @@ export class WatchProgressService {
     return result
   }
 
-  public async findWatchProgressesForMovie(movie: Movie) {
+  public async findWatchProgressesForMovieFile(movieFile: MovieFile) {
     return await this.findWatchProgress({
       filter: {
-        imdbId: { $eq: movie.imdbId },
+        movieFileId: { $eq: movieFile.id },
       },
     })
   }
@@ -129,22 +129,22 @@ export class WatchProgressService {
     return result
   }
 
-  public async prefetchWatchProgressForMovies(movies: Movie[]) {
-    const imdbIds = Array.from(new Set(movies.map((movie) => movie.imdbId)))
+  public async prefetchWatchProgressForMovieFiles(movieFiles: MovieFile[]) {
+    const movieFileIds = Array.from(new Set(movieFiles.map((movie) => movie.id)))
 
     const result = await this.findWatchProgress({
       filter: {
-        imdbId: { $in: imdbIds },
+        movieFileId: { $in: movieFileIds },
       },
     })
 
-    imdbIds.forEach((imdbId) => {
-      const relatedWatchProgresses = result.entries.filter((entry) => entry.imdbId === imdbId)
+    movieFileIds.forEach((movieFileId) => {
+      const relatedWatchProgresses = result.entries.filter((entry) => entry.movieFileId === movieFileId)
       this.watchProgressQueryCache.setExplicitValue({
         loadArgs: [
           {
             filter: {
-              imdbId: { $eq: imdbId },
+              movieFileId: { $eq: movieFileId },
             },
           },
         ],

@@ -60,7 +60,7 @@ export const setupDrives = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await DriveModel.sync()
     },
   })
 
