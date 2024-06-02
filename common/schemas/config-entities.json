@@ -1,6 +1,36 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "TorrentConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "TORRENT_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "torrentDriveLetter": {
+              "type": "string"
+            },
+            "torrentPath": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "torrentDriveLetter",
+            "torrentPath"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "additionalProperties": false
+    },
     "OmdbConfig": {
       "type": "object",
       "properties": {
@@ -17,6 +47,33 @@
           },
           "required": [
             "apiKey"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "IotConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "IOT_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "pingIntervalMs": {
+              "type": "number",
+              "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+            }
+          },
+          "required": [
+            "pingIntervalMs"
           ],
           "additionalProperties": false
         }
@@ -57,36 +114,6 @@
       ],
       "additionalProperties": false
     },
-    "TorrentConfig": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "const": "TORRENT_CONFIG"
-        },
-        "value": {
-          "type": "object",
-          "properties": {
-            "torrentDriveLetter": {
-              "type": "string"
-            },
-            "torrentPath": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "torrentDriveLetter",
-            "torrentPath"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "id",
-        "value"
-      ],
-      "additionalProperties": false
-    },
     "ConfigType": {
       "anyOf": [
         {
@@ -97,6 +124,9 @@
         },
         {
           "$ref": "#/definitions/TorrentConfig"
+        },
+        {
+          "$ref": "#/definitions/IotConfig"
         }
       ]
     },
@@ -108,7 +138,8 @@
           "enum": [
             "OMDB_CONFIG",
             "GITHUB_CONFIG",
-            "TORRENT_CONFIG"
+            "TORRENT_CONFIG",
+            "IOT_CONFIG"
           ]
         },
         "value": {
@@ -154,6 +185,19 @@
               "required": [
                 "torrentDriveLetter",
                 "torrentPath"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "pingIntervalMs": {
+                  "type": "number",
+                  "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                }
+              },
+              "required": [
+                "pingIntervalMs"
               ],
               "additionalProperties": false
             }

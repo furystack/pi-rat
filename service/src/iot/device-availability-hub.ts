@@ -4,8 +4,9 @@ import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { EventHub, sleepAsync } from '@furystack/utils'
-import { Device, DevicePingHistory } from 'common'
+import { Config, Device, DevicePingHistory } from 'common'
 import ping from 'ping'
+import type { IotConfig } from '../../../common/src/models/config/iot-config.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconnected: Device; refresh: null }> {
@@ -13,11 +14,13 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
   public updateDevices = (devices: Device[]) => {
     this.devices = [...devices]
   }
-
   private deviceStatusMap = new Map<string, boolean>()
 
   @Injected((injector) => getLogger(injector).withScope('DeviceAvailabilityHub'))
   private declare logger: ScopedLogger
+
+  @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Config, 'id'))
+  private declare configStore: PhysicalStore<Config, 'id', WithOptionalId<Config, 'id'>>
 
   private async refreshConnections() {
     this.emit('refresh', null)
@@ -48,7 +51,8 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
         data: { error },
       })
     } finally {
-      await sleepAsync(15000)
+      const currentConfig = (await this.configStore.get('IOT_CONFIG')) as IotConfig
+      await sleepAsync(currentConfig?.value.pingIntervalMs || 120 * 1000)
       await this.refreshConnections()
     }
   }
