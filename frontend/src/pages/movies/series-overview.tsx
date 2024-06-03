@@ -31,7 +31,7 @@ export const SeriesOverview = Shade<SeriesListProps>({
 
           await Promise.all([
             movieFileService.prefetchMovieFilesForMovies(relatedMovies.entries),
-            watchProgresses.prefetchWatchProgressForMovieFiles(relatedMovieFiles.entries),
+            watchProgresses.prefetchWatchProgressForFiles(relatedMovieFiles.entries),
           ])
 
           const seasons = Array.from(

@@ -46,7 +46,7 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
 
           await Promise.all([
             movieFileService.prefetchMovieFilesForMovies(movies),
-            watchProgressService.prefetchWatchProgressForMovieFiles(movieFiles.entries),
+            watchProgressService.prefetchWatchProgressForFiles(movieFiles.entries),
           ])
 
           return (

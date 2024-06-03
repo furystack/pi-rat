@@ -18,7 +18,7 @@ export const MovieList = Shade({
           const movieFiles = await movieFilesService.findMovieFile({})
           await Promise.all([
             movieFilesService.prefetchMovieFilesForMovies(movies.entries),
-            watchProgressService.prefetchWatchProgressForMovieFiles(movieFiles.entries),
+            watchProgressService.prefetchWatchProgressForFiles(movieFiles.entries),
           ])
 
           return (

@@ -121,7 +121,7 @@ export class WatchProgressService {
     return result
   }
 
-  public async prefetchWatchProgressForMovieFiles(files: PiRatFile[]) {
+  public async prefetchWatchProgressForFiles(files: PiRatFile[]) {
     const filter: FilterType<MovieWatchHistoryEntry> = {
       $or: files.map(({ path, driveLetter }) => ({
         path: { $eq: path },

@@ -3,8 +3,10 @@ import { FileAssociationsService } from '../../services/file-associations-servic
 import { ImageViewer } from './image-viewer.js'
 import { MonacoFileEditor } from './monaco-file-editor.js'
 import { UnknownType } from './unknown-type.js'
-import { VideoPlayer } from './video-player.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
+import { MoviePlayer } from '../movies/movie-player.js'
+import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
+import { FileMoviePlayer } from './file-movie-player.js'
 
 export const FilesPage = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-page',
@@ -21,7 +23,7 @@ export const FilesPage = Shade<{ letter: string; path: string }>({
             case 'image-viewer':
               return <ImageViewer letter={letter} path={path} />
             case 'video-player':
-              return <VideoPlayer letter={letter} path={path} />
+              return <FileMoviePlayer file={{ driveLetter: letter, path }} />
             case 'monaco-editor':
               return <MonacoFileEditor letter={letter} path={path} />
             default:
