@@ -4,8 +4,6 @@ import { ImageViewer } from './image-viewer.js'
 import { MonacoFileEditor } from './monaco-file-editor.js'
 import { UnknownType } from './unknown-type.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
-import { MoviePlayer } from '../movies/movie-player.js'
-import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
 import { FileMoviePlayer } from './file-movie-player.js'
 
 export const FilesPage = Shade<{ letter: string; path: string }>({
