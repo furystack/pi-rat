@@ -51,8 +51,30 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
         }),
     )
 
-    attachProps(element, { player })
+    const audioTrackList = (player as any).audioTracks()
 
+    props.ffProbe.streams
+      .filter((stream) => stream.codec_type === 'audio')
+      .forEach((audio) => {
+        const track = new (videojs as any).default.AudioTrack({
+          id: audio.index,
+          kind: Object.entries(audio.disposition).filter(([_key, value]) => value === 1)?.[0]?.[0] || 'default',
+          label: audio.tags.title || audio.tags.language || audio.tags.filename,
+          language: audio.tags.language,
+        })
+        audioTrackList.addTrack(track)
+      })
+
+    audioTrackList.addEventListener('change', () => {
+      const activeTrack = audioTrackList.tracks_.find((track: any) => track.enabled)
+      const currentSource = player.currentSource() as any as { type: string; src: string }
+      const newUrl = new URL(currentSource.src)
+      newUrl.searchParams.set('audio', activeTrack.id)
+      player.src({ type: currentSource.type, src: newUrl.toString() })
+      console.log('activeTrack', activeTrack)
+    })
+
+    attachProps(element, { player })
     return () => player.dispose()
   },
   render: ({ props }) => {
