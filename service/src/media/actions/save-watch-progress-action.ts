@@ -6,16 +6,14 @@ import type { SaveWatchProgress } from 'common'
 import { MovieWatchHistoryEntry } from 'common'
 
 export const SaveWatchProgressAction: RequestAction<SaveWatchProgress> = async ({ injector, getBody }) => {
-  const { completed, driveLetter, movieFileId, path, fileName, watchedSeconds } = await getBody()
+  const { completed, driveLetter, path, watchedSeconds } = await getBody()
 
   const dataSet = getDataSetFor(injector, MovieWatchHistoryEntry, 'id')
 
   const [existing] = await dataSet.find(injector, {
     filter: {
-      movieFileId: { $eq: movieFileId },
       driveLetter: { $eq: driveLetter },
       path: { $eq: path },
-      fileName: { $eq: fileName },
     },
   })
 
@@ -32,10 +30,8 @@ export const SaveWatchProgressAction: RequestAction<SaveWatchProgress> = async (
       created: [added],
     } = await dataSet.add(injector, {
       userName: user.username,
-      movieFileId,
       driveLetter,
       path,
-      fileName,
       watchedSeconds,
       completed,
       createdAt: new Date().toISOString(),

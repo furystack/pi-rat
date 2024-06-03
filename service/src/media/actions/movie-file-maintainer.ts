@@ -4,7 +4,7 @@ import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import type { Disposable } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
-import type { Drive } from 'common'
+import type { PiRatFile } from 'common'
 import { MovieFile } from 'common'
 import { linkMovie } from './link-movie-action.js'
 import { FileWatcherService } from '../../drives/file-watcher-service.js'
@@ -14,24 +14,21 @@ export class MovieMaintainerService {
   @Injected((i) => getLogger(i).withScope('MovieFileMaintainer'))
   private declare logger: ScopedLogger
   private declare injector: Injector
-  private onUnlink = async ({ drive, path }: { drive: Drive; path: string }) => {
+  private onUnlink = async (file: PiRatFile) => {
     try {
       const store = this.injector.getInstance(StoreManager).getStoreFor(MovieFile, 'id')
-      const parentPath = PathHelper.getParentPath(path) || ''
-      const fileName = path.split('/').slice(-1)[0]
 
       const existingMovies = await store.find({
         filter: {
-          path: { $eq: parentPath },
-          driveLetter: { $eq: drive.letter },
-          fileName: { $eq: fileName },
+          path: { $eq: file.path },
+          driveLetter: { $eq: file.driveLetter },
         },
       })
 
       if (existingMovies.length > 0) {
         await this.logger.verbose({
-          message: `🎬  A movie file has been removed, cleaning up '${path}' from DB...`,
-          data: { driveLetter: drive.letter, path: parentPath, fileName },
+          message: `🎬  A movie file has been removed, cleaning up '${file.path}' from DB...`,
+          data: file,
         })
         await store.remove(existingMovies[0].id)
       }
@@ -43,15 +40,15 @@ export class MovieMaintainerService {
     }
   }
 
-  private onUnlinkDir = async ({ drive, path }: { drive: Drive; path: string }) => {
+  private onUnlinkDir = async (file: PiRatFile) => {
     try {
       const store = this.injector.getInstance(StoreManager).getStoreFor(MovieFile, 'id')
-      const normalizedPath = PathHelper.normalize(path)
+      const normalizedPath = PathHelper.normalize(file.path)
 
       const existingMovies = await store.find({
         filter: {
           path: { $like: `${normalizedPath}%` },
-          driveLetter: { $eq: drive.letter },
+          driveLetter: { $eq: file.driveLetter },
         },
       })
 
@@ -59,10 +56,9 @@ export class MovieMaintainerService {
         await this.logger.verbose({
           message: `🎬  A folder has been removed, cleaning up movie files inside...`,
           data: {
-            path,
+            file,
             entries: existingMovies.map((movie) => ({
               path: movie.path,
-              fileName: movie.fileName,
             })),
           },
         })
@@ -76,11 +72,9 @@ export class MovieMaintainerService {
     }
   }
 
-  private onAdd = async ({ drive, path }: { drive: Drive; path: string }) => {
+  private onAdd = async (file: PiRatFile) => {
     try {
-      const parentPath = PathHelper.getParentPath(path) || ''
-      const fileName = path.split('/').slice(-1)[0]
-      await linkMovie({ injector: this.injector, drive: drive.letter, fileName, path: parentPath })
+      await linkMovie({ injector: this.injector, file })
     } catch (error) {
       await this.logger.error({
         message: '🎬  Failed to link movie',

@@ -16,22 +16,18 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
     const watchProgressService = injector.getInstance(WatchProgressService)
 
     const { letter, path } = props
-    const fileName = path.split('/').pop() as string
-    const parentPath = path.split('/').slice(0, -1).join('/') || '/'
 
     Promise.all([
       movieFilesService.findMovieFile({
         filter: {
-          path: { $eq: parentPath },
-          fileName: { $eq: fileName },
+          path: { $eq: path },
           driveLetter: { $eq: letter },
         },
         top: 1,
       }),
       watchProgressService.findWatchProgressForFile({
-        path: parentPath,
+        path,
         driveLetter: letter,
-        fileName,
       }),
     ]).then(
       ([
@@ -74,9 +70,7 @@ export const VideoPlayer = Shade<{ letter: string; path: string }>({
                   watchProgressService.updateWatchEntry({
                     completed: video.duration - progress < 10,
                     driveLetter: letter,
-                    path: parentPath,
-                    fileName: path.split('/').pop() as string,
-                    movieFileId: file.id,
+                    path,
                     watchedSeconds: progress,
                   })
                 },

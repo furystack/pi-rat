@@ -14,22 +14,15 @@ import type {
   OmdbSeriesMetadata,
   Series,
 } from '../models/media/index.js'
+import type { PiRatFile } from '../models/pirat-file.js'
 
 export type LinkMovie = {
-  body: {
-    drive: string
-    path: string
-    fileName: string
-  }
+  body: PiRatFile
   result: { status: 'already-linked' | 'linked' | 'failed' | 'not-movie-file' }
 }
 
 export type ExtractSubtitles = {
-  body: {
-    drive: string
-    path: string
-    fileName: string
-  }
+  body: PiRatFile
   result: { success: boolean }
 }
 

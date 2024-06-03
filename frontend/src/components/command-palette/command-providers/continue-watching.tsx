@@ -19,9 +19,10 @@ export const continueWatchingCommandProvider: CommandProvider = async ({ term, i
 
       const movieFiles = await movieFilesService.findMovieFile({
         filter: {
-          id: {
-            $in: lastEntries.map((e) => e.movieFileId),
-          },
+          $and: lastEntries.map((entry) => ({
+            path: { $eq: entry.path },
+            driveLetter: { $eq: entry.driveLetter },
+          })),
         },
       })
 

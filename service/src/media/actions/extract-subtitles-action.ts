@@ -4,8 +4,8 @@ import type { ExtractSubtitles } from 'common'
 import { extractSubtitles } from '../utils/extract-subtitles.js'
 
 export const ExtractSubtitlesAction: RequestAction<ExtractSubtitles> = async ({ injector, getBody }) => {
-  const { drive, path, fileName } = await getBody()
-  await extractSubtitles({ injector, driveLetter: drive, path, fileName })
+  const file = await getBody()
+  await extractSubtitles({ injector, file })
 
   return JsonResult({ success: true })
 }

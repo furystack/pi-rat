@@ -27,9 +27,10 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
 
           const movieFiles = await movieFileService.findMovieFile({
             filter: {
-              imdbId: {
-                $in: Array.from(new Set(watchEntries.entries.map((entry) => entry.movieFileId))),
-              },
+              $or: watchEntries.entries.map((entry) => ({
+                path: { $eq: entry.path },
+                driveLetter: { $eq: entry.driveLetter },
+              })),
             },
           })
 
@@ -63,7 +64,11 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
                   {watchEntries.entries.map((entry, index) => (
                     <div style={{ scrollSnapAlign: 'start' }}>
                       <MovieWidget
-                        imdbId={movieFiles.entries.find((mf) => mf.id === entry.movieFileId)!.imdbId as string}
+                        imdbId={
+                          movieFiles.entries.find(
+                            (mf) => mf.driveLetter === entry.driveLetter && mf.path === entry.path,
+                          )!.imdbId as string
+                        }
                         index={index}
                         size={size || 256}
                       />

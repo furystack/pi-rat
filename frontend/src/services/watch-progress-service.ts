@@ -1,8 +1,9 @@
 import { Injectable, Injected } from '@furystack/inject'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 import { Cache } from '@furystack/cache'
-import type { FindOptions } from '@furystack/core'
-import type { MovieFile, MovieWatchHistoryEntry } from 'common'
+import type { FilterType, FindOptions } from '@furystack/core'
+import type { MovieWatchHistoryEntry } from 'common'
+import type { PiRatFile } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class WatchProgressService {
@@ -43,7 +44,6 @@ export class WatchProgressService {
               filter: {
                 path: { $eq: entry.path },
                 driveLetter: { $eq: entry.driveLetter },
-                fileName: { $eq: entry.fileName },
               },
             },
           ],
@@ -61,15 +61,7 @@ export class WatchProgressService {
 
   public findWatchProgress = this.watchProgressQueryCache.get.bind(this.watchProgressQueryCache)
 
-  public findWatchProgressForFile = async ({
-    path,
-    fileName,
-    driveLetter,
-  }: {
-    path: string
-    fileName: string
-    driveLetter: string
-  }) => {
+  public findWatchProgressForFile = async ({ path, driveLetter }: PiRatFile) => {
     const { result } = await this.mediaApiClient.call({
       method: 'GET',
       action: '/my-watch-progresses',
@@ -77,7 +69,6 @@ export class WatchProgressService {
         findOptions: {
           filter: {
             path: { $eq: path },
-            fileName: { $eq: fileName },
             driveLetter: { $eq: driveLetter },
           },
         },
@@ -94,10 +85,11 @@ export class WatchProgressService {
     return result
   }
 
-  public async findWatchProgressesForMovieFile(movieFile: MovieFile) {
+  public async findWatchProgressesForFile({ driveLetter, path }: PiRatFile) {
     return await this.findWatchProgress({
       filter: {
-        movieFileId: { $eq: movieFile.id },
+        driveLetter: { $eq: driveLetter },
+        path: { $eq: path },
       },
     })
   }
@@ -129,22 +121,28 @@ export class WatchProgressService {
     return result
   }
 
-  public async prefetchWatchProgressForMovieFiles(movieFiles: MovieFile[]) {
-    const movieFileIds = Array.from(new Set(movieFiles.map((movie) => movie.id)))
+  public async prefetchWatchProgressForMovieFiles(files: PiRatFile[]) {
+    const filter: FilterType<MovieWatchHistoryEntry> = {
+      $or: files.map(({ path, driveLetter }) => ({
+        path: { $eq: path },
+        driveLetter: { $eq: driveLetter },
+      })),
+    }
 
     const result = await this.findWatchProgress({
-      filter: {
-        movieFileId: { $in: movieFileIds },
-      },
+      filter,
     })
 
-    movieFileIds.forEach((movieFileId) => {
-      const relatedWatchProgresses = result.entries.filter((entry) => entry.movieFileId === movieFileId)
+    files.forEach(({ path, driveLetter }) => {
+      const relatedWatchProgresses = result.entries.filter(
+        (entry) => entry.path === path && entry.driveLetter === driveLetter,
+      )
       this.watchProgressQueryCache.setExplicitValue({
         loadArgs: [
           {
             filter: {
-              movieFileId: { $eq: movieFileId },
+              path: { $eq: path },
+              driveLetter: { $eq: driveLetter },
             },
           },
         ],

@@ -5,7 +5,7 @@ import 'video.js/dist/video-js.css'
 import * as videojsDefault from 'video.js'
 import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
-import type { MovieFile, MovieWatchHistoryEntry } from 'common'
+import { getFileName, getParentPath, type MovieFile, type MovieWatchHistoryEntry } from 'common'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default /* & any*/
 
@@ -28,7 +28,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
       },
     })
 
-    const { fileName, path } = movieFile
+    const { path } = movieFile
     const watchProgressService = injector.getInstance(WatchProgressService)
 
     useDisposable(
@@ -41,8 +41,6 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
               completed: video.duration - progress < 10,
               driveLetter: movieFile.driveLetter,
               path,
-              fileName,
-              movieFileId: movieFile.id,
               watchedSeconds: progress,
             })
           },
@@ -57,6 +55,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
   },
   render: ({ props }) => {
     const { movieFile, watchProgress } = props
+    const fileName = getFileName(movieFile)
 
     const subtitleTracks = movieFile.ffprobe.streams
       .filter((stream) => (stream.codec_type as any) === 'subtitle')
@@ -66,7 +65,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
           label={subtitle.tags.title || subtitle.tags.language || subtitle.tags.filename}
           src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
             movieFile.driveLetter,
-          )}/${encodeURIComponent(`${movieFile.path}/${movieFile.fileName}-subtitle-${subtitle.index}.vtt`)}/download`}
+          )}/${encodeURIComponent(`${getParentPath(movieFile)}/${fileName}-subtitle-${subtitle.index}.vtt`)}/download`}
           srclang={subtitle.tags.language}
         />
       ))

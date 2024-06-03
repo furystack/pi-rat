@@ -183,12 +183,12 @@ export const MovieWidget = Shade<{
                     return <></>
                   }
 
-                  const { entries: watchProgresses } = await watchProgressService.findWatchProgressesForMovieFile(
+                  const { entries: watchProgresses } = await watchProgressService.findWatchProgressForFile(
                     movieFile.value.entries[0],
                   )
 
                   const lastRecentWatchProgress = watchProgresses.find((w) =>
-                    movieFile.value.entries.some((file) => file.id === w.movieFileId),
+                    movieFile.value.entries.some((file) => file.driveLetter === w.driveLetter && file.path === w.path),
                   )
 
                   const percent =

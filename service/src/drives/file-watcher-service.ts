@@ -3,6 +3,7 @@ import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import type { PiRatFile } from 'common'
 import { Drive } from 'common'
 import type { FSWatcher } from 'chokidar'
 import { watch } from 'chokidar'
@@ -10,7 +11,7 @@ import { sep } from 'path'
 import { EventHub } from '@furystack/utils'
 import { WebsocketService } from '../websocket-service.js'
 
-type EventParam = { path: string; drive: Drive }
+type EventParam = PiRatFile
 
 @Injectable({ lifetime: 'singleton' })
 export class FileWatcherService extends EventHub<{
@@ -38,7 +39,7 @@ export class FileWatcherService extends EventHub<{
     watcher.on('all', (event, path) => {
       const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
       this.logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
-      this.emit(event, { path: relativePath, drive })
+      this.emit(event, { path: relativePath, driveLetter: drive.letter })
 
       this.webSocketService.announce(
         { type: 'file-change', event, path: relativePath, drive: drive.letter },

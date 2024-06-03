@@ -1,7 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { ContextMenu } from '../../components/context-menu.js'
 import type { DirectoryEntry } from 'common'
-import { isMovieFile, getFallbackMetadata, isSampleFile } from 'common'
+import { isMovieFile, getFallbackMetadata, isSampleFile, getFullPath } from 'common'
 import { ObservableValue } from '@furystack/utils'
 import { FileInfoModal } from './file-info-modal.js'
 import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
@@ -57,9 +57,8 @@ export const FileContextMenu = Shade<{
                           method: 'POST',
                           action: '/extract-subtitles',
                           body: {
-                            drive: currentDriveLetter,
-                            path: currentPath,
-                            fileName: entry.name,
+                            driveLetter: currentDriveLetter,
+                            path: getFullPath(currentPath, entry.name),
                           },
                         })
                         .then(() => {

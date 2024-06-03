@@ -5,24 +5,7 @@
       "type": "object",
       "properties": {
         "body": {
-          "type": "object",
-          "properties": {
-            "drive": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            },
-            "fileName": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "drive",
-            "path",
-            "fileName"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/PiRatFile"
         },
         "result": {
           "type": "object",
@@ -49,28 +32,30 @@
       ],
       "additionalProperties": false
     },
+    "PiRatFile": {
+      "type": "object",
+      "properties": {
+        "driveLetter": {
+          "type": "string",
+          "description": "The letter for the drive"
+        },
+        "path": {
+          "type": "string",
+          "description": "The full path of the file"
+        }
+      },
+      "required": [
+        "driveLetter",
+        "path"
+      ],
+      "additionalProperties": false,
+      "description": "Represents a File entry in pi-rat"
+    },
     "ExtractSubtitles": {
       "type": "object",
       "properties": {
         "body": {
-          "type": "object",
-          "properties": {
-            "drive": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            },
-            "fileName": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "drive",
-            "path",
-            "fileName"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/PiRatFile"
         },
         "result": {
           "type": "object",
@@ -253,21 +238,15 @@
       "additionalProperties": false
     },
     "Omit<MovieWatchHistoryEntry,(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>": {
-      "$ref": "#/definitions/Pick%3CMovieWatchHistoryEntry%2CExclude%3C(%22id%22%7C%22userName%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E%3E"
+      "$ref": "#/definitions/Pick%3CMovieWatchHistoryEntry%2CExclude%3C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E%3E"
     },
-    "Pick<MovieWatchHistoryEntry,Exclude<(\"id\"|\"userName\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\"),(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>>": {
+    "Pick<MovieWatchHistoryEntry,Exclude<(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\"),(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>>": {
       "type": "object",
       "properties": {
-        "imdbId": {
-          "type": "string"
-        },
         "driveLetter": {
           "type": "string"
         },
         "path": {
-          "type": "string"
-        },
-        "fileName": {
           "type": "string"
         },
         "watchedSeconds": {
@@ -278,10 +257,8 @@
         }
       },
       "required": [
-        "imdbId",
         "driveLetter",
         "path",
-        "fileName",
         "watchedSeconds",
         "completed"
       ],
@@ -296,16 +273,10 @@
         "userName": {
           "type": "string"
         },
-        "imdbId": {
-          "type": "string"
-        },
         "driveLetter": {
           "type": "string"
         },
         "path": {
-          "type": "string"
-        },
-        "fileName": {
           "type": "string"
         },
         "watchedSeconds": {
@@ -324,10 +295,8 @@
       "required": [
         "id",
         "userName",
-        "imdbId",
         "driveLetter",
         "path",
-        "fileName",
         "watchedSeconds",
         "completed",
         "createdAt",
@@ -1800,7 +1769,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -1816,7 +1785,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieWatchHistoryEntry,(\"id\"|\"userName\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<MovieWatchHistoryEntry,(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1844,13 +1813,6 @@
                 "DESC"
               ]
             },
-            "imdbId": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
             "driveLetter": {
               "type": "string",
               "enum": [
@@ -1859,13 +1821,6 @@
               ]
             },
             "path": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
-            "fileName": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -1911,10 +1866,8 @@
             "enum": [
               "id",
               "userName",
-              "imdbId",
               "driveLetter",
               "path",
-              "fileName",
               "watchedSeconds",
               "completed",
               "createdAt",
@@ -2063,58 +2016,6 @@
             }
           ]
         },
-        "imdbId": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
         "driveLetter": {
           "anyOf": [
             {
@@ -2168,58 +2069,6 @@
           ]
         },
         "path": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "fileName": {
           "anyOf": [
             {
               "type": "object",
@@ -2498,10 +2347,8 @@
                 "enum": [
                   "id",
                   "userName",
-                  "imdbId",
                   "driveLetter",
                   "path",
-                  "fileName",
                   "watchedSeconds",
                   "completed",
                   "createdAt",
@@ -7002,7 +6849,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -7018,7 +6865,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieFile,(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\")[]>": {
+    "FindOptions<MovieFile,(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -7060,13 +6907,6 @@
                 "DESC"
               ]
             },
-            "fileName": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
             "ffprobe": {
               "type": "string",
               "enum": [
@@ -7094,7 +6934,6 @@
               "imdbId",
               "driveLetter",
               "path",
-              "fileName",
               "ffprobe",
               "relatedFiles"
             ]
@@ -7194,24 +7033,6 @@
             {
               "type": "object",
               "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
                 "$eq": {
                   "type": "string"
                 },
@@ -7227,13 +7048,27 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
                   }
                 }
               },
@@ -7294,58 +7129,6 @@
           ]
         },
         "path": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "fileName": {
           "anyOf": [
             {
               "type": "object",
@@ -8567,9 +8350,6 @@
         "path": {
           "type": "string"
         },
-        "fileName": {
-          "type": "string"
-        },
         "ffprobe": {
           "$ref": "#/definitions/getInfo.FFProbeResult"
         },
@@ -8602,10 +8382,8 @@
       },
       "required": [
         "id",
-        "imdbId",
         "driveLetter",
         "path",
-        "fileName",
         "ffprobe"
       ],
       "additionalProperties": false
@@ -8625,7 +8403,6 @@
                   "imdbId",
                   "driveLetter",
                   "path",
-                  "fileName",
                   "ffprobe",
                   "relatedFiles"
                 ]
@@ -8763,9 +8540,6 @@
         "path": {
           "type": "string"
         },
-        "fileName": {
-          "type": "string"
-        },
         "ffprobe": {
           "$ref": "#/definitions/getInfo.FFProbeResult"
         },
@@ -8799,15 +8573,13 @@
       "required": [
         "driveLetter",
         "ffprobe",
-        "fileName",
-        "imdbId",
         "path"
       ]
     },
     "Omit<MovieFile,\"id\">": {
-      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22id%22%3E%3E"
+      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22id%22%3E%3E"
     },
-    "Pick<MovieFile,Exclude<(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\"),\"id\">>": {
+    "Pick<MovieFile,Exclude<(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\"),\"id\">>": {
       "type": "object",
       "properties": {
         "imdbId": {
@@ -8817,9 +8589,6 @@
           "type": "string"
         },
         "path": {
-          "type": "string"
-        },
-        "fileName": {
           "type": "string"
         },
         "ffprobe": {
@@ -8853,10 +8622,8 @@
         }
       },
       "required": [
-        "imdbId",
         "driveLetter",
         "path",
-        "fileName",
         "ffprobe"
       ],
       "additionalProperties": false
@@ -8982,9 +8749,6 @@
           "type": "string"
         },
         "path": {
-          "type": "string"
-        },
-        "fileName": {
           "type": "string"
         },
         "ffprobe": {

@@ -38,7 +38,6 @@ class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare imdbId?: string
   declare driveLetter: string
   declare path: string
-  declare fileName: string
   declare ffprobe: FFProbeResult
   declare relatedFiles?: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> | undefined
 }
@@ -50,7 +49,6 @@ class MovieWatchHistoryEntryModel
   declare movieFileId: string
   declare driveLetter: string
   declare path: string
-  declare fileName: string
   declare id: string
   declare userName: string
   declare movie: Movie
@@ -233,10 +231,6 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.STRING,
             allowNull: false,
           },
-          fileName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
           ffprobe: {
             type: DataTypes.JSON,
             allowNull: true,
@@ -246,10 +240,10 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: true,
           },
         },
-        { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path', 'fileName'], unique: true }] },
+        { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path'], unique: true }] },
       )
 
-      await sequelize.sync({})
+      await MovieFileModel.sync()
     },
   })
 
@@ -276,15 +270,7 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.STRING,
             allowNull: false,
           },
-          movieFileId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
           path: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
-          fileName: {
             type: DataTypes.STRING,
             allowNull: false,
           },
@@ -307,10 +293,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         {
           sequelize,
-          indexes: [
-            { fields: ['userName', 'driveLetter', 'path', 'fileName'], unique: true },
-            { fields: ['movieFileId'] },
-          ],
+          indexes: [{ fields: ['userName', 'driveLetter', 'path'], unique: true }],
         },
       )
       await MovieWatchHistoryEntryModel.sync()

@@ -18,14 +18,14 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
     throw new RequestError(`Movie file with imdbId '${movieFileId}' not found`, 404)
   }
 
-  const { driveLetter, path, fileName } = movieFile
+  const { driveLetter, path } = movieFile
 
   const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, driveLetter)
   if (!drive) {
     throw new RequestError(`Drive ${driveLetter} not found`, 404)
   }
 
-  const fullPath = join(drive.physicalPath, path, fileName)
+  const fullPath = join(drive.physicalPath, path)
 
   const fileStats = await stat(fullPath)
   const fileSize = fileStats.size
