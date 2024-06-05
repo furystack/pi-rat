@@ -19,6 +19,7 @@ import { UploadAction } from './actions/upload-action.js'
 import { DeleteFileAction } from './actions/delete-file-action.js'
 import { DownloadAction } from './actions/download-action.js'
 import { FfprobeAction } from './actions/ffprobe-action.js'
+import { SaveTextFileAction } from './actions/save-text-file-action.js'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({
@@ -69,6 +70,11 @@ export const setupDrivesRestApi = async (injector: Injector) => {
             model: Drive,
             primaryKey: 'letter',
           }),
+        ),
+      },
+      PUT: {
+        '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'SaveTextFileEndpoint' })(
+          SaveTextFileAction,
         ),
       },
       DELETE: {

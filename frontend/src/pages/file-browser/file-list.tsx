@@ -82,6 +82,7 @@ export const FileList = Shade<{
 
     return (
       <div
+        data-testid="file-drop"
         ondragover={(ev) => {
           ev.preventDefault()
         }}

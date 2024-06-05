@@ -9,15 +9,7 @@ import { Model, DataTypes } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { useFileWatchers } from './file-watcher-service.js'
 import { withRole } from '../authorization/with-role.js'
-
-export const existsAsync = async (path: string, mode?: number) => {
-  try {
-    await access(path, mode)
-  } catch {
-    return false
-  }
-  return true
-}
+import { existsAsync } from '../utils/exists-async.js'
 
 const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
   const exists = await existsAsync(path, mode)

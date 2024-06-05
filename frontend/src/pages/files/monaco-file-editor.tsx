@@ -2,6 +2,9 @@ import { createComponent, Shade } from '@furystack/shades'
 import { MonacoEditor } from '../../components/monaco-editor.js'
 import { environmentOptions } from '../../environment-options.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
+import { ObservableValue } from '@furystack/utils'
+import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
+import { Button, NotyService } from '@furystack/shades-common-components'
 
 const getMonacoLanguage = (path: string) => {
   const extension = path.split('.').pop()
@@ -22,7 +25,7 @@ const getMonacoLanguage = (path: string) => {
 
 export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-monaco-editor',
-  render: ({ props }) => {
+  render: ({ props, injector }) => {
     const { letter, path } = props
 
     return (
@@ -42,25 +45,89 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
           }
 
           const text = await result.text()
+
           return (
-            <div
-              style={{
-                position: 'fixed',
-                top: '54px',
-                width: '100%',
-                height: 'calc(100% - 64px)',
-              }}>
-              <MonacoEditor
-                options={{
-                  language: getMonacoLanguage(path),
-                  automaticLayout: true,
-                }}
-                value={text}
-              />
-            </div>
+            <MonacoTextFileEditor
+              initialValue={text}
+              language={getMonacoLanguage(path)}
+              onSave={(newValue) => {
+                const client = injector.getInstance(DrivesApiClient)
+                client
+                  .call({
+                    method: 'PUT',
+                    action: '/files/:letter/:path',
+                    url: { letter: encodeURIComponent(letter), path: encodeURIComponent(path) },
+                    body: { text: newValue },
+                  })
+                  .then(() => {
+                    injector.getInstance(NotyService).emit('onNotyAdded', {
+                      title: 'File saved',
+                      body: `File ${path} has been saved successfully.`,
+                      type: 'success',
+                    })
+                  })
+                  .catch((error) => {
+                    injector.getInstance(NotyService).emit('onNotyAdded', {
+                      title: 'Failed to save file',
+                      body: `Failed to save file ${path}: ${error.message}`,
+                      type: 'error',
+                    })
+                  })
+              }}
+            />
           )
         }}
       />
+    )
+  },
+})
+
+const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onSave: (newValue: string) => void }>({
+  shadowDomName: 'monaco-text-file-editor',
+  render: ({ props, useDisposable }) => {
+    const { initialValue, language } = props
+
+    const value = useDisposable('value', () => new ObservableValue(initialValue))
+
+    useDisposable('save', () => {
+      const onSave = (ev: KeyboardEvent) => {
+        if (ev.ctrlKey && ev.key === 's') {
+          ev.preventDefault()
+          props.onSave(value.getValue())
+        }
+      }
+      window.addEventListener('keydown', onSave)
+      return {
+        dispose: () => window.removeEventListener('keydown', onSave),
+      }
+    })
+
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: '54px',
+          width: '100%',
+          height: 'calc(100% - 64px)',
+        }}>
+        <MonacoEditor
+          options={{
+            language,
+            automaticLayout: true,
+          }}
+          value={value.getValue()}
+          onValueChange={(newValue) => value.setValue(newValue)}
+        />
+        <div style={{ display: 'flex', gap: '16px', padding: '8px' }}>
+          <div style={{ flex: '1' }} />
+          <Button className="revert" onclick={() => value.setValue(initialValue)}>
+            Revert
+          </Button>
+          <Button className="save" variant="contained" color="primary" onclick={() => props.onSave(value.getValue())}>
+            Save
+          </Button>
+        </div>
+      </div>
     )
   },
 })

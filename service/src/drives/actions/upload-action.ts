@@ -7,11 +7,11 @@ import { IncomingForm } from 'formidable'
 import type { UploadEndpoint } from 'common'
 import { Drive } from 'common'
 import { getDataSetFor } from '@furystack/repository'
-import { existsAsync } from '../setup-drives.js'
 import type { DirectoryEntry } from 'common'
 import { join } from 'path'
 import { createDirentListFromFiles } from '../create-dirent-list-from-files.js'
 import { isAuthorized } from '@furystack/core'
+import { existsAsync } from '../../utils/exists-async.js'
 
 export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, getUrlParams, request }) => {
   if (!isAuthorized(injector, 'admin')) {
