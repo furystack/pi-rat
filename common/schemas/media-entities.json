@@ -26,7 +26,14 @@
           "type": "string"
         }
       },
-      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
+      "required": [
+        "imdbId",
+        "title",
+        "year",
+        "plot",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "OmdbSeriesMetadata": {
@@ -86,7 +93,10 @@
                 "type": "string"
               }
             },
-            "required": ["Source", "Value"],
+            "required": [
+              "Source",
+              "Value"
+            ],
             "additionalProperties": false
           }
         },
@@ -203,7 +213,10 @@
                 "type": "string"
               }
             },
-            "required": ["Source", "Value"],
+            "required": [
+              "Source",
+              "Value"
+            ],
             "additionalProperties": false
           }
         },
@@ -221,7 +234,10 @@
         },
         "Type": {
           "type": "string",
-          "enum": ["movie", "episode"]
+          "enum": [
+            "movie",
+            "episode"
+          ]
         },
         "DVD": {
           "type": "string"
@@ -291,7 +307,9 @@
           "properties": {
             "metadata": {}
           },
-          "required": ["metadata"],
+          "required": [
+            "metadata"
+          ],
           "additionalProperties": false
         }
       }
@@ -325,7 +343,10 @@
         },
         "type": {
           "type": "string",
-          "enum": ["movie", "episode"]
+          "enum": [
+            "movie",
+            "episode"
+          ]
         },
         "seriesId": {
           "type": "string"
@@ -343,10 +364,15 @@
           "type": "string"
         }
       },
-      "required": ["imdbId", "title", "createdAt", "updatedAt"],
+      "required": [
+        "imdbId",
+        "title",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
-    "MovieWatchHistoryEntry": {
+    "WatchHistoryEntry": {
       "type": "object",
       "properties": {
         "id": {
@@ -355,16 +381,10 @@
         "userName": {
           "type": "string"
         },
-        "imdbId": {
-          "type": "string"
-        },
         "driveLetter": {
           "type": "string"
         },
         "path": {
-          "type": "string"
-        },
-        "fileName": {
           "type": "string"
         },
         "watchedSeconds": {
@@ -383,10 +403,8 @@
       "required": [
         "id",
         "userName",
-        "imdbId",
         "driveLetter",
         "path",
-        "fileName",
         "watchedSeconds",
         "completed",
         "createdAt",
@@ -409,9 +427,6 @@
         "path": {
           "type": "string"
         },
-        "fileName": {
-          "type": "string"
-        },
         "ffprobe": {
           "$ref": "#/definitions/getInfo.FFProbeResult"
         },
@@ -422,18 +437,32 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["subtitle", "audio", "trailer", "info", "other"]
+                "enum": [
+                  "subtitle",
+                  "audio",
+                  "trailer",
+                  "info",
+                  "other"
+                ]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": ["type", "path"],
+            "required": [
+              "type",
+              "path"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["id", "imdbId", "driveLetter", "path", "fileName", "ffprobe"],
+      "required": [
+        "id",
+        "driveLetter",
+        "path",
+        "ffprobe"
+      ],
       "additionalProperties": false
     },
     "getInfo.FFProbeResult": {
@@ -446,7 +475,9 @@
           }
         }
       },
-      "required": ["streams"],
+      "required": [
+        "streams"
+      ],
       "additionalProperties": false
     },
     "getInfo.FFProbeStream": {
@@ -466,7 +497,11 @@
         },
         "codec_type": {
           "type": "string",
-          "enum": ["video", "audio", "images"]
+          "enum": [
+            "video",
+            "audio",
+            "images"
+          ]
         },
         "codec_time_base": {
           "type": "string"
@@ -700,7 +735,10 @@
     },
     "getInfo.FFProbeBoolean": {
       "type": "string",
-      "enum": ["0", "1"]
+      "enum": [
+        "0",
+        "1"
+      ]
     },
     "getInfo.SideData": {
       "anyOf": [
@@ -754,7 +792,9 @@
           "description": "Based on the C code related to the default side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2298}"
         }
       },
-      "required": ["side_data_type"],
+      "required": [
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.BaseSideData": {
@@ -764,7 +804,9 @@
           "type": "string"
         }
       },
-      "required": ["side_data_type"],
+      "required": [
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.DisplayMatrixSideData": {
@@ -783,7 +825,11 @@
           "type": "number"
         }
       },
-      "required": ["displaymatrix", "rotation", "side_data_type"],
+      "required": [
+        "displaymatrix",
+        "rotation",
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.Stereo3dSideData": {
@@ -813,7 +859,11 @@
           "type": "number"
         }
       },
-      "required": ["inverted", "side_data_type", "type"],
+      "required": [
+        "inverted",
+        "side_data_type",
+        "type"
+      ],
       "additionalProperties": false
     },
     "getInfo.SphericalMappingSideData": {
@@ -855,7 +905,13 @@
           "type": "number"
         }
       },
-      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
+      "required": [
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
       "additionalProperties": false
     },
     "getInfo.BaseSphericalMappingSideData": {
@@ -880,7 +936,13 @@
           "type": "number"
         }
       },
-      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
+      "required": [
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
       "additionalProperties": false
     },
     "getInfo.EquirectangularSphericalMappingSideData": {
@@ -906,7 +968,13 @@
           "type": "number"
         }
       },
-      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
+      "required": [
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
       "additionalProperties": false
     },
     "getInfo.CubeMapSphericalMappingSideData": {
@@ -936,7 +1004,14 @@
           "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2313}"
         }
       },
-      "required": ["padding", "pitch", "projection", "roll", "side_data_type", "yaw"],
+      "required": [
+        "padding",
+        "pitch",
+        "projection",
+        "roll",
+        "side_data_type",
+        "yaw"
+      ],
       "additionalProperties": false
     },
     "getInfo.TiltedEquirectangularSphericalMappingSideData": {
@@ -1009,7 +1084,13 @@
           "type": "number"
         }
       },
-      "required": ["discard_padding", "discard_reason", "side_data_type", "skip_reason", "skip_samples"],
+      "required": [
+        "discard_padding",
+        "discard_reason",
+        "side_data_type",
+        "skip_reason",
+        "skip_samples"
+      ],
       "additionalProperties": false
     },
     "getInfo.MasteringDisplayMetadataSideData": {
@@ -1134,7 +1215,9 @@
           "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
         }
       },
-      "required": ["side_data_type"],
+      "required": [
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.LuminanceMasteringDisplayMetadataSideData": {
@@ -1153,7 +1236,11 @@
           "type": "string"
         }
       },
-      "required": ["max_luminance", "min_luminance", "side_data_type"],
+      "required": [
+        "max_luminance",
+        "min_luminance",
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.ContentLightLevelMetadataSideData": {
@@ -1171,7 +1258,11 @@
           "type": "number"
         }
       },
-      "required": ["max_average", "max_content", "side_data_type"],
+      "required": [
+        "max_average",
+        "max_content",
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.DoviConfigurationRecordSideData": {
@@ -1232,7 +1323,10 @@
           "type": "number"
         }
       },
-      "required": ["service_type", "side_data_type"],
+      "required": [
+        "service_type",
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.MpegtsStreamIdSideData": {
@@ -1247,7 +1341,10 @@
           "type": "number"
         }
       },
-      "required": ["id", "side_data_type"],
+      "required": [
+        "id",
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.CpbPropertiesSideData": {
@@ -1274,7 +1371,14 @@
           "type": "number"
         }
       },
-      "required": ["avg_bitrate", "buffer_size", "max_bitrate", "min_bitrate", "side_data_type", "vbv_delay"],
+      "required": [
+        "avg_bitrate",
+        "buffer_size",
+        "max_bitrate",
+        "min_bitrate",
+        "side_data_type",
+        "vbv_delay"
+      ],
       "additionalProperties": false
     },
     "getInfo.WebvttSideData": {
@@ -1282,7 +1386,10 @@
       "properties": {
         "side_data_type": {
           "type": "string",
-          "enum": ["WebVTT ID", "WebVTT Settings"],
+          "enum": [
+            "WebVTT ID",
+            "WebVTT Settings"
+          ],
           "description": "Based on the C code related to Webvtt side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2379-L2381}"
         },
         "data": {
@@ -1292,7 +1399,10 @@
           "type": "string"
         }
       },
-      "required": ["data_hash", "side_data_type"],
+      "required": [
+        "data_hash",
+        "side_data_type"
+      ],
       "additionalProperties": false
     },
     "getInfo.ActiveFormatDescriptionSideData": {
@@ -1307,7 +1417,9 @@
           "type": "number"
         }
       },
-      "required": ["side_data_type"],
+      "required": [
+        "side_data_type"
+      ],
       "additionalProperties": false
     }
   }

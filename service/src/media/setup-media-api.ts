@@ -13,7 +13,7 @@ import {
 import type { MediaApi } from 'common'
 import { MovieFile } from 'common'
 import mediaApiSchema from 'common/schemas/media-api.json' assert { type: 'json' }
-import { Movie, MovieWatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
+import { Movie, WatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
@@ -43,12 +43,12 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         ),
         '/my-watch-progresses': Validate({
           schema: mediaApiSchema,
-          schemaName: 'GetCollectionEndpoint<MovieWatchHistoryEntry>',
-        })(createGetCollectionEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
+          schemaName: 'GetCollectionEndpoint<WatchHistoryEntry>',
+        })(createGetCollectionEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
         '/my-watch-progresses/:id': Validate({
           schema: mediaApiSchema,
-          schemaName: 'GetEntityEndpoint<MovieWatchHistoryEntry,"id">',
-        })(createGetEntityEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
+          schemaName: 'GetEntityEndpoint<WatchHistoryEntry,"id">',
+        })(createGetEntityEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
 
         // TODOs:
         '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
@@ -115,8 +115,8 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         ),
         '/my-watch-progresses/:id': Validate({
           schema: mediaApiSchema,
-          schemaName: 'DeleteEndpoint<MovieWatchHistoryEntry,"id">',
-        })(createDeleteEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
+          schemaName: 'DeleteEndpoint<WatchHistoryEntry,"id">',
+        })(createDeleteEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
       },
     },
   })

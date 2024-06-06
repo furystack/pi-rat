@@ -74,7 +74,7 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      await sequelize.sync()
+      await DeviceModel.sync()
     },
   })
 
@@ -108,7 +108,7 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      await sequelize.sync()
+      await DeviceAwakeHistoryModel.sync()
     },
   })
 
@@ -146,7 +146,7 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      await sequelize.sync()
+      await DevicePingHistoryModel.sync()
     },
   })
 

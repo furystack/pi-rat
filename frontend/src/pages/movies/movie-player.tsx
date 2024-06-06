@@ -5,19 +5,21 @@ import 'video.js/dist/video-js.css'
 import * as videojsDefault from 'video.js'
 import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
-import type { MovieFile, MovieWatchHistoryEntry } from 'common'
+import type { FfprobeEndpoint, PiRatFile } from 'common'
+import { getFileName, getParentPath, type WatchHistoryEntry } from 'common'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default /* & any*/
 
 interface MoviePlayerProps {
-  movieFile: MovieFile
-  watchProgress?: MovieWatchHistoryEntry
+  file: PiRatFile
+  ffProbe: FfprobeEndpoint['result']
+  watchProgress?: WatchHistoryEntry
 }
 
 export const MoviePlayer = Shade<MoviePlayerProps>({
   shadowDomName: 'pirat-movie-player',
   constructed: ({ props, element, injector, useDisposable }) => {
-    const { movieFile } = props
+    const { file } = props
     const video = element.querySelector('video') as any as HTMLVideoElement
 
     const player = videojs.default(video, {
@@ -28,7 +30,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
       },
     })
 
-    const { fileName, path } = movieFile
+    const { path, driveLetter } = file
     const watchProgressService = injector.getInstance(WatchProgressService)
 
     useDisposable(
@@ -39,10 +41,8 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
           onSave: async (progress) => {
             watchProgressService.updateWatchEntry({
               completed: video.duration - progress < 10,
-              driveLetter: movieFile.driveLetter,
+              driveLetter,
               path,
-              fileName,
-              imdbId: movieFile.imdbId,
               watchedSeconds: progress,
             })
           },
@@ -51,22 +51,47 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
         }),
     )
 
-    attachProps(element, { player })
+    const audioTrackList = (player as any).audioTracks()
 
+    props.ffProbe.streams
+      .filter((stream) => stream.codec_type === 'audio')
+      .forEach((audio) => {
+        const track = new (videojs as any).default.AudioTrack({
+          id: audio.index,
+          kind: Object.entries(audio.disposition).filter(([_key, value]) => value === 1)?.[0]?.[0] || 'default',
+          label: audio.tags.title || audio.tags.language || audio.tags.filename,
+          language: audio.tags.language,
+        })
+        audioTrackList.addTrack(track)
+      })
+
+    audioTrackList.addEventListener('change', () => {
+      const activeTrack = audioTrackList.tracks_.find((track: any) => track.enabled)
+      const currentSource = player.currentSource() as any as { type: string; src: string }
+      const newUrl = new URL(currentSource.src)
+      newUrl.searchParams.set('audio', activeTrack.id)
+      player.src({ type: currentSource.type, src: newUrl.toString() })
+      console.log('activeTrack', activeTrack)
+    })
+
+    attachProps(element, { player })
     return () => player.dispose()
   },
   render: ({ props }) => {
-    const { movieFile, watchProgress } = props
+    const { file, watchProgress, ffProbe } = props
+    const fileName = getFileName(file)
+    const { driveLetter, path } = file
+    const parentPath = getParentPath(file)
 
-    const subtitleTracks = movieFile.ffprobe.streams
+    const subtitleTracks = ffProbe.streams
       .filter((stream) => (stream.codec_type as any) === 'subtitle')
       .map((subtitle) => (
         <track
           kind="captions"
           label={subtitle.tags.title || subtitle.tags.language || subtitle.tags.filename}
           src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
-            movieFile.driveLetter,
-          )}/${encodeURIComponent(`${movieFile.path}/${movieFile.fileName}-subtitle-${subtitle.index}.vtt`)}/download`}
+            driveLetter,
+          )}/${encodeURIComponent(`${parentPath}/${fileName}-subtitle-${subtitle.index}.vtt`)}/download`}
           srclang={subtitle.tags.language}
         />
       ))
@@ -82,7 +107,9 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
         crossOrigin="use-credentials"
         currentTime={watchProgress?.watchedSeconds || 0}>
         <source
-          src={`${environmentOptions.serviceUrl}/media/movie-files/${encodeURIComponent(movieFile.id)}/stream`}
+          src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
+            path,
+          )}/download`}
           type="video/mp4"
         />
         {...subtitleTracks}

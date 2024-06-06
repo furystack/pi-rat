@@ -9,27 +9,20 @@ import type {
 import type {
   Movie,
   MovieFile,
-  MovieWatchHistoryEntry,
+  WatchHistoryEntry,
   OmdbMovieMetadata,
   OmdbSeriesMetadata,
   Series,
 } from '../models/media/index.js'
+import type { PiRatFile } from '../models/pirat-file.js'
 
 export type LinkMovie = {
-  body: {
-    drive: string
-    path: string
-    fileName: string
-  }
+  body: PiRatFile
   result: { status: 'already-linked' | 'linked' | 'failed' | 'not-movie-file' }
 }
 
 export type ExtractSubtitles = {
-  body: {
-    drive: string
-    path: string
-    fileName: string
-  }
+  body: PiRatFile
   result: { success: boolean }
 }
 
@@ -41,8 +34,8 @@ export type FetchOmdbSeries = {
 }
 
 export type SaveWatchProgress = {
-  body: Omit<MovieWatchHistoryEntry, 'userName' | 'createdAt' | 'updatedAt' | 'id'>
-  result: MovieWatchHistoryEntry
+  body: Omit<WatchHistoryEntry, 'userName' | 'createdAt' | 'updatedAt' | 'id'>
+  result: WatchHistoryEntry
 }
 
 export type StreamEndpoint = {
@@ -61,8 +54,8 @@ export interface MediaApi extends RestApi {
       url: { movieId: string; subtitleName: string }
       result: unknown
     }
-    '/my-watch-progresses': GetCollectionEndpoint<MovieWatchHistoryEntry>
-    '/my-watch-progresses/:id': GetEntityEndpoint<MovieWatchHistoryEntry, 'id'>
+    '/my-watch-progresses': GetCollectionEndpoint<WatchHistoryEntry>
+    '/my-watch-progresses/:id': GetEntityEndpoint<WatchHistoryEntry, 'id'>
     '/series': GetCollectionEndpoint<Series>
     '/series/:id': GetEntityEndpoint<Series, 'imdbId'>
     '/omdb-movie-metadata': GetCollectionEndpoint<OmdbMovieMetadata>
@@ -87,6 +80,6 @@ export interface MediaApi extends RestApi {
   DELETE: {
     '/movies/:id': DeleteEndpoint<Movie, 'imdbId'>
     '/movie-files/:id': DeleteEndpoint<MovieFile, 'id'>
-    '/my-watch-progresses/:id': DeleteEndpoint<MovieWatchHistoryEntry, 'id'>
+    '/my-watch-progresses/:id': DeleteEndpoint<WatchHistoryEntry, 'id'>
   }
 }

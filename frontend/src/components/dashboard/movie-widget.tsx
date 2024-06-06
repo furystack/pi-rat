@@ -179,11 +179,17 @@ export const MovieWidget = Shade<{
               <LazyLoad
                 loader={<div />}
                 component={async () => {
-                  const { entries: watchProgresses } = await watchProgressService.findWatchProgressesForMovie(
-                    movie.value,
+                  if (!isLoadedCacheResult(movieFile)) {
+                    return <></>
+                  }
+
+                  const { entries: watchProgresses } = await watchProgressService.findWatchProgressForFile(
+                    movieFile.value.entries[0],
                   )
 
-                  const lastRecentWatchProgress = watchProgresses.find((w) => w.imdbId === imdbId)
+                  const lastRecentWatchProgress = watchProgresses.find((w) =>
+                    movieFile.value.entries.some((file) => file.driveLetter === w.driveLetter && file.path === w.path),
+                  )
 
                   const percent =
                     lastRecentWatchProgress &&

@@ -66,7 +66,7 @@ export const setupDashboards = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await DashboardModel.sync()
     },
   })
   await logger.verbose({ message: 'Setting up repository...' })

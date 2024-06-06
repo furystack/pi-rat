@@ -50,7 +50,7 @@ export const setupConfig = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await ConfigModel.sync()
     },
   })
 

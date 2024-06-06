@@ -3,19 +3,17 @@ import { getDataSetFor } from '@furystack/repository'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { SaveWatchProgress } from 'common'
-import { MovieWatchHistoryEntry } from 'common'
+import { WatchHistoryEntry } from 'common'
 
 export const SaveWatchProgressAction: RequestAction<SaveWatchProgress> = async ({ injector, getBody }) => {
-  const { completed, driveLetter, imdbId, path, fileName, watchedSeconds } = await getBody()
+  const { completed, driveLetter, path, watchedSeconds } = await getBody()
 
-  const dataSet = getDataSetFor(injector, MovieWatchHistoryEntry, 'id')
+  const dataSet = getDataSetFor(injector, WatchHistoryEntry, 'id')
 
   const [existing] = await dataSet.find(injector, {
     filter: {
-      imdbId: { $eq: imdbId },
       driveLetter: { $eq: driveLetter },
       path: { $eq: path },
-      fileName: { $eq: fileName },
     },
   })
 
@@ -25,17 +23,15 @@ export const SaveWatchProgressAction: RequestAction<SaveWatchProgress> = async (
       completed,
     })
     const reloaded = await dataSet.get(injector, existing.id)
-    return JsonResult(reloaded as MovieWatchHistoryEntry)
+    return JsonResult(reloaded as WatchHistoryEntry)
   } else {
     const user = await getCurrentUser(injector)
     const {
       created: [added],
     } = await dataSet.add(injector, {
       userName: user.username,
-      imdbId,
       driveLetter,
       path,
-      fileName,
       watchedSeconds,
       completed,
       createdAt: new Date().toISOString(),

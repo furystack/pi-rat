@@ -275,40 +275,108 @@
               "type": "object",
               "properties": {
                 "$startsWith": {
-                  "type": "string",
-                  "enum": [
-                    "OMDB_CONFIG",
-                    "GITHUB_CONFIG",
-                    "TORRENT_CONFIG",
-                    "IOT_CONFIG"
-                  ]
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "OMDB_CONFIG",
+                      "description": "Configuration entry for the OMDB API"
+                    },
+                    {
+                      "type": "string",
+                      "const": "GITHUB_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "TORRENT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "IOT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "MOVIES_CONFIG"
+                    }
+                  ],
+                  "description": "Configuration entry for the OMDB API"
                 },
                 "$endsWith": {
-                  "type": "string",
-                  "enum": [
-                    "OMDB_CONFIG",
-                    "GITHUB_CONFIG",
-                    "TORRENT_CONFIG",
-                    "IOT_CONFIG"
-                  ]
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "OMDB_CONFIG",
+                      "description": "Configuration entry for the OMDB API"
+                    },
+                    {
+                      "type": "string",
+                      "const": "GITHUB_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "TORRENT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "IOT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "MOVIES_CONFIG"
+                    }
+                  ],
+                  "description": "Configuration entry for the OMDB API"
                 },
                 "$like": {
-                  "type": "string",
-                  "enum": [
-                    "OMDB_CONFIG",
-                    "GITHUB_CONFIG",
-                    "TORRENT_CONFIG",
-                    "IOT_CONFIG"
-                  ]
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "OMDB_CONFIG",
+                      "description": "Configuration entry for the OMDB API"
+                    },
+                    {
+                      "type": "string",
+                      "const": "GITHUB_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "TORRENT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "IOT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "MOVIES_CONFIG"
+                    }
+                  ],
+                  "description": "Configuration entry for the OMDB API"
                 },
                 "$regex": {
-                  "type": "string",
-                  "enum": [
-                    "OMDB_CONFIG",
-                    "GITHUB_CONFIG",
-                    "TORRENT_CONFIG",
-                    "IOT_CONFIG"
-                  ]
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "OMDB_CONFIG",
+                      "description": "Configuration entry for the OMDB API"
+                    },
+                    {
+                      "type": "string",
+                      "const": "GITHUB_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "TORRENT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "IOT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "MOVIES_CONFIG"
+                    }
+                  ],
+                  "description": "Configuration entry for the OMDB API"
                 }
               },
               "additionalProperties": false
@@ -317,22 +385,56 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "type": "string",
-                  "enum": [
-                    "OMDB_CONFIG",
-                    "GITHUB_CONFIG",
-                    "TORRENT_CONFIG",
-                    "IOT_CONFIG"
-                  ]
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "OMDB_CONFIG",
+                      "description": "Configuration entry for the OMDB API"
+                    },
+                    {
+                      "type": "string",
+                      "const": "GITHUB_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "TORRENT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "IOT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "MOVIES_CONFIG"
+                    }
+                  ],
+                  "description": "Configuration entry for the OMDB API"
                 },
                 "$ne": {
-                  "type": "string",
-                  "enum": [
-                    "OMDB_CONFIG",
-                    "GITHUB_CONFIG",
-                    "TORRENT_CONFIG",
-                    "IOT_CONFIG"
-                  ]
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "OMDB_CONFIG",
+                      "description": "Configuration entry for the OMDB API"
+                    },
+                    {
+                      "type": "string",
+                      "const": "GITHUB_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "TORRENT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "IOT_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "MOVIES_CONFIG"
+                    }
+                  ],
+                  "description": "Configuration entry for the OMDB API"
                 }
               },
               "additionalProperties": false
@@ -343,25 +445,59 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "enum": [
-                      "OMDB_CONFIG",
-                      "GITHUB_CONFIG",
-                      "TORRENT_CONFIG",
-                      "IOT_CONFIG"
-                    ]
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "OMDB_CONFIG",
+                        "description": "Configuration entry for the OMDB API"
+                      },
+                      {
+                        "type": "string",
+                        "const": "GITHUB_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "TORRENT_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "IOT_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "MOVIES_CONFIG"
+                      }
+                    ],
+                    "description": "Configuration entry for the OMDB API"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "enum": [
-                      "OMDB_CONFIG",
-                      "GITHUB_CONFIG",
-                      "TORRENT_CONFIG",
-                      "IOT_CONFIG"
-                    ]
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "OMDB_CONFIG",
+                        "description": "Configuration entry for the OMDB API"
+                      },
+                      {
+                        "type": "string",
+                        "const": "GITHUB_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "TORRENT_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "IOT_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "MOVIES_CONFIG"
+                      }
+                    ],
+                    "description": "Configuration entry for the OMDB API"
                   }
                 }
               },
@@ -380,11 +516,22 @@
                       "type": "object",
                       "properties": {
                         "apiKey": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                        },
+                        "trySearchMovieFromTitle": {
+                          "type": "boolean",
+                          "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                        },
+                        "autoDownloadMetadata": {
+                          "type": "boolean",
+                          "description": "If a new imdb id is added, download the metadata automatically"
                         }
                       },
                       "required": [
-                        "apiKey"
+                        "apiKey",
+                        "trySearchMovieFromTitle",
+                        "autoDownloadMetadata"
                       ],
                       "additionalProperties": false
                     },
@@ -435,6 +582,49 @@
                       "required": [
                         "pingIntervalMs",
                         "pingTimeoutMs"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "enableNfoParsing": {
+                          "type": "boolean",
+                          "description": "Search .nfo files for imdb id"
+                        },
+                        "watchFiles": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "all"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "drive": {
+                                    "type": "string",
+                                    "description": "The drive to watch"
+                                  },
+                                  "path": {
+                                    "type": "string",
+                                    "description": "An optional path filter. If not set, all files in the drive will be watched."
+                                  }
+                                },
+                                "required": [
+                                  "drive"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          ],
+                          "description": "'all' or a list of directories to watch for new movies."
+                        }
+                      },
+                      "required": [
+                        "enableNfoParsing",
+                        "watchFiles"
                       ],
                       "additionalProperties": false
                     }
@@ -446,11 +636,22 @@
                       "type": "object",
                       "properties": {
                         "apiKey": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                        },
+                        "trySearchMovieFromTitle": {
+                          "type": "boolean",
+                          "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                        },
+                        "autoDownloadMetadata": {
+                          "type": "boolean",
+                          "description": "If a new imdb id is added, download the metadata automatically"
                         }
                       },
                       "required": [
-                        "apiKey"
+                        "apiKey",
+                        "trySearchMovieFromTitle",
+                        "autoDownloadMetadata"
                       ],
                       "additionalProperties": false
                     },
@@ -501,6 +702,49 @@
                       "required": [
                         "pingIntervalMs",
                         "pingTimeoutMs"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "enableNfoParsing": {
+                          "type": "boolean",
+                          "description": "Search .nfo files for imdb id"
+                        },
+                        "watchFiles": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "all"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "drive": {
+                                    "type": "string",
+                                    "description": "The drive to watch"
+                                  },
+                                  "path": {
+                                    "type": "string",
+                                    "description": "An optional path filter. If not set, all files in the drive will be watched."
+                                  }
+                                },
+                                "required": [
+                                  "drive"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          ],
+                          "description": "'all' or a list of directories to watch for new movies."
+                        }
+                      },
+                      "required": [
+                        "enableNfoParsing",
+                        "watchFiles"
                       ],
                       "additionalProperties": false
                     }
@@ -520,11 +764,22 @@
                         "type": "object",
                         "properties": {
                           "apiKey": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                          },
+                          "trySearchMovieFromTitle": {
+                            "type": "boolean",
+                            "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                          },
+                          "autoDownloadMetadata": {
+                            "type": "boolean",
+                            "description": "If a new imdb id is added, download the metadata automatically"
                           }
                         },
                         "required": [
-                          "apiKey"
+                          "apiKey",
+                          "trySearchMovieFromTitle",
+                          "autoDownloadMetadata"
                         ],
                         "additionalProperties": false
                       },
@@ -575,6 +830,49 @@
                         "required": [
                           "pingIntervalMs",
                           "pingTimeoutMs"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "enableNfoParsing": {
+                            "type": "boolean",
+                            "description": "Search .nfo files for imdb id"
+                          },
+                          "watchFiles": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "all"
+                              },
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "drive": {
+                                      "type": "string",
+                                      "description": "The drive to watch"
+                                    },
+                                    "path": {
+                                      "type": "string",
+                                      "description": "An optional path filter. If not set, all files in the drive will be watched."
+                                    }
+                                  },
+                                  "required": [
+                                    "drive"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            ],
+                            "description": "'all' or a list of directories to watch for new movies."
+                          }
+                        },
+                        "required": [
+                          "enableNfoParsing",
+                          "watchFiles"
                         ],
                         "additionalProperties": false
                       }
@@ -589,11 +887,22 @@
                         "type": "object",
                         "properties": {
                           "apiKey": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                          },
+                          "trySearchMovieFromTitle": {
+                            "type": "boolean",
+                            "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                          },
+                          "autoDownloadMetadata": {
+                            "type": "boolean",
+                            "description": "If a new imdb id is added, download the metadata automatically"
                           }
                         },
                         "required": [
-                          "apiKey"
+                          "apiKey",
+                          "trySearchMovieFromTitle",
+                          "autoDownloadMetadata"
                         ],
                         "additionalProperties": false
                       },
@@ -644,6 +953,49 @@
                         "required": [
                           "pingIntervalMs",
                           "pingTimeoutMs"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "enableNfoParsing": {
+                            "type": "boolean",
+                            "description": "Search .nfo files for imdb id"
+                          },
+                          "watchFiles": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "all"
+                              },
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "drive": {
+                                      "type": "string",
+                                      "description": "The drive to watch"
+                                    },
+                                    "path": {
+                                      "type": "string",
+                                      "description": "An optional path filter. If not set, all files in the drive will be watched."
+                                    }
+                                  },
+                                  "required": [
+                                    "drive"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            ],
+                            "description": "'all' or a list of directories to watch for new movies."
+                          }
+                        },
+                        "required": [
+                          "enableNfoParsing",
+                          "watchFiles"
                         ],
                         "additionalProperties": false
                       }
@@ -803,13 +1155,30 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "enum": [
-            "OMDB_CONFIG",
-            "GITHUB_CONFIG",
-            "TORRENT_CONFIG",
-            "IOT_CONFIG"
-          ]
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "OMDB_CONFIG",
+              "description": "Configuration entry for the OMDB API"
+            },
+            {
+              "type": "string",
+              "const": "GITHUB_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "TORRENT_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "IOT_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "MOVIES_CONFIG"
+            }
+          ],
+          "description": "Configuration entry for the OMDB API"
         },
         "value": {
           "anyOf": [
@@ -817,11 +1186,22 @@
               "type": "object",
               "properties": {
                 "apiKey": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                },
+                "trySearchMovieFromTitle": {
+                  "type": "boolean",
+                  "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                },
+                "autoDownloadMetadata": {
+                  "type": "boolean",
+                  "description": "If a new imdb id is added, download the metadata automatically"
                 }
               },
               "required": [
-                "apiKey"
+                "apiKey",
+                "trySearchMovieFromTitle",
+                "autoDownloadMetadata"
               ],
               "additionalProperties": false
             },
@@ -872,6 +1252,49 @@
               "required": [
                 "pingIntervalMs",
                 "pingTimeoutMs"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "enableNfoParsing": {
+                  "type": "boolean",
+                  "description": "Search .nfo files for imdb id"
+                },
+                "watchFiles": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "all"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "drive": {
+                            "type": "string",
+                            "description": "The drive to watch"
+                          },
+                          "path": {
+                            "type": "string",
+                            "description": "An optional path filter. If not set, all files in the drive will be watched."
+                          }
+                        },
+                        "required": [
+                          "drive"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  ],
+                  "description": "'all' or a list of directories to watch for new movies."
+                }
+              },
+              "required": [
+                "enableNfoParsing",
+                "watchFiles"
               ],
               "additionalProperties": false
             }
@@ -920,12 +1343,28 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string",
-              "enum": [
-                "OMDB_CONFIG",
-                "GITHUB_CONFIG",
-                "TORRENT_CONFIG",
-                "IOT_CONFIG"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "OMDB_CONFIG",
+                  "description": "Configuration entry for the OMDB API"
+                },
+                {
+                  "type": "string",
+                  "const": "GITHUB_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "TORRENT_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "IOT_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "MOVIES_CONFIG"
+                }
               ],
               "description": "The entity's unique identifier"
             }
@@ -968,13 +1407,30 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "enum": [
-            "OMDB_CONFIG",
-            "GITHUB_CONFIG",
-            "TORRENT_CONFIG",
-            "IOT_CONFIG"
-          ]
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "OMDB_CONFIG",
+              "description": "Configuration entry for the OMDB API"
+            },
+            {
+              "type": "string",
+              "const": "GITHUB_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "TORRENT_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "IOT_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "MOVIES_CONFIG"
+            }
+          ],
+          "description": "Configuration entry for the OMDB API"
         },
         "value": {
           "anyOf": [
@@ -982,11 +1438,22 @@
               "type": "object",
               "properties": {
                 "apiKey": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                },
+                "trySearchMovieFromTitle": {
+                  "type": "boolean",
+                  "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                },
+                "autoDownloadMetadata": {
+                  "type": "boolean",
+                  "description": "If a new imdb id is added, download the metadata automatically"
                 }
               },
               "required": [
-                "apiKey"
+                "apiKey",
+                "trySearchMovieFromTitle",
+                "autoDownloadMetadata"
               ],
               "additionalProperties": false
             },
@@ -1039,6 +1506,49 @@
                 "pingTimeoutMs"
               ],
               "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "enableNfoParsing": {
+                  "type": "boolean",
+                  "description": "Search .nfo files for imdb id"
+                },
+                "watchFiles": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "all"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "drive": {
+                            "type": "string",
+                            "description": "The drive to watch"
+                          },
+                          "path": {
+                            "type": "string",
+                            "description": "An optional path filter. If not set, all files in the drive will be watched."
+                          }
+                        },
+                        "required": [
+                          "drive"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  ],
+                  "description": "'all' or a list of directories to watch for new movies."
+                }
+              },
+              "required": [
+                "enableNfoParsing",
+                "watchFiles"
+              ],
+              "additionalProperties": false
             }
           ]
         }
@@ -1059,13 +1569,30 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string",
-              "enum": [
-                "OMDB_CONFIG",
-                "GITHUB_CONFIG",
-                "TORRENT_CONFIG",
-                "IOT_CONFIG"
-              ]
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "OMDB_CONFIG",
+                  "description": "Configuration entry for the OMDB API"
+                },
+                {
+                  "type": "string",
+                  "const": "GITHUB_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "TORRENT_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "IOT_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "MOVIES_CONFIG"
+                }
+              ],
+              "description": "Configuration entry for the OMDB API"
             }
           },
           "required": [
@@ -1090,13 +1617,30 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "enum": [
-            "OMDB_CONFIG",
-            "GITHUB_CONFIG",
-            "TORRENT_CONFIG",
-            "IOT_CONFIG"
-          ]
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "OMDB_CONFIG",
+              "description": "Configuration entry for the OMDB API"
+            },
+            {
+              "type": "string",
+              "const": "GITHUB_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "TORRENT_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "IOT_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "MOVIES_CONFIG"
+            }
+          ],
+          "description": "Configuration entry for the OMDB API"
         },
         "value": {
           "anyOf": [
@@ -1104,11 +1648,22 @@
               "type": "object",
               "properties": {
                 "apiKey": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                },
+                "trySearchMovieFromTitle": {
+                  "type": "boolean",
+                  "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                },
+                "autoDownloadMetadata": {
+                  "type": "boolean",
+                  "description": "If a new imdb id is added, download the metadata automatically"
                 }
               },
               "required": [
-                "apiKey"
+                "apiKey",
+                "trySearchMovieFromTitle",
+                "autoDownloadMetadata"
               ],
               "additionalProperties": false
             },
@@ -1161,6 +1716,49 @@
                 "pingTimeoutMs"
               ],
               "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "enableNfoParsing": {
+                  "type": "boolean",
+                  "description": "Search .nfo files for imdb id"
+                },
+                "watchFiles": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "all"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "drive": {
+                            "type": "string",
+                            "description": "The drive to watch"
+                          },
+                          "path": {
+                            "type": "string",
+                            "description": "An optional path filter. If not set, all files in the drive will be watched."
+                          }
+                        },
+                        "required": [
+                          "drive"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  ],
+                  "description": "'all' or a list of directories to watch for new movies."
+                }
+              },
+              "required": [
+                "enableNfoParsing",
+                "watchFiles"
+              ],
+              "additionalProperties": false
             }
           ]
         },
@@ -1182,13 +1780,30 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string",
-              "enum": [
-                "OMDB_CONFIG",
-                "GITHUB_CONFIG",
-                "TORRENT_CONFIG",
-                "IOT_CONFIG"
-              ]
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "OMDB_CONFIG",
+                  "description": "Configuration entry for the OMDB API"
+                },
+                {
+                  "type": "string",
+                  "const": "GITHUB_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "TORRENT_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "IOT_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "MOVIES_CONFIG"
+                }
+              ],
+              "description": "Configuration entry for the OMDB API"
             }
           },
           "required": [

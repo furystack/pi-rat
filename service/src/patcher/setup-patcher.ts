@@ -45,7 +45,6 @@ export const setupPatcher = async (injector: Injector) => {
           name: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
           },
           description: {
             type: DataTypes.STRING,
@@ -82,7 +81,7 @@ export const setupPatcher = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await PatchModel.sync()
     },
   })
 

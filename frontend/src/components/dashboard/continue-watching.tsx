@@ -25,17 +25,28 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
             },
           })
 
+          const movieFiles = await movieFileService.findMovieFile({
+            filter: {
+              $or: watchEntries.entries.map((entry) => ({
+                path: { $eq: entry.path },
+                driveLetter: { $eq: entry.driveLetter },
+              })),
+            },
+          })
+
           const { entries: movies } = await movieService.findMovie({
             filter: {
               imdbId: {
-                $in: Array.from(new Set(watchEntries.entries.map((entry) => entry.imdbId))),
+                $in: Array.from(
+                  new Set(movieFiles.entries.filter((e) => e.imdbId).map((entry) => entry.imdbId as string)),
+                ),
               },
             },
           })
 
           await Promise.all([
             movieFileService.prefetchMovieFilesForMovies(movies),
-            watchProgressService.prefetchWatchProgressForMovies(movies),
+            watchProgressService.prefetchWatchProgressForFiles(movieFiles.entries),
           ])
 
           return (
@@ -52,7 +63,15 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
                 <div style={{ display: 'flex', overflow: 'auto', scrollSnapType: 'x mandatory' }}>
                   {watchEntries.entries.map((entry, index) => (
                     <div style={{ scrollSnapAlign: 'start' }}>
-                      <MovieWidget imdbId={entry.imdbId} index={index} size={size || 256} />
+                      <MovieWidget
+                        imdbId={
+                          movieFiles.entries.find(
+                            (mf) => mf.driveLetter === entry.driveLetter && mf.path === entry.path,
+                          )!.imdbId as string
+                        }
+                        index={index}
+                        size={size || 256}
+                      />
                     </div>
                   ))}
                 </div>

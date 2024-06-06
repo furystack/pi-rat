@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import type { DirectoryEntry } from 'common'
+import { getFullPath, type DirectoryEntry } from 'common'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { Button, Skeleton } from '@furystack/shades-common-components'
@@ -23,7 +23,6 @@ export const RelatedMoviesModalContent = Shade<{
         filter: {
           driveLetter: { $eq: drive },
           path: { $eq: path },
-          fileName: { $eq: file.name },
         },
       }),
     )
@@ -52,9 +51,8 @@ export const RelatedMoviesModalContent = Shade<{
                         method: 'POST',
                         action: '/link-movie',
                         body: {
-                          drive,
-                          path,
-                          fileName: file.name,
+                          driveLetter: drive,
+                          path: getFullPath(path, file.name),
                         },
                       })
                       linkedFilesService.movieFileQueryCache.obsoleteRange(() => true)
@@ -73,7 +71,7 @@ export const RelatedMoviesModalContent = Shade<{
           <>
             {`Found ${linkedFiles.value.count} related movies`}
             {linkedFiles.value.entries.map((linkedFile) => (
-              <MovieWidget imdbId={linkedFile.imdbId} />
+              <MovieWidget imdbId={linkedFile.imdbId as string} />
             ))}
           </>
         )

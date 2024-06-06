@@ -19,16 +19,15 @@ export const MovieLoader = Shade<{ movieFileId: string }>({
             throw new Error(`Movie file with id ${movieFileId} not found`)
           }
 
-          const { fileName, path } = movieFile
+          const { path } = movieFile
           const {
             entries: [watchProgress],
           } = await watchProgressService.findWatchProgressForFile({
             path,
             driveLetter: movieFile.driveLetter,
-            fileName,
           })
 
-          return <MoviePlayer movieFile={movieFile} watchProgress={watchProgress} />
+          return <MoviePlayer ffProbe={movieFile.ffprobe} file={movieFile} watchProgress={watchProgress} />
         }}
       />
     )
