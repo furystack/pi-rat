@@ -40,7 +40,22 @@ export type SaveWatchProgress = {
 
 export type StreamEndpoint = {
   url: {
-    id: string
+    letter: string
+    path: string
+  }
+  query: {
+    /**
+     * Selects the audio track to stream. If not provided, the first audio track will be played
+     */
+    audioTrackId?: number
+    /**
+     * Select the audio encoding. If not provided, the original encoding will be used
+     */
+    audioCodec?: '' // TODO
+    /**
+     * Select the video encoding. If not provided, the original encoding will be used
+     */
+    videoCodec?: 'h264'
   }
   result: unknown
 }
@@ -63,7 +78,7 @@ export interface MediaApi extends RestApi {
     '/omdb-series-metadata': GetCollectionEndpoint<OmdbSeriesMetadata>
     '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
     '/movie-files': GetCollectionEndpoint<MovieFile>
-    '/movie-files/:id/stream': StreamEndpoint
+    '/files/:letter/:path/stream': StreamEndpoint
     '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
   }
   POST: {

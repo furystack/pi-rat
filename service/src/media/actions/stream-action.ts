@@ -1,58 +1,76 @@
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
-import { BypassResult, getMimeForFile } from '@furystack/rest-service'
+import { BypassResult } from '@furystack/rest-service'
 import type { StreamEndpoint } from 'common'
-import { MovieFile } from 'common'
 import { Drive } from 'common'
-import { createReadStream } from 'fs'
-import { stat } from 'fs/promises'
-import { join } from 'path'
+import { extname, join } from 'path'
+import ffmpeg from 'fluent-ffmpeg'
+import { getLogger } from '@furystack/logging'
+import mime from 'mime'
 
-export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, request, response }) => {
-  const { id: movieFileId } = getUrlParams()
+export const StreamAction: RequestAction<StreamEndpoint> = async ({
+  injector,
+  getUrlParams,
+  //getQuery,
+  request,
+  response,
+}) => {
+  const logger = getLogger(injector).withScope('StreamAction')
 
-  const movieFile = await getDataSetFor(injector, MovieFile, 'id').get(injector, movieFileId)
+  // const { audioCodec, videoCodec } = getQuery()
+  const { letter, path } = getUrlParams()
 
-  if (!movieFile) {
-    throw new RequestError(`Movie file with imdbId '${movieFileId}' not found`, 404)
-  }
-
-  const { driveLetter, path } = movieFile
-
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, driveLetter)
+  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
   if (!drive) {
-    throw new RequestError(`Drive ${driveLetter} not found`, 404)
+    throw new RequestError(`Drive ${letter} not found`, 404)
   }
 
   const fullPath = join(drive.physicalPath, path)
-
-  const fileStats = await stat(fullPath)
-  const fileSize = fileStats.size
-  const mime = getMimeForFile(fullPath)
+  // const fileStats = await stat(fullPath)
+  // const fileSize = fileStats.size
+  const mimeType = mime.getType(extname(path))
+  const mimeHeader = mimeType ? { 'Content-Type': mimeType } : {}
   const { range } = request.headers
-  if (range) {
-    const parts = range.replace(/bytes=/, '').split('-')
-    const start = parseInt(parts[0], 10)
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
-    const chunksize = end - start + 1
-    const file = createReadStream(fullPath, { start, end, autoClose: true })
-    const head = {
-      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': chunksize,
-      'Content-Type': mime,
-    }
 
-    response.writeHead(206, head)
-    file.pipe(response)
-  } else {
+  if (range) {
+    // const parts = range.replace(/bytes=/, '').split('-')
+    // const start = parseInt(parts[0], 10)
+    // const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+    // const chunksize = end - start + 1
     const head = {
-      'Content-Length': fileSize,
-      'Content-Type': mime,
+      // 'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      // 'Accept-Ranges': 'bytes',
+      // 'Content-Length': chunksize,
+      ...mimeHeader,
     }
     response.writeHead(200, head)
-    createReadStream(fullPath, { autoClose: true }).pipe(response)
+
+    // const calculatedSeekOffset = start / fileSize
+
+    ffmpeg(fullPath)
+      .outputOptions(['-movflags isml+frag_keyframe'])
+      // .toFormat('mp4')
+      // .withAudioCodec('copy')
+      // .seekInput(seekOffset || 0)
+      // .map('0:v:0')
+      // .map(`${audioTrackId}:a:1`)
+      .videoCodec('copy')
+      .format('matroska')
+      .on('error', (err, stdout, stderr) => {
+        logger.error({ message: `an error happened: ${err}`, data: { err, stdout, stderr } })
+      })
+      .on('end', () => {
+        logger.verbose({ message: 'file has been converted succesfully' })
+      })
+      .on('progress', (progress) => {
+        logger.verbose({ message: `Processing: ${progress.percent}%` })
+      })
+      .pipe(response, { end: true })
+  } else {
+    response.writeHead(200, mimeHeader)
+    response.end()
   }
+
   return BypassResult()
 }

@@ -6,7 +6,7 @@ import * as videojsDefault from 'video.js'
 import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
 import type { FfprobeEndpoint, PiRatFile } from 'common'
-import { getFileName, getParentPath, type WatchHistoryEntry } from 'common'
+import { encode, getFileName, getParentPath, type WatchHistoryEntry } from 'common'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default /* & any*/
 
@@ -69,9 +69,10 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
       const activeTrack = audioTrackList.tracks_.find((track: any) => track.enabled)
       const currentSource = player.currentSource() as any as { type: string; src: string }
       const newUrl = new URL(currentSource.src)
-      newUrl.searchParams.set('audio', activeTrack.id)
+      newUrl.searchParams.set('audioTrackId', encode(activeTrack.id))
+      const currentTime = player.currentTime()
       player.src({ type: currentSource.type, src: newUrl.toString() })
-      console.log('activeTrack', activeTrack)
+      player.currentTime(currentTime)
     })
 
     attachProps(element, { player })
@@ -103,13 +104,14 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
           height: '100%',
           position: 'fixed',
         }}
+        controls
         className="video-js"
         crossOrigin="use-credentials"
         currentTime={watchProgress?.watchedSeconds || 0}>
         <source
-          src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
+          src={`${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
             path,
-          )}/download`}
+          )}/stream`}
           type="video/mp4"
         />
         {...subtitleTracks}

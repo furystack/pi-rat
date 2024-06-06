@@ -72,7 +72,7 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
-        '/movie-files/:id/stream': Authorize()(
+        '/files/:letter/:path/stream': Authorize()(
           Validate({ schema: mediaApiSchema, schemaName: 'StreamEndpoint' })(StreamAction),
         ),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"id">' })(

@@ -907,6 +907,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/fluent-ffmpeg@npm:^2":
+  version: 2.1.24
+  resolution: "@types/fluent-ffmpeg@npm:2.1.24"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/73a32f2313a0225452b5acdf7a341b9860ffcb88490ee726a1241887111cf4f2f7259d7491cf4e9b6be8316ababdd9064e085437f0b768adcfb0becc0733973c
+  languageName: node
+  linkType: hard
+
 "@types/formidable@npm:^3.4.5":
   version: 3.4.5
   resolution: "@types/formidable@npm:3.4.5"
@@ -1695,6 +1704,13 @@ __metadata:
   version: 1.1.0
   resolution: "assertion-error@npm:1.1.0"
   checksum: 10c0/25456b2aa333250f01143968e02e4884a34588a8538fbbf65c91a637f1dbfb8069249133cd2f4e530f10f624d206a664e7df30207830b659e9f5298b00a4099b
+  languageName: node
+  linkType: hard
+
+"async@npm:^0.2.9":
+  version: 0.2.10
+  resolution: "async@npm:0.2.10"
+  checksum: 10c0/714d284dc6c3ae59f3e8b347083e32c7657ba4ffc4ff945eb152ad4fb08def27e768992fcd4d9fd3b411c6b42f1541862ac917446bf2a1acfa0f302d1001f7d2
   languageName: node
   linkType: hard
 
@@ -3280,6 +3296,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fluent-ffmpeg@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "fluent-ffmpeg@npm:2.1.3"
+  dependencies:
+    async: "npm:^0.2.9"
+    which: "npm:^1.1.1"
+  checksum: 10c0/0397379ec3237c10b2389edeef26fdaf93f36d1b20b0f28f8945fe6d9121dcee9b0c615bf7d44edb7abd37233e0d24f0db39389668d3c86a1a2a0d59e3f4457b
+  languageName: node
+  linkType: hard
+
 "for-each@npm:^0.3.3":
   version: 0.3.3
   resolution: "for-each@npm:0.3.3"
@@ -4856,6 +4882,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mime@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "mime@npm:4.0.3"
+  bin:
+    mime: bin/cli.js
+  checksum: 10c0/4be1d06813a581eb9634748919eadab9785857dcfe2af4acca8e4bc340b4b74ff7452c7d3cd76169d0f6b77d7f1ab3434bde8a72ca4291fd150b4205c756c36b
+  languageName: node
+  linkType: hard
+
 "mimic-fn@npm:^2.1.0":
   version: 2.1.0
   resolution: "mimic-fn@npm:2.1.0"
@@ -6319,6 +6354,7 @@ __metadata:
     "@furystack/utils": "npm:^7.0.2"
     "@furystack/websocket-api": "npm:^12.0.4"
     "@types/ffprobe": "npm:^1.1.8"
+    "@types/fluent-ffmpeg": "npm:^2"
     "@types/formidable": "npm:^3.4.5"
     "@types/node": "npm:^20.14.2"
     "@types/ping": "npm:^0.4.4"
@@ -6326,7 +6362,9 @@ __metadata:
     chokidar: "npm:^3.6.0"
     common: "workspace:^"
     ffprobe: "npm:^1.1.2"
+    fluent-ffmpeg: "npm:^2.1.3"
     formidable: "npm:^3.5.1"
+    mime: "npm:^4.0.3"
     ping: "npm:^0.4.4"
     sequelize: "npm:^6.37.3"
     sqlite3: "npm:^5.1.7"
@@ -7577,6 +7615,17 @@ __metadata:
     gopd: "npm:^1.0.1"
     has-tostringtag: "npm:^1.0.2"
   checksum: 10c0/4465d5348c044032032251be54d8988270e69c6b7154f8fcb2a47ff706fe36f7624b3a24246b8d9089435a8f4ec48c1c1025c5d6b499456b9e5eff4f48212983
+  languageName: node
+  linkType: hard
+
+"which@npm:^1.1.1":
+  version: 1.3.1
+  resolution: "which@npm:1.3.1"
+  dependencies:
+    isexe: "npm:^2.0.0"
+  bin:
+    which: ./bin/which
+  checksum: 10c0/e945a8b6bbf6821aaaef7f6e0c309d4b615ef35699576d5489b4261da9539f70393c6b2ce700ee4321c18f914ebe5644bc4631b15466ffbaad37d83151f6af59
   languageName: node
   linkType: hard
 
