@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 
-import { MovieWatchHistoryEntry, Movie, Series, MovieFile, Config } from 'common'
+import { WatchHistoryEntry, Movie, Series, MovieFile, Config } from 'common'
 import { OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 
 import { DataTypes, Model } from 'sequelize'
@@ -42,10 +42,7 @@ class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare relatedFiles?: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> | undefined
 }
 
-class MovieWatchHistoryEntryModel
-  extends Model<MovieWatchHistoryEntry, MovieWatchHistoryEntry>
-  implements MovieWatchHistoryEntry
-{
+class WatchHistoryEntryModel extends Model<WatchHistoryEntry, WatchHistoryEntry> implements WatchHistoryEntry {
   declare movieFileId: string
   declare driveLetter: string
   declare path: string
@@ -249,12 +246,12 @@ export const setupMovies = async (injector: Injector) => {
 
   useSequelize({
     injector,
-    model: MovieWatchHistoryEntry,
-    sequelizeModel: MovieWatchHistoryEntryModel,
+    model: WatchHistoryEntry,
+    sequelizeModel: WatchHistoryEntryModel,
     primaryKey: 'id',
     options: dbOptions,
     initModel: async (sequelize) => {
-      MovieWatchHistoryEntryModel.init(
+      WatchHistoryEntryModel.init(
         {
           id: {
             type: DataTypes.UUIDV4,
@@ -296,7 +293,7 @@ export const setupMovies = async (injector: Injector) => {
           indexes: [{ fields: ['userName', 'driveLetter', 'path'], unique: true }],
         },
       )
-      await MovieWatchHistoryEntryModel.sync()
+      await WatchHistoryEntryModel.sync()
     },
   })
 
@@ -614,7 +611,7 @@ export const setupMovies = async (injector: Injector) => {
     entity,
     injector: i,
   }: {
-    entity: MovieWatchHistoryEntry
+    entity: WatchHistoryEntry
     injector: Injector
   }): Promise<AuthorizationResult> => {
     const user = await getCurrentUser(i)
@@ -631,7 +628,7 @@ export const setupMovies = async (injector: Injector) => {
     }
   }
 
-  repo.createDataSet(MovieWatchHistoryEntry, 'id', {
+  repo.createDataSet(WatchHistoryEntry, 'id', {
     authorizeGet: authorizedOnly,
     authorizeAdd: authorizedOnly,
     authorizeUpdate: authorizedOnly,

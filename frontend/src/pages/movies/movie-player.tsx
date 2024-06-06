@@ -6,14 +6,14 @@ import * as videojsDefault from 'video.js'
 import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
 import type { FfprobeEndpoint, PiRatFile } from 'common'
-import { getFileName, getParentPath, type MovieWatchHistoryEntry } from 'common'
+import { getFileName, getParentPath, type WatchHistoryEntry } from 'common'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default /* & any*/
 
 interface MoviePlayerProps {
   file: PiRatFile
   ffProbe: FfprobeEndpoint['result']
-  watchProgress?: MovieWatchHistoryEntry
+  watchProgress?: WatchHistoryEntry
 }
 
 export const MoviePlayer = Shade<MoviePlayerProps>({

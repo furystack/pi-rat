@@ -1,4 +1,4 @@
-export class MovieWatchHistoryEntry {
+export class WatchHistoryEntry {
   id!: string
   userName!: string
   driveLetter!: string

@@ -15,7 +15,10 @@
               "$ref": "#/definitions/GetEntityEndpoint%3CConfig%2C%22id%22%3E"
             }
           },
-          "required": ["/config", "/config/:id"],
+          "required": [
+            "/config",
+            "/config/:id"
+          ],
           "additionalProperties": false
         },
         "POST": {
@@ -25,7 +28,9 @@
               "$ref": "#/definitions/PostEndpoint%3CConfig%2C%22id%22%2CPick%3CConfig%2C(%22id%22%7C%22value%22)%3E%3E"
             }
           },
-          "required": ["/config"],
+          "required": [
+            "/config"
+          ],
           "additionalProperties": false
         },
         "PATCH": {
@@ -35,7 +40,9 @@
               "$ref": "#/definitions/PatchEndpoint%3CConfig%2C%22id%22%3E"
             }
           },
-          "required": ["/config/:id"],
+          "required": [
+            "/config/:id"
+          ],
           "additionalProperties": false
         },
         "PUT": {
@@ -49,7 +56,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -60,7 +69,9 @@
               "$ref": "#/definitions/DeleteEndpoint%3CConfig%2C%22id%22%3E"
             }
           },
-          "required": ["/config/:id"],
+          "required": [
+            "/config/:id"
+          ],
           "additionalProperties": false
         },
         "HEAD": {
@@ -74,7 +85,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -89,7 +102,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -104,7 +119,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -119,12 +136,19 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["GET", "POST", "PATCH", "DELETE"],
+      "required": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE"
+      ],
       "additionalProperties": false
     },
     "GetCollectionEndpoint<Config>": {
@@ -143,7 +167,10 @@
           "$ref": "#/definitions/GetCollectionResult%3CConfig%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -163,19 +190,31 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "value": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "createdAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "updatedAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -185,7 +224,12 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["id", "value", "createdAt", "updatedAt"]
+            "enum": [
+              "id",
+              "value",
+              "createdAt",
+              "updatedAt"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -484,7 +528,11 @@
                           "description": "If a new imdb id is added, download the metadata automatically"
                         }
                       },
-                      "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+                      "required": [
+                        "apiKey",
+                        "trySearchMovieFromTitle",
+                        "autoDownloadMetadata"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -497,7 +545,10 @@
                           "type": "string"
                         }
                       },
-                      "required": ["clientId", "clientSecret"],
+                      "required": [
+                        "clientId",
+                        "clientSecret"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -510,7 +561,10 @@
                           "type": "string"
                         }
                       },
-                      "required": ["torrentDriveLetter", "torrentPath"],
+                      "required": [
+                        "torrentDriveLetter",
+                        "torrentPath"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -525,7 +579,10 @@
                           "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                         }
                       },
-                      "required": ["pingIntervalMs", "pingTimeoutMs"],
+                      "required": [
+                        "pingIntervalMs",
+                        "pingTimeoutMs"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -555,7 +612,9 @@
                                     "description": "An optional path filter. If not set, all files in the drive will be watched."
                                   }
                                 },
-                                "required": ["drive"],
+                                "required": [
+                                  "drive"
+                                ],
                                 "additionalProperties": false
                               }
                             }
@@ -563,7 +622,10 @@
                           "description": "'all' or a list of directories to watch for new movies."
                         }
                       },
-                      "required": ["enableNfoParsing", "watchFiles"],
+                      "required": [
+                        "enableNfoParsing",
+                        "watchFiles"
+                      ],
                       "additionalProperties": false
                     }
                   ]
@@ -586,7 +648,11 @@
                           "description": "If a new imdb id is added, download the metadata automatically"
                         }
                       },
-                      "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+                      "required": [
+                        "apiKey",
+                        "trySearchMovieFromTitle",
+                        "autoDownloadMetadata"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -599,7 +665,10 @@
                           "type": "string"
                         }
                       },
-                      "required": ["clientId", "clientSecret"],
+                      "required": [
+                        "clientId",
+                        "clientSecret"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -612,7 +681,10 @@
                           "type": "string"
                         }
                       },
-                      "required": ["torrentDriveLetter", "torrentPath"],
+                      "required": [
+                        "torrentDriveLetter",
+                        "torrentPath"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -627,7 +699,10 @@
                           "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                         }
                       },
-                      "required": ["pingIntervalMs", "pingTimeoutMs"],
+                      "required": [
+                        "pingIntervalMs",
+                        "pingTimeoutMs"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -657,7 +732,9 @@
                                     "description": "An optional path filter. If not set, all files in the drive will be watched."
                                   }
                                 },
-                                "required": ["drive"],
+                                "required": [
+                                  "drive"
+                                ],
                                 "additionalProperties": false
                               }
                             }
@@ -665,7 +742,10 @@
                           "description": "'all' or a list of directories to watch for new movies."
                         }
                       },
-                      "required": ["enableNfoParsing", "watchFiles"],
+                      "required": [
+                        "enableNfoParsing",
+                        "watchFiles"
+                      ],
                       "additionalProperties": false
                     }
                   ]
@@ -696,7 +776,11 @@
                             "description": "If a new imdb id is added, download the metadata automatically"
                           }
                         },
-                        "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+                        "required": [
+                          "apiKey",
+                          "trySearchMovieFromTitle",
+                          "autoDownloadMetadata"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -709,7 +793,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["clientId", "clientSecret"],
+                        "required": [
+                          "clientId",
+                          "clientSecret"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -722,7 +809,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["torrentDriveLetter", "torrentPath"],
+                        "required": [
+                          "torrentDriveLetter",
+                          "torrentPath"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -737,7 +827,10 @@
                             "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                           }
                         },
-                        "required": ["pingIntervalMs", "pingTimeoutMs"],
+                        "required": [
+                          "pingIntervalMs",
+                          "pingTimeoutMs"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -767,7 +860,9 @@
                                       "description": "An optional path filter. If not set, all files in the drive will be watched."
                                     }
                                   },
-                                  "required": ["drive"],
+                                  "required": [
+                                    "drive"
+                                  ],
                                   "additionalProperties": false
                                 }
                               }
@@ -775,7 +870,10 @@
                             "description": "'all' or a list of directories to watch for new movies."
                           }
                         },
-                        "required": ["enableNfoParsing", "watchFiles"],
+                        "required": [
+                          "enableNfoParsing",
+                          "watchFiles"
+                        ],
                         "additionalProperties": false
                       }
                     ]
@@ -801,7 +899,11 @@
                             "description": "If a new imdb id is added, download the metadata automatically"
                           }
                         },
-                        "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+                        "required": [
+                          "apiKey",
+                          "trySearchMovieFromTitle",
+                          "autoDownloadMetadata"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -814,7 +916,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["clientId", "clientSecret"],
+                        "required": [
+                          "clientId",
+                          "clientSecret"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -827,7 +932,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["torrentDriveLetter", "torrentPath"],
+                        "required": [
+                          "torrentDriveLetter",
+                          "torrentPath"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -842,7 +950,10 @@
                             "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                           }
                         },
-                        "required": ["pingIntervalMs", "pingTimeoutMs"],
+                        "required": [
+                          "pingIntervalMs",
+                          "pingTimeoutMs"
+                        ],
                         "additionalProperties": false
                       },
                       {
@@ -872,7 +983,9 @@
                                       "description": "An optional path filter. If not set, all files in the drive will be watched."
                                     }
                                   },
-                                  "required": ["drive"],
+                                  "required": [
+                                    "drive"
+                                  ],
                                   "additionalProperties": false
                                 }
                               }
@@ -880,7 +993,10 @@
                             "description": "'all' or a list of directories to watch for new movies."
                           }
                         },
-                        "required": ["enableNfoParsing", "watchFiles"],
+                        "required": [
+                          "enableNfoParsing",
+                          "watchFiles"
+                        ],
                         "additionalProperties": false
                       }
                     ]
@@ -1028,7 +1144,10 @@
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1079,7 +1198,11 @@
                   "description": "If a new imdb id is added, download the metadata automatically"
                 }
               },
-              "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+              "required": [
+                "apiKey",
+                "trySearchMovieFromTitle",
+                "autoDownloadMetadata"
+              ],
               "additionalProperties": false
             },
             {
@@ -1092,7 +1215,10 @@
                   "type": "string"
                 }
               },
-              "required": ["clientId", "clientSecret"],
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
               "additionalProperties": false
             },
             {
@@ -1105,7 +1231,10 @@
                   "type": "string"
                 }
               },
-              "required": ["torrentDriveLetter", "torrentPath"],
+              "required": [
+                "torrentDriveLetter",
+                "torrentPath"
+              ],
               "additionalProperties": false
             },
             {
@@ -1120,7 +1249,10 @@
                   "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                 }
               },
-              "required": ["pingIntervalMs", "pingTimeoutMs"],
+              "required": [
+                "pingIntervalMs",
+                "pingTimeoutMs"
+              ],
               "additionalProperties": false
             },
             {
@@ -1150,7 +1282,9 @@
                             "description": "An optional path filter. If not set, all files in the drive will be watched."
                           }
                         },
-                        "required": ["drive"],
+                        "required": [
+                          "drive"
+                        ],
                         "additionalProperties": false
                       }
                     }
@@ -1158,7 +1292,10 @@
                   "description": "'all' or a list of directories to watch for new movies."
                 }
               },
-              "required": ["enableNfoParsing", "watchFiles"],
+              "required": [
+                "enableNfoParsing",
+                "watchFiles"
+              ],
               "additionalProperties": false
             }
           ]
@@ -1172,7 +1309,12 @@
           "format": "date-time"
         }
       },
-      "required": ["id", "value", "createdAt", "updatedAt"],
+      "required": [
+        "id",
+        "value",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Config,\"id\">": {
@@ -1185,7 +1327,12 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["id", "value", "createdAt", "updatedAt"]
+                "enum": [
+                  "id",
+                  "value",
+                  "createdAt",
+                  "updatedAt"
+                ]
               },
               "description": "The list of fields to select"
             }
@@ -1222,14 +1369,20 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Config"
         }
       },
-      "required": ["query", "url", "result"],
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -1243,7 +1396,10 @@
           "$ref": "#/definitions/Config"
         }
       },
-      "required": ["body", "result"],
+      "required": [
+        "body",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -1294,7 +1450,11 @@
                   "description": "If a new imdb id is added, download the metadata automatically"
                 }
               },
-              "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+              "required": [
+                "apiKey",
+                "trySearchMovieFromTitle",
+                "autoDownloadMetadata"
+              ],
               "additionalProperties": false
             },
             {
@@ -1307,7 +1467,10 @@
                   "type": "string"
                 }
               },
-              "required": ["clientId", "clientSecret"],
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
               "additionalProperties": false
             },
             {
@@ -1320,7 +1483,10 @@
                   "type": "string"
                 }
               },
-              "required": ["torrentDriveLetter", "torrentPath"],
+              "required": [
+                "torrentDriveLetter",
+                "torrentPath"
+              ],
               "additionalProperties": false
             },
             {
@@ -1335,7 +1501,10 @@
                   "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                 }
               },
-              "required": ["pingIntervalMs", "pingTimeoutMs"],
+              "required": [
+                "pingIntervalMs",
+                "pingTimeoutMs"
+              ],
               "additionalProperties": false
             },
             {
@@ -1365,7 +1534,9 @@
                             "description": "An optional path filter. If not set, all files in the drive will be watched."
                           }
                         },
-                        "required": ["drive"],
+                        "required": [
+                          "drive"
+                        ],
                         "additionalProperties": false
                       }
                     }
@@ -1373,13 +1544,19 @@
                   "description": "'all' or a list of directories to watch for new movies."
                 }
               },
-              "required": ["enableNfoParsing", "watchFiles"],
+              "required": [
+                "enableNfoParsing",
+                "watchFiles"
+              ],
               "additionalProperties": false
             }
           ]
         }
       },
-      "required": ["id", "value"],
+      "required": [
+        "id",
+        "value"
+      ],
       "additionalProperties": false
     },
     "PatchEndpoint<Config,\"id\">": {
@@ -1418,7 +1595,9 @@
               "description": "Configuration entry for the OMDB API"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
@@ -1426,7 +1605,11 @@
           "additionalProperties": false
         }
       },
-      "required": ["body", "url", "result"],
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -1477,7 +1660,11 @@
                   "description": "If a new imdb id is added, download the metadata automatically"
                 }
               },
-              "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+              "required": [
+                "apiKey",
+                "trySearchMovieFromTitle",
+                "autoDownloadMetadata"
+              ],
               "additionalProperties": false
             },
             {
@@ -1490,7 +1677,10 @@
                   "type": "string"
                 }
               },
-              "required": ["clientId", "clientSecret"],
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
               "additionalProperties": false
             },
             {
@@ -1503,7 +1693,10 @@
                   "type": "string"
                 }
               },
-              "required": ["torrentDriveLetter", "torrentPath"],
+              "required": [
+                "torrentDriveLetter",
+                "torrentPath"
+              ],
               "additionalProperties": false
             },
             {
@@ -1518,7 +1711,10 @@
                   "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                 }
               },
-              "required": ["pingIntervalMs", "pingTimeoutMs"],
+              "required": [
+                "pingIntervalMs",
+                "pingTimeoutMs"
+              ],
               "additionalProperties": false
             },
             {
@@ -1548,7 +1744,9 @@
                             "description": "An optional path filter. If not set, all files in the drive will be watched."
                           }
                         },
-                        "required": ["drive"],
+                        "required": [
+                          "drive"
+                        ],
                         "additionalProperties": false
                       }
                     }
@@ -1556,7 +1754,10 @@
                   "description": "'all' or a list of directories to watch for new movies."
                 }
               },
-              "required": ["enableNfoParsing", "watchFiles"],
+              "required": [
+                "enableNfoParsing",
+                "watchFiles"
+              ],
               "additionalProperties": false
             }
           ]
@@ -1605,7 +1806,9 @@
               "description": "Configuration entry for the OMDB API"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
@@ -1613,7 +1816,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["url", "result"],
+      "required": [
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }

@@ -225,10 +225,10 @@
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/Omit%3CMovieWatchHistoryEntry%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E"
+          "$ref": "#/definitions/Omit%3CWatchHistoryEntry%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E"
         },
         "result": {
-          "$ref": "#/definitions/MovieWatchHistoryEntry"
+          "$ref": "#/definitions/WatchHistoryEntry"
         }
       },
       "required": [
@@ -237,10 +237,10 @@
       ],
       "additionalProperties": false
     },
-    "Omit<MovieWatchHistoryEntry,(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>": {
-      "$ref": "#/definitions/Pick%3CMovieWatchHistoryEntry%2CExclude%3C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E%3E"
+    "Omit<WatchHistoryEntry,(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>": {
+      "$ref": "#/definitions/Pick%3CWatchHistoryEntry%2CExclude%3C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E%3E"
     },
-    "Pick<MovieWatchHistoryEntry,Exclude<(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\"),(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>>": {
+    "Pick<WatchHistoryEntry,Exclude<(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\"),(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>>": {
       "type": "object",
       "properties": {
         "driveLetter": {
@@ -264,7 +264,7 @@
       ],
       "additionalProperties": false
     },
-    "MovieWatchHistoryEntry": {
+    "WatchHistoryEntry": {
       "type": "object",
       "properties": {
         "id": {
@@ -395,10 +395,10 @@
               "additionalProperties": false
             },
             "/my-watch-progresses": {
-              "$ref": "#/definitions/GetCollectionEndpoint%3CMovieWatchHistoryEntry%3E"
+              "$ref": "#/definitions/GetCollectionEndpoint%3CWatchHistoryEntry%3E"
             },
             "/my-watch-progresses/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CMovieWatchHistoryEntry%2C%22id%22%3E"
+              "$ref": "#/definitions/GetEntityEndpoint%3CWatchHistoryEntry%2C%22id%22%3E"
             },
             "/series": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CSeries%3E"
@@ -518,7 +518,7 @@
               "$ref": "#/definitions/DeleteEndpoint%3CMovieFile%2C%22id%22%3E"
             },
             "/my-watch-progresses/:id": {
-              "$ref": "#/definitions/DeleteEndpoint%3CMovieWatchHistoryEntry%2C%22id%22%3E"
+              "$ref": "#/definitions/DeleteEndpoint%3CWatchHistoryEntry%2C%22id%22%3E"
             }
           },
           "required": [
@@ -1762,20 +1762,20 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "GetCollectionEndpoint<MovieWatchHistoryEntry>": {
+    "GetCollectionEndpoint<WatchHistoryEntry>": {
       "type": "object",
       "properties": {
         "query": {
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CMovieWatchHistoryEntry%3E"
+          "$ref": "#/definitions/GetCollectionResult%3CWatchHistoryEntry%3E"
         }
       },
       "required": [
@@ -1785,7 +1785,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieWatchHistoryEntry,(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<WatchHistoryEntry,(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1877,39 +1877,39 @@
           "description": "The result set will be limited to these fields"
         },
         "filter": {
-          "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E",
+          "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E",
           "description": "The fields should match this filter"
         }
       },
       "additionalProperties": false,
       "description": "Type for default filtering model"
     },
-    "FilterType<MovieWatchHistoryEntry>": {
+    "FilterType<WatchHistoryEntry>": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "$and": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "$not": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "$nor": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "$or": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "id": {
@@ -2312,7 +2312,7 @@
         }
       }
     },
-    "GetCollectionResult<MovieWatchHistoryEntry>": {
+    "GetCollectionResult<WatchHistoryEntry>": {
       "type": "object",
       "properties": {
         "count": {
@@ -2322,7 +2322,7 @@
         "entries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/MovieWatchHistoryEntry"
+            "$ref": "#/definitions/WatchHistoryEntry"
           },
           "description": "List of the selected entities"
         }
@@ -2334,7 +2334,7 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "GetEntityEndpoint<MovieWatchHistoryEntry,\"id\">": {
+    "GetEntityEndpoint<WatchHistoryEntry,\"id\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -2374,7 +2374,7 @@
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/MovieWatchHistoryEntry"
+          "$ref": "#/definitions/WatchHistoryEntry"
         }
       },
       "required": [
@@ -8837,7 +8837,7 @@
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
-    "DeleteEndpoint<MovieWatchHistoryEntry,\"id\">": {
+    "DeleteEndpoint<WatchHistoryEntry,\"id\">": {
       "type": "object",
       "properties": {
         "url": {

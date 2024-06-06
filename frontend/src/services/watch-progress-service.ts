@@ -2,7 +2,7 @@ import { Injectable, Injected } from '@furystack/inject'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 import { Cache } from '@furystack/cache'
 import type { FilterType, FindOptions } from '@furystack/core'
-import type { MovieWatchHistoryEntry } from 'common'
+import type { WatchHistoryEntry } from 'common'
 import type { PiRatFile } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
@@ -25,7 +25,7 @@ export class WatchProgressService {
 
   private watchProgressQueryCache = new Cache({
     capacity: 100,
-    load: async (findOptions: FindOptions<MovieWatchHistoryEntry, Array<keyof MovieWatchHistoryEntry>>) => {
+    load: async (findOptions: FindOptions<WatchHistoryEntry, Array<keyof WatchHistoryEntry>>) => {
       const { result } = await this.mediaApiClient.call({
         method: 'GET',
         action: '/my-watch-progresses',
@@ -105,9 +105,7 @@ export class WatchProgressService {
     this.watchProgressQueryCache.flushAll()
   }
 
-  public updateWatchEntry = async (
-    body: Omit<MovieWatchHistoryEntry, 'id' | 'createdAt' | 'updatedAt' | 'userName'>,
-  ) => {
+  public updateWatchEntry = async (body: Omit<WatchHistoryEntry, 'id' | 'createdAt' | 'updatedAt' | 'userName'>) => {
     const { result } = await this.mediaApiClient.call({
       method: 'POST',
       action: '/save-watch-progress',
@@ -122,7 +120,7 @@ export class WatchProgressService {
   }
 
   public async prefetchWatchProgressForFiles(files: PiRatFile[]) {
-    const filter: FilterType<MovieWatchHistoryEntry> = {
+    const filter: FilterType<WatchHistoryEntry> = {
       $or: files.map(({ path, driveLetter }) => ({
         path: { $eq: path },
         driveLetter: { $eq: driveLetter },
