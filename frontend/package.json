@@ -26,7 +26,7 @@
     "@furystack/shades-common-components": "^8.2.1",
     "@furystack/shades-lottie": "^6.0.4",
     "@furystack/utils": "^7.0.2",
-    "@types/node": "^20.13.0",
+    "@types/node": "^20.14.2",
     "common": "workspace:^",
     "marked": "^12.0.2",
     "monaco-editor": "^0.49.0",
