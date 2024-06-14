@@ -1,16 +1,10 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import {
-  getFileName,
-  getParentPath,
-  type FfprobeEndpoint,
-  type Movie,
-  type MovieFile,
-  type PiRatFile,
-  type WatchHistoryEntry,
-} from 'common'
+import { getFileName, getParentPath, type Movie, type MovieFile, type PiRatFile, type WatchHistoryEntry } from 'common'
 import { environmentOptions } from '../../../environment-options.js'
+import { WatchProgressService } from '../../../services/watch-progress-service.js'
+import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
 import { ControlArea } from './control-area.js'
 import { MovieTitle } from './title.js'
 
@@ -18,15 +12,37 @@ interface MoviePlayerProps {
   file: PiRatFile
   movieFile?: MovieFile
   movie?: Movie
-  ffProbe: FfprobeEndpoint['result']
   watchProgress?: WatchHistoryEntry
 }
 
 export const MoviePlayerV2 = Shade<MoviePlayerProps>({
   shadowDomName: 'pirat-movie-player-v2',
+  constructed: ({ useDisposable, element, injector, props }) => {
+    const { driveLetter, path } = props.file
+    const watchProgressService = injector.getInstance(WatchProgressService)
+    const watchProgressUpdater = useDisposable('watchProgressUpdater', () => {
+      const video = element.querySelector('video') as HTMLVideoElement
+      return new WatchProgressUpdater({
+        intervalMs: 10 * 1000,
+        onSave: async (progress) => {
+          watchProgressService.updateWatchEntry({
+            completed: video.duration - progress < 10,
+            driveLetter,
+            path,
+            watchedSeconds: progress,
+          })
+        },
+        saveTresholdSeconds: 10,
+        videoElement: video,
+      })
+    })
+
+    return () => {
+      watchProgressUpdater.dispose()
+    }
+  },
   render: ({ props, element, useDisposable }) => {
     const isPlaying = useDisposable('isPlaying', () => new ObservableValue(false))
-
     useDisposable('mouseMoveListener', () => {
       const elementHideDelay = 3000
 
@@ -85,12 +101,12 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       }
     })
 
-    const { file, watchProgress, ffProbe } = props
+    const { file, watchProgress } = props
     const fileName = getFileName(file)
     const { driveLetter, path } = file
     const parentPath = getParentPath(file)
 
-    const subtitleTracks = props.ffProbe.streams
+    const subtitleTracks = props.movieFile?.ffprobe.streams
       .filter((stream) => (stream.codec_type as any) === 'subtitle')
       .map((subtitle) => (
         <track
@@ -112,6 +128,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           width: '100%',
           height: '100%',
           zIndex: '1',
+          overflow: 'hidden',
         }}>
         <video
           style={{
@@ -120,20 +137,22 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             left: '0',
             width: '100%',
             height: '100%',
+            pointerEvents: 'none',
           }}
           onplay={() => {
             isPlaying.setValue(true)
           }}
           onpause={() => {
             isPlaying.setValue(false)
-          }}>
+          }}
+          currentTime={watchProgress?.watchedSeconds || 0}>
           <source
             src={`${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
               path,
             )}/stream`}
             type="video/mp4"
-          />{' '}
-          {...subtitleTracks}
+          />
+          {...subtitleTracks || []}
         </video>
         <div className="hideOnPlay">
           <MovieTitle file={props.file} movie={props.movie} />
@@ -150,9 +169,11 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               // TODO: Pause the video playback
             }}
             onFullScreen={() => {
-              element.querySelector('video')?.requestFullscreen({
-                navigationUI: 'show',
-              })
+              document.fullscreenElement
+                ? document.exitFullscreen()
+                : element.requestFullscreen({
+                    navigationUI: 'show',
+                  })
             }}
           />
         </div>

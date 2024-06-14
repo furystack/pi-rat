@@ -31,7 +31,7 @@ export const MovieLoader = Shade<{ movieFileId: string }>({
             driveLetter: movieFile.driveLetter,
           })
 
-          return <MoviePlayerV2 ffProbe={movieFile.ffprobe} file={movieFile} watchProgress={watchProgress} movie={movie} />
+          return <MoviePlayerV2 file={movieFile} watchProgress={watchProgress} movie={movie} />
         }}
       />
     )
