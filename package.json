@@ -61,7 +61,8 @@
     "lint": "eslint . --ext .tsx,.ts --cache",
     "bumpVersions": "yarn version check --interactive",
     "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
-    "dockerize": "docker build . --tag furystack/pi-rat:latest"
+    "dockerize": "docker build . --tag furystack/pi-rat:latest",
+    "sshIntoDocker": "docker run -i -t furystack/pi-rat sh"
   },
   "engines": {
     "node": ">=20.0.0"
