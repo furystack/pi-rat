@@ -1,4 +1,4 @@
-import { getCorsOptions } from './get-cors-options'
+import { getCorsOptions } from './get-cors-options.js'
 import { describe, expect, it } from 'vitest'
 
 describe('getCorsOptions', () => {

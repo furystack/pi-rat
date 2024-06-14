@@ -1,4 +1,4 @@
-import { getPort } from './get-port'
+import { getPort } from './get-port.js'
 import { describe, expect, it } from 'vitest'
 
 describe('getPort', () => {

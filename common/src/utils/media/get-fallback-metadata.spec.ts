@@ -1,5 +1,5 @@
 import { sep } from 'path'
-import { getFallbackMetadata } from './get-fallback-metadata'
+import { getFallbackMetadata } from './get-fallback-metadata.js'
 import { describe, it, expect } from 'vitest'
 
 describe('Get Fallback Metadata', () => {
