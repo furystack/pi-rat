@@ -45,27 +45,60 @@ export type StreamEndpoint = {
   }
   query: {
     /**
-     * Selects the audio track to stream. If not provided, the first audio track will be played
+     * Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc...
      */
-    audioTrackId?: number
+    audio?: {
+      /**
+       * Selects the audio track to stream. If not provided, the first audio track will be played
+       */
+      trackId: number
+      /**
+       * Select the codec for audio encoding. If not provided, the original encoding will be used
+       */
+      audioCodec?: 'aac'
+
+      /**
+       * Mix down multi-channel audio to stereo
+       */
+      mixdown?: boolean
+
+      /**
+       * The bitrate for the audio stream. If not provided, the original bitrate will be used
+       */
+      bitrate?: number
+    }
+
     /**
-     * Select the audio encoding. If not provided, the original encoding will be used
+     * Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc...
      */
-    audioCodec?: '' // TODO
+    video?: {
+      /**
+       * The codec for video encoding. If not provided, the original encoding will be used
+       */
+      codec?: 'h264'
+
+      /**
+       * The output resolution for the video stream. If not provided, the original resolution will be used
+       */
+      resolution?: '4k' | '1080p' | '720p' | '480p' | '360p'
+
+      /**
+       * Preset options
+       */
+      quality?: 'high' | 'medium' | 'low'
+    }
+
     /**
-     * Select the video encoding. If not provided, the original encoding will be used
+     * The start time in seconds
      */
-    videoCodec?: 'h264'
+    from: number
+
+    /**
+     * The end time in seconds
+     */
+    to: number
   }
   result: unknown
-}
-
-export type StreamEndpointV2 = {
-  url: {
-    letter: string
-    path: string
-  }
-  query: {}
 }
 
 export interface MediaApi extends RestApi {

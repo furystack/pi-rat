@@ -1,21 +1,20 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 
-import { WatchHistoryEntry, Movie, Series, MovieFile, Config } from 'common'
-import { OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
+import { Config, Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 
-import { DataTypes, Model } from 'sequelize'
-import { useSequelize } from '@furystack/sequelize-store'
+import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
 import type { AuthorizationResult } from '@furystack/repository'
 import { getRepository } from '@furystack/repository'
-import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
+import { useSequelize } from '@furystack/sequelize-store'
+import { DataTypes, Model } from 'sequelize'
 
-import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
-import type { FFProbeResult } from 'ffprobe'
-import { OmdbClientService } from './metadata-services/omdb-client-service.js'
+import type { FfprobeResult } from '../ffprobe-service.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { useMovieFileMaintainer } from './actions/movie-file-maintainer.js'
+import { OmdbClientService } from './metadata-services/omdb-client-service.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
   declare title: string
@@ -38,7 +37,7 @@ class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare imdbId?: string
   declare driveLetter: string
   declare path: string
-  declare ffprobe: FFProbeResult
+  declare ffprobe: FfprobeResult
   declare relatedFiles?: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> | undefined
 }
 

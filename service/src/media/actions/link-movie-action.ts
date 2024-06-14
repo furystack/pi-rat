@@ -1,26 +1,24 @@
+import { getStoreManager, isAuthorized } from '@furystack/core'
+import type { Injector } from '@furystack/inject'
+import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { LinkMovie, PiRatFile } from 'common'
 import {
-  getFallbackMetadata,
+  Movie,
   MovieFile,
-  Drive,
+  OmdbMovieMetadata,
   OmdbSeriesMetadata,
   Series,
+  getFallbackMetadata,
+  getFileName,
   isMovieFile,
   isSampleFile,
-  Movie,
-  OmdbMovieMetadata,
-  getFileName,
 } from 'common'
-import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
-import { RequestError } from '@furystack/rest'
-import { getStoreManager, isAuthorized } from '@furystack/core'
-import type { Injector } from '@furystack/inject'
-import { extractSubtitles } from '../utils/extract-subtitles.js'
-import ffprobe from 'ffprobe'
-import { join } from 'path'
+import { FfprobeService } from '../../ffprobe-service.js'
 import { WebsocketService } from '../../websocket-service.js'
+import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
+import { extractSubtitles } from '../utils/extract-subtitles.js'
 
 const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
   const movieStore = getStoreManager(injector).getStoreFor(Movie, 'imdbId')
@@ -145,13 +143,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     return { status: 'already-linked' } as const
   }
 
-  const loadedDrive = await getStoreManager(injector).getStoreFor(Drive, 'letter').get(driveLetter)
-
-  if (!loadedDrive) {
-    throw new RequestError(`Drive ${driveLetter} not found`, 404)
-  }
-
-  const ffprobeResult = await ffprobe(join(loadedDrive.physicalPath, path), { path: 'ffprobe' })
+  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(options.file)
 
   const omdbStore = getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
   const storedResult = await omdbStore.find({

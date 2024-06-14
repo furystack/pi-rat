@@ -1,13 +1,11 @@
 import type { Injector } from '@furystack/inject'
-import { DevicePingHistory } from 'common'
-import { DeviceAwakeHistory } from 'common'
-import { Device } from 'common'
-import { DataTypes, Model } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
 import type { ScopedLogger } from '@furystack/logging'
-import { useSequelize } from '@furystack/sequelize-store'
 import { getRepository } from '@furystack/repository'
+import { useSequelize } from '@furystack/sequelize-store'
+import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
+import { DataTypes, Model } from 'sequelize'
 import { withRole } from '../authorization/with-role.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class DeviceModel extends Model<Device, Device> implements Device {
   public name!: string
@@ -25,11 +23,11 @@ class DeviceAwakeHistoryModel extends Model<DeviceAwakeHistory, DeviceAwakeHisto
 }
 
 class DevicePingHistoryModel extends Model<DevicePingHistory, DevicePingHistory> implements DevicePingHistory {
-  public id!: string
-  public name!: string
-  public createdAt!: string
-  public isAvailable!: boolean
-  public ping!: number
+  declare id: string
+  declare name: string
+  declare createdAt: string
+  declare isAvailable: boolean
+  declare ping: number
 }
 
 export const setupIotStore = async (injector: Injector, logger: ScopedLogger) => {

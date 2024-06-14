@@ -1,3 +1,4 @@
+import type { WithOptionalId } from '@furystack/core'
 import type {
   DeleteEndpoint,
   GetCollectionEndpoint,
@@ -6,10 +7,9 @@ import type {
   PatchEndpoint,
   RestApi,
 } from '@furystack/rest'
+import type { FFProbeResult } from 'ffprobe'
 import type { DirectoryEntry } from '../models/drives/directory-entry.js'
 import type { Drive } from '../models/drives/drive.js'
-import type { WithOptionalId } from '@furystack/core'
-import type { FFProbeResult } from 'ffprobe'
 
 export type GetDirectoryEntries = {
   url: {

@@ -1,12 +1,10 @@
-import { promises } from 'fs'
-import { join } from 'path'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import type { PiRatFile } from 'common'
-import { Drive, getFileName, getPhysicalParentPath } from 'common'
 import { getDataSetFor } from '@furystack/repository'
-import ffprobe from 'ffprobe'
-import { existsAsync } from '../../utils/exists-async.js'
+import type { PiRatFile } from 'common'
+import { Drive, getFileName, getPhysicalParentPath, getPhysicalPath } from 'common'
+import { promises } from 'fs'
+import { FfprobeService } from '../../ffprobe-service.js'
 import { execAsync } from '../../utils/exec-async.js'
 
 export const extractSubtitles = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
@@ -23,13 +21,8 @@ export const extractSubtitles = async ({ injector, file }: { injector: Injector;
     throw new Error(`Drive with letter '${file.driveLetter}' not found`)
   }
 
-  const fullPath = join(drive.physicalPath, file.path)
-
-  if (!(await existsAsync(fullPath))) {
-    throw new Error(`File '${fullPath}' does not exist`)
-  }
-
-  const ffprobeResult = await ffprobe(fullPath, { path: 'ffprobe' })
+  const fullPath = getPhysicalPath(drive, file)
+  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 
   const subtitles: Array<{
     streamIndex: number

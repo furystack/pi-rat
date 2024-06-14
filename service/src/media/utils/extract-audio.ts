@@ -1,12 +1,11 @@
-import { promises } from 'fs'
-import { join } from 'path'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
 import { Drive, getFileName, getParentPath, getPhysicalPath } from 'common'
-import { getDataSetFor } from '@furystack/repository'
-import ffprobe from 'ffprobe'
-import { existsAsync } from '../../utils/exists-async.js'
+import { promises } from 'fs'
+import { join } from 'path'
+import { FfprobeService } from '../../ffprobe-service.js'
 import { execAsync } from '../../utils/exec-async.js'
 
 export const extractAudio = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
@@ -27,11 +26,7 @@ export const extractAudio = async ({ injector, file }: { injector: Injector; fil
 
   const fullPath = getPhysicalPath(drive, file)
 
-  if (!(await existsAsync(fullPath))) {
-    throw new Error(`File '${fullPath}' does not exist`)
-  }
-
-  const ffprobeResult = await ffprobe(fullPath, { path: 'ffprobe' })
+  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 
   const audioTracks: Array<{
     streamIndex: number
