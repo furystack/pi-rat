@@ -42,7 +42,8 @@ export const DrivesPage = Shade({
           gap: '8px',
           height: 'calc(100% - 48px)',
           width: '100%',
-        }}>
+        }}
+      >
         <FolderPanel
           focused={focused === 'ld'}
           searchStateKey="ld"

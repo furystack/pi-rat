@@ -65,7 +65,8 @@ export const Header = Shade<HeaderProps>({
           <Button
             onclick={() => {
               window.open(environmentOptions.repository)
-            }}>
+            }}
+          >
             <GithubLogo style={{ height: '1rem' }} />
           </Button>
           {sessionState === 'authenticated' ? (

@@ -18,7 +18,8 @@ export const UnknownType = Shade<{ letter: string; path: string }>({
             <a
               href={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
                 path,
-              )}/download`}>
+              )}/download`}
+            >
               here
             </a>
             .

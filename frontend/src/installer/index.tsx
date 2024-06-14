@@ -16,7 +16,8 @@ export const InstallerPage = Shade({
           display: 'flex',
           placeContent: 'center',
           position: 'fixed',
-        }}>
+        }}
+      >
         <Wizard
           steps={[WelcomeStep, CreateAdminStep, AllDoneStep]}
           onFinish={() => {

@@ -101,7 +101,8 @@ export const MovieWidget = Shade<{
                 ev.stopImmediatePropagation()
                 window.location.replace(url)
               }
-            }}>
+            }}
+          >
             <div
               style={{
                 position: 'absolute',
@@ -114,7 +115,8 @@ export const MovieWidget = Shade<{
                 margin: '1em',
                 justifyContent: 'space-between',
                 filter: 'drop-shadow(black 0px 0px 5px) drop-shadow(black 0px 0px 8px) drop-shadow(black 0px 0px 10px)',
-              }}>
+              }}
+            >
               {isLoadedCacheResult(movieFile) && movieFile.value.entries[0] ? (
                 <div style={{ display: 'flex' }}>
                   <div
@@ -124,7 +126,8 @@ export const MovieWidget = Shade<{
                       ev.stopImmediatePropagation()
                       ev.preventDefault()
                       navigateToRoute(injector, watchMovieRoute, { id: movieFile.value.entries[0].id })
-                    }}>
+                    }}
+                  >
                     ▶️
                   </div>
                 </div>
@@ -144,7 +147,8 @@ export const MovieWidget = Shade<{
                         serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
                       )
                     }}
-                    title="Edit movie details">
+                    title="Edit movie details"
+                  >
                     ✏️
                   </div>
                 </div>
@@ -174,7 +178,8 @@ export const MovieWidget = Shade<{
                 whiteSpace: 'nowrap',
                 padding: '1em',
                 background: 'rgba(0,0,0,0.7)',
-              }}>
+              }}
+            >
               {movie.value.title}
               <LazyLoad
                 loader={<div />}

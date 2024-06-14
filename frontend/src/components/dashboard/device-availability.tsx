@@ -71,7 +71,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
           params={{ id: props.deviceName }}
           style={{
             textDecoration: 'none',
-          }}>
+          }}
+        >
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -91,7 +92,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               overflow: 'hidden',
               color: 'white',
               boxShadow: 'rgba(0, 0, 0, 0.3) 1px 3px 6px',
-            }}>
+            }}
+          >
             <div
               style={{
                 position: 'absolute',
@@ -103,7 +105,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                 display: 'flex',
                 margin: '1em',
                 justifyContent: 'space-between',
-              }}>
+              }}
+            >
               <DeviceAvailabilityPanel {...device.value} />
 
               {currentUser?.roles.includes('admin') ? (
@@ -120,7 +123,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                         serializeToQueryString({ gedst: { mode: 'edit', currentId: device.value.name } }),
                       )
                     }}
-                    title="Edit device details">
+                    title="Edit device details"
+                  >
                     ✏️
                   </div>
                 </div>
@@ -138,7 +142,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                 textAlign: 'center',
                 lineHeight: `${size * 0.8}px`,
                 fontSize: `${size / 2}px`,
-              }}>
+              }}
+            >
               {props.icon ? <Icon {...props.icon} /> : null}
             </div>
             <div
@@ -152,7 +157,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                 whiteSpace: 'nowrap',
                 padding: '1em',
                 background: 'rgba(0,0,0,0.7)',
-              }}>
+              }}
+            >
               {device.value.name}
             </div>
           </div>

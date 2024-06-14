@@ -21,7 +21,8 @@ export const TorrentListPage = Shade({
                   torrentService.uploadTorrents(...files)
                 }
               }}
-              title="Add new Torrent file"></input>
+              title="Add new Torrent file"
+            ></input>
           </div>
         </div>
         <TorrentList />

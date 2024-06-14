@@ -107,7 +107,8 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
         controls
         className="video-js"
         crossOrigin="use-credentials"
-        currentTime={watchProgress?.watchedSeconds || 0}>
+        currentTime={watchProgress?.watchedSeconds || 0}
+      >
         <source
           src={`${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
             path,

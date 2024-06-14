@@ -130,7 +130,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                   onclick={() => {
                     setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] as string })
                     refresh()
-                  }}>
+                  }}
+                >
                   ✏️
                 </Button>
                 <Button
@@ -152,7 +153,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                           body: (error as Error).toString(),
                         })
                       })
-                  }}>
+                  }}
+                >
                   ❌
                 </Button>
               </div>
@@ -169,7 +171,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         <Fab
           onclick={() => {
             setEditorState({ mode: 'create' })
-          }}>
+          }}
+        >
           ➕
         </Fab>
       </>

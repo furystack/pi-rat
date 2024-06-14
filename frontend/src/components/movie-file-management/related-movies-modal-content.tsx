@@ -56,7 +56,8 @@ export const RelatedMoviesModalContent = Shade<{
                         },
                       })
                       linkedFilesService.movieFileQueryCache.obsoleteRange(() => true)
-                    }}>
+                    }}
+                  >
                     🔗 Link movie
                   </Button>
                 ) : (

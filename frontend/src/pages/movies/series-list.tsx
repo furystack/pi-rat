@@ -14,7 +14,8 @@ export const SeriesList = Shade({
 
           return (
             <div
-              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}
+            >
               {series.entries.map((movie, index) => (
                 <SeriesWidget index={index} imdbId={movie.imdbId} />
               ))}

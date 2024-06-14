@@ -86,7 +86,8 @@ export const SeriesWidget = Shade<{
                 ev.stopImmediatePropagation()
                 window.location.replace(url)
               }
-            }}>
+            }}
+          >
             <img
               src={series.value.thumbnailImageUrl as string}
               alt={series.value.title}
@@ -111,7 +112,8 @@ export const SeriesWidget = Shade<{
                 whiteSpace: 'nowrap',
                 padding: '1em',
                 background: 'rgba(0,0,0,0.7)',
-              }}>
+              }}
+            >
               {series.value.title}
             </div>
           </div>

@@ -47,7 +47,8 @@ export const GenericMonacoEditor = Shade<{
             right: '1em',
             display: 'flex',
             justifyContent: 'flex-end',
-          }}>
+          }}
+        >
           <Button color="secondary" variant="outlined" className="resetButton">
             Reset
           </Button>
@@ -55,7 +56,8 @@ export const GenericMonacoEditor = Shade<{
             color="primary"
             variant="contained"
             onclick={() => props.onSave(JSON.parse(currentValue.getValue()))}
-            className="saveButton">
+            className="saveButton"
+          >
             Save
           </Button>
         </div>

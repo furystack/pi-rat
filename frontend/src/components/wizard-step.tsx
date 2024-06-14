@@ -40,7 +40,8 @@ export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) =>
           justifyContent: 'space-between',
           maxWidth: 'calc(100% - 32px)',
           maxHeight: 'calc(100% - 32px)',
-        }}>
+        }}
+      >
         <h1 style={{ opacity: '0' }}>{props.title}</h1>
         <div style={{ opacity: '0', flexShrink: '1', overflow: 'auto', padding: '0 .1em' }} className="content">
           {children}
@@ -52,7 +53,8 @@ export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) =>
             justifyContent: 'space-between',
             paddingTop: '12px',
             opacity: '0',
-          }}>
+          }}
+        >
           <Button onclick={() => props.onPrev?.()} disabled={props.currentPage < 1} variant="outlined">
             Previous
           </Button>
@@ -60,7 +62,8 @@ export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) =>
             type="submit"
             disabled={props.currentPage > props.maxPages - 1}
             variant="contained"
-            color={props.currentPage === props.maxPages - 1 ? 'success' : 'primary'}>
+            color={props.currentPage === props.maxPages - 1 ? 'success' : 'primary'}
+          >
             {props.currentPage < props.maxPages - 1 ? 'Next' : 'Finish'}
           </Button>
         </div>

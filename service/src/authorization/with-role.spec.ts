@@ -1,7 +1,7 @@
 import { IdentityContext } from '@furystack/core'
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
-import { withRole } from './with-role'
+import { withRole } from './with-role.js'
 import { describe, expect, it } from 'vitest'
 
 describe('withRoleOnly', () => {

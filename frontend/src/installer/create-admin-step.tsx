@@ -28,7 +28,8 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           })
 
           await props.onNext?.()
-        }}>
+        }}
+      >
         You have to create a super admin user.
         <Input
           name="userName"

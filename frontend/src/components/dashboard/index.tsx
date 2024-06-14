@@ -17,7 +17,8 @@ export const Dashboard = Shade<DashboardData>({
         style={{
           marginTop: '48px',
           scrollPaddingTop: '48px',
-        }}>
+        }}
+      >
         <ContextMenu
           items={[
             ...(currentUser?.username === props.owner || currentUser?.roles.includes('admin')
@@ -38,7 +39,8 @@ export const Dashboard = Shade<DashboardData>({
                   },
                 ]
               : []),
-          ]}>
+          ]}
+        >
           {props.widgets.map((w) => (
             <Widget {...w} />
           ))}

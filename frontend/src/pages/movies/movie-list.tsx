@@ -23,7 +23,8 @@ export const MovieList = Shade({
 
           return (
             <div
-              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}
+            >
               {movies.entries
                 .filter((m) => !m.seriesId)
                 .map((movie, index) => (

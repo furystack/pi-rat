@@ -36,7 +36,8 @@ export const DriveSelector = Shade<{
               path: '/',
             })
           }
-        }}>
+        }}
+      >
         {availableDrives.value.entries.map((r) => (
           <option value={r.letter} selected={currentDrive.letter === r.letter}>
             {r.letter}

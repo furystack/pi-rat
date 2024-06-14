@@ -28,14 +28,16 @@ const MenuItem = Shade<MenuItemProps>({
         onmouseleave={(ev) => {
           ;(ev.target as HTMLElement).style.backgroundColor = 'transparent'
         }}
-        onclick={props.onClick}>
+        onclick={props.onClick}
+      >
         <div
           style={{
             minWidth: '24px',
             paddingRight: '8px',
             textAlign: 'center',
             lineHeight: '100%',
-          }}>
+          }}
+        >
           <Icon {...props.icon} />
         </div>
         <div style={{ lineHeight: '100%' }}>{props.label}</div>
@@ -100,7 +102,8 @@ export const ContextMenu = Shade<ContextMenuProps>({
             menu.style.left = `${ev.clientX}px`
             isOpen.setValue(true)
           })
-        }}>
+        }}
+      >
         <Paper
           className="menuItems"
           elevation={3}
@@ -113,7 +116,8 @@ export const ContextMenu = Shade<ContextMenuProps>({
             padding: '0',
             background: 'rgba(0,0,0,0.07)',
             backdropFilter: 'blur(20px)',
-          }}>
+          }}
+        >
           {items.map((itemProps) => (
             <MenuItem {...itemProps} />
           ))}

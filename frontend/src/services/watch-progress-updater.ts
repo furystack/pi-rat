@@ -13,7 +13,7 @@ export class WatchProgressUpdater implements Disposable {
     await this.update()
   }
 
-  private lastSavedTimeSeconds = this.settings.videoElement.currentTime
+  private lastSavedTimeSeconds: number
 
   public async update() {
     const progress = this.settings.videoElement.currentTime
@@ -29,5 +29,6 @@ export class WatchProgressUpdater implements Disposable {
     this.interval = setInterval(() => {
       this.update()
     }, this.settings.intervalMs)
+    this.lastSavedTimeSeconds = this.settings.videoElement.currentTime
   }
 }

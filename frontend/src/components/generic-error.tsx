@@ -35,27 +35,31 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
           padding: '0 100px',
           color: theme.text.secondary,
           paddingTop: '4em',
-        }}>
+        }}
+      >
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             perspective: '400px',
             animation: 'shake 150ms 2 linear',
-          }}>
+          }}
+        >
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <lottie-player
               autoplay
               style={{ width: '250px', height: '250px' }}
               mode="bounce"
-              src={Math.random() > 0.5 ? JSON.stringify(redCross) : JSON.stringify(deadSmiley)}></lottie-player>
+              src={Math.random() > 0.5 ? JSON.stringify(redCross) : JSON.stringify(deadSmiley)}
+            ></lottie-player>
             <div
               style={{
                 maxWidth: '750px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-              }}>
+              }}
+            >
               <h1 style={{ marginTop: '0', whiteSpace: 'nowrap' }}> {props.mainTitle || 'WhoOoOops... 😱'}</h1>
               <h3> {props.subtitle || 'Something terrible happened 😓'}</h3>
 
@@ -70,7 +74,8 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
             width: '70%',
             justifyContent: 'space-evenly',
             whiteSpace: 'nowrap',
-          }}>
+          }}
+        >
           <a href="/">
             <Button>🏡 Go Home</Button>
           </a>

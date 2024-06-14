@@ -86,7 +86,8 @@ export const FolderPanel = Shade<{
           flexGrow: '0',
           flexShrink: '0',
           height: 'calc(100% - 42px)',
-        }}>
+        }}
+      >
         <DriveSelector defaultDriveLetter={props.defaultDriveLetter} searchStateKey={props.searchStateKey} />
         <FileList
           service={service}

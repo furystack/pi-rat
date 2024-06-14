@@ -57,7 +57,8 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
                 alignItems: 'center',
                 overflow: 'hidden',
                 padding: '1em',
-              }}>
+              }}
+            >
               <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
                 <h3>Continue watching</h3>
                 <div style={{ display: 'flex', overflow: 'auto', scrollSnapType: 'x mandatory' }}>

@@ -73,7 +73,8 @@ const BlobGroup = Shade({
           animation: 'rotate calc(var(--duration, 10) * 1s) infinite var(--direction, 1) ease',
           transform: 'rotate(0deg) translate(-50%, -50%) scale(var(--scale, 1))',
           transition: 'all var(--duration) var(--timing)',
-        }}>
+        }}
+      >
         {children}
       </div>
     )
