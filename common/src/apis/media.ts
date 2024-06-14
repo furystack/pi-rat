@@ -1,18 +1,18 @@
 import type {
-  RestApi,
+  DeleteEndpoint,
   GetCollectionEndpoint,
   GetEntityEndpoint,
   PatchEndpoint,
-  DeleteEndpoint,
   PostEndpoint,
+  RestApi,
 } from '@furystack/rest'
 import type {
   Movie,
   MovieFile,
-  WatchHistoryEntry,
   OmdbMovieMetadata,
   OmdbSeriesMetadata,
   Series,
+  WatchHistoryEntry,
 } from '../models/media/index.js'
 import type { PiRatFile } from '../models/pirat-file.js'
 
@@ -58,6 +58,14 @@ export type StreamEndpoint = {
     videoCodec?: 'h264'
   }
   result: unknown
+}
+
+export type StreamEndpointV2 = {
+  url: {
+    letter: string
+    path: string
+  }
+  query: {}
 }
 
 export interface MediaApi extends RestApi {

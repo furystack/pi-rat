@@ -1,5 +1,5 @@
-import { Shade, createComponent } from '@furystack/shades'
-import type { Movie, PiRatFile } from 'common'
+import { Shade, createComponent } from '@furystack/shades';
+import type { Movie, PiRatFile } from 'common';
 
 export const MovieTitle = Shade<{ file: PiRatFile; movie?: Movie }>({
   shadowDomName: 'pirat-movie-title',
@@ -8,8 +8,8 @@ export const MovieTitle = Shade<{ file: PiRatFile; movie?: Movie }>({
       <div
         style={{
           position: 'fixed',
-          top: '0',
-          left: '0',
+          top: '32px',
+          left: '16px',
           width: '100%',
           height: '100%',
         }}>

@@ -3,11 +3,10 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "eslint.validate": ["typescript", "typescriptreact"],
-  "search.exclude": {
-    "**/.yarn": true,
-    "**/.pnp.*": true
-  },
   "eslint.nodePath": ".yarn/sdks",
-  "prettier.enable": true,
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always",
+    "source.fixAll.eslint": "always",
+    "source.fixAll": "always"
+  }
 }

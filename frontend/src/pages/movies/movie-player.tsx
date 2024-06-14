@@ -1,12 +1,12 @@
 import { attachProps, createComponent, Shade } from '@furystack/shades'
-import { environmentOptions } from '../../environment-options.js'
-import 'video.js'
-import 'video.js/dist/video-js.css'
-import * as videojsDefault from 'video.js'
-import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
-import { WatchProgressService } from '../../services/watch-progress-service.js'
 import type { FfprobeEndpoint, PiRatFile } from 'common'
 import { encode, getFileName, getParentPath, type WatchHistoryEntry } from 'common'
+import 'video.js'
+import * as videojsDefault from 'video.js'
+import 'video.js/dist/video-js.css'
+import { environmentOptions } from '../../environment-options.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
+import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default /* & any*/
 
