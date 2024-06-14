@@ -23,7 +23,7 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "2.29.1",
-    "eslint-plugin-jsdoc": "^48.2.11",
+    "eslint-plugin-jsdoc": "^48.2.12",
     "eslint-plugin-prettier": "^5.1.3",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.7",
@@ -61,7 +61,8 @@
     "lint": "eslint . --ext .tsx,.ts --cache",
     "bumpVersions": "yarn version check --interactive",
     "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
-    "dockerize": "docker build . --tag furystack/pi-rat:latest"
+    "dockerize": "docker build . --tag furystack/pi-rat:latest",
+    "sshIntoDocker": "docker run -i -t furystack/pi-rat sh"
   },
   "engines": {
     "node": ">=20.0.0"

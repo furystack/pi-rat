@@ -12,7 +12,7 @@ import {
 } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
 import { MovieFile } from 'common'
-import mediaApiSchema from 'common/schemas/media-api.json' assert { type: 'json' }
+import mediaApiSchema from 'common/schemas/media-api.json' with { type: 'json' }
 import { Movie, WatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'

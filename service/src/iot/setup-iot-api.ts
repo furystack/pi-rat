@@ -10,7 +10,7 @@ import {
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
 import type { IotApi } from 'common'
-import iotApiSchema from 'common/schemas/iot-api.json' assert { type: 'json' }
+import iotApiSchema from 'common/schemas/iot-api.json' with { type: 'json' }
 import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
 import { AwakeAction } from './actions/awake-action.js'
 import { PingAction } from './actions/ping-action.js'

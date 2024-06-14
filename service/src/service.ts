@@ -14,8 +14,6 @@ import { setupMovies } from './media/setup-media.js'
 import { setupMoviesRestApi } from './media/setup-media-api.js'
 import { setupConfig } from './config/setup-config.js'
 import { setupConfigRestApi } from './config/setup-config-rest-api.js'
-import { setupTorrentApi } from './webtorrent/setup-torrent-api.js'
-import { setupTorrent } from './webtorrent/setup-torrent.js'
 import { setupIot } from './iot/setup-iot.js'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
@@ -40,7 +38,6 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupInstall(injector),
       await setupDashboards(injector),
       await setupMovies(injector),
-      await setupTorrent(injector),
       await setupIot(injector),
     ])
 
@@ -59,7 +56,6 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupInstallRestApi(injector),
       await setupDashboardsRestApi(injector),
       await setupMoviesRestApi(injector),
-      await setupTorrentApi(injector),
       await setupIotApi(injector),
     ])
 
