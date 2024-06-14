@@ -1,11 +1,12 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import { getFileName, getParentPath, type Movie, type MovieFile, type PiRatFile, type WatchHistoryEntry } from 'common'
+import { type Movie, type MovieFile, type PiRatFile, type WatchHistoryEntry } from 'common'
 import { environmentOptions } from '../../../environment-options.js'
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
 import { ControlArea } from './control-area.js'
+import { getSubtitleTracks } from './getSubtitleTracks.js'
 import { MovieTitle } from './title.js'
 
 interface MoviePlayerProps {
@@ -102,22 +103,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     })
 
     const { file, watchProgress } = props
-    const fileName = getFileName(file)
     const { driveLetter, path } = file
-    const parentPath = getParentPath(file)
-
-    const subtitleTracks = props.movieFile?.ffprobe.streams
-      .filter((stream) => (stream.codec_type as any) === 'subtitle')
-      .map((subtitle) => (
-        <track
-          kind="captions"
-          label={subtitle.tags.title || subtitle.tags.language || subtitle.tags.filename}
-          src={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
-            driveLetter,
-          )}/${encodeURIComponent(`${parentPath}/${fileName}-subtitle-${subtitle.index}.vtt`)}/download`}
-          srclang={subtitle.tags.language}
-        />
-      ))
 
     return (
       <div
@@ -152,7 +138,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             )}/stream`}
             type="video/mp4"
           />
-          {...subtitleTracks || []}
+          {...props.movieFile ? getSubtitleTracks(props.movieFile) : []}
         </video>
         <div className="hideOnPlay">
           <MovieTitle file={props.file} movie={props.movie} />
