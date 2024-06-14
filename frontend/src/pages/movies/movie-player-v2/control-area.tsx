@@ -25,7 +25,8 @@ export const ControlArea = Shade<ControlAreaProps>({
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: '2147483647',
-        }}>
+        }}
+      >
         {isPlaying ? <Button onclick={props.onPause}>⏸️</Button> : <Button onclick={props.onPlay}>▶️</Button>}
         <Button onclick={props.onFullScreen}>🎞️</Button>
       </div>

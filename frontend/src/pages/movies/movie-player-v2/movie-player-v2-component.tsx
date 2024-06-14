@@ -115,7 +115,8 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           height: '100%',
           zIndex: '1',
           overflow: 'hidden',
-        }}>
+        }}
+      >
         <video
           style={{
             position: 'absolute',
@@ -131,7 +132,8 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           onpause={() => {
             isPlaying.setValue(false)
           }}
-          currentTime={watchProgress?.watchedSeconds || 0}>
+          currentTime={watchProgress?.watchedSeconds || 0}
+        >
           <source
             src={`${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
               path,
