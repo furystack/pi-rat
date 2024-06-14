@@ -12,6 +12,7 @@ const videojs = videojsDefault as any as typeof videojsDefault.default /* & any*
 
 interface MoviePlayerProps {
   file: PiRatFile
+
   ffProbe: FfprobeEndpoint['result']
   watchProgress?: WatchHistoryEntry
 }
