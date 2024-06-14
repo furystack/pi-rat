@@ -31,7 +31,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@furystack/core": "^14.0.4",
-    "@furystack/rest": "^7.0.4"
+    "@furystack/core": "^14.0.5",
+    "@furystack/rest": "^7.0.5"
   }
 }
