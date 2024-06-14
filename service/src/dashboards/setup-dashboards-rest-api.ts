@@ -10,7 +10,7 @@ import {
 } from '@furystack/rest-service'
 import type { DashboardsApi } from 'common'
 import { Dashboard } from 'common'
-import dashboardsApiSchema from 'common/schemas/dashboards-api.json' assert { type: 'json' }
+import dashboardsApiSchema from 'common/schemas/dashboards-api.json' with { type: 'json' }
 import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
 

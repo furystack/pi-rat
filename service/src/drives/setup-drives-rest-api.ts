@@ -10,7 +10,7 @@ import {
 } from '@furystack/rest-service'
 import '@furystack/repository'
 import { Drive } from 'common'
-import drivesApiSchema from 'common/schemas/drives-api.json' assert { type: 'json' }
+import drivesApiSchema from 'common/schemas/drives-api.json' with { type: 'json' }
 import type { Injector } from '@furystack/inject'
 import { GetDirectoryEntriesAction } from './actions/get-directory-entries.js'
 import { getPort } from '../get-port.js'
