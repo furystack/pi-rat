@@ -4615,9 +4615,6 @@ __metadata:
     typescript-eslint: "npm:^7.13.0"
     vite: "npm:^5.3.1"
     vitest: "npm:^1.6.0"
-  dependenciesMeta:
-    prettier@3.0.2:
-      unplugged: true
   languageName: unknown
   linkType: soft
 

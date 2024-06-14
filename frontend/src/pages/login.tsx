@@ -39,7 +39,8 @@ export const Login = Shade({
             return plainData?.userName?.length && plainData?.password?.length
           }}
           className="login-form"
-          onSubmit={({ userName, password }) => sessionService.login(userName, password)}>
+          onSubmit={({ userName, password }) => sessionService.login(userName, password)}
+        >
           <h2>Login</h2>
           <Input labelTitle="E-mail address" name="userName" required autofocus type="email" />
           <Input labelTitle="Password" name="password" required minLength={4} type="password" />
@@ -50,7 +51,8 @@ export const Login = Shade({
               alignItems: 'center',
               flexDirection: 'row',
               padding: '1em 0',
-            }}>
+            }}
+          >
             <Button variant="contained" color="primary" type="submit">
               Login
             </Button>

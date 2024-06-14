@@ -86,7 +86,8 @@ export const FileContextMenu = Shade<{
                 isInfoVisible.setValue(true)
               },
             },
-          ]}>
+          ]}
+        >
           {children}
         </ContextMenu>
         <FileInfoModal

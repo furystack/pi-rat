@@ -93,7 +93,8 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
               ev.stopImmediatePropagation()
               window.location.replace(props.url)
             }
-          }}>
+          }}
+        >
           <div
             className="cover"
             style={{
@@ -105,7 +106,8 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
               placeContent: 'center',
               textAlign: 'center',
               filter: 'drop-shadow(2px 4px 9px rgba(0,0,0,0.5))',
-            }}>
+            }}
+          >
             {props.icon}
           </div>
           <div
@@ -114,7 +116,8 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
               overflow: 'hidden',
               textAlign: 'center',
               textOverflow: 'ellipsis',
-            }}>
+            }}
+          >
             {props.name}
           </div>
         </div>

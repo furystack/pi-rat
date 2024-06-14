@@ -10,7 +10,8 @@ export const PiRatLazyLoad = Shade<Pick<LazyLoadProps, 'component'>>({
       <LazyLoad
         loader={<FullScreenLoader message="Loading..." />}
         error={(error, retry) => <GenericErrorPage error={error} retry={retry} />}
-        component={props.component}>
+        component={props.component}
+      >
         {children}
       </LazyLoad>
     )

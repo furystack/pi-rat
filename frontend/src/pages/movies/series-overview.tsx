@@ -66,7 +66,8 @@ export const SeriesOverview = Shade<SeriesListProps>({
                   justifyContent: 'center',
                   alignItems: 'flex-start',
                   flexWrap: !isDesktop ? 'wrap' : undefined,
-                }}>
+                }}
+              >
                 <div style={{ padding: '2em' }}>
                   <img
                     src={series.thumbnailImageUrl || ''}
@@ -82,7 +83,8 @@ export const SeriesOverview = Shade<SeriesListProps>({
                     maxHeight: isDesktop ? 'calc(100% - 128px)' : undefined,
                     overflow: 'hidden',
                     overflowY: isDesktop ? 'auto' : undefined,
-                  }}>
+                  }}
+                >
                   <h1>{series.title}</h1>
                   <p style={{ fontSize: '0.8em' }}>{series.year?.toString()} &nbsp;</p>
                   <p style={{ textAlign: 'justify' }}>{series.plot}</p>

@@ -23,7 +23,8 @@ export const FileInfoModal = Shade<{
         }}
         onClose={() => isInfoVisible.setValue(false)}
         showAnimation={fadeIn}
-        hideAnimation={fadeOut}>
+        hideAnimation={fadeOut}
+      >
         <div
           style={{
             display: 'flex',
@@ -31,7 +32,8 @@ export const FileInfoModal = Shade<{
             justifyContent: 'center',
             width: '100%',
             height: '100%',
-          }}>
+          }}
+        >
           <Paper style={{ display: 'flex', flexDirection: 'column', minWidth: '300px' }}>
             <h3>
               <FileIcon entry={entry} /> &nbsp;

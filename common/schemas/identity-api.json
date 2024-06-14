@@ -14,10 +14,7 @@
           }
         }
       },
-      "required": [
-        "username",
-        "roles"
-      ],
+      "required": ["username", "roles"],
       "additionalProperties": false
     },
     "IsAuthenticatedAction": {
@@ -30,15 +27,11 @@
               "type": "boolean"
             }
           },
-          "required": [
-            "isAuthenticated"
-          ],
+          "required": ["isAuthenticated"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "result"
-      ],
+      "required": ["result"],
       "additionalProperties": false
     },
     "GetCurrentUserAction": {
@@ -48,9 +41,7 @@
           "$ref": "#/definitions/FurystackUser"
         }
       },
-      "required": [
-        "result"
-      ],
+      "required": ["result"],
       "additionalProperties": false
     },
     "LoginAction": {
@@ -69,17 +60,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "username",
-            "password"
-          ],
+          "required": ["username", "password"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "result",
-        "body"
-      ],
+      "required": ["result", "body"],
       "additionalProperties": false
     },
     "LogoutAction": {
@@ -87,9 +72,7 @@
       "properties": {
         "result": {}
       },
-      "required": [
-        "result"
-      ],
+      "required": ["result"],
       "additionalProperties": false
     },
     "PostUserEndpoint": {
@@ -102,10 +85,7 @@
           "$ref": "#/definitions/WithOptionalId%3CFurystackUser%2C%22username%22%3E"
         }
       },
-      "required": [
-        "result",
-        "body"
-      ],
+      "required": ["result", "body"],
       "additionalProperties": false
     },
     "User": {
@@ -127,12 +107,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "username",
-        "roles",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["username", "roles", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "WithOptionalId<FurystackUser,\"username\">": {
@@ -149,9 +124,7 @@
           }
         }
       },
-      "required": [
-        "roles"
-      ]
+      "required": ["roles"]
     },
     "Omit<FurystackUser,\"username\">": {
       "$ref": "#/definitions/Pick%3CFurystackUser%2CExclude%3C(%22username%22%7C%22roles%22)%2C%22username%22%3E%3E"
@@ -166,9 +139,7 @@
           }
         }
       },
-      "required": [
-        "roles"
-      ],
+      "required": ["roles"],
       "additionalProperties": false
     },
     "IdentityApi": {
@@ -190,12 +161,7 @@
               "$ref": "#/definitions/GetEntityEndpoint%3CUser%2C%22username%22%3E"
             }
           },
-          "required": [
-            "/isAuthenticated",
-            "/currentUser",
-            "/users",
-            "/users/:id"
-          ],
+          "required": ["/isAuthenticated", "/currentUser", "/users", "/users/:id"],
           "additionalProperties": false
         },
         "POST": {
@@ -211,11 +177,7 @@
               "$ref": "#/definitions/PostUserEndpoint"
             }
           },
-          "required": [
-            "/login",
-            "/logout",
-            "/users"
-          ],
+          "required": ["/login", "/logout", "/users"],
           "additionalProperties": false
         },
         "PATCH": {
@@ -225,9 +187,7 @@
               "$ref": "#/definitions/PatchEndpoint%3COmit%3CUser%2C(%22createdAt%22%7C%22updatedAt%22)%3E%2C%22username%22%3E"
             }
           },
-          "required": [
-            "/users/:id"
-          ],
+          "required": ["/users/:id"],
           "additionalProperties": false
         },
         "PUT": {
@@ -241,9 +201,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -254,9 +212,7 @@
               "$ref": "#/definitions/DeleteEndpoint%3CUser%2C%22username%22%3E"
             }
           },
-          "required": [
-            "/users/:id"
-          ],
+          "required": ["/users/:id"],
           "additionalProperties": false
         },
         "HEAD": {
@@ -270,9 +226,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -287,9 +241,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -304,9 +256,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -321,19 +271,12 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "GET",
-        "POST",
-        "PATCH",
-        "DELETE"
-      ],
+      "required": ["GET", "POST", "PATCH", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -350,9 +293,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -367,9 +308,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -384,9 +323,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -401,9 +338,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -418,9 +353,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -435,9 +368,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -452,9 +383,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -469,9 +398,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -486,9 +413,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
@@ -511,10 +436,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CUser%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -534,31 +456,19 @@
           "properties": {
             "username": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "roles": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -568,12 +478,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "username",
-              "roles",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["username", "roles", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -832,10 +737,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -849,12 +751,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "username",
-                  "roles",
-                  "createdAt",
-                  "updatedAt"
-                ]
+                "enum": ["username", "roles", "createdAt", "updatedAt"]
               },
               "description": "The list of fields to select"
             }
@@ -869,20 +766,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/User"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -899,9 +790,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -909,11 +798,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -942,9 +827,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -952,10 +835,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }

@@ -16,7 +16,8 @@ export const ImageViewer = Shade<{ letter: string; path: string }>({
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-        }}>
+        }}
+      >
         <h1 style={{ paddingLeft: '2em' }}>
           {letter}:{path}
         </h1>

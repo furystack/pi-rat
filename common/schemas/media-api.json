@@ -12,24 +12,14 @@
           "properties": {
             "status": {
               "type": "string",
-              "enum": [
-                "already-linked",
-                "linked",
-                "failed",
-                "not-movie-file"
-              ]
+              "enum": ["already-linked", "linked", "failed", "not-movie-file"]
             }
           },
-          "required": [
-            "status"
-          ],
+          "required": ["status"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "PiRatFile": {
@@ -44,10 +34,7 @@
           "description": "The full path of the file"
         }
       },
-      "required": [
-        "driveLetter",
-        "path"
-      ],
+      "required": ["driveLetter", "path"],
       "additionalProperties": false,
       "description": "Represents a File entry in pi-rat"
     },
@@ -64,16 +51,11 @@
               "type": "boolean"
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "FetchOmdbSeries": {
@@ -86,19 +68,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "imdbId"
-          ],
+          "required": ["imdbId"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/OmdbSeriesMetadata"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "OmdbSeriesMetadata": {
@@ -158,10 +135,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "Source",
-              "Value"
-            ],
+            "required": ["Source", "Value"],
             "additionalProperties": false
           }
         },
@@ -231,10 +205,7 @@
           "$ref": "#/definitions/WatchHistoryEntry"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "Omit<WatchHistoryEntry,(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>": {
@@ -256,12 +227,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "driveLetter",
-        "path",
-        "watchedSeconds",
-        "completed"
-      ],
+      "required": ["driveLetter", "path", "watchedSeconds", "completed"],
       "additionalProperties": false
     },
     "WatchHistoryEntry": {
@@ -292,16 +258,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "userName",
-        "driveLetter",
-        "path",
-        "watchedSeconds",
-        "completed",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "StreamEndpoint": {
@@ -317,10 +274,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "query": {
@@ -345,11 +299,7 @@
         },
         "result": {}
       },
-      "required": [
-        "url",
-        "query",
-        "result"
-      ],
+      "required": ["url", "query", "result"],
       "additionalProperties": false
     },
     "MediaApi": {
@@ -374,9 +324,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "movieId"
-                  ],
+                  "required": ["movieId"],
                   "additionalProperties": false
                 },
                 "result": {
@@ -386,10 +334,7 @@
                   }
                 }
               },
-              "required": [
-                "url",
-                "result"
-              ],
+              "required": ["url", "result"],
               "additionalProperties": false
             },
             "/movies/:movieId/subtitles/:subtitleName": {
@@ -405,18 +350,12 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "movieId",
-                    "subtitleName"
-                  ],
+                  "required": ["movieId", "subtitleName"],
                   "additionalProperties": false
                 },
                 "result": {}
               },
-              "required": [
-                "url",
-                "result"
-              ],
+              "required": ["url", "result"],
               "additionalProperties": false
             },
             "/my-watch-progresses": {
@@ -491,13 +430,7 @@
               "$ref": "#/definitions/SaveWatchProgress"
             }
           },
-          "required": [
-            "/movies",
-            "/movie-files",
-            "/link-movie",
-            "/extract-subtitles",
-            "/save-watch-progress"
-          ],
+          "required": ["/movies", "/movie-files", "/link-movie", "/extract-subtitles", "/save-watch-progress"],
           "additionalProperties": false
         },
         "PATCH": {
@@ -510,10 +443,7 @@
               "$ref": "#/definitions/PatchEndpoint%3CMovieFile%2C%22id%22%3E"
             }
           },
-          "required": [
-            "/movies/:id",
-            "/movie-files/:id"
-          ],
+          "required": ["/movies/:id", "/movie-files/:id"],
           "additionalProperties": false
         },
         "PUT": {
@@ -527,9 +457,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -546,11 +474,7 @@
               "$ref": "#/definitions/DeleteEndpoint%3CWatchHistoryEntry%2C%22id%22%3E"
             }
           },
-          "required": [
-            "/movies/:id",
-            "/movie-files/:id",
-            "/my-watch-progresses/:id"
-          ],
+          "required": ["/movies/:id", "/movie-files/:id", "/my-watch-progresses/:id"],
           "additionalProperties": false
         },
         "HEAD": {
@@ -564,9 +488,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -581,9 +503,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -598,9 +518,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -615,19 +533,12 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "GET",
-        "POST",
-        "PATCH",
-        "DELETE"
-      ],
+      "required": ["GET", "POST", "PATCH", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -644,9 +555,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -661,9 +570,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -678,9 +585,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -695,9 +600,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -712,9 +615,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -729,9 +630,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -746,9 +645,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -763,9 +660,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -780,9 +675,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
@@ -805,10 +698,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CMovie%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -828,94 +718,55 @@
           "properties": {
             "imdbId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "duration": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "genre": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "thumbnailImageUrl": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "type": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "seriesId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "season": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "episode": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1342,17 +1193,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$ne": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 }
               },
               "additionalProperties": false
@@ -1666,10 +1511,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1702,10 +1544,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "seriesId": {
           "type": "string"
@@ -1723,12 +1562,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "imdbId",
-        "title",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["imdbId", "title", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Movie,\"imdbId\">": {
@@ -1770,20 +1604,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Movie"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -1803,10 +1631,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CWatchHistoryEntry%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -1826,59 +1651,35 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "userName": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "driveLetter": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "path": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "watchedSeconds": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "completed": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1888,16 +1689,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "id",
-              "userName",
-              "driveLetter",
-              "path",
-              "watchedSeconds",
-              "completed",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -2352,10 +2144,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -2393,20 +2182,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/WatchHistoryEntry"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -2426,10 +2209,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CSeries%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -2449,52 +2229,31 @@
           "properties": {
             "imdbId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "thumbnailImageUrl": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -2504,15 +2263,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "imdbId",
-              "title",
-              "year",
-              "thumbnailImageUrl",
-              "plot",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["imdbId", "title", "year", "thumbnailImageUrl", "plot", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -2929,10 +2680,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -2961,14 +2709,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "imdbId",
-        "title",
-        "year",
-        "plot",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Series,\"imdbId\">": {
@@ -2981,15 +2722,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "imdbId",
-                  "title",
-                  "year",
-                  "thumbnailImageUrl",
-                  "plot",
-                  "createdAt",
-                  "updatedAt"
-                ]
+                "enum": ["imdbId", "title", "year", "thumbnailImageUrl", "plot", "createdAt", "updatedAt"]
               },
               "description": "The list of fields to select"
             }
@@ -3004,20 +2737,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Series"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -3037,10 +2764,7 @@
           "$ref": "#/definitions/GetCollectionResult%3COmdbMovieMetadata%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -3060,213 +2784,123 @@
           "properties": {
             "Title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Rated": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Released": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Runtime": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Genre": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Director": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Writer": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Actors": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Language": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Country": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Awards": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Poster": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Ratings": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Metascore": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbRating": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbVotes": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbID": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Type": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "DVD": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "BoxOffice": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Production": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Website": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Response": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "seriesID": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Season": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Episode": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -4092,10 +3726,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 },
@@ -4111,10 +3742,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 }
@@ -4138,10 +3766,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -4160,10 +3785,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -4388,31 +4010,19 @@
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$endsWith": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$like": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$regex": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 }
               },
               "additionalProperties": false
@@ -4422,17 +4032,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$ne": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 }
               },
               "additionalProperties": false
@@ -4444,20 +4048,14 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "movie",
-                      "episode"
-                    ]
+                    "enum": ["movie", "episode"]
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "movie",
-                      "episode"
-                    ]
+                    "enum": ["movie", "episode"]
                   }
                 }
               },
@@ -4982,10 +4580,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -5046,10 +4641,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "Source",
-              "Value"
-            ],
+            "required": ["Source", "Value"],
             "additionalProperties": false
           }
         },
@@ -5067,10 +4659,7 @@
         },
         "Type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "DVD": {
           "type": "string"
@@ -5187,20 +4776,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/OmdbMovieMetadata"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -5220,10 +4803,7 @@
           "$ref": "#/definitions/GetCollectionResult%3COmdbSeriesMetadata%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -5243,171 +4823,99 @@
           "properties": {
             "Title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Rated": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Released": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Runtime": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Genre": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Director": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Writer": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Actors": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Language": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Country": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Awards": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Poster": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Ratings": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Metascore": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbRating": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbVotes": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbID": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Type": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "totalSeasons": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Response": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -6227,10 +5735,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 },
@@ -6246,10 +5751,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 }
@@ -6273,10 +5775,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -6295,10 +5794,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -6793,10 +6289,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -6850,20 +6343,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/OmdbSeriesMetadata"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -6883,10 +6370,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CMovieFile%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -6906,45 +6390,27 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "driveLetter": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "path": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "ffprobe": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "relatedFiles": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -6954,14 +6420,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "id",
-              "imdbId",
-              "driveLetter",
-              "path",
-              "ffprobe",
-              "relatedFiles"
-            ]
+            "enum": ["id", "imdbId", "driveLetter", "path", "ffprobe", "relatedFiles"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -7251,22 +6710,13 @@
                     "properties": {
                       "type": {
                         "type": "string",
-                        "enum": [
-                          "subtitle",
-                          "audio",
-                          "trailer",
-                          "info",
-                          "other"
-                        ]
+                        "enum": ["subtitle", "audio", "trailer", "info", "other"]
                       },
                       "path": {
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "type",
-                      "path"
-                    ],
+                    "required": ["type", "path"],
                     "additionalProperties": false
                   }
                 },
@@ -7277,22 +6727,13 @@
                     "properties": {
                       "type": {
                         "type": "string",
-                        "enum": [
-                          "subtitle",
-                          "audio",
-                          "trailer",
-                          "info",
-                          "other"
-                        ]
+                        "enum": ["subtitle", "audio", "trailer", "info", "other"]
                       },
                       "path": {
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "type",
-                      "path"
-                    ],
+                    "required": ["type", "path"],
                     "additionalProperties": false
                   }
                 }
@@ -7313,22 +6754,13 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "subtitle",
-                                "audio",
-                                "trailer",
-                                "info",
-                                "other"
-                              ]
+                              "enum": ["subtitle", "audio", "trailer", "info", "other"]
                             },
                             "path": {
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "path"
-                          ],
+                          "required": ["type", "path"],
                           "additionalProperties": false
                         }
                       },
@@ -7349,22 +6781,13 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "subtitle",
-                                "audio",
-                                "trailer",
-                                "info",
-                                "other"
-                              ]
+                              "enum": ["subtitle", "audio", "trailer", "info", "other"]
                             },
                             "path": {
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "path"
-                          ],
+                          "required": ["type", "path"],
                           "additionalProperties": false
                         }
                       },
@@ -7391,9 +6814,7 @@
           }
         }
       },
-      "required": [
-        "streams"
-      ],
+      "required": ["streams"],
       "additionalProperties": false
     },
     "getInfo.FFProbeStream": {
@@ -7413,11 +6834,7 @@
         },
         "codec_type": {
           "type": "string",
-          "enum": [
-            "video",
-            "audio",
-            "images"
-          ]
+          "enum": ["video", "audio", "images"]
         },
         "codec_time_base": {
           "type": "string"
@@ -7651,10 +7068,7 @@
     },
     "getInfo.FFProbeBoolean": {
       "type": "string",
-      "enum": [
-        "0",
-        "1"
-      ]
+      "enum": ["0", "1"]
     },
     "getInfo.SideData": {
       "anyOf": [
@@ -7708,9 +7122,7 @@
           "description": "Based on the C code related to the default side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2298}"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "getInfo.BaseSideData": {
@@ -7720,9 +7132,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "getInfo.DisplayMatrixSideData": {
@@ -7741,11 +7151,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "displaymatrix",
-        "rotation",
-        "side_data_type"
-      ],
+      "required": ["displaymatrix", "rotation", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.Stereo3dSideData": {
@@ -7775,11 +7181,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "inverted",
-        "side_data_type",
-        "type"
-      ],
+      "required": ["inverted", "side_data_type", "type"],
       "additionalProperties": false
     },
     "getInfo.SphericalMappingSideData": {
@@ -7821,13 +7223,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.BaseSphericalMappingSideData": {
@@ -7852,13 +7248,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.EquirectangularSphericalMappingSideData": {
@@ -7884,13 +7274,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.CubeMapSphericalMappingSideData": {
@@ -7920,14 +7304,7 @@
           "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2313}"
         }
       },
-      "required": [
-        "padding",
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["padding", "pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.TiltedEquirectangularSphericalMappingSideData": {
@@ -8000,13 +7377,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "discard_padding",
-        "discard_reason",
-        "side_data_type",
-        "skip_reason",
-        "skip_samples"
-      ],
+      "required": ["discard_padding", "discard_reason", "side_data_type", "skip_reason", "skip_samples"],
       "additionalProperties": false
     },
     "getInfo.MasteringDisplayMetadataSideData": {
@@ -8131,9 +7502,7 @@
           "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "getInfo.LuminanceMasteringDisplayMetadataSideData": {
@@ -8152,11 +7521,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "max_luminance",
-        "min_luminance",
-        "side_data_type"
-      ],
+      "required": ["max_luminance", "min_luminance", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.ContentLightLevelMetadataSideData": {
@@ -8174,11 +7539,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "max_average",
-        "max_content",
-        "side_data_type"
-      ],
+      "required": ["max_average", "max_content", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.DoviConfigurationRecordSideData": {
@@ -8239,10 +7600,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "service_type",
-        "side_data_type"
-      ],
+      "required": ["service_type", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.MpegtsStreamIdSideData": {
@@ -8257,10 +7615,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "id",
-        "side_data_type"
-      ],
+      "required": ["id", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.CpbPropertiesSideData": {
@@ -8287,14 +7642,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "avg_bitrate",
-        "buffer_size",
-        "max_bitrate",
-        "min_bitrate",
-        "side_data_type",
-        "vbv_delay"
-      ],
+      "required": ["avg_bitrate", "buffer_size", "max_bitrate", "min_bitrate", "side_data_type", "vbv_delay"],
       "additionalProperties": false
     },
     "getInfo.WebvttSideData": {
@@ -8302,10 +7650,7 @@
       "properties": {
         "side_data_type": {
           "type": "string",
-          "enum": [
-            "WebVTT ID",
-            "WebVTT Settings"
-          ],
+          "enum": ["WebVTT ID", "WebVTT Settings"],
           "description": "Based on the C code related to Webvtt side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2379-L2381}"
         },
         "data": {
@@ -8315,10 +7660,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "data_hash",
-        "side_data_type"
-      ],
+      "required": ["data_hash", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.ActiveFormatDescriptionSideData": {
@@ -8333,9 +7675,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "GetCollectionResult<MovieFile>": {
@@ -8353,10 +7693,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -8385,32 +7722,18 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "id",
-        "driveLetter",
-        "path",
-        "ffprobe"
-      ],
+      "required": ["id", "driveLetter", "path", "ffprobe"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<MovieFile,\"id\">": {
@@ -8423,14 +7746,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "id",
-                  "imdbId",
-                  "driveLetter",
-                  "path",
-                  "ffprobe",
-                  "relatedFiles"
-                ]
+                "enum": ["id", "imdbId", "driveLetter", "path", "ffprobe", "relatedFiles"]
               },
               "description": "The list of fields to select"
             }
@@ -8445,20 +7761,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/MovieFile"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -8472,10 +7782,7 @@
           "$ref": "#/definitions/Movie"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -8511,10 +7818,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "seriesId": {
           "type": "string"
@@ -8526,10 +7830,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "imdbId",
-        "title"
-      ],
+      "required": ["imdbId", "title"],
       "additionalProperties": false
     },
     "PostEndpoint<MovieFile,\"id\">": {
@@ -8542,10 +7843,7 @@
           "$ref": "#/definitions/MovieFile"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -8575,31 +7873,18 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "driveLetter",
-        "ffprobe",
-        "path"
-      ]
+      "required": ["driveLetter", "ffprobe", "path"]
     },
     "Omit<MovieFile,\"id\">": {
       "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22id%22%3E%3E"
@@ -8626,31 +7911,18 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "driveLetter",
-        "path",
-        "ffprobe"
-      ],
+      "required": ["driveLetter", "path", "ffprobe"],
       "additionalProperties": false
     },
     "PatchEndpoint<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
@@ -8666,9 +7938,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -8676,11 +7946,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -8713,10 +7979,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "seriesId": {
           "type": "string"
@@ -8743,9 +8006,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -8753,11 +8014,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -8786,22 +8043,13 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
@@ -8818,9 +8066,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -8828,10 +8074,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
@@ -8845,9 +8088,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -8855,10 +8096,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
@@ -8872,9 +8110,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -8882,10 +8118,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }

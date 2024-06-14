@@ -13,7 +13,8 @@ export const WidgetGroup = Shade<WidgetGroupData>({
           alignItems: 'center',
           overflow: 'hidden',
           padding: '1em',
-        }}>
+        }}
+      >
         <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
           <h3>{props.title}</h3>
           <div style={{ display: 'flex', overflow: 'auto', scrollSnapType: 'x mandatory' } as any}>

@@ -21,12 +21,7 @@
           "description": "Entry creation timestamp"
         }
       },
-      "required": [
-        "id",
-        "name",
-        "success",
-        "createdAt"
-      ],
+      "required": ["id", "name", "success", "createdAt"],
       "additionalProperties": false
     },
     "DevicePingHistory": {
@@ -53,12 +48,7 @@
           "description": "Entry creation timestamp"
         }
       },
-      "required": [
-        "id",
-        "name",
-        "isAvailable",
-        "createdAt"
-      ],
+      "required": ["id", "name", "isAvailable", "createdAt"],
       "additionalProperties": false
     },
     "Device": {
@@ -85,11 +75,7 @@
           "description": "Entry update timestamp"
         }
       },
-      "required": [
-        "name",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["name", "createdAt", "updatedAt"],
       "additionalProperties": false
     }
   }

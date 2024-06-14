@@ -47,7 +47,8 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                     color="primary"
                     onclick={() => {
                       navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
-                    }}>
+                    }}
+                  >
                     Continue from{' '}
                     {(() => {
                       const date = new Date(0)
@@ -59,7 +60,8 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                     onclick={async () => {
                       await watchProgressService.deleteWatchEntry(watchProgressResult.value.entries[0].id)
                       navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
-                    }}>
+                    }}
+                  >
                     Watch from the beginning
                   </Button>
                   {movieFilesResult.value.count > 1 ? <>{`${movieFile.driveLetter}:${movieFile.path}`}</> : null}
@@ -73,7 +75,8 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                   color="primary"
                   onclick={() => {
                     navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
-                  }}>
+                  }}
+                >
                   Start watching
                 </Button>
                 {movieFilesResult.value.count > 1 ? <>{`${movieFile.driveLetter}:${movieFile.path}`}</> : null}
@@ -124,7 +127,8 @@ export const MovieOverview = Shade<{ imdbId: string }>({
               justifyContent: 'center',
               alignItems: 'flex-start',
               flexWrap: 'wrap',
-            }}>
+            }}
+          >
             <div style={{ padding: '2em' }}>
               <img
                 src={movie.thumbnailImageUrl || ''}
@@ -150,7 +154,8 @@ export const MovieOverview = Shade<{ imdbId: string }>({
                           {},
                           serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
                         )
-                      }}>
+                      }}
+                    >
                       Edit
                     </Button>
                   </span>

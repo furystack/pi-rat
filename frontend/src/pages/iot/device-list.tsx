@@ -12,7 +12,8 @@ export const DeviceList = Shade({
           const devices = await injector.getInstance(IotDevicesService).findDevice({})
           return (
             <div
-              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}
+            >
               {devices.entries.map((device) => (
                 <Widget type="device-availability" deviceName={device.name} enableWakeUp />
               ))}

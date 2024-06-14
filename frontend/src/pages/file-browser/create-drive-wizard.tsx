@@ -38,7 +38,8 @@ export const AddDriveStep = Shade<WizardStepProps>({
               body: (error as any).toString(),
             })
           }
-        }}>
+        }}
+      >
         <div style={{ padding: '1em 0' }}>
           <Input
             required
@@ -76,20 +77,23 @@ export const CreateDriveWizard = Shade<{ onDriveAdded?: () => void }>({
           isVisible={isOpened}
           onClose={() => isOpened.setValue(false)}
           showAnimation={fadeIn}
-          hideAnimation={fadeOut}>
+          hideAnimation={fadeOut}
+        >
           <Wizard
             steps={[AddDriveStep]}
             onFinish={() => {
               isOpened.setValue(false)
               props.onDriveAdded?.()
-            }}></Wizard>
+            }}
+          ></Wizard>
         </Modal>
         <Button
           style={{ position: 'fixed', bottom: '1em', right: '1em', zIndex: '1' }}
           variant="outlined"
           color="success"
           onclick={() => isOpened.setValue(true)}
-          title="Add Drive">
+          title="Add Drive"
+        >
           +
         </Button>
       </>
