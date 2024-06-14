@@ -2,11 +2,11 @@ import { Cache } from '@furystack/cache'
 import { PhysicalStore, StoreManager } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import { Drive, PiRatFile, getPhysicalPath } from 'common'
-import ffprobe from 'ffprobe'
+import { FfprobeData, ffprobe } from 'fluent-ffmpeg'
 import { FileWatcherService } from './drives/file-watcher-service.js'
 import { existsAsync } from './utils/exists-async.js'
 
-export type FfprobeResult = ffprobe.FFProbeResult
+export type FfprobeResult = FfprobeData
 
 @Injectable({ lifetime: 'singleton' })
 export class FfprobeService {
@@ -33,7 +33,9 @@ export class FfprobeService {
   private physicalFileCache = new Cache({
     capacity: 100,
     load: async (fullPath: string) => {
-      const ffprobeResult = await ffprobe(fullPath, { path: 'ffprobe' })
+      const ffprobeResult = await new Promise((resolve, reject) =>
+        ffprobe(fullPath, (err, data) => (err ? reject(err) : resolve(data))),
+      )
       return ffprobeResult
     },
   })

@@ -44,6 +44,37 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
   },
   render: ({ props, element, useDisposable }) => {
     const isPlaying = useDisposable('isPlaying', () => new ObservableValue(false))
+    const isFullScreen = useDisposable('isFullScreen', () => new ObservableValue(false))
+    const isMuted = useDisposable('isMuted', () => new ObservableValue(false))
+    const volume = useDisposable('volume', () => new ObservableValue(100))
+
+    const getVideo = () => element.querySelector('video') as HTMLVideoElement
+
+    isPlaying.subscribe((playingValue) => {
+      const video = getVideo()
+      if (playingValue) {
+        video.play()
+      } else {
+        video.pause()
+      }
+    })
+
+    isFullScreen.subscribe((fullScreenValue) => {
+      if (fullScreenValue) {
+        element.requestFullscreen()
+      } else {
+        document.exitFullscreen()
+      }
+    })
+
+    isMuted.subscribe((mutedValue) => {
+      getVideo().muted = mutedValue
+    })
+
+    volume.subscribe((volumeValue) => {
+      getVideo().volume = volumeValue / 100
+    })
+
     useDisposable('mouseMoveListener', () => {
       const elementHideDelay = 3000
 
@@ -105,6 +136,15 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     const { file, watchProgress } = props
     const { driveLetter, path } = file
 
+    const watchProgressObservable = useDisposable(
+      'watchProgress',
+      () => new ObservableValue(watchProgress?.watchedSeconds || 0),
+    )
+
+    watchProgressObservable.subscribe((newProgress) => {
+      getVideo().currentTime = newProgress
+    })
+
     return (
       <div
         style={{
@@ -115,8 +155,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           height: '100%',
           zIndex: '1',
           overflow: 'hidden',
-        }}
-      >
+        }}>
         <video
           style={{
             position: 'absolute',
@@ -132,8 +171,15 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           onpause={() => {
             isPlaying.setValue(false)
           }}
-          currentTime={watchProgress?.watchedSeconds || 0}
-        >
+          onvolumechange={(ev) => {
+            const video = ev.target as HTMLVideoElement
+            volume.setValue(video.volume * 100)
+            isMuted.setValue(video.muted)
+          }}
+          onprogress={() => {
+            watchProgressObservable.setValue(getVideo().currentTime)
+          }}
+          currentTime={watchProgress?.watchedSeconds || 0}>
           <source
             src={`${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
               path,
@@ -145,24 +191,12 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
         <div className="hideOnPlay">
           <MovieTitle file={props.file} movie={props.movie} />
           <ControlArea
+            watchedSeconds={watchProgressObservable}
             isPlaying={isPlaying}
-            onPlay={() => {
-              isPlaying.setValue(true)
-              element.querySelector('video')?.play()
-              // TODO: Start the video playback
-            }}
-            onPause={() => {
-              isPlaying.setValue(false)
-              element.querySelector('video')?.pause()
-              // TODO: Pause the video playback
-            }}
-            onFullScreen={() => {
-              document.fullscreenElement
-                ? document.exitFullscreen()
-                : element.requestFullscreen({
-                    navigationUI: 'show',
-                  })
-            }}
+            isFullScreen={isFullScreen}
+            isMuted={isMuted}
+            volume={volume}
+            lengthSeconds={55}
           />
         </div>
       </div>
