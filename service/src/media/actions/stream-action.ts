@@ -7,18 +7,13 @@ import type { StreamEndpoint } from 'common'
 import { Drive } from 'common'
 import ffmpeg from 'fluent-ffmpeg'
 import mime from 'mime'
-import { extname, join } from 'path'
+import { join } from 'path'
 
-export const StreamAction: RequestAction<StreamEndpoint> = async ({
-  injector,
-  getUrlParams,
-  //getQuery,
-  response,
-}) => {
+export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, response, getQuery }) => {
   const logger = getLogger(injector).withScope('StreamAction')
 
-  // const { audioCodec, videoCodec } = getQuery()
   const { letter, path } = getUrlParams()
+  const { from, to, audio, video } = getQuery()
 
   const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
   if (!drive) {
@@ -26,34 +21,74 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({
   }
 
   const fullPath = join(drive.physicalPath, path)
-  // const fileStats = await stat(fullPath)
-  // const fileSize = fileStats.size
-  const mimeType = mime.getType(extname(path))
+  const mimeType = mime.getType('mp4')
   const mimeHeader = mimeType ? { 'Content-Type': mimeType } : {}
-
-  // const parts = range.replace(/bytes=/, '').split('-')
-  // const start = parseInt(parts[0], 10)
-  // const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
-  // const chunksize = end - start + 1
   const head = {
-    // 'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-    // 'Accept-Ranges': 'bytes',
-    // 'Content-Length': chunksize,
     ...mimeHeader,
   }
   response.writeHead(200, head)
 
-  // const calculatedSeekOffset = start / fileSize
+  const command = ffmpeg(fullPath)
+    // .videoCodec('libx264')
+    // .withAudioCodec('aac')
+    .audioChannels(2)
+    .format('mp4')
+    .outputOptions(['-movflags empty_moov+default_base_moof+frag_keyframe'])
 
-  ffmpeg(fullPath)
-    .outputOptions(['-movflags isml+frag_keyframe'])
-    // .toFormat('mp4')
-    // .withAudioCodec('copy')
-    // .seekInput(seekOffset || 0)
-    // .map('0:v:0')
-    // .map(`${audioTrackId}:a:1`)
-    .videoCodec('copy')
-    .format('matroska')
+  if (from) {
+    command.seekInput(from)
+  }
+
+  if (to) {
+    command.duration(to - from)
+  }
+
+  if (audio) {
+    if (audio.audioCodec) {
+      command.audioCodec('aac')
+    }
+    if (audio.bitrate) {
+      command.audioBitrate(audio.bitrate)
+    }
+
+    if (audio.mixdown) {
+      command.audioChannels(2)
+    }
+  }
+
+  if (video) {
+    if (video.codec) {
+      command.videoCodec(video.codec)
+    }
+
+    if (video.quality) {
+      // TODO: Figure out how to set quality
+    }
+
+    if (video.resolution) {
+      switch (video.resolution) {
+        case '4k':
+          command.size('3840x2160')
+          break
+        case '1080p':
+          command.size('1920x1080')
+          break
+        case '720p':
+          command.size('1280x720')
+          break
+        case '480p':
+          command.size('854x480')
+          break
+        case '360p':
+          command.size('640x360')
+          break
+        default:
+          break
+      }
+    }
+  }
+
+  command
     .on('error', (err, stdout, stderr) => {
       logger.error({ message: `an error happened: ${err}`, data: { err, stdout, stderr } })
     })
@@ -64,6 +99,8 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({
       logger.verbose({ message: `Processing: ${progress.percent}%` })
     })
     .pipe(response, { end: true })
+
+  console.log(command)
 
   return BypassResult()
 }

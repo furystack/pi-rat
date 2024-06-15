@@ -21,7 +21,7 @@
     "@furystack/core": "^14.0.5",
     "@furystack/inject": "^11.0.3",
     "@furystack/logging": "^7.0.2",
-    "@furystack/rest-client-fetch": "^7.0.5",
+    "@furystack/rest-client-fetch": "^7.1.0",
     "@furystack/shades": "^10.0.5",
     "@furystack/shades-common-components": "^8.2.2",
     "@furystack/shades-lottie": "^6.0.5",

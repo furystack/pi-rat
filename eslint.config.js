@@ -1,9 +1,9 @@
 // @ts-check
 
 import eslint from '@eslint/js'
-import tseslint from 'typescript-eslint'
-import jsdoc from 'eslint-plugin-jsdoc'
 import prettierConfig from 'eslint-config-prettier'
+import jsdoc from 'eslint-plugin-jsdoc'
+import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
@@ -66,7 +66,7 @@ export default tseslint.config(
       'no-useless-concat': 'error',
       radix: 'error',
       yoda: 'error',
-      'prefer-arrow-callback': 'error',
+      'prefer-arrow-callback': ['error', { allowUnboundThis: true }],
       'prefer-rest-params': 'error',
       'no-var': 'error',
       'prefer-const': 'error',

@@ -3,11 +3,11 @@ import { promisifyAnimation } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import { type Movie, type PiRatFile, type WatchHistoryEntry } from 'common'
 import type { FfprobeData } from 'fluent-ffmpeg'
-import { environmentOptions } from '../../../environment-options.js'
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
 import { ControlArea } from './control-area.js'
-import { getSubtitleTracks } from './getSubtitleTracks.js'
+// import { getSubtitleTracks } from './getSubtitleTracks.js'
+import { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { MovieTitle } from './title.js'
 
 interface MoviePlayerProps {
@@ -45,13 +45,16 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       watchProgressUpdater.dispose()
     }
   },
-  render: ({ props, element, useDisposable }) => {
+  render: ({ props, element, useDisposable, injector }) => {
     const { watchProgress, file } = props
     const { driveLetter, path } = file
     const isPlaying = useDisposable('isPlaying', () => new ObservableValue(false))
     const isFullScreen = useDisposable('isFullScreen', () => new ObservableValue(false))
     const isMuted = useDisposable('isMuted', () => new ObservableValue(false))
     const volume = useDisposable('volume', () => new ObservableValue(100))
+
+    const api = injector.getInstance(MediaApiClient)
+
     const watchProgressObservable = useDisposable(
       'watchProgress',
       () => new ObservableValue(watchProgress?.watchedSeconds || 0),
@@ -74,26 +77,33 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       })
       return ms as MediaSource & { dispose: () => void }
     })
-
-    mediaSource.addEventListener('sourceopen', async () => {
-      const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"')
-      const response = await fetch(
-        `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
-          path,
-        )}/stream`,
-        {
-          credentials: 'include',
-          mode: 'cors',
+    mediaSource.addEventListener('sourceopen', async function (this: MediaSource) {
+      const { response } = await api.call({
+        method: 'GET',
+        action: '/files/:letter/:path/stream',
+        url: {
+          letter: encodeURIComponent(driveLetter),
+          path: encodeURIComponent(path),
         },
-      )
+        query: {
+          from: watchProgress?.watchedSeconds || 0,
+          to: (watchProgress?.watchedSeconds || 0) + 10,
+        },
+        responseParser: async (r) => {
+          return { response: r, result: null as any }
+        },
+      })
+
+      const sourceBuffer = this.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')
       if (!response.ok) {
         throw new Error(`Failed to fetch video: ${response.statusText}`)
       }
+      this.duration = props.ffprobe.format.duration || 0
       sourceBuffer.addEventListener('updateend', () => {
-        mediaSource.endOfStream()
-        console.log(mediaSource.readyState) // ended
+        this.endOfStream()
       })
       const ab = await response.arrayBuffer()
+      sourceBuffer.appendWindowStart = 0
       sourceBuffer.appendBuffer(ab)
     })
 
@@ -219,13 +229,13 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           currentTime={watchProgress?.watchedSeconds || 0}
           src={URL.createObjectURL(mediaSource)}
         >
-          <source
+          {/* <source
             src={`${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
               path,
             )}/stream`}
             type="video/mp4"
           />
-          {...getSubtitleTracks(props.file, props.ffprobe)}
+          {...getSubtitleTracks(props.file, props.ffprobe)} */}
         </video>
         <div className="hideOnPlay">
           <MovieTitle file={props.file} movie={props.movie} />

@@ -75,7 +75,7 @@ export type StreamEndpoint = {
       /**
        * The codec for video encoding. If not provided, the original encoding will be used
        */
-      codec?: 'h264'
+      codec?: 'libx264'
 
       /**
        * The output resolution for the video stream. If not provided, the original resolution will be used
