@@ -32,7 +32,6 @@
     "@furystack/websocket-api": "^12.0.5",
     "chokidar": "^3.6.0",
     "common": "workspace:^",
-    "ffprobe": "^1.1.2",
     "fluent-ffmpeg": "^2.1.3",
     "formidable": "^3.5.1",
     "mime": "^4.0.3",

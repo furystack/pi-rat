@@ -33,7 +33,7 @@ export class FfprobeService {
   private physicalFileCache = new Cache({
     capacity: 100,
     load: async (fullPath: string) => {
-      const ffprobeResult = await new Promise((resolve, reject) =>
+      const ffprobeResult = await new Promise<FfprobeData>((resolve, reject) =>
         ffprobe(fullPath, (err, data) => (err ? reject(err) : resolve(data))),
       )
       return ffprobeResult

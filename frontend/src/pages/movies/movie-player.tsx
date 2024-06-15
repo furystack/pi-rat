@@ -59,7 +59,9 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
       .forEach((audio) => {
         const track = new (videojs as any).default.AudioTrack({
           id: audio.index,
-          kind: Object.entries(audio.disposition).filter(([_key, value]) => value === 1)?.[0]?.[0] || 'default',
+          kind:
+            (audio.disposition && Object.entries(audio.disposition).filter(([_key, value]) => value === 1)?.[0]?.[0]) ||
+            'default',
           label: audio.tags.title || audio.tags.language || audio.tags.filename,
           language: audio.tags.language,
         })
