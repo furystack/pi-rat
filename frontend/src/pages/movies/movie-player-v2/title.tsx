@@ -14,8 +14,6 @@ export const MovieTitle = Shade<{ file: PiRatFile; movie?: Movie }>({
           position: 'absolute',
           top: '32px',
           left: '16px',
-          width: '100%',
-          height: '100%',
           zIndex: '2147483647',
           textShadow: '2px 2px 16px black',
         }}

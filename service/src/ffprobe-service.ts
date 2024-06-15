@@ -1,10 +1,11 @@
 import { Cache } from '@furystack/cache'
 import { PhysicalStore, StoreManager } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
-import { Drive, PiRatFile, getPhysicalPath } from 'common'
+import { Drive, PiRatFile } from 'common'
 import fluendFfmpeg, { FfprobeData } from 'fluent-ffmpeg'
 import { FileWatcherService } from './drives/file-watcher-service.js'
 import { existsAsync } from './utils/exists-async.js'
+import { getPhysicalPath } from './utils/physical-path-utils.js'
 
 export type FfprobeResult = FfprobeData
 

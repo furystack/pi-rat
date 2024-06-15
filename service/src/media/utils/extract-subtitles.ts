@@ -2,10 +2,11 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
-import { Drive, getFileName, getPhysicalParentPath, getPhysicalPath } from 'common'
+import { Drive, getFileName } from 'common'
 import { promises } from 'fs'
 import { FfprobeService } from '../../ffprobe-service.js'
 import { execAsync } from '../../utils/exec-async.js'
+import { getPhysicalParentPath, getPhysicalPath } from '../../utils/physical-path-utils.js'
 
 export const extractSubtitles = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
   const logger = getLogger(injector).withScope('extract-subtitles')
@@ -28,7 +29,7 @@ export const extractSubtitles = async ({ injector, file }: { injector: Injector;
     streamIndex: number
   }> =
     ffprobeResult.streams
-      .filter((stream) => (stream.codec_type as any) === 'subtitle')
+      .filter((stream) => (stream.codec_type as any) === 'subtitle' && stream.codec_name === 'subrip')
       .map((stream) => ({
         streamIndex: stream.index,
       })) || []

@@ -29,11 +29,9 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   response.writeHead(200, head)
 
   const command = ffmpeg(fullPath)
-    // .videoCodec('libx264')
-    // .withAudioCodec('aac')
-    .audioChannels(2)
     .format('mp4')
     .outputOptions(['-movflags empty_moov+default_base_moof+frag_keyframe'])
+    .addOutputOption('-map 0:v:0')
 
   if (from) {
     command.seekInput(from)
@@ -44,6 +42,10 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   }
 
   if (audio) {
+    if (!isNaN(audio.trackId)) {
+      command.addOutputOption(`-map 0:a:${audio.trackId}`)
+    }
+
     if (audio.audioCodec) {
       command.audioCodec('aac')
     }
@@ -88,19 +90,25 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
     }
   }
 
-  command
-    .on('error', (err, stdout, stderr) => {
-      logger.error({ message: `an error happened: ${err}`, data: { err, stdout, stderr } })
-    })
-    .on('end', () => {
-      logger.verbose({ message: 'file has been converted succesfully' })
-    })
-    .on('progress', (progress) => {
-      logger.verbose({ message: `Processing: ${progress.percent}%` })
-    })
-    .pipe(response, { end: true })
+  command.on('start', (commandLine) => {
+    logger.verbose({ message: `Spawned Ffmpeg with command: ${commandLine}` })
+  })
 
-  console.log(command)
+  try {
+    command
+      .on('error', (err, stdout, stderr) => {
+        logger.error({ message: `an error happened: ${err}`, data: { err, stdout, stderr } })
+      })
+      .on('end', () => {
+        logger.verbose({ message: 'file has been converted succesfully' })
+      })
+      .on('progress', (progress) => {
+        logger.verbose({ message: `Processing: ${progress.percent}%` })
+      })
+      .pipe(response, { end: true })
+  } catch (error) {
+    console.error('Stream error', error)
+  }
 
   return BypassResult()
 }

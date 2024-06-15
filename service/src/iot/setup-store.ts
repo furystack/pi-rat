@@ -8,18 +8,18 @@ import { withRole } from '../authorization/with-role.js'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class DeviceModel extends Model<Device, Device> implements Device {
-  public name!: string
-  public ipAddress?: string | undefined
-  public macAddress?: string | undefined
-  public createdAt!: string
-  public updatedAt!: string
+  public declare name: string
+  public declare ipAddress: string | undefined
+  public declare macAddress: string | undefined
+  public declare createdAt: string
+  public declare updatedAt: string
 }
 
 class DeviceAwakeHistoryModel extends Model<DeviceAwakeHistory, DeviceAwakeHistory> implements DeviceAwakeHistory {
-  public id!: string
-  public name!: string
-  public createdAt!: string
-  public success!: boolean
+  public declare id: string
+  public declare name: string
+  public declare createdAt: string
+  public declare success: boolean
 }
 
 class DevicePingHistoryModel extends Model<DevicePingHistory, DevicePingHistory> implements DevicePingHistory {

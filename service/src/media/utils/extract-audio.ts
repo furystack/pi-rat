@@ -2,11 +2,12 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
-import { Drive, getFileName, getParentPath, getPhysicalPath } from 'common'
+import { Drive, getFileName, getParentPath } from 'common'
 import { promises } from 'fs'
 import { join } from 'path'
 import { FfprobeService } from '../../ffprobe-service.js'
 import { execAsync } from '../../utils/exec-async.js'
+import { getPhysicalPath } from '../../utils/physical-path-utils.js'
 
 export const extractAudio = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
   const logger = getLogger(injector).withScope('extract-audio-tracks')
