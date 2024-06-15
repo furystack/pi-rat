@@ -1,7 +1,8 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import { type Movie, type MovieFile, type PiRatFile, type WatchHistoryEntry } from 'common'
+import { type Movie, type PiRatFile, type WatchHistoryEntry } from 'common'
+import type { FfprobeData } from 'fluent-ffmpeg'
 import { environmentOptions } from '../../../environment-options.js'
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
@@ -11,7 +12,7 @@ import { MovieTitle } from './title.js'
 
 interface MoviePlayerProps {
   file: PiRatFile
-  movieFile?: MovieFile
+  ffprobe: FfprobeData
   movie?: Movie
   watchProgress?: WatchHistoryEntry
 }
@@ -19,10 +20,12 @@ interface MoviePlayerProps {
 export const MoviePlayerV2 = Shade<MoviePlayerProps>({
   shadowDomName: 'pirat-movie-player-v2',
   constructed: ({ useDisposable, element, injector, props }) => {
+    const getVideo = () => element.querySelector('video') as HTMLVideoElement
+
     const { driveLetter, path } = props.file
     const watchProgressService = injector.getInstance(WatchProgressService)
     const watchProgressUpdater = useDisposable('watchProgressUpdater', () => {
-      const video = element.querySelector('video') as HTMLVideoElement
+      const video = getVideo()
       return new WatchProgressUpdater({
         intervalMs: 10 * 1000,
         onSave: async (progress) => {
@@ -43,16 +46,61 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     }
   },
   render: ({ props, element, useDisposable }) => {
+    const { watchProgress, file } = props
+    const { driveLetter, path } = file
     const isPlaying = useDisposable('isPlaying', () => new ObservableValue(false))
     const isFullScreen = useDisposable('isFullScreen', () => new ObservableValue(false))
     const isMuted = useDisposable('isMuted', () => new ObservableValue(false))
     const volume = useDisposable('volume', () => new ObservableValue(100))
+    const watchProgressObservable = useDisposable(
+      'watchProgress',
+      () => new ObservableValue(watchProgress?.watchedSeconds || 0),
+    )
 
     const getVideo = () => element.querySelector('video') as HTMLVideoElement
+
+    const mediaSource = useDisposable('mediaSource', () => {
+      const ms = new MediaSource()
+      Object.assign(ms, {
+        dispose: () => {
+          ;[...ms.sourceBuffers].forEach((sb) => {
+            try {
+              ms.removeSourceBuffer(sb)
+            } catch (e) {
+              console.error(e)
+            }
+          })
+        },
+      })
+      return ms as MediaSource & { dispose: () => void }
+    })
+
+    mediaSource.addEventListener('sourceopen', async () => {
+      const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"')
+      const response = await fetch(
+        `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
+          path,
+        )}/stream`,
+        {
+          credentials: 'include',
+          mode: 'cors',
+        },
+      )
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video: ${response.statusText}`)
+      }
+      sourceBuffer.addEventListener('updateend', () => {
+        mediaSource.endOfStream()
+        console.log(mediaSource.readyState) // ended
+      })
+      const ab = await response.arrayBuffer()
+      sourceBuffer.appendBuffer(ab)
+    })
 
     isPlaying.subscribe((playingValue) => {
       const video = getVideo()
       if (playingValue) {
+        console.log(mediaSource.readyState)
         video.play()
       } else {
         video.pause()
@@ -133,18 +181,6 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       }
     })
 
-    const { file, watchProgress } = props
-    const { driveLetter, path } = file
-
-    const watchProgressObservable = useDisposable(
-      'watchProgress',
-      () => new ObservableValue(watchProgress?.watchedSeconds || 0),
-    )
-
-    watchProgressObservable.subscribe((newProgress) => {
-      getVideo().currentTime = newProgress
-    })
-
     return (
       <div
         style={{
@@ -155,7 +191,8 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           height: '100%',
           zIndex: '1',
           overflow: 'hidden',
-        }}>
+        }}
+      >
         <video
           style={{
             position: 'absolute',
@@ -179,14 +216,16 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           onprogress={() => {
             watchProgressObservable.setValue(getVideo().currentTime)
           }}
-          currentTime={watchProgress?.watchedSeconds || 0}>
+          currentTime={watchProgress?.watchedSeconds || 0}
+          src={URL.createObjectURL(mediaSource)}
+        >
           <source
             src={`${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(driveLetter)}/${encodeURIComponent(
               path,
             )}/stream`}
             type="video/mp4"
           />
-          {...props.movieFile ? getSubtitleTracks(props.movieFile) : []}
+          {...getSubtitleTracks(props.file, props.ffprobe)}
         </video>
         <div className="hideOnPlay">
           <MovieTitle file={props.file} movie={props.movie} />
@@ -196,7 +235,10 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             isFullScreen={isFullScreen}
             isMuted={isMuted}
             volume={volume}
-            lengthSeconds={55}
+            lengthSeconds={props.ffprobe.format.duration || 0}
+            seekTo={(seconds) => {
+              getVideo().currentTime = Math.round(seconds)
+            }}
           />
         </div>
       </div>

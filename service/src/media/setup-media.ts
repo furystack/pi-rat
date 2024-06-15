@@ -85,14 +85,14 @@ class OmdbMovieMetadataModel extends Model<OmdbMovieMetadata, OmdbMovieMetadata>
   declare imdbVotes: string
   declare imdbID: string
   declare Type: 'episode' | 'movie'
-  DVD?: string | undefined
-  BoxOffice?: string | undefined
-  Production?: string | undefined
-  Website?: string | undefined
+  declare DVD?: string | undefined
+  declare BoxOffice?: string | undefined
+  declare Production?: string | undefined
+  declare Website?: string | undefined
   declare Response: 'True'
-  seriesID?: string | undefined
-  Season?: string | undefined
-  Episode?: string | undefined
+  declare seriesID?: string | undefined
+  declare Season?: string | undefined
+  declare Episode?: string | undefined
   declare createdAt: string
   declare updatedAt: string
 }

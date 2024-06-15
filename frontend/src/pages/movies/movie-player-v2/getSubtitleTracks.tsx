@@ -1,14 +1,17 @@
 import { createComponent } from '@furystack/shades'
-import { getFileName, getParentPath, type MovieFile } from 'common'
+import type { PiRatFile } from 'common'
+import { getFileName, getParentPath } from 'common'
+import type { FfprobeData } from 'fluent-ffmpeg'
+
 import { environmentOptions } from '../../../environment-options.js'
 
-export const getSubtitleTracks = (movieFile: MovieFile) => {
-  const fileName = getFileName(movieFile)
-  const parentPath = getParentPath(movieFile)
-  const { driveLetter } = movieFile
+export const getSubtitleTracks = (file: PiRatFile, ffProbeData: FfprobeData) => {
+  const fileName = getFileName(file)
+  const parentPath = getParentPath(file)
+  const { driveLetter } = file
 
   return (
-    movieFile.ffprobe.streams
+    ffProbeData.streams
       .filter((stream) => (stream.codec_type as any) === 'subtitle')
       .map((subtitle) => (
         <track

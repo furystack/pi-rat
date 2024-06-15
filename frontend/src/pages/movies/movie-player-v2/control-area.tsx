@@ -9,6 +9,7 @@ type ControlAreaProps = {
   volume: ObservableValue<number>
   watchedSeconds: ObservableValue<number>
   lengthSeconds: number
+  seekTo: (seconds: number) => void
 }
 
 const ControlButton = styledShade(Button, {
@@ -48,13 +49,9 @@ export const SoundControl = Shade<{
 
 export const ControlArea = Shade<ControlAreaProps>({
   shadowDomName: 'pirat-movie-player-v2-control-area',
-  render: ({ props, useObservable, element }) => {
+  render: ({ props, useObservable }) => {
     const [isPlaying, setIsPlaying] = useObservable('isPlaying', props.isPlaying)
-    const [progress, setProgress] = useObservable('progress', props.watchedSeconds, {
-      onChange: (newProgressValue) => {
-        ;(element.querySelector('.progress-bar') as HTMLInputElement)!.value = newProgressValue as any
-      },
-    })
+    const [progress] = useObservable('progress', props.watchedSeconds)
     const [isFullScreen, setFullScreen] = useObservable('isFullScreen', props.isFullScreen)
 
     return (
@@ -69,7 +66,8 @@ export const ControlArea = Shade<ControlAreaProps>({
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: '2147483647',
-        }}>
+        }}
+      >
         <Input
           className="progress-bar"
           type="range"
@@ -82,7 +80,7 @@ export const ControlArea = Shade<ControlAreaProps>({
             left: '10px',
             width: 'calc(100% - 20px)',
           }}
-          onTextChange={(e) => setProgress(parseInt(e, 10))}
+          onTextChange={(e) => props.seekTo(parseInt(e, 10))}
         />
         {isPlaying ? (
           <ControlButton title="Pause" onclick={() => setIsPlaying(false)}>
