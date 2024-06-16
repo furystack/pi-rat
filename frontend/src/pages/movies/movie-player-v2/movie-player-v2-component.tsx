@@ -53,9 +53,15 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
     mediaService.MediaSource.addEventListener('sourceopen', async () => {
       mediaService.MediaSource.duration = props.ffprobe.format.duration || 0
-      mediaService.loadChunk(watchProgress?.watchedSeconds ? watchProgress?.watchedSeconds - 1 : 0).then(() => {
-        mediaService.progress.setValue(watchProgress?.watchedSeconds || 0)
-      })
+      if (watchProgress?.watchedSeconds) {
+        mediaService
+          .loadChunk(Math.floor(watchProgress.watchedSeconds / mediaService.chunkLength) * mediaService.chunkLength)
+          .then(() => {
+            mediaService.progress.setValue(watchProgress.watchedSeconds)
+          })
+      } else {
+        mediaService.loadChunk(0)
+      }
     })
 
     useDisposable('mouseMoveListener', () => {

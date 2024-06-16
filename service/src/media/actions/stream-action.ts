@@ -8,6 +8,7 @@ import { Drive } from 'common'
 import ffmpeg from 'fluent-ffmpeg'
 import mime from 'mime'
 import { join } from 'path'
+import { FfprobeService } from '../../ffprobe-service.js'
 
 export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, response, getQuery }) => {
   const logger = getLogger(injector).withScope('StreamAction')
@@ -28,6 +29,17 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   }
   response.writeHead(200, head)
 
+  const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile({ driveLetter: letter, path })
+
+  const audioStreams = ffprobe.streams.filter((stream) => stream.codec_type === 'audio')
+  const audioStream = audioStreams[audio?.trackId || 0]
+  const videoStream = ffprobe.streams.find((stream) => stream.codec_type === 'video')
+
+  logger.information({
+    message: `Starting stream from ${from} to ${to}, transcodeVideo: ${!!video?.codec}, transcodeAudio: ${!!audio?.audioCodec}`,
+    data: { fullPath, from, to, audio, video, audioStream, videoStream },
+  })
+
   const command = ffmpeg(fullPath)
     .format('mp4')
     .outputOptions(['-movflags empty_moov+default_base_moof+frag_keyframe'])
@@ -38,14 +50,13 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   }
 
   if (to) {
-    command.duration(to - from)
+    command.inputOption(`-t ${to - from}`)
   }
 
   if (audio) {
     if (!isNaN(audio.trackId)) {
       command.addOutputOption(`-map 0:a:${audio.trackId}`)
     }
-
     if (audio.audioCodec) {
       command.audioCodec('aac')
     }
@@ -56,6 +67,8 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
     if (audio.mixdown) {
       command.audioChannels(2)
     }
+  } else {
+    command.audioCodec('copy')
   }
 
   if (video) {
@@ -88,6 +101,8 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
           break
       }
     }
+  } else {
+    command.videoCodec('copy')
   }
 
   command.on('start', (commandLine) => {
@@ -107,7 +122,7 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
       })
       .pipe(response, { end: true })
   } catch (error) {
-    console.error('Stream error', error)
+    logger.error({ message: 'Stream error', data: { error } })
   }
 
   return BypassResult()
