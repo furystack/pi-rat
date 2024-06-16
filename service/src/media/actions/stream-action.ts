@@ -46,11 +46,11 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
     .addOutputOption('-map 0:v:0')
 
   if (from) {
-    command.seekInput(from)
+    command.seek(from)
   }
 
   if (to) {
-    command.inputOption(`-t ${to - from}`)
+    command.duration(to - from)
   }
 
   if (audio) {

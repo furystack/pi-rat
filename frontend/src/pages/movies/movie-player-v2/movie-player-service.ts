@@ -23,11 +23,8 @@ export const audioCodecs = {
 export class MoviePlayerService implements Disposable {
   public readonly MediaSource = new MediaSource()
   public readonly url = URL.createObjectURL(this.MediaSource)
-
   private loadLock = new Lock()
-
   public audioTrackId = new ObservableValue(0)
-
   public async dispose() {
     this.progress.dispose()
     this.MediaSource.endOfStream()
@@ -42,20 +39,54 @@ export class MoviePlayerService implements Disposable {
 
   private lastLoadTime = Infinity
 
-  private getActiveSourceBuffer = () =>
-    this.MediaSource.activeSourceBuffers[0] || this.MediaSource.addSourceBuffer(this.getMimeType())
+  private bufferZones: Array<[number, number]> = []
+  private gapsInBuffers: Array<[number, number]> = []
 
-  public async loadChunk(
-    from: number,
-    to: number = from + this.chunkLength,
-    sourceBuffer = this.getActiveSourceBuffer(),
-  ) {
+  private getActiveSourceBuffer = () => {
+    const existing = this.MediaSource.activeSourceBuffers[0]
+    if (existing) {
+      return existing
+    }
+    console.log('Creating new source buffer')
+    const newSourceBuffer = this.MediaSource.addSourceBuffer(this.getMimeType())
+    return newSourceBuffer
+  }
+
+  private updateBufferZones = () => {
+    const newSourceBuffer = this.MediaSource.activeSourceBuffers[0]
+    this.bufferZones = newSourceBuffer.buffered.length
+      ? [
+          ...(newSourceBuffer.buffered.start(0) > 0 ? [[0, 0] as [number, number]] : []),
+          ...new Array(newSourceBuffer.buffered.length)
+            .fill(0)
+            .map((_, i) => [newSourceBuffer.buffered.start(i), newSourceBuffer.buffered.end(i)] as [number, number]),
+          ...(!this.ffprobe.format.duration ||
+          newSourceBuffer.buffered.end(newSourceBuffer.buffered.length - 1) < this.ffprobe.format.duration - 1
+            ? [[this.ffprobe.format.duration, this.ffprobe.format.duration] as [number, number]]
+            : []),
+        ]
+      : []
+
+    this.gapsInBuffers = this.bufferZones.reduce(
+      (acc, [_start, end], i) => {
+        const nextStart = this.bufferZones[i + 1]?.[0] || end
+        if (nextStart > end) {
+          acc.push([end, nextStart])
+        }
+        return acc
+      },
+      [] as Array<[number, number]>,
+    )
+    console.log('Buffer updated:', { bufferZones: this.bufferZones, gapsInBuffers: this.gapsInBuffers })
+  }
+
+  public async loadChunkForProgress(progress: number) {
+    const from = this.getSegmentStartForProgress(progress)
+    const to = from + this.chunkLength
     console.log(`Starting stream from ${from} to ${to}`)
     try {
       await this.loadLock.acquire()
-
       const start = new Date().getTime()
-
       const audio = this.getAudioTracks()[this.audioTrackId.getValue()]
 
       const video = this.getVideoTrack()
@@ -97,7 +128,14 @@ export class MoviePlayerService implements Disposable {
       }
 
       const arrayBuffer = await response.arrayBuffer()
+      const sourceBuffer = this.getActiveSourceBuffer()
+      if (sourceBuffer.updating) {
+        console.warn('Source buffer is updating, aborting')
+        sourceBuffer.abort()
+      }
       sourceBuffer.timestampOffset = from
+      sourceBuffer.appendWindowStart = from
+      // sourceBuffer.appendWindowEnd = to
       sourceBuffer.appendBuffer(arrayBuffer)
       const end = new Date().getTime()
       this.lastLoadTime = (end - start) / 1000
@@ -110,47 +148,30 @@ export class MoviePlayerService implements Disposable {
 
   public progress = new ObservableValue(-1)
 
+  public getSegmentStartForProgress(progress: number) {
+    return Math.floor(progress / this.chunkLength) * this.chunkLength
+  }
+
   public progressUpdateSubscription = this.progress.subscribe((progress) => {
+    this.updateBufferZones()
     const sb = this.getActiveSourceBuffer()
-    if (!sb || sb.updating) {
-      return
-    }
-
     if (!sb.buffered.length) {
-      this.loadChunk(Math.floor(progress / this.chunkLength) * this.chunkLength)
+      console.warn('No buffered data, loading a chunk...', { progress })
+      this.loadChunkForProgress(progress)
       return
     }
 
-    const bufferZones = [
-      ...(sb.buffered.start(0) > 0 ? [[0, 0] as const] : []),
-      ...new Array(sb.buffered.length).fill(0).map((_, i) => [sb.buffered.start(i), sb.buffered.end(i)]),
-      ...(!this.ffprobe.format.duration || sb.buffered.end(sb.buffered.length - 1) < this.ffprobe.format.duration - 1
-        ? [[this.ffprobe.format.duration, this.ffprobe.format.duration] as [number, number]]
-        : []),
-    ]
-
-    const gapsInBuffers = bufferZones.reduce(
-      (acc, [_start, end], i) => {
-        const nextStart = bufferZones[i + 1]?.[0] || end
-        if (nextStart > end) {
-          acc.push([end, nextStart])
-        }
-        return acc
-      },
-      [] as Array<[number, number]>,
-    )
-
-    const isInGap = gapsInBuffers.some(([start, end]) => progress >= start && progress <= end)
+    const isInGap = this.gapsInBuffers.some(([start, end]) => progress >= start && progress <= end)
     if (isInGap) {
       if (this.loadLock.getPermits()) {
-        console.warn('Gap detected, seeking to buffer end', { progress, gapsInBuffers, bufferZones })
+        console.warn('Progress inside a buffer gap', { progress })
         sb.abort()
-        this.loadChunk(Math.floor(progress / this.chunkLength) * this.chunkLength)
+        this.loadChunkForProgress(progress)
       }
     }
 
     const minDesiredGapDistance = this.chunkLength - 1
-    const isGapApproaching = gapsInBuffers.find(
+    const isGapApproaching = this.gapsInBuffers.find(
       ([start, end]) => progress >= start - minDesiredGapDistance && progress <= end,
     )
 
@@ -158,16 +179,14 @@ export class MoviePlayerService implements Disposable {
       if (this.loadLock.getPermits()) {
         console.warn('Gap approaching, write queue clear, loading a chunk...', {
           progress,
-          gapsInBuffers,
-          bufferZones,
           lastLoadTime: this.lastLoadTime,
         })
-        this.loadChunk(isGapApproaching[0])
+        this.loadChunkForProgress(isGapApproaching[0])
       }
     }
   })
 
-  public readonly chunkLength = 10
+  private readonly chunkLength = 5
 
   public getAudioTracks() {
     return this.ffprobe.streams

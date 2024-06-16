@@ -53,15 +53,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
     mediaService.MediaSource.addEventListener('sourceopen', async () => {
       mediaService.MediaSource.duration = props.ffprobe.format.duration || 0
-      if (watchProgress?.watchedSeconds) {
-        mediaService
-          .loadChunk(Math.floor(watchProgress.watchedSeconds / mediaService.chunkLength) * mediaService.chunkLength)
-          .then(() => {
-            mediaService.progress.setValue(watchProgress.watchedSeconds)
-          })
-      } else {
-        mediaService.loadChunk(0)
-      }
+      mediaService.loadChunkForProgress(watchProgress?.watchedSeconds || 0)
     })
 
     useDisposable('mouseMoveListener', () => {
@@ -145,8 +137,12 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             objectFit: 'cover',
           }}
           ontimeupdate={(ev) => {
-            const currentTime = Math.round((ev.currentTarget as HTMLVideoElement).currentTime as number)
+            const currentTime = (ev.currentTarget as HTMLVideoElement).currentTime as number
             mediaService.progress.setValue(currentTime || 0)
+          }}
+          onseeked={(ev) => {
+            const currentTime = (ev.currentTarget as HTMLVideoElement).currentTime as number
+            mediaService.loadChunkForProgress(currentTime)
           }}
           currentTime={watchProgress?.watchedSeconds || 0}
           src={mediaService.url}
