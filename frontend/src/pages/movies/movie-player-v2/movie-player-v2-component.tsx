@@ -49,11 +49,13 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
     const api = injector.getInstance(MediaApiClient)
 
-    const mediaService = useDisposable('mediaService', () => new MoviePlayerService(file, props.ffprobe, api))
+    const mediaService = useDisposable(
+      'mediaService',
+      () => new MoviePlayerService(file, props.ffprobe, api, watchProgress?.watchedSeconds || 0),
+    )
 
     mediaService.MediaSource.addEventListener('sourceopen', async () => {
       mediaService.MediaSource.duration = props.ffprobe.format.duration || 0
-      mediaService.loadChunkForProgress(watchProgress?.watchedSeconds || 0)
     })
 
     useDisposable('mouseMoveListener', () => {

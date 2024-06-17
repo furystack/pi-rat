@@ -42,7 +42,8 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
 
   const command = ffmpeg(fullPath)
     .format('mp4')
-    .outputOptions(['-movflags empty_moov+default_base_moof+frag_keyframe'])
+    .outputOptions(['-movflags empty_moov+frag_keyframe+faststart+default_base_moof'])
+    // .outputOptions(['-movflags empty_moov+default_base_moof+frag_keyframe'])
     .addOutputOption('-map 0:v:0')
 
   if (from) {

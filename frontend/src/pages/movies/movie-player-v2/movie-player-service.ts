@@ -21,8 +21,38 @@ export const audioCodecs = {
 }
 
 export class MoviePlayerService implements Disposable {
-  public readonly MediaSource = new MediaSource()
-  public readonly url = URL.createObjectURL(this.MediaSource)
+  constructor(
+    private readonly file: PiRatFile,
+    private readonly ffprobe: FfprobeData,
+    private readonly api: MediaApiClient,
+    private currentProgress: number,
+  ) {
+    this.progress = new ObservableValue(this.currentProgress)
+    this.progress.subscribe(this.onProgressChange)
+
+    this.MediaSource = new MediaSource()
+    this.url = URL.createObjectURL(this.MediaSource)
+
+    this.MediaSource.addEventListener('sourceopen', () => {
+      console.log('MediaSource opened')
+      this.MediaSource.duration = this.ffprobe.format.duration || 0
+    })
+
+    this.MediaSource.addEventListener('sourceclose', () => {
+      console.log('MediaSource closed')
+    })
+
+    this.MediaSource.addEventListener('sourceended', () => {
+      console.log('MediaSource ended')
+    })
+
+    this.chunkLength = 2
+
+    this.loadChunkForProgress(this.currentProgress)
+  }
+
+  public readonly MediaSource: MediaSource
+  public readonly url: string
   private loadLock = new Lock()
   public audioTrackId = new ObservableValue(0)
   public async dispose() {
@@ -77,7 +107,11 @@ export class MoviePlayerService implements Disposable {
       },
       [] as Array<[number, number]>,
     )
-    console.log('Buffer updated:', { bufferZones: this.bufferZones, gapsInBuffers: this.gapsInBuffers })
+    // console.log('Buffer updated:', {
+    //   bufferZones: this.bufferZones,
+    //   gapsInBuffers: this.gapsInBuffers,
+    //   mediaSourceState: this.MediaSource.readyState,
+    // })
   }
 
   public async loadChunkForProgress(progress: number) {
@@ -129,14 +163,20 @@ export class MoviePlayerService implements Disposable {
 
       const arrayBuffer = await response.arrayBuffer()
       const sourceBuffer = this.getActiveSourceBuffer()
-      if (sourceBuffer.updating) {
-        console.warn('Source buffer is updating, aborting')
-        sourceBuffer.abort()
-      }
-      sourceBuffer.timestampOffset = from
-      sourceBuffer.appendWindowStart = from
-      // sourceBuffer.appendWindowEnd = to
-      sourceBuffer.appendBuffer(arrayBuffer)
+
+      await new Promise((resolve, reject) => {
+        const onUpdateEnd = resolve
+        const onError = reject
+        sourceBuffer.addEventListener('updateend', onUpdateEnd)
+        sourceBuffer.addEventListener('error', onError)
+        if (sourceBuffer.updating) {
+          console.warn('Source buffer is updating, aborting')
+          sourceBuffer.abort()
+        }
+        sourceBuffer.timestampOffset = from
+        sourceBuffer.appendBuffer(arrayBuffer)
+      })
+
       const end = new Date().getTime()
       this.lastLoadTime = (end - start) / 1000
     } catch (error) {
@@ -146,13 +186,13 @@ export class MoviePlayerService implements Disposable {
     }
   }
 
-  public progress = new ObservableValue(-1)
+  public progress: ObservableValue<number>
 
   public getSegmentStartForProgress(progress: number) {
     return Math.floor(progress / this.chunkLength) * this.chunkLength
   }
 
-  public progressUpdateSubscription = this.progress.subscribe((progress) => {
+  private onProgressChange = (progress: number) => {
     this.updateBufferZones()
     const sb = this.getActiveSourceBuffer()
     if (!sb.buffered.length) {
@@ -164,7 +204,7 @@ export class MoviePlayerService implements Disposable {
     const isInGap = this.gapsInBuffers.some(([start, end]) => progress >= start && progress <= end)
     if (isInGap) {
       if (this.loadLock.getPermits()) {
-        console.warn('Progress inside a buffer gap', { progress })
+        console.warn('Progress inside a buffer gap', { progress, lastLoadTime: this.lastLoadTime })
         sb.abort()
         this.loadChunkForProgress(progress)
       }
@@ -180,30 +220,34 @@ export class MoviePlayerService implements Disposable {
         console.warn('Gap approaching, write queue clear, loading a chunk...', {
           progress,
           lastLoadTime: this.lastLoadTime,
+          nextGap: isGapApproaching,
         })
         this.loadChunkForProgress(isGapApproaching[0])
       }
     }
-  })
+  }
 
-  private readonly chunkLength = 5
+  private readonly chunkLength: number
 
   public getAudioTracks() {
     return this.ffprobe.streams
       .filter((s) => s.codec_type === 'audio')
-      .map((s) => ({
-        id: s.index,
-        codecName: s.codec_name,
-        codecMime: `${audioCodecs[s.codec_name as keyof typeof audioCodecs] || audioCodecs.aac}`,
+      .map((stream) => ({
+        stream,
+        id: stream.index,
+        codecName: stream.codec_name,
+        codecMime: `${audioCodecs[stream.codec_name as keyof typeof audioCodecs] || audioCodecs.aac}`,
         needsTranscoding: !MediaSource.isTypeSupported(
-          `audio/mp4; codecs="${audioCodecs[s.codec_name as keyof typeof audioCodecs] || audioCodecs.aac}"`,
+          `audio/mp4; codecs="${audioCodecs[stream.codec_name as keyof typeof audioCodecs] || audioCodecs.aac}"`,
         ),
       }))
   }
 
   private getVideoTrack() {
-    const codecName = this.ffprobe.streams.find((s) => s.codec_type === 'video')?.codec_name || 'unknown'
+    const stream = this.ffprobe.streams.find((s) => s.codec_type === 'video')
+    const codecName = stream?.codec_name || 'unknown'
     return {
+      stream,
       codecName,
       codecMime: `${videoCodecs[codecName as keyof typeof videoCodecs] || videoCodecs.h264}`,
       needsTranscoding: !MediaSource.isTypeSupported(
@@ -219,10 +263,4 @@ export class MoviePlayerService implements Disposable {
     const audioCodecMime = audio.needsTranscoding ? audioCodecs.aac : audio.codecMime
     return `video/mp4; codecs="${videoCodecMime}, ${audioCodecMime}"`
   }
-
-  constructor(
-    private readonly file: PiRatFile,
-    private readonly ffprobe: FfprobeData,
-    private readonly api: MediaApiClient,
-  ) {}
 }
