@@ -1,3 +1,4 @@
+import type { ScopedLogger } from '@furystack/logging'
 import { ObservableValue, type Disposable } from '@furystack/utils'
 import type { PiRatFile } from 'common'
 import type { FfprobeData } from 'fluent-ffmpeg'
@@ -26,6 +27,7 @@ export class MoviePlayerService implements Disposable {
     private readonly ffprobe: FfprobeData,
     private readonly api: MediaApiClient,
     private currentProgress: number,
+    private readonly logger: ScopedLogger,
   ) {
     this.progress = new ObservableValue(this.currentProgress)
     this.progress.subscribe(this.onProgressChange)
@@ -34,16 +36,16 @@ export class MoviePlayerService implements Disposable {
     this.url = URL.createObjectURL(this.MediaSource)
 
     this.MediaSource.addEventListener('sourceopen', () => {
-      console.log('MediaSource opened')
+      this.logger.verbose({ message: 'MediaSource opened' })
       this.MediaSource.duration = this.ffprobe.format.duration || 0
     })
 
     this.MediaSource.addEventListener('sourceclose', () => {
-      console.log('MediaSource closed')
+      this.logger.verbose({ message: 'MediaSource closed' })
     })
 
     this.MediaSource.addEventListener('sourceended', () => {
-      console.log('MediaSource ended')
+      this.logger.verbose({ message: 'MediaSource ended' })
     })
 
     this.chunkLength = 2
@@ -57,67 +59,89 @@ export class MoviePlayerService implements Disposable {
   public audioTrackId = new ObservableValue(0)
   public async dispose() {
     this.progress.dispose()
+    this.bufferZoneChangeSubscription.dispose()
+    this.bufferZones.dispose()
+    this.gapsInBuffersChangeSubscription.dispose()
+    this.gapsInBuffers.dispose()
+    this.lastLoadTime.dispose()
     this.MediaSource.endOfStream()
     ;[...this.MediaSource.sourceBuffers].forEach((sb) => {
       try {
         this.MediaSource.removeSourceBuffer(sb)
-      } catch (e) {
-        console.error('Error disposing MediaSource Buffer', e)
+      } catch (error) {
+        this.logger.error({ message: 'Error disposing MediaSource Buffer', data: { error } })
       }
     })
   }
 
-  private lastLoadTime = Infinity
+  private lastLoadTime = new ObservableValue(Infinity)
 
-  private bufferZones: Array<[number, number]> = []
-  private gapsInBuffers: Array<[number, number]> = []
+  private bufferZones = new ObservableValue<Array<[number, number]>>([], {
+    compare: (a, b) => {
+      return JSON.stringify(a) !== JSON.stringify(b)
+    },
+  })
+  private gapsInBuffers = new ObservableValue<Array<[number, number]>>([], {
+    compare: (a, b) => {
+      return JSON.stringify(a) !== JSON.stringify(b)
+    },
+  })
+
+  private bufferZoneChangeSubscription = this.bufferZones.subscribe((next) => {
+    this.logger.verbose({ message: 'Buffer zones changed', data: { next } })
+  })
+
+  private gapsInBuffersChangeSubscription = this.gapsInBuffers.subscribe((next) => {
+    this.logger.verbose({ message: 'Gaps in buffers changed', data: { next } })
+  })
 
   private getActiveSourceBuffer = () => {
     const existing = this.MediaSource.activeSourceBuffers[0]
     if (existing) {
       return existing
     }
-    console.log('Creating new source buffer')
+    this.logger.verbose({ message: 'Creating new source buffer' })
     const newSourceBuffer = this.MediaSource.addSourceBuffer(this.getMimeType())
+    newSourceBuffer.mode = 'segments'
+    newSourceBuffer.timestampOffset = this.progress.getValue()
     return newSourceBuffer
   }
 
   private updateBufferZones = () => {
     const newSourceBuffer = this.MediaSource.activeSourceBuffers[0]
-    this.bufferZones = newSourceBuffer.buffered.length
-      ? [
-          ...(newSourceBuffer.buffered.start(0) > 0 ? [[0, 0] as [number, number]] : []),
-          ...new Array(newSourceBuffer.buffered.length)
-            .fill(0)
-            .map((_, i) => [newSourceBuffer.buffered.start(i), newSourceBuffer.buffered.end(i)] as [number, number]),
-          ...(!this.ffprobe.format.duration ||
-          newSourceBuffer.buffered.end(newSourceBuffer.buffered.length - 1) < this.ffprobe.format.duration - 1
-            ? [[this.ffprobe.format.duration, this.ffprobe.format.duration] as [number, number]]
-            : []),
-        ]
-      : []
-
-    this.gapsInBuffers = this.bufferZones.reduce(
-      (acc, [_start, end], i) => {
-        const nextStart = this.bufferZones[i + 1]?.[0] || end
-        if (nextStart > end) {
-          acc.push([end, nextStart])
-        }
-        return acc
-      },
-      [] as Array<[number, number]>,
+    this.bufferZones.setValue(
+      newSourceBuffer.buffered.length
+        ? [
+            ...(newSourceBuffer.buffered.start(0) > 0 ? [[0, 0] as [number, number]] : []),
+            ...new Array(newSourceBuffer.buffered.length)
+              .fill(0)
+              .map((_, i) => [newSourceBuffer.buffered.start(i), newSourceBuffer.buffered.end(i)] as [number, number]),
+            ...(!this.ffprobe.format.duration ||
+            newSourceBuffer.buffered.end(newSourceBuffer.buffered.length - 1) < this.ffprobe.format.duration - 1
+              ? [[this.ffprobe.format.duration, this.ffprobe.format.duration] as [number, number]]
+              : []),
+          ]
+        : [],
     )
-    // console.log('Buffer updated:', {
-    //   bufferZones: this.bufferZones,
-    //   gapsInBuffers: this.gapsInBuffers,
-    //   mediaSourceState: this.MediaSource.readyState,
-    // })
+
+    this.gapsInBuffers.setValue(
+      this.bufferZones.getValue().reduce(
+        (acc, [_start, end], i) => {
+          const nextStart = this.bufferZones.getValue()[i + 1]?.[0] || end
+          if (nextStart > end) {
+            acc.push([end, nextStart])
+          }
+          return acc
+        },
+        [] as Array<[number, number]>,
+      ),
+    )
   }
 
   public async loadChunkForProgress(progress: number) {
     const from = this.getSegmentStartForProgress(progress)
     const to = from + this.chunkLength
-    console.log(`Starting stream from ${from} to ${to}`)
+    this.logger.verbose({ message: `Loading chunk from ${from} to ${to}` })
     try {
       await this.loadLock.acquire()
       const start = new Date().getTime()
@@ -164,26 +188,17 @@ export class MoviePlayerService implements Disposable {
       const arrayBuffer = await response.arrayBuffer()
       const sourceBuffer = this.getActiveSourceBuffer()
 
-      await new Promise((resolve, reject) => {
-        const onUpdateEnd = resolve
-        const onError = reject
-        sourceBuffer.addEventListener('updateend', onUpdateEnd)
-        sourceBuffer.addEventListener('error', onError)
-        if (sourceBuffer.updating) {
-          console.warn('Source buffer is updating, aborting')
-          sourceBuffer.abort()
-        }
-        sourceBuffer.timestampOffset = from
-        sourceBuffer.appendBuffer(arrayBuffer)
-      })
+      sourceBuffer.timestampOffset = from
+      sourceBuffer.appendBuffer(arrayBuffer)
 
       const end = new Date().getTime()
-      this.lastLoadTime = (end - start) / 1000
+      this.lastLoadTime.setValue((end - start) / 1000)
     } catch (error) {
-      console.error('Chunk loading error', error)
+      this.logger.error({ message: 'Chunk loading error', data: { error } })
     } finally {
       this.loadLock.release()
     }
+    this.logger.verbose({ message: `Loading ${from}-${to} loading finished` })
   }
 
   public progress: ObservableValue<number>
@@ -196,31 +211,30 @@ export class MoviePlayerService implements Disposable {
     this.updateBufferZones()
     const sb = this.getActiveSourceBuffer()
     if (!sb.buffered.length) {
-      console.warn('No buffered data, loading a chunk...', { progress })
+      this.logger.information({ message: 'No buffered data, loading a chunk...', data: { progress } })
       this.loadChunkForProgress(progress)
       return
     }
 
-    const isInGap = this.gapsInBuffers.some(([start, end]) => progress >= start && progress <= end)
+    const isInGap = this.gapsInBuffers.getValue().some(([start, end]) => progress >= start && progress <= end)
     if (isInGap) {
       if (this.loadLock.getPermits()) {
-        console.warn('Progress inside a buffer gap', { progress, lastLoadTime: this.lastLoadTime })
-        sb.abort()
+        this.logger.information({
+          message: 'Progress inside a buffer gap',
+        })
         this.loadChunkForProgress(progress)
       }
     }
 
-    const minDesiredGapDistance = this.chunkLength - 1
-    const isGapApproaching = this.gapsInBuffers.find(
-      ([start, end]) => progress >= start - minDesiredGapDistance && progress <= end,
-    )
+    const minDesiredGapDistance = this.chunkLength
+    const isGapApproaching = this.gapsInBuffers
+      .getValue()
+      .find(([start, end]) => progress >= start - minDesiredGapDistance && progress <= end)
 
     if (isGapApproaching) {
       if (this.loadLock.getPermits()) {
-        console.warn('Gap approaching, write queue clear, loading a chunk...', {
-          progress,
-          lastLoadTime: this.lastLoadTime,
-          nextGap: isGapApproaching,
+        this.logger.information({
+          message: 'Gap approaching, write queue clear, loading a chunk...',
         })
         this.loadChunkForProgress(isGapApproaching[0])
       }

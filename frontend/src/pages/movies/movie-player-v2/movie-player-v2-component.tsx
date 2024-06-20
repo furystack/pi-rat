@@ -1,3 +1,4 @@
+import { getLogger } from '@furystack/logging'
 import { Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 import { type Movie, type PiRatFile, type WatchHistoryEntry } from 'common'
@@ -49,9 +50,11 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
     const api = injector.getInstance(MediaApiClient)
 
+    const logger = getLogger(injector).withScope('MoviePlayerService')
+
     const mediaService = useDisposable(
       'mediaService',
-      () => new MoviePlayerService(file, props.ffprobe, api, watchProgress?.watchedSeconds || 0),
+      () => new MoviePlayerService(file, props.ffprobe, api, watchProgress?.watchedSeconds || 0, logger),
     )
 
     mediaService.MediaSource.addEventListener('sourceopen', async () => {
