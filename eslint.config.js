@@ -7,14 +7,7 @@ import prettierConfig from 'eslint-config-prettier'
 
 export default tseslint.config(
   {
-    ignores: [
-      'coverage',
-      'packages/*/node_modules/*',
-      'packages/*/esm/*',
-      'packages/*/types/*',
-      'packages/*/dist/*',
-      '.yarn/*',
-    ],
+    ignores: ['coverage', '*/node_modules/*', '*/esm/*', '*/types/*', '*/dist/*', '.yarn/*'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,

@@ -76,7 +76,7 @@ export const FileList = Shade<{
       }
       window.addEventListener('keydown', listener)
       return {
-        dispose: () => window.removeEventListener('keydown', listener),
+        [Symbol.dispose]: () => window.removeEventListener('keydown', listener),
       }
     })
 
@@ -129,8 +129,7 @@ export const FileList = Shade<{
           if (ev.key === 'Enter') {
             activate()
           }
-        }}
-      >
+        }}>
         <DataGrid
           collectionService={service}
           findOptions={findOptions}
@@ -151,8 +150,7 @@ export const FileList = Shade<{
                 entry={entry}
                 currentDriveLetter={currentDriveLetter}
                 currentPath={currentPath}
-                open={activate}
-              >
+                open={activate}>
                 <div
                   style={{
                     display: 'flex',
@@ -161,8 +159,7 @@ export const FileList = Shade<{
                     justifyContent: 'flex-start',
                     gap: '16px',
                   }}
-                  title={entry.name}
-                >
+                  title={entry.name}>
                   <div>
                     <SelectionCell entry={entry} service={service} />
                   </div>

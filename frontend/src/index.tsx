@@ -15,7 +15,7 @@ const shadeInjector = new Injector()
 
 useLogging(shadeInjector, VerboseConsoleLogger)
 
-shadeInjector.getInstance(ThemeProviderService).set(darkTheme)
+shadeInjector.getInstance(ThemeProviderService).setAssignedTheme(darkTheme)
 
 shadeInjector.getInstance(SessionService).init()
 

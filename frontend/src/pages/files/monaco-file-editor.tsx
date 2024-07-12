@@ -98,7 +98,7 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
       }
       window.addEventListener('keydown', onSave)
       return {
-        dispose: () => window.removeEventListener('keydown', onSave),
+        [Symbol.dispose]: () => window.removeEventListener('keydown', onSave),
       }
     })
 
@@ -109,8 +109,7 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
           top: '54px',
           width: '100%',
           height: 'calc(100% - 64px)',
-        }}
-      >
+        }}>
         <MonacoEditor
           options={{
             language,

@@ -5,7 +5,6 @@ import { ThemeProviderService } from '@furystack/shades-common-components'
 import ghLight from './gh-light.png'
 // @ts-ignore
 import ghDark from './gh-dark.png'
-import { Trace } from '@furystack/utils'
 
 type GithubLogoProps = {
   style?: Partial<CSSStyleDeclaration> | undefined
@@ -22,13 +21,9 @@ export const GithubLogo = Shade<GithubLogoProps>({
       themeProvider.getTextColor(themeProvider.theme.background.paper, 'light', 'dark'),
     )
     useDisposable('themeChange', () =>
-      Trace.method({
-        object: themeProvider,
-        method: themeProvider.set,
-        onFinished: () => {
-          const value = themeProvider.getTextColor(themeProvider.theme.background.paper, 'light', 'dark')
-          setTheme(value)
-        },
+      themeProvider.subscribe('themeChanged', () => {
+        const value = themeProvider.getTextColor(themeProvider.theme.background.paper, 'light', 'dark')
+        setTheme(value)
       }),
     )
 

@@ -26,7 +26,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
         iotService.findAwakeHistory(...wolEntryArgs)
       }, 1000)
 
-      return { dispose: () => clearInterval(interval) }
+      return { [Symbol.dispose]: () => clearInterval(interval) }
     })
 
     const [lastPingState] = useObservable('pingState', iotService.findPingHistoryAsObservable(...pingArgs))

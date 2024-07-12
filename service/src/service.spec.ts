@@ -9,6 +9,6 @@ describe('Service', () => {
 
     expect(instance).toBeDefined()
 
-    await rootInjector.dispose()
+    await rootInjector[Symbol.asyncDispose]()
   })
 })

@@ -2,7 +2,6 @@ import { StoreManager } from '@furystack/core'
 import { Injectable, Injected, type Injector } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
-import type { Disposable } from '@furystack/utils'
 import { PathHelper } from '@furystack/utils'
 import type { PiRatFile } from 'common'
 import { MovieFile } from 'common'
@@ -99,10 +98,10 @@ export class MovieMaintainerService {
     this.unlinkSubscription = fileWatcherService.subscribe('unlink', this.onUnlink)
   }
 
-  public dispose() {
-    this.addSubsciption.dispose()
-    this.unlinkDirSubscription.dispose()
-    this.unlinkSubscription.dispose()
+  public [Symbol.dispose]() {
+    this.addSubsciption[Symbol.dispose]()
+    this.unlinkDirSubscription[Symbol.dispose]()
+    this.unlinkSubscription[Symbol.dispose]()
   }
 }
 

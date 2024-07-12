@@ -3,7 +3,6 @@ import type { Constructable } from '@furystack/inject'
 import type { GetCollectionResult } from '@furystack/rest'
 import type { CollectionServiceOptions } from '@furystack/shades-common-components'
 import { CollectionService } from '@furystack/shades-common-components'
-import type { Disposable } from '@furystack/utils'
 import { ObservableValue } from '@furystack/utils'
 import type { Uri } from 'monaco-editor/esm/vs/editor/editor.api.js'
 
@@ -39,10 +38,10 @@ export class GenericEditorService<T, TKey extends keyof T, TOmittedProperties ex
 
   private refreshSubscription = this.findOptions.subscribe(this.onRefresh.bind(this))
 
-  public dispose(): void {
-    this.editedEntry.dispose()
-    super.dispose()
-    this.refreshSubscription.dispose()
+  public [Symbol.dispose](): void {
+    this.editedEntry[Symbol.dispose]()
+    super[Symbol.dispose]()
+    this.refreshSubscription[Symbol.dispose]()
   }
 
   public patchEntry = async (key: T[TKey], patch: T) => {

@@ -11,7 +11,7 @@ export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'aut
 export class SessionService implements IdentityContext {
   private readonly operation = () => {
     this.isOperationInProgress.setValue(true)
-    return { dispose: () => this.isOperationInProgress.setValue(false) }
+    return { [Symbol.dispose]: () => this.isOperationInProgress.setValue(false) }
   }
 
   public state = new ObservableValue<SessionState>('initializing')
