@@ -2,11 +2,6 @@
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "editor.formatOnSave": true,
   "eslint.validate": ["typescript", "typescriptreact"],
-  "search.exclude": {
-    "**/.yarn": true,
-    "**/.pnp.*": true
-  },
-  "eslint.nodePath": ".yarn/sdks",
   "prettier.enable": true,
   "typescript.enablePromptUseWorkspaceTsdk": true
 }
