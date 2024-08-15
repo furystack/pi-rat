@@ -21,6 +21,8 @@ export class WebsocketService {
   ) => {
     await this.webSocketApi.broadcast(async (options) => {
       if (await shouldAnnounce(options)) {
+        // ws types are not resolved by eslint
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         options.ws.send(JSON.stringify(message))
       }
     })
