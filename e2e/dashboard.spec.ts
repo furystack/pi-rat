@@ -101,7 +101,7 @@ test.describe('Dashboard', () => {
 
     await navigateToDashboardList(page)
 
-    const text = await page.locator('shade-data-grid-body').textContent()
-    expect(text).not.toContain(dashboardName)
+    const grid = page.locator('shade-data-grid')
+    await expect(grid).not.toHaveText(dashboardName)
   })
 })
