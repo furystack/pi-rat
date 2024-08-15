@@ -14,7 +14,10 @@
           "$ref": "#/definitions/Dashboard"
         }
       },
-      "required": ["body", "result"],
+      "required": [
+        "body",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -43,7 +46,12 @@
           "type": "string"
         }
       },
-      "required": ["name", "description", "owner", "widgets"],
+      "required": [
+        "name",
+        "description",
+        "owner",
+        "widgets"
+      ],
       "additionalProperties": false
     },
     "Widget": {
@@ -86,10 +94,19 @@
         },
         "appName": {
           "type": "string",
-          "enum": ["home", "browser", "movies", "series", "torrents", "iot"]
+          "enum": [
+            "home",
+            "browser",
+            "movies",
+            "series",
+            "iot"
+          ]
         }
       },
-      "required": ["type", "appName"],
+      "required": [
+        "type",
+        "appName"
+      ],
       "additionalProperties": false
     },
     "EntityShortcutWidget": {
@@ -114,7 +131,10 @@
           ]
         }
       },
-      "required": ["type", "entityName"],
+      "required": [
+        "type",
+        "entityName"
+      ],
       "additionalProperties": false
     },
     "HtmlWidget": {
@@ -128,7 +148,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "content"],
+      "required": [
+        "type",
+        "content"
+      ],
       "additionalProperties": false
     },
     "MarkdownWidget": {
@@ -142,7 +165,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "content"],
+      "required": [
+        "type",
+        "content"
+      ],
       "additionalProperties": false
     },
     "MovieWidget": {
@@ -162,7 +188,10 @@
           "type": "number"
         }
       },
-      "required": ["type", "imdbId"],
+      "required": [
+        "type",
+        "imdbId"
+      ],
       "additionalProperties": false
     },
     "SeriesWidget": {
@@ -182,7 +211,10 @@
           "type": "number"
         }
       },
-      "required": ["type", "imdbId"],
+      "required": [
+        "type",
+        "imdbId"
+      ],
       "additionalProperties": false
     },
     "WidgetGroup": {
@@ -202,7 +234,11 @@
           }
         }
       },
-      "required": ["type", "title", "widgets"],
+      "required": [
+        "type",
+        "title",
+        "widgets"
+      ],
       "additionalProperties": false
     },
     "ContinueWatchingWidgetGroup": {
@@ -219,7 +255,9 @@
           "type": "number"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "additionalProperties": false
     },
     "DeviceAvailability": {
@@ -239,7 +277,10 @@
           "$ref": "#/definitions/Icon"
         }
       },
-      "required": ["type", "deviceName"],
+      "required": [
+        "type",
+        "deviceName"
+      ],
       "additionalProperties": false
     },
     "Icon": {
@@ -269,7 +310,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "Base64Icon": {
@@ -283,7 +327,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "LottieIcon": {
@@ -325,7 +372,10 @@
             },
             "renderer": {
               "type": "string",
-              "enum": ["svg", "canvas"]
+              "enum": [
+                "svg",
+                "canvas"
+              ]
             },
             "speed": {
               "type": "number"
@@ -337,11 +387,16 @@
               }
             }
           },
-          "required": ["src"],
+          "required": [
+            "src"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "UrlIcon": {
@@ -355,7 +410,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "Dashboard": {
@@ -386,7 +444,15 @@
           "type": "string"
         }
       },
-      "required": ["id", "name", "description", "owner", "widgets", "createdAt", "updatedAt"],
+      "required": [
+        "id",
+        "name",
+        "description",
+        "owner",
+        "widgets",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "PatchDashboardEndpoint": {
@@ -405,15 +471,20 @@
               "type": "string"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
-      "required": ["body", "url", "result"],
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -430,7 +501,10 @@
               "$ref": "#/definitions/GetEntityEndpoint%3CDashboard%2C%22id%22%3E"
             }
           },
-          "required": ["/dashboards", "/dashboards/:id"],
+          "required": [
+            "/dashboards",
+            "/dashboards/:id"
+          ],
           "additionalProperties": false
         },
         "POST": {
@@ -440,7 +514,9 @@
               "$ref": "#/definitions/PostDashboardEndpoint"
             }
           },
-          "required": ["/dashboards"],
+          "required": [
+            "/dashboards"
+          ],
           "additionalProperties": false
         },
         "PATCH": {
@@ -450,7 +526,9 @@
               "$ref": "#/definitions/PatchDashboardEndpoint"
             }
           },
-          "required": ["/dashboards/:id"],
+          "required": [
+            "/dashboards/:id"
+          ],
           "additionalProperties": false
         },
         "PUT": {
@@ -464,7 +542,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -475,7 +555,9 @@
               "$ref": "#/definitions/DeleteEndpoint%3CDashboard%2C%22id%22%3E"
             }
           },
-          "required": ["/dashboards/:id"],
+          "required": [
+            "/dashboards/:id"
+          ],
           "additionalProperties": false
         },
         "HEAD": {
@@ -489,7 +571,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -504,7 +588,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -519,7 +605,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -534,12 +622,19 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["GET", "POST", "PATCH", "DELETE"],
+      "required": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE"
+      ],
       "additionalProperties": false
     },
     "RestApi": {
@@ -556,7 +651,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -571,7 +668,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -586,7 +685,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -601,7 +702,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -616,7 +719,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -631,7 +736,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -646,7 +753,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -661,7 +770,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -676,7 +787,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }
@@ -699,7 +812,10 @@
           "$ref": "#/definitions/GetCollectionResult%3CDashboard%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -719,31 +835,52 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "name": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "description": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "owner": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "widgets": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "createdAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "updatedAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -753,7 +890,15 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["id", "name", "description", "owner", "widgets", "createdAt", "updatedAt"]
+            "enum": [
+              "id",
+              "name",
+              "description",
+              "owner",
+              "widgets",
+              "createdAt",
+              "updatedAt"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -1168,7 +1313,10 @@
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1182,7 +1330,15 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["id", "name", "description", "owner", "widgets", "createdAt", "updatedAt"]
+                "enum": [
+                  "id",
+                  "name",
+                  "description",
+                  "owner",
+                  "widgets",
+                  "createdAt",
+                  "updatedAt"
+                ]
               },
               "description": "The list of fields to select"
             }
@@ -1197,14 +1353,20 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Dashboard"
         }
       },
-      "required": ["query", "url", "result"],
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -1218,15 +1380,19 @@
               "type": "string"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
-      "required": ["url", "result"],
+      "required": [
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }
