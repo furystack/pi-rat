@@ -2,9 +2,9 @@ import { createComponent, Shade } from '@furystack/shades'
 import { AppBar, AppBarLink, Button } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
 import { SessionService } from '../services/session.js'
+import { PiRatCommandPalette } from './command-palette/index.js'
 import { GithubLogo } from './github-logo/index.js'
 import { ThemeSwitch } from './theme-switch/index.js'
-import { PiRatCommandPalette } from './command-palette/index.js'
 
 export interface HeaderProps {
   title: string
@@ -50,10 +50,6 @@ export const Header = Shade<HeaderProps>({
 
             <AppBarLink title="Movies" href="/series">
               📺 Series
-            </AppBarLink>
-
-            <AppBarLink title="Torrents" href="/torrents">
-              🧲 Torrents
             </AppBarLink>
           </>
         ) : null}

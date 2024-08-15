@@ -14,8 +14,6 @@ export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
         return <IconUrlWidget {...rest} name="Movies" url="/movies" icon={<>🎥</>} />
       case 'series':
         return <IconUrlWidget {...rest} name="Series" url="/series" icon={<>📺</>} />
-      case 'torrents':
-        return <IconUrlWidget {...rest} name="Torrents" url="/torrents" icon={<>🧲</>} />
       case 'iot':
         return <IconUrlWidget {...rest} name="IOT Devices" url="/iot/devices" icon={<>📡</>} />
       default:

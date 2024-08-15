@@ -1,5 +1,5 @@
-import { createComponent } from '@furystack/shades'
 import type { Injector } from '@furystack/inject'
+import { createComponent } from '@furystack/shades'
 import type { CommandPaletteSuggestionResult } from '@furystack/shades-common-components'
 
 export interface SuggestionOptions {
@@ -30,14 +30,17 @@ export const createSuggestion = (options: SuggestionOptions) => ({
 export const distinctByName = (
   ...entries: Array<ReturnType<typeof createSuggestion>>
 ): CommandPaletteSuggestionResult[] =>
-  entries.reduce<any[]>((prev, current) => {
-    if (!prev.some((i) => i.name === current.name)) {
-      return [...prev, current]
-    }
-    return prev.map((entry) => {
-      if (entry.name === current.name && entry.score < current.score) {
-        return current
+  entries.reduce(
+    (prev, current) => {
+      if (!prev.some((i) => i.name === current.name)) {
+        return [...prev, current]
       }
-      return entry
-    })
-  }, [])
+      return prev.map((entry) => {
+        if (entry.name === current.name && entry.score < current.score) {
+          return current
+        }
+        return entry
+      })
+    },
+    [] as Array<ReturnType<typeof createSuggestion>>,
+  )

@@ -1,23 +1,30 @@
 // @ts-check
 
 import eslint from '@eslint/js'
-import tseslint from 'typescript-eslint'
-import jsdoc from 'eslint-plugin-jsdoc'
 import prettierConfig from 'eslint-config-prettier'
+import jsdoc from 'eslint-plugin-jsdoc'
+import playwright from 'eslint-plugin-playwright'
+import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
+    ...playwright.configs['flat/recommended'],
+    files: ['e2e'],
+  },
+  {
     ignores: [
       'coverage',
-      'packages/*/node_modules/*',
-      'packages/*/esm/*',
-      'packages/*/types/*',
-      'packages/*/dist/*',
+      '*/node_modules/*',
+      '*/esm/*',
+      '*/types/*',
+      '*/dist/*',
       '.yarn/*',
+      'eslint.config.js',
+      'prettier.config.js',
     ],
   },
   eslint.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
   prettierConfig,
   {
     linterOptions: {
@@ -25,10 +32,7 @@ export default tseslint.config(
     },
     languageOptions: {
       parserOptions: {
-        project: [
-          'tsconfig.eslint.json',
-          //'packages/*/tsconfig.json'
-        ],
+        project: ['tsconfig.eslint.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -75,6 +79,12 @@ export default tseslint.config(
       'prefer-template': 'error',
       'prefer-destructuring': ['error', { array: false, object: true }],
       'default-case': 'error',
+    },
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.spec.tsx'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off', // vi.fn() is fine in tests
     },
   },
 )

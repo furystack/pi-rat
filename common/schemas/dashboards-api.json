@@ -86,7 +86,7 @@
         },
         "appName": {
           "type": "string",
-          "enum": ["home", "browser", "movies", "series", "torrents", "iot"]
+          "enum": ["home", "browser", "movies", "series", "iot"]
         }
       },
       "required": ["type", "appName"],
@@ -409,8 +409,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
       "required": ["body", "url", "result"],
@@ -1222,8 +1221,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
       "required": ["url", "result"],

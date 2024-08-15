@@ -6,9 +6,9 @@ COPY --chown=node:node /service /home/node/app/service
 
 COPY --chown=node:node /package.json /home/node/app/package.json
 COPY --chown=node:node /.yarn/releases /home/node/app/.yarn/releases
-COPY --chown=node:node /.yarn/sdks /home/node/app/.yarn/sdks
 
 # These dependencies are only needed for Yarn PNP
+# COPY --chown=node:node /.yarn/sdks /home/node/app/.yarn/sdks
 # COPY --chown=node:node /.yarn/unplugged /home/node/app/.yarn/unplugged
 # COPY --chown=node:node /.pnp.cjs /home/node/app/.pnp.cjs
 # COPY --chown=node:node /.pnp.loader.mjs /home/node/app/.pnp.loader.mjs

@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
-import { Button, fadeIn, fadeOut, Input, Modal, Wizard } from '@furystack/shades-common-components'
+import { Button, fadeIn, fadeOut, Input, Modal, NotyService, Wizard } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import { NotyService } from '@furystack/shades-common-components'
 import { WizardStep } from '../../components/wizard-step.js'
 import { DrivesService } from '../../services/drives-service.js'
+import { getErrorMessage } from '../../services/get-error-message.js'
 
 export const AddDriveStep = Shade<WizardStepProps>({
   shadowDomName: 'add-drive-step',
@@ -19,13 +19,12 @@ export const AddDriveStep = Shade<WizardStepProps>({
           const form = ev.target as HTMLFormElement
           const formData = new FormData(form)
 
-          const values = Object.fromEntries(formData.entries())
+          const values = Object.fromEntries(formData.entries()) as { letter: string; physicalPath: string }
           try {
             await injector.getInstance(DrivesService).addVolume({
               letter: values.letter.toString(),
               physicalPath: values.physicalPath.toString(),
             })
-            await props.onNext?.()
             injector.getInstance(NotyService).emit('onNotyAdded', {
               type: 'success',
               body: `Drive '${values.letter.toString()}' has been created succesfully`,
@@ -35,7 +34,7 @@ export const AddDriveStep = Shade<WizardStepProps>({
             injector.getInstance(NotyService).emit('onNotyAdded', {
               type: 'error',
               title: 'Error during drive creation',
-              body: (error as any).toString(),
+              body: getErrorMessage(error),
             })
           }
         }}

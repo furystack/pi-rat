@@ -1,8 +1,8 @@
-import { Injectable, Injected } from '@furystack/inject'
-import { IotApiClient } from './api-clients/iot-api-client.js'
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
+import { Injectable, Injected } from '@furystack/inject'
 import type { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
+import { IotApiClient } from './api-clients/iot-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
 @Injectable({ lifetime: 'singleton' })
@@ -118,7 +118,7 @@ export class IotDevicesService {
       body,
     })
 
-    this.deviceCache.reload(name)
+    void this.deviceCache.reload(name)
     this.deviceQueryCache.flushAll()
     this.deviceAwakeHistoryCache.flushAll()
     this.devicePingHistoryCache.flushAll()
@@ -168,12 +168,12 @@ export class IotDevicesService {
     this.deviceAwakeHistoryCache.reload(device.name, { top: 1, order: { createdAt: 'DESC' } })
 
   public init() {
-    this.websocketNotificationsService.addListener('onMessage', (message: any) => {
-      if (['device-connected', 'device-disconnected'].includes(message.type)) {
-        this.deviceCache.reload(message.device.name)
+    this.websocketNotificationsService.addListener('onMessage', (message) => {
+      if (message.type === 'device-connected' || message.type === 'device-disconnected') {
+        void void this.deviceCache.reload(message.device.name)
         this.deviceAwakeHistoryCache.obsoleteRange((v) => v.entries.some((e) => e.name === message.device.name))
         this.devicePingHistoryCache.obsoleteRange((v) => v.entries.some((e) => e.name === message.device.name))
-        this.devicePingHistoryCache.reload(message.device.name, { top: 1, order: { createdAt: 'DESC' } })
+        void this.devicePingHistoryCache.reload(message.device.name, { top: 1, order: { createdAt: 'DESC' } })
       }
     })
   }

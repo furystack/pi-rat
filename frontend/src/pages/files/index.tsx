@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
+import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { FileAssociationsService } from '../../services/file-associations-service.js'
+import { FileMoviePlayer } from './file-movie-player.js'
 import { ImageViewer } from './image-viewer.js'
 import { MonacoFileEditor } from './monaco-file-editor.js'
 import { UnknownType } from './unknown-type.js'
-import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
-import { FileMoviePlayer } from './file-movie-player.js'
 
 export const FilesPage = Shade<{ letter: string; path: string }>({
   shadowDomName: 'drives-files-page',
@@ -14,7 +14,7 @@ export const FilesPage = Shade<{ letter: string; path: string }>({
     return (
       <PiRatLazyLoad
         component={async () => {
-          const associations = await injector.getInstance(FileAssociationsService)
+          const associations = injector.getInstance(FileAssociationsService)
           const component = await associations.getServiceForFile(letter, path)
 
           switch (component) {

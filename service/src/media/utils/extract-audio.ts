@@ -1,19 +1,19 @@
-import { promises } from 'fs'
-import { join } from 'path'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
 import { Drive, getFileName, getParentPath, getPhysicalPath } from 'common'
-import { getDataSetFor } from '@furystack/repository'
 import ffprobe from 'ffprobe'
-import { existsAsync } from '../../utils/exists-async.js'
+import { promises } from 'fs'
+import { join } from 'path'
 import { execAsync } from '../../utils/exec-async.js'
+import { existsAsync } from '../../utils/exists-async.js'
 
 export const extractAudio = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
   const logger = getLogger(injector).withScope('extract-audio-tracks')
 
-  logger.verbose({
-    message: `Starting to extract audio tracks for movie file '${file}'`,
+  await logger.verbose({
+    message: `Starting to extract audio tracks for movie file '${file.driveLetter}:${file.path}'`,
     data: {
       file,
     },
@@ -55,7 +55,7 @@ export const extractAudio = async ({ injector, file }: { injector: Injector; fil
     },
   )
 
-  logger.information({
+  await logger.information({
     message: `Subtitles has been extracted from stream for movie '${fileName}'`,
     data: {
       file,

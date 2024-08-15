@@ -1,14 +1,14 @@
+import { hasCacheValue, type CacheResult } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, Paper } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { encode } from 'common'
+import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
+import { navigateToRoute } from '../../navigate-to-route.js'
+import { DrivesService } from '../../services/drives-service.js'
 import { DriveSelector } from './drive-selector.js'
 import { FileList } from './file-list.js'
-import { navigateToRoute } from '../../navigate-to-route.js'
-import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
-import { DrivesService } from '../../services/drives-service.js'
-import { hasCacheValue, type CacheResult } from '@furystack/cache'
 
 const upEntry: DirectoryEntry = {
   name: '..',
@@ -45,7 +45,7 @@ export const FolderPanel = Shade<{
 
     const onFileListChange = (result: CacheResult<Awaited<ReturnType<typeof drivesService.getFileList>>>) => {
       if (result.status === 'obsolete') {
-        drivesService.getFileList(letter, path)
+        void drivesService.getFileList(letter, path)
         return
       }
       if (hasCacheValue(result)) {
@@ -68,7 +68,7 @@ export const FolderPanel = Shade<{
     onFileListChange(fileList)
 
     useDisposable('onFilesystemChanged', () =>
-      drivesService.subscribe('onFilesystemChanged', () => drivesService.getFileList(letter, path)),
+      drivesService.subscribe('onFilesystemChanged', () => void drivesService.getFileList(letter, path)),
     )
 
     service.hasFocus.setValue(!!props.focused)

@@ -1,14 +1,14 @@
+import { isLoadedCacheResult } from '@furystack/cache'
+import { serializeToQueryString } from '@furystack/rest'
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { Button, promisifyAnimation, Skeleton } from '@furystack/shades-common-components'
-import { SessionService } from '../../services/session.js'
-import { MoviesService } from '../../services/movies-service.js'
-import { isLoadedCacheResult } from '@furystack/cache'
-import { WatchProgressService } from '../../services/watch-progress-service.js'
-import { navigateToRoute } from '../../navigate-to-route.js'
-import { watchMovieRoute } from '../../components/routes/movie-routes.js'
 import { entityMoviesRoute } from '../../components/routes/entity-routes.js'
+import { watchMovieRoute } from '../../components/routes/movie-routes.js'
+import { navigateToRoute } from '../../navigate-to-route.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
-import { serializeToQueryString } from '@furystack/rest'
+import { MoviesService } from '../../services/movies-service.js'
+import { SessionService } from '../../services/session.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
 
 export const PlayButtons = Shade<{ imdbId: string }>({
   shadowDomName: 'shade-movie-play-buttons',
@@ -102,7 +102,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
 
     if (isLoadedCacheResult(movieResult)) {
       setTimeout(() => {
-        promisifyAnimation(
+        void promisifyAnimation(
           element.querySelector('img'),
           [
             { opacity: 0, transform: 'scale(0.85)' },

@@ -1,21 +1,20 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 
-import { WatchHistoryEntry, Movie, Series, MovieFile, Config } from 'common'
-import { OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
+import { Config, Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 
-import { DataTypes, Model } from 'sequelize'
-import { useSequelize } from '@furystack/sequelize-store'
+import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
 import type { AuthorizationResult } from '@furystack/repository'
 import { getRepository } from '@furystack/repository'
-import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
+import { useSequelize } from '@furystack/sequelize-store'
+import { DataTypes, Model } from 'sequelize'
 
-import { getDefaultDbSettings } from '../get-default-db-options.js'
+import type { FFProbeResult } from 'ffprobe'
 import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
-import type { FFProbeResult } from 'ffprobe'
-import { OmdbClientService } from './metadata-services/omdb-client-service.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { useMovieFileMaintainer } from './actions/movie-file-maintainer.js'
+import { OmdbClientService } from './metadata-services/omdb-client-service.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
   declare title: string
@@ -128,7 +127,7 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
 export const setupMovies = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Movies')
 
-  logger.verbose({ message: '🎥  Setting up Media store and repository...' })
+  await logger.verbose({ message: '🎥  Setting up Media store and repository...' })
 
   const dbOptions = getDefaultDbSettings('movies.sqlite', logger)
 
@@ -640,7 +639,7 @@ export const setupMovies = async (injector: Injector) => {
         ...filter,
         filter: {
           ...filter.filter,
-          userName: { $eq: user.username as string },
+          userName: { $eq: user.username },
         },
       } as typeof filter
     },
@@ -673,18 +672,24 @@ export const setupMovies = async (injector: Injector) => {
 
   const configStore = getStoreManager(injector).getStoreFor(Config, 'id')
 
-  configStore.subscribe(
-    'onEntityAdded',
-    ({ entity }) => entity.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
-  )
-  configStore.subscribe(
-    'onEntityUpdated',
-    ({ change }) => change.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
-  )
+  configStore.subscribe('onEntityAdded', ({ entity }) => {
+    if (entity.id === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
+  configStore.subscribe('onEntityUpdated', ({ change }) => {
+    if (change.id === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
 
-  configStore.subscribe('onEntityRemoved', ({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
+  configStore.subscribe('onEntityRemoved', ({ key }) => {
+    if (key === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
 
   useMovieFileMaintainer(injector)
 
-  logger.verbose({ message: '✅  Media setup completed' })
+  await logger.verbose({ message: '✅  Media setup completed' })
 }

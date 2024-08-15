@@ -10,7 +10,7 @@
         },
         "appName": {
           "type": "string",
-          "enum": ["home", "browser", "movies", "series", "torrents", "iot"]
+          "enum": ["home", "browser", "movies", "series", "iot"]
         }
       },
       "required": ["type", "appName"],

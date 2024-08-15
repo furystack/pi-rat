@@ -247,8 +247,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
       "required": ["body", "url", "result"],
@@ -1917,8 +1916,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
       "required": ["body", "url", "result"],
@@ -1964,8 +1962,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
       "required": ["url", "result"],

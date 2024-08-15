@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { login, logout } from './helpers'
+import { expect, test } from '@playwright/test'
+import { login, logout } from './helpers.js'
 
 test.describe('Pi-Rat Application', () => {
   test('Login and logout roundtrip', async ({ page }) => {
@@ -7,7 +7,7 @@ test.describe('Pi-Rat Application', () => {
 
     await login(page)
 
-    const defaultDashboard = await page.locator('pi-rat-default-dashboard')
+    const defaultDashboard = page.locator('pi-rat-default-dashboard')
     await expect(defaultDashboard).toBeVisible()
     await expect(defaultDashboard).toContainText('Apps')
     await expect(defaultDashboard).toContainText('Entities')
