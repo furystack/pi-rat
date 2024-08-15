@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Paper, expand, collapse } from '@furystack/shades-common-components'
+import { collapse, expand, Paper } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Icon as IconModel } from 'common'
 import { Icon } from './Icon.js'
@@ -72,19 +72,21 @@ export const ContextMenu = Shade<ContextMenuProps>({
 
     const isOpen = useDisposable('isOpen', () => new ObservableValue(false))
 
-    isOpen.subscribe(async (value) => {
+    isOpen.subscribe((value) => {
       const menu = element.querySelector('.menuItems') as HTMLUListElement
       try {
         if (value) {
           menu.getAnimations().forEach((a) => a.cancel())
           menu.style.display = 'block'
-          await expand(menu)
-          menu.style.opacity = '1'
+          void expand(menu).then(() => {
+            menu.style.opacity = '1'
+          })
         } else {
           menu.getAnimations().forEach((a) => a.cancel())
-          await collapse(menu)
-          menu.style.display = 'none'
-          menu.style.opacity = '0'
+          void collapse(menu).then(() => {
+            menu.style.display = 'none'
+            menu.style.opacity = '0'
+          })
         }
       } catch (error) {
         /** in-progress animations will throw */

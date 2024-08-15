@@ -1,18 +1,18 @@
-import { Shade, createComponent, ScreenService } from '@furystack/shades'
-import { Button, ThemeProviderService } from '@furystack/shades-common-components'
-import redCross from '../animations/error-red-cross.json'
-import deadSmiley from '../animations/error-dead-smiley.json'
-import { ErrorReporter } from '../services/error-reporter.js'
-import { ErrorDisplay } from './error-display.js'
-import { Error404 } from './error-404.js'
 import { ResponseError } from '@furystack/rest-client-fetch'
+import { createComponent, ScreenService, Shade } from '@furystack/shades'
+import { Button, ThemeProviderService } from '@furystack/shades-common-components'
+import deadSmiley from '../animations/error-dead-smiley.json'
+import redCross from '../animations/error-red-cross.json'
+import { ErrorReporter } from '../services/error-reporter.js'
+import { Error404 } from './error-404.js'
+import { ErrorDisplay } from './error-display.js'
 
 export interface GenericErrorProps {
   mainTitle?: string
   subtitle?: string
   description?: JSX.Element
   error?: any
-  retry?: () => void
+  retry?: () => Promise<void>
 }
 
 export const GenericErrorPage = Shade<GenericErrorProps>({
@@ -81,7 +81,7 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
           </a>
           {props.retry ? <Button onclick={() => props.retry?.()}>🔄️ Retry</Button> : null}
           {props.error ? (
-            <Button onclick={() => injector.getInstance(ErrorReporter).sendErrorReport(props.error)}>
+            <Button onclick={() => injector.getInstance(ErrorReporter).sendErrorReport(props.error as Error)}>
               📩 Report error
             </Button>
           ) : null}

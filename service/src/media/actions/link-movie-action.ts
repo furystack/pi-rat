@@ -47,7 +47,7 @@ const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector
 }
 
 const ensureOmdbMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
-  const store = await getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
+  const store = getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
   const existing = await store.get(omdbMeta.imdbID)
   if (existing) {
     return existing
@@ -110,7 +110,7 @@ const announceNewMovie = async ({
   movie: Movie
   movieFile: MovieFile
 }) => {
-  injector
+  await injector
     .getInstance(WebsocketService)
     .announce({ type: 'add-movie', file, movie, movieFile }, async ({ injector: i }) => isAuthorized(i, 'admin'))
 }
@@ -173,7 +173,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       ffprobe: ffprobeResult,
     })
 
-    announceNewMovie({
+    await announceNewMovie({
       injector,
       file: {
         driveLetter,
@@ -215,7 +215,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   await extractSubtitles({ injector, file: { driveLetter, path } })
 
-  announceNewMovie({
+  await announceNewMovie({
     injector,
     file: { driveLetter, path },
     movie,

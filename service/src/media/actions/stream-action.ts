@@ -113,13 +113,13 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   try {
     command
       .on('error', (err, stdout, stderr) => {
-        logger.error({ message: `an error happened: ${err}`, data: { err, stdout, stderr } })
+        void logger.error({ message: `an error happened: ${err.message}`, data: { err, stdout, stderr } })
       })
       .on('end', () => {
-        logger.verbose({ message: 'file has been converted succesfully' })
+        void logger.verbose({ message: 'file has been converted succesfully' })
       })
       .on('progress', (progress) => {
-        logger.verbose({ message: `Processing: ${progress.percent}%` })
+        void logger.verbose({ message: `Processing: ${progress.percent}%` })
       })
       .pipe(response, { end: true })
   } catch (error) {

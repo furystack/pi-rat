@@ -243,10 +243,6 @@
                     },
                     {
                       "type": "string",
-                      "const": "TORRENT_CONFIG"
-                    },
-                    {
-                      "type": "string",
                       "const": "IOT_CONFIG"
                     },
                     {
@@ -266,10 +262,6 @@
                     {
                       "type": "string",
                       "const": "GITHUB_CONFIG"
-                    },
-                    {
-                      "type": "string",
-                      "const": "TORRENT_CONFIG"
                     },
                     {
                       "type": "string",
@@ -295,10 +287,6 @@
                     },
                     {
                       "type": "string",
-                      "const": "TORRENT_CONFIG"
-                    },
-                    {
-                      "type": "string",
                       "const": "IOT_CONFIG"
                     },
                     {
@@ -318,10 +306,6 @@
                     {
                       "type": "string",
                       "const": "GITHUB_CONFIG"
-                    },
-                    {
-                      "type": "string",
-                      "const": "TORRENT_CONFIG"
                     },
                     {
                       "type": "string",
@@ -353,10 +337,6 @@
                     },
                     {
                       "type": "string",
-                      "const": "TORRENT_CONFIG"
-                    },
-                    {
-                      "type": "string",
                       "const": "IOT_CONFIG"
                     },
                     {
@@ -376,10 +356,6 @@
                     {
                       "type": "string",
                       "const": "GITHUB_CONFIG"
-                    },
-                    {
-                      "type": "string",
-                      "const": "TORRENT_CONFIG"
                     },
                     {
                       "type": "string",
@@ -413,10 +389,6 @@
                       },
                       {
                         "type": "string",
-                        "const": "TORRENT_CONFIG"
-                      },
-                      {
-                        "type": "string",
                         "const": "IOT_CONFIG"
                       },
                       {
@@ -439,10 +411,6 @@
                       {
                         "type": "string",
                         "const": "GITHUB_CONFIG"
-                      },
-                      {
-                        "type": "string",
-                        "const": "TORRENT_CONFIG"
                       },
                       {
                         "type": "string",
@@ -498,19 +466,6 @@
                         }
                       },
                       "required": ["clientId", "clientSecret"],
-                      "additionalProperties": false
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "torrentDriveLetter": {
-                          "type": "string"
-                        },
-                        "torrentPath": {
-                          "type": "string"
-                        }
-                      },
-                      "required": ["torrentDriveLetter", "torrentPath"],
                       "additionalProperties": false
                     },
                     {
@@ -600,19 +555,6 @@
                         }
                       },
                       "required": ["clientId", "clientSecret"],
-                      "additionalProperties": false
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "torrentDriveLetter": {
-                          "type": "string"
-                        },
-                        "torrentPath": {
-                          "type": "string"
-                        }
-                      },
-                      "required": ["torrentDriveLetter", "torrentPath"],
                       "additionalProperties": false
                     },
                     {
@@ -710,19 +652,6 @@
                           }
                         },
                         "required": ["clientId", "clientSecret"],
-                        "additionalProperties": false
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "torrentDriveLetter": {
-                            "type": "string"
-                          },
-                          "torrentPath": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["torrentDriveLetter", "torrentPath"],
                         "additionalProperties": false
                       },
                       {
@@ -815,19 +744,6 @@
                           }
                         },
                         "required": ["clientId", "clientSecret"],
-                        "additionalProperties": false
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "torrentDriveLetter": {
-                            "type": "string"
-                          },
-                          "torrentPath": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["torrentDriveLetter", "torrentPath"],
                         "additionalProperties": false
                       },
                       {
@@ -1048,10 +964,6 @@
             },
             {
               "type": "string",
-              "const": "TORRENT_CONFIG"
-            },
-            {
-              "type": "string",
               "const": "IOT_CONFIG"
             },
             {
@@ -1093,19 +1005,6 @@
                 }
               },
               "required": ["clientId", "clientSecret"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "torrentDriveLetter": {
-                  "type": "string"
-                },
-                "torrentPath": {
-                  "type": "string"
-                }
-              },
-              "required": ["torrentDriveLetter", "torrentPath"],
               "additionalProperties": false
             },
             {
@@ -1208,10 +1107,6 @@
                 },
                 {
                   "type": "string",
-                  "const": "TORRENT_CONFIG"
-                },
-                {
-                  "type": "string",
                   "const": "IOT_CONFIG"
                 },
                 {
@@ -1263,10 +1158,6 @@
             },
             {
               "type": "string",
-              "const": "TORRENT_CONFIG"
-            },
-            {
-              "type": "string",
               "const": "IOT_CONFIG"
             },
             {
@@ -1308,19 +1199,6 @@
                 }
               },
               "required": ["clientId", "clientSecret"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "torrentDriveLetter": {
-                  "type": "string"
-                },
-                "torrentPath": {
-                  "type": "string"
-                }
-              },
-              "required": ["torrentDriveLetter", "torrentPath"],
               "additionalProperties": false
             },
             {
@@ -1404,10 +1282,6 @@
                 },
                 {
                   "type": "string",
-                  "const": "TORRENT_CONFIG"
-                },
-                {
-                  "type": "string",
                   "const": "IOT_CONFIG"
                 },
                 {
@@ -1422,8 +1296,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
       "required": ["body", "url", "result"],
@@ -1443,10 +1316,6 @@
             {
               "type": "string",
               "const": "GITHUB_CONFIG"
-            },
-            {
-              "type": "string",
-              "const": "TORRENT_CONFIG"
             },
             {
               "type": "string",
@@ -1491,19 +1360,6 @@
                 }
               },
               "required": ["clientId", "clientSecret"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "torrentDriveLetter": {
-                  "type": "string"
-                },
-                "torrentPath": {
-                  "type": "string"
-                }
-              },
-              "required": ["torrentDriveLetter", "torrentPath"],
               "additionalProperties": false
             },
             {
@@ -1591,10 +1447,6 @@
                 },
                 {
                   "type": "string",
-                  "const": "TORRENT_CONFIG"
-                },
-                {
-                  "type": "string",
                   "const": "IOT_CONFIG"
                 },
                 {
@@ -1609,8 +1461,7 @@
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
       "required": ["url", "result"],

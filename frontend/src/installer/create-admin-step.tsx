@@ -16,9 +16,9 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           const form = ev.target as HTMLFormElement
           const formData = new FormData(form)
 
-          const values = Object.fromEntries(formData.entries())
+          const values = Object.fromEntries(formData.entries()) as { userName: string; password: string }
 
-          injector.getInstance(InstallApiClient).call({
+          await injector.getInstance(InstallApiClient).call({
             method: 'POST',
             action: '/install',
             body: {
@@ -27,7 +27,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
             },
           })
 
-          await props.onNext?.()
+          props.onNext?.()
         }}
       >
         You have to create a super admin user.

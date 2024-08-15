@@ -1,3 +1,4 @@
+import { isAuthorized } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import {
   Validate,
@@ -7,17 +8,16 @@ import {
   createPostEndpoint,
   useRestService,
 } from '@furystack/rest-service'
+import { useWebsockets } from '@furystack/websocket-api'
+import type { IotApi } from 'common'
+import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
+import iotApiSchema from 'common/schemas/iot-api.json' with { type: 'json' }
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
-import type { IotApi } from 'common'
-import iotApiSchema from 'common/schemas/iot-api.json' with { type: 'json' }
-import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
+import { WebsocketService } from '../websocket-service.js'
 import { AwakeAction } from './actions/awake-action.js'
 import { PingAction } from './actions/ping-action.js'
-import { useWebsockets } from '@furystack/websocket-api'
 import { DeviceAvailabilityHub } from './device-availability-hub.js'
-import { isAuthorized } from '@furystack/core'
-import { WebsocketService } from '../websocket-service.js'
 
 export const setupIotApi = async (injector: Injector) => {
   await useRestService<IotApi>({
@@ -71,7 +71,7 @@ export const setupIotApi = async (injector: Injector) => {
     },
   })
 
-  await useWebsockets(injector, {
+  useWebsockets(injector, {
     port: getPort(),
     path: '/api/ws',
   })
@@ -79,11 +79,13 @@ export const setupIotApi = async (injector: Injector) => {
   const hub = injector.getInstance(DeviceAvailabilityHub)
   const ws = injector.getInstance(WebsocketService)
 
-  hub.subscribe('connected', async (device) => {
-    ws.announce({ type: 'device-connected', device }, async (options) => isAuthorized(options.injector, 'admin'))
+  hub.subscribe('connected', (device) => {
+    void ws.announce({ type: 'device-connected', device }, (options) => isAuthorized(options.injector, 'admin'))
   })
 
-  hub.subscribe('disconnected', async (device) => {
-    ws.announce({ type: 'device-disconnected', device }, async (options) => isAuthorized(options.injector, 'admin'))
+  hub.subscribe('disconnected', (device) => {
+    void ws.announce({ type: 'device-disconnected', device }, async (options) =>
+      isAuthorized(options.injector, 'admin'),
+    )
   })
 }

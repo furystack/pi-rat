@@ -127,7 +127,7 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
 export const setupMovies = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Movies')
 
-  logger.verbose({ message: '🎥  Setting up Media store and repository...' })
+  await logger.verbose({ message: '🎥  Setting up Media store and repository...' })
 
   const dbOptions = getDefaultDbSettings('movies.sqlite', logger)
 
@@ -639,7 +639,7 @@ export const setupMovies = async (injector: Injector) => {
         ...filter,
         filter: {
           ...filter.filter,
-          userName: { $eq: user.username as string },
+          userName: { $eq: user.username },
         },
       } as typeof filter
     },
@@ -672,18 +672,24 @@ export const setupMovies = async (injector: Injector) => {
 
   const configStore = getStoreManager(injector).getStoreFor(Config, 'id')
 
-  configStore.subscribe(
-    'onEntityAdded',
-    ({ entity }) => entity.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
-  )
-  configStore.subscribe(
-    'onEntityUpdated',
-    ({ change }) => change.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
-  )
+  configStore.subscribe('onEntityAdded', ({ entity }) => {
+    if (entity.id === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
+  configStore.subscribe('onEntityUpdated', ({ change }) => {
+    if (change.id === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
 
-  configStore.subscribe('onEntityRemoved', ({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
+  configStore.subscribe('onEntityRemoved', ({ key }) => {
+    if (key === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
 
   useMovieFileMaintainer(injector)
 
-  logger.verbose({ message: '✅  Media setup completed' })
+  await logger.verbose({ message: '✅  Media setup completed' })
 }

@@ -102,7 +102,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
 
     if (isLoadedCacheResult(movieResult)) {
       setTimeout(() => {
-        promisifyAnimation(
+        void promisifyAnimation(
           element.querySelector('img'),
           [
             { opacity: 0, transform: 'scale(0.85)' },

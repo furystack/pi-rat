@@ -11,7 +11,7 @@ import { getPhysicalParentPath, getPhysicalPath } from '../../utils/physical-pat
 export const extractSubtitles = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
   const logger = getLogger(injector).withScope('extract-subtitles')
 
-  logger.verbose({
+  await logger.verbose({
     message: `Starting to extract subtitles for movie file '${file.driveLetter}:${file.path}'`,
     data: file,
   })
@@ -46,7 +46,7 @@ export const extractSubtitles = async ({ injector, file }: { injector: Injector;
     },
   )
 
-  logger.information({
+  await logger.information({
     message: `Subtitles has been extracted from stream for movie '${fileName}'`,
     data: {
       file,

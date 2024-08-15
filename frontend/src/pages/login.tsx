@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { SessionService } from '../services/session.js'
 import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
+import { SessionService } from '../services/session.js'
 
 type LoginPayload = {
   userName: string
@@ -35,11 +35,11 @@ export const Login = Shade({
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>
         <Form<LoginPayload>
-          validate={(plainData: any): plainData is LoginPayload => {
-            return plainData?.userName?.length && plainData?.password?.length
+          validate={(plainData): plainData is LoginPayload => {
+            return !!(plainData as LoginPayload)?.userName?.length && !!(plainData as LoginPayload)?.password?.length
           }}
           className="login-form"
-          onSubmit={({ userName, password }) => sessionService.login(userName, password)}
+          onSubmit={({ userName, password }) => void sessionService.login(userName, password)}
         >
           <h2>Login</h2>
           <Input labelTitle="E-mail address" name="userName" required autofocus type="email" />

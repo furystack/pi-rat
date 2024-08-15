@@ -11,13 +11,12 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
-import { MovieFile } from 'common'
+import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 import mediaApiSchema from 'common/schemas/media-api.json' with { type: 'json' }
-import { Movie, WatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
-import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
-import { LinkMovieAction } from './actions/link-movie-action.js'
+import { getPort } from '../get-port.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
+import { LinkMovieAction } from './actions/link-movie-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
 import { StreamAction } from './actions/stream-action.js'
 
@@ -51,7 +50,9 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         })(createGetEntityEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
 
         // TODOs:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         '/movies/:movieId/subtitles/:subtitleName': () => null as any, // TODO: Implement
         '/omdb-movie-metadata': Validate({
           schema: mediaApiSchema,

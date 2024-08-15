@@ -1,5 +1,5 @@
-import { join } from 'path'
 import { promises } from 'fs'
+import { join } from 'path'
 import { createGenerator } from 'ts-json-schema-generator'
 
 export interface SchemaGenerationSetting {
@@ -83,11 +83,6 @@ export const apiValues: SchemaGenerationSetting[] = [
   {
     inputFile: './src/apis/media.ts',
     outputFile: './schemas/media-api.json',
-    type: '*',
-  },
-  {
-    inputFile: './src/apis/torrent.ts',
-    outputFile: './schemas/torrent-api.json',
     type: '*',
   },
 ]

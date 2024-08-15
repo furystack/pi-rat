@@ -54,7 +54,7 @@ export type PatchDriveEndpoint = {
   url: {
     id: Drive['letter']
   }
-  result: {}
+  result: object
 }
 
 export type FfprobeEndpoint = {

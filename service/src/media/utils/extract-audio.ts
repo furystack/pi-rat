@@ -12,8 +12,8 @@ import { getPhysicalPath } from '../../utils/physical-path-utils.js'
 export const extractAudio = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
   const logger = getLogger(injector).withScope('extract-audio-tracks')
 
-  logger.verbose({
-    message: `Starting to extract audio tracks for movie file '${file}'`,
+  await logger.verbose({
+    message: `Starting to extract audio tracks for movie file '${file.driveLetter}:${file.path}'`,
     data: {
       file,
     },
@@ -51,7 +51,7 @@ export const extractAudio = async ({ injector, file }: { injector: Injector; fil
     },
   )
 
-  logger.information({
+  await logger.information({
     message: `Subtitles has been extracted from stream for movie '${fileName}'`,
     data: {
       file,

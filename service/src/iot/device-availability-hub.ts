@@ -48,26 +48,30 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
     const currentConfig = await this.getCurrentConfig()
 
     try {
-      await this.devices
-        .filter((device) => device.ipAddress)
-        .map(async (device) => {
-          const lastStatus = this.deviceStatusMap.get(device.name)
-          const { alive: newStatus, avg } = await ping.promise.probe(device.ipAddress!, {
-            timeout: currentConfig.value.pingTimeoutMs,
-          })
-
-          if (lastStatus !== newStatus) {
-            await this.devicePingHistoryStore.add({
-              name: device.name,
-              isAvailable: newStatus,
-              ping: parseFloat(avg) || undefined,
-              createdAt: new Date().toISOString(),
+      await Promise.all(
+        this.devices
+          .filter((device) => device.ipAddress)
+          .map(async (device) => {
+            const lastStatus = this.deviceStatusMap.get(device.name)
+            const { alive: newStatus, avg } = await ping.promise.probe(device.ipAddress!, {
+              timeout: currentConfig.value.pingTimeoutMs,
             })
-            this.deviceStatusMap.set(device.name, newStatus)
-            this.emit(newStatus ? 'connected' : 'disconnected', device)
-            this.logger.verbose({ message: `Device ${device.name} is ${newStatus ? 'connected' : 'disconnected'}` })
-          }
-        })
+
+            if (lastStatus !== newStatus) {
+              await this.devicePingHistoryStore.add({
+                name: device.name,
+                isAvailable: newStatus,
+                ping: parseFloat(avg) || undefined,
+                createdAt: new Date().toISOString(),
+              })
+              this.deviceStatusMap.set(device.name, newStatus)
+              this.emit(newStatus ? 'connected' : 'disconnected', device)
+              await this.logger.verbose({
+                message: `Device ${device.name} is ${newStatus ? 'connected' : 'disconnected'}`,
+              })
+            }
+          }),
+      )
     } catch (error) {
       await this.logger.warning({
         message: `Error while refreshing device connections: ${error?.toString()}`,
@@ -104,6 +108,6 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
     this.deviceStore.subscribe('onEntityUpdated', ({ id, change }) => {
       this.updateDevices(this.devices.map((device) => (device.name === id ? { ...device, ...change } : device)))
     })
-    this.refreshConnections()
+    await this.refreshConnections()
   }
 }

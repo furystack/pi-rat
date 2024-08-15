@@ -1,8 +1,8 @@
-import { Shade, RouteLink, createComponent } from '@furystack/shades'
+import { RouteLink, Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 
 const focus = (el: HTMLElement) => {
-  promisifyAnimation(
+  void promisifyAnimation(
     el,
     [
       { opacity: '.7', boxShadow: '1px 3px 6px rgba(0,0,0,0.3)' },
@@ -14,7 +14,7 @@ const focus = (el: HTMLElement) => {
       easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
     },
   )
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('.cover') as HTMLImageElement,
     [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
     {
@@ -26,7 +26,7 @@ const focus = (el: HTMLElement) => {
 }
 
 const blur = (el: HTMLElement) => {
-  promisifyAnimation(
+  void promisifyAnimation(
     el,
     [
       { opacity: '1', boxShadow: '0px 1px 2px rgba(0,0,0,0.3)' },
@@ -38,7 +38,7 @@ const blur = (el: HTMLElement) => {
       easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
     },
   )
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('.cover') as HTMLImageElement,
     [{ transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
     { fill: 'forwards', duration: 150 },
@@ -57,12 +57,15 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
   shadowDomName: 'icon-url-widget',
   render: ({ props, element }) => {
     setTimeout(() => {
-      promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-        fill: 'forwards',
-        delay: (props.index || 0) * 160 + Math.random() * 100,
-        duration: 700,
-        easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-      })
+      const el = element.querySelector('a div')
+      if (el) {
+        void promisifyAnimation(el, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+          fill: 'forwards',
+          delay: (props.index || 0) * 160 + Math.random() * 100,
+          duration: 700,
+          easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+        })
+      }
     })
 
     return (

@@ -1,10 +1,10 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
-import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
-import { SeriesService } from '../../services/series-service.js'
-import { MoviesService } from '../../services/movies-service.js'
 import { WidgetGroup } from '../../components/dashboard/widget-group.js'
+import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
+import { MoviesService } from '../../services/movies-service.js'
+import { SeriesService } from '../../services/series-service.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
 
 export interface SeriesListProps {
@@ -40,8 +40,8 @@ export const SeriesOverview = Shade<SeriesListProps>({
 
           setTimeout(() => {
             const img = element.querySelector('img')
-            img &&
-              promisifyAnimation(
+            if (img) {
+              void promisifyAnimation(
                 img,
                 [
                   { opacity: 0, transform: 'scale(0.85)' },
@@ -54,6 +54,7 @@ export const SeriesOverview = Shade<SeriesListProps>({
                   fill: 'forwards',
                 },
               )
+            }
           }, 100)
 
           return (

@@ -1,9 +1,9 @@
+import { hasCacheValue } from '@furystack/cache'
 import { Shade, createComponent } from '@furystack/shades'
+import { Loader } from '@furystack/shades-common-components'
 import type { Device } from 'common'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
-import { Loader } from '@furystack/shades-common-components'
 import { Icon } from '../Icon.js'
-import { hasCacheValue } from '@furystack/cache'
 
 export const DeviceAvailabilityPanel = Shade<Device>({
   shadowDomName: 'device-availability-panel',
@@ -22,11 +22,11 @@ export const DeviceAvailabilityPanel = Shade<Device>({
 
     useDisposable('refresher', () => {
       const interval = setInterval(() => {
-        iotService.findPingHistory(...pingArgs)
-        iotService.findAwakeHistory(...wolEntryArgs)
+        void iotService.findPingHistory(...pingArgs)
+        void iotService.findAwakeHistory(...wolEntryArgs)
       }, 1000)
 
-      return { dispose: () => clearInterval(interval) }
+      return { [Symbol.dispose]: () => clearInterval(interval) }
     })
 
     const [lastPingState] = useObservable('pingState', iotService.findPingHistoryAsObservable(...pingArgs))
@@ -48,7 +48,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
             onclick={(ev) => {
               ev.stopPropagation()
               ev.preventDefault()
-              iotService.pingDevice(props)
+              void iotService.pingDevice(props)
             }}
             type="font"
             value="❓"
@@ -82,7 +82,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
             onclick={(ev) => {
               ev.preventDefault()
               ev.stopPropagation()
-              iotService
+              void iotService
                 .wakeUpDevice(props)
                 .then(() => iotService.pingDevice(props))
                 .then(() => iotService.findPingHistory(...pingArgs))

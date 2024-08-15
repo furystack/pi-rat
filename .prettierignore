@@ -1,2 +1,4 @@
 .yarn
-node_modules
+*/bundle
+*/dist
+*/node_modules

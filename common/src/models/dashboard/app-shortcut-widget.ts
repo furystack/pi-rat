@@ -1,4 +1,4 @@
 export interface AppShortcutWidget {
   type: 'app-shortcut'
-  appName: 'home' | 'browser' | 'movies' | 'series' | 'torrents' | 'iot'
+  appName: 'home' | 'browser' | 'movies' | 'series' | 'iot'
 }

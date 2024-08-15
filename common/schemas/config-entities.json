@@ -1,30 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "TorrentConfig": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "const": "TORRENT_CONFIG"
-        },
-        "value": {
-          "type": "object",
-          "properties": {
-            "torrentDriveLetter": {
-              "type": "string"
-            },
-            "torrentPath": {
-              "type": "string"
-            }
-          },
-          "required": ["torrentDriveLetter", "torrentPath"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["id", "value"],
-      "additionalProperties": false
-    },
     "OmdbConfig": {
       "type": "object",
       "properties": {
@@ -164,9 +140,6 @@
           "$ref": "#/definitions/GithubConfig"
         },
         {
-          "$ref": "#/definitions/TorrentConfig"
-        },
-        {
           "$ref": "#/definitions/IotConfig"
         },
         {
@@ -187,10 +160,6 @@
             {
               "type": "string",
               "const": "GITHUB_CONFIG"
-            },
-            {
-              "type": "string",
-              "const": "TORRENT_CONFIG"
             },
             {
               "type": "string",
@@ -235,19 +204,6 @@
                 }
               },
               "required": ["clientId", "clientSecret"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "torrentDriveLetter": {
-                  "type": "string"
-                },
-                "torrentPath": {
-                  "type": "string"
-                }
-              },
-              "required": ["torrentDriveLetter", "torrentPath"],
               "additionalProperties": false
             },
             {

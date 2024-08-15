@@ -14,7 +14,7 @@ export class OmdbClientService {
   private declare logger: ScopedLogger
 
   public async init(injector: Injector) {
-    this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
+    await this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
     const config = await getStoreManager(injector).getStoreFor(Config, 'id').get('OMDB_CONFIG')
     if (!config) {
       this.config = undefined
@@ -41,7 +41,7 @@ export class OmdbClientService {
     episode?: number
   }): Promise<OmdbMovieMetadata | undefined> {
     if (!this.config) {
-      this.logger.error({
+      await this.logger.error({
         message: '🚫   OMDB Service is not initialized, cannot fetch movie metadata',
       })
       return undefined
@@ -63,7 +63,7 @@ export class OmdbClientService {
       const omdbMeta: OmdbMovieMetadata = await omdbResult.json()
       return omdbMeta
     } catch (error) {
-      this.logger.warning({
+      await this.logger.warning({
         message: `❗  Failed to fetch OMDB Movie metadata`,
         data: { error, title, year, season, episode },
       })
@@ -73,7 +73,7 @@ export class OmdbClientService {
 
   public async fetchOmdbSeriesMetadata({ imdbId }: { imdbId: string }): Promise<OmdbSeriesMetadata | undefined> {
     if (!this.config) {
-      this.logger.error({
+      await this.logger.error({
         message: '🚫   OMDB Service is not initialized, cannot fetch series metadata',
       })
       return undefined
@@ -88,7 +88,7 @@ export class OmdbClientService {
       const omdbMeta: OmdbSeriesMetadata = await omdbResult.json()
       return omdbMeta
     } catch (error) {
-      this.logger.warning({ message: `❗  Failed to fetch OMDB Series metadata`, data: { error, imdbId } })
+      await this.logger.warning({ message: `❗  Failed to fetch OMDB Series metadata`, data: { error, imdbId } })
       return undefined
     }
   }

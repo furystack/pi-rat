@@ -1,10 +1,11 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { MonacoEditor } from '../../components/monaco-editor.js'
-import { environmentOptions } from '../../environment-options.js'
-import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
-import { ObservableValue } from '@furystack/utils'
-import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
 import { Button, NotyService } from '@furystack/shades-common-components'
+import { ObservableValue } from '@furystack/utils'
+import { MonacoEditor } from '../../components/monaco-editor.js'
+import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
+import { environmentOptions } from '../../environment-options.js'
+import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
+import { getErrorMessage } from '../../services/get-error-message.js'
 
 const getMonacoLanguage = (path: string) => {
   const extension = path.split('.').pop()
@@ -56,7 +57,7 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
                   .call({
                     method: 'PUT',
                     action: '/files/:letter/:path',
-                    url: { letter: encodeURIComponent(letter), path: encodeURIComponent(path) },
+                    url: { letter, path },
                     body: { text: newValue },
                   })
                   .then(() => {
@@ -69,7 +70,7 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
                   .catch((error) => {
                     injector.getInstance(NotyService).emit('onNotyAdded', {
                       title: 'Failed to save file',
-                      body: `Failed to save file ${path}: ${error.message}`,
+                      body: getErrorMessage(error),
                       type: 'error',
                     })
                   })
@@ -98,7 +99,7 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
       }
       window.addEventListener('keydown', onSave)
       return {
-        dispose: () => window.removeEventListener('keydown', onSave),
+        [Symbol.dispose]: () => window.removeEventListener('keydown', onSave),
       }
     })
 

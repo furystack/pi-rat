@@ -23,11 +23,11 @@ class DeviceAwakeHistoryModel extends Model<DeviceAwakeHistory, DeviceAwakeHisto
 }
 
 class DevicePingHistoryModel extends Model<DevicePingHistory, DevicePingHistory> implements DevicePingHistory {
-  declare id: string
-  declare name: string
-  declare createdAt: string
-  declare isAvailable: boolean
-  declare ping: number
+  public declare id: string
+  public declare name: string
+  public declare createdAt: string
+  public declare isAvailable: boolean
+  public declare ping: number
 }
 
 export const setupIotStore = async (injector: Injector, logger: ScopedLogger) => {

@@ -1,14 +1,16 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
-import { showParallax, Button } from '@furystack/shades-common-components'
+import { Button, showParallax } from '@furystack/shades-common-components'
 
-export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) => void } & WizardStepProps>({
+export const WizardStep = Shade<
+  { title: string; onSubmit?: (ev: SubmitEvent) => void | Promise<void> } & WizardStepProps
+>({
   shadowDomName: 'wizard-step',
   render: ({ props, element, children, useObservable, injector }) => {
     setTimeout(() => {
-      showParallax(element.querySelector('h1'))
-      showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
-      showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
+      void showParallax(element.querySelector('h1'))
+      void showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
+      void showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
     }, 1)
 
     const updateScreenSize = (isLargeScreen: boolean) => {
@@ -28,9 +30,13 @@ export const WizardStep = Shade<{ title: string; onSubmit?: (ev: SubmitEvent) =>
 
     return (
       <form
-        onsubmit={(ev) => {
+        onsubmit={async (ev) => {
           ev.preventDefault()
-          props.onSubmit ? props.onSubmit(ev) : props.onNext?.()
+          if (props.onSubmit) {
+            await props.onSubmit(ev)
+          } else {
+            props.onNext?.()
+          }
         }}
         style={{
           padding: '32px',

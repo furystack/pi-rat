@@ -1,5 +1,3 @@
-import type { Disposable } from '@furystack/utils'
-
 type WatchProgressUpdaterSettings = {
   intervalMs: number
   videoElement: HTMLVideoElement
@@ -7,8 +5,8 @@ type WatchProgressUpdaterSettings = {
   saveTresholdSeconds: number
 }
 
-export class WatchProgressUpdater implements Disposable {
-  public async dispose() {
+export class WatchProgressUpdater implements AsyncDisposable {
+  public async [Symbol.asyncDispose]() {
     clearInterval(this.interval)
     await this.update()
   }
@@ -27,7 +25,7 @@ export class WatchProgressUpdater implements Disposable {
 
   constructor(public readonly settings: WatchProgressUpdaterSettings) {
     this.interval = setInterval(() => {
-      this.update()
+      void this.update()
     }, this.settings.intervalMs)
     this.lastSavedTimeSeconds = this.settings.videoElement.currentTime
   }
