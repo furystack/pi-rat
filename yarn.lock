@@ -359,9 +359,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/rest-service@npm:^10.0.3":
-  version: 10.0.3
-  resolution: "@furystack/rest-service@npm:10.0.3"
+"@furystack/rest-service@npm:^10.0.4":
+  version: 10.0.4
+  resolution: "@furystack/rest-service@npm:10.0.4"
   dependencies:
     "@furystack/core": "npm:^15.0.3"
     "@furystack/inject": "npm:^12.0.2"
@@ -373,7 +373,7 @@ __metadata:
     ajv-formats: "npm:^3.0.1"
     path-to-regexp: "npm:^7.1.0"
     semaphore-async-await: "npm:^1.5.1"
-  checksum: 10c0/4744ac7a4d933ea8b54b16b004204e8f7ce61e6972f2f30389854b24fe3fcb3ceffbeee88af2148eed8c009cfffa731fff78379880b4d91baf699a7f0682565a
+  checksum: 10c0/b0f1aa495b79696636f1162b20381931dda7d72c36dcbd4718770e6363d7727088182175027bf6326be61f0a864442263a3b295edfdeec2735ba53182643e78d
   languageName: node
   linkType: hard
 
@@ -454,16 +454,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/websocket-api@npm:^13.0.3":
-  version: 13.0.3
-  resolution: "@furystack/websocket-api@npm:13.0.3"
+"@furystack/websocket-api@npm:^13.0.4":
+  version: 13.0.4
+  resolution: "@furystack/websocket-api@npm:13.0.4"
   dependencies:
     "@furystack/core": "npm:^15.0.3"
     "@furystack/inject": "npm:^12.0.2"
-    "@furystack/rest-service": "npm:^10.0.3"
+    "@furystack/rest-service": "npm:^10.0.4"
     "@furystack/utils": "npm:^8.0.2"
     ws: "npm:^8.18.0"
-  checksum: 10c0/fdb8ec9cb7d70279c53c68be86c26300b641ec736b797cd510b7eb85328c1c18b0b686e91173dc106df11c1ff9907cf05d7bd508cf11a9f234441d6e0cdaf0e2
+  checksum: 10c0/5334aa1ce8f8a7a19c61d5035f2cb14b631ed7fba3fcf0b0283396a1175aec5ceaf5c54e71f751441a48f49ae60560951d5d7547a8537c0a1fa220f74996c587
   languageName: node
   linkType: hard
 
@@ -5211,11 +5211,11 @@ __metadata:
     "@furystack/logging": "npm:^8.0.2"
     "@furystack/repository": "npm:^10.0.3"
     "@furystack/rest": "npm:^8.0.3"
-    "@furystack/rest-service": "npm:^10.0.3"
+    "@furystack/rest-service": "npm:^10.0.4"
     "@furystack/security": "npm:^6.0.3"
     "@furystack/sequelize-store": "npm:^6.0.3"
     "@furystack/utils": "npm:^8.0.2"
-    "@furystack/websocket-api": "npm:^13.0.3"
+    "@furystack/websocket-api": "npm:^13.0.4"
     "@types/ffprobe": "npm:^1.1.8"
     "@types/fluent-ffmpeg": "npm:^2.1.25"
     "@types/formidable": "npm:^3.4.5"
