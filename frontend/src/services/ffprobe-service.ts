@@ -14,7 +14,7 @@ export class FfprobeService {
       const { result } = await this.mediaApiClient.call({
         method: 'GET',
         action: '/files/:letter/:path/ffprobe',
-        url: { letter: encodeURIComponent(file.driveLetter), path: encodeURIComponent(file.path) },
+        url: { letter: file.driveLetter, path: file.path },
       })
       return result
     },

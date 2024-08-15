@@ -153,8 +153,8 @@ export class MoviePlayerService implements AsyncDisposable {
         method: 'GET',
         action: '/files/:letter/:path/stream',
         url: {
-          letter: encodeURIComponent(this.file.driveLetter),
-          path: encodeURIComponent(this.file.path),
+          letter: this.file.driveLetter,
+          path: this.file.path,
         },
         query: {
           from,
