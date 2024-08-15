@@ -40,7 +40,5 @@ test('Setup Project @install', async ({ page }) => {
   await expect(finishButton).toBeVisible()
   await finishButton.click()
 
-  await page.waitForNavigation()
-
   await login(page, 'testuser@gmail.com', 'password')
 })
