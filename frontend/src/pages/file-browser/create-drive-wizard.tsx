@@ -25,7 +25,6 @@ export const AddDriveStep = Shade<WizardStepProps>({
               letter: values.letter.toString(),
               physicalPath: values.physicalPath.toString(),
             })
-            props.onNext?.()
             injector.getInstance(NotyService).emit('onNotyAdded', {
               type: 'success',
               body: `Drive '${values.letter.toString()}' has been created succesfully`,

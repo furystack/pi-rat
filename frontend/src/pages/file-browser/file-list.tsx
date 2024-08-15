@@ -2,7 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService } from '@furystack/shades-common-components'
 import { DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
 import { ObservableValue, PathHelper } from '@furystack/utils'
-import type { DirectoryEntry } from 'common'
+import { getFullPath, type DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { getErrorMessage } from '../../services/get-error-message.js'
@@ -64,7 +64,7 @@ export const FileList = Shade<{
           const focused = service.focusedEntry.getValue()
           if (focused) {
             drivesService
-              .removeFile(currentDriveLetter, encodeURIComponent(`${currentPath}/${focused.name}`))
+              .removeFile({ letter: currentDriveLetter, path: getFullPath(currentPath, focused.name) })
               .then(() => {
                 notyService.emit('onNotyAdded', {
                   type: 'success',

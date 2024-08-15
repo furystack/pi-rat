@@ -48,7 +48,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
       action: '/volumes',
       body: volume,
     })
-    this.volumesCache.flushAll()
+    this.volumesCache.obsoleteRange(() => true)
     return addResult
   }
 
@@ -59,7 +59,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
       url: { id: letter },
       body: volume,
     })
-    this.volumesCache.flushAll()
+    this.volumesCache.obsoleteRange(() => true)
     this.singleVolumeCache.obsoleteRange((drive) => drive.letter === letter)
   }
 
@@ -108,7 +108,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
 
   public getFileListAsObservable = this.fileListCache.getObservable.bind(this.fileListCache)
 
-  public removeFile = async (letter: string, path: string) => {
+  public removeFile = async ({ letter, path }: { letter: string; path: string }) => {
     const removeResult = await this.drivesApiClient.call({
       method: 'DELETE',
       action: '/files/:letter/:path',

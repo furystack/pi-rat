@@ -57,12 +57,15 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
   shadowDomName: 'icon-url-widget',
   render: ({ props, element }) => {
     setTimeout(() => {
-      void promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-        fill: 'forwards',
-        delay: (props.index || 0) * 160 + Math.random() * 100,
-        duration: 700,
-        easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-      })
+      const el = element.querySelector('a div')
+      if (el) {
+        void promisifyAnimation(el, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+          fill: 'forwards',
+          delay: (props.index || 0) * 160 + Math.random() * 100,
+          duration: 700,
+          easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+        })
+      }
     })
 
     return (
