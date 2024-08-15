@@ -80,7 +80,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
         .call({
           method: 'GET',
           action: '/files/:letter/:path',
-          url: { letter, path: encodeURIComponent(path) },
+          url: { letter, path },
         })
         .then((response) => {
           const orderedResult: typeof response = {

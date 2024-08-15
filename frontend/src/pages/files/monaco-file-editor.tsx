@@ -57,7 +57,7 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
                   .call({
                     method: 'PUT',
                     action: '/files/:letter/:path',
-                    url: { letter: encodeURIComponent(letter), path: encodeURIComponent(path) },
+                    url: { letter, path },
                     body: { text: newValue },
                   })
                   .then(() => {
