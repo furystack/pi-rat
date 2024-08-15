@@ -14,7 +14,7 @@
     "@furystack/rest": "^8.0.3",
     "@types/marked": "^6.0.0",
     "typescript": "^5.5.4",
-    "vite": "^5.4.0"
+    "vite": "^5.4.1"
   },
   "dependencies": {
     "@furystack/cache": "^5.0.2",
@@ -22,9 +22,9 @@
     "@furystack/inject": "^12.0.2",
     "@furystack/logging": "^8.0.2",
     "@furystack/rest-client-fetch": "^8.0.3",
-    "@furystack/shades": "^11.0.3",
-    "@furystack/shades-common-components": "^10.0.3",
-    "@furystack/shades-lottie": "^7.0.3",
+    "@furystack/shades": "^11.0.4",
+    "@furystack/shades-common-components": "^10.0.4",
+    "@furystack/shades-lottie": "^7.0.4",
     "@furystack/utils": "^8.0.2",
     "@types/node": "^22.3.0",
     "common": "workspace:^",

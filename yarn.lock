@@ -410,40 +410,40 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^10.0.3":
-  version: 10.0.3
-  resolution: "@furystack/shades-common-components@npm:10.0.3"
+"@furystack/shades-common-components@npm:^10.0.4":
+  version: 10.0.4
+  resolution: "@furystack/shades-common-components@npm:10.0.4"
   dependencies:
     "@furystack/core": "npm:^15.0.3"
     "@furystack/inject": "npm:^12.0.2"
-    "@furystack/shades": "npm:^11.0.3"
+    "@furystack/shades": "npm:^11.0.4"
     "@furystack/utils": "npm:^8.0.2"
     path-to-regexp: "npm:^7.1.0"
     semaphore-async-await: "npm:^1.5.1"
-  checksum: 10c0/896b08229a8d16dbeba850626b1392eec1824208c06c5c173947cb8b3b04d40e92dc3f557992fc411c7eb04ea95adc17450eb6020309a3542c2651b51c28d137
+  checksum: 10c0/cc58d6ceb7bfbe41572374d7e6d7743e28d637b6532631cbf11b099c3767fb3690bb9fe8f0e7b6aa37dc3ea56f549ee5f78127339d12435c4a47e9b7b6cddc0a
   languageName: node
   linkType: hard
 
-"@furystack/shades-lottie@npm:^7.0.3":
-  version: 7.0.3
-  resolution: "@furystack/shades-lottie@npm:7.0.3"
+"@furystack/shades-lottie@npm:^7.0.4":
+  version: 7.0.4
+  resolution: "@furystack/shades-lottie@npm:7.0.4"
   dependencies:
-    "@furystack/shades": "npm:^11.0.3"
+    "@furystack/shades": "npm:^11.0.4"
     "@lottiefiles/lottie-player": "npm:^2.0.4"
-  checksum: 10c0/29c07ae6b6a1805befdb770571802b99e147172eca20185a572b38f5975bcaf52e5aad29da9a941e46d13825e070d99f5088318e6552b9ecfeda739289c384ce
+  checksum: 10c0/2d67287b627af9ec222ddb246afe614bc775441b612afae3cca3bc40dbc4e1c3b3da088a799ab211147b9343c00d73a94c5e72e3aba9595eda83c1f90be65d43
   languageName: node
   linkType: hard
 
-"@furystack/shades@npm:^11.0.3":
-  version: 11.0.3
-  resolution: "@furystack/shades@npm:11.0.3"
+"@furystack/shades@npm:^11.0.4":
+  version: 11.0.4
+  resolution: "@furystack/shades@npm:11.0.4"
   dependencies:
     "@furystack/inject": "npm:^12.0.2"
     "@furystack/rest": "npm:^8.0.3"
     "@furystack/utils": "npm:^8.0.2"
     path-to-regexp: "npm:^7.1.0"
     semaphore-async-await: "npm:^1.5.1"
-  checksum: 10c0/73155be750e3e062ec7f3be0d61f6dd801d661439dfe63461b8ef5f7d24ee7ec8cf49bff469ab8a032978fcc62efb5d3e756ce1e77008a30135b70f4aa37177c
+  checksum: 10c0/d79caac1d90b37816dc40a4648c6d9681060d3c699d9fcee250a7a78851884562313fd40c8b6ebc1acc4432b5e1a81a98e1f2f7f2a703233f503ea93f8157362
   languageName: node
   linkType: hard
 
@@ -2720,9 +2720,9 @@ __metadata:
     "@furystack/logging": "npm:^8.0.2"
     "@furystack/rest": "npm:^8.0.3"
     "@furystack/rest-client-fetch": "npm:^8.0.3"
-    "@furystack/shades": "npm:^11.0.3"
-    "@furystack/shades-common-components": "npm:^10.0.3"
-    "@furystack/shades-lottie": "npm:^7.0.3"
+    "@furystack/shades": "npm:^11.0.4"
+    "@furystack/shades-common-components": "npm:^10.0.4"
+    "@furystack/shades-lottie": "npm:^7.0.4"
     "@furystack/utils": "npm:^8.0.2"
     "@types/marked": "npm:^6.0.0"
     "@types/node": "npm:^22.3.0"
@@ -2733,7 +2733,7 @@ __metadata:
     semaphore-async-await: "npm:^1.5.1"
     typescript: "npm:^5.5.4"
     video.js: "npm:8.17.3"
-    vite: "npm:^5.4.0"
+    vite: "npm:^5.4.1"
   languageName: unknown
   linkType: soft
 
@@ -4642,7 +4642,7 @@ __metadata:
     rimraf: "npm:^6.0.1"
     typescript: "npm:^5.5.4"
     typescript-eslint: "npm:^8.1.0"
-    vite: "npm:^5.4.0"
+    vite: "npm:^5.4.1"
     vitest: "npm:^2.0.5"
   languageName: unknown
   linkType: soft
@@ -4719,7 +4719,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.40":
+"postcss@npm:^8.4.40, postcss@npm:^8.4.41":
   version: 8.4.41
   resolution: "postcss@npm:8.4.41"
   dependencies:
@@ -6083,7 +6083,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^5.0.0, vite@npm:^5.4.0":
+"vite@npm:^5.0.0":
   version: 5.4.0
   resolution: "vite@npm:5.4.0"
   dependencies:
@@ -6123,6 +6123,49 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/122de7795e1c3c08cd0acc7d77296f908398266b424492be7310400107f37a3cf4c9506f2b4b16619e57299ca2859b8ca187aac5e25f8e66d84f9204a1d72d18
+  languageName: node
+  linkType: hard
+
+"vite@npm:^5.4.1":
+  version: 5.4.1
+  resolution: "vite@npm:5.4.1"
+  dependencies:
+    esbuild: "npm:^0.21.3"
+    fsevents: "npm:~2.3.3"
+    postcss: "npm:^8.4.41"
+    rollup: "npm:^4.13.0"
+  peerDependencies:
+    "@types/node": ^18.0.0 || >=20.0.0
+    less: "*"
+    lightningcss: ^1.21.0
+    sass: "*"
+    sass-embedded: "*"
+    stylus: "*"
+    sugarss: "*"
+    terser: ^5.4.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+    less:
+      optional: true
+    lightningcss:
+      optional: true
+    sass:
+      optional: true
+    sass-embedded:
+      optional: true
+    stylus:
+      optional: true
+    sugarss:
+      optional: true
+    terser:
+      optional: true
+  bin:
+    vite: bin/vite.js
+  checksum: 10c0/b9ea824f1a946aa494f756e6d9dd88869baa62ae5ba3071b32b6a20958fd622cb624c860bdd7daee201c83ca029feaf8bbe2d2a6e172a5d49308772f8899d86d
   languageName: node
   linkType: hard
 
