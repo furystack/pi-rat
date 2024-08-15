@@ -1,14 +1,11 @@
 import type { ChildrenList } from '@furystack/shades'
 import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
-import { NotyService } from '@furystack/shades-common-components'
-import { Button, SelectionCell } from '@furystack/shades-common-components'
-import { Fab } from '@furystack/shades-common-components'
-import { DataGrid } from '@furystack/shades-common-components'
+import { Button, DataGrid, Fab, NotyService, SelectionCell } from '@furystack/shades-common-components'
+import type { Uri } from 'monaco-editor'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import type { GenericEditorService } from './generic-editor-service.js'
 import { GenericMonacoEditor } from './generic-monaco-editor.js'
-import { PiRatLazyLoad } from '../pirat-lazy-load.js'
-import type { Uri } from 'monaco-editor'
 
 type CreateEditorState = {
   mode: 'create'
@@ -18,12 +15,12 @@ type ListEditorState = {
   mode: 'list'
 }
 
-type EditEditorState = {
+type EditEditorState<T, TKey extends keyof T> = {
   mode: 'edit'
   currentId: string
 }
 
-type GenericEditorState = CreateEditorState | ListEditorState | EditEditorState
+type GenericEditorState<T, TKey extends keyof T> = CreateEditorState | ListEditorState | EditEditorState<T, TKey>
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
@@ -46,7 +43,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 
     const noty = injector.getInstance(NotyService)
 
-    const [editorState, setEditorState] = useSearchState<GenericEditorState>('gedst', {
+    const [editorState, setEditorState] = useSearchState<GenericEditorState<T, TKey>>('gedst', {
       mode: 'list',
     })
 
@@ -54,7 +51,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       return (
         <PiRatLazyLoad
           component={async () => {
-            const entry = await service.getSingleEntry(editorState.currentId as any)
+            const entry = await service.getSingleEntry(editorState.currentId as T[TKey])
             return (
               <GenericMonacoEditor
                 value={entry}

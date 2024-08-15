@@ -1,26 +1,26 @@
+import { getStoreManager, isAuthorized } from '@furystack/core'
+import type { Injector } from '@furystack/inject'
+import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { LinkMovie, PiRatFile } from 'common'
 import {
-  getFallbackMetadata,
-  MovieFile,
   Drive,
-  OmdbSeriesMetadata,
-  Series,
+  getFallbackMetadata,
+  getFileName,
   isMovieFile,
   isSampleFile,
   Movie,
+  MovieFile,
   OmdbMovieMetadata,
-  getFileName,
+  OmdbSeriesMetadata,
+  Series,
 } from 'common'
-import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
-import { RequestError } from '@furystack/rest'
-import { getStoreManager, isAuthorized } from '@furystack/core'
-import type { Injector } from '@furystack/inject'
-import { extractSubtitles } from '../utils/extract-subtitles.js'
 import ffprobe from 'ffprobe'
 import { join } from 'path'
 import { WebsocketService } from '../../websocket-service.js'
+import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
+import { extractSubtitles } from '../utils/extract-subtitles.js'
 
 const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
   const movieStore = getStoreManager(injector).getStoreFor(Movie, 'imdbId')
@@ -49,7 +49,7 @@ const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector
 }
 
 const ensureOmdbMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
-  const store = await getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
+  const store = getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
   const existing = await store.get(omdbMeta.imdbID)
   if (existing) {
     return existing
@@ -112,7 +112,7 @@ const announceNewMovie = async ({
   movie: Movie
   movieFile: MovieFile
 }) => {
-  injector
+  await injector
     .getInstance(WebsocketService)
     .announce({ type: 'add-movie', file, movie, movieFile }, async ({ injector: i }) => isAuthorized(i, 'admin'))
 }
@@ -181,7 +181,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       ffprobe: ffprobeResult,
     })
 
-    announceNewMovie({
+    await announceNewMovie({
       injector,
       file: {
         driveLetter,
@@ -223,7 +223,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   await extractSubtitles({ injector, file: { driveLetter, path } })
 
-  announceNewMovie({
+  await announceNewMovie({
     injector,
     file: { driveLetter, path },
     movie,

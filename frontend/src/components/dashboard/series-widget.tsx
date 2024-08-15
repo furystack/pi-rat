@@ -1,15 +1,15 @@
-import { Shade, RouteLink, createComponent } from '@furystack/shades'
-import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import { RouteLink, Shade, createComponent } from '@furystack/shades'
+import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { SeriesService } from '../../services/series-service.js'
 
 const focus = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('img.cover') as HTMLImageElement,
     [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
     {
@@ -21,12 +21,12 @@ const focus = (el: HTMLElement) => {
 }
 
 const blur = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('img.cover') as HTMLImageElement,
     [{ transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
     { fill: 'forwards', duration: 150 },
@@ -41,7 +41,7 @@ export const SeriesWidget = Shade<{
   shadowDomName: 'pi-rat-series-widget',
   constructed: ({ props, element }) => {
     setTimeout(() => {
-      promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+      void promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
         fill: 'forwards',
         delay: (props.index || 0) * 160 + Math.random() * 100,
         duration: 700,

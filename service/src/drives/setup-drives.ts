@@ -1,15 +1,15 @@
-import { useSequelize } from '@furystack/sequelize-store'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
-import { access, mkdir } from 'fs/promises'
-import { constants } from 'fs'
+import { useSequelize } from '@furystack/sequelize-store'
 import { Drive } from 'common'
-import { Model, DataTypes } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
-import { useFileWatchers } from './file-watcher-service.js'
+import { constants } from 'fs'
+import { access, mkdir } from 'fs/promises'
+import { DataTypes, Model } from 'sequelize'
 import { withRole } from '../authorization/with-role.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { existsAsync } from '../utils/exists-async.js'
+import { useFileWatchers } from './file-watcher-service.js'
 
 const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
   const exists = await existsAsync(path, mode)
@@ -92,9 +92,12 @@ export const setupDrives = async (injector: Injector) => {
       }
 
       try {
-        await ensureFolder(args.entity.physicalPath as string)
+        await ensureFolder(args.entity.physicalPath)
       } catch (error) {
-        logger.warning({ message: `Failed to create folder in path ${args.entity.physicalPath}`, data: { error } })
+        await logger.warning({
+          message: `Failed to create folder in path ${args.entity.physicalPath}`,
+          data: { error },
+        })
         return {
           isAllowed: false,
           message: `Could not access the physical path: ${args.entity.physicalPath}`,

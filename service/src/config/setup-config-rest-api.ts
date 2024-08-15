@@ -1,3 +1,4 @@
+import type { Injector } from '@furystack/inject'
 import {
   Validate,
   createDeleteEndpoint,
@@ -8,14 +9,13 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { ConfigApi } from 'common'
-import configApiSchema from 'common/schemas/config-api.json' with { type: 'json' }
 import { Config } from 'common'
+import configApiSchema from 'common/schemas/config-api.json' with { type: 'json' }
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
-import type { Injector } from '@furystack/inject'
 
 export const setupConfigRestApi = async (injector: Injector) => {
-  useRestService<ConfigApi>({
+  await useRestService<ConfigApi>({
     injector,
     root: 'api/config',
     port: getPort(),

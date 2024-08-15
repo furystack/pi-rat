@@ -25,7 +25,7 @@ export class WatchProgressUpdater implements AsyncDisposable {
 
   constructor(public readonly settings: WatchProgressUpdaterSettings) {
     this.interval = setInterval(() => {
-      this.update()
+      void this.update()
     }, this.settings.intervalMs)
     this.lastSavedTimeSeconds = this.settings.videoElement.currentTime
   }

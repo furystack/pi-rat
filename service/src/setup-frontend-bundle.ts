@@ -5,7 +5,7 @@ import { join, sep } from 'path'
 
 export const setupFrontendBundle = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('FrontendBundle')
-  logger.information({ message: '📦  Setting up frontend bundle...' })
+  await logger.information({ message: '📦  Setting up frontend bundle...' })
 
   await useStaticFiles({
     injector,
@@ -14,5 +14,5 @@ export const setupFrontendBundle = async (injector: Injector) => {
     path: join(process.cwd(), '..', 'frontend', 'dist') + sep,
     port: 9090,
   })
-  logger.information({ message: '✅  Frontend bundle setup completed' })
+  await logger.information({ message: '✅  Frontend bundle setup completed' })
 }

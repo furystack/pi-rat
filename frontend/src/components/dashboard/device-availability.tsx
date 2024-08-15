@@ -1,23 +1,23 @@
-import type { DeviceAvailability as DeviceAvailabilityProps } from '../../../../common/src/models/dashboard/device-availability.js'
+import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import { serializeToQueryString } from '@furystack/rest'
 import { LinkToRoute, Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
-import { SessionService } from '../../services/session.js'
-import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import type { DeviceAvailability as DeviceAvailabilityProps } from '../../../../common/src/models/dashboard/device-availability.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
-import { entityDeviceRoute } from '../routes/entity-routes.js'
-import { serializeToQueryString } from '@furystack/rest'
-import { iotDeviceRoute } from '../routes/iot-routes.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
+import { SessionService } from '../../services/session.js'
 import { Icon } from '../Icon.js'
 import { DeviceAvailabilityPanel } from '../iot-devices/device-availability-panel.js'
+import { entityDeviceRoute } from '../routes/entity-routes.js'
+import { iotDeviceRoute } from '../routes/iot-routes.js'
 
 const focus = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('.cover') as HTMLImageElement,
     [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
     {
@@ -29,12 +29,12 @@ const focus = (el: HTMLElement) => {
 }
 
 const blur = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('.cover') as HTMLImageElement,
     [{ transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
     { fill: 'forwards', duration: 150 },
@@ -47,7 +47,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
   elementBaseName: 'div',
   constructed: ({ props, element }) => {
     element.style.transform = 'scale(0)'
-    promisifyAnimation(element, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+    void promisifyAnimation(element, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
       fill: 'forwards',
       delay: (props.index || 0) * 160 + Math.random() * 100,
       duration: 700,

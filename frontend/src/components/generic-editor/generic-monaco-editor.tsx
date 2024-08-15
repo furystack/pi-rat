@@ -1,13 +1,13 @@
 import { createComponent, Shade } from '@furystack/shades'
-import type { GenericEditorService } from './generic-editor-service.js'
-import { MonacoEditor } from '../monaco-editor.js'
 import { Button } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Uri } from 'monaco-editor'
+import { MonacoEditor } from '../monaco-editor.js'
+import type { GenericEditorService } from './generic-editor-service.js'
 
 export const GenericMonacoEditor = Shade<{
   value: any
-  onSave: (value: any) => Promise<void>
+  onSave: (value: any) => void
   service: GenericEditorService<any, any, any>
   modelUri?: Uri
 }>({

@@ -1,19 +1,19 @@
+import type { Injector } from '@furystack/inject'
+import { getLogger } from '@furystack/logging'
+import '@furystack/repository'
+import { useRestService, Validate } from '@furystack/rest-service'
 import type { InstallApi } from 'common'
 import installApiSchema from 'common/schemas/install-api.json' with { type: 'json' }
-import { useRestService, Validate } from '@furystack/rest-service'
-import '@furystack/repository'
-import { getLogger } from '@furystack/logging'
-import type { Injector } from '@furystack/inject'
 
-import { GetServiceStatus } from './actions/get-service-status.js'
-import { getPort } from '../get-port.js'
 import { getCorsOptions } from '../get-cors-options.js'
+import { getPort } from '../get-port.js'
+import { GetServiceStatus } from './actions/get-service-status.js'
 import { PostInstallAction } from './actions/post-install-action.js'
 
 export const setupInstallRestApi = async (injector: Injector) => {
   const restApiLogger = getLogger(injector).withScope('service')
 
-  restApiLogger.information({ message: '⚙️  Starting REST API...' })
+  await restApiLogger.information({ message: '⚙️  Starting REST API...' })
 
   await useRestService<InstallApi>({
     injector,

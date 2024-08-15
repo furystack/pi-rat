@@ -5,8 +5,8 @@ import { getLogger } from '@furystack/logging'
 import { PathHelper } from '@furystack/utils'
 import type { PiRatFile } from 'common'
 import { MovieFile } from 'common'
-import { linkMovie } from './link-movie-action.js'
 import { FileWatcherService } from '../../drives/file-watcher-service.js'
+import { linkMovie } from './link-movie-action.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class MovieMaintainerService {
@@ -93,9 +93,9 @@ export class MovieMaintainerService {
 
   public init(injector: Injector) {
     const fileWatcherService = injector.getInstance(FileWatcherService)
-    this.addSubsciption = fileWatcherService.subscribe('add', this.onAdd)
-    this.unlinkDirSubscription = fileWatcherService.subscribe('unlinkDir', this.onUnlinkDir)
-    this.unlinkSubscription = fileWatcherService.subscribe('unlink', this.onUnlink)
+    this.addSubsciption = fileWatcherService.subscribe('add', (file) => void this.onAdd(file))
+    this.unlinkDirSubscription = fileWatcherService.subscribe('unlinkDir', (dir) => void this.onUnlinkDir(dir))
+    this.unlinkSubscription = fileWatcherService.subscribe('unlink', (file) => void this.onUnlink(file))
   }
 
   public [Symbol.dispose]() {

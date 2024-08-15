@@ -1,9 +1,8 @@
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
-import { WebSocketApi } from '@furystack/websocket-api'
-import { useWebsockets } from '@furystack/websocket-api'
-import { getPort } from './get-port.js'
+import { useWebsockets, WebSocketApi } from '@furystack/websocket-api'
 import type { WebsocketMessage } from 'common'
+import { getPort } from './get-port.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class WebsocketService {
@@ -20,7 +19,7 @@ export class WebsocketService {
     message: WebsocketMessage,
     shouldAnnounce: (options: { injector: Injector }) => Promise<boolean> = async () => true,
   ) => {
-    this.webSocketApi.broadcast(async (options) => {
+    await this.webSocketApi.broadcast(async (options) => {
       if (await shouldAnnounce(options)) {
         options.ws.send(JSON.stringify(message))
       }

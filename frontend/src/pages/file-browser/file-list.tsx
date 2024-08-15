@@ -4,10 +4,11 @@ import { DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-c
 import { ObservableValue, PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options.js'
+import { DrivesService } from '../../services/drives-service.js'
+import { getErrorMessage } from '../../services/get-error-message.js'
 import { SessionService } from '../../services/session.js'
 import { BreadCrumbs } from './breadcrumbs.js'
 import { DirectoryEntryIcon } from './directory-entry-icon.js'
-import { DrivesService } from '../../services/drives-service.js'
 import { FileContextMenu } from './file-context-menu.js'
 
 export const FileList = Shade<{
@@ -29,7 +30,9 @@ export const FileList = Shade<{
     const activate = () => {
       const focused = service.focusedEntry.getValue()
       const isComponentFocused = service.hasFocus.getValue()
-      isComponentFocused && focused && props.onActivate?.(focused)
+      if (isComponentFocused && focused) {
+        props.onActivate?.(focused)
+      }
     }
 
     useDisposable('keypressListener', () => {
@@ -47,7 +50,7 @@ export const FileList = Shade<{
             const url = `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
               letter,
             )}/${encodeURIComponent(PathHelper.joinPaths(path, focused.name))}/download`
-            const a = document.createElement('a') as HTMLAnchorElement
+            const a = document.createElement('a')
             a.href = url
             a.target = '_blank'
             a.download = focused.name
@@ -59,7 +62,7 @@ export const FileList = Shade<{
 
         if (ev.key === 'Delete') {
           const focused = service.focusedEntry.getValue()
-          focused &&
+          if (focused) {
             drivesService
               .removeFile(currentDriveLetter, encodeURIComponent(`${currentPath}/${focused.name}`))
               .then(() => {
@@ -70,8 +73,13 @@ export const FileList = Shade<{
                 })
               })
               .catch((err) =>
-                notyService.emit('onNotyAdded', { title: 'Delete failed', body: <>{err.toString()}</>, type: 'error' }),
+                notyService.emit('onNotyAdded', {
+                  title: 'Delete failed',
+                  body: <>{getErrorMessage(err)}</>,
+                  type: 'error',
+                }),
               )
+          }
         }
       }
       window.addEventListener('keydown', listener)
@@ -120,7 +128,11 @@ export const FileList = Shade<{
                 })
               })
               .catch((err) =>
-                notyService.emit('onNotyAdded', { title: 'Upload failed', body: <>{err.toString()}</>, type: 'error' }),
+                notyService.emit('onNotyAdded', {
+                  title: 'Upload failed',
+                  body: <>{getErrorMessage(err)}</>,
+                  type: 'error',
+                }),
               )
           }
         }}

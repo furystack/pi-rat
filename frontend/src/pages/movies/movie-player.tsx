@@ -1,12 +1,12 @@
 import { attachProps, createComponent, Shade } from '@furystack/shades'
-import { environmentOptions } from '../../environment-options.js'
-import 'video.js'
-import 'video.js/dist/video-js.css'
-import * as videojsDefault from 'video.js'
-import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
-import { WatchProgressService } from '../../services/watch-progress-service.js'
 import type { FfprobeEndpoint, PiRatFile } from 'common'
 import { encode, getFileName, getParentPath, type WatchHistoryEntry } from 'common'
+import 'video.js'
+import * as videojsDefault from 'video.js'
+import 'video.js/dist/video-js.css'
+import { environmentOptions } from '../../environment-options.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
+import { WatchProgressUpdater } from '../../services/watch-progress-updater.js'
 
 const videojs = videojsDefault as any as typeof videojsDefault.default /* & any*/
 
@@ -39,7 +39,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
         new WatchProgressUpdater({
           intervalMs: 10 * 1000,
           onSave: async (progress) => {
-            watchProgressService.updateWatchEntry({
+            await watchProgressService.updateWatchEntry({
               completed: video.duration - progress < 10,
               driveLetter,
               path,
@@ -51,7 +51,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
         }),
     )
 
-    const audioTrackList = (player as any).audioTracks()
+    const audioTrackList = player.audioTracks()
 
     props.ffProbe.streams
       .filter((stream) => stream.codec_type === 'audio')

@@ -1,8 +1,7 @@
-import type { IdentityContext } from '@furystack/core'
-import { ObservableValue, usingAsync } from '@furystack/utils'
+import type { IdentityContext, User } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
-import type { User } from '@furystack/core'
+import { ObservableValue, usingAsync } from '@furystack/utils'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
@@ -65,7 +64,7 @@ export class SessionService implements IdentityContext {
 
   public async logout(): Promise<void> {
     return await usingAsync(this.operation(), async () => {
-      this.api.call({ method: 'POST', action: '/logout' })
+      void this.api.call({ method: 'POST', action: '/logout' })
       this.currentUser.setValue(null)
       this.state.setValue('unauthenticated')
       this.notys.emit('onNotyAdded', {

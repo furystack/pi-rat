@@ -1,13 +1,13 @@
-import type { RequestAction } from '@furystack/rest-service'
 import { AuthorizationError, isAuthorized } from '@furystack/core'
+import { getDataSetFor } from '@furystack/repository'
+import { RequestError } from '@furystack/rest'
+import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import { Device, DevicePingHistory, type PingEndpoint } from 'common'
 import ping from 'ping'
-import { getDataSetFor } from '@furystack/repository'
-import { RequestError } from '@furystack/rest'
 
 export const PingAction: RequestAction<PingEndpoint> = async ({ injector, getUrlParams }) => {
-  if (!isAuthorized(injector, 'admin')) {
+  if (!(await isAuthorized(injector, 'admin'))) {
     throw new AuthorizationError('Needs admin access')
   }
 

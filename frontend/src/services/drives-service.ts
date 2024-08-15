@@ -1,29 +1,14 @@
-import { Injectable, Injected } from '@furystack/inject'
-import type { FindOptions, WithOptionalId } from '@furystack/core'
-import { EventHub, PathHelper } from '@furystack/utils'
 import { Cache } from '@furystack/cache'
+import type { FindOptions, WithOptionalId } from '@furystack/core'
+import { Injectable, Injected } from '@furystack/inject'
+import { EventHub, PathHelper } from '@furystack/utils'
+import type { Drive, WebsocketMessage } from 'common'
+import type { FileChangeMessage } from '../../../common/src/websocket/file-change-message.js'
 import { DrivesApiClient } from './api-clients/drives-api-client.js'
-import type { Drive } from 'common'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
-type DrivesFilesystemChangedEvent = {
-  type: 'fileChange'
-  /**
-   * The type of the filesystem event
-   */
-  event: 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir'
-  /**
-   * The relative path of the changed file
-   */
-  path: string
-  /**
-   * The drive letter
-   */
-  drive: string
-}
-
 @Injectable({ lifetime: 'singleton' })
-export class DrivesService extends EventHub<{ onFilesystemChanged: DrivesFilesystemChangedEvent }> {
+export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMessage }> {
   @Injected(DrivesApiClient)
   private declare readonly drivesApiClient: DrivesApiClient
 
@@ -135,9 +120,9 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: DrivesFilesys
   @Injected(WebsocketNotificationsService)
   private declare readonly socket: WebsocketNotificationsService
 
-  private onMessage = ((messageData: any) => {
-    if ((messageData as any).type === 'file-change') {
-      this.emit('onFilesystemChanged', messageData as DrivesFilesystemChangedEvent)
+  private onMessage = ((messageData: WebsocketMessage) => {
+    if (messageData.type === 'file-change') {
+      this.emit('onFilesystemChanged', messageData as FileChangeMessage)
 
       this.fileListCache.obsoleteRange((fileList) => {
         const parentPath = PathHelper.getParentPath(messageData.path)
