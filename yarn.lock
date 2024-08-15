@@ -5160,6 +5160,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "service@workspace:service"
   dependencies:
+    "@furystack/cache": "npm:^5.0.2"
     "@furystack/core": "npm:^15.0.3"
     "@furystack/inject": "npm:^12.0.2"
     "@furystack/logging": "npm:^8.0.2"
