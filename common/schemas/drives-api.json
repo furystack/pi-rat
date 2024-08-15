@@ -14,20 +14,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/GetCollectionResult%3CDirectoryEntry%3E"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "GetCollectionResult<DirectoryEntry>": {
@@ -45,10 +39,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -109,10 +100,7 @@
               }
             }
           },
-          "required": [
-            "success",
-            "entries"
-          ],
+          "required": ["success", "entries"],
           "additionalProperties": false
         },
         "url": {
@@ -125,19 +113,12 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "body": {}
       },
-      "required": [
-        "result",
-        "url",
-        "body"
-      ],
+      "required": ["result", "url", "body"],
       "additionalProperties": false
     },
     "DeleteFileEndpoint": {
@@ -153,10 +134,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {
@@ -167,16 +145,11 @@
               "const": true
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "DownloadEndpoint": {
@@ -192,18 +165,12 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {}
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "PostDriveEndpoint": {
@@ -216,10 +183,7 @@
           "$ref": "#/definitions/Drive"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "Omit<WithOptionalId<Drive,\"letter\">,(\"createdAt\"|\"updatedAt\")>": {
@@ -237,9 +201,7 @@
           "description": "The drive letter, should be unique"
         }
       },
-      "required": [
-        "physicalPath"
-      ],
+      "required": ["physicalPath"],
       "additionalProperties": false
     },
     "Drive": {
@@ -264,12 +226,7 @@
           "format": "date-time"
         }
       },
-      "required": [
-        "physicalPath",
-        "letter",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["physicalPath", "letter", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "PatchDriveEndpoint": {
@@ -286,20 +243,14 @@
               "description": "The drive letter, should be unique"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false
     },
     "Partial<Omit<Drive,(\"createdAt\"|\"updatedAt\")>>": {
@@ -329,20 +280,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/getInfo.FFProbeResult"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "getInfo.FFProbeResult": {
@@ -355,9 +300,7 @@
           }
         }
       },
-      "required": [
-        "streams"
-      ],
+      "required": ["streams"],
       "additionalProperties": false
     },
     "getInfo.FFProbeStream": {
@@ -377,11 +320,7 @@
         },
         "codec_type": {
           "type": "string",
-          "enum": [
-            "video",
-            "audio",
-            "images"
-          ]
+          "enum": ["video", "audio", "images"]
         },
         "codec_time_base": {
           "type": "string"
@@ -615,10 +554,7 @@
     },
     "getInfo.FFProbeBoolean": {
       "type": "string",
-      "enum": [
-        "0",
-        "1"
-      ]
+      "enum": ["0", "1"]
     },
     "getInfo.SideData": {
       "anyOf": [
@@ -672,9 +608,7 @@
           "description": "Based on the C code related to the default side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2298}"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "getInfo.BaseSideData": {
@@ -684,9 +618,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "getInfo.DisplayMatrixSideData": {
@@ -705,11 +637,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "displaymatrix",
-        "rotation",
-        "side_data_type"
-      ],
+      "required": ["displaymatrix", "rotation", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.Stereo3dSideData": {
@@ -739,11 +667,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "inverted",
-        "side_data_type",
-        "type"
-      ],
+      "required": ["inverted", "side_data_type", "type"],
       "additionalProperties": false
     },
     "getInfo.SphericalMappingSideData": {
@@ -785,13 +709,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.BaseSphericalMappingSideData": {
@@ -816,13 +734,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.EquirectangularSphericalMappingSideData": {
@@ -848,13 +760,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.CubeMapSphericalMappingSideData": {
@@ -884,14 +790,7 @@
           "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2313}"
         }
       },
-      "required": [
-        "padding",
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
+      "required": ["padding", "pitch", "projection", "roll", "side_data_type", "yaw"],
       "additionalProperties": false
     },
     "getInfo.TiltedEquirectangularSphericalMappingSideData": {
@@ -964,13 +863,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "discard_padding",
-        "discard_reason",
-        "side_data_type",
-        "skip_reason",
-        "skip_samples"
-      ],
+      "required": ["discard_padding", "discard_reason", "side_data_type", "skip_reason", "skip_samples"],
       "additionalProperties": false
     },
     "getInfo.MasteringDisplayMetadataSideData": {
@@ -1095,9 +988,7 @@
           "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "getInfo.LuminanceMasteringDisplayMetadataSideData": {
@@ -1116,11 +1007,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "max_luminance",
-        "min_luminance",
-        "side_data_type"
-      ],
+      "required": ["max_luminance", "min_luminance", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.ContentLightLevelMetadataSideData": {
@@ -1138,11 +1025,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "max_average",
-        "max_content",
-        "side_data_type"
-      ],
+      "required": ["max_average", "max_content", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.DoviConfigurationRecordSideData": {
@@ -1203,10 +1086,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "service_type",
-        "side_data_type"
-      ],
+      "required": ["service_type", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.MpegtsStreamIdSideData": {
@@ -1221,10 +1101,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "id",
-        "side_data_type"
-      ],
+      "required": ["id", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.CpbPropertiesSideData": {
@@ -1251,14 +1128,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "avg_bitrate",
-        "buffer_size",
-        "max_bitrate",
-        "min_bitrate",
-        "side_data_type",
-        "vbv_delay"
-      ],
+      "required": ["avg_bitrate", "buffer_size", "max_bitrate", "min_bitrate", "side_data_type", "vbv_delay"],
       "additionalProperties": false
     },
     "getInfo.WebvttSideData": {
@@ -1266,10 +1136,7 @@
       "properties": {
         "side_data_type": {
           "type": "string",
-          "enum": [
-            "WebVTT ID",
-            "WebVTT Settings"
-          ],
+          "enum": ["WebVTT ID", "WebVTT Settings"],
           "description": "Based on the C code related to Webvtt side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2379-L2381}"
         },
         "data": {
@@ -1279,10 +1146,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "data_hash",
-        "side_data_type"
-      ],
+      "required": ["data_hash", "side_data_type"],
       "additionalProperties": false
     },
     "getInfo.ActiveFormatDescriptionSideData": {
@@ -1297,9 +1161,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "side_data_type"
-      ],
+      "required": ["side_data_type"],
       "additionalProperties": false
     },
     "SaveTextFileEndpoint": {
@@ -1315,10 +1177,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "body": {
@@ -1328,9 +1187,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "text"
-          ],
+          "required": ["text"],
           "additionalProperties": false
         },
         "result": {
@@ -1341,17 +1198,11 @@
               "const": true
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "body",
-        "result"
-      ],
+      "required": ["url", "body", "result"],
       "additionalProperties": false
     },
     "DrivesApi": {
@@ -1395,10 +1246,7 @@
               "$ref": "#/definitions/UploadEndpoint"
             }
           },
-          "required": [
-            "/volumes",
-            "/volumes/:letter/:path/upload"
-          ],
+          "required": ["/volumes", "/volumes/:letter/:path/upload"],
           "additionalProperties": false
         },
         "PATCH": {
@@ -1408,9 +1256,7 @@
               "$ref": "#/definitions/PatchEndpoint%3CDrive%2C%22letter%22%3E"
             }
           },
-          "required": [
-            "/volumes/:id"
-          ],
+          "required": ["/volumes/:id"],
           "additionalProperties": false
         },
         "PUT": {
@@ -1420,9 +1266,7 @@
               "$ref": "#/definitions/SaveTextFileEndpoint"
             }
           },
-          "required": [
-            "/files/:letter/:path"
-          ],
+          "required": ["/files/:letter/:path"],
           "additionalProperties": false
         },
         "DELETE": {
@@ -1435,10 +1279,7 @@
               "$ref": "#/definitions/DeleteFileEndpoint"
             }
           },
-          "required": [
-            "/volumes/:id",
-            "/files/:letter/:path"
-          ],
+          "required": ["/volumes/:id", "/files/:letter/:path"],
           "additionalProperties": false
         },
         "HEAD": {
@@ -1452,9 +1293,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1469,9 +1308,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1486,9 +1323,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1503,20 +1338,12 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE"
-      ],
+      "required": ["GET", "POST", "PUT", "PATCH", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -1533,9 +1360,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1550,9 +1375,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1567,9 +1390,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1584,9 +1405,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1601,9 +1420,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1618,9 +1435,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1635,9 +1450,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1652,9 +1465,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -1669,9 +1480,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
@@ -1694,10 +1503,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CDrive%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -1717,31 +1523,19 @@
           "properties": {
             "physicalPath": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "letter": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1751,12 +1545,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "physicalPath",
-              "letter",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["physicalPath", "letter", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -2069,10 +1858,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -2086,12 +1872,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "physicalPath",
-                  "letter",
-                  "createdAt",
-                  "updatedAt"
-                ]
+                "enum": ["physicalPath", "letter", "createdAt", "updatedAt"]
               },
               "description": "The list of fields to select"
             }
@@ -2106,20 +1887,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Drive"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -2137,20 +1912,14 @@
               "description": "The drive letter, should be unique"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -2189,19 +1958,14 @@
               "description": "The drive letter, should be unique"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }
