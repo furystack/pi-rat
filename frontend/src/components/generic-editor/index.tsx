@@ -17,7 +17,7 @@ type ListEditorState = {
 
 type EditEditorState<T, TKey extends keyof T> = {
   mode: 'edit'
-  currentId: string
+  currentId: T[TKey]
 }
 
 type GenericEditorState<T, TKey extends keyof T> = CreateEditorState | ListEditorState | EditEditorState<T, TKey>
@@ -31,6 +31,9 @@ type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends key
   modelUri?: Uri
 }
 
+type EntityFromProps<Props> = Props extends { service: GenericEditorService<infer T, any, any> } ? T : never
+type EntityKeyFromProps<Props> = Props extends { service: GenericEditorService<any, infer TKey, any> } ? TKey : never
+
 export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string>(
   props: GenericEditorProps<T, TKey, TReadonlyProperties, TColumns>,
   childrenList: ChildrenList,
@@ -43,7 +46,9 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 
     const noty = injector.getInstance(NotyService)
 
-    const [editorState, setEditorState] = useSearchState<GenericEditorState<T, TKey>>('gedst', {
+    const [editorState, setEditorState] = useSearchState<
+      GenericEditorState<EntityFromProps<typeof props>, EntityKeyFromProps<typeof props>>
+    >('gedst', {
       mode: 'list',
     })
 
@@ -51,13 +56,14 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       return (
         <PiRatLazyLoad
           component={async () => {
-            const entry = await service.getSingleEntry(editorState.currentId as T[TKey])
+            const entry = await service.getSingleEntry(editorState.currentId)
             return (
               <GenericMonacoEditor
-                value={entry}
+                value={entry!}
+                service={service}
                 onSave={async (value) => {
                   try {
-                    await service.patchEntry(editorState.currentId as any, value)
+                    await service.patchEntry(editorState.currentId, value)
                     noty.emit('onNotyAdded', {
                       type: 'success',
                       title: '📝 Entity updated',
@@ -72,7 +78,6 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                     })
                   }
                 }}
-                service={service}
                 modelUri={modelUri}
               />
             )
@@ -86,13 +91,15 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         <GenericMonacoEditor
           service={service}
           modelUri={modelUri}
-          value={{}}
+          value={{} as EntityFromProps<typeof props>}
           onSave={async (value) => {
             try {
               const response = await service.postEntry(value)
               setEditorState({
                 mode: 'edit',
-                currentId: response[service.extendedOptions.keyProperty] as string,
+                currentId: response[service.extendedOptions.keyProperty] as EntityFromProps<
+                  typeof props
+                >[EntityKeyFromProps<typeof props>],
               })
               noty.emit('onNotyAdded', {
                 type: 'success',
@@ -125,7 +132,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
               <div style={{ width: '156px' }}>
                 <Button
                   onclick={() => {
-                    setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] as string })
+                    setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] })
                     refresh()
                   }}
                 >
@@ -134,7 +141,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 <Button
                   onclick={() => {
                     service
-                      .removeEntries(entry[service.extendedOptions.keyProperty] as any)
+                      .removeEntries(entry[service.extendedOptions.keyProperty])
                       .then(() => {
                         noty.emit('onNotyAdded', {
                           type: 'success',

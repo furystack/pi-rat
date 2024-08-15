@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test'
-import { test, expect } from '@playwright/test'
-import { assertAndDismissNoty, login } from './helpers'
+import { expect, test } from '@playwright/test'
 import { randomUUID } from 'crypto'
+import { assertAndDismissNoty, login } from './helpers.js'
 
 const navigateToDashboardList = async (page: Page) => {
   await page.goto('/')
@@ -9,7 +9,7 @@ const navigateToDashboardList = async (page: Page) => {
 }
 
 const setMonacoValue = async (page: Page, value: any) => {
-  const monaco = await page.locator('textarea')
+  const monaco = page.locator('textarea')
   await monaco.press('Control+a')
   await monaco.fill(JSON.stringify(value, null, 2), {})
   await monaco.press('Control+End')
@@ -102,6 +102,6 @@ test.describe('Dashboard', () => {
     await navigateToDashboardList(page)
 
     const text = await page.locator('shade-data-grid-body').textContent()
-    await expect(text).not.toContain(dashboardName)
+    expect(text).not.toContain(dashboardName)
   })
 })

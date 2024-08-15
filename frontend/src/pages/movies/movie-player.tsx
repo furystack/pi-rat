@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { attachProps, createComponent, Shade } from '@furystack/shades'
 import type { FfprobeEndpoint, PiRatFile } from 'common'
 import { encode, getFileName, getParentPath, type WatchHistoryEntry } from 'common'
@@ -51,7 +54,7 @@ export const MoviePlayer = Shade<MoviePlayerProps>({
         }),
     )
 
-    const audioTrackList = player.audioTracks()
+    const audioTrackList = (player as any).audioTracks()
 
     props.ffProbe.streams
       .filter((stream) => stream.codec_type === 'audio')

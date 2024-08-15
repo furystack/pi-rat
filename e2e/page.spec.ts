@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { login, logout } from './helpers'
+import { login, logout } from './helpers.js'
 
 test.describe('Pi-Rat Application', () => {
   test('Login and logout roundtrip', async ({ page }) => {

@@ -39,5 +39,5 @@ export class OmdbMovieMetadata {
 }
 
 export const isValidOmdbMetadata = (metadata: any): metadata is OmdbMovieMetadata => {
-  return metadata && metadata.Response === 'True' ? true : false
+  return metadata && (metadata as OmdbMovieMetadata).Response === 'True' ? true : false
 }
