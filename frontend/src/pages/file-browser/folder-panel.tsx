@@ -3,7 +3,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, Paper } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
-import { encode } from 'common'
+import { encode, getFullPath } from 'common'
 import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { DrivesService } from '../../services/drives-service.js'
@@ -106,7 +106,7 @@ export const FolderPanel = Shade<{
             } else {
               navigateToRoute(injector, fileBrowserOpenFileRoute, {
                 driveLetter: encode(currentDrive.letter),
-                path: encode(PathHelper.joinPaths(path, v.name)),
+                path: encode(getFullPath(path, v.name)),
               })
             }
           }}

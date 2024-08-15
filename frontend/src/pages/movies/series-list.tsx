@@ -1,7 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { SeriesWidget } from '../../components/dashboard/series-widget.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { SeriesService } from '../../services/series-service.js'
-import { SeriesWidget } from '../../components/dashboard/series-widget.js'
 
 export const SeriesList = Shade({
   shadowDomName: 'shade-movie-list',

@@ -280,21 +280,63 @@
         "query": {
           "type": "object",
           "properties": {
-            "audioTrackId": {
+            "audio": {
+              "type": "object",
+              "properties": {
+                "trackId": {
+                  "type": "number",
+                  "description": "Selects the audio track to stream. If not provided, the first audio track will be played"
+                },
+                "audioCodec": {
+                  "type": "string",
+                  "const": "aac",
+                  "description": "Select the codec for audio encoding. If not provided, the original encoding will be used"
+                },
+                "mixdown": {
+                  "type": "boolean",
+                  "description": "Mix down multi-channel audio to stereo"
+                },
+                "bitrate": {
+                  "type": "number",
+                  "description": "The bitrate for the audio stream. If not provided, the original bitrate will be used"
+                }
+              },
+              "required": ["trackId"],
+              "additionalProperties": false,
+              "description": "Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc..."
+            },
+            "video": {
+              "type": "object",
+              "properties": {
+                "codec": {
+                  "type": "string",
+                  "const": "libx264",
+                  "description": "The codec for video encoding. If not provided, the original encoding will be used"
+                },
+                "resolution": {
+                  "type": "string",
+                  "enum": ["4k", "1080p", "720p", "480p", "360p"],
+                  "description": "The output resolution for the video stream. If not provided, the original resolution will be used"
+                },
+                "quality": {
+                  "type": "string",
+                  "enum": ["high", "medium", "low"],
+                  "description": "Preset options"
+                }
+              },
+              "additionalProperties": false,
+              "description": "Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc..."
+            },
+            "from": {
               "type": "number",
-              "description": "Selects the audio track to stream. If not provided, the first audio track will be played"
+              "description": "The start time in seconds"
             },
-            "audioCodec": {
-              "type": "string",
-              "const": "",
-              "description": "Select the audio encoding. If not provided, the original encoding will be used"
-            },
-            "videoCodec": {
-              "type": "string",
-              "const": "h264",
-              "description": "Select the video encoding. If not provided, the original encoding will be used"
+            "to": {
+              "type": "number",
+              "description": "The end time in seconds"
             }
           },
+          "required": ["from", "to"],
           "additionalProperties": false
         },
         "result": {}
@@ -6670,10 +6712,10 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "$ref": "#/definitions/getInfo.FFProbeResult"
+                  "$ref": "#/definitions/Ffmpeg.FfprobeData"
                 },
                 "$ne": {
-                  "$ref": "#/definitions/getInfo.FFProbeResult"
+                  "$ref": "#/definitions/Ffmpeg.FfprobeData"
                 }
               },
               "additionalProperties": false
@@ -6684,13 +6726,13 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/getInfo.FFProbeResult"
+                    "$ref": "#/definitions/Ffmpeg.FfprobeData"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/getInfo.FFProbeResult"
+                    "$ref": "#/definitions/Ffmpeg.FfprobeData"
                   }
                 }
               },
@@ -6804,20 +6846,27 @@
         }
       }
     },
-    "getInfo.FFProbeResult": {
+    "Ffmpeg.FfprobeData": {
       "type": "object",
       "properties": {
         "streams": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/getInfo.FFProbeStream"
+            "$ref": "#/definitions/Ffmpeg.FfprobeStream"
           }
+        },
+        "format": {
+          "$ref": "#/definitions/Ffmpeg.FfprobeFormat"
+        },
+        "chapters": {
+          "type": "array",
+          "items": {}
         }
       },
-      "required": ["streams"],
+      "required": ["streams", "format", "chapters"],
       "additionalProperties": false
     },
-    "getInfo.FFProbeStream": {
+    "Ffmpeg.FfprobeStream": {
       "type": "object",
       "properties": {
         "index": {
@@ -6830,11 +6879,10 @@
           "type": "string"
         },
         "profile": {
-          "type": "string"
+          "type": "number"
         },
         "codec_type": {
-          "type": "string",
-          "enum": ["video", "audio", "images"]
+          "type": "string"
         },
         "codec_time_base": {
           "type": "string"
@@ -6843,9 +6891,6 @@
           "type": "string"
         },
         "codec_tag": {
-          "type": "string"
-        },
-        "extradata": {
           "type": "string"
         },
         "width": {
@@ -6860,9 +6905,6 @@
         "coded_height": {
           "type": "number"
         },
-        "closed_captions": {
-          "$ref": "#/definitions/getInfo.FFProbeBoolean"
-        },
         "has_b_frames": {
           "type": "number"
         },
@@ -6876,7 +6918,7 @@
           "type": "string"
         },
         "level": {
-          "type": "number"
+          "type": "string"
         },
         "color_range": {
           "type": "string"
@@ -6902,21 +6944,6 @@
         "refs": {
           "type": "number"
         },
-        "sample_fmt": {
-          "type": "string"
-        },
-        "sample_rate": {
-          "type": "number"
-        },
-        "channels": {
-          "type": "number"
-        },
-        "channel_layout": {
-          "type": "string"
-        },
-        "bits_per_sample": {
-          "type": "number"
-        },
         "id": {
           "type": "string"
         },
@@ -6936,747 +6963,137 @@
           "type": "number"
         },
         "duration_ts": {
-          "type": "number"
+          "type": "string"
         },
         "duration": {
           "type": "string"
         },
         "bit_rate": {
-          "type": "number"
+          "type": "string"
         },
         "max_bit_rate": {
-          "type": "number"
+          "type": "string"
         },
         "bits_per_raw_sample": {
-          "type": "number"
+          "type": "string"
         },
         "nb_frames": {
-          "type": "number"
+          "type": "string"
         },
         "nb_read_frames": {
-          "type": "number"
+          "type": "string"
         },
         "nb_read_packets": {
+          "type": "string"
+        },
+        "sample_fmt": {
+          "type": "string"
+        },
+        "sample_rate": {
           "type": "number"
         },
-        "is_avc": {
+        "channels": {
           "type": "number"
         },
-        "nal_length_size": {
+        "channel_layout": {
+          "type": "string"
+        },
+        "bits_per_sample": {
           "type": "number"
         },
         "disposition": {
-          "type": "object",
-          "properties": {
-            "default": {
-              "type": "number"
-            },
-            "dub": {
-              "type": "number"
-            },
-            "original": {
-              "type": "number"
-            },
-            "comment": {
-              "type": "number"
-            },
-            "lyrics": {
-              "type": "number"
-            },
-            "karaoke": {
-              "type": "number"
-            },
-            "forced": {
-              "type": "number"
-            },
-            "hearing_impaired": {
-              "type": "number"
-            },
-            "visual_impaired": {
-              "type": "number"
-            },
-            "clean_effects": {
-              "type": "number"
-            },
-            "attached_pic": {
-              "type": "number"
-            },
-            "timed_thumbnails": {
-              "type": "number"
-            }
-          },
-          "required": [
-            "default",
-            "dub",
-            "original",
-            "comment",
-            "lyrics",
-            "karaoke",
-            "forced",
-            "hearing_impaired",
-            "visual_impaired",
-            "clean_effects",
-            "attached_pic"
-          ],
-          "additionalProperties": false
-        },
-        "tags": {
-          "type": "object",
-          "properties": {
-            "language": {
-              "type": "string"
-            },
-            "handler_name": {
-              "type": "string"
-            },
-            "creation_time": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "not": {}
-              }
-            ]
-          }
-        },
-        "side_data_list": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/getInfo.SideData"
-          }
-        }
-      },
-      "required": [
-        "index",
-        "codec_time_base",
-        "codec_tag_string",
-        "codec_tag",
-        "id",
-        "r_frame_rate",
-        "avg_frame_rate",
-        "time_base",
-        "disposition",
-        "tags"
-      ],
-      "additionalProperties": false,
-      "description": "Based on the XML definition of the ffprobe stream type {@see https://github.com/FFmpeg/FFmpeg/blob/master/doc/ffprobe.xsd#L206}"
-    },
-    "getInfo.FFProbeBoolean": {
-      "type": "string",
-      "enum": ["0", "1"]
-    },
-    "getInfo.SideData": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/getInfo.UnknownSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.DisplayMatrixSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.Stereo3dSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.SphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.SkipSamplesSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.MasteringDisplayMetadataSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.ContentLightLevelMetadataSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.DoviConfigurationRecordSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.AudioServiceTypeSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.MpegtsStreamIdSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.CpbPropertiesSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.WebvttSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.ActiveFormatDescriptionSideData"
-        }
-      ]
-    },
-    "getInfo.UnknownSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "unknown",
-          "description": "Based on the C code related to the default side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2298}"
-        }
-      },
-      "required": ["side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.BaseSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string"
-        }
-      },
-      "required": ["side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.DisplayMatrixSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Display Matrix",
-          "description": "Based on the C code related to Display Matrix side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2300-L2304}"
-        },
-        "displaymatrix": {
-          "type": "string",
-          "description": "Mismatches the type linked earlier because ffprobe JSON output reads the printed integers for the display matrix as a string"
+          "$ref": "#/definitions/Ffmpeg.FfprobeStreamDisposition"
         },
         "rotation": {
-          "type": "number"
+          "type": ["string", "number"]
         }
       },
-      "required": ["displaymatrix", "rotation", "side_data_type"],
-      "additionalProperties": false
+      "required": ["index"]
     },
-    "getInfo.Stereo3dSideData": {
+    "Ffmpeg.FfprobeStreamDisposition": {
       "type": "object",
       "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Stereo 3D",
-          "description": "Based on the C code related to Stereo 3D side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2306-L2308}"
+        "default": {
+          "type": "number"
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "unknown",
-            "2D",
-            "side by side",
-            "top and bottom",
-            "frame alternate",
-            "checkerboard",
-            "side by side (quincunx subsampling)",
-            "interleaved lines",
-            "interleaved columns"
-          ],
-          "description": "Based on the C code of the libauvutil stereo3d file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/stereo3d.c#L47-L56}"
+        "dub": {
+          "type": "number"
         },
-        "inverted": {
+        "original": {
+          "type": "number"
+        },
+        "comment": {
+          "type": "number"
+        },
+        "lyrics": {
+          "type": "number"
+        },
+        "karaoke": {
+          "type": "number"
+        },
+        "forced": {
+          "type": "number"
+        },
+        "hearing_impaired": {
+          "type": "number"
+        },
+        "visual_impaired": {
+          "type": "number"
+        },
+        "clean_effects": {
+          "type": "number"
+        },
+        "attached_pic": {
+          "type": "number"
+        },
+        "timed_thumbnails": {
           "type": "number"
         }
-      },
-      "required": ["inverted", "side_data_type", "type"],
-      "additionalProperties": false
+      }
     },
-    "getInfo.SphericalMappingSideData": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/getInfo.UnknownSphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.EquirectangularSphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.CubeMapSphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.TiltedEquirectangularSphericalMappingSideData"
-        }
-      ]
-    },
-    "getInfo.UnknownSphericalMappingSideData": {
+    "Ffmpeg.FfprobeFormat": {
       "type": "object",
       "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "unknown",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        }
-      },
-      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
-      "additionalProperties": false
-    },
-    "getInfo.BaseSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        }
-      },
-      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
-      "additionalProperties": false
-    },
-    "getInfo.EquirectangularSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "equirectangular",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        }
-      },
-      "required": ["pitch", "projection", "roll", "side_data_type", "yaw"],
-      "additionalProperties": false
-    },
-    "getInfo.CubeMapSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "cubemap",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        },
-        "padding": {
-          "type": "number",
-          "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2313}"
-        }
-      },
-      "required": ["padding", "pitch", "projection", "roll", "side_data_type", "yaw"],
-      "additionalProperties": false
-    },
-    "getInfo.TiltedEquirectangularSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "tiled equirectangular",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        },
-        "bound_left": {
-          "type": "number",
-          "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2315-L2321}"
-        },
-        "bound_top": {
-          "type": "number"
-        },
-        "bound_right": {
-          "type": "number"
-        },
-        "bound_bottom": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "bound_bottom",
-        "bound_left",
-        "bound_right",
-        "bound_top",
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.SkipSamplesSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Skip Samples",
-          "description": "Based on the C code related to Skip Samples side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2328-L2331}"
-        },
-        "skip_samples": {
-          "type": "number"
-        },
-        "discard_padding": {
-          "type": "number"
-        },
-        "skip_reason": {
-          "type": "number"
-        },
-        "discard_reason": {
-          "type": "number"
-        }
-      },
-      "required": ["discard_padding", "discard_reason", "side_data_type", "skip_reason", "skip_samples"],
-      "additionalProperties": false
-    },
-    "getInfo.MasteringDisplayMetadataSideData": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/getInfo.PrimariesMasteringDisplayMetadataSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.LuminanceMasteringDisplayMetadataSideData"
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "side_data_type": {
-              "type": "string",
-              "const": "Mastering display metadata",
-              "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-            },
-            "min_luminance": {
-              "type": "string",
-              "description": "Based on the C code related to Luminance Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2348-L2349}"
-            },
-            "max_luminance": {
-              "type": "string"
-            },
-            "red_x": {
-              "type": "string",
-              "description": "Based on the C code related to Primaries Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2336-L2344}"
-            },
-            "red_y": {
-              "type": "string"
-            },
-            "green_x": {
-              "type": "string"
-            },
-            "green_y": {
-              "type": "string"
-            },
-            "blue_x": {
-              "type": "string"
-            },
-            "blue_y": {
-              "type": "string"
-            },
-            "white_point_x": {
-              "type": "string"
-            },
-            "white_point_y": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "blue_x",
-            "blue_y",
-            "green_x",
-            "green_y",
-            "max_luminance",
-            "min_luminance",
-            "red_x",
-            "red_y",
-            "side_data_type",
-            "white_point_x",
-            "white_point_y"
-          ]
-        }
-      ]
-    },
-    "getInfo.PrimariesMasteringDisplayMetadataSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Mastering display metadata",
-          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-        },
-        "red_x": {
-          "type": "string",
-          "description": "Based on the C code related to Primaries Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2336-L2344}"
-        },
-        "red_y": {
+        "filename": {
           "type": "string"
         },
-        "green_x": {
+        "nb_streams": {
+          "type": "number"
+        },
+        "nb_programs": {
+          "type": "number"
+        },
+        "format_name": {
           "type": "string"
         },
-        "green_y": {
+        "format_long_name": {
           "type": "string"
         },
-        "blue_x": {
-          "type": "string"
+        "start_time": {
+          "type": "number"
         },
-        "blue_y": {
-          "type": "string"
+        "duration": {
+          "type": "number"
         },
-        "white_point_x": {
-          "type": "string"
+        "size": {
+          "type": "number"
         },
-        "white_point_y": {
-          "type": "string"
+        "bit_rate": {
+          "type": "number"
+        },
+        "probe_score": {
+          "type": "number"
+        },
+        "tags": {
+          "$ref": "#/definitions/Record%3Cstring%2C(string%7Cnumber)%3E"
         }
-      },
-      "required": [
-        "blue_x",
-        "blue_y",
-        "green_x",
-        "green_y",
-        "red_x",
-        "red_y",
-        "side_data_type",
-        "white_point_x",
-        "white_point_y"
-      ],
-      "additionalProperties": false
+      }
     },
-    "getInfo.BaseMasteringDisplayMetadataSideData": {
+    "Record<string,(string|number)>": {
       "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Mastering display metadata",
-          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-        }
-      },
-      "required": ["side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.LuminanceMasteringDisplayMetadataSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Mastering display metadata",
-          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-        },
-        "min_luminance": {
-          "type": "string",
-          "description": "Based on the C code related to Luminance Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2348-L2349}"
-        },
-        "max_luminance": {
-          "type": "string"
-        }
-      },
-      "required": ["max_luminance", "min_luminance", "side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.ContentLightLevelMetadataSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Content light level metadata",
-          "description": "Based on the C code related to Content light level metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2352-L2354}"
-        },
-        "max_content": {
-          "type": "number"
-        },
-        "max_average": {
-          "type": "number"
-        }
-      },
-      "required": ["max_average", "max_content", "side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.DoviConfigurationRecordSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "DOVI configuration record",
-          "description": "Based on the C code related to DOVI configuration record side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2356-L2364}"
-        },
-        "dv_version_major": {
-          "type": "number"
-        },
-        "dv_version_minor": {
-          "type": "number"
-        },
-        "dv_profile": {
-          "type": "number"
-        },
-        "dv_level": {
-          "type": "number"
-        },
-        "rpu_present_flag": {
-          "type": "number"
-        },
-        "el_present_flag": {
-          "type": "number"
-        },
-        "bl_present_flag": {
-          "type": "number"
-        },
-        "dv_bl_signal_compatibility_id": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "bl_present_flag",
-        "dv_bl_signal_compatibility_id",
-        "dv_level",
-        "dv_profile",
-        "dv_version_major",
-        "dv_version_minor",
-        "el_present_flag",
-        "rpu_present_flag",
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.AudioServiceTypeSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Audio Service Type",
-          "description": "Based on the C code related to Audio Service Type side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2366-L2367}"
-        },
-        "service_type": {
-          "type": "number"
-        }
-      },
-      "required": ["service_type", "side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.MpegtsStreamIdSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "MPEGTS Stream ID",
-          "description": "Based on the C code related to MPEGTS Stream ID side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2369}"
-        },
-        "id": {
-          "type": "number"
-        }
-      },
-      "required": ["id", "side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.CpbPropertiesSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "CPB properties",
-          "description": "Based on the C code related to CPB properties side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2371-L2376}"
-        },
-        "max_bitrate": {
-          "type": "number"
-        },
-        "min_bitrate": {
-          "type": "number"
-        },
-        "avg_bitrate": {
-          "type": "number"
-        },
-        "buffer_size": {
-          "type": "number"
-        },
-        "vbv_delay": {
-          "type": "number"
-        }
-      },
-      "required": ["avg_bitrate", "buffer_size", "max_bitrate", "min_bitrate", "side_data_type", "vbv_delay"],
-      "additionalProperties": false
-    },
-    "getInfo.WebvttSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "enum": ["WebVTT ID", "WebVTT Settings"],
-          "description": "Based on the C code related to Webvtt side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2379-L2381}"
-        },
-        "data": {
-          "type": "string"
-        },
-        "data_hash": {
-          "type": "string"
-        }
-      },
-      "required": ["data_hash", "side_data_type"],
-      "additionalProperties": false
-    },
-    "getInfo.ActiveFormatDescriptionSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Active format description",
-          "description": "Based on the C code related to Active format description side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2383}"
-        },
-        "active_format": {
-          "type": "number"
-        }
-      },
-      "required": ["side_data_type"],
-      "additionalProperties": false
+      "additionalProperties": {
+        "type": ["string", "number"]
+      }
     },
     "GetCollectionResult<MovieFile>": {
       "type": "object",
@@ -7713,7 +7130,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -7864,7 +7281,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -7902,7 +7319,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -8032,7 +7449,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",

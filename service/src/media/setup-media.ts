@@ -9,9 +9,9 @@ import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { DataTypes, Model } from 'sequelize'
 
-import type { FFProbeResult } from 'ffprobe'
 import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
+import type { FfprobeResult } from '../ffprobe-service.js'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { useMovieFileMaintainer } from './actions/movie-file-maintainer.js'
 import { OmdbClientService } from './metadata-services/omdb-client-service.js'
@@ -37,7 +37,7 @@ class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare imdbId?: string
   declare driveLetter: string
   declare path: string
-  declare ffprobe: FFProbeResult
+  declare ffprobe: FfprobeResult
   declare relatedFiles?: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> | undefined
 }
 
@@ -85,14 +85,14 @@ class OmdbMovieMetadataModel extends Model<OmdbMovieMetadata, OmdbMovieMetadata>
   declare imdbVotes: string
   declare imdbID: string
   declare Type: 'episode' | 'movie'
-  DVD?: string | undefined
-  BoxOffice?: string | undefined
-  Production?: string | undefined
-  Website?: string | undefined
+  declare DVD?: string | undefined
+  declare BoxOffice?: string | undefined
+  declare Production?: string | undefined
+  declare Website?: string | undefined
   declare Response: 'True'
-  seriesID?: string | undefined
-  Season?: string | undefined
-  Episode?: string | undefined
+  declare seriesID?: string | undefined
+  declare Season?: string | undefined
+  declare Episode?: string | undefined
   declare createdAt: string
   declare updatedAt: string
 }

@@ -70,7 +70,7 @@ export default tseslint.config(
       'no-useless-concat': 'error',
       radix: 'error',
       yoda: 'error',
-      'prefer-arrow-callback': 'error',
+      'prefer-arrow-callback': ['error', { allowUnboundThis: true }],
       'prefer-rest-params': 'error',
       'no-var': 'error',
       'prefer-const': 'error',

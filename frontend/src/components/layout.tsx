@@ -10,7 +10,7 @@ export const Layout = Shade({
   style: {
     width: '100%',
     height: '100%',
-    position: 'fixed',
+    position: 'absolute',
     top: '0',
     left: '0',
     padding: '0',
@@ -20,7 +20,7 @@ export const Layout = Shade({
   render: ({ injector }) => {
     return (
       <>
-        <NotyList style={{ zIndex: '2', position: 'fixed' }} />
+        <NotyList style={{ zIndex: '2' }} />
         <PiRatLazyLoad
           component={async () => {
             const result = await injector.getInstance(InstallService).getServiceStatus()

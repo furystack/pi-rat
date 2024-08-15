@@ -7,19 +7,14 @@ import type { StreamEndpoint } from 'common'
 import { Drive } from 'common'
 import ffmpeg from 'fluent-ffmpeg'
 import mime from 'mime'
-import { extname, join } from 'path'
+import { join } from 'path'
+import { FfprobeService } from '../../ffprobe-service.js'
 
-export const StreamAction: RequestAction<StreamEndpoint> = async ({
-  injector,
-  getUrlParams,
-  //getQuery,
-  request,
-  response,
-}) => {
+export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, response, getQuery }) => {
   const logger = getLogger(injector).withScope('StreamAction')
 
-  // const { audioCodec, videoCodec } = getQuery()
   const { letter, path } = getUrlParams()
+  const { from, to, audio, video } = getQuery()
 
   const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
   if (!drive) {
@@ -27,36 +22,96 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({
   }
 
   const fullPath = join(drive.physicalPath, path)
-  // const fileStats = await stat(fullPath)
-  // const fileSize = fileStats.size
-  const mimeType = mime.getType(extname(path))
+  const mimeType = mime.getType('mp4')
   const mimeHeader = mimeType ? { 'Content-Type': mimeType } : {}
-  const { range } = request.headers
+  const head = {
+    ...mimeHeader,
+  }
+  response.writeHead(200, head)
 
-  if (range) {
-    // const parts = range.replace(/bytes=/, '').split('-')
-    // const start = parseInt(parts[0], 10)
-    // const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
-    // const chunksize = end - start + 1
-    const head = {
-      // 'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-      // 'Accept-Ranges': 'bytes',
-      // 'Content-Length': chunksize,
-      ...mimeHeader,
+  const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile({ driveLetter: letter, path })
+
+  const audioStreams = ffprobe.streams.filter((stream) => stream.codec_type === 'audio')
+  const audioStream = audioStreams[audio?.trackId || 0]
+  const videoStream = ffprobe.streams.find((stream) => stream.codec_type === 'video')
+
+  await logger.information({
+    message: `Starting stream from ${from} to ${to}, transcodeVideo: ${!!video?.codec}, transcodeAudio: ${!!audio?.audioCodec}`,
+    data: { fullPath, from, to, audio, video, audioStream, videoStream },
+  })
+
+  const command = ffmpeg(fullPath)
+    .format('mp4')
+    .outputOptions(['-movflags empty_moov+frag_keyframe+faststart+default_base_moof'])
+    .addOutputOption('-map 0:v:0')
+
+  if (audio) {
+    if (!isNaN(audio.trackId)) {
+      command.addOutputOption(`-map 0:a:${audio.trackId}`)
     }
-    response.writeHead(200, head)
+    if (audio.audioCodec) {
+      command.audioCodec('aac')
+    }
+    if (audio.bitrate) {
+      command.audioBitrate(audio.bitrate)
+    }
 
-    // const calculatedSeekOffset = start / fileSize
+    if (audio.mixdown) {
+      command.audioChannels(2)
+    }
+  } else {
+    command.audioCodec('copy')
+  }
 
-    ffmpeg(fullPath)
-      .outputOptions(['-movflags isml+frag_keyframe'])
-      // .toFormat('mp4')
-      // .withAudioCodec('copy')
-      // .seekInput(seekOffset || 0)
-      // .map('0:v:0')
-      // .map(`${audioTrackId}:a:1`)
-      .videoCodec('copy')
-      .format('matroska')
+  if (video) {
+    if (video.codec) {
+      command.videoCodec(video.codec)
+    }
+
+    if (video.quality) {
+      // TODO: Figure out how to set quality
+    }
+
+    if (video.resolution) {
+      switch (video.resolution) {
+        case '4k':
+          command.size('3840x2160')
+          break
+        case '1080p':
+          command.size('1920x1080')
+          break
+        case '720p':
+          command.size('1280x720')
+          break
+        case '480p':
+          command.size('854x480')
+          break
+        case '360p':
+          command.size('640x360')
+          break
+        default:
+          break
+      }
+    }
+  } else {
+    command.videoCodec('copy')
+  }
+
+  if (from) {
+    command.seekInput(from)
+    command.seek(from)
+  }
+
+  if (to) {
+    command.duration(to - from)
+  }
+
+  command.on('start', (commandLine) => {
+    void logger.verbose({ message: `Spawned Ffmpeg with command: ${commandLine}` })
+  })
+
+  try {
+    command
       .on('error', (err, stdout, stderr) => {
         void logger.error({ message: `an error happened: ${err.message}`, data: { err, stdout, stderr } })
       })
@@ -67,9 +122,8 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({
         void logger.verbose({ message: `Processing: ${progress.percent}%` })
       })
       .pipe(response, { end: true })
-  } else {
-    response.writeHead(200, mimeHeader)
-    response.end()
+  } catch (error) {
+    await logger.error({ message: 'Stream error', data: { error } })
   }
 
   return BypassResult()
