@@ -1,5 +1,5 @@
 import type { ScopedLogger } from '@furystack/logging'
-import { ObservableValue, type Disposable } from '@furystack/utils'
+import { ObservableValue } from '@furystack/utils'
 import type { PiRatFile } from 'common'
 import type { FfprobeData } from 'fluent-ffmpeg'
 import { Lock } from 'semaphore-async-await'
@@ -21,7 +21,7 @@ export const audioCodecs = {
   dts: 'dts+',
 }
 
-export class MoviePlayerService implements Disposable {
+export class MoviePlayerService implements AsyncDisposable {
   constructor(
     private readonly file: PiRatFile,
     private readonly ffprobe: FfprobeData,
@@ -36,40 +36,40 @@ export class MoviePlayerService implements Disposable {
     this.url = URL.createObjectURL(this.MediaSource)
 
     this.MediaSource.addEventListener('sourceopen', () => {
-      this.logger.verbose({ message: 'MediaSource opened' })
+      void this.logger.verbose({ message: 'MediaSource opened' })
       this.MediaSource.duration = this.ffprobe.format.duration || 0
     })
 
     this.MediaSource.addEventListener('sourceclose', () => {
-      this.logger.verbose({ message: 'MediaSource closed' })
+      void this.logger.verbose({ message: 'MediaSource closed' })
     })
 
     this.MediaSource.addEventListener('sourceended', () => {
-      this.logger.verbose({ message: 'MediaSource ended' })
+      void this.logger.verbose({ message: 'MediaSource ended' })
     })
 
     this.chunkLength = 2
 
-    this.loadChunkForProgress(this.currentProgress)
+    void this.loadChunkForProgress(this.currentProgress)
   }
 
   public readonly MediaSource: MediaSource
   public readonly url: string
   private loadLock = new Lock()
   public audioTrackId = new ObservableValue(0)
-  public async dispose() {
-    this.progress.dispose()
-    this.bufferZoneChangeSubscription.dispose()
-    this.bufferZones.dispose()
-    this.gapsInBuffersChangeSubscription.dispose()
-    this.gapsInBuffers.dispose()
-    this.lastLoadTime.dispose()
+  public async [Symbol.asyncDispose]() {
+    this.progress[Symbol.dispose]()
+    this.bufferZoneChangeSubscription[Symbol.dispose]()
+    this.bufferZones[Symbol.dispose]()
+    this.gapsInBuffersChangeSubscription[Symbol.dispose]()
+    this.gapsInBuffers[Symbol.dispose]()
+    this.lastLoadTime[Symbol.dispose]()
     this.MediaSource.endOfStream()
     ;[...this.MediaSource.sourceBuffers].forEach((sb) => {
       try {
         this.MediaSource.removeSourceBuffer(sb)
       } catch (error) {
-        this.logger.error({ message: 'Error disposing MediaSource Buffer', data: { error } })
+        void this.logger.error({ message: 'Error disposing MediaSource Buffer', data: { error } })
       }
     })
   }
@@ -88,11 +88,11 @@ export class MoviePlayerService implements Disposable {
   })
 
   private bufferZoneChangeSubscription = this.bufferZones.subscribe((next) => {
-    this.logger.verbose({ message: 'Buffer zones changed', data: { next } })
+    void this.logger.verbose({ message: 'Buffer zones changed', data: { next } })
   })
 
   private gapsInBuffersChangeSubscription = this.gapsInBuffers.subscribe((next) => {
-    this.logger.verbose({ message: 'Gaps in buffers changed', data: { next } })
+    void this.logger.verbose({ message: 'Gaps in buffers changed', data: { next } })
   })
 
   private getActiveSourceBuffer = () => {
@@ -100,7 +100,7 @@ export class MoviePlayerService implements Disposable {
     if (existing) {
       return existing
     }
-    this.logger.verbose({ message: 'Creating new source buffer' })
+    void this.logger.verbose({ message: 'Creating new source buffer' })
     const newSourceBuffer = this.MediaSource.addSourceBuffer(this.getMimeType())
     newSourceBuffer.mode = 'segments'
     newSourceBuffer.timestampOffset = this.progress.getValue()
@@ -141,7 +141,7 @@ export class MoviePlayerService implements Disposable {
   public async loadChunkForProgress(progress: number) {
     const from = this.getSegmentStartForProgress(progress)
     const to = from + this.chunkLength
-    this.logger.verbose({ message: `Loading chunk from ${from} to ${to}` })
+    await this.logger.verbose({ message: `Loading chunk from ${from} to ${to}` })
     try {
       await this.loadLock.acquire()
       const start = new Date().getTime()
@@ -194,11 +194,11 @@ export class MoviePlayerService implements Disposable {
       const end = new Date().getTime()
       this.lastLoadTime.setValue((end - start) / 1000)
     } catch (error) {
-      this.logger.error({ message: 'Chunk loading error', data: { error } })
+      await this.logger.error({ message: 'Chunk loading error', data: { error } })
     } finally {
       this.loadLock.release()
     }
-    this.logger.verbose({ message: `Loading ${from}-${to} loading finished` })
+    await this.logger.verbose({ message: `Loading ${from}-${to} loading finished` })
   }
 
   public progress: ObservableValue<number>
@@ -211,18 +211,18 @@ export class MoviePlayerService implements Disposable {
     this.updateBufferZones()
     const sb = this.getActiveSourceBuffer()
     if (!sb.buffered.length) {
-      this.logger.information({ message: 'No buffered data, loading a chunk...', data: { progress } })
-      this.loadChunkForProgress(progress)
+      void this.logger.information({ message: 'No buffered data, loading a chunk...', data: { progress } })
+      void this.loadChunkForProgress(progress)
       return
     }
 
     const isInGap = this.gapsInBuffers.getValue().some(([start, end]) => progress >= start && progress <= end)
     if (isInGap) {
       if (this.loadLock.getPermits()) {
-        this.logger.information({
+        void this.logger.information({
           message: 'Progress inside a buffer gap',
         })
-        this.loadChunkForProgress(progress)
+        void this.loadChunkForProgress(progress)
       }
     }
 
@@ -233,10 +233,10 @@ export class MoviePlayerService implements Disposable {
 
     if (isGapApproaching) {
       if (this.loadLock.getPermits()) {
-        this.logger.information({
+        void this.logger.information({
           message: 'Gap approaching, write queue clear, loading a chunk...',
         })
-        this.loadChunkForProgress(isGapApproaching[0])
+        void this.loadChunkForProgress(isGapApproaching[0])
       }
     }
   }

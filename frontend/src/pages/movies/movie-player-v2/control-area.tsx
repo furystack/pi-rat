@@ -40,7 +40,7 @@ export const SoundControl = Shade<{
           min="0"
           max="100"
           value={volume.toString()}
-          onchange={(e) => props.volume.setValue((e.target as HTMLInputElement).value as any)}
+          onchange={(e) => props.volume.setValue((e.target as HTMLInputElement).value as unknown as number)}
         />
       </div>
     )

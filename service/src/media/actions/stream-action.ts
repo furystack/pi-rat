@@ -35,7 +35,7 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   const audioStream = audioStreams[audio?.trackId || 0]
   const videoStream = ffprobe.streams.find((stream) => stream.codec_type === 'video')
 
-  logger.information({
+  await logger.information({
     message: `Starting stream from ${from} to ${to}, transcodeVideo: ${!!video?.codec}, transcodeAudio: ${!!audio?.audioCodec}`,
     data: { fullPath, from, to, audio, video, audioStream, videoStream },
   })
@@ -107,7 +107,7 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   }
 
   command.on('start', (commandLine) => {
-    logger.verbose({ message: `Spawned Ffmpeg with command: ${commandLine}` })
+    void logger.verbose({ message: `Spawned Ffmpeg with command: ${commandLine}` })
   })
 
   try {
@@ -123,7 +123,7 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
       })
       .pipe(response, { end: true })
   } catch (error) {
-    logger.error({ message: 'Stream error', data: { error } })
+    await logger.error({ message: 'Stream error', data: { error } })
   }
 
   return BypassResult()

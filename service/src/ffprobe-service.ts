@@ -35,7 +35,7 @@ export class FfprobeService {
     capacity: 100,
     load: async (fullPath: string) => {
       const ffprobeResult = await new Promise<FfprobeData>((resolve, reject) =>
-        fluendFfmpeg.ffprobe(fullPath, (err, data) => (err ? reject(err) : resolve(data))),
+        fluendFfmpeg.ffprobe(fullPath, (err, data) => (err ? reject(err as Error) : resolve(data))),
       )
       return ffprobeResult
     },

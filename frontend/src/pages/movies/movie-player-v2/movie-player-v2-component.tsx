@@ -29,7 +29,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       return new WatchProgressUpdater({
         intervalMs: 10 * 1000,
         onSave: async (progress) => {
-          watchProgressService.updateWatchEntry({
+          void watchProgressService.updateWatchEntry({
             completed: video.duration - progress < 10,
             driveLetter,
             path,
@@ -42,7 +42,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     })
 
     return () => {
-      watchProgressUpdater.dispose()
+      void watchProgressUpdater[Symbol.asyncDispose]()
     }
   },
   render: ({ props, element, useDisposable, injector }) => {
@@ -57,7 +57,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       () => new MoviePlayerService(file, props.ffprobe, api, watchProgress?.watchedSeconds || 0, logger),
     )
 
-    mediaService.MediaSource.addEventListener('sourceopen', async () => {
+    mediaService.MediaSource.addEventListener('sourceopen', () => {
       mediaService.MediaSource.duration = props.ffprobe.format.duration || 0
     })
 
@@ -67,7 +67,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       const createTimedOutHide = () =>
         setTimeout(() => {
           element.querySelectorAll('.hideOnPlay').forEach((el) => {
-            promisifyAnimation(
+            void promisifyAnimation(
               el,
               [
                 {
@@ -91,7 +91,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       const onMouseMove = () => {
         clearTimeout(timeoutId)
         element.querySelectorAll('.hideOnPlay').forEach((el) => {
-          promisifyAnimation(
+          void promisifyAnimation(
             el,
             [
               {
@@ -113,7 +113,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       element.addEventListener('mousemove', onMouseMove)
 
       return {
-        dispose: () => {
+        [Symbol.dispose]: () => {
           element.removeEventListener('mousemove', onMouseMove)
         },
       }
@@ -142,12 +142,12 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             objectFit: 'cover',
           }}
           ontimeupdate={(ev) => {
-            const currentTime = (ev.currentTarget as HTMLVideoElement).currentTime as number
+            const { currentTime } = ev.currentTarget as HTMLVideoElement
             mediaService.progress.setValue(currentTime || 0)
           }}
           onseeked={(ev) => {
-            const currentTime = (ev.currentTarget as HTMLVideoElement).currentTime as number
-            mediaService.loadChunkForProgress(currentTime)
+            const { currentTime } = ev.currentTarget as HTMLVideoElement
+            void mediaService.loadChunkForProgress(currentTime)
           }}
           currentTime={watchProgress?.watchedSeconds || 0}
           src={mediaService.url}
