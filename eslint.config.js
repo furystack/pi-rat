@@ -12,7 +12,16 @@ export default tseslint.config(
     files: ['e2e'],
   },
   {
-    ignores: ['coverage', '*/node_modules/*', '*/esm/*', '*/types/*', '*/dist/*', '.yarn/*', 'eslint.config.js'],
+    ignores: [
+      'coverage',
+      '*/node_modules/*',
+      '*/esm/*',
+      '*/types/*',
+      '*/dist/*',
+      '.yarn/*',
+      'eslint.config.js',
+      'prettier.config.js',
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
