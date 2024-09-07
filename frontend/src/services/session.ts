@@ -2,6 +2,7 @@ import type { IdentityContext, User } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue, usingAsync } from '@furystack/utils'
+import type { Roles } from 'common'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
@@ -78,7 +79,7 @@ export class SessionService implements IdentityContext {
   public async isAuthenticated(): Promise<boolean> {
     return this.state.getValue() === 'authenticated'
   }
-  public async isAuthorized(...roles: string[]): Promise<boolean> {
+  public async isAuthorized(...roles: Roles): Promise<boolean> {
     const currentUser = await this.getCurrentUser()
     for (const role of roles) {
       if (!currentUser || !currentUser.roles.some((c) => c === role)) {

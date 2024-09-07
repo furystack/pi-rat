@@ -8,14 +8,18 @@
           "type": "string"
         },
         "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/Roles"
         }
       },
       "required": ["username", "roles"],
       "additionalProperties": false
+    },
+    "Roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "const": "admin"
+      }
     },
     "IsAuthenticatedAction": {
       "type": "object",
@@ -95,10 +99,7 @@
           "type": "string"
         },
         "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/Roles"
         },
         "createdAt": {
           "type": "string"
@@ -118,10 +119,7 @@
           "type": "string"
         },
         "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/Roles"
         }
       },
       "required": ["roles"]
@@ -133,10 +131,7 @@
       "type": "object",
       "properties": {
         "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/Roles"
         }
       },
       "required": ["roles"],
@@ -576,16 +571,10 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/definitions/Roles"
                 },
                 "$ne": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/definitions/Roles"
                 }
               },
               "additionalProperties": false
@@ -596,19 +585,13 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
+                    "$ref": "#/definitions/Roles"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
+                    "$ref": "#/definitions/Roles"
                   }
                 }
               },
@@ -808,10 +791,7 @@
           "type": "string"
         },
         "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/Roles"
         }
       },
       "additionalProperties": false
