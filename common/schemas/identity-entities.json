@@ -1,7 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/User",
   "definitions": {
+    "Roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "const": "admin"
+      }
+    },
     "User": {
       "type": "object",
       "properties": {
@@ -9,10 +15,7 @@
           "type": "string"
         },
         "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/Roles"
         },
         "createdAt": {
           "type": "string"
