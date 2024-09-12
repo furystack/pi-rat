@@ -1,13 +1,12 @@
-import { createComponent, Shade, Router } from '@furystack/shades'
-import { SessionService } from '../services/session.js'
-import { Init, Offline, Login } from '../pages/index.js'
-import { fileBrowserRoutes } from './routes/file-browser-routes.js'
-import { entityRoutes } from './routes/entity-routes.js'
-import { movieRoutes } from './routes/movie-routes.js'
-import { dashboardRoutes } from './routes/dashboard-routes.js'
+import { createComponent, Router, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
-import { torrentRoutes } from './routes/torrent-routes.js'
+import { Init, Login, Offline } from '../pages/index.js'
+import { SessionService } from '../services/session.js'
+import { dashboardRoutes } from './routes/dashboard-routes.js'
+import { entityRoutes } from './routes/entity-routes.js'
+import { fileBrowserRoutes } from './routes/file-browser-routes.js'
 import { iotRoutes } from './routes/iot-routes.js'
+import { movieRoutes } from './routes/movie-routes.js'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
@@ -28,7 +27,6 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
             routes={[
               ...movieRoutes,
               ...(hasAdminRole ? [...entityRoutes, ...fileBrowserRoutes, ...iotRoutes] : []),
-              ...torrentRoutes,
               ...dashboardRoutes,
             ]}
           />

@@ -9,7 +9,7 @@ import { unlink } from 'fs/promises'
 import { join } from 'path'
 
 export const DeleteFileAction: RequestAction<DeleteFileEndpoint> = async ({ injector, getUrlParams }) => {
-  if (!isAuthorized(injector, 'admin')) {
+  if (!(await isAuthorized(injector, 'admin'))) {
     throw new RequestError('Unauthorized', 401)
   }
   const { letter, path } = getUrlParams()

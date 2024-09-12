@@ -5,72 +5,44 @@
       "type": "object",
       "properties": {
         "body": {
-          "type": "object",
-          "properties": {
-            "drive": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            },
-            "fileName": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "drive",
-            "path",
-            "fileName"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/PiRatFile"
         },
         "result": {
           "type": "object",
           "properties": {
             "status": {
               "type": "string",
-              "enum": [
-                "already-linked",
-                "linked",
-                "failed",
-                "not-movie-file"
-              ]
+              "enum": ["already-linked", "linked", "failed", "not-movie-file"]
             }
           },
-          "required": [
-            "status"
-          ],
+          "required": ["status"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
+    },
+    "PiRatFile": {
+      "type": "object",
+      "properties": {
+        "driveLetter": {
+          "type": "string",
+          "description": "The letter for the drive"
+        },
+        "path": {
+          "type": "string",
+          "description": "The full path of the file"
+        }
+      },
+      "required": ["driveLetter", "path"],
+      "additionalProperties": false,
+      "description": "Represents a File entry in pi-rat"
     },
     "ExtractSubtitles": {
       "type": "object",
       "properties": {
         "body": {
-          "type": "object",
-          "properties": {
-            "drive": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            },
-            "fileName": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "drive",
-            "path",
-            "fileName"
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/PiRatFile"
         },
         "result": {
           "type": "object",
@@ -79,16 +51,11 @@
               "type": "boolean"
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "FetchOmdbSeries": {
@@ -101,19 +68,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "imdbId"
-          ],
+          "required": ["imdbId"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/OmdbSeriesMetadata"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "OmdbSeriesMetadata": {
@@ -173,10 +135,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "Source",
-              "Value"
-            ],
+            "required": ["Source", "Value"],
             "additionalProperties": false
           }
         },
@@ -240,34 +199,25 @@
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/Omit%3CMovieWatchHistoryEntry%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E"
+          "$ref": "#/definitions/Omit%3CWatchHistoryEntry%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E"
         },
         "result": {
-          "$ref": "#/definitions/MovieWatchHistoryEntry"
+          "$ref": "#/definitions/WatchHistoryEntry"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
-    "Omit<MovieWatchHistoryEntry,(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>": {
-      "$ref": "#/definitions/Pick%3CMovieWatchHistoryEntry%2CExclude%3C(%22id%22%7C%22userName%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E%3E"
+    "Omit<WatchHistoryEntry,(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>": {
+      "$ref": "#/definitions/Pick%3CWatchHistoryEntry%2CExclude%3C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E%3E"
     },
-    "Pick<MovieWatchHistoryEntry,Exclude<(\"id\"|\"userName\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\"),(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>>": {
+    "Pick<WatchHistoryEntry,Exclude<(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\"),(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>>": {
       "type": "object",
       "properties": {
-        "imdbId": {
-          "type": "string"
-        },
         "driveLetter": {
           "type": "string"
         },
         "path": {
-          "type": "string"
-        },
-        "fileName": {
           "type": "string"
         },
         "watchedSeconds": {
@@ -277,17 +227,10 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "imdbId",
-        "driveLetter",
-        "path",
-        "fileName",
-        "watchedSeconds",
-        "completed"
-      ],
+      "required": ["driveLetter", "path", "watchedSeconds", "completed"],
       "additionalProperties": false
     },
-    "MovieWatchHistoryEntry": {
+    "WatchHistoryEntry": {
       "type": "object",
       "properties": {
         "id": {
@@ -296,16 +239,10 @@
         "userName": {
           "type": "string"
         },
-        "imdbId": {
-          "type": "string"
-        },
         "driveLetter": {
           "type": "string"
         },
         "path": {
-          "type": "string"
-        },
-        "fileName": {
           "type": "string"
         },
         "watchedSeconds": {
@@ -321,18 +258,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "userName",
-        "imdbId",
-        "driveLetter",
-        "path",
-        "fileName",
-        "watchedSeconds",
-        "completed",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "StreamEndpoint": {
@@ -341,21 +267,81 @@
         "url": {
           "type": "object",
           "properties": {
-            "id": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "audio": {
+              "type": "object",
+              "properties": {
+                "trackId": {
+                  "type": "number",
+                  "description": "Selects the audio track to stream. If not provided, the first audio track will be played"
+                },
+                "audioCodec": {
+                  "type": "string",
+                  "const": "aac",
+                  "description": "Select the codec for audio encoding. If not provided, the original encoding will be used"
+                },
+                "mixdown": {
+                  "type": "boolean",
+                  "description": "Mix down multi-channel audio to stereo"
+                },
+                "bitrate": {
+                  "type": "number",
+                  "description": "The bitrate for the audio stream. If not provided, the original bitrate will be used"
+                }
+              },
+              "required": ["trackId"],
+              "additionalProperties": false,
+              "description": "Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc..."
+            },
+            "video": {
+              "type": "object",
+              "properties": {
+                "codec": {
+                  "type": "string",
+                  "const": "libx264",
+                  "description": "The codec for video encoding. If not provided, the original encoding will be used"
+                },
+                "resolution": {
+                  "type": "string",
+                  "enum": ["4k", "1080p", "720p", "480p", "360p"],
+                  "description": "The output resolution for the video stream. If not provided, the original resolution will be used"
+                },
+                "quality": {
+                  "type": "string",
+                  "enum": ["high", "medium", "low"],
+                  "description": "Preset options"
+                }
+              },
+              "additionalProperties": false,
+              "description": "Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc..."
+            },
+            "from": {
+              "type": "number",
+              "description": "The start time in seconds"
+            },
+            "to": {
+              "type": "number",
+              "description": "The end time in seconds"
+            }
+          },
+          "required": ["from", "to"],
           "additionalProperties": false
         },
         "result": {}
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "query", "result"],
       "additionalProperties": false
     },
     "MediaApi": {
@@ -380,9 +366,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "movieId"
-                  ],
+                  "required": ["movieId"],
                   "additionalProperties": false
                 },
                 "result": {
@@ -392,10 +376,7 @@
                   }
                 }
               },
-              "required": [
-                "url",
-                "result"
-              ],
+              "required": ["url", "result"],
               "additionalProperties": false
             },
             "/movies/:movieId/subtitles/:subtitleName": {
@@ -411,25 +392,19 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "movieId",
-                    "subtitleName"
-                  ],
+                  "required": ["movieId", "subtitleName"],
                   "additionalProperties": false
                 },
                 "result": {}
               },
-              "required": [
-                "url",
-                "result"
-              ],
+              "required": ["url", "result"],
               "additionalProperties": false
             },
             "/my-watch-progresses": {
-              "$ref": "#/definitions/GetCollectionEndpoint%3CMovieWatchHistoryEntry%3E"
+              "$ref": "#/definitions/GetCollectionEndpoint%3CWatchHistoryEntry%3E"
             },
             "/my-watch-progresses/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CMovieWatchHistoryEntry%2C%22id%22%3E"
+              "$ref": "#/definitions/GetEntityEndpoint%3CWatchHistoryEntry%2C%22id%22%3E"
             },
             "/series": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CSeries%3E"
@@ -452,7 +427,7 @@
             "/movie-files": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieFile%3E"
             },
-            "/movie-files/:id/stream": {
+            "/files/:letter/:path/stream": {
               "$ref": "#/definitions/StreamEndpoint"
             },
             "/movie-files/:id": {
@@ -473,7 +448,7 @@
             "/omdb-series-metadata",
             "/omdb-series-metadata/:id",
             "/movie-files",
-            "/movie-files/:id/stream",
+            "/files/:letter/:path/stream",
             "/movie-files/:id"
           ],
           "additionalProperties": false
@@ -497,13 +472,7 @@
               "$ref": "#/definitions/SaveWatchProgress"
             }
           },
-          "required": [
-            "/movies",
-            "/movie-files",
-            "/link-movie",
-            "/extract-subtitles",
-            "/save-watch-progress"
-          ],
+          "required": ["/movies", "/movie-files", "/link-movie", "/extract-subtitles", "/save-watch-progress"],
           "additionalProperties": false
         },
         "PATCH": {
@@ -516,10 +485,7 @@
               "$ref": "#/definitions/PatchEndpoint%3CMovieFile%2C%22id%22%3E"
             }
           },
-          "required": [
-            "/movies/:id",
-            "/movie-files/:id"
-          ],
+          "required": ["/movies/:id", "/movie-files/:id"],
           "additionalProperties": false
         },
         "PUT": {
@@ -533,9 +499,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -549,14 +513,10 @@
               "$ref": "#/definitions/DeleteEndpoint%3CMovieFile%2C%22id%22%3E"
             },
             "/my-watch-progresses/:id": {
-              "$ref": "#/definitions/DeleteEndpoint%3CMovieWatchHistoryEntry%2C%22id%22%3E"
+              "$ref": "#/definitions/DeleteEndpoint%3CWatchHistoryEntry%2C%22id%22%3E"
             }
           },
-          "required": [
-            "/movies/:id",
-            "/movie-files/:id",
-            "/my-watch-progresses/:id"
-          ],
+          "required": ["/movies/:id", "/movie-files/:id", "/my-watch-progresses/:id"],
           "additionalProperties": false
         },
         "HEAD": {
@@ -570,9 +530,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -587,9 +545,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -604,9 +560,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -621,19 +575,12 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "GET",
-        "POST",
-        "PATCH",
-        "DELETE"
-      ],
+      "required": ["GET", "POST", "PATCH", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -650,9 +597,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -667,9 +612,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -684,9 +627,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -701,9 +642,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -718,9 +657,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -735,9 +672,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -752,9 +687,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -769,9 +702,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -786,9 +717,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
@@ -811,10 +740,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CMovie%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -834,94 +760,55 @@
           "properties": {
             "imdbId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "duration": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "genre": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "thumbnailImageUrl": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "type": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "seriesId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "season": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "episode": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1348,17 +1235,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$ne": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 }
               },
               "additionalProperties": false
@@ -1672,10 +1553,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1708,10 +1586,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "seriesId": {
           "type": "string"
@@ -1729,12 +1604,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "imdbId",
-        "title",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["imdbId", "title", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Movie,\"imdbId\">": {
@@ -1776,47 +1646,38 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Movie"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "GetCollectionEndpoint<MovieWatchHistoryEntry>": {
+    "GetCollectionEndpoint<WatchHistoryEntry>": {
       "type": "object",
       "properties": {
         "query": {
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CWatchHistoryEntry%2C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CMovieWatchHistoryEntry%3E"
+          "$ref": "#/definitions/GetCollectionResult%3CWatchHistoryEntry%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieWatchHistoryEntry,(\"id\"|\"userName\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<WatchHistoryEntry,(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1832,73 +1693,35 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "userName": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
-            "imdbId": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "driveLetter": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "path": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
-            "fileName": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "watchedSeconds": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "completed": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1908,55 +1731,44 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "id",
-              "userName",
-              "imdbId",
-              "driveLetter",
-              "path",
-              "fileName",
-              "watchedSeconds",
-              "completed",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
         "filter": {
-          "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E",
+          "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E",
           "description": "The fields should match this filter"
         }
       },
       "additionalProperties": false,
       "description": "Type for default filtering model"
     },
-    "FilterType<MovieWatchHistoryEntry>": {
+    "FilterType<WatchHistoryEntry>": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "$and": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "$not": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "$nor": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "$or": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CMovieWatchHistoryEntry%3E"
+            "$ref": "#/definitions/FilterType%3CWatchHistoryEntry%3E"
           }
         },
         "id": {
@@ -2063,58 +1875,6 @@
             }
           ]
         },
-        "imdbId": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
         "driveLetter": {
           "anyOf": [
             {
@@ -2168,58 +1928,6 @@
           ]
         },
         "path": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "fileName": {
           "anyOf": [
             {
               "type": "object",
@@ -2463,7 +2171,7 @@
         }
       }
     },
-    "GetCollectionResult<MovieWatchHistoryEntry>": {
+    "GetCollectionResult<WatchHistoryEntry>": {
       "type": "object",
       "properties": {
         "count": {
@@ -2473,19 +2181,16 @@
         "entries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/MovieWatchHistoryEntry"
+            "$ref": "#/definitions/WatchHistoryEntry"
           },
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "GetEntityEndpoint<MovieWatchHistoryEntry,\"id\">": {
+    "GetEntityEndpoint<WatchHistoryEntry,\"id\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -2498,10 +2203,8 @@
                 "enum": [
                   "id",
                   "userName",
-                  "imdbId",
                   "driveLetter",
                   "path",
-                  "fileName",
                   "watchedSeconds",
                   "completed",
                   "createdAt",
@@ -2521,20 +2224,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/MovieWatchHistoryEntry"
+          "$ref": "#/definitions/WatchHistoryEntry"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -2554,10 +2251,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CSeries%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -2577,52 +2271,31 @@
           "properties": {
             "imdbId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "thumbnailImageUrl": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -2632,15 +2305,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "imdbId",
-              "title",
-              "year",
-              "thumbnailImageUrl",
-              "plot",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["imdbId", "title", "year", "thumbnailImageUrl", "plot", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -3057,10 +2722,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -3089,14 +2751,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "imdbId",
-        "title",
-        "year",
-        "plot",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Series,\"imdbId\">": {
@@ -3109,15 +2764,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "imdbId",
-                  "title",
-                  "year",
-                  "thumbnailImageUrl",
-                  "plot",
-                  "createdAt",
-                  "updatedAt"
-                ]
+                "enum": ["imdbId", "title", "year", "thumbnailImageUrl", "plot", "createdAt", "updatedAt"]
               },
               "description": "The list of fields to select"
             }
@@ -3132,20 +2779,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Series"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -3165,10 +2806,7 @@
           "$ref": "#/definitions/GetCollectionResult%3COmdbMovieMetadata%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -3188,213 +2826,123 @@
           "properties": {
             "Title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Rated": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Released": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Runtime": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Genre": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Director": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Writer": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Actors": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Language": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Country": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Awards": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Poster": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Ratings": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Metascore": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbRating": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbVotes": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbID": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Type": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "DVD": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "BoxOffice": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Production": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Website": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Response": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "seriesID": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Season": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Episode": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -4220,10 +3768,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 },
@@ -4239,10 +3784,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 }
@@ -4266,10 +3808,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -4288,10 +3827,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -4516,31 +4052,19 @@
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$endsWith": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$like": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$regex": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 }
               },
               "additionalProperties": false
@@ -4550,17 +4074,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 },
                 "$ne": {
                   "type": "string",
-                  "enum": [
-                    "movie",
-                    "episode"
-                  ]
+                  "enum": ["movie", "episode"]
                 }
               },
               "additionalProperties": false
@@ -4572,20 +4090,14 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "movie",
-                      "episode"
-                    ]
+                    "enum": ["movie", "episode"]
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "movie",
-                      "episode"
-                    ]
+                    "enum": ["movie", "episode"]
                   }
                 }
               },
@@ -5110,10 +4622,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -5174,10 +4683,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "Source",
-              "Value"
-            ],
+            "required": ["Source", "Value"],
             "additionalProperties": false
           }
         },
@@ -5195,10 +4701,7 @@
         },
         "Type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "DVD": {
           "type": "string"
@@ -5315,20 +4818,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/OmdbMovieMetadata"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -5348,10 +4845,7 @@
           "$ref": "#/definitions/GetCollectionResult%3COmdbSeriesMetadata%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -5371,171 +4865,99 @@
           "properties": {
             "Title": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Year": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Rated": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Released": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Runtime": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Genre": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Director": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Writer": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Actors": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Plot": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Language": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Country": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Awards": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Poster": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Ratings": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Metascore": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbRating": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbVotes": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbID": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Type": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "totalSeasons": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "Response": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -6355,10 +5777,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 },
@@ -6374,10 +5793,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "Source",
-                      "Value"
-                    ],
+                    "required": ["Source", "Value"],
                     "additionalProperties": false
                   }
                 }
@@ -6401,10 +5817,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -6423,10 +5836,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "Source",
-                        "Value"
-                      ],
+                      "required": ["Source", "Value"],
                       "additionalProperties": false
                     }
                   }
@@ -6921,10 +6331,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -6978,20 +6385,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/OmdbSeriesMetadata"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -7002,7 +6403,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovieFile%2C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -7011,14 +6412,11 @@
           "$ref": "#/definitions/GetCollectionResult%3CMovieFile%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<MovieFile,(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\")[]>": {
+    "FindOptions<MovieFile,(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -7034,52 +6432,27 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "imdbId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "driveLetter": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "path": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            },
-            "fileName": {
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "ffprobe": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "relatedFiles": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -7089,15 +6462,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "id",
-              "imdbId",
-              "driveLetter",
-              "path",
-              "fileName",
-              "ffprobe",
-              "relatedFiles"
-            ]
+            "enum": ["id", "imdbId", "driveLetter", "path", "ffprobe", "relatedFiles"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -7194,24 +6559,6 @@
             {
               "type": "object",
               "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
                 "$eq": {
                   "type": "string"
                 },
@@ -7227,13 +6574,27 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
                   }
                 }
               },
@@ -7345,68 +6706,16 @@
             }
           ]
         },
-        "fileName": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
         "ffprobe": {
           "anyOf": [
             {
               "type": "object",
               "properties": {
                 "$eq": {
-                  "$ref": "#/definitions/getInfo.FFProbeResult"
+                  "$ref": "#/definitions/Ffmpeg.FfprobeData"
                 },
                 "$ne": {
-                  "$ref": "#/definitions/getInfo.FFProbeResult"
+                  "$ref": "#/definitions/Ffmpeg.FfprobeData"
                 }
               },
               "additionalProperties": false
@@ -7417,13 +6726,13 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/getInfo.FFProbeResult"
+                    "$ref": "#/definitions/Ffmpeg.FfprobeData"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/getInfo.FFProbeResult"
+                    "$ref": "#/definitions/Ffmpeg.FfprobeData"
                   }
                 }
               },
@@ -7443,22 +6752,13 @@
                     "properties": {
                       "type": {
                         "type": "string",
-                        "enum": [
-                          "subtitle",
-                          "audio",
-                          "trailer",
-                          "info",
-                          "other"
-                        ]
+                        "enum": ["subtitle", "audio", "trailer", "info", "other"]
                       },
                       "path": {
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "type",
-                      "path"
-                    ],
+                    "required": ["type", "path"],
                     "additionalProperties": false
                   }
                 },
@@ -7469,22 +6769,13 @@
                     "properties": {
                       "type": {
                         "type": "string",
-                        "enum": [
-                          "subtitle",
-                          "audio",
-                          "trailer",
-                          "info",
-                          "other"
-                        ]
+                        "enum": ["subtitle", "audio", "trailer", "info", "other"]
                       },
                       "path": {
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "type",
-                      "path"
-                    ],
+                    "required": ["type", "path"],
                     "additionalProperties": false
                   }
                 }
@@ -7505,22 +6796,13 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "subtitle",
-                                "audio",
-                                "trailer",
-                                "info",
-                                "other"
-                              ]
+                              "enum": ["subtitle", "audio", "trailer", "info", "other"]
                             },
                             "path": {
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "path"
-                          ],
+                          "required": ["type", "path"],
                           "additionalProperties": false
                         }
                       },
@@ -7541,22 +6823,13 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "subtitle",
-                                "audio",
-                                "trailer",
-                                "info",
-                                "other"
-                              ]
+                              "enum": ["subtitle", "audio", "trailer", "info", "other"]
                             },
                             "path": {
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "path"
-                          ],
+                          "required": ["type", "path"],
                           "additionalProperties": false
                         }
                       },
@@ -7573,22 +6846,27 @@
         }
       }
     },
-    "getInfo.FFProbeResult": {
+    "Ffmpeg.FfprobeData": {
       "type": "object",
       "properties": {
         "streams": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/getInfo.FFProbeStream"
+            "$ref": "#/definitions/Ffmpeg.FfprobeStream"
           }
+        },
+        "format": {
+          "$ref": "#/definitions/Ffmpeg.FfprobeFormat"
+        },
+        "chapters": {
+          "type": "array",
+          "items": {}
         }
       },
-      "required": [
-        "streams"
-      ],
+      "required": ["streams", "format", "chapters"],
       "additionalProperties": false
     },
-    "getInfo.FFProbeStream": {
+    "Ffmpeg.FfprobeStream": {
       "type": "object",
       "properties": {
         "index": {
@@ -7601,15 +6879,10 @@
           "type": "string"
         },
         "profile": {
-          "type": "string"
+          "type": "number"
         },
         "codec_type": {
-          "type": "string",
-          "enum": [
-            "video",
-            "audio",
-            "images"
-          ]
+          "type": "string"
         },
         "codec_time_base": {
           "type": "string"
@@ -7618,9 +6891,6 @@
           "type": "string"
         },
         "codec_tag": {
-          "type": "string"
-        },
-        "extradata": {
           "type": "string"
         },
         "width": {
@@ -7635,9 +6905,6 @@
         "coded_height": {
           "type": "number"
         },
-        "closed_captions": {
-          "$ref": "#/definitions/getInfo.FFProbeBoolean"
-        },
         "has_b_frames": {
           "type": "number"
         },
@@ -7651,7 +6918,7 @@
           "type": "string"
         },
         "level": {
-          "type": "number"
+          "type": "string"
         },
         "color_range": {
           "type": "string"
@@ -7677,21 +6944,6 @@
         "refs": {
           "type": "number"
         },
-        "sample_fmt": {
-          "type": "string"
-        },
-        "sample_rate": {
-          "type": "number"
-        },
-        "channels": {
-          "type": "number"
-        },
-        "channel_layout": {
-          "type": "string"
-        },
-        "bits_per_sample": {
-          "type": "number"
-        },
         "id": {
           "type": "string"
         },
@@ -7711,824 +6963,137 @@
           "type": "number"
         },
         "duration_ts": {
-          "type": "number"
+          "type": "string"
         },
         "duration": {
           "type": "string"
         },
         "bit_rate": {
-          "type": "number"
+          "type": "string"
         },
         "max_bit_rate": {
-          "type": "number"
+          "type": "string"
         },
         "bits_per_raw_sample": {
-          "type": "number"
+          "type": "string"
         },
         "nb_frames": {
-          "type": "number"
+          "type": "string"
         },
         "nb_read_frames": {
-          "type": "number"
+          "type": "string"
         },
         "nb_read_packets": {
+          "type": "string"
+        },
+        "sample_fmt": {
+          "type": "string"
+        },
+        "sample_rate": {
           "type": "number"
         },
-        "is_avc": {
+        "channels": {
           "type": "number"
         },
-        "nal_length_size": {
+        "channel_layout": {
+          "type": "string"
+        },
+        "bits_per_sample": {
           "type": "number"
         },
         "disposition": {
-          "type": "object",
-          "properties": {
-            "default": {
-              "type": "number"
-            },
-            "dub": {
-              "type": "number"
-            },
-            "original": {
-              "type": "number"
-            },
-            "comment": {
-              "type": "number"
-            },
-            "lyrics": {
-              "type": "number"
-            },
-            "karaoke": {
-              "type": "number"
-            },
-            "forced": {
-              "type": "number"
-            },
-            "hearing_impaired": {
-              "type": "number"
-            },
-            "visual_impaired": {
-              "type": "number"
-            },
-            "clean_effects": {
-              "type": "number"
-            },
-            "attached_pic": {
-              "type": "number"
-            },
-            "timed_thumbnails": {
-              "type": "number"
-            }
-          },
-          "required": [
-            "default",
-            "dub",
-            "original",
-            "comment",
-            "lyrics",
-            "karaoke",
-            "forced",
-            "hearing_impaired",
-            "visual_impaired",
-            "clean_effects",
-            "attached_pic"
-          ],
-          "additionalProperties": false
-        },
-        "tags": {
-          "type": "object",
-          "properties": {
-            "language": {
-              "type": "string"
-            },
-            "handler_name": {
-              "type": "string"
-            },
-            "creation_time": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "not": {}
-              }
-            ]
-          }
-        },
-        "side_data_list": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/getInfo.SideData"
-          }
-        }
-      },
-      "required": [
-        "index",
-        "codec_time_base",
-        "codec_tag_string",
-        "codec_tag",
-        "id",
-        "r_frame_rate",
-        "avg_frame_rate",
-        "time_base",
-        "disposition",
-        "tags"
-      ],
-      "additionalProperties": false,
-      "description": "Based on the XML definition of the ffprobe stream type {@see https://github.com/FFmpeg/FFmpeg/blob/master/doc/ffprobe.xsd#L206}"
-    },
-    "getInfo.FFProbeBoolean": {
-      "type": "string",
-      "enum": [
-        "0",
-        "1"
-      ]
-    },
-    "getInfo.SideData": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/getInfo.UnknownSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.DisplayMatrixSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.Stereo3dSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.SphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.SkipSamplesSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.MasteringDisplayMetadataSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.ContentLightLevelMetadataSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.DoviConfigurationRecordSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.AudioServiceTypeSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.MpegtsStreamIdSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.CpbPropertiesSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.WebvttSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.ActiveFormatDescriptionSideData"
-        }
-      ]
-    },
-    "getInfo.UnknownSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "unknown",
-          "description": "Based on the C code related to the default side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2298}"
-        }
-      },
-      "required": [
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.BaseSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.DisplayMatrixSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Display Matrix",
-          "description": "Based on the C code related to Display Matrix side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2300-L2304}"
-        },
-        "displaymatrix": {
-          "type": "string",
-          "description": "Mismatches the type linked earlier because ffprobe JSON output reads the printed integers for the display matrix as a string"
+          "$ref": "#/definitions/Ffmpeg.FfprobeStreamDisposition"
         },
         "rotation": {
-          "type": "number"
+          "type": ["string", "number"]
         }
       },
-      "required": [
-        "displaymatrix",
-        "rotation",
-        "side_data_type"
-      ],
-      "additionalProperties": false
+      "required": ["index"]
     },
-    "getInfo.Stereo3dSideData": {
+    "Ffmpeg.FfprobeStreamDisposition": {
       "type": "object",
       "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Stereo 3D",
-          "description": "Based on the C code related to Stereo 3D side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2306-L2308}"
+        "default": {
+          "type": "number"
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "unknown",
-            "2D",
-            "side by side",
-            "top and bottom",
-            "frame alternate",
-            "checkerboard",
-            "side by side (quincunx subsampling)",
-            "interleaved lines",
-            "interleaved columns"
-          ],
-          "description": "Based on the C code of the libauvutil stereo3d file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/stereo3d.c#L47-L56}"
+        "dub": {
+          "type": "number"
         },
-        "inverted": {
+        "original": {
+          "type": "number"
+        },
+        "comment": {
+          "type": "number"
+        },
+        "lyrics": {
+          "type": "number"
+        },
+        "karaoke": {
+          "type": "number"
+        },
+        "forced": {
+          "type": "number"
+        },
+        "hearing_impaired": {
+          "type": "number"
+        },
+        "visual_impaired": {
+          "type": "number"
+        },
+        "clean_effects": {
+          "type": "number"
+        },
+        "attached_pic": {
+          "type": "number"
+        },
+        "timed_thumbnails": {
           "type": "number"
         }
-      },
-      "required": [
-        "inverted",
-        "side_data_type",
-        "type"
-      ],
-      "additionalProperties": false
+      }
     },
-    "getInfo.SphericalMappingSideData": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/getInfo.UnknownSphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.EquirectangularSphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.CubeMapSphericalMappingSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.TiltedEquirectangularSphericalMappingSideData"
-        }
-      ]
-    },
-    "getInfo.UnknownSphericalMappingSideData": {
+    "Ffmpeg.FfprobeFormat": {
       "type": "object",
       "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "unknown",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.BaseSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.EquirectangularSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "equirectangular",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.CubeMapSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "cubemap",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        },
-        "padding": {
-          "type": "number",
-          "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2313}"
-        }
-      },
-      "required": [
-        "padding",
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.TiltedEquirectangularSphericalMappingSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Spherical Mapping",
-          "description": "Based on the C code related to Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2310-L2326}"
-        },
-        "projection": {
-          "type": "string",
-          "const": "tiled equirectangular",
-          "description": "Based on the C code of the libauvutil spherical file {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/libavutil/spherical.c#L55-L59}"
-        },
-        "yaw": {
-          "type": "number"
-        },
-        "pitch": {
-          "type": "number"
-        },
-        "roll": {
-          "type": "number"
-        },
-        "bound_left": {
-          "type": "number",
-          "description": "Based on the C code related to Cube Map Spherical Mapping side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2315-L2321}"
-        },
-        "bound_top": {
-          "type": "number"
-        },
-        "bound_right": {
-          "type": "number"
-        },
-        "bound_bottom": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "bound_bottom",
-        "bound_left",
-        "bound_right",
-        "bound_top",
-        "pitch",
-        "projection",
-        "roll",
-        "side_data_type",
-        "yaw"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.SkipSamplesSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Skip Samples",
-          "description": "Based on the C code related to Skip Samples side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2328-L2331}"
-        },
-        "skip_samples": {
-          "type": "number"
-        },
-        "discard_padding": {
-          "type": "number"
-        },
-        "skip_reason": {
-          "type": "number"
-        },
-        "discard_reason": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "discard_padding",
-        "discard_reason",
-        "side_data_type",
-        "skip_reason",
-        "skip_samples"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.MasteringDisplayMetadataSideData": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/getInfo.PrimariesMasteringDisplayMetadataSideData"
-        },
-        {
-          "$ref": "#/definitions/getInfo.LuminanceMasteringDisplayMetadataSideData"
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "side_data_type": {
-              "type": "string",
-              "const": "Mastering display metadata",
-              "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-            },
-            "min_luminance": {
-              "type": "string",
-              "description": "Based on the C code related to Luminance Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2348-L2349}"
-            },
-            "max_luminance": {
-              "type": "string"
-            },
-            "red_x": {
-              "type": "string",
-              "description": "Based on the C code related to Primaries Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2336-L2344}"
-            },
-            "red_y": {
-              "type": "string"
-            },
-            "green_x": {
-              "type": "string"
-            },
-            "green_y": {
-              "type": "string"
-            },
-            "blue_x": {
-              "type": "string"
-            },
-            "blue_y": {
-              "type": "string"
-            },
-            "white_point_x": {
-              "type": "string"
-            },
-            "white_point_y": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "blue_x",
-            "blue_y",
-            "green_x",
-            "green_y",
-            "max_luminance",
-            "min_luminance",
-            "red_x",
-            "red_y",
-            "side_data_type",
-            "white_point_x",
-            "white_point_y"
-          ]
-        }
-      ]
-    },
-    "getInfo.PrimariesMasteringDisplayMetadataSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Mastering display metadata",
-          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-        },
-        "red_x": {
-          "type": "string",
-          "description": "Based on the C code related to Primaries Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2336-L2344}"
-        },
-        "red_y": {
+        "filename": {
           "type": "string"
         },
-        "green_x": {
+        "nb_streams": {
+          "type": "number"
+        },
+        "nb_programs": {
+          "type": "number"
+        },
+        "format_name": {
           "type": "string"
         },
-        "green_y": {
+        "format_long_name": {
           "type": "string"
         },
-        "blue_x": {
-          "type": "string"
+        "start_time": {
+          "type": "number"
         },
-        "blue_y": {
-          "type": "string"
+        "duration": {
+          "type": "number"
         },
-        "white_point_x": {
-          "type": "string"
+        "size": {
+          "type": "number"
         },
-        "white_point_y": {
-          "type": "string"
+        "bit_rate": {
+          "type": "number"
+        },
+        "probe_score": {
+          "type": "number"
+        },
+        "tags": {
+          "$ref": "#/definitions/Record%3Cstring%2C(string%7Cnumber)%3E"
         }
-      },
-      "required": [
-        "blue_x",
-        "blue_y",
-        "green_x",
-        "green_y",
-        "red_x",
-        "red_y",
-        "side_data_type",
-        "white_point_x",
-        "white_point_y"
-      ],
-      "additionalProperties": false
+      }
     },
-    "getInfo.BaseMasteringDisplayMetadataSideData": {
+    "Record<string,(string|number)>": {
       "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Mastering display metadata",
-          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-        }
-      },
-      "required": [
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.LuminanceMasteringDisplayMetadataSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Mastering display metadata",
-          "description": "Based on the C code related to Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2333-L2350}"
-        },
-        "min_luminance": {
-          "type": "string",
-          "description": "Based on the C code related to Luminance Mastering display metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2348-L2349}"
-        },
-        "max_luminance": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "max_luminance",
-        "min_luminance",
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.ContentLightLevelMetadataSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Content light level metadata",
-          "description": "Based on the C code related to Content light level metadata side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2352-L2354}"
-        },
-        "max_content": {
-          "type": "number"
-        },
-        "max_average": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "max_average",
-        "max_content",
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.DoviConfigurationRecordSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "DOVI configuration record",
-          "description": "Based on the C code related to DOVI configuration record side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2356-L2364}"
-        },
-        "dv_version_major": {
-          "type": "number"
-        },
-        "dv_version_minor": {
-          "type": "number"
-        },
-        "dv_profile": {
-          "type": "number"
-        },
-        "dv_level": {
-          "type": "number"
-        },
-        "rpu_present_flag": {
-          "type": "number"
-        },
-        "el_present_flag": {
-          "type": "number"
-        },
-        "bl_present_flag": {
-          "type": "number"
-        },
-        "dv_bl_signal_compatibility_id": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "bl_present_flag",
-        "dv_bl_signal_compatibility_id",
-        "dv_level",
-        "dv_profile",
-        "dv_version_major",
-        "dv_version_minor",
-        "el_present_flag",
-        "rpu_present_flag",
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.AudioServiceTypeSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Audio Service Type",
-          "description": "Based on the C code related to Audio Service Type side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2366-L2367}"
-        },
-        "service_type": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "service_type",
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.MpegtsStreamIdSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "MPEGTS Stream ID",
-          "description": "Based on the C code related to MPEGTS Stream ID side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2369}"
-        },
-        "id": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "id",
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.CpbPropertiesSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "CPB properties",
-          "description": "Based on the C code related to CPB properties side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2371-L2376}"
-        },
-        "max_bitrate": {
-          "type": "number"
-        },
-        "min_bitrate": {
-          "type": "number"
-        },
-        "avg_bitrate": {
-          "type": "number"
-        },
-        "buffer_size": {
-          "type": "number"
-        },
-        "vbv_delay": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "avg_bitrate",
-        "buffer_size",
-        "max_bitrate",
-        "min_bitrate",
-        "side_data_type",
-        "vbv_delay"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.WebvttSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "enum": [
-            "WebVTT ID",
-            "WebVTT Settings"
-          ],
-          "description": "Based on the C code related to Webvtt side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2379-L2381}"
-        },
-        "data": {
-          "type": "string"
-        },
-        "data_hash": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "data_hash",
-        "side_data_type"
-      ],
-      "additionalProperties": false
-    },
-    "getInfo.ActiveFormatDescriptionSideData": {
-      "type": "object",
-      "properties": {
-        "side_data_type": {
-          "type": "string",
-          "const": "Active format description",
-          "description": "Based on the C code related to Active format description side data section {@see https://github.com/FFmpeg/FFmpeg/blob/b37795688a9bfa6d5a2e9b2535c4b10ebc14ac5d/fftools/ffprobe.c#L2383}"
-        },
-        "active_format": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "side_data_type"
-      ],
-      "additionalProperties": false
+      "additionalProperties": {
+        "type": ["string", "number"]
+      }
     },
     "GetCollectionResult<MovieFile>": {
       "type": "object",
@@ -8545,10 +7110,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -8567,11 +7129,8 @@
         "path": {
           "type": "string"
         },
-        "fileName": {
-          "type": "string"
-        },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -8580,34 +7139,18 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "id",
-        "imdbId",
-        "driveLetter",
-        "path",
-        "fileName",
-        "ffprobe"
-      ],
+      "required": ["id", "driveLetter", "path", "ffprobe"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<MovieFile,\"id\">": {
@@ -8620,15 +7163,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "id",
-                  "imdbId",
-                  "driveLetter",
-                  "path",
-                  "fileName",
-                  "ffprobe",
-                  "relatedFiles"
-                ]
+                "enum": ["id", "imdbId", "driveLetter", "path", "ffprobe", "relatedFiles"]
               },
               "description": "The list of fields to select"
             }
@@ -8643,20 +7178,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/MovieFile"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -8670,10 +7199,7 @@
           "$ref": "#/definitions/Movie"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -8709,10 +7235,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "seriesId": {
           "type": "string"
@@ -8724,10 +7247,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "imdbId",
-        "title"
-      ],
+      "required": ["imdbId", "title"],
       "additionalProperties": false
     },
     "PostEndpoint<MovieFile,\"id\">": {
@@ -8740,10 +7260,7 @@
           "$ref": "#/definitions/MovieFile"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -8763,11 +7280,8 @@
         "path": {
           "type": "string"
         },
-        "fileName": {
-          "type": "string"
-        },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -8776,38 +7290,23 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "driveLetter",
-        "ffprobe",
-        "fileName",
-        "imdbId",
-        "path"
-      ]
+      "required": ["driveLetter", "ffprobe", "path"]
     },
     "Omit<MovieFile,\"id\">": {
-      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22fileName%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22id%22%3E%3E"
+      "$ref": "#/definitions/Pick%3CMovieFile%2CExclude%3C(%22id%22%7C%22imdbId%22%7C%22driveLetter%22%7C%22path%22%7C%22ffprobe%22%7C%22relatedFiles%22)%2C%22id%22%3E%3E"
     },
-    "Pick<MovieFile,Exclude<(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"fileName\"|\"ffprobe\"|\"relatedFiles\"),\"id\">>": {
+    "Pick<MovieFile,Exclude<(\"id\"|\"imdbId\"|\"driveLetter\"|\"path\"|\"ffprobe\"|\"relatedFiles\"),\"id\">>": {
       "type": "object",
       "properties": {
         "imdbId": {
@@ -8819,11 +7318,8 @@
         "path": {
           "type": "string"
         },
-        "fileName": {
-          "type": "string"
-        },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -8832,33 +7328,18 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "imdbId",
-        "driveLetter",
-        "path",
-        "fileName",
-        "ffprobe"
-      ],
+      "required": ["driveLetter", "path", "ffprobe"],
       "additionalProperties": false
     },
     "PatchEndpoint<Omit<Movie,(\"createdAt\"|\"updatedAt\")>,\"imdbId\">": {
@@ -8874,21 +7355,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -8921,10 +7395,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "seriesId": {
           "type": "string"
@@ -8951,21 +7422,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -8984,11 +7448,8 @@
         "path": {
           "type": "string"
         },
-        "fileName": {
-          "type": "string"
-        },
         "ffprobe": {
-          "$ref": "#/definitions/getInfo.FFProbeResult"
+          "$ref": "#/definitions/Ffmpeg.FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -8997,22 +7458,13 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
@@ -9029,20 +7481,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
@@ -9056,24 +7502,18 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
-    "DeleteEndpoint<MovieWatchHistoryEntry,\"id\">": {
+    "DeleteEndpoint<WatchHistoryEntry,\"id\">": {
       "type": "object",
       "properties": {
         "url": {
@@ -9083,20 +7523,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
-          "type": "object",
-          "additionalProperties": false
+          "type": "object"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }

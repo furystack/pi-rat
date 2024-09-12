@@ -1,10 +1,11 @@
 import { Shade } from '@furystack/shades'
-import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import type { Uri } from 'monaco-editor'
+import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import 'monaco-editor/esm/vs/editor/editor.main'
 
+import { ThemeProviderService, getCssVariable } from '@furystack/shades-common-components'
+import { darkTheme } from '../themes/dark.js'
 import './worker-config'
-import { ThemeProviderService, defaultDarkTheme, getCssVariable } from '@furystack/shades-common-components'
 
 export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
@@ -19,25 +20,24 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
 
     const [theme] = useState<'vs-light' | 'vs-dark'>(
       'theme',
-      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
-        ? 'vs-dark'
-        : 'vs-light',
+      getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'vs-dark' : 'vs-light',
     )
 
     const editorInstance = editor.create(element as HTMLElement, { ...props.options, theme })
 
     editorInstance.setValue(props.value || '')
-    props.onValueChange &&
+    if (props.onValueChange) {
       editorInstance.onKeyUp(() => {
         props.onValueChange?.(editorInstance.getValue())
       })
+    }
 
     if (props.modelUri) {
       useDisposable('monacoModelUri', () => {
         const model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
         editorInstance.setModel(model)
         return {
-          dispose: () => {
+          [Symbol.dispose]: () => {
             model.dispose()
           },
         }

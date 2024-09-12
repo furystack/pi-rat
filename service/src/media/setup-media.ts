@@ -1,19 +1,19 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 
-import { MovieWatchHistoryEntry, Movie, Series, MovieFile, Config } from 'common'
-import { OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
+import { Config, Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 
-import { DataTypes, Model } from 'sequelize'
-import { useSequelize } from '@furystack/sequelize-store'
+import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
 import type { AuthorizationResult } from '@furystack/repository'
 import { getRepository } from '@furystack/repository'
-import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
+import { useSequelize } from '@furystack/sequelize-store'
+import { DataTypes, Model } from 'sequelize'
 
-import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
-import type { FFProbeResult } from 'ffprobe'
+import type { FfprobeResult } from '../ffprobe-service.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { useMovieFileMaintainer } from './actions/movie-file-maintainer.js'
 import { OmdbClientService } from './metadata-services/omdb-client-service.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
@@ -34,22 +34,17 @@ class MovieModel extends Model<Movie, Movie> implements Movie {
 
 class MovieFileModel extends Model<MovieFile, MovieFile> implements MovieFile {
   declare id: string
-  declare imdbId: string
+  declare imdbId?: string
   declare driveLetter: string
   declare path: string
-  declare fileName: string
-  declare ffprobe: FFProbeResult
+  declare ffprobe: FfprobeResult
   declare relatedFiles?: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> | undefined
 }
 
-class MovieWatchHistoryEntryModel
-  extends Model<MovieWatchHistoryEntry, MovieWatchHistoryEntry>
-  implements MovieWatchHistoryEntry
-{
-  declare imdbId: string
+class WatchHistoryEntryModel extends Model<WatchHistoryEntry, WatchHistoryEntry> implements WatchHistoryEntry {
+  declare movieFileId: string
   declare driveLetter: string
   declare path: string
-  declare fileName: string
   declare id: string
   declare userName: string
   declare movie: Movie
@@ -90,14 +85,14 @@ class OmdbMovieMetadataModel extends Model<OmdbMovieMetadata, OmdbMovieMetadata>
   declare imdbVotes: string
   declare imdbID: string
   declare Type: 'episode' | 'movie'
-  DVD?: string | undefined
-  BoxOffice?: string | undefined
-  Production?: string | undefined
-  Website?: string | undefined
+  declare DVD?: string | undefined
+  declare BoxOffice?: string | undefined
+  declare Production?: string | undefined
+  declare Website?: string | undefined
   declare Response: 'True'
-  seriesID?: string | undefined
-  Season?: string | undefined
-  Episode?: string | undefined
+  declare seriesID?: string | undefined
+  declare Season?: string | undefined
+  declare Episode?: string | undefined
   declare createdAt: string
   declare updatedAt: string
 }
@@ -132,7 +127,7 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
 export const setupMovies = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Movies')
 
-  logger.verbose({ message: '🎥  Setting up Media store and repository...' })
+  await logger.verbose({ message: '🎥  Setting up Media store and repository...' })
 
   const dbOptions = getDefaultDbSettings('movies.sqlite', logger)
 
@@ -201,7 +196,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await MovieModel.sync()
     },
   })
 
@@ -222,17 +217,13 @@ export const setupMovies = async (injector: Injector) => {
           },
           imdbId: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           driveLetter: {
             type: DataTypes.STRING,
             allowNull: false,
           },
           path: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
-          fileName: {
             type: DataTypes.STRING,
             allowNull: false,
           },
@@ -245,20 +236,21 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: true,
           },
         },
-        { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path', 'fileName'], unique: true }] },
+        { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path'], unique: true }] },
       )
-      await sequelize.sync()
+
+      await MovieFileModel.sync()
     },
   })
 
   useSequelize({
     injector,
-    model: MovieWatchHistoryEntry,
-    sequelizeModel: MovieWatchHistoryEntryModel,
+    model: WatchHistoryEntry,
+    sequelizeModel: WatchHistoryEntryModel,
     primaryKey: 'id',
     options: dbOptions,
     initModel: async (sequelize) => {
-      MovieWatchHistoryEntryModel.init(
+      WatchHistoryEntryModel.init(
         {
           id: {
             type: DataTypes.UUIDV4,
@@ -274,15 +266,7 @@ export const setupMovies = async (injector: Injector) => {
             type: DataTypes.STRING,
             allowNull: false,
           },
-          imdbId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
           path: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
-          fileName: {
             type: DataTypes.STRING,
             allowNull: false,
           },
@@ -303,9 +287,12 @@ export const setupMovies = async (injector: Injector) => {
             allowNull: false,
           },
         },
-        { sequelize, indexes: [{ fields: ['userName', 'driveLetter', 'path', 'fileName'], unique: true }] },
+        {
+          sequelize,
+          indexes: [{ fields: ['userName', 'driveLetter', 'path'], unique: true }],
+        },
       )
-      await sequelize.sync()
+      await WatchHistoryEntryModel.sync()
     },
   })
 
@@ -349,7 +336,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await SeriesModel.sync()
     },
   })
 
@@ -486,7 +473,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await OmdbMovieMetadataModel.sync()
     },
   })
 
@@ -599,7 +586,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await OmdbSeriesMetadataModel.sync()
     },
   })
 
@@ -623,7 +610,7 @@ export const setupMovies = async (injector: Injector) => {
     entity,
     injector: i,
   }: {
-    entity: MovieWatchHistoryEntry
+    entity: WatchHistoryEntry
     injector: Injector
   }): Promise<AuthorizationResult> => {
     const user = await getCurrentUser(i)
@@ -640,7 +627,7 @@ export const setupMovies = async (injector: Injector) => {
     }
   }
 
-  repo.createDataSet(MovieWatchHistoryEntry, 'id', {
+  repo.createDataSet(WatchHistoryEntry, 'id', {
     authorizeGet: authorizedOnly,
     authorizeAdd: authorizedOnly,
     authorizeUpdate: authorizedOnly,
@@ -652,7 +639,7 @@ export const setupMovies = async (injector: Injector) => {
         ...filter,
         filter: {
           ...filter.filter,
-          userName: { $eq: user.username as string },
+          userName: { $eq: user.username },
         },
       } as typeof filter
     },
@@ -685,16 +672,24 @@ export const setupMovies = async (injector: Injector) => {
 
   const configStore = getStoreManager(injector).getStoreFor(Config, 'id')
 
-  configStore.subscribe(
-    'onEntityAdded',
-    ({ entity }) => entity.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
-  )
-  configStore.subscribe(
-    'onEntityUpdated',
-    ({ change }) => change.id === 'OMDB_CONFIG' && omdbClientService.init(injector),
-  )
+  configStore.subscribe('onEntityAdded', ({ entity }) => {
+    if (entity.id === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
+  configStore.subscribe('onEntityUpdated', ({ change }) => {
+    if (change.id === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
 
-  configStore.subscribe('onEntityRemoved', ({ key }) => key === 'OMDB_CONFIG' && omdbClientService.init(injector))
+  configStore.subscribe('onEntityRemoved', ({ key }) => {
+    if (key === 'OMDB_CONFIG') {
+      void omdbClientService.init(injector)
+    }
+  })
 
-  logger.verbose({ message: '✅  Media setup completed' })
+  useMovieFileMaintainer(injector)
+
+  await logger.verbose({ message: '✅  Media setup completed' })
 }

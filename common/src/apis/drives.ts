@@ -1,3 +1,4 @@
+import type { WithOptionalId } from '@furystack/core'
 import type {
   DeleteEndpoint,
   GetCollectionEndpoint,
@@ -6,10 +7,9 @@ import type {
   PatchEndpoint,
   RestApi,
 } from '@furystack/rest'
+import type { FfprobeData } from 'fluent-ffmpeg'
 import type { DirectoryEntry } from '../models/drives/directory-entry.js'
 import type { Drive } from '../models/drives/drive.js'
-import type { WithOptionalId } from '@furystack/core'
-import type { FFProbeResult } from 'ffprobe'
 
 export type GetDirectoryEntries = {
   url: {
@@ -54,7 +54,7 @@ export type PatchDriveEndpoint = {
   url: {
     id: Drive['letter']
   }
-  result: {}
+  result: object
 }
 
 export type FfprobeEndpoint = {
@@ -62,7 +62,20 @@ export type FfprobeEndpoint = {
     letter: string
     path: string
   }
-  result: FFProbeResult
+  result: FfprobeData
+}
+
+export type SaveTextFileEndpoint = {
+  url: {
+    letter: string
+    path: string
+  }
+  body: {
+    text: string
+  }
+  result: {
+    success: true
+  }
 }
 
 export interface DrivesApi extends RestApi {
@@ -76,6 +89,9 @@ export interface DrivesApi extends RestApi {
   POST: {
     '/volumes': PostDriveEndpoint
     '/volumes/:letter/:path/upload': UploadEndpoint
+  }
+  PUT: {
+    '/files/:letter/:path': SaveTextFileEndpoint
   }
   PATCH: {
     '/volumes/:id': PatchEndpoint<Drive, 'letter'>

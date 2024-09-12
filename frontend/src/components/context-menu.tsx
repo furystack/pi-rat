@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Paper, expand, collapse } from '@furystack/shades-common-components'
+import { collapse, expand, Paper } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Icon as IconModel } from 'common'
 import { Icon } from './Icon.js'
@@ -28,14 +28,16 @@ const MenuItem = Shade<MenuItemProps>({
         onmouseleave={(ev) => {
           ;(ev.target as HTMLElement).style.backgroundColor = 'transparent'
         }}
-        onclick={props.onClick}>
+        onclick={props.onClick}
+      >
         <div
           style={{
             minWidth: '24px',
             paddingRight: '8px',
             textAlign: 'center',
             lineHeight: '100%',
-          }}>
+          }}
+        >
           <Icon {...props.icon} />
         </div>
         <div style={{ lineHeight: '100%' }}>{props.label}</div>
@@ -70,19 +72,21 @@ export const ContextMenu = Shade<ContextMenuProps>({
 
     const isOpen = useDisposable('isOpen', () => new ObservableValue(false))
 
-    isOpen.subscribe(async (value) => {
+    isOpen.subscribe((value) => {
       const menu = element.querySelector('.menuItems') as HTMLUListElement
       try {
         if (value) {
           menu.getAnimations().forEach((a) => a.cancel())
           menu.style.display = 'block'
-          await expand(menu)
-          menu.style.opacity = '1'
+          void expand(menu).then(() => {
+            menu.style.opacity = '1'
+          })
         } else {
           menu.getAnimations().forEach((a) => a.cancel())
-          await collapse(menu)
-          menu.style.display = 'none'
-          menu.style.opacity = '0'
+          void collapse(menu).then(() => {
+            menu.style.display = 'none'
+            menu.style.opacity = '0'
+          })
         }
       } catch (error) {
         /** in-progress animations will throw */
@@ -100,7 +104,8 @@ export const ContextMenu = Shade<ContextMenuProps>({
             menu.style.left = `${ev.clientX}px`
             isOpen.setValue(true)
           })
-        }}>
+        }}
+      >
         <Paper
           className="menuItems"
           elevation={3}
@@ -113,7 +118,8 @@ export const ContextMenu = Shade<ContextMenuProps>({
             padding: '0',
             background: 'rgba(0,0,0,0.07)',
             backdropFilter: 'blur(20px)',
-          }}>
+          }}
+        >
           {items.map((itemProps) => (
             <MenuItem {...itemProps} />
           ))}

@@ -13,14 +13,16 @@ export const Offline = Shade({
           alignItems: 'center',
           justifyContent: 'center',
           padding: '0 100px',
-        }}>
+        }}
+      >
         <div
           id="offline"
           style={{
             display: 'flex',
             flexDirection: 'column',
             perspective: '400px',
-          }}>
+          }}
+        >
           <h1>WhoOoOops... 😱</h1>
           <h3>The service seems to be offline 😓</h3>
           <p>

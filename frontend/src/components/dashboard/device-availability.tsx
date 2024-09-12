@@ -1,23 +1,23 @@
-import type { DeviceAvailability as DeviceAvailabilityProps } from '../../../../common/src/models/dashboard/device-availability.js'
+import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import { serializeToQueryString } from '@furystack/rest'
 import { LinkToRoute, Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
-import { SessionService } from '../../services/session.js'
-import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import type { DeviceAvailability as DeviceAvailabilityProps } from '../../../../common/src/models/dashboard/device-availability.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
-import { entityDeviceRoute } from '../routes/entity-routes.js'
-import { serializeToQueryString } from '@furystack/rest'
-import { iotDeviceRoute } from '../routes/iot-routes.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
+import { SessionService } from '../../services/session.js'
 import { Icon } from '../Icon.js'
 import { DeviceAvailabilityPanel } from '../iot-devices/device-availability-panel.js'
+import { entityDeviceRoute } from '../routes/entity-routes.js'
+import { iotDeviceRoute } from '../routes/iot-routes.js'
 
 const focus = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('.cover') as HTMLImageElement,
     [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
     {
@@ -29,12 +29,12 @@ const focus = (el: HTMLElement) => {
 }
 
 const blur = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('.cover') as HTMLImageElement,
     [{ transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
     { fill: 'forwards', duration: 150 },
@@ -47,7 +47,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
   elementBaseName: 'div',
   constructed: ({ props, element }) => {
     element.style.transform = 'scale(0)'
-    promisifyAnimation(element, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+    void promisifyAnimation(element, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
       fill: 'forwards',
       delay: (props.index || 0) * 160 + Math.random() * 100,
       duration: 700,
@@ -71,7 +71,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
           params={{ id: props.deviceName }}
           style={{
             textDecoration: 'none',
-          }}>
+          }}
+        >
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -90,7 +91,9 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               margin: '8px',
               overflow: 'hidden',
               color: 'white',
-            }}>
+              boxShadow: 'rgba(0, 0, 0, 0.3) 1px 3px 6px',
+            }}
+          >
             <div
               style={{
                 position: 'absolute',
@@ -102,8 +105,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                 display: 'flex',
                 margin: '1em',
                 justifyContent: 'space-between',
-                filter: 'drop-shadow(black 0px 0px 5px) drop-shadow(black 0px 0px 8px) drop-shadow(black 0px 0px 10px)',
-              }}>
+              }}
+            >
               <DeviceAvailabilityPanel {...device.value} />
 
               {currentUser?.roles.includes('admin') ? (
@@ -120,7 +123,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                         serializeToQueryString({ gedst: { mode: 'edit', currentId: device.value.name } }),
                       )
                     }}
-                    title="Edit device details">
+                    title="Edit device details"
+                  >
                     ✏️
                   </div>
                 </div>
@@ -130,7 +134,6 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               className="cover"
               style={{
                 display: 'inline-block',
-                backgroundColor: '#666',
                 objectFit: 'cover',
                 width: '100%',
                 height: '100%',
@@ -139,7 +142,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                 textAlign: 'center',
                 lineHeight: `${size * 0.8}px`,
                 fontSize: `${size / 2}px`,
-              }}>
+              }}
+            >
               {props.icon ? <Icon {...props.icon} /> : null}
             </div>
             <div
@@ -153,7 +157,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                 whiteSpace: 'nowrap',
                 padding: '1em',
                 background: 'rgba(0,0,0,0.7)',
-              }}>
+              }}
+            >
               {device.value.name}
             </div>
           </div>

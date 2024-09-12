@@ -1,6 +1,31 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "Drive": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "letter": {
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The drive creation date",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update date",
+          "format": "date-time"
+        }
+      },
+      "required": ["physicalPath", "letter", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
     "DirectoryEntry": {
       "type": "object",
       "properties": {
@@ -38,36 +63,6 @@
         "isSymbolicLink",
         "isFIFO",
         "isSocket"
-      ],
-      "additionalProperties": false
-    },
-    "Drive": {
-      "type": "object",
-      "properties": {
-        "physicalPath": {
-          "type": "string",
-          "description": "The physical path that will be mounted to the drive letter"
-        },
-        "letter": {
-          "type": "string",
-          "description": "The drive letter, should be unique"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The drive creation date",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Last update date",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "physicalPath",
-        "letter",
-        "createdAt",
-        "updatedAt"
       ],
       "additionalProperties": false
     }

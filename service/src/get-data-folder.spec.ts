@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { getDataFolder } from './get-data-folder'
+import { getDataFolder } from './get-data-folder.js'
 import { describe, expect, it } from 'vitest'
 
 describe('getDataFolder', () => {

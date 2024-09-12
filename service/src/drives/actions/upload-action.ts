@@ -1,26 +1,25 @@
+import { isAuthorized } from '@furystack/core'
 import { getLogger } from '@furystack/logging'
-import type { RequestAction } from '@furystack/rest-service'
+import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
+import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
+import type { DirectoryEntry, UploadEndpoint } from 'common'
+import { Drive } from 'common'
 import type { Fields, Files } from 'formidable'
 import { IncomingForm } from 'formidable'
-import type { UploadEndpoint } from 'common'
-import { Drive } from 'common'
-import { getDataSetFor } from '@furystack/repository'
-import { existsAsync } from '../setup-drives.js'
-import type { DirectoryEntry } from 'common'
 import { join } from 'path'
+import { existsAsync } from '../../utils/exists-async.js'
 import { createDirentListFromFiles } from '../create-dirent-list-from-files.js'
-import { isAuthorized } from '@furystack/core'
 
 export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, getUrlParams, request }) => {
-  if (!isAuthorized(injector, 'admin')) {
+  if (!(await isAuthorized(injector, 'admin'))) {
     throw new RequestError('Unauthorized', 401)
   }
 
   const logger = getLogger(injector).withScope('UploadAction')
   const { letter, path } = getUrlParams()
-  logger.verbose({ message: `Uploading file to ${letter}:${path}` })
+  await logger.verbose({ message: `Uploading file to ${letter}:${path}` })
 
   const dataSet = getDataSetFor(injector, Drive, 'letter')
 
@@ -45,7 +44,7 @@ export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, ge
   })
 
   form.on('file', (formName, file) => {
-    logger.debug({ message: `Uploading File '${file.originalFilename}'`, data: { formName, file } })
+    void logger.debug({ message: `Uploading File '${file.originalFilename}'`, data: { formName, file } })
   })
 
   // TODO: Implement response parsing
@@ -53,16 +52,16 @@ export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, ge
     try {
       form.parse(request, (err, fields, files) => {
         if (err) {
-          return reject(err)
+          return reject(err as Error)
         }
         resolve({ fields, files })
       })
     } catch (error) {
-      reject(error)
+      reject(error as Error)
     }
   })
 
-  logger.debug({ message: 'Upload finished', data: parseResult })
+  await logger.debug({ message: 'Upload finished', data: parseResult })
 
   const createdEntries: DirectoryEntry[] = createDirentListFromFiles(parseResult.files)
 

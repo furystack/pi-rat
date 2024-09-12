@@ -14,15 +14,27 @@ export const continueWatchingCommandProvider: CommandProvider = async ({ term, i
       order: { updatedAt: 'DESC' },
     })
     if (lastEntries.length) {
+      const movieFilesService = injector.getInstance(MovieFilesService)
       const moviesService = injector.getInstance(MoviesService)
-      const movies = await moviesService.findMovie({
+
+      const movieFiles = await movieFilesService.findMovieFile({
         filter: {
-          imdbId: {
-            $in: lastEntries.map((e) => e.imdbId),
-          },
+          $and: lastEntries.map((entry) => ({
+            path: { $eq: entry.path },
+            driveLetter: { $eq: entry.driveLetter },
+          })),
         },
       })
-      const movieFilesService = injector.getInstance(MovieFilesService)
+
+      const movies = movieFiles.entries.some((e) => e.imdbId)
+        ? await moviesService.findMovie({
+            filter: {
+              imdbId: {
+                $in: movieFiles.entries.map((e) => e.imdbId as string),
+              },
+            },
+          })
+        : { entries: [] }
       await movieFilesService.prefetchMovieFilesForMovies(movies.entries)
 
       return [
@@ -32,7 +44,12 @@ export const continueWatchingCommandProvider: CommandProvider = async ({ term, i
             <WidgetGroup
               title="Continue watching"
               type="group"
-              widgets={lastEntries.map((entry, index) => ({ type: 'movie', imdbId: entry.imdbId, index, size: 128 }))}
+              widgets={movieFiles.entries.map((entry, index) => ({
+                type: 'movie',
+                imdbId: entry.imdbId as string,
+                index,
+                size: 128,
+              }))}
             />
           ),
           onSelected: () => {

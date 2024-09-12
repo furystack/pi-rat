@@ -10,7 +10,8 @@ export const Init = Shade({
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-      }}>
+      }}
+    >
       <div
         className="initLoader"
         style={{
@@ -18,7 +19,8 @@ export const Init = Shade({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-        }}>
+        }}
+      >
         <Loader
           style={{
             width: '128px',

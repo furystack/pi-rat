@@ -11,13 +11,12 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
-import { MovieFile } from 'common'
-import mediaApiSchema from 'common/schemas/media-api.json' assert { type: 'json' }
-import { Movie, MovieWatchHistoryEntry, Series, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
-import { getPort } from '../get-port.js'
+import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
+import mediaApiSchema from 'common/schemas/media-api.json' with { type: 'json' }
 import { getCorsOptions } from '../get-cors-options.js'
-import { LinkMovieAction } from './actions/link-movie-action.js'
+import { getPort } from '../get-port.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
+import { LinkMovieAction } from './actions/link-movie-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
 import { StreamAction } from './actions/stream-action.js'
 
@@ -43,15 +42,17 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         ),
         '/my-watch-progresses': Validate({
           schema: mediaApiSchema,
-          schemaName: 'GetCollectionEndpoint<MovieWatchHistoryEntry>',
-        })(createGetCollectionEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
+          schemaName: 'GetCollectionEndpoint<WatchHistoryEntry>',
+        })(createGetCollectionEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
         '/my-watch-progresses/:id': Validate({
           schema: mediaApiSchema,
-          schemaName: 'GetEntityEndpoint<MovieWatchHistoryEntry,"id">',
-        })(createGetEntityEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
+          schemaName: 'GetEntityEndpoint<WatchHistoryEntry,"id">',
+        })(createGetEntityEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
 
         // TODOs:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         '/movies/:movieId/subtitles/:subtitleName': () => null as any, // TODO: Implement
         '/omdb-movie-metadata': Validate({
           schema: mediaApiSchema,
@@ -72,7 +73,7 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
-        '/movie-files/:id/stream': Authorize()(
+        '/files/:letter/:path/stream': Authorize()(
           Validate({ schema: mediaApiSchema, schemaName: 'StreamEndpoint' })(StreamAction),
         ),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"id">' })(
@@ -115,8 +116,8 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         ),
         '/my-watch-progresses/:id': Validate({
           schema: mediaApiSchema,
-          schemaName: 'DeleteEndpoint<MovieWatchHistoryEntry,"id">',
-        })(createDeleteEndpoint({ model: MovieWatchHistoryEntry, primaryKey: 'id' })),
+          schemaName: 'DeleteEndpoint<WatchHistoryEntry,"id">',
+        })(createDeleteEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
       },
     },
   })

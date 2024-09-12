@@ -1,22 +1,22 @@
-import { Shade, RouteLink, createComponent, LazyLoad } from '@furystack/shades'
-import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
-import { SessionService } from '../../services/session.js'
-import { MoviesService } from '../../services/movies-service.js'
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
-import { WatchProgressService } from '../../services/watch-progress-service.js'
-import { navigateToRoute } from '../../navigate-to-route.js'
-import { watchMovieRoute } from '../routes/movie-routes.js'
-import { entityMoviesRoute } from '../routes/entity-routes.js'
-import { MovieFilesService } from '../../services/movie-files-service.js'
 import { serializeToQueryString } from '@furystack/rest'
+import { LazyLoad, RouteLink, Shade, createComponent } from '@furystack/shades'
+import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
+import { navigateToRoute } from '../../navigate-to-route.js'
+import { MovieFilesService } from '../../services/movie-files-service.js'
+import { MoviesService } from '../../services/movies-service.js'
+import { SessionService } from '../../services/session.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
+import { entityMoviesRoute } from '../routes/entity-routes.js'
+import { watchMovieRoute } from '../routes/movie-routes.js'
 
 const focus = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('img.cover') as HTMLImageElement,
     [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
     {
@@ -28,12 +28,12 @@ const focus = (el: HTMLElement) => {
 }
 
 const blur = (el: HTMLElement) => {
-  promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
+  void promisifyAnimation(el, [{ filter: 'saturate(1)brightness(1)' }, { filter: 'saturate(0.3)brightness(0.6)' }], {
     duration: 500,
     fill: 'forwards',
     easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
   })
-  promisifyAnimation(
+  void promisifyAnimation(
     el.querySelector('img.cover') as HTMLImageElement,
     [{ transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
     { fill: 'forwards', duration: 150 },
@@ -48,7 +48,7 @@ export const MovieWidget = Shade<{
   shadowDomName: 'pi-rat-movie-widget',
   constructed: ({ props, element }) => {
     setTimeout(() => {
-      promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+      void promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
         fill: 'forwards',
         delay: (props.index || 0) * 160 + Math.random() * 100,
         duration: 700,
@@ -101,7 +101,8 @@ export const MovieWidget = Shade<{
                 ev.stopImmediatePropagation()
                 window.location.replace(url)
               }
-            }}>
+            }}
+          >
             <div
               style={{
                 position: 'absolute',
@@ -114,7 +115,8 @@ export const MovieWidget = Shade<{
                 margin: '1em',
                 justifyContent: 'space-between',
                 filter: 'drop-shadow(black 0px 0px 5px) drop-shadow(black 0px 0px 8px) drop-shadow(black 0px 0px 10px)',
-              }}>
+              }}
+            >
               {isLoadedCacheResult(movieFile) && movieFile.value.entries[0] ? (
                 <div style={{ display: 'flex' }}>
                   <div
@@ -124,7 +126,8 @@ export const MovieWidget = Shade<{
                       ev.stopImmediatePropagation()
                       ev.preventDefault()
                       navigateToRoute(injector, watchMovieRoute, { id: movieFile.value.entries[0].id })
-                    }}>
+                    }}
+                  >
                     ▶️
                   </div>
                 </div>
@@ -144,7 +147,8 @@ export const MovieWidget = Shade<{
                         serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
                       )
                     }}
-                    title="Edit movie details">
+                    title="Edit movie details"
+                  >
                     ✏️
                   </div>
                 </div>
@@ -174,16 +178,23 @@ export const MovieWidget = Shade<{
                 whiteSpace: 'nowrap',
                 padding: '1em',
                 background: 'rgba(0,0,0,0.7)',
-              }}>
+              }}
+            >
               {movie.value.title}
               <LazyLoad
                 loader={<div />}
                 component={async () => {
-                  const { entries: watchProgresses } = await watchProgressService.findWatchProgressesForMovie(
-                    movie.value,
+                  if (!isLoadedCacheResult(movieFile)) {
+                    return <></>
+                  }
+
+                  const { entries: watchProgresses } = await watchProgressService.findWatchProgressForFile(
+                    movieFile.value.entries[0],
                   )
 
-                  const lastRecentWatchProgress = watchProgresses.find((w) => w.imdbId === imdbId)
+                  const lastRecentWatchProgress = watchProgresses.find((w) =>
+                    movieFile.value.entries.some((file) => file.driveLetter === w.driveLetter && file.path === w.path),
+                  )
 
                   const percent =
                     lastRecentWatchProgress &&

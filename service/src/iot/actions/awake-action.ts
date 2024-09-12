@@ -1,13 +1,13 @@
-import type { RequestAction } from '@furystack/rest-service'
 import { AuthorizationError, isAuthorized } from '@furystack/core'
+import { getDataSetFor } from '@furystack/repository'
+import { RequestError } from '@furystack/rest'
+import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import { Device, DeviceAwakeHistory, type AwakeEndpoint } from 'common'
 import { wakeOnLan } from '../../utils/wake-on-lan.js'
-import { getDataSetFor } from '@furystack/repository'
-import { RequestError } from '@furystack/rest'
 
 export const AwakeAction: RequestAction<AwakeEndpoint> = async ({ injector, getUrlParams }) => {
-  if (!isAuthorized(injector, 'admin')) {
+  if (!(await isAuthorized(injector, 'admin'))) {
     throw new AuthorizationError('Needs admin access')
   }
 

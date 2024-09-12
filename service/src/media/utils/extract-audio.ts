@@ -1,48 +1,33 @@
-import { promises } from 'fs'
-import { join } from 'path'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { Drive } from 'common'
 import { getDataSetFor } from '@furystack/repository'
-import ffprobe from 'ffprobe'
-import { existsAsync } from '../../utils/exists-async.js'
+import type { PiRatFile } from 'common'
+import { Drive, getFileName, getParentPath } from 'common'
+import { promises } from 'fs'
+import { join } from 'path'
+import { FfprobeService } from '../../ffprobe-service.js'
 import { execAsync } from '../../utils/exec-async.js'
+import { getPhysicalPath } from '../../utils/physical-path-utils.js'
 
-export const extractAudio = async ({
-  injector,
-  driveLetter,
-  path,
-  fileName,
-}: {
-  injector: Injector
-  driveLetter: string
-  path: string
-  fileName: string
-}) => {
+export const extractAudio = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
   const logger = getLogger(injector).withScope('extract-audio-tracks')
 
-  logger.verbose({
-    message: `Starting to extract audio tracks for movie file '${fileName}'`,
+  await logger.verbose({
+    message: `Starting to extract audio tracks for movie file '${file.driveLetter}:${file.path}'`,
     data: {
-      driveLetter,
-      path,
-      fileName,
+      file,
     },
   })
 
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, driveLetter)
+  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, file.driveLetter)
 
   if (!drive) {
-    throw new Error(`Drive with letter '${driveLetter}' not found`)
+    throw new Error(`Drive with letter '${file.driveLetter}' not found`)
   }
 
-  const fullPath = join(drive.physicalPath, path, fileName)
+  const fullPath = getPhysicalPath(drive, file)
 
-  if (!(await existsAsync(fullPath))) {
-    throw new Error(`File '${fullPath}' does not exist`)
-  }
-
-  const ffprobeResult = await ffprobe(fullPath, { path: 'ffprobe' })
+  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 
   const audioTracks: Array<{
     streamIndex: number
@@ -53,7 +38,8 @@ export const extractAudio = async ({
         streamIndex: stream.index,
       })) || []
 
-  const cwd = join(drive.physicalPath, path)
+  const cwd = join(drive.physicalPath, getParentPath(file))
+  const fileName = getFileName(file)
   await promises.mkdir(cwd, { recursive: true })
 
   await execAsync(
@@ -65,12 +51,10 @@ export const extractAudio = async ({
     },
   )
 
-  logger.information({
+  await logger.information({
     message: `Subtitles has been extracted from stream for movie '${fileName}'`,
     data: {
-      driveLetter,
-      path,
-      fileName,
+      file,
       audioTracks,
     },
   })

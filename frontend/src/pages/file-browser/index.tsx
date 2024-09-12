@@ -1,8 +1,8 @@
+import { hasCacheValue, isObsoleteCacheResult } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
+import { DrivesService } from '../../services/drives-service.js'
 import { CreateDriveWizard } from './create-drive-wizard.js'
 import { FolderPanel } from './folder-panel.js'
-import { DrivesService } from '../../services/drives-service.js'
-import { hasCacheValue } from '@furystack/cache'
 
 export type DriveLocation = {
   letter: string
@@ -21,12 +21,16 @@ export const DrivesPage = Shade({
       return null
     }
 
+    if (isObsoleteCacheResult(drives)) {
+      void drivesService.getVolumes({})
+    }
+
     if (drives.value.entries.length === 0) {
       return (
-        <>
-          <div>No drive created yet.</div>
+        <div style={{ marginTop: '8em', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div>No drives has been created yet.</div>
           <CreateDriveWizard />
-        </>
+        </div>
       )
     }
 
@@ -42,7 +46,8 @@ export const DrivesPage = Shade({
           gap: '8px',
           height: 'calc(100% - 48px)',
           width: '100%',
-        }}>
+        }}
+      >
         <FolderPanel
           focused={focused === 'ld'}
           searchStateKey="ld"

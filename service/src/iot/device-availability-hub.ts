@@ -4,8 +4,17 @@ import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { EventHub, sleepAsync } from '@furystack/utils'
-import { Device, DevicePingHistory } from 'common'
+import { Config, Device, DevicePingHistory } from 'common'
 import ping from 'ping'
+import type { IotConfig } from '../../../common/src/models/config/iot-config.js'
+
+const defaultIotConfig: IotConfig = {
+  id: 'IOT_CONFIG',
+  value: {
+    pingIntervalMs: 30 * 1000,
+    pingTimeoutMs: 3000,
+  },
+}
 
 @Injectable({ lifetime: 'singleton' })
 export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconnected: Device; refresh: null }> {
@@ -13,42 +22,65 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
   public updateDevices = (devices: Device[]) => {
     this.devices = [...devices]
   }
-
   private deviceStatusMap = new Map<string, boolean>()
 
   @Injected((injector) => getLogger(injector).withScope('DeviceAvailabilityHub'))
   private declare logger: ScopedLogger
 
+  @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Config, 'id'))
+  private declare configStore: PhysicalStore<Config, 'id', WithOptionalId<Config, 'id'>>
+
+  private getCurrentConfig = async () => {
+    try {
+      const loaded = (await this.configStore.get('IOT_CONFIG')) as IotConfig
+      return loaded || defaultIotConfig
+    } catch (error) {
+      await this.logger.warning({
+        message: 'Error while loading IOT_CONFIG, falling back to defaults',
+        data: { error },
+      })
+      return defaultIotConfig
+    }
+  }
+
   private async refreshConnections() {
     this.emit('refresh', null)
-    try {
-      await this.devices
-        .filter((device) => device.ipAddress)
-        .map(async (device) => {
-          const lastStatus = this.deviceStatusMap.get(device.name)
-          const { alive: newStatus, avg } = await ping.promise.probe(device.ipAddress!, {
-            timeout: 1,
-          })
+    const currentConfig = await this.getCurrentConfig()
 
-          if (lastStatus !== newStatus) {
-            await this.devicePingHistoryStore.add({
-              name: device.name,
-              isAvailable: newStatus,
-              ping: parseFloat(avg) || undefined,
-              createdAt: new Date().toISOString(),
+    try {
+      await Promise.all(
+        this.devices
+          .filter((device) => device.ipAddress)
+          .map(async (device) => {
+            const lastStatus = this.deviceStatusMap.get(device.name)
+            const { alive: newStatus, avg } = await ping.promise.probe(device.ipAddress!, {
+              timeout: currentConfig.value.pingTimeoutMs,
             })
-            this.deviceStatusMap.set(device.name, newStatus)
-            this.emit(newStatus ? 'connected' : 'disconnected', device)
-            this.logger.verbose({ message: `Device ${device.name} is ${newStatus ? 'connected' : 'disconnected'}` })
-          }
-        })
+
+            if (lastStatus !== newStatus) {
+              await this.devicePingHistoryStore.add({
+                name: device.name,
+                isAvailable: newStatus,
+                ping: parseFloat(avg) || undefined,
+                createdAt: new Date().toISOString(),
+              })
+              this.deviceStatusMap.set(device.name, newStatus)
+              this.emit(newStatus ? 'connected' : 'disconnected', device)
+              await this.logger.verbose({
+                message: `Device ${device.name} is ${newStatus ? 'connected' : 'disconnected'}`,
+              })
+            }
+          }),
+      )
     } catch (error) {
       await this.logger.warning({
         message: `Error while refreshing device connections: ${error?.toString()}`,
         data: { error },
       })
     } finally {
-      await sleepAsync(3000)
+      const sleepMs = currentConfig.value.pingIntervalMs || 30 * 1000
+      await this.logger.verbose({ message: `Device refresh done, sleeping for ${sleepMs}ms` })
+      await sleepAsync(sleepMs)
       await this.refreshConnections()
     }
   }
@@ -76,10 +108,6 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
     this.deviceStore.subscribe('onEntityUpdated', ({ id, change }) => {
       this.updateDevices(this.devices.map((device) => (device.name === id ? { ...device, ...change } : device)))
     })
-  }
-
-  constructor() {
-    super()
-    this.refreshConnections()
+    await this.refreshConnections()
   }
 }

@@ -25,7 +25,8 @@ export const BreadCrumbs = Shade<{
           alignItems: 'center',
           padding: '0.5em',
           letterSpacing: '0.1em',
-        }}>
+        }}
+      >
         {drive}:/
         {segmentsWithRelativePaths.map((s) => (
           <a
@@ -36,7 +37,8 @@ export const BreadCrumbs = Shade<{
               (ev.currentTarget as HTMLElement)?.style?.setProperty?.('color', theme.text.secondary)
             }
             href="#"
-            onclick={() => setPath(s.path)}>
+            onclick={() => setPath(s.path)}
+          >
             {s.name}/
           </a>
         ))}

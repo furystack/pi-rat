@@ -1,8 +1,9 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { ButtonProps } from '@furystack/shades-common-components'
 import { getCssVariable } from '@furystack/shades-common-components'
-import { Button, defaultDarkTheme, defaultLightTheme, ThemeProviderService } from '@furystack/shades-common-components'
-import { Trace } from '@furystack/utils'
+import { Button, ThemeProviderService } from '@furystack/shades-common-components'
+import { darkTheme } from '../../themes/dark.js'
+import { lightTheme } from '../../themes/light.js'
 
 export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>>({
   shadowDomName: 'theme-switch',
@@ -10,20 +11,14 @@ export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>>({
     const themeProvider = injector.getInstance(ThemeProviderService)
     const [theme, setTheme] = useState<'light' | 'dark'>(
       'theme',
-      getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default ? 'dark' : 'light',
+      getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'dark' : 'light',
     )
 
     useDisposable('traceThemeChange', () =>
-      Trace.method({
-        object: themeProvider,
-        method: themeProvider.set,
-        onFinished: () => {
-          setTheme(
-            getCssVariable(themeProvider.theme.background.default) === defaultDarkTheme.background.default
-              ? 'dark'
-              : 'light',
-          )
-        },
+      themeProvider.subscribe('themeChanged', () => {
+        setTheme(
+          getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'dark' : 'light',
+        )
       }),
     )
 
@@ -31,8 +26,9 @@ export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>>({
       <Button
         {...props}
         onclick={() => {
-          themeProvider.set(theme === 'dark' ? defaultLightTheme : defaultDarkTheme)
-        }}>
+          themeProvider.setAssignedTheme(theme === 'dark' ? lightTheme : darkTheme)
+        }}
+      >
         {theme === 'dark' ? '☀️' : '🌜'}
       </Button>
     )

@@ -25,7 +25,9 @@ export class ServiceStatusProvider {
     })
     const credential = await this.authenticator.hasher.createCredential(username, password)
     await this.storeManager.getStoreFor(PasswordCredential, 'userName').add(credential)
-    this.logger.withScope(this.constructor.name).information({ message: `Service installed for user '${username}'` })
+    await this.logger
+      .withScope(this.constructor.name)
+      .information({ message: `Service installed for user '${username}'` })
   }
 
   @Injected(StoreManager)

@@ -1,8 +1,8 @@
-import type { IdentityContext } from '@furystack/core'
-import { ObservableValue, usingAsync } from '@furystack/utils'
+import type { IdentityContext, User } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
-import type { User } from '@furystack/core'
+import { ObservableValue, usingAsync } from '@furystack/utils'
+import type { Roles } from 'common'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
@@ -11,7 +11,7 @@ export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'aut
 export class SessionService implements IdentityContext {
   private readonly operation = () => {
     this.isOperationInProgress.setValue(true)
-    return { dispose: () => this.isOperationInProgress.setValue(false) }
+    return { [Symbol.dispose]: () => this.isOperationInProgress.setValue(false) }
   }
 
   public state = new ObservableValue<SessionState>('initializing')
@@ -65,7 +65,7 @@ export class SessionService implements IdentityContext {
 
   public async logout(): Promise<void> {
     return await usingAsync(this.operation(), async () => {
-      this.api.call({ method: 'POST', action: '/logout' })
+      void this.api.call({ method: 'POST', action: '/logout' })
       this.currentUser.setValue(null)
       this.state.setValue('unauthenticated')
       this.notys.emit('onNotyAdded', {
@@ -79,7 +79,7 @@ export class SessionService implements IdentityContext {
   public async isAuthenticated(): Promise<boolean> {
     return this.state.getValue() === 'authenticated'
   }
-  public async isAuthorized(...roles: string[]): Promise<boolean> {
+  public async isAuthorized(...roles: Roles): Promise<boolean> {
     const currentUser = await this.getCurrentUser()
     for (const role of roles) {
       if (!currentUser || !currentUser.roles.some((c) => c === role)) {

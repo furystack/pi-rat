@@ -1,14 +1,11 @@
 import type { ChildrenList } from '@furystack/shades'
 import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
-import { NotyService } from '@furystack/shades-common-components'
-import { Button, SelectionCell } from '@furystack/shades-common-components'
-import { Fab } from '@furystack/shades-common-components'
-import { DataGrid } from '@furystack/shades-common-components'
+import { Button, DataGrid, Fab, NotyService, SelectionCell } from '@furystack/shades-common-components'
+import type { Uri } from 'monaco-editor'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import type { GenericEditorService } from './generic-editor-service.js'
 import { GenericMonacoEditor } from './generic-monaco-editor.js'
-import { PiRatLazyLoad } from '../pirat-lazy-load.js'
-import type { Uri } from 'monaco-editor'
 
 type CreateEditorState = {
   mode: 'create'
@@ -18,12 +15,12 @@ type ListEditorState = {
   mode: 'list'
 }
 
-type EditEditorState = {
+type EditEditorState<T, TKey extends keyof T> = {
   mode: 'edit'
-  currentId: string
+  currentId: T[TKey]
 }
 
-type GenericEditorState = CreateEditorState | ListEditorState | EditEditorState
+type GenericEditorState<T, TKey extends keyof T> = CreateEditorState | ListEditorState | EditEditorState<T, TKey>
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
@@ -33,6 +30,9 @@ type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends key
   styles: DataGridProps<T, TColumns>['styles']
   modelUri?: Uri
 }
+
+type EntityFromProps<Props> = Props extends { service: GenericEditorService<infer T, any, any> } ? T : never
+type EntityKeyFromProps<Props> = Props extends { service: GenericEditorService<any, infer TKey, any> } ? TKey : never
 
 export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string>(
   props: GenericEditorProps<T, TKey, TReadonlyProperties, TColumns>,
@@ -46,7 +46,9 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 
     const noty = injector.getInstance(NotyService)
 
-    const [editorState, setEditorState] = useSearchState<GenericEditorState>('gedst', {
+    const [editorState, setEditorState] = useSearchState<
+      GenericEditorState<EntityFromProps<typeof props>, EntityKeyFromProps<typeof props>>
+    >('gedst', {
       mode: 'list',
     })
 
@@ -54,13 +56,14 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       return (
         <PiRatLazyLoad
           component={async () => {
-            const entry = await service.getSingleEntry(editorState.currentId as any)
+            const entry = await service.getSingleEntry(editorState.currentId)
             return (
               <GenericMonacoEditor
-                value={entry}
+                value={entry!}
+                service={service}
                 onSave={async (value) => {
                   try {
-                    await service.patchEntry(editorState.currentId as any, value)
+                    await service.patchEntry(editorState.currentId, value)
                     noty.emit('onNotyAdded', {
                       type: 'success',
                       title: '📝 Entity updated',
@@ -75,7 +78,6 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                     })
                   }
                 }}
-                service={service}
                 modelUri={modelUri}
               />
             )
@@ -89,13 +91,15 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         <GenericMonacoEditor
           service={service}
           modelUri={modelUri}
-          value={{}}
+          value={{} as EntityFromProps<typeof props>}
           onSave={async (value) => {
             try {
               const response = await service.postEntry(value)
               setEditorState({
                 mode: 'edit',
-                currentId: response[service.extendedOptions.keyProperty] as string,
+                currentId: response[service.extendedOptions.keyProperty] as EntityFromProps<
+                  typeof props
+                >[EntityKeyFromProps<typeof props>],
               })
               noty.emit('onNotyAdded', {
                 type: 'success',
@@ -128,15 +132,16 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
               <div style={{ width: '156px' }}>
                 <Button
                   onclick={() => {
-                    setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] as string })
+                    setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] })
                     refresh()
-                  }}>
+                  }}
+                >
                   ✏️
                 </Button>
                 <Button
                   onclick={() => {
                     service
-                      .removeEntries(entry[service.extendedOptions.keyProperty] as any)
+                      .removeEntries(entry[service.extendedOptions.keyProperty])
                       .then(() => {
                         noty.emit('onNotyAdded', {
                           type: 'success',
@@ -152,7 +157,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                           body: (error as Error).toString(),
                         })
                       })
-                  }}>
+                  }}
+                >
                   ❌
                 </Button>
               </div>
@@ -169,7 +175,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         <Fab
           onclick={() => {
             setEditorState({ mode: 'create' })
-          }}>
+          }}
+        >
           ➕
         </Fab>
       </>

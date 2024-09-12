@@ -1,12 +1,11 @@
-import type { FFProbeResult } from 'ffprobe'
+import type { FfprobeData } from 'fluent-ffmpeg'
 
 export class MovieFile {
   id!: string
-  imdbId!: string
+  imdbId?: string
   driveLetter!: string
   path!: string
-  fileName!: string
-  ffprobe!: FFProbeResult
+  ffprobe!: FfprobeData
   relatedFiles?: Array<{
     type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'
     path: string

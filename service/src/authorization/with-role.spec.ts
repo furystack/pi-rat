@@ -1,8 +1,8 @@
 import { IdentityContext } from '@furystack/core'
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
-import { withRole } from './with-role'
 import { describe, expect, it } from 'vitest'
+import { withRole } from './with-role.js'
 
 describe('withRoleOnly', () => {
   it('Should fail if not authorized', async () => {
@@ -37,6 +37,8 @@ describe('withRoleOnly', () => {
       Object.assign(ic, { isAuthorized: async () => true })
 
       i.setExplicitInstance(ic)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      /// @ts-expect-error
       const result = await withRole('role1', 'admin')({ injector: i })
       expect(result).toEqual({
         isAllowed: true,

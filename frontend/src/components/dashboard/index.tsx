@@ -1,7 +1,6 @@
 import { LocationService, Shade, createComponent } from '@furystack/shades'
 import type { Dashboard as DashboardData } from 'common'
 import { Widget } from './widget.js'
-import { Paper } from '@furystack/shades-common-components'
 import { ContextMenu } from '../context-menu.js'
 import { SessionService } from '../../services/session.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
@@ -14,38 +13,39 @@ export const Dashboard = Shade<DashboardData>({
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
 
     return (
-      <ContextMenu
-        items={[
-          ...(currentUser?.username === props.owner || currentUser?.roles.includes('admin')
-            ? [
-                {
-                  icon: { type: 'font', value: '📝' } as const,
-                  label: 'Edit this dashboard',
-                  onClick: () => {
-                    navigateToRoute(
-                      injector,
-                      entityDashboardsRoute,
-                      {},
-                      serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
-                    )
+      <div
+        style={{
+          marginTop: '48px',
+          scrollPaddingTop: '48px',
+        }}
+      >
+        <ContextMenu
+          items={[
+            ...(currentUser?.username === props.owner || currentUser?.roles.includes('admin')
+              ? [
+                  {
+                    icon: { type: 'font', value: '📝' } as const,
+                    label: 'Edit this dashboard',
+                    onClick: () => {
+                      navigateToRoute(
+                        injector,
+                        entityDashboardsRoute,
+                        {},
+                        serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
+                      )
 
-                    injector.getInstance(LocationService).updateState()
+                      injector.getInstance(LocationService).updateState()
+                    },
                   },
-                },
-              ]
-            : []),
-        ]}>
-        <Paper
-          style={{
-            paddingTop: '2em',
-            display: 'flex',
-            flexDirection: 'column',
-          }}>
+                ]
+              : []),
+          ]}
+        >
           {props.widgets.map((w) => (
             <Widget {...w} />
           ))}
-        </Paper>
-      </ContextMenu>
+        </ContextMenu>
+      </div>
     )
   },
 })

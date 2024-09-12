@@ -1,4 +1,4 @@
-import { isMovieFile } from './is-movie-file'
+import { isMovieFile } from './is-movie-file.js'
 import { describe, it, expect } from 'vitest'
 
 describe('isMovieFile', () => {

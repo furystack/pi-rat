@@ -1,16 +1,23 @@
-import { createComponent, Shade } from '@furystack/shades'
-import type { GenericEditorService } from './generic-editor-service.js'
-import { MonacoEditor } from '../monaco-editor.js'
+import { createComponent, Shade, type ChildrenList } from '@furystack/shades'
 import { Button } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Uri } from 'monaco-editor'
+import { MonacoEditor } from '../monaco-editor.js'
+import type { GenericEditorService } from './generic-editor-service.js'
 
-export const GenericMonacoEditor = Shade<{
-  value: any
-  onSave: (value: any) => Promise<void>
-  service: GenericEditorService<any, any, any>
+type GenericMonacoEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
+  value: T
+  onSave: (value: T) => Promise<void>
+  service: GenericEditorService<T, TKey, TReadonlyProperties>
   modelUri?: Uri
-}>({
+}
+
+type EntityFromProps<Props> = Props extends GenericMonacoEditorProps<infer T, any, any> ? T : never
+
+export const GenericMonacoEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T>(
+  props: GenericMonacoEditorProps<T, TKey, TReadonlyProperties>,
+  childrenList: ChildrenList,
+) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-monaco-editor',
   render: ({ props, useDisposable }) => {
     const currentValue = useDisposable('currentValue', () => new ObservableValue(JSON.stringify(props.value, null, 2)))
@@ -19,12 +26,13 @@ export const GenericMonacoEditor = Shade<{
       const saveHandler = (e: KeyboardEvent) => {
         if (e.ctrlKey && e.key === 's') {
           e.preventDefault()
-          props.onSave(JSON.parse(currentValue.getValue()))
+          const value = JSON.parse(currentValue.getValue()) as EntityFromProps<typeof props>
+          void props.onSave(value)
         }
       }
       document.addEventListener('keydown', saveHandler)
       return {
-        dispose: () => {
+        [Symbol.dispose]: () => {
           document.removeEventListener('keydown', saveHandler)
         },
       }
@@ -47,15 +55,20 @@ export const GenericMonacoEditor = Shade<{
             right: '1em',
             display: 'flex',
             justifyContent: 'flex-end',
-          }}>
+          }}
+        >
           <Button color="secondary" variant="outlined" className="resetButton">
             Reset
           </Button>
           <Button
             color="primary"
             variant="contained"
-            onclick={() => props.onSave(JSON.parse(currentValue.getValue()))}
-            className="saveButton">
+            onclick={() => {
+              const value = JSON.parse(currentValue.getValue()) as EntityFromProps<typeof props>
+              void props.onSave(value)
+            }}
+            className="saveButton"
+          >
             Save
           </Button>
         </div>

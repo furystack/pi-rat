@@ -1,15 +1,14 @@
+import { isLoadedCacheResult } from '@furystack/cache'
+import { serializeToQueryString } from '@furystack/rest'
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { Button, promisifyAnimation, Skeleton } from '@furystack/shades-common-components'
-import { SessionService } from '../../services/session.js'
-import { MoviesService } from '../../services/movies-service.js'
-import { isLoadedCacheResult } from '@furystack/cache'
-import { WatchProgressService } from '../../services/watch-progress-service.js'
-import { navigateToRoute } from '../../navigate-to-route.js'
-import { watchMovieRoute } from '../../components/routes/movie-routes.js'
 import { entityMoviesRoute } from '../../components/routes/entity-routes.js'
+import { watchMovieRoute } from '../../components/routes/movie-routes.js'
+import { navigateToRoute } from '../../navigate-to-route.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
-import { PathHelper } from '@furystack/utils'
-import { serializeToQueryString } from '@furystack/rest'
+import { MoviesService } from '../../services/movies-service.js'
+import { SessionService } from '../../services/session.js'
+import { WatchProgressService } from '../../services/watch-progress-service.js'
 
 export const PlayButtons = Shade<{ imdbId: string }>({
   shadowDomName: 'shade-movie-play-buttons',
@@ -22,7 +21,15 @@ export const PlayButtons = Shade<{ imdbId: string }>({
     )
     const [watchProgressResult] = useObservable(
       'watchProgress',
-      watchProgressService.findWatchProgressAsObservable({ filter: { imdbId: { $eq: props.imdbId } } }),
+      watchProgressService.findWatchProgressAsObservable({
+        filter: {
+          $or:
+            movieFilesResult?.value?.entries.map((v) => ({
+              path: { $eq: v.path },
+              driveLetter: { $eq: v.driveLetter },
+            })) || [],
+        },
+      }),
     )
 
     if (isLoadedCacheResult(movieFilesResult) && isLoadedCacheResult(watchProgressResult)) {
@@ -30,10 +37,7 @@ export const PlayButtons = Shade<{ imdbId: string }>({
         <>
           {movieFilesResult.value.entries.map((movieFile) => {
             const watchProgress = watchProgressResult.value.entries.find(
-              (wp) =>
-                wp.driveLetter === movieFile.driveLetter &&
-                wp.path === movieFile.path &&
-                wp.fileName === movieFile.fileName,
+              (wp) => wp.driveLetter === movieFile.driveLetter && wp.path === movieFile.path,
             )
             if (watchProgress) {
               return (
@@ -43,7 +47,8 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                     color="primary"
                     onclick={() => {
                       navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
-                    }}>
+                    }}
+                  >
                     Continue from{' '}
                     {(() => {
                       const date = new Date(0)
@@ -55,12 +60,11 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                     onclick={async () => {
                       await watchProgressService.deleteWatchEntry(watchProgressResult.value.entries[0].id)
                       navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
-                    }}>
+                    }}
+                  >
                     Watch from the beginning
                   </Button>
-                  {movieFilesResult.value.count > 1 ? (
-                    <>{`${movieFile.driveLetter}:${PathHelper.joinPaths(movieFile.path, movieFile.fileName)}`}</>
-                  ) : null}
+                  {movieFilesResult.value.count > 1 ? <>{`${movieFile.driveLetter}:${movieFile.path}`}</> : null}
                 </div>
               )
             }
@@ -71,12 +75,11 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                   color="primary"
                   onclick={() => {
                     navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
-                  }}>
+                  }}
+                >
                   Start watching
                 </Button>
-                {movieFilesResult.value.count > 1 ? (
-                  <>{`${movieFile.driveLetter}:${PathHelper.joinPaths(movieFile.path, movieFile.fileName)}`}</>
-                ) : null}
+                {movieFilesResult.value.count > 1 ? <>{`${movieFile.driveLetter}:${movieFile.path}`}</> : null}
               </div>
             )
           })}
@@ -99,7 +102,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
 
     if (isLoadedCacheResult(movieResult)) {
       setTimeout(() => {
-        promisifyAnimation(
+        void promisifyAnimation(
           element.querySelector('img'),
           [
             { opacity: 0, transform: 'scale(0.85)' },
@@ -124,7 +127,8 @@ export const MovieOverview = Shade<{ imdbId: string }>({
               justifyContent: 'center',
               alignItems: 'flex-start',
               flexWrap: 'wrap',
-            }}>
+            }}
+          >
             <div style={{ padding: '2em' }}>
               <img
                 src={movie.thumbnailImageUrl || ''}
@@ -150,7 +154,8 @@ export const MovieOverview = Shade<{ imdbId: string }>({
                           {},
                           serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
                         )
-                      }}>
+                      }}
+                    >
                       Edit
                     </Button>
                   </span>

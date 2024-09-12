@@ -1,10 +1,8 @@
-export class MovieWatchHistoryEntry {
+export class WatchHistoryEntry {
   id!: string
   userName!: string
-  imdbId!: string
   driveLetter!: string
   path!: string
-  fileName!: string
   watchedSeconds!: number
   completed!: boolean
   createdAt!: string

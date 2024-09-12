@@ -1,4 +1,4 @@
-FROM node:19-alpine as base
+FROM node:lts-alpine as base
 
 COPY --chown=node:node /common /home/node/app/common
 COPY --chown=node:node /frontend /home/node/app/frontend
@@ -6,21 +6,22 @@ COPY --chown=node:node /service /home/node/app/service
 
 COPY --chown=node:node /package.json /home/node/app/package.json
 COPY --chown=node:node /.yarn/releases /home/node/app/.yarn/releases
-COPY --chown=node:node /.yarn/sdks /home/node/app/.yarn/sdks
-COPY --chown=node:node /.pnp.cjs /home/node/app/.pnp.cjs
-COPY --chown=node:node /.pnp.loader.mjs /home/node/app/.pnp.loader.mjs
+
+# These dependencies are only needed for Yarn PNP
+# COPY --chown=node:node /.yarn/sdks /home/node/app/.yarn/sdks
+# COPY --chown=node:node /.yarn/unplugged /home/node/app/.yarn/unplugged
+# COPY --chown=node:node /.pnp.cjs /home/node/app/.pnp.cjs
+# COPY --chown=node:node /.pnp.loader.mjs /home/node/app/.pnp.loader.mjs
+
 COPY --chown=node:node /yarn.lock /home/node/app/yarn.lock
 COPY --chown=node:node /tsconfig.json /home/node/app/tsconfig.json
 COPY --chown=node:node /.yarnrc.yml /home/node/app/.yarnrc.yml
 
 WORKDIR /home/node/app
 
-# Needed for webtorrent dependency install
-RUN apk add python3 make g++
-
 RUN yarn workspaces focus service --production
 
-FROM node:19-alpine as runner
+FROM node:lts-alpine as runner
 
 RUN apk upgrade -U \ 
     && apk add ffmpeg \

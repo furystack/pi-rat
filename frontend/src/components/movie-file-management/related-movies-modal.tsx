@@ -31,7 +31,8 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
         }}
         onClose={() => isOpened.setValue(false)}
         showAnimation={fadeIn}
-        hideAnimation={fadeOut}>
+        hideAnimation={fadeOut}
+      >
         <div
           onclick={(ev) => ev.stopPropagation()}
           ondblclick={(ev) => ev.stopPropagation()}
@@ -41,7 +42,8 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
             justifyContent: 'center',
             width: '100%',
             height: '100%',
-          }}>
+          }}
+        >
           <Paper style={{ display: 'flex', flexDirection: 'column', minWidth: '300px', fontWeight: 'lighter' }}>
             <div>
               <h3 style={{ marginBottom: '0' }}>
@@ -53,7 +55,8 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
                   padding: '0.5em 0.5em 0 0.7em',
                   fontSize: '0.85em',
                   color: 'rgba(128,128,128,0.8)',
-                }}>{`${path === '/' ? '' : path}/${file.name}`}</div>
+                }}
+              >{`${path === '/' ? '' : path}/${file.name}`}</div>
             </div>
 
             <Separator />

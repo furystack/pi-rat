@@ -20,13 +20,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "name",
-        "path",
-        "length",
-        "downloaded",
-        "progress"
-      ],
+      "required": ["name", "path", "length", "downloaded", "progress"],
       "additionalProperties": false
     },
     "ApiTorrentPiece": {
@@ -39,10 +33,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "length",
-        "missing"
-      ],
+      "required": ["length", "missing"],
       "additionalProperties": false
     },
     "ApiTorrent": {
@@ -197,18 +188,12 @@
               }
             }
           },
-          "required": [
-            "success",
-            "entries"
-          ],
+          "required": ["success", "entries"],
           "additionalProperties": false
         },
         "body": {}
       },
-      "required": [
-        "result",
-        "body"
-      ],
+      "required": ["result", "body"],
       "additionalProperties": false
     },
     "PauseTorrentEndpoint": {
@@ -221,9 +206,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -234,16 +217,11 @@
               "const": true
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "ResumeTorrentEndpoint": {
@@ -256,9 +234,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
@@ -269,16 +245,11 @@
               "const": true
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "DeleteTorrentEndpoint": {
@@ -291,9 +262,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "query": {
@@ -313,17 +282,11 @@
               "const": true
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "query",
-        "result"
-      ],
+      "required": ["url", "query", "result"],
       "additionalProperties": false
     },
     "TorrentApi": {
@@ -342,15 +305,11 @@
                   }
                 }
               },
-              "required": [
-                "result"
-              ],
+              "required": ["result"],
               "additionalProperties": false
             }
           },
-          "required": [
-            "/torrents"
-          ],
+          "required": ["/torrents"],
           "additionalProperties": false
         },
         "POST": {
@@ -366,11 +325,7 @@
               "$ref": "#/definitions/ResumeTorrentEndpoint"
             }
           },
-          "required": [
-            "/torrents",
-            "/torrents/:id/pause",
-            "/torrents/:id/resume"
-          ],
+          "required": ["/torrents", "/torrents/:id/pause", "/torrents/:id/resume"],
           "additionalProperties": false
         },
         "PATCH": {
@@ -384,9 +339,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -401,9 +354,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -414,9 +365,7 @@
               "$ref": "#/definitions/DeleteTorrentEndpoint"
             }
           },
-          "required": [
-            "/torrents/:id"
-          ],
+          "required": ["/torrents/:id"],
           "additionalProperties": false
         },
         "HEAD": {
@@ -430,9 +379,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -447,9 +394,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -464,9 +409,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -481,18 +424,12 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "GET",
-        "POST",
-        "DELETE"
-      ],
+      "required": ["GET", "POST", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -509,9 +446,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -526,9 +461,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -543,9 +476,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -560,9 +491,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -577,9 +506,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -594,9 +521,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -611,9 +536,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -628,9 +551,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -645,9 +566,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }

@@ -1,14 +1,14 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { Widget as WidgetData } from 'common'
+import { AppShortcutWidget } from './app-shortcut-widget.js'
+import { ContinueWatchingWidgetGroup } from './continue-watching.js'
+import { DeviceAvailability } from './device-availability.js'
+import { EntityShortcutWidget } from './entity-shortcut-widget.js'
 import { HtmlWidget } from './html-widget.js'
 import { MarkdownWidget } from './markdown-widget.js'
-import { AppShortcutWidget } from './app-shortcut-widget.js'
-import { WidgetGroup } from './widget-group.js'
-import { EntityShortcutWidget } from './entity-shortcut-widget.js'
 import { MovieWidget } from './movie-widget.js'
-import { ContinueWatchingWidgetGroup } from './continue-watching.js'
 import { SeriesWidget } from './series-widget.js'
-import { DeviceAvailability } from './device-availability.js'
+import { WidgetGroup } from './widget-group.js'
 
 export const Widget = Shade<WidgetData>({
   shadowDomName: 'pi-rat-widget',
@@ -39,7 +39,7 @@ export const Widget = Shade<WidgetData>({
       case 'device-availability':
         return <DeviceAvailability {...props} />
       default: {
-        return <div>{(props as any).type}</div>
+        return <div>{props}</div>
       }
     }
   },

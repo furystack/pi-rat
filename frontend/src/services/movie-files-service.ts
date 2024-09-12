@@ -43,14 +43,13 @@ export class MovieFilesService {
           },
         })
 
-        // path / driveLetter / fileName is unique
+        // path / driveLetter is unique
         this.movieFileQueryCache.setExplicitValue({
           loadArgs: [
             {
               filter: {
                 path: { $eq: entry.path },
                 driveLetter: { $eq: entry.driveLetter },
-                fileName: { $eq: entry.fileName },
               },
             },
           ],

@@ -1,7 +1,6 @@
-import type { CommandProvider } from '@furystack/shades-common-components'
-import type { SuggestionOptions } from './create-suggestion.js'
-import { createSuggestion, distinctByName } from './create-suggestion.js'
 import { getCurrentUser } from '@furystack/core'
+import type { CommandProvider } from '@furystack/shades-common-components'
+import { navigateToRoute } from '../../../navigate-to-route.js'
 import {
   entityConfigRoute,
   entityDashboardsRoute,
@@ -13,7 +12,8 @@ import {
   entityOmdbSeriesMetadataRoute,
   entityUsersRoute,
 } from '../../routes/entity-routes.js'
-import { navigateToRoute } from '../../../navigate-to-route.js'
+import type { SuggestionOptions } from './create-suggestion.js'
+import { createSuggestion, distinctByName } from './create-suggestion.js'
 
 const EntitySuggestions: SuggestionOptions[] = [
   {

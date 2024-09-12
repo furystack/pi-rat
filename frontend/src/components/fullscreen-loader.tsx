@@ -13,7 +13,8 @@ export const FullScreenLoader = Shade<{ message?: string }>({
           alignItems: 'center',
           justifyContent: 'center',
           margin: '2em',
-        }}>
+        }}
+      >
         <style>{`
       @keyframes show{
         0%{
@@ -37,7 +38,8 @@ export const FullScreenLoader = Shade<{ message?: string }>({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-          }}>
+          }}
+        >
           <Loader
             style={{
               width: '128px',

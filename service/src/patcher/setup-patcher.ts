@@ -1,16 +1,15 @@
+import { StoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { useSequelize } from '@furystack/sequelize-store'
 import { getRepository } from '@furystack/repository'
-import { StoreManager } from '@furystack/core'
+import { useSequelize } from '@furystack/sequelize-store'
 import { PatchRun } from 'common'
 import { DataTypes, Model } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
-import { withRole } from '../authorization/with-role.js'
 import { alwaysDeny } from '../authorization/always-deny.js'
-import { checkForOrphanedPatch } from './check-for-orphaned-patch.js'
-import type { PatchRunStore } from './patch-run-store.js'
+import { withRole } from '../authorization/with-role.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { patchList } from './0000-patch-list.js'
+import { checkForOrphanedPatch } from './check-for-orphaned-patch.js'
 import { runPatch } from './run-patch.js'
 
 class PatchModel extends Model<PatchRun, PatchRun> implements PatchRun {
@@ -45,7 +44,6 @@ export const setupPatcher = async (injector: Injector) => {
           name: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
           },
           description: {
             type: DataTypes.STRING,
@@ -82,7 +80,7 @@ export const setupPatcher = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await PatchModel.sync()
     },
   })
 
@@ -93,7 +91,7 @@ export const setupPatcher = async (injector: Injector) => {
     authorizeUpdate: alwaysDeny,
   })
 
-  const patchRunStore = injector.getInstance(StoreManager).getStoreFor(PatchRun, 'id') as PatchRunStore
+  const patchRunStore = injector.getInstance(StoreManager).getStoreFor(PatchRun, 'id')
 
   await checkForOrphanedPatch(injector, patchRunStore)
 
@@ -101,5 +99,5 @@ export const setupPatcher = async (injector: Injector) => {
     await runPatch(injector, patchInstance, patchRunStore)
   }
 
-  logger.verbose({ message: '✅  Patches executed' })
+  await logger.verbose({ message: '✅  Patches executed' })
 }

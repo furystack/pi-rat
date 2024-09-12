@@ -1,14 +1,14 @@
+import { hasCacheValue, type CacheResult } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
 import { CollectionService, Paper } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
-import { encode } from 'common'
+import { encode, getFullPath } from 'common'
+import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
+import { navigateToRoute } from '../../navigate-to-route.js'
+import { DrivesService } from '../../services/drives-service.js'
 import { DriveSelector } from './drive-selector.js'
 import { FileList } from './file-list.js'
-import { navigateToRoute } from '../../navigate-to-route.js'
-import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
-import { DrivesService } from '../../services/drives-service.js'
-import { hasCacheValue, type CacheResult } from '@furystack/cache'
 
 const upEntry: DirectoryEntry = {
   name: '..',
@@ -45,7 +45,7 @@ export const FolderPanel = Shade<{
 
     const onFileListChange = (result: CacheResult<Awaited<ReturnType<typeof drivesService.getFileList>>>) => {
       if (result.status === 'obsolete') {
-        drivesService.getFileList(letter, path)
+        void drivesService.getFileList(letter, path)
         return
       }
       if (hasCacheValue(result)) {
@@ -67,6 +67,10 @@ export const FolderPanel = Shade<{
     })
     onFileListChange(fileList)
 
+    useDisposable('onFilesystemChanged', () =>
+      drivesService.subscribe('onFilesystemChanged', () => void drivesService.getFileList(letter, path)),
+    )
+
     service.hasFocus.setValue(!!props.focused)
 
     element.style.height = '100%'
@@ -82,7 +86,8 @@ export const FolderPanel = Shade<{
           flexGrow: '0',
           flexShrink: '0',
           height: 'calc(100% - 42px)',
-        }}>
+        }}
+      >
         <DriveSelector defaultDriveLetter={props.defaultDriveLetter} searchStateKey={props.searchStateKey} />
         <FileList
           service={service}
@@ -101,7 +106,7 @@ export const FolderPanel = Shade<{
             } else {
               navigateToRoute(injector, fileBrowserOpenFileRoute, {
                 driveLetter: encode(currentDrive.letter),
-                path: encode(PathHelper.joinPaths(path, v.name)),
+                path: encode(getFullPath(path, v.name)),
               })
             }
           }}

@@ -1,12 +1,12 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { useSequelize } from '@furystack/sequelize-store'
 import { getRepository } from '@furystack/repository'
-import { Config } from 'common'
+import { useSequelize } from '@furystack/sequelize-store'
 import type { ConfigType } from 'common'
+import { Config } from 'common'
 import { DataTypes, Model } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { withRole } from '../authorization/with-role.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class ConfigModel extends Model<Config, Config> implements Config {
   declare id: ConfigType['id']
@@ -18,7 +18,7 @@ class ConfigModel extends Model<Config, Config> implements Config {
 export const setupConfig = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Config')
 
-  logger.verbose({ message: '🔧  Setting up Config models and repository' })
+  await logger.verbose({ message: '🔧  Setting up Config models and repository' })
 
   const dbOptions = getDefaultDbSettings('config.sqlite', logger)
 
@@ -50,7 +50,7 @@ export const setupConfig = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await sequelize.sync()
+      await ConfigModel.sync()
     },
   })
 
@@ -60,5 +60,5 @@ export const setupConfig = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  logger.verbose({ message: '✅  Config setup completed' })
+  await logger.verbose({ message: '✅  Config setup completed' })
 }

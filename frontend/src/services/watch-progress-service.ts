@@ -1,8 +1,9 @@
 import { Injectable, Injected } from '@furystack/inject'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 import { Cache } from '@furystack/cache'
-import type { FindOptions } from '@furystack/core'
-import type { Movie, MovieWatchHistoryEntry } from 'common'
+import type { FilterType, FindOptions } from '@furystack/core'
+import type { WatchHistoryEntry } from 'common'
+import type { PiRatFile } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class WatchProgressService {
@@ -24,7 +25,7 @@ export class WatchProgressService {
 
   private watchProgressQueryCache = new Cache({
     capacity: 100,
-    load: async (findOptions: FindOptions<MovieWatchHistoryEntry, Array<keyof MovieWatchHistoryEntry>>) => {
+    load: async (findOptions: FindOptions<WatchHistoryEntry, Array<keyof WatchHistoryEntry>>) => {
       const { result } = await this.mediaApiClient.call({
         method: 'GET',
         action: '/my-watch-progresses',
@@ -43,7 +44,6 @@ export class WatchProgressService {
               filter: {
                 path: { $eq: entry.path },
                 driveLetter: { $eq: entry.driveLetter },
-                fileName: { $eq: entry.fileName },
               },
             },
           ],
@@ -61,15 +61,7 @@ export class WatchProgressService {
 
   public findWatchProgress = this.watchProgressQueryCache.get.bind(this.watchProgressQueryCache)
 
-  public findWatchProgressForFile = async ({
-    path,
-    fileName,
-    driveLetter,
-  }: {
-    path: string
-    fileName: string
-    driveLetter: string
-  }) => {
+  public findWatchProgressForFile = async ({ path, driveLetter }: PiRatFile) => {
     const { result } = await this.mediaApiClient.call({
       method: 'GET',
       action: '/my-watch-progresses',
@@ -77,7 +69,6 @@ export class WatchProgressService {
         findOptions: {
           filter: {
             path: { $eq: path },
-            fileName: { $eq: fileName },
             driveLetter: { $eq: driveLetter },
           },
         },
@@ -94,10 +85,11 @@ export class WatchProgressService {
     return result
   }
 
-  public async findWatchProgressesForMovie(movie: Movie) {
+  public async findWatchProgressesForFile({ driveLetter, path }: PiRatFile) {
     return await this.findWatchProgress({
       filter: {
-        imdbId: { $eq: movie.imdbId },
+        driveLetter: { $eq: driveLetter },
+        path: { $eq: path },
       },
     })
   }
@@ -113,9 +105,7 @@ export class WatchProgressService {
     this.watchProgressQueryCache.flushAll()
   }
 
-  public updateWatchEntry = async (
-    body: Omit<MovieWatchHistoryEntry, 'id' | 'createdAt' | 'updatedAt' | 'userName'>,
-  ) => {
+  public updateWatchEntry = async (body: Omit<WatchHistoryEntry, 'id' | 'createdAt' | 'updatedAt' | 'userName'>) => {
     const { result } = await this.mediaApiClient.call({
       method: 'POST',
       action: '/save-watch-progress',
@@ -129,22 +119,28 @@ export class WatchProgressService {
     return result
   }
 
-  public async prefetchWatchProgressForMovies(movies: Movie[]) {
-    const imdbIds = Array.from(new Set(movies.map((movie) => movie.imdbId)))
+  public async prefetchWatchProgressForFiles(files: PiRatFile[]) {
+    const filter: FilterType<WatchHistoryEntry> = {
+      $or: files.map(({ path, driveLetter }) => ({
+        path: { $eq: path },
+        driveLetter: { $eq: driveLetter },
+      })),
+    }
 
     const result = await this.findWatchProgress({
-      filter: {
-        imdbId: { $in: imdbIds },
-      },
+      filter,
     })
 
-    imdbIds.forEach((imdbId) => {
-      const relatedWatchProgresses = result.entries.filter((entry) => entry.imdbId === imdbId)
+    files.forEach(({ path, driveLetter }) => {
+      const relatedWatchProgresses = result.entries.filter(
+        (entry) => entry.path === path && entry.driveLetter === driveLetter,
+      )
       this.watchProgressQueryCache.setExplicitValue({
         loadArgs: [
           {
             filter: {
-              imdbId: { $eq: imdbId },
+              path: { $eq: path },
+              driveLetter: { $eq: driveLetter },
             },
           },
         ],

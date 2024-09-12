@@ -2,9 +2,9 @@ import { createComponent, Shade } from '@furystack/shades'
 import { AppBar, AppBarLink, Button } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
 import { SessionService } from '../services/session.js'
+import { PiRatCommandPalette } from './command-palette/index.js'
 import { GithubLogo } from './github-logo/index.js'
 import { ThemeSwitch } from './theme-switch/index.js'
-import { PiRatCommandPalette } from './command-palette/index.js'
 
 export interface HeaderProps {
   title: string
@@ -51,23 +51,20 @@ export const Header = Shade<HeaderProps>({
             <AppBarLink title="Movies" href="/series">
               📺 Series
             </AppBarLink>
-
-            <AppBarLink title="Torrents" href="/torrents">
-              🧲 Torrents
-            </AppBarLink>
           </>
         ) : null}
 
-        <div style={{ flex: '1' }}>
-          <PiRatCommandPalette />
-        </div>
+        <div style={{ flex: '1' }}>{sessionState === 'authenticated' && <PiRatCommandPalette />}</div>
+
         <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
-          <ThemeSwitch variant="outlined" />
-          <a href={environmentOptions.repository} target="_blank" style={{ display: 'flex' }}>
-            <Button variant="outlined" style={{ verticalAlign: 'baseline', display: 'flex' }}>
-              <GithubLogo style={{ height: '1em' }} />
-            </Button>
-          </a>
+          <ThemeSwitch />
+          <Button
+            onclick={() => {
+              window.open(environmentOptions.repository)
+            }}
+          >
+            <GithubLogo style={{ height: '1rem' }} />
+          </Button>
           {sessionState === 'authenticated' ? (
             <Button variant="outlined" onclick={() => injector.getInstance(SessionService).logout()}>
               Log Out

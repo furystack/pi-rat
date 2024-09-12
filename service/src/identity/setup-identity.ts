@@ -1,20 +1,19 @@
-import { useSequelize } from '@furystack/sequelize-store'
+import { getCurrentUser } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
-import { PasswordCredential } from '@furystack/security'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
-import { usePasswordPolicy } from '@furystack/security'
-import { User } from 'common'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
-import { Model, DataTypes } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { PasswordCredential, usePasswordPolicy } from '@furystack/security'
+import { useSequelize } from '@furystack/sequelize-store'
+import { User, type Roles } from 'common'
+import { DataTypes, Model } from 'sequelize'
 import { withRole } from '../authorization/with-role.js'
-import { getCurrentUser } from '@furystack/core'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class UserModel extends Model<User, User> implements User {
   declare username: string
 
-  declare roles: string[]
+  declare roles: Roles
 
   declare createdAt: string
 
@@ -68,7 +67,7 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await UserModel.sync()
     },
   })
 
@@ -99,7 +98,7 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await PasswordCredentialModel.sync()
     },
   })
 
@@ -124,7 +123,7 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      await sequelize.sync()
+      await SessionModel.sync()
     },
   })
 

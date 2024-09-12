@@ -1,26 +1,25 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "npm",
-			"script": "build",
-			"group": "build",
-			"problemMatcher": [],
-			"label": "full build",
-			"detail": "tsc -b && yarn workspace frontend build"
-		},
-		{
-			"command": "yarn tsc -b -w",
-			"type": "shell",
-			"group": "build",
-			"problemMatcher": ["$tsc-watch"],
-			"isBackground": true,
-			"icon": {
-				"color": "terminal.ansiBlue",
-				"id": "eye-watch"
-			},
-			"label": "build and watch"
-
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "full build",
+      "detail": "tsc -b && yarn workspace frontend build"
+    },
+    {
+      "command": "yarn tsc -b -w",
+      "type": "shell",
+      "group": "build",
+      "problemMatcher": ["$tsc-watch"],
+      "isBackground": true,
+      "icon": {
+        "color": "terminal.ansiBlue",
+        "id": "eye-watch"
+      },
+      "label": "build and watch"
+    }
+  ]
 }

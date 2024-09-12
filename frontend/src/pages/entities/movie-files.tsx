@@ -37,7 +37,7 @@ export const MovieFilesPage = Shade({
     return (
       <GenericEditor
         service={service}
-        columns={['driveLetter', 'path', 'fileName', 'imdbId']}
+        columns={['driveLetter', 'path', 'imdbId']}
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}

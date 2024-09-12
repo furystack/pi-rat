@@ -1,12 +1,13 @@
 {
   "name": "pi-rat",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "example web app based on furystack",
   "main": "service/src/index.ts",
   "repository": "https://github.com/furystack/pi-rat.git",
   "author": "Gallay Lajos <gallay.lajos@gmail.com>",
   "license": "GPL-2.0-only",
   "private": true,
+  "type": "module",
   "workspaces": {
     "packages": [
       "common",
@@ -15,23 +16,24 @@
     ]
   },
   "devDependencies": {
-    "@playwright/test": "^1.43.1",
-    "@types/node": "^20.12.7",
-    "@typescript-eslint/eslint-plugin": "^7.7.0",
-    "@typescript-eslint/parser": "^7.7.0",
-    "@vitest/coverage-v8": "^1.5.0",
-    "eslint": "^8.57.0",
+    "@eslint/js": "^9.10.0",
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^22.5.4",
+    "@vitest/coverage-v8": "^2.0.5",
+    "eslint": "^9.10.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "2.29.1",
-    "eslint-plugin-jsdoc": "^48.2.3",
-    "eslint-plugin-prettier": "^5.1.3",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "prettier": "^3.2.5",
-    "rimraf": "^5.0.5",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.9",
-    "vitest": "^1.5.0"
+    "eslint-plugin-import": "2.30.0",
+    "eslint-plugin-jsdoc": "^50.2.2",
+    "eslint-plugin-playwright": "^1.6.2",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.5.0",
+    "vite": "^5.4.4",
+    "vitest": "^2.0.5"
   },
   "husky": {
     "hooks": {
@@ -58,18 +60,16 @@
     "start:service": "yarn workspace service start",
     "start:frontend": "yarn workspace frontend start",
     "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
-    "lint": "eslint . --ext .tsx,.ts --cache",
+    "lint": "eslint .",
     "bumpVersions": "yarn version check --interactive",
     "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
-    "dockerize": "docker build . --tag furystack/pi-rat:latest"
+    "dockerize": "docker build . --tag furystack/pi-rat:latest",
+    "sshIntoDocker": "docker run -i -t furystack/pi-rat sh",
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write ."
   },
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "yarn@4.1.1",
-  "dependenciesMeta": {
-    "prettier@3.0.2": {
-      "unplugged": true
-    }
-  }
+  "packageManager": "yarn@4.4.1"
 }

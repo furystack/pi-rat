@@ -1,4 +1,4 @@
-import { isSampleFile } from './is-sample-file'
+import { isSampleFile } from './is-sample-file.js'
 import { describe, it, expect } from 'vitest'
 
 describe('isSampleFile', () => {

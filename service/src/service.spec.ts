@@ -1,4 +1,4 @@
-import { injector as rootInjector } from './root-injector'
+import { injector as rootInjector } from './root-injector.js'
 import { PiRatRootService } from './service.js'
 import { describe, expect, it } from 'vitest'
 
@@ -9,6 +9,6 @@ describe('Service', () => {
 
     expect(instance).toBeDefined()
 
-    await rootInjector.dispose()
+    await rootInjector[Symbol.asyncDispose]()
   })
 })

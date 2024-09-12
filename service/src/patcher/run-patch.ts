@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
-import type { Patch } from './patch.js'
 import { getLogger } from '@furystack/logging'
 import type { PatchRunStore } from './patch-run-store.js'
+import type { Patch } from './patch.js'
 
 export const runPatch = async (injector: Injector, patch: Patch, patchRunStore: PatchRunStore) => {
   const logger = getLogger(injector).withScope('Patch Runner')
@@ -12,17 +12,17 @@ export const runPatch = async (injector: Injector, patch: Patch, patchRunStore: 
   })
 
   if (alreadyRun.some((p) => p.status === 'success')) {
-    logger.verbose({ message: `📦  Patch ${patch.id} has already been applied.` })
+    await logger.verbose({ message: `📦  Patch ${patch.id} has already been applied.` })
     return
   }
 
   if (alreadyRun.some((p) => p.status === 'running')) {
-    logger.verbose({ message: `📦  Patch ${patch.id} is already running.` })
+    await logger.verbose({ message: `📦  Patch ${patch.id} is already running.` })
     return
   }
 
   if (alreadyRun.some((p) => p.status === 'failed')) {
-    logger.warning({ message: `📦  Patch ${patch.id} has been failed recently. Watch out.` })
+    await logger.warning({ message: `📦  Patch ${patch.id} has been failed recently. Watch out.` })
   }
 
   await logger.verbose({ message: `📦  Running patch ${patch.id}...` })

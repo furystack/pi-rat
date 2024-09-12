@@ -1,9 +1,11 @@
+import { Injectable, Injected } from '@furystack/inject'
+import { getLogger, type ScopedLogger } from '@furystack/logging'
 import { EventHub } from '@furystack/utils'
+import type { WebsocketMessage } from 'common'
 import { environmentOptions } from '../environment-options.js'
-import { Injectable } from '@furystack/inject'
 
 @Injectable({ lifetime: 'singleton' })
-export class WebsocketNotificationsService extends EventHub<{ onMessage: unknown }> {
+export class WebsocketNotificationsService extends EventHub<{ onMessage: WebsocketMessage; onInvalidMessage: [any] }> {
   private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
 
   public socket = new WebSocket(this.wsUrl.toString().replace('http', 'ws'))
@@ -12,10 +14,17 @@ export class WebsocketNotificationsService extends EventHub<{ onMessage: unknown
     this.socket.close()
   }
 
+  @Injected((i) => getLogger(i).withScope('WebsocketNotificationsService'))
+  private declare logger: ScopedLogger
+
   constructor() {
     super()
-    this.socket.onmessage = (event) => {
-      this.emit('onMessage', JSON.parse(event.data))
+    this.socket.onmessage = async ({ data }) => {
+      if (typeof data === 'string') {
+        this.emit('onMessage', JSON.parse(data) as WebsocketMessage)
+      } else {
+        await this.logger.warning({ message: 'Invalid message received', data })
+      }
     }
   }
 }

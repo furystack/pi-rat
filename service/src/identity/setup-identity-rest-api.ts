@@ -11,12 +11,13 @@ import {
   LogoutAction,
   useRestService,
   Validate,
+  type RequestAction,
 } from '@furystack/rest-service'
-import type { IdentityApi } from 'common'
+import type { GetCurrentUserAction, IdentityApi, LoginAction as PiRatLoginAction } from 'common'
 import { User } from 'common'
+import identityApiSchema from 'common/schemas/identity-api.json' with { type: 'json' }
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
-import identityApiSchema from 'common/schemas/identity-api.json' assert { type: 'json' }
 
 export const setupIdentityRestApi = async (injector: Injector) => {
   await useRestService<IdentityApi>({
@@ -26,7 +27,9 @@ export const setupIdentityRestApi = async (injector: Injector) => {
     cors: getCorsOptions(),
     api: {
       GET: {
-        '/currentUser': Validate({ schema: identityApiSchema, schemaName: 'GetCurrentUserAction' })(GetCurrentUser),
+        '/currentUser': Validate({ schema: identityApiSchema, schemaName: 'GetCurrentUserAction' })(
+          GetCurrentUser as RequestAction<GetCurrentUserAction>,
+        ),
         '/users': Validate({ schema: identityApiSchema, schemaName: 'GetCollectionEndpoint<User>' })(
           createGetCollectionEndpoint({
             model: User,
@@ -42,7 +45,7 @@ export const setupIdentityRestApi = async (injector: Injector) => {
         '/isAuthenticated': IsAuthenticated,
       },
       POST: {
-        '/login': LoginAction,
+        '/login': LoginAction as RequestAction<PiRatLoginAction>,
         '/logout': LogoutAction,
         '/users': Validate({ schema: identityApiSchema, schemaName: 'PostUserEndpoint' })(
           createPostEndpoint({
