@@ -1,10 +1,21 @@
-import { defineConfig } from 'vitest/config'
+import { codecovVitePlugin } from '@codecov/vite-plugin'
+import { defineConfig } from 'vite'
 
-export default defineConfig({
-  test: {
-    coverage: {
-      enabled: true,
-      include: ['common/src/**/*.ts', 'frontend/src/**/*.ts', 'service/src/**/*.ts'],
+// https://vitejs.dev/config/
+
+export default defineConfig(async () => {
+  return {
+    plugins: [
+      codecovVitePlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: 'shades-showcase-app',
+        uploadToken: process.env.CODECOV_TOKEN,
+      }),
+    ],
+    build: {
+      rollupOptions: {
+        external: ['vitest'],
+      },
     },
-  },
+  }
 })
