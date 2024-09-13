@@ -31,7 +31,7 @@
     "@furystack/sequelize-store": "^6.0.5",
     "@furystack/utils": "^8.0.3",
     "@furystack/websocket-api": "^13.0.6",
-    "chokidar": "^3.6.0",
+    "chokidar": "^4.0.0",
     "common": "workspace:^",
     "fluent-ffmpeg": "^2.1.3",
     "formidable": "^3.5.1",
@@ -39,6 +39,6 @@
     "ping": "^0.4.4",
     "sequelize": "^6.37.3",
     "sqlite3": "^5.1.7",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.0"
   }
 }
