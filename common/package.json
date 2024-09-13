@@ -28,7 +28,7 @@
     "@types/ffprobe": "^1.1.8",
     "@types/node": "^22.5.4",
     "ts-json-schema-generator": "^2.3.0",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.0"
   },
   "dependencies": {
     "@furystack/core": "^15.0.5",
