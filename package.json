@@ -52,7 +52,7 @@
     ]
   },
   "scripts": {
-    "build": "tsc -b && yarn workspace frontend build",
+    "build": "tsc -b common service frontend && yarn workspace frontend build",
     "create-schemas": "yarn workspace common create-schemas",
     "test:e2e:install": "yarn playwright test --grep @install --project chromium",
     "test:e2e": "yarn playwright test --grep-invert @install",
