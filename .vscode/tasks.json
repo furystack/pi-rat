@@ -7,10 +7,10 @@
       "group": "build",
       "problemMatcher": [],
       "label": "full build",
-      "detail": "tsc -b && yarn workspace frontend build"
+      "detail": "tsc -b common frontend service && yarn workspace frontend build"
     },
     {
-      "command": "yarn tsc -b -w",
+      "command": "yarn tsc -b common frontend service -w",
       "type": "shell",
       "group": "build",
       "problemMatcher": ["$tsc-watch"],
