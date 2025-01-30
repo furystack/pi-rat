@@ -7,7 +7,7 @@ import type { Movie, MovieFile } from 'common'
 @Injectable({ lifetime: 'singleton' })
 export class MovieFilesService {
   @Injected(MediaApiClient)
-  private declare readonly mediaApiClient: MediaApiClient
+  declare private readonly mediaApiClient: MediaApiClient
 
   public movieFileCache = new Cache({
     capacity: 100,

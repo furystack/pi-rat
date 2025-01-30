@@ -11,7 +11,7 @@ export class OmdbClientService {
   public config?: OmdbConfig
 
   @Injected((injector) => getLogger(injector).withScope('OMDB Client Service'))
-  private declare logger: ScopedLogger
+  declare private logger: ScopedLogger
 
   public async init(injector: Injector) {
     await this.logger.verbose({ message: '🎬   Initializing OMDB Service' })

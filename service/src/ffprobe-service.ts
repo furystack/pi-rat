@@ -12,7 +12,7 @@ export type FfprobeResult = FfprobeData
 @Injectable({ lifetime: 'singleton' })
 export class FfprobeService {
   @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Drive, 'letter'))
-  private declare readonly physicalPathStore: PhysicalStore<Drive, 'letter'>
+  declare private readonly physicalPathStore: PhysicalStore<Drive, 'letter'>
 
   private readonly piRatFileCache = new Cache({
     capacity: 100,
@@ -42,7 +42,7 @@ export class FfprobeService {
   })
 
   @Injected(FileWatcherService)
-  private declare fileWatcherService: FileWatcherService
+  declare private fileWatcherService: FileWatcherService
 
   public getFfprobeForPiratFile = async (file: PiRatFile) => {
     return await this.piRatFileCache.get(file)

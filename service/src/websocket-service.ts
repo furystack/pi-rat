@@ -13,7 +13,7 @@ export class WebsocketService {
     })
     return injector.getInstance(WebSocketApi)
   })
-  private declare webSocketApi: WebSocketApi
+  declare private webSocketApi: WebSocketApi
 
   public announce = async (
     message: WebsocketMessage,

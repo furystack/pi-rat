@@ -7,7 +7,7 @@ import type { Series } from 'common'
 @Injectable({ lifetime: 'singleton' })
 export class SeriesService {
   @Injected(MediaApiClient)
-  private declare readonly mediaApiClient: MediaApiClient
+  declare private readonly mediaApiClient: MediaApiClient
 
   public seriesCache = new Cache({
     capacity: 100,

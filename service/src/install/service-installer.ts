@@ -31,11 +31,11 @@ export class ServiceStatusProvider {
   }
 
   @Injected(StoreManager)
-  public declare storeManager: StoreManager
+  declare public storeManager: StoreManager
 
   @Injected(PasswordAuthenticator)
-  public declare authenticator: PasswordAuthenticator
+  declare public authenticator: PasswordAuthenticator
 
   @Injected(LoggerCollection)
-  public declare logger: LoggerCollection
+  declare public logger: LoggerCollection
 }
