@@ -11,7 +11,7 @@ export class IotDevicesService {
   declare readonly websocketNotificationsService: WebsocketNotificationsService
 
   @Injected(IotApiClient)
-  private declare readonly iotApiClient: IotApiClient
+  declare private readonly iotApiClient: IotApiClient
 
   private deviceCache = new Cache({
     capacity: 100,

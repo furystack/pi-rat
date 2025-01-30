@@ -6,7 +6,7 @@ import { DrivesApiClient } from './api-clients/drives-api-client.js'
 @Injectable({ lifetime: 'singleton' })
 export class FfprobeService {
   @Injected(DrivesApiClient)
-  private declare readonly mediaApiClient: DrivesApiClient
+  declare private readonly mediaApiClient: DrivesApiClient
 
   public ffprobeCache = new Cache({
     capacity: 100,

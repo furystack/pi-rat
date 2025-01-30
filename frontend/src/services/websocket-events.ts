@@ -15,7 +15,7 @@ export class WebsocketNotificationsService extends EventHub<{ onMessage: Websock
   }
 
   @Injected((i) => getLogger(i).withScope('WebsocketNotificationsService'))
-  private declare logger: ScopedLogger
+  declare private logger: ScopedLogger
 
   constructor() {
     super()

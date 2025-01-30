@@ -1,8 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { User } from 'common'
-import identitySchemas from 'common/schemas/identity-entities.json'
-import { GenericEditor } from '../../components/generic-editor/index.js'
+import identitySchemas from 'common/schemas/identity-entities.json' assert { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
+import { GenericEditor } from '../../components/generic-editor/index.js'
 import { IdentityApiClient } from '../../services/api-clients/identity-api-client.js'
 import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 

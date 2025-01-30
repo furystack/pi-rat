@@ -25,10 +25,10 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
   private deviceStatusMap = new Map<string, boolean>()
 
   @Injected((injector) => getLogger(injector).withScope('DeviceAvailabilityHub'))
-  private declare logger: ScopedLogger
+  declare private logger: ScopedLogger
 
   @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Config, 'id'))
-  private declare configStore: PhysicalStore<Config, 'id', WithOptionalId<Config, 'id'>>
+  declare private configStore: PhysicalStore<Config, 'id', WithOptionalId<Config, 'id'>>
 
   private getCurrentConfig = async () => {
     try {
@@ -86,10 +86,10 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
   }
 
   @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Device, 'name'))
-  private declare deviceStore: PhysicalStore<Device, 'name', WithOptionalId<Device, 'name'>>
+  declare private deviceStore: PhysicalStore<Device, 'name', WithOptionalId<Device, 'name'>>
 
   @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(DevicePingHistory, 'id'))
-  private declare devicePingHistoryStore: PhysicalStore<
+  declare private devicePingHistoryStore: PhysicalStore<
     DevicePingHistory,
     'id',
     WithOptionalId<DevicePingHistory, 'id'>

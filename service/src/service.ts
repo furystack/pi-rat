@@ -23,7 +23,7 @@ import { EventHub } from '@furystack/utils'
 @Injectable({ lifetime: 'singleton' })
 export class PiRatRootService extends EventHub<{ initialized: undefined }> {
   @Injected((injector) => getLogger(injector).withScope('service'))
-  private declare logger: ScopedLogger
+  declare private logger: ScopedLogger
 
   public async init(injector: Injector) {
     await this.logger.information({ message: '🐀 Starting PI-RAT service...' })
