@@ -26,12 +26,12 @@
   },
   "devDependencies": {
     "@types/ffprobe": "^1.1.8",
-    "@types/node": "^22.9.0",
+    "@types/node": "^22.12.0",
     "ts-json-schema-generator": "^2.3.0",
-    "vitest": "^2.1.4"
+    "vitest": "^3.0.4"
   },
   "dependencies": {
-    "@furystack/core": "^15.0.9",
-    "@furystack/rest": "^8.0.9"
+    "@furystack/core": "^15.0.13",
+    "@furystack/rest": "^8.0.13"
   }
 }
