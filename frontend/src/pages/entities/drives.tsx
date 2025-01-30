@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Drive } from 'common'
-import { GenericEditor } from '../../components/generic-editor/index.js'
+import drivesSchemas from 'common/schemas/drives-entities.json' assert { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
+import { GenericEditor } from '../../components/generic-editor/index.js'
 import { DrivesService } from '../../services/drives-service.js'
-import drivesSchemas from 'common/schemas/drives-entities.json'
+import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const DrivesPage = Shade({
   shadowDomName: 'shade-app-drives-page',

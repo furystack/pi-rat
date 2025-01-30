@@ -20,14 +20,18 @@ export class FileWatcherService extends EventHub<{
   change: EventParam
   unlink: EventParam
   unlinkDir: EventParam
+  all: EventParam
+  ready: EventParam
+  raw: EventParam
+  error: EventParam
 }> {
   private watchers: { [key: string]: FSWatcher } = {}
 
   @Injected((injector) => getLogger(injector).withScope('FileWatchers'))
-  private declare logger: ScopedLogger
+  declare private logger: ScopedLogger
 
   @Injected(WebsocketService)
-  private declare webSocketService: WebsocketService
+  declare private webSocketService: WebsocketService
 
   private addWatcher = async (drive: Drive) => {
     if (this.watchers[drive.letter]) {
@@ -37,7 +41,7 @@ export class FileWatcherService extends EventHub<{
     await this.logger.verbose({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
     const watcher = watch(drive.physicalPath, { ignoreInitial: true })
     watcher.on('all', (event, path) => {
-      const relativePath = (path as string).toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
+      const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
       void this.logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
       this.emit(event, { path: relativePath, driveLetter: drive.letter })
 
@@ -60,7 +64,7 @@ export class FileWatcherService extends EventHub<{
     }
   }
 
-  private declare injector: Injector
+  declare private injector: Injector
 
   public async init() {
     await this.startWatchCurrentDirectories()
