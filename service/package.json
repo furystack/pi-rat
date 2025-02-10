@@ -15,7 +15,7 @@
     "@types/ffprobe": "^1.1.8",
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/formidable": "^3.4.5",
-    "@types/node": "^22.12.0",
+    "@types/node": "^22.13.1",
     "@types/ping": "^0.4.4",
     "typescript": "^5.7.3"
   },
@@ -39,6 +39,6 @@
     "ping": "^0.4.4",
     "sequelize": "^6.37.5",
     "sqlite3": "^5.1.7",
-    "vitest": "^3.0.4"
+    "vitest": "^3.0.5"
   }
 }

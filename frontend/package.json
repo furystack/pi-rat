@@ -15,7 +15,7 @@
     "@furystack/rest": "^8.0.13",
     "@types/marked": "^6.0.0",
     "typescript": "^5.7.3",
-    "vite": "^6.0.11"
+    "vite": "^6.1.0"
   },
   "dependencies": {
     "@furystack/cache": "^5.0.10",
@@ -27,12 +27,12 @@
     "@furystack/shades-common-components": "^10.0.14",
     "@furystack/shades-lottie": "^7.0.14",
     "@furystack/utils": "^8.0.9",
-    "@types/node": "^22.12.0",
+    "@types/node": "^22.13.1",
     "common": "workspace:^",
-    "marked": "^15.0.6",
+    "marked": "^15.0.7",
     "monaco-editor": "^0.52.2",
     "path-to-regexp": "^8.2.0",
     "semaphore-async-await": "^1.5.1",
-    "video.js": "8.21.0"
+    "video.js": "8.22.0"
   }
 }
