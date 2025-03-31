@@ -1,6 +1,6 @@
 import { createComponent, RouteLink, Shade } from '@furystack/shades'
 import { Dashboard } from 'common'
-import dashboardSchemas from 'common/schemas/dashboard-entities.json' assert { type: 'json' }
+import dashboardSchemas from 'common/schemas/dashboard-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { DashboardService } from '../../services/dashboards-service.js'
