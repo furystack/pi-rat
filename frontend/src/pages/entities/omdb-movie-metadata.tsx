@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { OmdbMovieMetadata } from 'common'
-import mediaSchemas from 'common/schemas/media-entities.json' assert { type: 'json' }
+import mediaSchemas from 'common/schemas/media-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'

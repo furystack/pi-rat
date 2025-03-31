@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Device } from 'common'
-import iotSchemas from 'common/schemas/iot-entities.json' assert { type: 'json' }
+import iotSchemas from 'common/schemas/iot-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'

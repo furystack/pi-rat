@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Drive } from 'common'
-import drivesSchemas from 'common/schemas/drives-entities.json' assert { type: 'json' }
+import drivesSchemas from 'common/schemas/drives-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { DrivesService } from '../../services/drives-service.js'

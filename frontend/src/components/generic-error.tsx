@@ -1,8 +1,8 @@
 import { ResponseError } from '@furystack/rest-client-fetch'
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { Button, ThemeProviderService } from '@furystack/shades-common-components'
-import deadSmiley from '../animations/error-dead-smiley.json' assert { type: 'json' }
-import redCross from '../animations/error-red-cross.json' assert { type: 'json' }
+import deadSmiley from '../animations/error-dead-smiley.json' with { type: 'json' }
+import redCross from '../animations/error-red-cross.json' with { type: 'json' }
 import { ErrorReporter } from '../services/error-reporter.js'
 import { Error404 } from './error-404.js'
 import { ErrorDisplay } from './error-display.js'
