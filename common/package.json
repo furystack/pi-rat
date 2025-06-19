@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@furystack/core": "^15.0.20",
-    "@furystack/rest": "^8.0.20"
+    "@furystack/rest": "^8.0.20",
+    "ollama": "^0.5.16"
   }
 }

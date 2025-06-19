@@ -31,6 +31,7 @@
     "common": "workspace:^",
     "marked": "^15.0.12",
     "monaco-editor": "^0.52.2",
+    "ollama": "^0.5.16",
     "path-to-regexp": "^8.2.0",
     "semaphore-async-await": "^1.5.1",
     "video.js": "8.23.3"

@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ChatMessageAttachment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the attachment"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+        },
+        "contentType": {
+          "type": "string",
+          "enum": ["image", "url", "json", "text", "other"],
+          "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+        },
+        "chatMessageId": {
+          "type": "string",
+          "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+        }
+      },
+      "required": ["id", "name", "contentType", "chatMessageId"],
+      "additionalProperties": false
+    },
+    "ChatMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the message"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the message was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The unique identifier of the user who sent the message"
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The unique identifier of the chat to which this message belongs"
+        }
+      },
+      "required": ["id", "content", "createdAt", "owner", "chatId"],
+      "additionalProperties": false
+    },
+    "Chat": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the chat"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description in markdown format"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the chat was created"
+        }
+      },
+      "required": ["id", "name", "createdAt"],
+      "additionalProperties": false
+    }
+  }
+}
