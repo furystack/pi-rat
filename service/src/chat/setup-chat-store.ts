@@ -4,7 +4,7 @@ import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { Chat, ChatMessage, ChatMessageAttachment } from 'common'
-import { ARRAY, DATE, Model, STRING } from 'sequelize'
+import { DATE, JSON, Model, STRING } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class ChatModel extends Model<Chat, Chat> implements Chat {
@@ -66,7 +66,7 @@ export const setupChatStore = async (injector: Injector) => {
             allowNull: false,
           },
           participants: {
-            type: ARRAY(STRING),
+            type: JSON,
             allowNull: true,
             defaultValue: [],
           },
