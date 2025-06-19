@@ -1,14 +1,19 @@
+import { getCurrentUser } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
+import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { Chat, ChatMessage, ChatMessageAttachment } from 'common'
-import { DATE, Model, STRING } from 'sequelize'
+import { ARRAY, DATE, Model, STRING } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class ChatModel extends Model<Chat, Chat> implements Chat {
   declare id: string
   declare name: string
   declare createdAt: Date
+  declare description?: string
+  declare owner: string
+  declare participants: string[]
 }
 
 class ChatMessageModel extends Model<ChatMessage, ChatMessage> implements ChatMessage {
@@ -56,10 +61,27 @@ export const setupChatStore = async (injector: Injector) => {
             type: DATE,
             defaultValue: new Date(),
           },
+          owner: {
+            type: STRING,
+            allowNull: false,
+          },
+          participants: {
+            type: ARRAY(STRING),
+            allowNull: true,
+            defaultValue: [],
+          },
         },
         {
           sequelize,
           tableName: 'chats',
+          indexes: [
+            {
+              fields: ['owner'],
+            },
+            {
+              fields: ['participants'],
+            },
+          ],
         },
       )
       await ChatModel.sync()
@@ -138,6 +160,106 @@ export const setupChatStore = async (injector: Injector) => {
         onDelete: 'CASCADE',
       })
       await ChatMessageAttachmentModel.sync()
+    },
+  })
+
+  const repo = getRepository(injector)
+
+  repo.createDataSet(Chat, 'id', {
+    authorizeAdd: async ({ injector: i, entity }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.owner !== user.username) {
+        return { isAllowed: false, message: 'You can only create chats for yourself' }
+      }
+
+      return { isAllowed: true }
+    },
+    authroizeRemoveEntity: async ({ injector: i, entity }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.owner !== user.username) {
+        return { isAllowed: false, message: 'You can only delete chats for yourself' }
+      }
+
+      return { isAllowed: true }
+    },
+    authorizeUpdateEntity: async ({ injector: i, entity, change }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.owner !== user.username) {
+        return { isAllowed: false, message: 'You can only update chats for yourself' }
+      }
+
+      if (change.owner && change.owner !== user.username) {
+        return { isAllowed: false, message: 'You cannot change the owner of a chat' }
+      }
+
+      return { isAllowed: true }
+    },
+    addFilter: async ({ injector: i, filter }) => {
+      const user = await getCurrentUser(i)
+      return {
+        ...filter,
+        filter: {
+          ...filter.filter,
+          $or: [{ owner: { $eq: user.username } }, { participants: { $in: [[user.username]] } }],
+        },
+      }
+    },
+  })
+
+  repo.createDataSet(ChatMessage, 'id', {
+    authorizeAdd: async ({ injector: i, entity }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.owner !== user.username) {
+        return { isAllowed: false, message: 'You can only create messages for yourself' }
+      }
+
+      return { isAllowed: true }
+    },
+    authroizeRemoveEntity: async ({ injector: i, entity }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.owner !== user.username) {
+        return { isAllowed: false, message: 'You can only delete messages for yourself' }
+      }
+
+      return { isAllowed: true }
+    },
+    authorizeUpdateEntity: async ({ injector: i, entity }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.owner !== user.username) {
+        return { isAllowed: false, message: 'You can only update messages for yourself' }
+      }
+
+      return { isAllowed: true }
     },
   })
 }

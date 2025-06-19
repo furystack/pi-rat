@@ -1,0 +1,1972 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/ChatApi",
+  "definitions": {
+    "ChatApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "properties": {
+            "/chat": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CChat%3E"
+            },
+            "/chat/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CChat%2C%22id%22%3E"
+            },
+            "/chat-messages": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CChatMessage%3E"
+            },
+            "/chat-messages/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CChatMessage%2C%22id%22%3E"
+            },
+            "/chat-message-attachments": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CChatMessageAttachment%3E"
+            },
+            "/chat-message-attachments/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
+            }
+          },
+          "required": [
+            "/chat",
+            "/chat/:id",
+            "/chat-messages",
+            "/chat-messages/:id",
+            "/chat-message-attachments",
+            "/chat-message-attachments/:id"
+          ],
+          "additionalProperties": false
+        },
+        "POST": {
+          "type": "object",
+          "properties": {
+            "/chat": {
+              "$ref": "#/definitions/PostEndpoint%3CChat%2C%22id%22%3E"
+            },
+            "/chat-messages": {
+              "$ref": "#/definitions/PostEndpoint%3CChatMessage%2C%22id%22%3E"
+            },
+            "/chat-message-attachments": {
+              "$ref": "#/definitions/PostEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
+            }
+          },
+          "required": ["/chat", "/chat-messages", "/chat-message-attachments"],
+          "additionalProperties": false
+        },
+        "PATCH": {
+          "type": "object",
+          "properties": {
+            "/chat/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CChat%2C%22id%22%3E"
+            },
+            "/chat-messages/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CChatMessage%2C%22id%22%3E"
+            },
+            "/chat-message-attachments/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
+            }
+          },
+          "required": ["/chat/:id", "/chat-messages/:id", "/chat-message-attachments/:id"],
+          "additionalProperties": false
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "properties": {
+            "/chat/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CChat%2C%22id%22%3E"
+            },
+            "/chat-messages/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CChatMessage%2C%22id%22%3E"
+            },
+            "/chat-message-attachments/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
+            }
+          },
+          "required": ["/chat/:id", "/chat-messages/:id", "/chat-message-attachments/:id"],
+          "additionalProperties": false
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["GET", "POST", "PATCH", "DELETE"],
+      "additionalProperties": false
+    },
+    "GetCollectionEndpoint<Chat>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CChat%2C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22participants%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CChat%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<Chat,(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"participants\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "name": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "description": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "owner": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "participants": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["id", "name", "description", "createdAt", "owner", "participants"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CChat%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<Chat>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChat%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChat%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChat%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChat%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The unique identifier"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The unique identifier"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The unique identifier"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The unique identifier"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The unique identifier"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The unique identifier"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The name of the chat"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The name of the chat"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The name of the chat"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The name of the chat"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The name of the chat"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The name of the chat"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the chat"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the chat"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The description in markdown format"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The description in markdown format"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "The description in markdown format"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "The description in markdown format"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The date the chat was created"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The date the chat was created"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The date the chat was created"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The date the chat was created"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The date the chat was created"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The date the chat was created"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The date the chat was created"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The date the chat was created"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The owner of the chat"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The owner of the chat"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The owner of the chat"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The owner of the chat"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The owner of the chat"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The owner of the chat"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The owner of the chat"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The owner of the chat"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "participants": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "A list of participants in the chat"
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "A list of participants in the chat"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "A list of participants in the chat"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "A list of participants in the chat"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<Chat>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Chat"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "Chat": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the chat"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description in markdown format"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the chat was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the chat"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of participants in the chat"
+        }
+      },
+      "required": ["id", "name", "createdAt", "owner", "participants"],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<Chat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["id", "name", "description", "createdAt", "owner", "participants"]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/Chat"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetCollectionEndpoint<ChatMessage>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CChatMessage%2C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CChatMessage%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<ChatMessage,(\"id\"|\"content\"|\"createdAt\"|\"owner\"|\"chatId\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "content": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "owner": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "chatId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["id", "content", "createdAt", "owner", "chatId"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CChatMessage%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<ChatMessage>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessage%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessage%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessage%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessage%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the message"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the message"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The unique identifier of the message"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The unique identifier of the message"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The unique identifier of the message"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The unique identifier of the message"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the message"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the message"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "content": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The content of the message"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The content of the message"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The content of the message"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The content of the message"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The content of the message"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The content of the message"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The content of the message"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The content of the message"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The date the message was created"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The date the message was created"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The date the message was created"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The date the message was created"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The date the message was created"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The date the message was created"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The date the message was created"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The date the message was created"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the user who sent the message"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the user who sent the message"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The unique identifier of the user who sent the message"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The unique identifier of the user who sent the message"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The unique identifier of the user who sent the message"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The unique identifier of the user who sent the message"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the user who sent the message"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the user who sent the message"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "chatId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the chat to which this message belongs"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the chat to which this message belongs"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The unique identifier of the chat to which this message belongs"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The unique identifier of the chat to which this message belongs"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The unique identifier of the chat to which this message belongs"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The unique identifier of the chat to which this message belongs"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the chat to which this message belongs"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the chat to which this message belongs"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<ChatMessage>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessage"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "ChatMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the message"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the message was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The unique identifier of the user who sent the message"
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The unique identifier of the chat to which this message belongs"
+        }
+      },
+      "required": ["id", "content", "createdAt", "owner", "chatId"],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<ChatMessage,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["id", "content", "createdAt", "owner", "chatId"]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/ChatMessage"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetCollectionEndpoint<ChatMessageAttachment>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CChatMessageAttachment%2C(%22id%22%7C%22name%22%7C%22contentType%22%7C%22chatMessageId%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CChatMessageAttachment%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<ChatMessageAttachment,(\"id\"|\"name\"|\"contentType\"|\"chatMessageId\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "name": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "contentType": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "chatMessageId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["id", "name", "contentType", "chatMessageId"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<ChatMessageAttachment>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the attachment"
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The unique identifier of the attachment"
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The unique identifier of the attachment"
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The unique identifier of the attachment"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The unique identifier of the attachment"
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The unique identifier of the attachment"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the attachment"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier of the attachment"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "contentType": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "enum": ["image", "url", "json", "text", "other"],
+                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "enum": ["image", "url", "json", "text", "other"],
+                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                },
+                "$like": {
+                  "type": "string",
+                  "enum": ["image", "url", "json", "text", "other"],
+                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                },
+                "$regex": {
+                  "type": "string",
+                  "enum": ["image", "url", "json", "text", "other"],
+                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "enum": ["image", "url", "json", "text", "other"],
+                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                },
+                "$ne": {
+                  "type": "string",
+                  "enum": ["image", "url", "json", "text", "other"],
+                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["image", "url", "json", "text", "other"],
+                    "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["image", "url", "json", "text", "other"],
+                    "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "chatMessageId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<ChatMessageAttachment>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessageAttachment"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "ChatMessageAttachment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the attachment"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+        },
+        "contentType": {
+          "type": "string",
+          "enum": ["image", "url", "json", "text", "other"],
+          "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+        },
+        "chatMessageId": {
+          "type": "string",
+          "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+        }
+      },
+      "required": ["id", "name", "contentType", "chatMessageId"],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<ChatMessageAttachment,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["id", "name", "contentType", "chatMessageId"]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/ChatMessageAttachment"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "PostEndpoint<Chat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CChat%2C%22id%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/Chat"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "WithOptionalId<Chat,\"id\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the chat"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description in markdown format"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the chat was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the chat"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of participants in the chat"
+        }
+      },
+      "required": ["createdAt", "name", "owner", "participants"]
+    },
+    "PostEndpoint<ChatMessage,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CChatMessage%2C%22id%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/ChatMessage"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "WithOptionalId<ChatMessage,\"id\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the message"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the message was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The unique identifier of the user who sent the message"
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The unique identifier of the chat to which this message belongs"
+        }
+      },
+      "required": ["chatId", "content", "createdAt", "owner"]
+    },
+    "PostEndpoint<ChatMessageAttachment,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CChatMessageAttachment%2C%22id%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/ChatMessageAttachment"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "WithOptionalId<ChatMessageAttachment,\"id\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the attachment"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+        },
+        "contentType": {
+          "type": "string",
+          "enum": ["image", "url", "json", "text", "other"],
+          "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+        },
+        "chatMessageId": {
+          "type": "string",
+          "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+        }
+      },
+      "required": ["chatMessageId", "contentType", "name"]
+    },
+    "PatchEndpoint<Chat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CChat%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["body", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "Partial<Chat>": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the chat"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description in markdown format"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the chat was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the chat"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of participants in the chat"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PatchEndpoint<ChatMessage,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CChatMessage%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier of the message"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["body", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "Partial<ChatMessage>": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the message"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the message was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The unique identifier of the user who sent the message"
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The unique identifier of the chat to which this message belongs"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PatchEndpoint<ChatMessageAttachment,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CChatMessageAttachment%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier of the attachment"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["body", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "Partial<ChatMessageAttachment>": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the attachment"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+        },
+        "contentType": {
+          "type": "string",
+          "enum": ["image", "url", "json", "text", "other"],
+          "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+        },
+        "chatMessageId": {
+          "type": "string",
+          "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+        }
+      },
+      "additionalProperties": false
+    },
+    "DeleteEndpoint<Chat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for deleting entities"
+    },
+    "DeleteEndpoint<ChatMessage,\"id\">": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier of the message"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for deleting entities"
+    },
+    "DeleteEndpoint<ChatMessageAttachment,\"id\">": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier of the attachment"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for deleting entities"
+    }
+  }
+}

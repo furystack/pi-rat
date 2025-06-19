@@ -15,4 +15,14 @@ export class Chat {
    * The date the chat was created
    */
   declare createdAt: Date
+
+  /**
+   * The owner of the chat
+   */
+  declare owner: string
+
+  /**
+   * A list of participants in the chat
+   */
+  declare participants: string[]
 }

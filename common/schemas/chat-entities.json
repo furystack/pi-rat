@@ -72,9 +72,20 @@
           "type": "string",
           "format": "date-time",
           "description": "The date the chat was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the chat"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of participants in the chat"
         }
       },
-      "required": ["id", "name", "createdAt"],
+      "required": ["id", "name", "createdAt", "owner", "participants"],
       "additionalProperties": false
     }
   }
