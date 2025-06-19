@@ -12,6 +12,9 @@ export default defineConfig(async () => {
         uploadToken: process.env.CODECOV_TOKEN,
       }),
     ],
+    server: {
+      host: true,
+    },
     build: {
       rollupOptions: {
         external: ['vitest'],
