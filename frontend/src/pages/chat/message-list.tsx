@@ -4,6 +4,7 @@ import type { Chat } from 'common'
 import { marked } from 'marked'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { ChatMessageService } from './chat-messages-service.js'
+import { DeleteChatMessage } from './delete-chat-message.js'
 
 const ChatLine = styledElement('div', {
   fontSize: '12px',
@@ -12,6 +13,7 @@ const ChatLine = styledElement('div', {
   gap: '4px',
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
+  width: '100%',
 })
 
 const ChatLineHeader = styledElement('div', {
@@ -45,17 +47,15 @@ export const MessageList = Shade<{ chat: Chat }>({
     overflowY: 'auto',
     width: '100%',
   },
-  constructed: ({ element }) => {
+  render: ({ injector, props, useObservable, element }) => {
     setTimeout(() => {
       requestAnimationFrame(() => {
         element.scrollTo({
-          behavior: 'smooth',
+          behavior: 'instant',
           top: Math.max(element.scrollHeight, element.offsetHeight),
         })
       })
     }, 1)
-  },
-  render: ({ injector, props, useObservable }) => {
     const chatMessageService = injector.getInstance(ChatMessageService)
 
     const { chat } = props
@@ -65,7 +65,7 @@ export const MessageList = Shade<{ chat: Chat }>({
       chatMessageService.getChatMessagesAsObservable({ filter: { chatId: { $eq: chat.id } } }),
     )
 
-    if (chatMessages.status === 'loading' || chatMessages.status === 'uninitialized') {
+    if (!chatMessages.value) {
       return (
         <>
           <Skeleton />
@@ -92,13 +92,13 @@ export const MessageList = Shade<{ chat: Chat }>({
         {chatMessages.value.entries.map((message) => (
           <ChatLine>
             <ChatLineAvatar />
-
-            <div>
-              <ChatLineHeader>
+            <div style={{ width: '100%' }}>
+              <ChatLineHeader style={{ position: 'relative', width: '100%' }}>
                 <strong>{message.owner}</strong>
                 <span style={{ marginLeft: '8px', fontWeight: 'lighter' }}>
                   {new Date(message.createdAt).toLocaleString()}
                 </span>
+                <DeleteChatMessage chatMessage={message} />
               </ChatLineHeader>
               <div innerHTML={marked(message.content) as string} />
             </div>

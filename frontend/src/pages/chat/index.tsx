@@ -1,5 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button } from '@furystack/shades-common-components'
+import { WebsocketNotificationsService } from '../../services/websocket-events.js'
 import { AddChatButton } from './add-chat-button.js'
 import { ChatFlow } from './chat-flow.js'
 import { ChatList } from './chat-list.js'
@@ -21,6 +22,8 @@ export const ChatPage = Shade({
     const speechSynthesis = injector.getInstance(SpeechSynthesisService)
 
     const speechRecognizer = injector.getInstance(SpeechRecognitionService)
+
+    injector.getInstance(WebsocketNotificationsService)
 
     return (
       <>

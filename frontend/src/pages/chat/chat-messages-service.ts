@@ -3,11 +3,15 @@ import type { FilterType } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ChatMessage } from 'common'
 import { ChatApiClient } from '../../services/api-clients/chat-api-client.js'
+import { WebsocketNotificationsService } from '../../services/websocket-events.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class ChatMessageService {
   @Injected(ChatApiClient)
   declare private readonly chatApiClient: ChatApiClient
+
+  @Injected(WebsocketNotificationsService)
+  declare private readonly websocketNotificationsService: WebsocketNotificationsService
 
   private chatMessageCache = new Cache({
     capacity: 100,
@@ -103,5 +107,39 @@ export class ChatMessageService {
     })
     this.chatMessagesQueryCache.obsoleteRange(() => true)
     return result
+  }
+
+  public async deleteChatMessage(id: string) {
+    await this.chatApiClient.call({
+      method: 'DELETE',
+      action: '/chat-messages/:id',
+      url: { id },
+    })
+
+    this.chatMessageCache.remove(id)
+    this.chatMessagesQueryCache.obsoleteRange(() => true)
+  }
+
+  public init() {
+    this.websocketNotificationsService.addListener('onMessage', async (message) => {
+      if (message.type === 'chat-message-added') {
+        this.chatMessageCache.setExplicitValue({
+          loadArgs: [message.chatMessage.id],
+          value: {
+            status: 'loaded',
+            value: message.chatMessage,
+            updatedAt: new Date(),
+          },
+        })
+
+        try {
+          this.chatMessagesQueryCache.obsoleteRange((entity) => {
+            return entity?.entries.some((entry) => entry.chatId === message.chatMessage.chatId)
+          })
+        } catch (error) {
+          // Ignore - Maybe already reloading
+        }
+      }
+    })
   }
 }
