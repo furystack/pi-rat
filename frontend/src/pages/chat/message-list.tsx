@@ -1,8 +1,39 @@
-import { createComponent, Shade } from '@furystack/shades'
+import { createComponent, Shade, styledElement } from '@furystack/shades'
 import { Skeleton } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
+import { marked } from 'marked'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { ChatMessageService } from './chat-messages-service.js'
+
+const ChatLine = styledElement('div', {
+  fontSize: '12px',
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '4px',
+  alignItems: 'flex-start',
+  justifyContent: 'flex-start',
+})
+
+const ChatLineHeader = styledElement('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  height: '100%',
+})
+
+const ChatLineAvatar = styledElement('div', {
+  width: '32px',
+  height: '32px',
+  borderRadius: '50%',
+  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  color: 'rgba(0, 0, 0, 0.7)',
+  marginRight: '8px',
+})
 
 export const MessageList = Shade<{ chat: Chat }>({
   shadowDomName: 'shade-app-message-list',
@@ -50,10 +81,19 @@ export const MessageList = Shade<{ chat: Chat }>({
     return (
       <>
         {chatMessages.value.entries.map((message) => (
-          <div style={{ padding: '8px', borderBottom: '1px solid #ccc' }}>
-            <strong>{message.owner}:</strong>
-            <span>{message.content}</span>
-          </div>
+          <ChatLine>
+            <ChatLineAvatar />
+
+            <div>
+              <ChatLineHeader>
+                <strong>{message.owner}</strong>
+                <span style={{ marginLeft: '8px', fontWeight: 'lighter' }}>
+                  {new Date(message.createdAt).toLocaleString()}
+                </span>
+              </ChatLineHeader>
+              <div innerHTML={marked(message.content) as string} />
+            </div>
+          </ChatLine>
         ))}
       </>
     )
