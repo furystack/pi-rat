@@ -31,8 +31,8 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@furystack/core": "^15.0.20",
-    "@furystack/rest": "^8.0.20",
+    "@furystack/core": "^15.0.21",
+    "@furystack/rest": "^8.0.21",
     "ollama": "^0.5.16"
   }
 }
