@@ -307,10 +307,9 @@ export const setupChatStore = async (injector: Injector) => {
     })
   })
 
-  chatDataSet.subscribe('onEntityUpdated', ({ id, change }) => {
-    const entityPromise = chatPhysicalStore.get(id)
+  chatDataSet.subscribe('onEntityUpdated', async ({ id, change }) => {
+    const entity = await chatPhysicalStore.get(id)
     void wsService.announce({ type: 'chat-updated', id, change }, async ({ injector: i }) => {
-      const entity = await entityPromise
       const user = await getCurrentUser(i)
       if (!user || !entity) {
         return false
@@ -319,52 +318,59 @@ export const setupChatStore = async (injector: Injector) => {
     })
   })
 
-  chatMessageDataSet.subscribe('onEntityAdded', ({ entity }) => {
+  chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
     const chatPromise = chatPhysicalStore.get(entity.chatId)
     const attachmentsPromise = attachmentsPhysicalStore.find({
       filter: { chatMessageId: { $eq: entity.id } },
     })
-    Promise.all([chatPromise, attachmentsPromise])
-      .then(([chat, attachments]) => {
-        if (chat) {
-          void wsService.announce(
-            { type: 'chat-message-added', chatMessage: entity, chat, attachments },
-            async ({ injector: i }) => {
-              const user = await getCurrentUser(i)
-              if (!user || !chat) {
-                return false
-              }
-              return chat.owner === user.username || chat.participants.includes(user.username)
-            },
-          )
-        }
-      })
-      .catch((error) => {
-        void logger.error({
-          message: 'Error announcing chat message added',
-          data: { entity, error },
-        })
-      })
+    const [chat, attachments] = await Promise.all([chatPromise, attachmentsPromise])
+    if (chat) {
+      void wsService.announce(
+        { type: 'chat-message-added', chatMessage: entity, chat, attachments },
+        async ({ injector: i }) => {
+          const user = await getCurrentUser(i)
+          if (!user || !chat) {
+            return false
+          }
+          return chat.owner === user.username || chat.participants.includes(user.username)
+        },
+      )
+    }
   })
 
-  chatMessageDataSet.subscribe('onEntityUpdated', ({ id, change }) => {
-    chatMessagePhysicalStore
-      .get(id)
-      .then(async (entity) => {
-        if (!entity) {
-          return
+  chatMessageDataSet.subscribe('onEntityUpdated', async ({ id, change }) => {
+    const reloadedChatMessage = await chatMessagePhysicalStore.get(id)
+    if (!reloadedChatMessage) {
+      return
+    }
+    const chat = await chatPhysicalStore.get(reloadedChatMessage.chatId)
+    if (!chat) {
+      return
+    }
+
+    const attachments = await attachmentsPhysicalStore.find({
+      filter: { chatMessageId: { $eq: reloadedChatMessage.id } },
+    })
+
+    void wsService.announce(
+      { type: 'chat-message-updated', id, change, chat, attachments },
+      async ({ injector: i }) => {
+        const currentUser = await getCurrentUser(i)
+        if (!currentUser) {
+          return false
         }
-        const chatPromise = chatPhysicalStore.get(entity.chatId)
-        const attachmentsPromise = attachmentsPhysicalStore.find({
-          filter: { chatMessageId: { $eq: entity.id } },
-        })
-        return Promise.all([chatPromise, attachmentsPromise])
-      })
-      .catch((error) => {
-        void logger.error({
-          message: 'Error getting chat message for update',
-          data: { id, change, error },
-        })
-      })
+        return chat.owner === currentUser.username || chat.participants.includes(currentUser.username)
+      },
+    )
+  })
+
+  chatMessageDataSet.subscribe('onEntityRemoved', async ({ key }) => {
+    await wsService.announce({ type: 'chat-message-removed', chatMessageId: key }, async ({ injector: i }) => {
+      const user = await getCurrentUser(i)
+      if (!user) {
+        return false
+      }
+      return true
+    })
   })
 }
