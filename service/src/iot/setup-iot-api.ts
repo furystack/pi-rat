@@ -8,7 +8,6 @@ import {
   createPostEndpoint,
   useRestService,
 } from '@furystack/rest-service'
-import { useWebsockets } from '@furystack/websocket-api'
 import type { IotApi } from 'common'
 import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
 import iotApiSchema from 'common/schemas/iot-api.json' with { type: 'json' }
@@ -69,11 +68,6 @@ export const setupIotApi = async (injector: Injector) => {
         ),
       },
     },
-  })
-
-  useWebsockets(injector, {
-    port: getPort(),
-    path: '/api/ws',
   })
 
   const hub = injector.getInstance(DeviceAvailabilityHub)

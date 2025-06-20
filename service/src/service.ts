@@ -3,6 +3,7 @@ import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { EventHub } from '@furystack/utils'
+import { useWebsockets } from '@furystack/websocket-api'
 import { setupChatRestApi } from './chat/setup-chat-api.js'
 import { setupChat } from './chat/setup-chat.js'
 import { setupConfigRestApi } from './config/setup-config-rest-api.js'
@@ -11,6 +12,7 @@ import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api.j
 import { setupDashboards } from './dashboards/setup-dashboards.js'
 import { setupDrivesRestApi } from './drives/setup-drives-rest-api.js'
 import { setupDrives } from './drives/setup-drives.js'
+import { getPort } from './get-port.js'
 import { setupIdentityRestApi } from './identity/setup-identity-rest-api.js'
 import { setupIdentity } from './identity/setup-identity.js'
 import { setupInstallRestApi } from './install/setup-install-rest-api.js'
@@ -62,6 +64,11 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupIotApi(injector),
       await setupChatRestApi(injector),
     ])
+
+    useWebsockets(injector, {
+      port: getPort(),
+      path: '/api/ws',
+    })
 
     await setupFrontendBundle(injector)
 
