@@ -14,6 +14,7 @@ export const ChatPage = Shade({
     display: 'flex',
     flexDirection: 'column',
     maxWidth: '100%',
+    width: '100%',
     height: 'calc(100% - 48px)',
     gap: '16px',
     overflow: 'hidden',
@@ -34,6 +35,7 @@ export const ChatPage = Shade({
             alignItems: 'center',
             gap: '8px',
             flexGrow: '0',
+            width: '100%',
           }}
         >
           <h1 style={{ margin: '0', marginLeft: '16px' }}>Chat Page</h1>
@@ -59,17 +61,21 @@ export const ChatPage = Shade({
             flexGrow: '1',
             overflow: 'hidden',
             height: '100%',
+            width: '100%',
           }}
         >
           <ChatList
             style={{
               height: '100%',
+              minWidth: '250px',
             }}
           />
           <ChatFlow
             style={{
               flexGrow: '1',
               height: '100%',
+              width: '100%',
+              overflow: 'hidden',
             }}
           />
         </div>

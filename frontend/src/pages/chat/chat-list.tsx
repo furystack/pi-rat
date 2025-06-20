@@ -33,7 +33,7 @@ export const ChatList = Shade({
     }
 
     return (
-      <Paper style={{ minWidth: '250px' }}>
+      <Paper style={{ width: '100%', height: 'calc(100% - 28px)' }}>
         <h2>Chat List</h2>
         <div
           style={{

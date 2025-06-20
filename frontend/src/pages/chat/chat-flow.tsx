@@ -53,7 +53,7 @@ export const ChatFlow = Shade({
         style={{
           flexGrow: '1',
           display: 'flex',
-          width: '100%',
+          width: 'calc(100% - 62px)',
           flexDirection: 'column',
           height: 'calc(100% - 28px)',
           position: 'relative',

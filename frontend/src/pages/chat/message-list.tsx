@@ -14,6 +14,8 @@ const ChatLine = styledElement('div', {
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
   width: '100%',
+  overflow: 'hidden',
+  overflowY: 'auto',
 })
 
 const ChatLineHeader = styledElement('div', {
@@ -35,6 +37,7 @@ const ChatLineAvatar = styledElement('div', {
   fontWeight: 'bold',
   color: 'rgba(0, 0, 0, 0.7)',
   marginRight: '8px',
+  flexShrink: '0',
 })
 
 export const MessageList = Shade<{ chat: Chat }>({
@@ -100,7 +103,15 @@ export const MessageList = Shade<{ chat: Chat }>({
                 </span>
                 <DeleteChatMessage chatMessage={message} />
               </ChatLineHeader>
-              <div innerHTML={marked(message.content) as string} />
+              <div
+                style={{ overflowX: 'auto', width: 'calc(100% - 32px)' }}
+                innerHTML={
+                  marked(message.content, {
+                    gfm: true,
+                    breaks: true,
+                  }) as string
+                }
+              />
             </div>
           </ChatLine>
         ))}
