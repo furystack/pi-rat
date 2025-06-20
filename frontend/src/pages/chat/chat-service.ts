@@ -104,4 +104,15 @@ export class ChatService {
     this.chatQueryCache.obsoleteRange(() => true)
     return result
   }
+
+  public async deleteChat(id: string) {
+    await this.chatApiClient.call({
+      method: 'DELETE',
+      action: '/chat/:id',
+      url: { id },
+    })
+
+    this.chatCache.remove(id)
+    this.chatQueryCache.obsoleteRange(() => true)
+  }
 }

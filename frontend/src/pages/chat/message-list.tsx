@@ -42,9 +42,18 @@ export const MessageList = Shade<{ chat: Chat }>({
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: '8px',
-    maxHeight: '400px',
     overflowY: 'auto',
     width: '100%',
+  },
+  constructed: ({ element }) => {
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        element.scrollTo({
+          behavior: 'smooth',
+          top: Math.max(element.scrollHeight, element.offsetHeight),
+        })
+      })
+    }, 1)
   },
   render: ({ injector, props, useObservable }) => {
     const chatMessageService = injector.getInstance(ChatMessageService)

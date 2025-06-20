@@ -115,6 +115,14 @@ export const setupChatStore = async (injector: Injector) => {
         {
           sequelize,
           tableName: 'chat_messages',
+          indexes: [
+            {
+              fields: ['chatId'],
+            },
+            {
+              fields: ['createdAt'],
+            },
+          ],
         },
       )
       ChatMessageModel.belongsTo(ChatModel, {
@@ -152,6 +160,11 @@ export const setupChatStore = async (injector: Injector) => {
         {
           sequelize,
           tableName: 'chat_message_attachments',
+          indexes: [
+            {
+              fields: ['chatMessageId'],
+            },
+          ],
         },
       )
       ChatMessageAttachmentModel.belongsTo(ChatMessageModel, {

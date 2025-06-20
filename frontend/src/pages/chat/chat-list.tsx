@@ -41,7 +41,6 @@ export const ChatList = Shade({
             flexDirection: 'column',
             alignItems: 'flex-start',
             gap: '8px',
-            maxHeight: '400px',
             overflowY: 'auto',
             width: '100%',
           }}

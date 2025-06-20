@@ -15,6 +15,7 @@ export const ChatPage = Shade({
     maxWidth: '100%',
     height: 'calc(100% - 48px)',
     gap: '16px',
+    overflow: 'hidden',
   },
   render: ({ injector }) => {
     const speechSynthesis = injector.getInstance(SpeechSynthesisService)
@@ -53,6 +54,8 @@ export const ChatPage = Shade({
             alignItems: 'center',
             gap: '8px',
             flexGrow: '1',
+            overflow: 'hidden',
+            height: '100%',
           }}
         >
           <ChatList
