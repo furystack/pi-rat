@@ -1,11 +1,17 @@
 import { Cache } from '@furystack/cache'
 import type { FilterType } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
+import { EventHub } from '@furystack/utils'
 import type { ChatInvitation } from 'common'
 import { ChatApiClient } from '../../services/api-clients/chat-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class ChatInvitationService {
+export class ChatInvitationService extends EventHub<{
+  invitationAccepted: ChatInvitation
+  invitationCreated: ChatInvitation
+  invitationRejected: ChatInvitation
+  invitationRevoked: ChatInvitation
+}> {
   @Injected(ChatApiClient)
   declare private readonly chatApiClient: ChatApiClient
 
@@ -81,7 +87,7 @@ export class ChatInvitationService {
     })
 
     this.chatInvitationQueryCache.obsoleteRange(() => true)
-
+    this.emit('invitationCreated', result)
     return result
   }
 
@@ -101,6 +107,7 @@ export class ChatInvitationService {
       },
     })
     this.chatInvitationQueryCache.obsoleteRange(() => true)
+    this.emit('invitationAccepted', result)
     return result
   }
 
@@ -120,6 +127,7 @@ export class ChatInvitationService {
       },
     })
     this.chatInvitationQueryCache.obsoleteRange(() => true)
+    this.emit('invitationRejected', result)
     return result
   }
 
@@ -139,6 +147,7 @@ export class ChatInvitationService {
       },
     })
     this.chatInvitationQueryCache.obsoleteRange(() => true)
+    this.emit('invitationRevoked', result)
     return result
   }
 }

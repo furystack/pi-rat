@@ -3,9 +3,13 @@ import type { FilterType } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import type { Chat } from 'common'
 import { ChatApiClient } from '../../services/api-clients/chat-api-client.js'
+import { ChatInvitationService } from './chat-intivation-service.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class ChatService {
+  @Injected(ChatInvitationService)
+  declare private readonly chatInvitationService: ChatInvitationService
+
   @Injected(ChatApiClient)
   declare private readonly chatApiClient: ChatApiClient
 
@@ -114,5 +118,11 @@ export class ChatService {
 
     this.chatCache.remove(id)
     this.chatQueryCache.obsoleteRange(() => true)
+  }
+
+  public init() {
+    this.chatInvitationService.subscribe('invitationAccepted', () => {
+      this.chatQueryCache.obsoleteRange(() => true)
+    })
   }
 }

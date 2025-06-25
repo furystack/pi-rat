@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import { Button, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { SessionService } from '../../services/session.js'
@@ -10,20 +10,35 @@ export const ChatInvitationList = Shade({
   style: {
     display: 'flex',
     width: '100%',
+    flexDirection: 'column',
   },
-  render: ({ injector, useObservable }) => {
-    const chatInvitationService = injector.getInstance(ChatInvitationService)
+  render: ({ injector, useObservable, useDisposable }) => {
+    const filter = { filter: { status: { $eq: 'pending' } } } as const
 
+    const chatInvitationService = injector.getInstance(ChatInvitationService)
     const currentUser = injector.getInstance(SessionService).currentUser.getValue()
 
-    const [invitations] = useObservable(
-      'chatInvitations',
-      chatInvitationService.getChatInvitationsAsObservable({
-        filter: {
-          status: { $eq: 'pending' },
-        },
-      }),
+    const reloadChatInvitations = () => {
+      void chatInvitationService.getChatInvitations(filter)
+    }
+
+    useDisposable('onInvitationAccepted', () =>
+      chatInvitationService.subscribe('invitationAccepted', reloadChatInvitations),
     )
+
+    useDisposable('onInvitationRejected', () =>
+      chatInvitationService.subscribe('invitationRejected', reloadChatInvitations),
+    )
+
+    useDisposable('onInvitationRevoked', () =>
+      chatInvitationService.subscribe('invitationRevoked', reloadChatInvitations),
+    )
+
+    useDisposable('onInvitationCreated', () =>
+      chatInvitationService.subscribe('invitationCreated', reloadChatInvitations),
+    )
+
+    const [invitations] = useObservable('chatInvitations', chatInvitationService.getChatInvitationsAsObservable(filter))
 
     if (invitations.status === 'failed') {
       return <GenericErrorPage error={invitations.error} />
@@ -41,29 +56,36 @@ export const ChatInvitationList = Shade({
 
     const noty = injector.getInstance(NotyService)
 
-    return (
-      <Paper style={{ width: '100%' }}>
-        {invitations.value.entries.length === 0 ? (
-          <p>🪹 No invitations</p>
-        ) : (
-          <>
-            <h2>📨 Invitations</h2>
+    const received = invitations.value.entries.filter(
+      (invitation) => invitation.userId === currentUser?.username && invitation.status === 'pending',
+    )
 
-            <ul>
-              {invitations.value.entries.map((invitation) => (
+    const sent = invitations.value.entries.filter(
+      (invitation) => invitation.createdBy === currentUser?.username && invitation.status === 'pending',
+    )
+
+    return (
+      <>
+        {received.length ? (
+          <Paper style={{ width: '100%' }}>
+            <h2>Invitations</h2>
+
+            <ul style={{ padding: '0', margin: '0' }}>
+              {received.map((invitation) => (
                 <li
                   style={{
                     listStyle: 'none',
                     display: 'flex',
+                    alignContent: 'center',
+                    justifyContent: 'space-between',
                   }}
                 >
-                  <p>{invitation.userId}</p>
-                  <p>{invitation.chatName}</p>
-                  <div>
-                    {invitation.userId === currentUser?.username ? (
-                      <>
-                        {invitation.status === 'pending' ? (
-                          <button
+                  {invitation.userId === currentUser?.username ? (
+                    <>
+                      {invitation.status === 'pending' ? (
+                        <>
+                          <p>{invitation.chatName}</p>
+                          <Button
                             onclick={async () => {
                               await chatInvitationService
                                 .acceptChatInvitation(invitation.id)
@@ -83,18 +105,90 @@ export const ChatInvitationList = Shade({
                                 })
                             }}
                           >
-                            Accept
-                          </button>
-                        ) : null}
-                      </>
-                    ) : null}
-                  </div>
+                            ✅
+                          </Button>
+                          <Button
+                            onclick={async () => {
+                              await chatInvitationService
+                                .rejectChatInvitation(invitation.id)
+                                .then(() => {
+                                  noty.emit('onNotyAdded', {
+                                    type: 'success',
+                                    title: 'Invitation Rejected',
+                                    body: `Invitation to chat "${invitation.chatName}" rejected!`,
+                                  })
+                                })
+                                .catch((error) => {
+                                  noty.emit('onNotyAdded', {
+                                    type: 'error',
+                                    title: 'Error Rejecting Invitation',
+                                    body: <ErrorDisplay error={error} />,
+                                  })
+                                })
+                            }}
+                          >
+                            ❌
+                          </Button>
+                        </>
+                      ) : null}
+                    </>
+                  ) : null}
                 </li>
               ))}
             </ul>
-          </>
-        )}
-      </Paper>
+          </Paper>
+        ) : null}
+        {sent.length ? (
+          <Paper style={{ width: '100%' }}>
+            <h2>Sent Invitations</h2>
+
+            <ul style={{ padding: '0', margin: '0' }}>
+              {sent.map((invitation) => (
+                <li
+                  style={{
+                    listStyle: 'none',
+                    display: 'flex',
+                    alignContent: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  {invitation.userId === currentUser?.username ? (
+                    <>
+                      {invitation.status === 'pending' ? (
+                        <>
+                          <p>{invitation.chatName}</p>
+                          <Button
+                            onclick={async () => {
+                              await chatInvitationService
+                                .rejectChatInvitation(invitation.id)
+                                .then(() => {
+                                  noty.emit('onNotyAdded', {
+                                    type: 'success',
+                                    title: 'Invitation Cancelled',
+                                    body: `Invitation to chat "${invitation.chatName}" cancelled!`,
+                                  })
+                                })
+                                .catch((error) => {
+                                  noty.emit('onNotyAdded', {
+                                    type: 'error',
+                                    title: 'Error Cancelling Invitation',
+                                    body: <ErrorDisplay error={error} />,
+                                  })
+                                })
+                            }}
+                          >
+                            ❌
+                          </Button>
+                        </>
+                      ) : null}
+                    </>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </Paper>
+        ) : null}
+      </>
     )
   },
 })
