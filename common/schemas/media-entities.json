@@ -26,14 +26,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "imdbId",
-        "title",
-        "year",
-        "plot",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "OmdbSeriesMetadata": {
@@ -93,10 +86,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "Source",
-              "Value"
-            ],
+            "required": ["Source", "Value"],
             "additionalProperties": false
           }
         },
@@ -213,10 +203,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "Source",
-              "Value"
-            ],
+            "required": ["Source", "Value"],
             "additionalProperties": false
           }
         },
@@ -234,10 +221,7 @@
         },
         "Type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "DVD": {
           "type": "string"
@@ -307,9 +291,7 @@
           "properties": {
             "metadata": {}
           },
-          "required": [
-            "metadata"
-          ],
+          "required": ["metadata"],
           "additionalProperties": false
         }
       }
@@ -343,10 +325,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "movie",
-            "episode"
-          ]
+          "enum": ["movie", "episode"]
         },
         "seriesId": {
           "type": "string"
@@ -364,12 +343,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "imdbId",
-        "title",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["imdbId", "title", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "WatchHistoryEntry": {
@@ -400,16 +374,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "userName",
-        "driveLetter",
-        "path",
-        "watchedSeconds",
-        "completed",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "MovieFile": {
@@ -437,32 +402,18 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "subtitle",
-                  "audio",
-                  "trailer",
-                  "info",
-                  "other"
-                ]
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
               },
               "path": {
                 "type": "string"
               }
             },
-            "required": [
-              "type",
-              "path"
-            ],
+            "required": ["type", "path"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "id",
-        "driveLetter",
-        "path",
-        "ffprobe"
-      ],
+      "required": ["id", "driveLetter", "path", "ffprobe"],
       "additionalProperties": false
     },
     "Ffmpeg.FfprobeData": {
@@ -482,11 +433,7 @@
           "items": {}
         }
       },
-      "required": [
-        "streams",
-        "format",
-        "chapters"
-      ],
+      "required": ["streams", "format", "chapters"],
       "additionalProperties": false
     },
     "Ffmpeg.FfprobeStream": {
@@ -628,15 +575,10 @@
           "$ref": "#/definitions/Ffmpeg.FfprobeStreamDisposition"
         },
         "rotation": {
-          "type": [
-            "string",
-            "number"
-          ]
+          "type": ["string", "number"]
         }
       },
-      "required": [
-        "index"
-      ]
+      "required": ["index"]
     },
     "Ffmpeg.FfprobeStreamDisposition": {
       "type": "object",
@@ -720,10 +662,7 @@
     "Record<string,(string|number)>": {
       "type": "object",
       "additionalProperties": {
-        "type": [
-          "string",
-          "number"
-        ]
+        "type": ["string", "number"]
       }
     }
   }

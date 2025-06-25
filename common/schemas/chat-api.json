@@ -14,16 +14,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "result",
-        "url"
-      ],
+      "required": ["result", "url"],
       "additionalProperties": false
     },
     "ChatInvitation": {
@@ -51,13 +46,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "pending",
-            "accepted",
-            "rejected",
-            "revoked",
-            "expired"
-          ],
+          "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
           "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
         },
         "createdAt": {
@@ -70,16 +59,7 @@
           "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
         }
       },
-      "required": [
-        "id",
-        "chatId",
-        "chatName",
-        "message",
-        "userId",
-        "status",
-        "createdAt",
-        "createdBy"
-      ],
+      "required": ["id", "chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"],
       "additionalProperties": false
     },
     "RejectInvitationAction": {
@@ -95,16 +75,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "result",
-        "url"
-      ],
+      "required": ["result", "url"],
       "additionalProperties": false
     },
     "RevokeInvitationAction": {
@@ -120,16 +95,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "result",
-        "url"
-      ],
+      "required": ["result", "url"],
       "additionalProperties": false
     },
     "ChatApi": {
@@ -212,11 +182,7 @@
               "$ref": "#/definitions/PatchEndpoint%3CChatInvitation%2C%22id%22%3E"
             }
           },
-          "required": [
-            "/chat/:id",
-            "/chat-messages/:id",
-            "/chat-invitations/:id"
-          ],
+          "required": ["/chat/:id", "/chat-messages/:id", "/chat-invitations/:id"],
           "additionalProperties": false
         },
         "PUT": {
@@ -230,9 +196,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -246,10 +210,7 @@
               "$ref": "#/definitions/DeleteEndpoint%3CChatMessage%2C%22id%22%3E"
             }
           },
-          "required": [
-            "/chat/:id",
-            "/chat-messages/:id"
-          ],
+          "required": ["/chat/:id", "/chat-messages/:id"],
           "additionalProperties": false
         },
         "HEAD": {
@@ -263,9 +224,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -280,9 +239,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -297,9 +254,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -314,19 +269,12 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "GET",
-        "POST",
-        "PATCH",
-        "DELETE"
-      ],
+      "required": ["GET", "POST", "PATCH", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -343,9 +291,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -360,9 +306,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -377,9 +321,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -394,9 +336,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -411,9 +351,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -428,9 +366,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -445,9 +381,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -462,9 +396,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -479,9 +411,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
@@ -504,10 +434,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CChat%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -527,45 +454,27 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "name": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "description": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "owner": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "participants": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -575,14 +484,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "id",
-              "name",
-              "description",
-              "createdAt",
-              "owner",
-              "participants"
-            ]
+            "enum": ["id", "name", "description", "createdAt", "owner", "participants"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -981,10 +883,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1020,13 +919,7 @@
           "description": "A list of participants in the chat"
         }
       },
-      "required": [
-        "id",
-        "name",
-        "createdAt",
-        "owner",
-        "participants"
-      ],
+      "required": ["id", "name", "createdAt", "owner", "participants"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Chat,\"id\">": {
@@ -1039,14 +932,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "id",
-                  "name",
-                  "description",
-                  "createdAt",
-                  "owner",
-                  "participants"
-                ]
+                "enum": ["id", "name", "description", "createdAt", "owner", "participants"]
               },
               "description": "The list of fields to select"
             }
@@ -1061,20 +947,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Chat"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -1094,10 +974,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CChatMessage%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -1117,45 +994,27 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "content": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "owner": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "chatId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "attachments": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1165,14 +1024,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "id",
-              "content",
-              "createdAt",
-              "owner",
-              "chatId",
-              "attachments"
-            ]
+            "enum": ["id", "content", "createdAt", "owner", "chatId", "attachments"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -1580,11 +1432,7 @@
           "description": "The type that hints how the attachment can be displayed"
         }
       },
-      "required": [
-        "id",
-        "fileName",
-        "type"
-      ],
+      "required": ["id", "fileName", "type"],
       "additionalProperties": false
     },
     "GetCollectionResult<ChatMessage>": {
@@ -1602,10 +1450,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1641,14 +1486,7 @@
           "description": "The attachments of the message"
         }
       },
-      "required": [
-        "id",
-        "content",
-        "createdAt",
-        "owner",
-        "chatId",
-        "attachments"
-      ],
+      "required": ["id", "content", "createdAt", "owner", "chatId", "attachments"],
       "additionalProperties": false
     },
     "GetEntityEndpoint<ChatMessage,\"id\">": {
@@ -1661,14 +1499,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "id",
-                  "content",
-                  "createdAt",
-                  "owner",
-                  "chatId",
-                  "attachments"
-                ]
+                "enum": ["id", "content", "createdAt", "owner", "chatId", "attachments"]
               },
               "description": "The list of fields to select"
             }
@@ -1683,20 +1514,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/ChatMessage"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -1716,10 +1541,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CChatInvitation%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -1739,59 +1561,35 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "chatId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "chatName": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "message": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "userId": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "status": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdBy": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1801,16 +1599,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "id",
-              "chatId",
-              "chatName",
-              "message",
-              "userId",
-              "status",
-              "createdAt",
-              "createdBy"
-            ]
+            "enum": ["id", "chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -2157,46 +1946,22 @@
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "accepted",
-                    "rejected",
-                    "revoked",
-                    "expired"
-                  ],
+                  "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                   "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$endsWith": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "accepted",
-                    "rejected",
-                    "revoked",
-                    "expired"
-                  ],
+                  "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                   "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$like": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "accepted",
-                    "rejected",
-                    "revoked",
-                    "expired"
-                  ],
+                  "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                   "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$regex": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "accepted",
-                    "rejected",
-                    "revoked",
-                    "expired"
-                  ],
+                  "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                   "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 }
               },
@@ -2207,24 +1972,12 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "accepted",
-                    "rejected",
-                    "revoked",
-                    "expired"
-                  ],
+                  "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                   "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$ne": {
                   "type": "string",
-                  "enum": [
-                    "pending",
-                    "accepted",
-                    "rejected",
-                    "revoked",
-                    "expired"
-                  ],
+                  "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                   "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 }
               },
@@ -2237,13 +1990,7 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "pending",
-                      "accepted",
-                      "rejected",
-                      "revoked",
-                      "expired"
-                    ],
+                    "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                     "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                   }
                 },
@@ -2251,13 +1998,7 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": [
-                      "pending",
-                      "accepted",
-                      "rejected",
-                      "revoked",
-                      "expired"
-                    ],
+                    "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
                     "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                   }
                 }
@@ -2403,10 +2144,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -2420,16 +2158,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "id",
-                  "chatId",
-                  "chatName",
-                  "message",
-                  "userId",
-                  "status",
-                  "createdAt",
-                  "createdBy"
-                ]
+                "enum": ["id", "chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"]
               },
               "description": "The list of fields to select"
             }
@@ -2444,20 +2173,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/ChatInvitation"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -2471,10 +2194,7 @@
           "$ref": "#/definitions/Chat"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -2510,12 +2230,7 @@
           "description": "A list of participants in the chat"
         }
       },
-      "required": [
-        "createdAt",
-        "name",
-        "owner",
-        "participants"
-      ]
+      "required": ["createdAt", "name", "owner", "participants"]
     },
     "Omit<Chat,\"id\">": {
       "$ref": "#/definitions/Pick%3CChat%2CExclude%3C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22participants%22)%2C%22id%22%3E%3E"
@@ -2547,12 +2262,7 @@
           "description": "A list of participants in the chat"
         }
       },
-      "required": [
-        "name",
-        "createdAt",
-        "owner",
-        "participants"
-      ],
+      "required": ["name", "createdAt", "owner", "participants"],
       "additionalProperties": false
     },
     "PostEndpoint<ChatMessage,\"id\">": {
@@ -2565,10 +2275,7 @@
           "$ref": "#/definitions/ChatMessage"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -2604,13 +2311,7 @@
           "description": "The attachments of the message"
         }
       },
-      "required": [
-        "attachments",
-        "chatId",
-        "content",
-        "createdAt",
-        "owner"
-      ]
+      "required": ["attachments", "chatId", "content", "createdAt", "owner"]
     },
     "Omit<ChatMessage,\"id\">": {
       "$ref": "#/definitions/Pick%3CChatMessage%2CExclude%3C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22%7C%22attachments%22)%2C%22id%22%3E%3E"
@@ -2642,13 +2343,7 @@
           "description": "The attachments of the message"
         }
       },
-      "required": [
-        "content",
-        "createdAt",
-        "owner",
-        "chatId",
-        "attachments"
-      ],
+      "required": ["content", "createdAt", "owner", "chatId", "attachments"],
       "additionalProperties": false
     },
     "PostEndpoint<ChatInvitation,\"id\">": {
@@ -2661,10 +2356,7 @@
           "$ref": "#/definitions/ChatInvitation"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -2694,13 +2386,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "pending",
-            "accepted",
-            "rejected",
-            "revoked",
-            "expired"
-          ],
+          "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
           "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
         },
         "createdAt": {
@@ -2712,15 +2398,7 @@
           "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
         }
       },
-      "required": [
-        "chatId",
-        "chatName",
-        "createdAt",
-        "createdBy",
-        "message",
-        "status",
-        "userId"
-      ]
+      "required": ["chatId", "chatName", "createdAt", "createdBy", "message", "status", "userId"]
     },
     "Omit<ChatInvitation,\"id\">": {
       "$ref": "#/definitions/Pick%3CChatInvitation%2CExclude%3C(%22id%22%7C%22chatId%22%7C%22chatName%22%7C%22message%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%2C%22id%22%3E%3E"
@@ -2746,13 +2424,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "pending",
-            "accepted",
-            "rejected",
-            "revoked",
-            "expired"
-          ],
+          "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
           "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
         },
         "createdAt": {
@@ -2764,15 +2436,7 @@
           "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
         }
       },
-      "required": [
-        "chatId",
-        "chatName",
-        "message",
-        "userId",
-        "status",
-        "createdAt",
-        "createdBy"
-      ],
+      "required": ["chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"],
       "additionalProperties": false
     },
     "PatchEndpoint<Chat,\"id\">": {
@@ -2789,20 +2453,14 @@
               "description": "The unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -2853,20 +2511,14 @@
               "description": "The unique identifier of the message"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -2917,20 +2569,14 @@
               "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -2959,13 +2605,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "pending",
-            "accepted",
-            "rejected",
-            "revoked",
-            "expired"
-          ],
+          "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
           "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
         },
         "createdAt": {
@@ -2990,19 +2630,14 @@
               "description": "The unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
@@ -3017,19 +2652,14 @@
               "description": "The unique identifier of the message"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }

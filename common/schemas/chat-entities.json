@@ -26,13 +26,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "pending",
-            "accepted",
-            "rejected",
-            "revoked",
-            "expired"
-          ],
+          "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
           "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
         },
         "createdAt": {
@@ -45,16 +39,7 @@
           "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
         }
       },
-      "required": [
-        "id",
-        "chatId",
-        "chatName",
-        "message",
-        "userId",
-        "status",
-        "createdAt",
-        "createdBy"
-      ],
+      "required": ["id", "chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"],
       "additionalProperties": false
     },
     "ChatMessageAttachment": {
@@ -73,11 +58,7 @@
           "description": "The type that hints how the attachment can be displayed"
         }
       },
-      "required": [
-        "id",
-        "fileName",
-        "type"
-      ],
+      "required": ["id", "fileName", "type"],
       "additionalProperties": false
     },
     "ChatMessage": {
@@ -112,14 +93,7 @@
           "description": "The attachments of the message"
         }
       },
-      "required": [
-        "id",
-        "content",
-        "createdAt",
-        "owner",
-        "chatId",
-        "attachments"
-      ],
+      "required": ["id", "content", "createdAt", "owner", "chatId", "attachments"],
       "additionalProperties": false
     },
     "Chat": {
@@ -154,13 +128,7 @@
           "description": "A list of participants in the chat"
         }
       },
-      "required": [
-        "id",
-        "name",
-        "createdAt",
-        "owner",
-        "participants"
-      ],
+      "required": ["id", "name", "createdAt", "owner", "participants"],
       "additionalProperties": false
     }
   }

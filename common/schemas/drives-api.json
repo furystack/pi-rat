@@ -14,20 +14,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/GetCollectionResult%3CDirectoryEntry%3E"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "GetCollectionResult<DirectoryEntry>": {
@@ -45,10 +39,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -109,10 +100,7 @@
               }
             }
           },
-          "required": [
-            "success",
-            "entries"
-          ],
+          "required": ["success", "entries"],
           "additionalProperties": false
         },
         "url": {
@@ -125,19 +113,12 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "body": {}
       },
-      "required": [
-        "result",
-        "url",
-        "body"
-      ],
+      "required": ["result", "url", "body"],
       "additionalProperties": false
     },
     "DeleteFileEndpoint": {
@@ -153,10 +134,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {
@@ -167,16 +145,11 @@
               "const": true
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "DownloadEndpoint": {
@@ -192,18 +165,12 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {}
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "PostDriveEndpoint": {
@@ -216,10 +183,7 @@
           "$ref": "#/definitions/Drive"
         }
       },
-      "required": [
-        "body",
-        "result"
-      ],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "Omit<WithOptionalId<Drive,\"letter\">,(\"createdAt\"|\"updatedAt\")>": {
@@ -237,9 +201,7 @@
           "description": "The drive letter, should be unique"
         }
       },
-      "required": [
-        "physicalPath"
-      ],
+      "required": ["physicalPath"],
       "additionalProperties": false
     },
     "Drive": {
@@ -264,12 +226,7 @@
           "format": "date-time"
         }
       },
-      "required": [
-        "physicalPath",
-        "letter",
-        "createdAt",
-        "updatedAt"
-      ],
+      "required": ["physicalPath", "letter", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "PatchDriveEndpoint": {
@@ -286,20 +243,14 @@
               "description": "The drive letter, should be unique"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false
     },
     "Partial<Omit<Drive,(\"createdAt\"|\"updatedAt\")>>": {
@@ -329,20 +280,14 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Ffmpeg.FfprobeData"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "Ffmpeg.FfprobeData": {
@@ -362,11 +307,7 @@
           "items": {}
         }
       },
-      "required": [
-        "streams",
-        "format",
-        "chapters"
-      ],
+      "required": ["streams", "format", "chapters"],
       "additionalProperties": false
     },
     "Ffmpeg.FfprobeStream": {
@@ -508,15 +449,10 @@
           "$ref": "#/definitions/Ffmpeg.FfprobeStreamDisposition"
         },
         "rotation": {
-          "type": [
-            "string",
-            "number"
-          ]
+          "type": ["string", "number"]
         }
       },
-      "required": [
-        "index"
-      ]
+      "required": ["index"]
     },
     "Ffmpeg.FfprobeStreamDisposition": {
       "type": "object",
@@ -600,10 +536,7 @@
     "Record<string,(string|number)>": {
       "type": "object",
       "additionalProperties": {
-        "type": [
-          "string",
-          "number"
-        ]
+        "type": ["string", "number"]
       }
     },
     "SaveTextFileEndpoint": {
@@ -619,10 +552,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "letter",
-            "path"
-          ],
+          "required": ["letter", "path"],
           "additionalProperties": false
         },
         "body": {
@@ -632,9 +562,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "text"
-          ],
+          "required": ["text"],
           "additionalProperties": false
         },
         "result": {
@@ -645,17 +573,11 @@
               "const": true
             }
           },
-          "required": [
-            "success"
-          ],
+          "required": ["success"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "url",
-        "body",
-        "result"
-      ],
+      "required": ["url", "body", "result"],
       "additionalProperties": false
     },
     "DrivesApi": {
@@ -699,10 +621,7 @@
               "$ref": "#/definitions/UploadEndpoint"
             }
           },
-          "required": [
-            "/volumes",
-            "/volumes/:letter/:path/upload"
-          ],
+          "required": ["/volumes", "/volumes/:letter/:path/upload"],
           "additionalProperties": false
         },
         "PATCH": {
@@ -712,9 +631,7 @@
               "$ref": "#/definitions/PatchEndpoint%3CDrive%2C%22letter%22%3E"
             }
           },
-          "required": [
-            "/volumes/:id"
-          ],
+          "required": ["/volumes/:id"],
           "additionalProperties": false
         },
         "PUT": {
@@ -724,9 +641,7 @@
               "$ref": "#/definitions/SaveTextFileEndpoint"
             }
           },
-          "required": [
-            "/files/:letter/:path"
-          ],
+          "required": ["/files/:letter/:path"],
           "additionalProperties": false
         },
         "DELETE": {
@@ -739,10 +654,7 @@
               "$ref": "#/definitions/DeleteFileEndpoint"
             }
           },
-          "required": [
-            "/volumes/:id",
-            "/files/:letter/:path"
-          ],
+          "required": ["/volumes/:id", "/files/:letter/:path"],
           "additionalProperties": false
         },
         "HEAD": {
@@ -756,9 +668,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -773,9 +683,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -790,9 +698,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -807,20 +713,12 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE"
-      ],
+      "required": ["GET", "POST", "PUT", "PATCH", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -837,9 +735,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -854,9 +750,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -871,9 +765,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -888,9 +780,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -905,9 +795,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -922,9 +810,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -939,9 +825,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -956,9 +840,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         },
@@ -973,9 +855,7 @@
               "body": {},
               "headers": {}
             },
-            "required": [
-              "result"
-            ],
+            "required": ["result"],
             "additionalProperties": false
           }
         }
@@ -998,10 +878,7 @@
           "$ref": "#/definitions/GetCollectionResult%3CDrive%3E"
         }
       },
-      "required": [
-        "query",
-        "result"
-      ],
+      "required": ["query", "result"],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -1021,31 +898,19 @@
           "properties": {
             "physicalPath": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "letter": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "createdAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             },
             "updatedAt": {
               "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
+              "enum": ["ASC", "DESC"]
             }
           },
           "additionalProperties": false,
@@ -1055,12 +920,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "physicalPath",
-              "letter",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["physicalPath", "letter", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -1373,10 +1233,7 @@
           "description": "List of the selected entities"
         }
       },
-      "required": [
-        "count",
-        "entries"
-      ],
+      "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1390,12 +1247,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "physicalPath",
-                  "letter",
-                  "createdAt",
-                  "updatedAt"
-                ]
+                "enum": ["physicalPath", "letter", "createdAt", "updatedAt"]
               },
               "description": "The list of fields to select"
             }
@@ -1410,20 +1262,14 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Drive"
         }
       },
-      "required": [
-        "query",
-        "url",
-        "result"
-      ],
+      "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -1441,20 +1287,14 @@
               "description": "The drive letter, should be unique"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "body",
-        "url",
-        "result"
-      ],
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -1493,19 +1333,14 @@
               "description": "The drive letter, should be unique"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": [
-        "url",
-        "result"
-      ],
+      "required": ["url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }
