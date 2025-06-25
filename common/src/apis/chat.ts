@@ -9,21 +9,21 @@ import type {
 import type { Chat, ChatInvitation, ChatMessage } from '../models/index.js'
 
 export type AcceptInvitationAction = {
-  result: unknown
+  result: ChatInvitation
   url: {
     id: string
   }
 }
 
 export type RejectInvitationAction = {
-  result: unknown
+  result: ChatInvitation
   url: {
     id: string
   }
 }
 
 export type RevokeInvitationAction = {
-  result: unknown
+  result: ChatInvitation
   url: {
     id: string
   }

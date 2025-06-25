@@ -1,13 +1,10 @@
 import { getCurrentUser, StoreManager } from '@furystack/core'
+import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
 import { Chat, ChatInvitation, type AcceptInvitationAction as AcceptInvitationActionType } from 'common'
 
 export const AcceptInvitationAction: RequestAction<AcceptInvitationActionType> = async ({ getUrlParams, injector }) => {
   const user = await getCurrentUser(injector)
-
-  if (!user) {
-    return JsonResult({ success: false, error: 'Unauthorized' }, 401)
-  }
 
   const { id } = getUrlParams()
 
@@ -17,21 +14,14 @@ export const AcceptInvitationAction: RequestAction<AcceptInvitationActionType> =
   const chatInvitation = await chatInvitationStore.get(id)
 
   if (!chatInvitation || chatInvitation.userId !== user.username) {
-    return JsonResult({ success: false, error: 'Chat invitation not found or you are not the recipient' }, 404)
-  }
-
-  if (chatInvitation.status !== 'pending') {
-    return JsonResult(
-      { success: false, error: 'Chat invitation is not pending. Only pending invitations can be accepted' },
-      400,
-    )
+    throw new RequestError('Chat invitation not found or you are not the recipient', 404)
   }
 
   const chatStore = storeManager.getStoreFor(Chat, 'id')
   const chat = await chatStore.get(chatInvitation.chatId)
 
   if (!chat) {
-    return JsonResult({ success: false, error: 'Chat not found' }, 404)
+    throw new RequestError('Chat not found', 404)
   }
 
   await chatStore.update(chat.id, {
@@ -42,5 +32,5 @@ export const AcceptInvitationAction: RequestAction<AcceptInvitationActionType> =
     status: 'accepted',
   })
 
-  return JsonResult({ success: true })
+  return JsonResult({ ...chatInvitation, status: 'accepted' }, 200)
 }

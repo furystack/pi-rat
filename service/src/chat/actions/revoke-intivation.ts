@@ -1,13 +1,10 @@
 import { getCurrentUser, StoreManager } from '@furystack/core'
+import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
 import { ChatInvitation, type RevokeInvitationAction as RevokeInvitationActionType } from 'common'
 
 export const RevokeInvitationAction: RequestAction<RevokeInvitationActionType> = async ({ getUrlParams, injector }) => {
   const user = await getCurrentUser(injector)
-
-  if (!user) {
-    return JsonResult({ success: false, error: 'Unauthorized' }, 401)
-  }
 
   const { id } = getUrlParams()
 
@@ -17,19 +14,16 @@ export const RevokeInvitationAction: RequestAction<RevokeInvitationActionType> =
   const chatInvitation = await chatInvitationStore.get(id)
 
   if (!chatInvitation || chatInvitation.createdBy !== user.username) {
-    return JsonResult({ success: false, error: 'Chat invitation not found or you are not the inviter' }, 404)
+    throw new RequestError('Chat invitation not found or you are not the inviter', 404)
   }
 
   if (chatInvitation.status !== 'pending') {
-    return JsonResult(
-      { success: false, error: 'Chat invitation is not pending. Only pending invitations can be revoked' },
-      400,
-    )
+    throw new RequestError('Chat invitation can only be revoked if it is pending', 400)
   }
 
   await chatInvitationStore.update(id, {
     status: 'revoked',
   })
 
-  return JsonResult({ success: true })
+  return JsonResult({ ...chatInvitation, status: 'revoked' }, 200)
 }

@@ -33,6 +33,8 @@ class ChatInvitationModel extends Model<ChatInvitation, ChatInvitation> implemen
   declare status: 'pending' | 'accepted' | 'rejected' | 'revoked' | 'expired'
   declare createdAt: Date
   declare createdBy: string
+  declare chatName: string
+  declare message: string
 }
 
 export const setupChatStore = async (injector: Injector) => {
@@ -154,6 +156,14 @@ export const setupChatStore = async (injector: Injector) => {
             primaryKey: true,
           },
           chatId: {
+            type: STRING,
+            allowNull: false,
+          },
+          chatName: {
+            type: STRING,
+            allowNull: false,
+          },
+          message: {
             type: STRING,
             allowNull: false,
           },

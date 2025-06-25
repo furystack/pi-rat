@@ -4,7 +4,9 @@
     "AcceptInvitationAction": {
       "type": "object",
       "properties": {
-        "result": {},
+        "result": {
+          "$ref": "#/definitions/ChatInvitation"
+        },
         "url": {
           "type": "object",
           "properties": {
@@ -24,10 +26,68 @@
       ],
       "additionalProperties": false
     },
+    "ChatInvitation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
+        },
+        "chatName": {
+          "type": "string",
+          "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected",
+            "revoked",
+            "expired"
+          ],
+          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+        }
+      },
+      "required": [
+        "id",
+        "chatId",
+        "chatName",
+        "message",
+        "userId",
+        "status",
+        "createdAt",
+        "createdBy"
+      ],
+      "additionalProperties": false
+    },
     "RejectInvitationAction": {
       "type": "object",
       "properties": {
-        "result": {},
+        "result": {
+          "$ref": "#/definitions/ChatInvitation"
+        },
         "url": {
           "type": "object",
           "properties": {
@@ -50,7 +110,9 @@
     "RevokeInvitationAction": {
       "type": "object",
       "properties": {
-        "result": {},
+        "result": {
+          "$ref": "#/definitions/ChatInvitation"
+        },
         "url": {
           "type": "object",
           "properties": {
@@ -1023,7 +1085,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CChatMessage%2C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CChatMessage%2C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22%7C%22attachments%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -1039,7 +1101,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<ChatMessage,(\"id\"|\"content\"|\"createdAt\"|\"owner\"|\"chatId\")[]>": {
+    "FindOptions<ChatMessage,(\"id\"|\"content\"|\"createdAt\"|\"owner\"|\"chatId\"|\"attachments\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1087,6 +1149,13 @@
                 "ASC",
                 "DESC"
               ]
+            },
+            "attachments": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -1101,7 +1170,8 @@
               "content",
               "createdAt",
               "owner",
-              "chatId"
+              "chatId",
+              "attachments"
             ]
           },
           "description": "The result set will be limited to these fields"
@@ -1441,8 +1511,81 @@
               "additionalProperties": false
             }
           ]
+        },
+        "attachments": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/ChatMessageAttachment"
+                  },
+                  "description": "The attachments of the message"
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/ChatMessageAttachment"
+                  },
+                  "description": "The attachments of the message"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/ChatMessageAttachment"
+                    },
+                    "description": "The attachments of the message"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/ChatMessageAttachment"
+                    },
+                    "description": "The attachments of the message"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       }
+    },
+    "ChatMessageAttachment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the attachment"
+        },
+        "fileName": {
+          "type": "string",
+          "description": "The type of the file"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type that hints how the attachment can be displayed"
+        }
+      },
+      "required": [
+        "id",
+        "fileName",
+        "type"
+      ],
+      "additionalProperties": false
     },
     "GetCollectionResult<ChatMessage>": {
       "type": "object",
@@ -1489,6 +1632,13 @@
         "chatId": {
           "type": "string",
           "description": "The unique identifier of the chat to which this message belongs"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessageAttachment"
+          },
+          "description": "The attachments of the message"
         }
       },
       "required": [
@@ -1496,7 +1646,8 @@
         "content",
         "createdAt",
         "owner",
-        "chatId"
+        "chatId",
+        "attachments"
       ],
       "additionalProperties": false
     },
@@ -1515,7 +1666,8 @@
                   "content",
                   "createdAt",
                   "owner",
-                  "chatId"
+                  "chatId",
+                  "attachments"
                 ]
               },
               "description": "The list of fields to select"
@@ -1555,7 +1707,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CChatInvitation%2C(%22id%22%7C%22chatId%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CChatInvitation%2C(%22id%22%7C%22chatId%22%7C%22chatName%22%7C%22message%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -1571,7 +1723,7 @@
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<ChatInvitation,(\"id\"|\"chatId\"|\"userId\"|\"status\"|\"createdAt\"|\"createdBy\")[]>": {
+    "FindOptions<ChatInvitation,(\"id\"|\"chatId\"|\"chatName\"|\"message\"|\"userId\"|\"status\"|\"createdAt\"|\"createdBy\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1593,6 +1745,20 @@
               ]
             },
             "chatId": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "chatName": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "message": {
               "type": "string",
               "enum": [
                 "ASC",
@@ -1638,6 +1804,8 @@
             "enum": [
               "id",
               "chatId",
+              "chatName",
+              "message",
               "userId",
               "status",
               "createdAt",
@@ -1795,6 +1963,126 @@
                   "items": {
                     "type": "string",
                     "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "chatName": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
                   }
                 }
               },
@@ -2122,52 +2410,6 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "ChatInvitation": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
-        },
-        "chatId": {
-          "type": "string",
-          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
-        },
-        "userId": {
-          "type": "string",
-          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "pending",
-            "accepted",
-            "rejected",
-            "revoked",
-            "expired"
-          ],
-          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
-        },
-        "createdBy": {
-          "type": "string",
-          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
-        }
-      },
-      "required": [
-        "id",
-        "chatId",
-        "userId",
-        "status",
-        "createdAt",
-        "createdBy"
-      ],
-      "additionalProperties": false
-    },
     "GetEntityEndpoint<ChatInvitation,\"id\">": {
       "type": "object",
       "properties": {
@@ -2181,6 +2423,8 @@
                 "enum": [
                   "id",
                   "chatId",
+                  "chatName",
+                  "message",
                   "userId",
                   "status",
                   "createdAt",
@@ -2351,9 +2595,17 @@
         "chatId": {
           "type": "string",
           "description": "The unique identifier of the chat to which this message belongs"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessageAttachment"
+          },
+          "description": "The attachments of the message"
         }
       },
       "required": [
+        "attachments",
         "chatId",
         "content",
         "createdAt",
@@ -2361,9 +2613,9 @@
       ]
     },
     "Omit<ChatMessage,\"id\">": {
-      "$ref": "#/definitions/Pick%3CChatMessage%2CExclude%3C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22)%2C%22id%22%3E%3E"
+      "$ref": "#/definitions/Pick%3CChatMessage%2CExclude%3C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22%7C%22attachments%22)%2C%22id%22%3E%3E"
     },
-    "Pick<ChatMessage,Exclude<(\"id\"|\"content\"|\"createdAt\"|\"owner\"|\"chatId\"),\"id\">>": {
+    "Pick<ChatMessage,Exclude<(\"id\"|\"content\"|\"createdAt\"|\"owner\"|\"chatId\"|\"attachments\"),\"id\">>": {
       "type": "object",
       "properties": {
         "content": {
@@ -2381,13 +2633,21 @@
         "chatId": {
           "type": "string",
           "description": "The unique identifier of the chat to which this message belongs"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessageAttachment"
+          },
+          "description": "The attachments of the message"
         }
       },
       "required": [
         "content",
         "createdAt",
         "owner",
-        "chatId"
+        "chatId",
+        "attachments"
       ],
       "additionalProperties": false
     },
@@ -2420,6 +2680,14 @@
           "type": "string",
           "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
         },
+        "chatName": {
+          "type": "string",
+          "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+        },
         "userId": {
           "type": "string",
           "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
@@ -2446,22 +2714,32 @@
       },
       "required": [
         "chatId",
+        "chatName",
         "createdAt",
         "createdBy",
+        "message",
         "status",
         "userId"
       ]
     },
     "Omit<ChatInvitation,\"id\">": {
-      "$ref": "#/definitions/Pick%3CChatInvitation%2CExclude%3C(%22id%22%7C%22chatId%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%2C%22id%22%3E%3E"
+      "$ref": "#/definitions/Pick%3CChatInvitation%2CExclude%3C(%22id%22%7C%22chatId%22%7C%22chatName%22%7C%22message%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%2C%22id%22%3E%3E"
     },
-    "Pick<ChatInvitation,Exclude<(\"id\"|\"chatId\"|\"userId\"|\"status\"|\"createdAt\"|\"createdBy\"),\"id\">>": {
+    "Pick<ChatInvitation,Exclude<(\"id\"|\"chatId\"|\"chatName\"|\"message\"|\"userId\"|\"status\"|\"createdAt\"|\"createdBy\"),\"id\">>": {
       "type": "object",
       "properties": {
         "chatId": {
           "type": "string",
           "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
         },
+        "chatName": {
+          "type": "string",
+          "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+        },
         "userId": {
           "type": "string",
           "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
@@ -2488,6 +2766,8 @@
       },
       "required": [
         "chatId",
+        "chatName",
+        "message",
         "userId",
         "status",
         "createdAt",
@@ -2612,6 +2892,13 @@
         "chatId": {
           "type": "string",
           "description": "The unique identifier of the chat to which this message belongs"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessageAttachment"
+          },
+          "description": "The attachments of the message"
         }
       },
       "additionalProperties": false
@@ -2657,6 +2944,14 @@
         "chatId": {
           "type": "string",
           "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
+        },
+        "chatName": {
+          "type": "string",
+          "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
         },
         "userId": {
           "type": "string",

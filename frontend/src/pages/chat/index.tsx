@@ -3,6 +3,7 @@ import { Button } from '@furystack/shades-common-components'
 import { WebsocketNotificationsService } from '../../services/websocket-events.js'
 import { AddChatButton } from './add-chat-button.js'
 import { ChatFlow } from './chat-flow.js'
+import { ChatInvitationList } from './chat-invitation-list.js'
 import { ChatList } from './chat-list.js'
 import { SpeechRecognitionService } from './speech-recognition-service.js'
 import { SpeechSynthesisService } from './speech-synthesis-service.js'
@@ -64,12 +65,24 @@ export const ChatPage = Shade({
             width: '100%',
           }}
         >
-          <ChatList
+          <div
             style={{
-              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: '0',
               minWidth: '250px',
+              height: '100%',
+              overflow: 'hidden',
             }}
-          />
+          >
+            <ChatList
+              style={{
+                height: '100%',
+                width: '100%',
+              }}
+            />
+            <ChatInvitationList />
+          </div>
           <ChatFlow
             style={{
               flexGrow: '1',
