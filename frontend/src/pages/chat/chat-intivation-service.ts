@@ -96,7 +96,7 @@ export class ChatInvitationService {
       loadArgs: [id],
       value: {
         status: 'loaded',
-        value: result as ChatInvitation,
+        value: result,
         updatedAt: new Date(),
       },
     })
@@ -115,7 +115,7 @@ export class ChatInvitationService {
       loadArgs: [id],
       value: {
         status: 'loaded',
-        value: result as ChatInvitation,
+        value: result,
         updatedAt: new Date(),
       },
     })
@@ -134,7 +134,7 @@ export class ChatInvitationService {
       loadArgs: [id],
       value: {
         status: 'loaded',
-        value: result as ChatInvitation,
+        value: result,
         updatedAt: new Date(),
       },
     })
