@@ -377,5 +377,57 @@ export const setupChatStore = async (injector: Injector) => {
     })
   })
 
-  repo.createDataSet(ChatInvitation, 'id', {})
+  repo.createDataSet(ChatInvitation, 'id', {
+    addFilter: async ({ injector: i, filter }) => {
+      const user = await getCurrentUser(i)
+      return {
+        ...filter,
+        filter: {
+          ...filter.filter,
+          $or: [{ userId: { $eq: user.username } }, { createdBy: { $eq: user.username } }],
+        },
+      }
+    },
+    authorizeAdd: async ({ injector: i, entity }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.createdBy !== user.username) {
+        return { isAllowed: false, message: 'You can only create invitations for yourself' }
+      }
+
+      return { isAllowed: true }
+    },
+    authorizeRemove: async () => {
+      return {
+        isAllowed: false,
+        message: 'You cannot remove chat invitations directly. Use the revoke action instead.',
+      }
+    },
+    authorizeGetEntity: async ({ injector: i, entity }) => {
+      const user = await getCurrentUser(i)
+
+      if (!user) {
+        return { isAllowed: false, message: 'User not authenticated' }
+      }
+
+      if (entity.userId !== user.username && entity.createdBy !== user.username) {
+        return {
+          isAllowed: false,
+          message: 'You can only access your own invitations or invitations you are a participant of',
+        }
+      }
+
+      return { isAllowed: true }
+    },
+    authorizeUpdate: async () => {
+      return {
+        isAllowed: false,
+        message: 'You cannot update chat invitations directly. Please revoke / reject and create a new one',
+      }
+    },
+  })
 }
