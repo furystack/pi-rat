@@ -81,57 +81,55 @@ export const ChatInvitationList = Shade({
                   }}
                 >
                   {invitation.userId === currentUser?.username ? (
-                    <>
-                      {invitation.status === 'pending' ? (
-                        <>
-                          <p>{invitation.chatName}</p>
-                          <Button
-                            onclick={async () => {
-                              await chatInvitationService
-                                .acceptChatInvitation(invitation.id)
-                                .then(() => {
-                                  noty.emit('onNotyAdded', {
-                                    type: 'success',
-                                    title: 'Invitation Accepted',
-                                    body: `Invitation to chat "${invitation.chatName}" accepted!`,
-                                  })
-                                })
-                                .catch((error) => {
-                                  noty.emit('onNotyAdded', {
-                                    type: 'error',
-                                    title: 'Error Accepting Invitation',
-                                    body: <ErrorDisplay error={error} />,
-                                  })
-                                })
-                            }}
-                          >
-                            ✅
-                          </Button>
-                          <Button
-                            onclick={async () => {
-                              await chatInvitationService
-                                .rejectChatInvitation(invitation.id)
-                                .then(() => {
-                                  noty.emit('onNotyAdded', {
-                                    type: 'success',
-                                    title: 'Invitation Rejected',
-                                    body: `Invitation to chat "${invitation.chatName}" rejected!`,
-                                  })
-                                })
-                                .catch((error) => {
-                                  noty.emit('onNotyAdded', {
-                                    type: 'error',
-                                    title: 'Error Rejecting Invitation',
-                                    body: <ErrorDisplay error={error} />,
-                                  })
-                                })
-                            }}
-                          >
-                            ❌
-                          </Button>
-                        </>
-                      ) : null}
-                    </>
+                    <div>
+                      <p>{invitation.chatName}</p>
+                      <Button
+                        onclick={async () => {
+                          await chatInvitationService
+                            .acceptChatInvitation(invitation.id)
+                            .then(() => {
+                              noty.emit('onNotyAdded', {
+                                type: 'success',
+                                title: 'Invitation Accepted',
+                                body: `Invitation to chat "${invitation.chatName}" accepted!`,
+                              })
+                            })
+                            .catch((error) => {
+                              noty.emit('onNotyAdded', {
+                                type: 'error',
+                                title: 'Error Accepting Invitation',
+                                body: <ErrorDisplay error={error} />,
+                              })
+                            })
+                        }}
+                        title="Accept Invitation"
+                      >
+                        ✔️
+                      </Button>
+                      <Button
+                        onclick={async () => {
+                          await chatInvitationService
+                            .rejectChatInvitation(invitation.id)
+                            .then(() => {
+                              noty.emit('onNotyAdded', {
+                                type: 'success',
+                                title: 'Invitation Rejected',
+                                body: `Invitation to chat "${invitation.chatName}" rejected!`,
+                              })
+                            })
+                            .catch((error) => {
+                              noty.emit('onNotyAdded', {
+                                type: 'error',
+                                title: 'Error Rejecting Invitation',
+                                body: <ErrorDisplay error={error} />,
+                              })
+                            })
+                        }}
+                        title="Reject Invitation"
+                      >
+                        ❌
+                      </Button>
+                    </div>
                   ) : null}
                 </li>
               ))}
@@ -152,37 +150,29 @@ export const ChatInvitationList = Shade({
                     justifyContent: 'space-between',
                   }}
                 >
-                  {invitation.userId === currentUser?.username ? (
-                    <>
-                      {invitation.status === 'pending' ? (
-                        <>
-                          <p>{invitation.chatName}</p>
-                          <Button
-                            onclick={async () => {
-                              await chatInvitationService
-                                .rejectChatInvitation(invitation.id)
-                                .then(() => {
-                                  noty.emit('onNotyAdded', {
-                                    type: 'success',
-                                    title: 'Invitation Cancelled',
-                                    body: `Invitation to chat "${invitation.chatName}" cancelled!`,
-                                  })
-                                })
-                                .catch((error) => {
-                                  noty.emit('onNotyAdded', {
-                                    type: 'error',
-                                    title: 'Error Cancelling Invitation',
-                                    body: <ErrorDisplay error={error} />,
-                                  })
-                                })
-                            }}
-                          >
-                            ❌
-                          </Button>
-                        </>
-                      ) : null}
-                    </>
-                  ) : null}
+                  <p>{invitation.chatName}</p>
+                  <Button
+                    onclick={async () => {
+                      await chatInvitationService
+                        .rejectChatInvitation(invitation.id)
+                        .then(() => {
+                          noty.emit('onNotyAdded', {
+                            type: 'success',
+                            title: 'Invitation Cancelled',
+                            body: `Invitation to chat "${invitation.chatName}" cancelled!`,
+                          })
+                        })
+                        .catch((error) => {
+                          noty.emit('onNotyAdded', {
+                            type: 'error',
+                            title: 'Error Cancelling Invitation',
+                            body: <ErrorDisplay error={error} />,
+                          })
+                        })
+                    }}
+                  >
+                    ❌
+                  </Button>
                 </li>
               ))}
             </ul>
