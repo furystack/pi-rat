@@ -20,6 +20,7 @@ export const MessageInput = Shade<{ chat: Chat }>({
             chatId: props.chat.id,
             content: formData.content,
             owner: session.currentUser.getValue()?.username || '',
+            attachments: [],
           })
           const form = element.firstElementChild as HTMLFormElement
           if (form) {

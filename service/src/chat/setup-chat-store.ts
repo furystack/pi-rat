@@ -23,6 +23,7 @@ class ChatMessageModel extends Model<ChatMessage, ChatMessage> implements ChatMe
   declare createdAt: Date
   declare chatId: string
   declare owner: string
+  declare attachments: ChatMessage['attachments']
 }
 
 class ChatInvitationModel extends Model<ChatInvitation, ChatInvitation> implements ChatInvitation {
@@ -110,6 +111,11 @@ export const setupChatStore = async (injector: Injector) => {
           chatId: {
             type: STRING,
             allowNull: false,
+          },
+          attachments: {
+            type: JSON,
+            allowNull: true,
+            defaultValue: [],
           },
         },
         {
