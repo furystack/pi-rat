@@ -19,16 +19,25 @@
               "description": "Github API Installation Status for external authentication"
             }
           },
-          "required": ["omdb", "github"],
+          "required": [
+            "omdb",
+            "github"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["state", "services"],
+      "required": [
+        "state",
+        "services"
+      ],
       "additionalProperties": false
     },
     "ServiceStatus": {
       "type": "string",
-      "enum": ["installed", "needsInstall"]
+      "enum": [
+        "installed",
+        "needsInstall"
+      ]
     },
     "GetServiceStatusAction": {
       "type": "object",
@@ -37,7 +46,9 @@
           "$ref": "#/definitions/ServiceStatusResponse"
         }
       },
-      "required": ["result"],
+      "required": [
+        "result"
+      ],
       "additionalProperties": false
     },
     "InstallAction": {
@@ -50,7 +61,9 @@
               "type": "boolean"
             }
           },
-          "required": ["success"],
+          "required": [
+            "success"
+          ],
           "additionalProperties": false
         },
         "body": {
@@ -63,11 +76,17 @@
               "type": "string"
             }
           },
-          "required": ["username", "password"],
+          "required": [
+            "username",
+            "password"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["result", "body"],
+      "required": [
+        "result",
+        "body"
+      ],
       "additionalProperties": false
     },
     "InstallApi": {
@@ -80,7 +99,9 @@
               "$ref": "#/definitions/GetServiceStatusAction"
             }
           },
-          "required": ["/serviceStatus"],
+          "required": [
+            "/serviceStatus"
+          ],
           "additionalProperties": false
         },
         "POST": {
@@ -90,7 +111,9 @@
               "$ref": "#/definitions/InstallAction"
             }
           },
-          "required": ["/install"],
+          "required": [
+            "/install"
+          ],
           "additionalProperties": false
         },
         "PATCH": {
@@ -104,7 +127,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -119,7 +144,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -134,7 +161,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -149,7 +178,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -164,7 +195,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -179,7 +212,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -194,12 +229,17 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["GET", "POST"],
+      "required": [
+        "GET",
+        "POST"
+      ],
       "additionalProperties": false
     },
     "RestApi": {
@@ -216,7 +256,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -231,7 +273,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -246,7 +290,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -261,7 +307,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -276,7 +324,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -291,7 +341,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -306,7 +358,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -321,7 +375,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -336,7 +392,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }

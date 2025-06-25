@@ -1,7 +1,75 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/ChatApi",
   "definitions": {
+    "AcceptInvitationAction": {
+      "type": "object",
+      "properties": {
+        "result": {},
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "result",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    "RejectInvitationAction": {
+      "type": "object",
+      "properties": {
+        "result": {},
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "result",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    "RevokeInvitationAction": {
+      "type": "object",
+      "properties": {
+        "result": {},
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "result",
+        "url"
+      ],
+      "additionalProperties": false
+    },
     "ChatApi": {
       "type": "object",
       "properties": {
@@ -20,11 +88,11 @@
             "/chat-messages/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3CChatMessage%2C%22id%22%3E"
             },
-            "/chat-message-attachments": {
-              "$ref": "#/definitions/GetCollectionEndpoint%3CChatMessageAttachment%3E"
+            "/chat-invitations": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CChatInvitation%3E"
             },
-            "/chat-message-attachments/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
+            "/chat-invitations/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CChatInvitation%2C%22id%22%3E"
             }
           },
           "required": [
@@ -32,8 +100,8 @@
             "/chat/:id",
             "/chat-messages",
             "/chat-messages/:id",
-            "/chat-message-attachments",
-            "/chat-message-attachments/:id"
+            "/chat-invitations",
+            "/chat-invitations/:id"
           ],
           "additionalProperties": false
         },
@@ -46,11 +114,27 @@
             "/chat-messages": {
               "$ref": "#/definitions/PostEndpoint%3CChatMessage%2C%22id%22%3E"
             },
-            "/chat-message-attachments": {
-              "$ref": "#/definitions/PostEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
+            "/chat-invitations": {
+              "$ref": "#/definitions/PostEndpoint%3CChatInvitation%2C%22id%22%3E"
+            },
+            "/chat-invitations/:id/accept": {
+              "$ref": "#/definitions/AcceptInvitationAction"
+            },
+            "/chat-invitations/:id/reject": {
+              "$ref": "#/definitions/RejectInvitationAction"
+            },
+            "/chat-invitations/:id/revoke": {
+              "$ref": "#/definitions/RevokeInvitationAction"
             }
           },
-          "required": ["/chat", "/chat-messages", "/chat-message-attachments"],
+          "required": [
+            "/chat",
+            "/chat-messages",
+            "/chat-invitations",
+            "/chat-invitations/:id/accept",
+            "/chat-invitations/:id/reject",
+            "/chat-invitations/:id/revoke"
+          ],
           "additionalProperties": false
         },
         "PATCH": {
@@ -62,11 +146,15 @@
             "/chat-messages/:id": {
               "$ref": "#/definitions/PatchEndpoint%3CChatMessage%2C%22id%22%3E"
             },
-            "/chat-message-attachments/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
+            "/chat-invitations/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CChatInvitation%2C%22id%22%3E"
             }
           },
-          "required": ["/chat/:id", "/chat-messages/:id", "/chat-message-attachments/:id"],
+          "required": [
+            "/chat/:id",
+            "/chat-messages/:id",
+            "/chat-invitations/:id"
+          ],
           "additionalProperties": false
         },
         "PUT": {
@@ -80,7 +168,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -92,12 +182,12 @@
             },
             "/chat-messages/:id": {
               "$ref": "#/definitions/DeleteEndpoint%3CChatMessage%2C%22id%22%3E"
-            },
-            "/chat-message-attachments/:id": {
-              "$ref": "#/definitions/DeleteEndpoint%3CChatMessageAttachment%2C%22id%22%3E"
             }
           },
-          "required": ["/chat/:id", "/chat-messages/:id", "/chat-message-attachments/:id"],
+          "required": [
+            "/chat/:id",
+            "/chat-messages/:id"
+          ],
           "additionalProperties": false
         },
         "HEAD": {
@@ -111,7 +201,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -126,7 +218,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -141,7 +235,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -156,12 +252,178 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["GET", "POST", "PATCH", "DELETE"],
+      "required": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE"
+      ],
+      "additionalProperties": false
+    },
+    "RestApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "POST": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": [
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
       "additionalProperties": false
     },
     "GetCollectionEndpoint<Chat>": {
@@ -180,7 +442,10 @@
           "$ref": "#/definitions/GetCollectionResult%3CChat%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -200,27 +465,45 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "name": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "description": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "createdAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "owner": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "participants": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -230,7 +513,14 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["id", "name", "description", "createdAt", "owner", "participants"]
+            "enum": [
+              "id",
+              "name",
+              "description",
+              "createdAt",
+              "owner",
+              "participants"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -629,7 +919,10 @@
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -665,7 +958,13 @@
           "description": "A list of participants in the chat"
         }
       },
-      "required": ["id", "name", "createdAt", "owner", "participants"],
+      "required": [
+        "id",
+        "name",
+        "createdAt",
+        "owner",
+        "participants"
+      ],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Chat,\"id\">": {
@@ -678,7 +977,14 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["id", "name", "description", "createdAt", "owner", "participants"]
+                "enum": [
+                  "id",
+                  "name",
+                  "description",
+                  "createdAt",
+                  "owner",
+                  "participants"
+                ]
               },
               "description": "The list of fields to select"
             }
@@ -693,14 +999,20 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Chat"
         }
       },
-      "required": ["query", "url", "result"],
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -720,7 +1032,10 @@
           "$ref": "#/definitions/GetCollectionResult%3CChatMessage%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -740,23 +1055,38 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "content": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "createdAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "owner": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "chatId": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -766,7 +1096,13 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["id", "content", "createdAt", "owner", "chatId"]
+            "enum": [
+              "id",
+              "content",
+              "createdAt",
+              "owner",
+              "chatId"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -1123,7 +1459,10 @@
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1152,7 +1491,13 @@
           "description": "The unique identifier of the chat to which this message belongs"
         }
       },
-      "required": ["id", "content", "createdAt", "owner", "chatId"],
+      "required": [
+        "id",
+        "content",
+        "createdAt",
+        "owner",
+        "chatId"
+      ],
       "additionalProperties": false
     },
     "GetEntityEndpoint<ChatMessage,\"id\">": {
@@ -1165,7 +1510,13 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["id", "content", "createdAt", "owner", "chatId"]
+                "enum": [
+                  "id",
+                  "content",
+                  "createdAt",
+                  "owner",
+                  "chatId"
+                ]
               },
               "description": "The list of fields to select"
             }
@@ -1180,38 +1531,47 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/ChatMessage"
         }
       },
-      "required": ["query", "url", "result"],
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "GetCollectionEndpoint<ChatMessageAttachment>": {
+    "GetCollectionEndpoint<ChatInvitation>": {
       "type": "object",
       "properties": {
         "query": {
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CChatMessageAttachment%2C(%22id%22%7C%22name%22%7C%22contentType%22%7C%22chatMessageId%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CChatInvitation%2C(%22id%22%7C%22chatId%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CChatMessageAttachment%3E"
+          "$ref": "#/definitions/GetCollectionResult%3CChatInvitation%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
-    "FindOptions<ChatMessageAttachment,(\"id\"|\"name\"|\"contentType\"|\"chatMessageId\")[]>": {
+    "FindOptions<ChatInvitation,(\"id\"|\"chatId\"|\"userId\"|\"status\"|\"createdAt\"|\"createdBy\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -1227,19 +1587,45 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
-            "name": {
+            "chatId": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
-            "contentType": {
+            "userId": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
-            "chatMessageId": {
+            "status": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            },
+            "createdBy": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -1249,44 +1635,51 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["id", "name", "contentType", "chatMessageId"]
+            "enum": [
+              "id",
+              "chatId",
+              "userId",
+              "status",
+              "createdAt",
+              "createdBy"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
         "filter": {
-          "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E",
+          "$ref": "#/definitions/FilterType%3CChatInvitation%3E",
           "description": "The fields should match this filter"
         }
       },
       "additionalProperties": false,
       "description": "Type for default filtering model"
     },
-    "FilterType<ChatMessageAttachment>": {
+    "FilterType<ChatInvitation>": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "$and": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+            "$ref": "#/definitions/FilterType%3CChatInvitation%3E"
           }
         },
         "$not": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+            "$ref": "#/definitions/FilterType%3CChatInvitation%3E"
           }
         },
         "$nor": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+            "$ref": "#/definitions/FilterType%3CChatInvitation%3E"
           }
         },
         "$or": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FilterType%3CChatMessageAttachment%3E"
+            "$ref": "#/definitions/FilterType%3CChatInvitation%3E"
           }
         },
         "id": {
@@ -1296,19 +1689,19 @@
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "description": "The unique identifier of the attachment"
+                  "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                 },
                 "$endsWith": {
                   "type": "string",
-                  "description": "The unique identifier of the attachment"
+                  "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                 },
                 "$like": {
                   "type": "string",
-                  "description": "The unique identifier of the attachment"
+                  "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                 },
                 "$regex": {
                   "type": "string",
-                  "description": "The unique identifier of the attachment"
+                  "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                 }
               },
               "additionalProperties": false
@@ -1318,11 +1711,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "description": "The unique identifier of the attachment"
+                  "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                 },
                 "$ne": {
                   "type": "string",
-                  "description": "The unique identifier of the attachment"
+                  "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                 }
               },
               "additionalProperties": false
@@ -1334,14 +1727,14 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The unique identifier of the attachment"
+                    "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The unique identifier of the attachment"
+                    "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
                   }
                 }
               },
@@ -1349,26 +1742,26 @@
             }
           ]
         },
-        "name": {
+        "chatId": {
           "anyOf": [
             {
               "type": "object",
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                 },
                 "$endsWith": {
                   "type": "string",
-                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                 },
                 "$like": {
                   "type": "string",
-                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                 },
                 "$regex": {
                   "type": "string",
-                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                 }
               },
               "additionalProperties": false
@@ -1378,11 +1771,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                 },
                 "$ne": {
                   "type": "string",
-                  "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                  "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                 }
               },
               "additionalProperties": false
@@ -1394,14 +1787,14 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                    "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+                    "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
                   }
                 }
               },
@@ -1409,30 +1802,26 @@
             }
           ]
         },
-        "contentType": {
+        "userId": {
           "anyOf": [
             {
               "type": "object",
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "enum": ["image", "url", "json", "text", "other"],
-                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                 },
                 "$endsWith": {
                   "type": "string",
-                  "enum": ["image", "url", "json", "text", "other"],
-                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                 },
                 "$like": {
                   "type": "string",
-                  "enum": ["image", "url", "json", "text", "other"],
-                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                 },
                 "$regex": {
                   "type": "string",
-                  "enum": ["image", "url", "json", "text", "other"],
-                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                 }
               },
               "additionalProperties": false
@@ -1442,13 +1831,11 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "enum": ["image", "url", "json", "text", "other"],
-                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                 },
                 "$ne": {
                   "type": "string",
-                  "enum": ["image", "url", "json", "text", "other"],
-                  "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                  "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                 }
               },
               "additionalProperties": false
@@ -1460,16 +1847,14 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": ["image", "url", "json", "text", "other"],
-                    "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                    "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": ["image", "url", "json", "text", "other"],
-                    "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+                    "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
                   }
                 }
               },
@@ -1477,26 +1862,54 @@
             }
           ]
         },
-        "chatMessageId": {
+        "status": {
           "anyOf": [
             {
               "type": "object",
               "properties": {
                 "$startsWith": {
                   "type": "string",
-                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected",
+                    "revoked",
+                    "expired"
+                  ],
+                  "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$endsWith": {
                   "type": "string",
-                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected",
+                    "revoked",
+                    "expired"
+                  ],
+                  "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$like": {
                   "type": "string",
-                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected",
+                    "revoked",
+                    "expired"
+                  ],
+                  "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$regex": {
                   "type": "string",
-                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected",
+                    "revoked",
+                    "expired"
+                  ],
+                  "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 }
               },
               "additionalProperties": false
@@ -1506,11 +1919,25 @@
               "properties": {
                 "$eq": {
                   "type": "string",
-                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected",
+                    "revoked",
+                    "expired"
+                  ],
+                  "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 },
                 "$ne": {
                   "type": "string",
-                  "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected",
+                    "revoked",
+                    "expired"
+                  ],
+                  "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                 }
               },
               "additionalProperties": false
@@ -1522,14 +1949,148 @@
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected",
+                      "revoked",
+                      "expired"
+                    ],
+                    "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected",
+                      "revoked",
+                      "expired"
+                    ],
+                    "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdBy": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
                   }
                 }
               },
@@ -1539,7 +2100,7 @@
         }
       }
     },
-    "GetCollectionResult<ChatMessageAttachment>": {
+    "GetCollectionResult<ChatInvitation>": {
       "type": "object",
       "properties": {
         "count": {
@@ -1549,40 +2110,65 @@
         "entries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/ChatMessageAttachment"
+            "$ref": "#/definitions/ChatInvitation"
           },
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "ChatMessageAttachment": {
+    "ChatInvitation": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique identifier of the attachment"
+          "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
         },
-        "name": {
+        "chatId": {
           "type": "string",
-          "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
         },
-        "contentType": {
+        "userId": {
           "type": "string",
-          "enum": ["image", "url", "json", "text", "other"],
-          "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
         },
-        "chatMessageId": {
+        "status": {
           "type": "string",
-          "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected",
+            "revoked",
+            "expired"
+          ],
+          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
         }
       },
-      "required": ["id", "name", "contentType", "chatMessageId"],
+      "required": [
+        "id",
+        "chatId",
+        "userId",
+        "status",
+        "createdAt",
+        "createdBy"
+      ],
       "additionalProperties": false
     },
-    "GetEntityEndpoint<ChatMessageAttachment,\"id\">": {
+    "GetEntityEndpoint<ChatInvitation,\"id\">": {
       "type": "object",
       "properties": {
         "query": {
@@ -1592,7 +2178,14 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["id", "name", "contentType", "chatMessageId"]
+                "enum": [
+                  "id",
+                  "chatId",
+                  "userId",
+                  "status",
+                  "createdAt",
+                  "createdBy"
+                ]
               },
               "description": "The list of fields to select"
             }
@@ -1607,14 +2200,20 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/ChatMessageAttachment"
+          "$ref": "#/definitions/ChatInvitation"
         }
       },
-      "required": ["query", "url", "result"],
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -1628,7 +2227,10 @@
           "$ref": "#/definitions/Chat"
         }
       },
-      "required": ["body", "result"],
+      "required": [
+        "body",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -1664,7 +2266,50 @@
           "description": "A list of participants in the chat"
         }
       },
-      "required": ["createdAt", "name", "owner", "participants"]
+      "required": [
+        "createdAt",
+        "name",
+        "owner",
+        "participants"
+      ]
+    },
+    "Omit<Chat,\"id\">": {
+      "$ref": "#/definitions/Pick%3CChat%2CExclude%3C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22participants%22)%2C%22id%22%3E%3E"
+    },
+    "Pick<Chat,Exclude<(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"participants\"),\"id\">>": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the chat"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description in markdown format"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the chat was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the chat"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of participants in the chat"
+        }
+      },
+      "required": [
+        "name",
+        "createdAt",
+        "owner",
+        "participants"
+      ],
+      "additionalProperties": false
     },
     "PostEndpoint<ChatMessage,\"id\">": {
       "type": "object",
@@ -1676,7 +2321,10 @@
           "$ref": "#/definitions/ChatMessage"
         }
       },
-      "required": ["body", "result"],
+      "required": [
+        "body",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -1705,45 +2353,147 @@
           "description": "The unique identifier of the chat to which this message belongs"
         }
       },
-      "required": ["chatId", "content", "createdAt", "owner"]
+      "required": [
+        "chatId",
+        "content",
+        "createdAt",
+        "owner"
+      ]
     },
-    "PostEndpoint<ChatMessageAttachment,\"id\">": {
+    "Omit<ChatMessage,\"id\">": {
+      "$ref": "#/definitions/Pick%3CChatMessage%2CExclude%3C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22)%2C%22id%22%3E%3E"
+    },
+    "Pick<ChatMessage,Exclude<(\"id\"|\"content\"|\"createdAt\"|\"owner\"|\"chatId\"),\"id\">>": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the message was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The unique identifier of the user who sent the message"
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The unique identifier of the chat to which this message belongs"
+        }
+      },
+      "required": [
+        "content",
+        "createdAt",
+        "owner",
+        "chatId"
+      ],
+      "additionalProperties": false
+    },
+    "PostEndpoint<ChatInvitation,\"id\">": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/WithOptionalId%3CChatMessageAttachment%2C%22id%22%3E"
+          "$ref": "#/definitions/WithOptionalId%3CChatInvitation%2C%22id%22%3E"
         },
         "result": {
-          "$ref": "#/definitions/ChatMessageAttachment"
+          "$ref": "#/definitions/ChatInvitation"
         }
       },
-      "required": ["body", "result"],
+      "required": [
+        "body",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
-    "WithOptionalId<ChatMessageAttachment,\"id\">": {
+    "WithOptionalId<ChatInvitation,\"id\">": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique identifier of the attachment"
+          "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
         },
-        "name": {
+        "chatId": {
           "type": "string",
-          "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
         },
-        "contentType": {
+        "userId": {
           "type": "string",
-          "enum": ["image", "url", "json", "text", "other"],
-          "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
         },
-        "chatMessageId": {
+        "status": {
           "type": "string",
-          "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected",
+            "revoked",
+            "expired"
+          ],
+          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
         }
       },
-      "required": ["chatMessageId", "contentType", "name"]
+      "required": [
+        "chatId",
+        "createdAt",
+        "createdBy",
+        "status",
+        "userId"
+      ]
+    },
+    "Omit<ChatInvitation,\"id\">": {
+      "$ref": "#/definitions/Pick%3CChatInvitation%2CExclude%3C(%22id%22%7C%22chatId%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%2C%22id%22%3E%3E"
+    },
+    "Pick<ChatInvitation,Exclude<(\"id\"|\"chatId\"|\"userId\"|\"status\"|\"createdAt\"|\"createdBy\"),\"id\">>": {
+      "type": "object",
+      "properties": {
+        "chatId": {
+          "type": "string",
+          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected",
+            "revoked",
+            "expired"
+          ],
+          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+        }
+      },
+      "required": [
+        "chatId",
+        "userId",
+        "status",
+        "createdAt",
+        "createdBy"
+      ],
+      "additionalProperties": false
     },
     "PatchEndpoint<Chat,\"id\">": {
       "type": "object",
@@ -1759,14 +2509,20 @@
               "description": "The unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": ["body", "url", "result"],
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -1817,14 +2573,20 @@
               "description": "The unique identifier of the message"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": ["body", "url", "result"],
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -1854,50 +2616,70 @@
       },
       "additionalProperties": false
     },
-    "PatchEndpoint<ChatMessageAttachment,\"id\">": {
+    "PatchEndpoint<ChatInvitation,\"id\">": {
       "type": "object",
       "properties": {
         "body": {
-          "$ref": "#/definitions/Partial%3CChatMessageAttachment%3E"
+          "$ref": "#/definitions/Partial%3CChatInvitation%3E"
         },
         "url": {
           "type": "object",
           "properties": {
             "id": {
               "type": "string",
-              "description": "The unique identifier of the attachment"
+              "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": ["body", "url", "result"],
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
-    "Partial<ChatMessageAttachment>": {
+    "Partial<ChatInvitation>": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique identifier of the attachment"
+          "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
         },
-        "name": {
+        "chatId": {
           "type": "string",
-          "description": "The name of the attachment. Can be a file name or a URL. This is used to display the attachment in the chat message."
+          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
         },
-        "contentType": {
+        "userId": {
           "type": "string",
-          "enum": ["image", "url", "json", "text", "other"],
-          "description": "The content type of the attachment. This is used to determine how the attachment should be handled or displayed."
+          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
         },
-        "chatMessageId": {
+        "status": {
           "type": "string",
-          "description": "The unique identifier to the chat message to which this attachment belongs. This is used to associate the attachment with the correct chat message. It is a foreign key to the ChatMessage model."
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected",
+            "revoked",
+            "expired"
+          ],
+          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
         }
       },
       "additionalProperties": false
@@ -1913,14 +2695,19 @@
               "description": "The unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": ["url", "result"],
+      "required": [
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     },
@@ -1935,36 +2722,19 @@
               "description": "The unique identifier of the message"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": ["url", "result"],
-      "additionalProperties": false,
-      "description": "Endpoint model for deleting entities"
-    },
-    "DeleteEndpoint<ChatMessageAttachment,\"id\">": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier of the attachment"
-            }
-          },
-          "required": ["id"],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object"
-        }
-      },
-      "required": ["url", "result"],
+      "required": [
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }

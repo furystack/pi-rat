@@ -24,7 +24,12 @@
           "type": "string"
         }
       },
-      "required": ["username", "roles", "createdAt", "updatedAt"],
+      "required": [
+        "username",
+        "roles",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     }
   }

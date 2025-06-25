@@ -10,10 +10,19 @@
         },
         "appName": {
           "type": "string",
-          "enum": ["home", "browser", "movies", "series", "iot"]
+          "enum": [
+            "home",
+            "browser",
+            "movies",
+            "series",
+            "iot"
+          ]
         }
       },
-      "required": ["type", "appName"],
+      "required": [
+        "type",
+        "appName"
+      ],
       "additionalProperties": false
     },
     "ContinueWatchingWidgetGroup": {
@@ -30,7 +39,9 @@
           "type": "number"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "additionalProperties": false
     },
     "EntityShortcutWidget": {
@@ -55,7 +66,10 @@
           ]
         }
       },
-      "required": ["type", "entityName"],
+      "required": [
+        "type",
+        "entityName"
+      ],
       "additionalProperties": false
     },
     "HtmlWidget": {
@@ -69,7 +83,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "content"],
+      "required": [
+        "type",
+        "content"
+      ],
       "additionalProperties": false
     },
     "DeviceAvailability": {
@@ -89,7 +106,10 @@
           "$ref": "#/definitions/Icon"
         }
       },
-      "required": ["type", "deviceName"],
+      "required": [
+        "type",
+        "deviceName"
+      ],
       "additionalProperties": false
     },
     "Icon": {
@@ -119,7 +139,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "Base64Icon": {
@@ -133,7 +156,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "LottieIcon": {
@@ -175,7 +201,10 @@
             },
             "renderer": {
               "type": "string",
-              "enum": ["svg", "canvas"]
+              "enum": [
+                "svg",
+                "canvas"
+              ]
             },
             "speed": {
               "type": "number"
@@ -187,11 +216,16 @@
               }
             }
           },
-          "required": ["src"],
+          "required": [
+            "src"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "UrlIcon": {
@@ -205,7 +239,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false
     },
     "MarkdownWidget": {
@@ -219,7 +256,10 @@
           "type": "string"
         }
       },
-      "required": ["type", "content"],
+      "required": [
+        "type",
+        "content"
+      ],
       "additionalProperties": false
     },
     "MovieWidget": {
@@ -239,7 +279,10 @@
           "type": "number"
         }
       },
-      "required": ["type", "imdbId"],
+      "required": [
+        "type",
+        "imdbId"
+      ],
       "additionalProperties": false
     },
     "SeriesWidget": {
@@ -259,7 +302,10 @@
           "type": "number"
         }
       },
-      "required": ["type", "imdbId"],
+      "required": [
+        "type",
+        "imdbId"
+      ],
       "additionalProperties": false
     },
     "WidgetGroup": {
@@ -279,7 +325,11 @@
           }
         }
       },
-      "required": ["type", "title", "widgets"],
+      "required": [
+        "type",
+        "title",
+        "widgets"
+      ],
       "additionalProperties": false
     },
     "Widget": {
@@ -341,7 +391,15 @@
           "type": "string"
         }
       },
-      "required": ["id", "name", "description", "owner", "widgets", "createdAt", "updatedAt"],
+      "required": [
+        "id",
+        "name",
+        "description",
+        "owner",
+        "widgets",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     }
   }

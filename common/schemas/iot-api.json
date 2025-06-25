@@ -14,7 +14,10 @@
           "$ref": "#/definitions/Omit%3CDevice%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
         }
       },
-      "required": ["body", "result"],
+      "required": [
+        "body",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
     },
@@ -72,7 +75,9 @@
           "description": "Optional MAC address, used to awake the device with WOL"
         }
       },
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false
     },
     "PatchDeviceEndpoint": {
@@ -92,14 +97,20 @@
               "description": "Should be used as primary key"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": ["body", "url", "result"],
+      "required": [
+        "body",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
@@ -119,7 +130,9 @@
           "description": "Optional MAC address, used to awake the device with WOL"
         }
       },
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false
     },
     "AwakeEndpoint": {
@@ -132,7 +145,9 @@
               "type": "string"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
@@ -142,11 +157,16 @@
               "type": "boolean"
             }
           },
-          "required": ["success"],
+          "required": [
+            "success"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["url", "result"],
+      "required": [
+        "url",
+        "result"
+      ],
       "additionalProperties": false
     },
     "PingEndpoint": {
@@ -159,7 +179,9 @@
               "type": "string"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
@@ -190,10 +212,19 @@
               "type": "boolean"
             }
           },
-          "required": ["createdAt", "id", "isAvailable", "name", "success"]
+          "required": [
+            "createdAt",
+            "id",
+            "isAvailable",
+            "name",
+            "success"
+          ]
         }
       },
-      "required": ["url", "result"],
+      "required": [
+        "url",
+        "result"
+      ],
       "additionalProperties": false
     },
     "DevicePingHistory": {
@@ -220,7 +251,12 @@
           "description": "Entry creation timestamp"
         }
       },
-      "required": ["id", "name", "isAvailable", "createdAt"],
+      "required": [
+        "id",
+        "name",
+        "isAvailable",
+        "createdAt"
+      ],
       "additionalProperties": false
     },
     "IotApi": {
@@ -242,7 +278,12 @@
               "$ref": "#/definitions/GetCollectionEndpoint%3CDeviceAwakeHistory%3E"
             }
           },
-          "required": ["/devices", "/devices/:id", "/device-ping-history", "/device-awake-history"],
+          "required": [
+            "/devices",
+            "/devices/:id",
+            "/device-ping-history",
+            "/device-awake-history"
+          ],
           "additionalProperties": false
         },
         "POST": {
@@ -258,7 +299,11 @@
               "$ref": "#/definitions/PingEndpoint"
             }
           },
-          "required": ["/devices", "/devices/:id/awake", "/devices/:id/ping"],
+          "required": [
+            "/devices",
+            "/devices/:id/awake",
+            "/devices/:id/ping"
+          ],
           "additionalProperties": false
         },
         "PATCH": {
@@ -268,7 +313,9 @@
               "$ref": "#/definitions/PatchDeviceEndpoint"
             }
           },
-          "required": ["/devices/:id"],
+          "required": [
+            "/devices/:id"
+          ],
           "additionalProperties": false
         },
         "PUT": {
@@ -282,7 +329,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -293,7 +342,9 @@
               "$ref": "#/definitions/DeleteEndpoint%3CDevice%2C%22name%22%3E"
             }
           },
-          "required": ["/devices/:id"],
+          "required": [
+            "/devices/:id"
+          ],
           "additionalProperties": false
         },
         "HEAD": {
@@ -307,7 +358,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -322,7 +375,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -337,7 +392,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -352,12 +409,19 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["GET", "POST", "PATCH", "DELETE"],
+      "required": [
+        "GET",
+        "POST",
+        "PATCH",
+        "DELETE"
+      ],
       "additionalProperties": false
     },
     "RestApi": {
@@ -374,7 +438,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -389,7 +455,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -404,7 +472,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -419,7 +489,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -434,7 +506,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -449,7 +523,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -464,7 +540,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -479,7 +557,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         },
@@ -494,7 +574,9 @@
               "body": {},
               "headers": {}
             },
-            "required": ["result"],
+            "required": [
+              "result"
+            ],
             "additionalProperties": false
           }
         }
@@ -517,7 +599,10 @@
           "$ref": "#/definitions/GetCollectionResult%3CDevice%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -537,23 +622,38 @@
           "properties": {
             "name": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "ipAddress": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "macAddress": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "createdAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "updatedAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -563,7 +663,13 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["name", "ipAddress", "macAddress", "createdAt", "updatedAt"]
+            "enum": [
+              "name",
+              "ipAddress",
+              "macAddress",
+              "createdAt",
+              "updatedAt"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -904,7 +1010,10 @@
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -932,7 +1041,11 @@
           "description": "Entry update timestamp"
         }
       },
-      "required": ["name", "createdAt", "updatedAt"],
+      "required": [
+        "name",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "GetEntityEndpoint<Device,\"name\">": {
@@ -945,7 +1058,13 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["name", "ipAddress", "macAddress", "createdAt", "updatedAt"]
+                "enum": [
+                  "name",
+                  "ipAddress",
+                  "macAddress",
+                  "createdAt",
+                  "updatedAt"
+                ]
               },
               "description": "The list of fields to select"
             }
@@ -960,14 +1079,20 @@
               "description": "The entity's unique identifier"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/Device"
         }
       },
-      "required": ["query", "url", "result"],
+      "required": [
+        "query",
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
@@ -987,7 +1112,10 @@
           "$ref": "#/definitions/GetCollectionResult%3CDevicePingHistory%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -1007,23 +1135,38 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "name": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "isAvailable": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "ping": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "createdAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -1033,7 +1176,13 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["id", "name", "isAvailable", "ping", "createdAt"]
+            "enum": [
+              "id",
+              "name",
+              "isAvailable",
+              "ping",
+              "createdAt"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -1360,7 +1509,10 @@
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1380,7 +1532,10 @@
           "$ref": "#/definitions/GetCollectionResult%3CDeviceAwakeHistory%3E"
         }
       },
-      "required": ["query", "result"],
+      "required": [
+        "query",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Rest endpoint model for getting / querying collections"
     },
@@ -1400,19 +1555,31 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "name": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "success": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             },
             "createdAt": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
             }
           },
           "additionalProperties": false,
@@ -1422,7 +1589,12 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["id", "name", "success", "createdAt"]
+            "enum": [
+              "id",
+              "name",
+              "success",
+              "createdAt"
+            ]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -1697,7 +1869,10 @@
           "description": "List of the selected entities"
         }
       },
-      "required": ["count", "entries"],
+      "required": [
+        "count",
+        "entries"
+      ],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
@@ -1721,7 +1896,12 @@
           "description": "Entry creation timestamp"
         }
       },
-      "required": ["id", "name", "success", "createdAt"],
+      "required": [
+        "id",
+        "name",
+        "success",
+        "createdAt"
+      ],
       "additionalProperties": false
     },
     "DeleteEndpoint<Device,\"name\">": {
@@ -1735,14 +1915,19 @@
               "description": "Should be used as primary key"
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "result": {
           "type": "object"
         }
       },
-      "required": ["url", "result"],
+      "required": [
+        "url",
+        "result"
+      ],
       "additionalProperties": false,
       "description": "Endpoint model for deleting entities"
     }

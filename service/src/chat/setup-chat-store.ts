@@ -3,7 +3,7 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
-import { Chat, ChatMessage, ChatMessageAttachment } from 'common'
+import { Chat, ChatInvitation, ChatMessage } from 'common'
 import { DATE, JSON, Model, STRING } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { WebsocketService } from '../websocket-service.js'
@@ -25,14 +25,13 @@ class ChatMessageModel extends Model<ChatMessage, ChatMessage> implements ChatMe
   declare owner: string
 }
 
-class ChatMessageAttachmentModel
-  extends Model<ChatMessageAttachment, ChatMessageAttachment>
-  implements ChatMessageAttachment
-{
+class ChatInvitationModel extends Model<ChatInvitation, ChatInvitation> implements ChatInvitation {
   declare id: string
-  declare name: string
-  declare contentType: 'image' | 'url' | 'json' | 'text' | 'other'
-  declare chatMessageId: string
+  declare chatId: string
+  declare userId: string
+  declare status: 'pending' | 'accepted' | 'rejected' | 'revoked' | 'expired'
+  declare createdAt: Date
+  declare createdBy: string
 }
 
 export const setupChatStore = async (injector: Injector) => {
@@ -138,42 +137,56 @@ export const setupChatStore = async (injector: Injector) => {
   useSequelize({
     injector,
     options: dbOptions,
-    model: ChatMessageAttachment,
-    sequelizeModel: ChatMessageAttachmentModel,
+    model: ChatInvitation,
+    sequelizeModel: ChatInvitationModel,
     primaryKey: 'id',
     initModel: async (sequelize) => {
-      ChatMessageAttachmentModel.init(
+      ChatInvitationModel.init(
         {
           id: {
             type: STRING,
             primaryKey: true,
           },
-          name: STRING,
-          contentType: {
+          chatId: {
             type: STRING,
             allowNull: false,
           },
-          chatMessageId: {
+          userId: {
             type: STRING,
             allowNull: false,
           },
+          status: {
+            type: STRING,
+            allowNull: false,
+          },
+          createdAt: {
+            type: DATE,
+            defaultValue: new Date(),
+          },
+          createdBy: STRING,
         },
         {
           sequelize,
-          tableName: 'chat_message_attachments',
+          tableName: 'chat_invitations',
           indexes: [
             {
-              fields: ['chatMessageId'],
+              fields: ['chatId'],
+            },
+            {
+              fields: ['userId'],
+            },
+            {
+              fields: ['status'],
             },
           ],
         },
       )
-      ChatMessageAttachmentModel.belongsTo(ChatMessageModel, {
-        foreignKey: 'chatMessageId',
-        as: 'message',
+      ChatInvitationModel.belongsTo(ChatModel, {
+        foreignKey: 'chatId',
+        as: 'chat',
         onDelete: 'CASCADE',
       })
-      await ChatMessageAttachmentModel.sync()
+      await ChatInvitationModel.sync()
     },
   })
 
@@ -283,8 +296,6 @@ export const setupChatStore = async (injector: Injector) => {
   const chatMessageDataSet = repo.getDataSetFor(ChatMessage, 'id')
   const chatMessagePhysicalStore = getStoreManager(injector).getStoreFor(ChatMessage, 'id')
 
-  const attachmentsPhysicalStore = getStoreManager(injector).getStoreFor(ChatMessageAttachment, 'id')
-
   const wsService = injector.getInstance(WebsocketService)
 
   chatDataSet.subscribe('onEntityAdded', ({ entity }) => {
@@ -319,22 +330,15 @@ export const setupChatStore = async (injector: Injector) => {
   })
 
   chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
-    const chatPromise = chatPhysicalStore.get(entity.chatId)
-    const attachmentsPromise = attachmentsPhysicalStore.find({
-      filter: { chatMessageId: { $eq: entity.id } },
-    })
-    const [chat, attachments] = await Promise.all([chatPromise, attachmentsPromise])
+    const chat = await chatPhysicalStore.get(entity.chatId)
     if (chat) {
-      void wsService.announce(
-        { type: 'chat-message-added', chatMessage: entity, chat, attachments },
-        async ({ injector: i }) => {
-          const user = await getCurrentUser(i)
-          if (!user || !chat) {
-            return false
-          }
-          return chat.owner === user.username || chat.participants.includes(user.username)
-        },
-      )
+      void wsService.announce({ type: 'chat-message-added', chatMessage: entity, chat }, async ({ injector: i }) => {
+        const user = await getCurrentUser(i)
+        if (!user || !chat) {
+          return false
+        }
+        return chat.owner === user.username || chat.participants.includes(user.username)
+      })
     }
   })
 
@@ -348,20 +352,13 @@ export const setupChatStore = async (injector: Injector) => {
       return
     }
 
-    const attachments = await attachmentsPhysicalStore.find({
-      filter: { chatMessageId: { $eq: reloadedChatMessage.id } },
+    void wsService.announce({ type: 'chat-message-updated', id, change, chat }, async ({ injector: i }) => {
+      const currentUser = await getCurrentUser(i)
+      if (!currentUser) {
+        return false
+      }
+      return chat.owner === currentUser.username || chat.participants.includes(currentUser.username)
     })
-
-    void wsService.announce(
-      { type: 'chat-message-updated', id, change, chat, attachments },
-      async ({ injector: i }) => {
-        const currentUser = await getCurrentUser(i)
-        if (!currentUser) {
-          return false
-        }
-        return chat.owner === currentUser.username || chat.participants.includes(currentUser.username)
-      },
-    )
   })
 
   chatMessageDataSet.subscribe('onEntityRemoved', async ({ key }) => {
@@ -373,4 +370,6 @@ export const setupChatStore = async (injector: Injector) => {
       return true
     })
   })
+
+  repo.createDataSet(ChatInvitation, 'id', {})
 }

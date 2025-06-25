@@ -4,7 +4,10 @@
   "definitions": {
     "ServiceStatus": {
       "type": "string",
-      "enum": ["installed", "needsInstall"]
+      "enum": [
+        "installed",
+        "needsInstall"
+      ]
     }
   }
 }

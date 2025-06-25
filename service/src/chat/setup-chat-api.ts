@@ -8,10 +8,13 @@ import {
   useRestService,
   Validate,
 } from '@furystack/rest-service'
-import { Chat, ChatMessage, ChatMessageAttachment, type ChatApi } from 'common'
+import { Chat, ChatInvitation, ChatMessage, type ChatApi } from 'common'
 import chatApiSchema from 'common/schemas/chat-api.json' with { type: 'json' }
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
+import { AcceptInvitationAction } from './actions/accept-invitation-action.js'
+import { RejectInvitationAction } from './actions/reject-invitation.js'
+import { RevokeInvitationAction } from './actions/revoke-intivation.js'
 
 export const setupChatRestApi = async (injector: Injector) => {
   await useRestService<ChatApi>({
@@ -57,21 +60,22 @@ export const setupChatRestApi = async (injector: Injector) => {
             primaryKey: 'id',
           }),
         ),
-        '/chat-message-attachments': Validate({
+
+        '/chat-invitations': Validate({
           schema: chatApiSchema,
-          schemaName: 'GetCollectionEndpoint<ChatMessageAttachment>',
+          schemaName: 'GetCollectionEndpoint<ChatInvitation>',
         })(
           createGetCollectionEndpoint({
-            model: ChatMessageAttachment,
+            model: ChatInvitation,
             primaryKey: 'id',
           }),
         ),
-        '/chat-message-attachments/:id': Validate({
+        '/chat-invitations/:id': Validate({
           schema: chatApiSchema,
-          schemaName: 'GetEntityEndpoint<ChatMessageAttachment,"id">',
+          schemaName: 'GetEntityEndpoint<ChatInvitation,"id">',
         })(
           createGetEntityEndpoint({
-            model: ChatMessageAttachment,
+            model: ChatInvitation,
             primaryKey: 'id',
           }),
         ),
@@ -95,15 +99,27 @@ export const setupChatRestApi = async (injector: Injector) => {
             primaryKey: 'id',
           }),
         ),
-        '/chat-message-attachments': Validate({
+        '/chat-invitations': Validate({
           schema: chatApiSchema,
-          schemaName: 'PostEndpoint<ChatMessageAttachment,"id">',
+          schemaName: 'PostEndpoint<ChatInvitation,"id">',
         })(
           createPostEndpoint({
-            model: ChatMessageAttachment,
+            model: ChatInvitation,
             primaryKey: 'id',
           }),
         ),
+        '/chat-invitations/:id/accept': Validate({
+          schema: chatApiSchema,
+          schemaName: 'AcceptInvitationAction',
+        })(AcceptInvitationAction),
+        '/chat-invitations/:id/reject': Validate({
+          schema: chatApiSchema,
+          schemaName: 'RejectInvitationAction',
+        })(RejectInvitationAction),
+        '/chat-invitations/:id/revoke': Validate({
+          schema: chatApiSchema,
+          schemaName: 'RevokeInvitationAction',
+        })(RevokeInvitationAction),
       },
       PATCH: {
         '/chat/:id': Validate({
@@ -124,12 +140,12 @@ export const setupChatRestApi = async (injector: Injector) => {
             primaryKey: 'id',
           }),
         ),
-        '/chat-message-attachments/:id': Validate({
+        '/chat-invitations/:id': Validate({
           schema: chatApiSchema,
-          schemaName: 'PatchEndpoint<ChatMessageAttachment,"id">',
+          schemaName: 'PatchEndpoint<ChatInvitation,"id">',
         })(
           createPatchEndpoint({
-            model: ChatMessageAttachment,
+            model: ChatInvitation,
             primaryKey: 'id',
           }),
         ),
@@ -150,15 +166,6 @@ export const setupChatRestApi = async (injector: Injector) => {
         })(
           createDeleteEndpoint({
             model: ChatMessage,
-            primaryKey: 'id',
-          }),
-        ),
-        '/chat-message-attachments/:id': Validate({
-          schema: chatApiSchema,
-          schemaName: 'DeleteEndpoint<ChatMessageAttachment,"id">',
-        })(
-          createDeleteEndpoint({
-            model: ChatMessageAttachment,
             primaryKey: 'id',
           }),
         ),

@@ -25,11 +25,18 @@
               "description": "If a new imdb id is added, download the metadata automatically"
             }
           },
-          "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+          "required": [
+            "apiKey",
+            "trySearchMovieFromTitle",
+            "autoDownloadMetadata"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["id", "value"],
+      "required": [
+        "id",
+        "value"
+      ],
       "additionalProperties": false
     },
     "MoviesConfig": {
@@ -66,7 +73,9 @@
                         "description": "An optional path filter. If not set, all files in the drive will be watched."
                       }
                     },
-                    "required": ["drive"],
+                    "required": [
+                      "drive"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -74,11 +83,17 @@
               "description": "'all' or a list of directories to watch for new movies."
             }
           },
-          "required": ["enableNfoParsing", "watchFiles"],
+          "required": [
+            "enableNfoParsing",
+            "watchFiles"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["id", "value"],
+      "required": [
+        "id",
+        "value"
+      ],
       "additionalProperties": false
     },
     "IotConfig": {
@@ -100,11 +115,17 @@
               "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
             }
           },
-          "required": ["pingIntervalMs", "pingTimeoutMs"],
+          "required": [
+            "pingIntervalMs",
+            "pingTimeoutMs"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["id", "value"],
+      "required": [
+        "id",
+        "value"
+      ],
       "additionalProperties": false
     },
     "GithubConfig": {
@@ -124,11 +145,17 @@
               "type": "string"
             }
           },
-          "required": ["clientId", "clientSecret"],
+          "required": [
+            "clientId",
+            "clientSecret"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["id", "value"],
+      "required": [
+        "id",
+        "value"
+      ],
       "additionalProperties": false
     },
     "ConfigType": {
@@ -190,7 +217,11 @@
                   "description": "If a new imdb id is added, download the metadata automatically"
                 }
               },
-              "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+              "required": [
+                "apiKey",
+                "trySearchMovieFromTitle",
+                "autoDownloadMetadata"
+              ],
               "additionalProperties": false
             },
             {
@@ -203,7 +234,10 @@
                   "type": "string"
                 }
               },
-              "required": ["clientId", "clientSecret"],
+              "required": [
+                "clientId",
+                "clientSecret"
+              ],
               "additionalProperties": false
             },
             {
@@ -218,7 +252,10 @@
                   "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
                 }
               },
-              "required": ["pingIntervalMs", "pingTimeoutMs"],
+              "required": [
+                "pingIntervalMs",
+                "pingTimeoutMs"
+              ],
               "additionalProperties": false
             },
             {
@@ -248,7 +285,9 @@
                             "description": "An optional path filter. If not set, all files in the drive will be watched."
                           }
                         },
-                        "required": ["drive"],
+                        "required": [
+                          "drive"
+                        ],
                         "additionalProperties": false
                       }
                     }
@@ -256,7 +295,10 @@
                   "description": "'all' or a list of directories to watch for new movies."
                 }
               },
-              "required": ["enableNfoParsing", "watchFiles"],
+              "required": [
+                "enableNfoParsing",
+                "watchFiles"
+              ],
               "additionalProperties": false
             }
           ]
@@ -270,7 +312,12 @@
           "format": "date-time"
         }
       },
-      "required": ["id", "value", "createdAt", "updatedAt"],
+      "required": [
+        "id",
+        "value",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     }
   }
