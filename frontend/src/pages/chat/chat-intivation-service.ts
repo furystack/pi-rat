@@ -1,7 +1,7 @@
 import { Cache } from '@furystack/cache'
 import type { FilterType } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
-import type { Chat, ChatInvitation } from 'common'
+import type { ChatInvitation } from 'common'
 import { ChatApiClient } from '../../services/api-clients/chat-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
@@ -24,7 +24,7 @@ export class ChatInvitationService {
 
   private chatInvitationQueryCache = new Cache({
     capacity: 100,
-    load: async (findOptions: { filter?: FilterType<Chat> }) => {
+    load: async (findOptions: { filter?: FilterType<ChatInvitation> }) => {
       const { result } = await this.chatApiClient.call({
         method: 'GET',
         action: '/chat-invitations',
@@ -56,11 +56,11 @@ export class ChatInvitationService {
     return this.chatInvitationCache.getObservable(id)
   }
 
-  public async getChatInvitations(findOptions: { filter?: FilterType<Chat> }) {
+  public async getChatInvitations(findOptions: { filter?: FilterType<ChatInvitation> }) {
     return this.chatInvitationQueryCache.get(findOptions)
   }
 
-  public getChatInvitationsAsObservable(findOptions: { filter?: FilterType<Chat> }) {
+  public getChatInvitationsAsObservable(findOptions: { filter?: FilterType<ChatInvitation> }) {
     return this.chatInvitationQueryCache.getObservable(findOptions)
   }
 

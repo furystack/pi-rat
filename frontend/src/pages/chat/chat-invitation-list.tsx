@@ -1,6 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Paper, Skeleton } from '@furystack/shades-common-components'
+import { NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import { ErrorDisplay } from '../../components/error-display.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
+import { SessionService } from '../../services/session.js'
 import { ChatInvitationService } from './chat-intivation-service.js'
 
 export const ChatInvitationList = Shade({
@@ -12,7 +14,16 @@ export const ChatInvitationList = Shade({
   render: ({ injector, useObservable }) => {
     const chatInvitationService = injector.getInstance(ChatInvitationService)
 
-    const [invitations] = useObservable('chatInvitations', chatInvitationService.getChatInvitationsAsObservable({}))
+    const currentUser = injector.getInstance(SessionService).currentUser.getValue()
+
+    const [invitations] = useObservable(
+      'chatInvitations',
+      chatInvitationService.getChatInvitationsAsObservable({
+        filter: {
+          status: { $eq: 'pending' },
+        },
+      }),
+    )
 
     if (invitations.status === 'failed') {
       return <GenericErrorPage error={invitations.error} />
@@ -28,21 +39,60 @@ export const ChatInvitationList = Shade({
       )
     }
 
+    const noty = injector.getInstance(NotyService)
+
     return (
       <Paper style={{ width: '100%' }}>
-        <h2>Invitations</h2>
         {invitations.value.entries.length === 0 ? (
-          <p>No invitations found.</p>
+          <p>🪹 No invitations</p>
         ) : (
-          <ul>
-            {invitations.value.entries.map((invitation) => (
-              <li>
-                <p>{invitation.userId}</p>
-                <p>{invitation.chatId}</p>
-                <p>{invitation.status}</p>
-              </li>
-            ))}
-          </ul>
+          <>
+            <h2>📨 Invitations</h2>
+
+            <ul>
+              {invitations.value.entries.map((invitation) => (
+                <li
+                  style={{
+                    listStyle: 'none',
+                    display: 'flex',
+                  }}
+                >
+                  <p>{invitation.userId}</p>
+                  <p>{invitation.chatName}</p>
+                  <div>
+                    {invitation.userId === currentUser?.username ? (
+                      <>
+                        {invitation.status === 'pending' ? (
+                          <button
+                            onclick={async () => {
+                              await chatInvitationService
+                                .acceptChatInvitation(invitation.id)
+                                .then(() => {
+                                  noty.emit('onNotyAdded', {
+                                    type: 'success',
+                                    title: 'Invitation Accepted',
+                                    body: `Invitation to chat "${invitation.chatName}" accepted!`,
+                                  })
+                                })
+                                .catch((error) => {
+                                  noty.emit('onNotyAdded', {
+                                    type: 'error',
+                                    title: 'Error Accepting Invitation',
+                                    body: <ErrorDisplay error={error} />,
+                                  })
+                                })
+                            }}
+                          >
+                            Accept
+                          </button>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </Paper>
     )

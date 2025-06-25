@@ -26,11 +26,12 @@ export const AddChatButton = Shade({
             left: '0',
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             zIndex: '1000000',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            background: 'rgba(128,128,128, 0.3)',
+            backdropFilter: 'blur(5px)',
           }}
         >
           <Paper onclick={(ev) => ev.stopPropagation()}>

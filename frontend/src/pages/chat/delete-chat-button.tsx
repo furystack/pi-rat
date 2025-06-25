@@ -23,6 +23,7 @@ export const DeleteChatButton = Shade<{ chat: Chat }>({
 
     return (
       <Button
+        color="error"
         disabled={props.chat.owner !== user?.username}
         onclick={async () => {
           if (!confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
@@ -44,7 +45,7 @@ export const DeleteChatButton = Shade<{ chat: Chat }>({
           }
         }}
       >
-        Delete Chat
+        ❌ Delete Chat
       </Button>
     )
   },

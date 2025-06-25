@@ -4,6 +4,7 @@ import { FullScreenLoader } from '../../components/fullscreen-loader.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { ChatService } from './chat-service.js'
 import { DeleteChatButton } from './delete-chat-button.js'
+import { InviteButton } from './invite-button.js'
 import { MessageInput } from './message-input.js'
 import { MessageList } from './message-list.js'
 
@@ -61,14 +62,16 @@ export const ChatFlow = Shade({
       >
         <h2>{selectedChat.value.name}</h2>
         <h5>{selectedChat.value.description}</h5>
-        <DeleteChatButton
+        <div
           style={{
             position: 'absolute',
             top: '8px',
             right: '8px',
           }}
-          chat={selectedChat.value}
-        />
+        >
+          <DeleteChatButton chat={selectedChat.value} />
+          <InviteButton chat={selectedChat.value} />
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <MessageList
             style={{
