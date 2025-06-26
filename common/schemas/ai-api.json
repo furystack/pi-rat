@@ -78,7 +78,7 @@
     "ChatAction": {
       "type": "object",
       "properties": {
-        "request": {
+        "body": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -127,7 +127,7 @@
           "$ref": "#/definitions/ChatResponse"
         }
       },
-      "required": ["request", "result"],
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "ChatRequest": {

@@ -7,9 +7,9 @@ export const AiChat = Shade<{ model: string }>({
   shadowDomName: 'pi-rat-ai-chat',
   style: {
     display: 'flex',
-    flexDirection: 'column',
     width: '100%',
     height: '100%',
+    overflow: 'hidden',
   },
   render: ({ props }) => {
     const { model } = props
