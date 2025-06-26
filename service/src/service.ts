@@ -4,6 +4,7 @@ import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { EventHub } from '@furystack/utils'
 import { useWebsockets } from '@furystack/websocket-api'
+import { setupAiRestApi } from './ai/setup-ai-rest-api.js'
 import { setupAi } from './ai/setup-ai.js'
 import { setupChatRestApi } from './chat/setup-chat-api.js'
 import { setupChat } from './chat/setup-chat.js'
@@ -65,6 +66,7 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupMoviesRestApi(injector),
       await setupIotApi(injector),
       await setupChatRestApi(injector),
+      await setupAiRestApi(injector),
     ])
 
     useWebsockets(injector, {

@@ -2,6 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { AppBar, AppBarLink, Button } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
 import { SessionService } from '../services/session.js'
+import { AiIcon } from './ai/ai-icon.js'
 import { ChatIcon } from './chat/chat-icon.js'
 import { PiRatCommandPalette } from './command-palette/index.js'
 import { GithubLogo } from './github-logo/index.js'
@@ -67,6 +68,7 @@ export const Header = Shade<HeaderProps>({
             <GithubLogo style={{ height: '1rem' }} />
           </Button>
           <ChatIcon />
+          <AiIcon />
           {sessionState === 'authenticated' ? (
             <Button variant="outlined" onclick={() => injector.getInstance(SessionService).logout()}>
               Log Out

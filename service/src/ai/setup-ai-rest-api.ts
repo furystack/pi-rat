@@ -10,8 +10,8 @@ import { GetModelsAction } from './actions/get-models-action.js'
 export const setupAiRestApi = async (injector: Injector) => {
   await useRestService<AiApi>({
     injector,
-    port: getPort(),
     root: 'api/ai',
+    port: getPort(),
     cors: getCorsOptions(),
     api: {
       GET: {
