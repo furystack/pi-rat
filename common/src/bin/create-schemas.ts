@@ -56,6 +56,11 @@ export const entityValues: SchemaGenerationSetting[] = [
 
 export const apiValues: SchemaGenerationSetting[] = [
   {
+    inputFile: './src/apis/ai.ts',
+    outputFile: './schemas/ai-api.json',
+    type: '*',
+  },
+  {
     inputFile: './src/apis/chat.ts',
     outputFile: './schemas/chat-api.json',
     type: '*',

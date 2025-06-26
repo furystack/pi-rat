@@ -1,0 +1,770 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "GetModelsAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelResponse"
+          }
+        }
+      },
+      "required": ["result"],
+      "additionalProperties": false
+    },
+    "ModelResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "modified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "model": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        },
+        "digest": {
+          "type": "string"
+        },
+        "details": {
+          "$ref": "#/definitions/ModelDetails"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size_vram": {
+          "type": "number"
+        }
+      },
+      "required": ["name", "modified_at", "model", "size", "digest", "details", "expires_at", "size_vram"],
+      "additionalProperties": false
+    },
+    "ModelDetails": {
+      "type": "object",
+      "properties": {
+        "parent_model": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "families": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parameter_size": {
+          "type": "string"
+        },
+        "quantization_level": {
+          "type": "string"
+        }
+      },
+      "required": ["parent_model", "format", "family", "families", "parameter_size", "quantization_level"],
+      "additionalProperties": false
+    },
+    "ChatAction": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "stream": {
+              "type": "boolean",
+              "const": false
+            },
+            "model": {
+              "type": "string"
+            },
+            "messages": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Message"
+              }
+            },
+            "format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "keep_alive": {
+              "type": ["string", "number"]
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Tool"
+              }
+            },
+            "think": {
+              "type": "boolean"
+            },
+            "options": {
+              "$ref": "#/definitions/Partial%3COptions%3E"
+            }
+          },
+          "required": ["model"]
+        },
+        "result": {
+          "$ref": "#/definitions/ChatResponse"
+        }
+      },
+      "required": ["request", "result"],
+      "additionalProperties": false
+    },
+    "ChatRequest": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Message"
+          }
+        },
+        "stream": {
+          "type": "boolean"
+        },
+        "format": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "keep_alive": {
+          "type": ["string", "number"]
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tool"
+          }
+        },
+        "think": {
+          "type": "boolean"
+        },
+        "options": {
+          "$ref": "#/definitions/Partial%3COptions%3E"
+        }
+      },
+      "required": ["model"],
+      "additionalProperties": false
+    },
+    "Message": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "thinking": {
+          "type": "string"
+        },
+        "images": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Uint8Array"
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "tool_calls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ToolCall"
+          }
+        }
+      },
+      "required": ["role", "content"],
+      "additionalProperties": false
+    },
+    "Uint8Array": {
+      "type": "object",
+      "properties": {
+        "BYTES_PER_ELEMENT": {
+          "type": "number"
+        },
+        "buffer": {
+          "$ref": "#/definitions/ArrayBufferLike"
+        },
+        "byteLength": {
+          "type": "number"
+        },
+        "byteOffset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": ["BYTES_PER_ELEMENT", "buffer", "byteLength", "byteOffset", "length"],
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "ArrayBufferLike": {
+      "$ref": "#/definitions/ArrayBuffer"
+    },
+    "ArrayBuffer": {
+      "type": "object",
+      "properties": {
+        "byteLength": {
+          "type": "number"
+        }
+      },
+      "required": ["byteLength"],
+      "additionalProperties": false
+    },
+    "ToolCall": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "arguments": {
+              "type": "object"
+            }
+          },
+          "required": ["name", "arguments"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["function"],
+      "additionalProperties": false
+    },
+    "Tool": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "function": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "$defs": {},
+                "items": {},
+                "required": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "properties": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        ]
+                      },
+                      "items": {},
+                      "description": {
+                        "type": "string"
+                      },
+                      "enum": {
+                        "type": "array",
+                        "items": {}
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["type", "function"],
+      "additionalProperties": false
+    },
+    "Partial<Options>": {
+      "type": "object",
+      "properties": {
+        "numa": {
+          "type": "boolean"
+        },
+        "num_ctx": {
+          "type": "number"
+        },
+        "num_batch": {
+          "type": "number"
+        },
+        "num_gpu": {
+          "type": "number"
+        },
+        "main_gpu": {
+          "type": "number"
+        },
+        "low_vram": {
+          "type": "boolean"
+        },
+        "f16_kv": {
+          "type": "boolean"
+        },
+        "logits_all": {
+          "type": "boolean"
+        },
+        "vocab_only": {
+          "type": "boolean"
+        },
+        "use_mmap": {
+          "type": "boolean"
+        },
+        "use_mlock": {
+          "type": "boolean"
+        },
+        "embedding_only": {
+          "type": "boolean"
+        },
+        "num_thread": {
+          "type": "number"
+        },
+        "num_keep": {
+          "type": "number"
+        },
+        "seed": {
+          "type": "number"
+        },
+        "num_predict": {
+          "type": "number"
+        },
+        "top_k": {
+          "type": "number"
+        },
+        "top_p": {
+          "type": "number"
+        },
+        "tfs_z": {
+          "type": "number"
+        },
+        "typical_p": {
+          "type": "number"
+        },
+        "repeat_last_n": {
+          "type": "number"
+        },
+        "temperature": {
+          "type": "number"
+        },
+        "repeat_penalty": {
+          "type": "number"
+        },
+        "presence_penalty": {
+          "type": "number"
+        },
+        "frequency_penalty": {
+          "type": "number"
+        },
+        "mirostat": {
+          "type": "number"
+        },
+        "mirostat_tau": {
+          "type": "number"
+        },
+        "mirostat_eta": {
+          "type": "number"
+        },
+        "penalize_newline": {
+          "type": "boolean"
+        },
+        "stop": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ChatResponse": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "$ref": "#/definitions/Message"
+        },
+        "done": {
+          "type": "boolean"
+        },
+        "done_reason": {
+          "type": "string"
+        },
+        "total_duration": {
+          "type": "number"
+        },
+        "load_duration": {
+          "type": "number"
+        },
+        "prompt_eval_count": {
+          "type": "number"
+        },
+        "prompt_eval_duration": {
+          "type": "number"
+        },
+        "eval_count": {
+          "type": "number"
+        },
+        "eval_duration": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "model",
+        "created_at",
+        "message",
+        "done",
+        "done_reason",
+        "total_duration",
+        "load_duration",
+        "prompt_eval_count",
+        "prompt_eval_duration",
+        "eval_count",
+        "eval_duration"
+      ],
+      "additionalProperties": false
+    },
+    "AiApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "properties": {
+            "/models": {
+              "$ref": "#/definitions/GetModelsAction"
+            }
+          },
+          "required": ["/models"],
+          "additionalProperties": false
+        },
+        "POST": {
+          "type": "object",
+          "properties": {
+            "/chat": {
+              "$ref": "#/definitions/ChatAction"
+            }
+          },
+          "required": ["/chat"],
+          "additionalProperties": false
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["GET", "POST"],
+      "additionalProperties": false
+    },
+    "RestApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "POST": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
