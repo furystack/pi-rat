@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ChatInvitation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the chat invitation. This is used to identify the invitation in the system. It is a primary key in the database. It is also used to reference the invitation in other models."
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
+        },
+        "chatName": {
+          "type": "string",
+          "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
+          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
+        }
+      },
+      "required": ["id", "chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"],
+      "additionalProperties": false
+    },
+    "ChatMessageAttachment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the attachment"
+        },
+        "fileName": {
+          "type": "string",
+          "description": "The type of the file"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type that hints how the attachment can be displayed"
+        }
+      },
+      "required": ["id", "fileName", "type"],
+      "additionalProperties": false
+    },
+    "ChatMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the message"
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the message was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The unique identifier of the user who sent the message"
+        },
+        "chatId": {
+          "type": "string",
+          "description": "The unique identifier of the chat to which this message belongs"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChatMessageAttachment"
+          },
+          "description": "The attachments of the message"
+        }
+      },
+      "required": ["id", "content", "createdAt", "owner", "chatId", "attachments"],
+      "additionalProperties": false
+    },
+    "Chat": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the chat"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description in markdown format"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the chat was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the chat"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of participants in the chat"
+        }
+      },
+      "required": ["id", "name", "createdAt", "owner", "participants"],
+      "additionalProperties": false
+    }
+  }
+}

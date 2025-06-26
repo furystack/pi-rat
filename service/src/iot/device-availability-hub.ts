@@ -79,7 +79,7 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
       })
     } finally {
       const sleepMs = currentConfig.value.pingIntervalMs || 30 * 1000
-      await this.logger.verbose({ message: `Device refresh done, sleeping for ${sleepMs}ms` })
+      // await this.logger.verbose({ message: `Device refresh done, sleeping for ${sleepMs}ms` })
       await sleepAsync(sleepMs)
       await this.refreshConnections()
     }

@@ -1,24 +1,28 @@
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { setupDrives } from './drives/setup-drives.js'
-import { setupIdentity } from './identity/setup-identity.js'
-import { setupFrontendBundle } from './setup-frontend-bundle.js'
-import { setupInstall } from './install/setup-install.js'
-import { setupDashboards } from './dashboards/setup-dashboards.js'
-import { setupIdentityRestApi } from './identity/setup-identity-rest-api.js'
-import { setupDrivesRestApi } from './drives/setup-drives-rest-api.js'
-import { setupInstallRestApi } from './install/setup-install-rest-api.js'
-import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api.js'
-import { setupPatcher } from './patcher/setup-patcher.js'
-import { setupMovies } from './media/setup-media.js'
-import { setupMoviesRestApi } from './media/setup-media-api.js'
-import { setupConfig } from './config/setup-config.js'
-import { setupConfigRestApi } from './config/setup-config-rest-api.js'
-import { setupIot } from './iot/setup-iot.js'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
-import { setupIotApi } from './iot/setup-iot-api.js'
+import type { ScopedLogger } from '@furystack/logging'
+import { getLogger } from '@furystack/logging'
 import { EventHub } from '@furystack/utils'
+import { useWebsockets } from '@furystack/websocket-api'
+import { setupChatRestApi } from './chat/setup-chat-api.js'
+import { setupChat } from './chat/setup-chat.js'
+import { setupConfigRestApi } from './config/setup-config-rest-api.js'
+import { setupConfig } from './config/setup-config.js'
+import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api.js'
+import { setupDashboards } from './dashboards/setup-dashboards.js'
+import { setupDrivesRestApi } from './drives/setup-drives-rest-api.js'
+import { setupDrives } from './drives/setup-drives.js'
+import { getPort } from './get-port.js'
+import { setupIdentityRestApi } from './identity/setup-identity-rest-api.js'
+import { setupIdentity } from './identity/setup-identity.js'
+import { setupInstallRestApi } from './install/setup-install-rest-api.js'
+import { setupInstall } from './install/setup-install.js'
+import { setupIotApi } from './iot/setup-iot-api.js'
+import { setupIot } from './iot/setup-iot.js'
+import { setupMoviesRestApi } from './media/setup-media-api.js'
+import { setupMovies } from './media/setup-media.js'
+import { setupPatcher } from './patcher/setup-patcher.js'
+import { setupFrontendBundle } from './setup-frontend-bundle.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class PiRatRootService extends EventHub<{ initialized: undefined }> {
@@ -39,6 +43,7 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupDashboards(injector),
       await setupMovies(injector),
       await setupIot(injector),
+      await setupChat(injector),
     ])
 
     /**
@@ -57,7 +62,13 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupDashboardsRestApi(injector),
       await setupMoviesRestApi(injector),
       await setupIotApi(injector),
+      await setupChatRestApi(injector),
     ])
+
+    useWebsockets(injector, {
+      port: getPort(),
+      path: '/api/ws',
+    })
 
     await setupFrontendBundle(injector)
 
