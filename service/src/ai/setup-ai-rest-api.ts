@@ -7,7 +7,7 @@ import {
   useRestService,
   Validate,
 } from '@furystack/rest-service'
-import { AiChat, type AiApi } from 'common'
+import { AiChat, AiChatMessage, type AiApi } from 'common'
 import schema from 'common/schemas/ai-api.json' with { type: 'json' }
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
@@ -46,19 +46,19 @@ export const setupAiRestApi = async (injector: Injector) => {
         ),
         '/ai-chat-messages': Validate({
           schema,
-          schemaName: 'GetCollectionEndpoint<AiChat>',
+          schemaName: 'GetCollectionEndpoint<AiChatMessage>',
         })(
           createGetCollectionEndpoint({
-            model: AiChat,
+            model: AiChatMessage,
             primaryKey: 'id',
           }),
         ),
         '/ai-chat-messages/:id': Validate({
           schema,
-          schemaName: 'GetEntityEndpoint<AiChat,"id">',
+          schemaName: 'GetEntityEndpoint<AiChatMessage,"id">',
         })(
           createGetEntityEndpoint({
-            model: AiChat,
+            model: AiChatMessage,
             primaryKey: 'id',
           }),
         ),
@@ -79,10 +79,10 @@ export const setupAiRestApi = async (injector: Injector) => {
         ),
         '/ai-chat-messages': Validate({
           schema,
-          schemaName: 'PostEndpoint<AiChat,"id">',
+          schemaName: 'PostEndpoint<AiChatMessage,"id">',
         })(
           createPostEndpoint({
-            model: AiChat,
+            model: AiChatMessage,
             primaryKey: 'id',
           }),
         ),

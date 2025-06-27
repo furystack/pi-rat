@@ -1,6 +1,6 @@
 import type { GetCollectionEndpoint, GetEntityEndpoint, PatchEndpoint, PostEndpoint, RestApi } from '@furystack/rest'
 import type { ChatRequest, ChatResponse, ModelResponse } from 'ollama'
-import type { AiChat } from '../models/index.js'
+import type { AiChat, AiChatMessage } from '../models/index.js'
 
 export type GetModelsAction = {
   result: ModelResponse[]
@@ -16,14 +16,14 @@ export interface AiApi extends RestApi {
     '/models': GetModelsAction
     '/ai-chats': GetCollectionEndpoint<AiChat>
     '/ai-chats/:id': GetEntityEndpoint<AiChat, 'id'>
-    '/ai-chat-messages': GetCollectionEndpoint<AiChat>
-    '/ai-chat-messages/:id': GetEntityEndpoint<AiChat, 'id'>
+    '/ai-chat-messages': GetCollectionEndpoint<AiChatMessage>
+    '/ai-chat-messages/:id': GetEntityEndpoint<AiChatMessage, 'id'>
   }
   POST: {
     // @deprecated
     '/chat': ChatAction
     '/ai-chats': PostEndpoint<AiChat, 'id'>
-    '/ai-chat-messages': PostEndpoint<AiChat, 'id'>
+    '/ai-chat-messages': PostEndpoint<AiChatMessage, 'id'>
   }
   PATCH: {
     '/ai-chats/:id': PatchEndpoint<AiChat, 'id'>

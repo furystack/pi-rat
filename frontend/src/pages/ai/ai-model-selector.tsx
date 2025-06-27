@@ -19,6 +19,7 @@ export const AiModelSelector = Shade<{ value?: string; onSelect?: (newValue: str
     if (models?.value) {
       return (
         <select
+          name="model"
           onchange={(e) => {
             const target = e.target as HTMLSelectElement
             const newValue = target.value

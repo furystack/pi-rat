@@ -3,7 +3,7 @@ import { Paper } from '@furystack/shades-common-components'
 import { AiChatInput } from './ai-chat-input.js'
 import { AiChatMessageList } from './ai-chat-message-list.js'
 
-export const AiChat = Shade<{ model: string }>({
+export const AiChat = Shade<{ selectedChatId: string }>({
   shadowDomName: 'pi-rat-ai-chat',
   style: {
     display: 'flex',
@@ -12,11 +12,11 @@ export const AiChat = Shade<{ model: string }>({
     overflow: 'hidden',
   },
   render: ({ props }) => {
-    const { model } = props
+    const { selectedChatId } = props
     return (
       <Paper style={{ padding: '16px', flexGrow: '1' }}>
-        <AiChatMessageList model={model} />
-        <AiChatInput />
+        <AiChatMessageList selectedChatId={selectedChatId} />
+        <AiChatInput selectedChatId={selectedChatId} />
       </Paper>
     )
   },
