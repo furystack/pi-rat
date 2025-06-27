@@ -20,7 +20,16 @@ export const AiPage = Shade({
     const [selectedChatId, setSelectedChatId] = useSearchState('selectedChat', '')
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: '1', width: '100%', height: '100%' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: '1',
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+        }}
+      >
         <Paper style={{ display: 'flex', flexDirection: 'row', width: 'calc(100% - 48px)', flexGrow: '0' }}>
           <div style={{ display: 'flex', flexDirection: 'column', flexGrow: '1', flex: '5' }}>
             <h1>AI Chats</h1>
@@ -32,11 +41,15 @@ export const AiPage = Shade({
             display: 'flex',
             flexDirection: 'row',
             width: '100%',
-            height: 'calc(100% - 48px)',
+            overflow: 'hidden',
             flexGrow: '1',
           }}
         >
-          <AiChatList style={{ height: '100%', minWidth: '250px' }} onSelect={({ id }) => setSelectedChatId(id)} />
+          <AiChatList
+            style={{ height: '100%', minWidth: '250px' }}
+            onSelect={({ id }) => setSelectedChatId(id)}
+            selectedChatId={selectedChatId}
+          />
           <AiChat selectedChatId={selectedChatId} />
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Form } from '@furystack/shades-common-components'
+import { Button, Form, Input } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
 import { AiChatMessageService } from './ai-chat-message-service.js'
 import { AiChatService } from './ai-chat-service.js'
@@ -47,9 +47,18 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
             (formData as { message: string }).message.trim() !== ''
           )
         }}
+        style={{ display: 'flex', flexDirection: 'row', width: '100%' }}
       >
-        <input type="text" name="message" placeholder="Type your message..." />
-        <button type="submit">Send</button>
+        <Input
+          type="text"
+          name="message"
+          placeholder="Type your message..."
+          style={{
+            flexGrow: '1',
+            marginRight: '8px',
+          }}
+        />
+        <Button type="submit">Send</Button>
       </Form>
     )
   },
