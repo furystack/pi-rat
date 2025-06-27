@@ -13,6 +13,11 @@ export interface SchemaGenerationSetting {
  */
 export const entityValues: SchemaGenerationSetting[] = [
   {
+    inputFile: './src/models/ai/*.ts',
+    outputFile: './schemas/ai-entities.json',
+    type: '*',
+  },
+  {
     inputFile: './src/models/chat/*.ts',
     outputFile: './schemas/chat-entities.json',
     type: '*',

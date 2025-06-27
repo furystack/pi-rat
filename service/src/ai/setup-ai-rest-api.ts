@@ -1,6 +1,13 @@
 import type { Injector } from '@furystack/inject'
-import { useRestService, Validate } from '@furystack/rest-service'
-import type { AiApi } from 'common'
+import {
+  createGetCollectionEndpoint,
+  createGetEntityEndpoint,
+  createPatchEndpoint,
+  createPostEndpoint,
+  useRestService,
+  Validate,
+} from '@furystack/rest-service'
+import { AiChat, type AiApi } from 'common'
 import schema from 'common/schemas/ai-api.json' with { type: 'json' }
 import { getCorsOptions } from '../get-cors-options.js'
 import { getPort } from '../get-port.js'
@@ -19,12 +26,77 @@ export const setupAiRestApi = async (injector: Injector) => {
           schema,
           schemaName: 'GetModelsAction',
         })(GetModelsAction),
+        '/ai-chats': Validate({
+          schema,
+          schemaName: 'GetCollectionEndpoint<AiChat>',
+        })(
+          createGetCollectionEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
+        '/ai-chats/:id': Validate({
+          schema,
+          schemaName: 'GetEntityEndpoint<AiChat,"id">',
+        })(
+          createGetEntityEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
+        '/ai-chat-messages': Validate({
+          schema,
+          schemaName: 'GetCollectionEndpoint<AiChat>',
+        })(
+          createGetCollectionEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
+        '/ai-chat-messages/:id': Validate({
+          schema,
+          schemaName: 'GetEntityEndpoint<AiChat,"id">',
+        })(
+          createGetEntityEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
       },
       POST: {
         '/chat': Validate({
           schema,
           schemaName: 'ChatAction',
         })(ChatAction),
+        '/ai-chats': Validate({
+          schema,
+          schemaName: 'PostEndpoint<AiChat,"id">',
+        })(
+          createPostEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
+        '/ai-chat-messages': Validate({
+          schema,
+          schemaName: 'PostEndpoint<AiChat,"id">',
+        })(
+          createPostEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
+      },
+      PATCH: {
+        '/ai-chats/:id': Validate({
+          schema,
+          schemaName: 'PatchEndpoint<AiChat,"id">',
+        })(
+          createPatchEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
       },
     },
   })

@@ -3,6 +3,7 @@ import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
 import { Config } from 'common'
 import { OllamaClientService } from './ollama-client-service.js'
+import { setupAiStore } from './setup-ai-store.js'
 
 export const setupAi = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('AI Setup')
@@ -20,4 +21,6 @@ export const setupAi = async (injector: Injector) => {
     await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
     await clientService.init(injector)
   })
+
+  await setupAiStore(injector)
 }

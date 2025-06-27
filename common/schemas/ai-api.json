@@ -501,9 +501,21 @@
           "properties": {
             "/models": {
               "$ref": "#/definitions/GetModelsAction"
+            },
+            "/ai-chats": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CAiChat%3E"
+            },
+            "/ai-chats/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CAiChat%2C%22id%22%3E"
+            },
+            "/ai-chat-messages": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CAiChat%3E"
+            },
+            "/ai-chat-messages/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CAiChat%2C%22id%22%3E"
             }
           },
-          "required": ["/models"],
+          "required": ["/models", "/ai-chats", "/ai-chats/:id", "/ai-chat-messages", "/ai-chat-messages/:id"],
           "additionalProperties": false
         },
         "POST": {
@@ -511,25 +523,26 @@
           "properties": {
             "/chat": {
               "$ref": "#/definitions/ChatAction"
+            },
+            "/ai-chats": {
+              "$ref": "#/definitions/PostEndpoint%3CAiChat%2C%22id%22%3E"
+            },
+            "/ai-chat-messages": {
+              "$ref": "#/definitions/PostEndpoint%3CAiChat%2C%22id%22%3E"
             }
           },
-          "required": ["/chat"],
+          "required": ["/chat", "/ai-chats", "/ai-chat-messages"],
           "additionalProperties": false
         },
         "PATCH": {
           "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
+          "properties": {
+            "/ai-chats/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CAiChat%2C%22id%22%3E"
+            }
+          },
+          "required": ["/ai-chats/:id"],
+          "additionalProperties": false
         },
         "PUT": {
           "type": "object",
@@ -622,7 +635,7 @@
           }
         }
       },
-      "required": ["GET", "POST"],
+      "required": ["GET", "POST", "PATCH"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -762,6 +775,867 @@
             "required": ["result"],
             "additionalProperties": false
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    "GetCollectionEndpoint<AiChat>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CAiChat%2C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22model%22%7C%22status%22%7C%22visibility%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CAiChat%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "FindOptions<AiChat,(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"model\"|\"status\"|\"visibility\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "name": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "description": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "owner": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "model": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "status": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "visibility": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["id", "name", "description", "createdAt", "owner", "model", "status", "visibility"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CAiChat%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FilterType<AiChat>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CAiChat%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CAiChat%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CAiChat%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CAiChat%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The unique identifier for the AI chat."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The unique identifier for the AI chat."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The unique identifier for the AI chat."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The unique identifier for the AI chat."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The unique identifier for the AI chat."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The unique identifier for the AI chat."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier for the AI chat."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The unique identifier for the AI chat."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ],
+                    "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The date the AI chat was created."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The date the AI chat was created."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The date the AI chat was created."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The date the AI chat was created."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The date the AI chat was created."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The date the AI chat was created."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The date the AI chat was created."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The date the AI chat was created."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The owner username of the AI chat."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The owner username of the AI chat."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The owner username of the AI chat."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The owner username of the AI chat."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The owner username of the AI chat."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The owner username of the AI chat."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The owner username of the AI chat."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The owner username of the AI chat."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                },
+                "$like": {
+                  "type": "string",
+                  "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                },
+                "$regex": {
+                  "type": "string",
+                  "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                },
+                "$ne": {
+                  "type": "string",
+                  "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "status": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "enum": ["active", "archived"],
+                  "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "enum": ["active", "archived"],
+                  "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                },
+                "$like": {
+                  "type": "string",
+                  "enum": ["active", "archived"],
+                  "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                },
+                "$regex": {
+                  "type": "string",
+                  "enum": ["active", "archived"],
+                  "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "enum": ["active", "archived"],
+                  "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                },
+                "$ne": {
+                  "type": "string",
+                  "enum": ["active", "archived"],
+                  "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["active", "archived"],
+                    "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["active", "archived"],
+                    "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "visibility": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "enum": ["private", "public"],
+                  "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "enum": ["private", "public"],
+                  "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                },
+                "$like": {
+                  "type": "string",
+                  "enum": ["private", "public"],
+                  "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                },
+                "$regex": {
+                  "type": "string",
+                  "enum": ["private", "public"],
+                  "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "enum": ["private", "public"],
+                  "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                },
+                "$ne": {
+                  "type": "string",
+                  "enum": ["private", "public"],
+                  "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["private", "public"],
+                    "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["private", "public"],
+                    "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "GetCollectionResult<AiChat>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AiChat"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "AiChat": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the AI chat."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the AI chat was created."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner username of the AI chat."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "archived"],
+          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["private", "public"],
+          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+        }
+      },
+      "required": ["id", "name", "createdAt", "owner", "model", "status", "visibility"],
+      "additionalProperties": false
+    },
+    "GetEntityEndpoint<AiChat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["id", "name", "description", "createdAt", "owner", "model", "status", "visibility"]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/AiChat"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "PostEndpoint<AiChat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CAiChat%2C%22id%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/AiChat"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "WithOptionalId<AiChat,\"id\">": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the AI chat."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the AI chat was created."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner username of the AI chat."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "archived"],
+          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["private", "public"],
+          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+        }
+      },
+      "required": ["createdAt", "model", "name", "owner", "status", "visibility"]
+    },
+    "Omit<AiChat,\"id\">": {
+      "$ref": "#/definitions/Pick%3CAiChat%2CExclude%3C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22model%22%7C%22status%22%7C%22visibility%22)%2C%22id%22%3E%3E"
+    },
+    "Pick<AiChat,Exclude<(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"model\"|\"status\"|\"visibility\"),\"id\">>": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the AI chat was created."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner username of the AI chat."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "archived"],
+          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["private", "public"],
+          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+        }
+      },
+      "required": ["name", "createdAt", "owner", "model", "status", "visibility"],
+      "additionalProperties": false
+    },
+    "PatchEndpoint<AiChat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CAiChat%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the AI chat."
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["body", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
+    "Partial<AiChat>": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the AI chat."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the AI chat was created."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner username of the AI chat."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "archived"],
+          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["private", "public"],
+          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
         }
       },
       "additionalProperties": false
