@@ -75,14 +75,29 @@ export const AiChatMessageList = Shade<{
     return (
       <>
         {messages.value.result.entries.map((message) => {
-          const innerHTML = marked.parse(message.content)
+          try {
+            const fromJson = JSON.parse(message.content) as { content: string; thinking?: string }
+            const { content, thinking } = fromJson
 
-          return (
-            <Paper elevation={1} style={{ padding: '8px', margin: '4px 0', filter: 'brightness(0.9)' }}>
-              <strong>{message.role}</strong>
-              <div style={{ marginTop: '4px' }} innerHTML={innerHTML as string} />
-            </Paper>
-          )
+            const contentHtml = marked.parse(content)
+            const thinkingHtml = thinking ? marked.parse(thinking) : null
+
+            return (
+              <Paper elevation={1} style={{ padding: '8px', margin: '4px 0' }}>
+                <strong>{message.role}</strong>
+                {thinkingHtml && <div style={{ opacity: '0.7' }} innerHTML={thinkingHtml as string} />}
+                <div style={{ marginTop: '4px' }} innerHTML={contentHtml as string} />
+              </Paper>
+            )
+          } catch (error) {
+            const innerHTML = marked.parse(message.content)
+            return (
+              <Paper elevation={1} style={{ padding: '8px', margin: '4px 0', filter: 'brightness(0.9)' }}>
+                <strong>{message.role}</strong>
+                <div style={{ marginTop: '4px' }} innerHTML={innerHTML as string} />
+              </Paper>
+            )
+          }
         })}
       </>
     )

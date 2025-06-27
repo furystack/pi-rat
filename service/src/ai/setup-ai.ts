@@ -62,7 +62,16 @@ export const setupAi = async (injector: Injector) => {
 
     await usingAsync(injector.createChild({}), async (handlerInjector) => {
       handlerInjector.setExplicitInstance(new ImpersonatedIdentityContext(currentUser), IdentityContext)
-      await clientService.handleChatMessageReceived(handlerInjector, entity, chat, chatHistory)
+      try {
+        await clientService.handleChatMessageReceived(handlerInjector, entity, chat, chatHistory)
+      } catch (error) {
+        await logger.error({
+          message: `❌  Error handling chat message received for chat ${chat.id} and message ${entity.id}`,
+          data: {
+            error,
+          },
+        })
+      }
     })
   })
 }

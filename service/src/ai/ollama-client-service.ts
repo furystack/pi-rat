@@ -6,6 +6,33 @@ import type { Message } from 'ollama'
 import { Ollama, type ChatRequest } from 'ollama'
 import { isToolingSupported, OllamaTools } from './tools/ollama-tools.js'
 
+const jsonFormat = {
+  type: 'object',
+  properties: {
+    content: { type: 'string', description: 'The response in markdown format' },
+    thinking: {
+      type: 'string',
+      description: 'The thought process of the AI in markdown format',
+    },
+    references: {
+      type: 'object',
+      properties: {
+        movieReferences: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'If a movie is referenced, the "imdbId" of the movie should be added to this list',
+        },
+        userReferences: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'If a user is referenced, the "username" of the user should be added to this list',
+        },
+      },
+    },
+  },
+  required: ['content', 'thinking', 'references'],
+}
+
 @Injectable({ lifetime: 'singleton' })
 export class OllamaClientService {
   config?: OllamaConfig
@@ -175,9 +202,10 @@ export class OllamaClientService {
 
       const result = await this.chat({
         model: chat.model,
-        messages,
+        messages: [...messages, ...(enableTooling ? [] : [{ role: 'system', content: 'Answer in JSON format' }])],
         tools: enableTooling ? OllamaTools.map((tool) => tool.toolDefinition) : [],
         stream: false,
+        format: enableTooling ? undefined : jsonFormat,
       })
 
       const toolResponses = await Promise.all(
@@ -197,6 +225,10 @@ export class OllamaClientService {
               model: chat.model,
               messages: [
                 ...historyInOrder.map((msg) => ({ role: msg.role, content: msg.content })),
+                {
+                  role: 'system',
+                  content: 'Answer in JSON format',
+                },
                 ...validToolResponses.map((r) => ({
                   role: 'tool',
                   content: r,
@@ -204,6 +236,7 @@ export class OllamaClientService {
               ],
               tools: OllamaTools.map((tool) => tool.toolDefinition),
               stream: false,
+              format: jsonFormat,
             })
           : result
 
