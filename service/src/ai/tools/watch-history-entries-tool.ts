@@ -8,7 +8,7 @@ export const WatchHistoryEntriesTool: OllamaTool = {
     function: {
       name: 'getMovieWatchHistory',
       description:
-        'Return a list of movie watch entries in JSON format. This method is useful to track what movies the user has watched previously or stopped watching.',
+        'Return a list of movie watch entries in JSON format. This method is useful when a user asks about in-progress movies or movies they have watched recently.',
       parameters: {
         type: 'object',
         properties: {},
