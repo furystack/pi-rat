@@ -2,7 +2,7 @@ import { getCurrentUser, getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
-import { useSequelize } from '@furystack/sequelize-store'
+import { SequelizeStore, useSequelize } from '@furystack/sequelize-store'
 import { Chat, ChatInvitation, ChatMessage } from 'common'
 import { DATE, JSON, Model, STRING } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
@@ -133,6 +133,12 @@ export const setupChatStore = async (injector: Injector) => {
           ],
         },
       )
+
+      const chatStore = getStoreManager(injector).getStoreFor(Chat, 'id')
+      if (chatStore instanceof SequelizeStore) {
+        await chatStore.getModel()
+      }
+
       ChatMessageModel.belongsTo(ChatModel, {
         foreignKey: 'chatId',
         as: 'chat',
@@ -197,6 +203,12 @@ export const setupChatStore = async (injector: Injector) => {
           ],
         },
       )
+
+      const chatStore = getStoreManager(injector).getStoreFor(Chat, 'id')
+      if (chatStore instanceof SequelizeStore) {
+        await chatStore.getModel()
+      }
+
       ChatInvitationModel.belongsTo(ChatModel, {
         foreignKey: 'chatId',
         as: 'chat',
