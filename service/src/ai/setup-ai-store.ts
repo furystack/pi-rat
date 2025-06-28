@@ -92,7 +92,6 @@ export const setupAiStore = async (injector: Injector) => {
           sequelize,
         },
       )
-      await AiChatModel.sync()
     },
   })
 
@@ -165,7 +164,6 @@ export const setupAiStore = async (injector: Injector) => {
         foreignKey: 'aiChatId',
         as: 'aiChat',
       })
-      await AiChatMessageModel.sync()
     },
   })
 

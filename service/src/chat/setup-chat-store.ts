@@ -87,7 +87,6 @@ export const setupChatStore = async (injector: Injector) => {
           ],
         },
       )
-      await ChatModel.sync()
     },
   })
 
@@ -144,7 +143,6 @@ export const setupChatStore = async (injector: Injector) => {
         as: 'chat',
         onDelete: 'CASCADE',
       })
-      await ChatMessageModel.sync()
     },
   })
 
@@ -214,7 +212,6 @@ export const setupChatStore = async (injector: Injector) => {
         as: 'chat',
         onDelete: 'CASCADE',
       })
-      await ChatInvitationModel.sync()
     },
   })
 
