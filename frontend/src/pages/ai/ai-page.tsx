@@ -31,7 +31,16 @@ export const AiPage = Shade({
         }}
       >
         <Paper style={{ display: 'flex', flexDirection: 'row', width: 'calc(100% - 48px)', flexGrow: '0' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', flexGrow: '1', flex: '5' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexGrow: '1',
+              flex: '5',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <h1>AI Chats</h1>
             <CreateAiChatButton />
           </div>

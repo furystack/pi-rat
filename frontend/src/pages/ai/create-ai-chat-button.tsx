@@ -18,14 +18,14 @@ export const CreateAiChatButton = Shade({
 
     return (
       <>
-        <button
+        <Button
           style={{ padding: '8px 16px', cursor: 'pointer' }}
           onclick={() => {
             isModalOpen.setValue(true)
           }}
         >
           ➕ New AI Chat
-        </button>
+        </Button>
         <Modal
           isVisible={isModalOpen}
           onClose={() => isModalOpen.setValue(false)}
