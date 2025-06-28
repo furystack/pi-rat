@@ -1,8 +1,8 @@
-import { getCurrentUser } from '@furystack/core'
+import { getCurrentUser, getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { Repository } from '@furystack/repository'
-import { useSequelize } from '@furystack/sequelize-store'
+import { useSequelize, type SequelizeStore } from '@furystack/sequelize-store'
 import { AiChat, AiChatMessage } from 'common'
 import { DATE, Model, STRING } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
@@ -92,6 +92,7 @@ export const setupAiStore = async (injector: Injector) => {
           sequelize,
         },
       )
+      await AiChatModel.sync()
     },
   })
 
@@ -102,6 +103,16 @@ export const setupAiStore = async (injector: Injector) => {
     primaryKey: 'id',
     options: dbOptions,
     initModel: async (sequelize) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const aiChatStore = getStoreManager(injector).getStoreFor(AiChat, 'id') as SequelizeStore<
+        AiChat,
+        AiChatModel,
+        'id',
+        AiChat
+      >
+
+      await aiChatStore.getModel() // Ensure AiChatModel is initialized before AiChatMessageModel because of the foreign key
+
       AiChatMessageModel.init(
         {
           id: {
@@ -158,6 +169,7 @@ export const setupAiStore = async (injector: Injector) => {
         foreignKey: 'aiChatId',
         as: 'aiChat',
       })
+      await AiChatMessageModel.sync()
     },
   })
 
