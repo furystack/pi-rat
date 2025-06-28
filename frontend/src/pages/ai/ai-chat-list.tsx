@@ -9,7 +9,7 @@ export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiCh
   render: ({ injector, useObservable, props }) => {
     const aiChatService = injector.getInstance(AiChatService)
 
-    const [chatList] = useObservable('chatList', aiChatService.getChatAsObservable({}))
+    const [chatList] = useObservable('chatList', aiChatService.getAiChatsAsObservable({}))
 
     if (chatList.status === 'loading' || chatList.status === 'uninitialized') {
       return <div>Loading...</div>
@@ -19,7 +19,7 @@ export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiCh
     }
 
     if (chatList.status === 'obsolete') {
-      void aiChatService.chat({})
+      void aiChatService.getAiChats({})
     }
 
     return (
@@ -34,7 +34,7 @@ export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiCh
             padding: '8px',
           }}
         >
-          {chatList.value.result.entries.map((chat) => (
+          {chatList.value.entries.map((chat) => (
             <Button
               variant={props.selectedChatId === chat.id ? 'contained' : undefined}
               onclick={() => {

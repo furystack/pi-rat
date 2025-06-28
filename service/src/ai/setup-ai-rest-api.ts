@@ -1,5 +1,6 @@
 import type { Injector } from '@furystack/inject'
 import {
+  createDeleteEndpoint,
   createGetCollectionEndpoint,
   createGetEntityEndpoint,
   createPatchEndpoint,
@@ -93,6 +94,17 @@ export const setupAiRestApi = async (injector: Injector) => {
           schemaName: 'PatchEndpoint<AiChat,"id">',
         })(
           createPatchEndpoint({
+            model: AiChat,
+            primaryKey: 'id',
+          }),
+        ),
+      },
+      DELETE: {
+        '/ai-chats/:id': Validate({
+          schema,
+          schemaName: 'DeleteEndpoint<AiChat,"id">',
+        })(
+          createDeleteEndpoint({
             model: AiChat,
             primaryKey: 'id',
           }),

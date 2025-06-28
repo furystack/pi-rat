@@ -8,22 +8,56 @@ import { AiApiClient } from '../../services/api-clients/ai-api-client.js'
 export class AiChatService {
   @Injected(AiApiClient)
   declare private aiApi: AiApiClient
+
   private cache = new Cache({
+    load: async (chatId: string) => {
+      const { result } = await this.aiApi.call({
+        method: 'GET',
+        action: '/ai-chats/:id',
+        url: { id: chatId },
+        query: {},
+      })
+      return result
+    },
+  })
+
+  public async getAiChat(chatId: string) {
+    return this.cache.get(chatId)
+  }
+
+  public getAiChatAsObservable(chatId: string) {
+    return this.cache.getObservable(chatId)
+  }
+
+  private queryCache = new Cache({
     load: async (findOptions: FindOptions<AiChat, Array<keyof AiChat>>) => {
-      return this.aiApi.call({
+      const results = await this.aiApi.call({
         method: 'GET',
         action: '/ai-chats',
         query: { findOptions },
       })
+
+      results.result.entries.forEach((chat) => {
+        this.cache.setExplicitValue({
+          loadArgs: [chat.id],
+          value: {
+            status: 'loaded',
+            updatedAt: new Date(),
+            value: chat,
+          },
+        })
+      })
+
+      return results.result
     },
   })
 
-  public async chat(request: FindOptions<AiChat, Array<keyof AiChat>>) {
-    return this.cache.get(request)
+  public async getAiChats(request: FindOptions<AiChat, Array<keyof AiChat>>) {
+    return this.queryCache.get(request)
   }
 
-  public getChatAsObservable(request: FindOptions<AiChat, Array<keyof AiChat>>) {
-    return this.cache.getObservable(request)
+  public getAiChatsAsObservable(request: FindOptions<AiChat, Array<keyof AiChat>>) {
+    return this.queryCache.getObservable(request)
   }
 
   public async createChat(chat: AiChat) {
@@ -33,7 +67,19 @@ export class AiChatService {
       body: chat,
     })
 
-    this.cache.obsoleteRange(() => true)
+    this.queryCache.obsoleteRange(() => true)
+
+    return result
+  }
+
+  public async removeChat(chatId: string) {
+    const result = await this.aiApi.call({
+      method: 'DELETE',
+      action: `/ai-chats/:id`,
+      url: { id: chatId },
+    })
+
+    this.queryCache.obsoleteRange(() => true)
 
     return result
   }

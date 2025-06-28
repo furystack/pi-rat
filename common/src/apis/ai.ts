@@ -1,4 +1,11 @@
-import type { GetCollectionEndpoint, GetEntityEndpoint, PatchEndpoint, PostEndpoint, RestApi } from '@furystack/rest'
+import type {
+  DeleteEndpoint,
+  GetCollectionEndpoint,
+  GetEntityEndpoint,
+  PatchEndpoint,
+  PostEndpoint,
+  RestApi,
+} from '@furystack/rest'
 import type { ChatRequest, ChatResponse, ModelResponse } from 'ollama'
 import type { AiChat, AiChatMessage } from '../models/index.js'
 
@@ -27,5 +34,8 @@ export interface AiApi extends RestApi {
   }
   PATCH: {
     '/ai-chats/:id': PatchEndpoint<AiChat, 'id'>
+  }
+  DELETE: {
+    '/ai-chats/:id': DeleteEndpoint<AiChat, 'id'>
   }
 }

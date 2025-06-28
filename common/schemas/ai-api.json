@@ -561,18 +561,13 @@
         },
         "DELETE": {
           "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
+          "properties": {
+            "/ai-chats/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CAiChat%2C%22id%22%3E"
+            }
+          },
+          "required": ["/ai-chats/:id"],
+          "additionalProperties": false
         },
         "HEAD": {
           "type": "object",
@@ -635,7 +630,7 @@
           }
         }
       },
-      "required": ["GET", "POST", "PATCH"],
+      "required": ["GET", "POST", "PATCH", "DELETE"],
       "additionalProperties": false
     },
     "RestApi": {
@@ -2367,6 +2362,28 @@
         }
       },
       "additionalProperties": false
+    },
+    "DeleteEndpoint<AiChat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the AI chat."
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for deleting entities"
     }
   }
 }

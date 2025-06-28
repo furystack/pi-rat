@@ -18,7 +18,7 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
 
     const [selectedChat] = useObservable(
       'selectedChat',
-      aiChatService.getChatAsObservable({
+      aiChatService.getAiChatsAsObservable({
         filter: {
           id: { $eq: props.selectedChatId },
         },
@@ -36,7 +36,7 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
               createdAt: new Date(),
               id: crypto.randomUUID(),
               owner: sessionService.currentUser.getValue()!.username,
-              visibility: selectedChat?.value?.result.entries[0]?.visibility ?? 'private',
+              visibility: selectedChat?.value?.entries[0]?.visibility ?? 'private',
             })
             .then(() => element.querySelector<HTMLFormElement>('form')?.reset())
         }}

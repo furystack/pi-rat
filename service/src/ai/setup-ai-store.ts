@@ -163,6 +163,7 @@ export const setupAiStore = async (injector: Injector) => {
       AiChatMessageModel.belongsTo(AiChatModel, {
         foreignKey: 'aiChatId',
         as: 'aiChat',
+        onDelete: 'CASCADE',
       })
     },
   })
