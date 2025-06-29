@@ -80,7 +80,6 @@ export const setupPatcher = async (injector: Injector) => {
           sequelize,
         },
       )
-      await PatchModel.sync()
     },
   })
 

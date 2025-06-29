@@ -1,13 +1,13 @@
-import { DataTypes, Model } from 'sequelize'
-import { Dashboard } from 'common'
-import type { Widget } from 'common'
-import { getLogger } from '@furystack/logging'
-import type { Injector } from '@furystack/inject'
-import { useSequelize } from '@furystack/sequelize-store'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
-import { getRepository } from '@furystack/repository'
-import { withRole } from '../authorization/with-role.js'
 import { getCurrentUser } from '@furystack/core'
+import type { Injector } from '@furystack/inject'
+import { getLogger } from '@furystack/logging'
+import { getRepository } from '@furystack/repository'
+import { useSequelize } from '@furystack/sequelize-store'
+import type { Widget } from 'common'
+import { Dashboard } from 'common'
+import { DataTypes, Model } from 'sequelize'
+import { withRole } from '../authorization/with-role.js'
+import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class DashboardModel extends Model<Dashboard, Dashboard> implements Dashboard {
   declare id: string
@@ -66,7 +66,6 @@ export const setupDashboards = async (injector: Injector) => {
           sequelize,
         },
       )
-      await DashboardModel.sync()
     },
   })
   await logger.verbose({ message: 'Setting up repository...' })

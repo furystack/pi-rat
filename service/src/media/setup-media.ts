@@ -196,7 +196,6 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await MovieModel.sync()
     },
   })
 
@@ -239,7 +238,7 @@ export const setupMovies = async (injector: Injector) => {
         { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path'], unique: true }] },
       )
 
-      await MovieFileModel.sync()
+      // await MovieFileModel.sync()
     },
   })
 
@@ -292,7 +291,7 @@ export const setupMovies = async (injector: Injector) => {
           indexes: [{ fields: ['userName', 'driveLetter', 'path'], unique: true }],
         },
       )
-      await WatchHistoryEntryModel.sync()
+      // await WatchHistoryEntryModel.sync()
     },
   })
 
@@ -336,7 +335,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await SeriesModel.sync()
+      // await SeriesModel.sync()
     },
   })
 
@@ -473,7 +472,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await OmdbMovieMetadataModel.sync()
+      // await OmdbMovieMetadataModel.sync()
     },
   })
 
@@ -586,7 +585,7 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      await OmdbSeriesMetadataModel.sync()
+      // await OmdbSeriesMetadataModel.sync()
     },
   })
 

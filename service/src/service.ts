@@ -1,9 +1,14 @@
+import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import { SequelizeStore } from '@furystack/sequelize-store'
 import { EventHub } from '@furystack/utils'
 import { useWebsockets } from '@furystack/websocket-api'
+import { User } from 'common'
+import { setupAiRestApi } from './ai/setup-ai-rest-api.js'
+import { setupAi } from './ai/setup-ai.js'
 import { setupChatRestApi } from './chat/setup-chat-api.js'
 import { setupChat } from './chat/setup-chat.js'
 import { setupConfigRestApi } from './config/setup-config-rest-api.js'
@@ -44,7 +49,19 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupMovies(injector),
       await setupIot(injector),
       await setupChat(injector),
+      await setupAi(injector),
     ])
+
+    await this.logger.information({ message: '🔄 Syncing models...' })
+    const store = getStoreManager(injector).getStoreFor(User, 'username')
+    if (store instanceof SequelizeStore) {
+      const model = await store.getModel()
+      if (model.sequelize) {
+        await model.sequelize.sync({
+          alter: true,
+        })
+      }
+    }
 
     /**
      * Execute patches
@@ -63,6 +80,7 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupMoviesRestApi(injector),
       await setupIotApi(injector),
       await setupChatRestApi(injector),
+      await setupAiRestApi(injector),
     ])
 
     useWebsockets(injector, {
