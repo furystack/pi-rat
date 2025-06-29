@@ -13,7 +13,7 @@ export const AiChatMessageList = Shade<{
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    height: 'calc(100% - 32px)',
+    height: 'calc(100% - 124px)',
     overflowY: 'auto',
   },
   render: ({ useObservable, injector, props, element, useDisposable }) => {
