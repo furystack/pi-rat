@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { OmdbSeriesMetadata } from 'common'
-import { GenericEditor } from '../../components/generic-editor/index.js'
+import mediaSchemas from 'common/schemas/media-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
-import mediaSchemas from 'common/schemas/media-entities.json'
+import { GenericEditor } from '../../components/generic-editor/index.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
+import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const OmdbSeriesMetadataPage = Shade({
   shadowDomName: 'shade-app-omdb-series-metadata-page',

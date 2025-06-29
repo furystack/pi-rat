@@ -10,7 +10,7 @@ import { WebsocketNotificationsService } from './websocket-events.js'
 @Injectable({ lifetime: 'singleton' })
 export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMessage }> {
   @Injected(DrivesApiClient)
-  private declare readonly drivesApiClient: DrivesApiClient
+  declare private readonly drivesApiClient: DrivesApiClient
 
   private volumesCache = new Cache({
     load: async ({ findOptions }: { findOptions?: FindOptions<Drive, Array<keyof Drive>> }) => {
@@ -118,7 +118,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
   }
 
   @Injected(WebsocketNotificationsService)
-  private declare readonly socket: WebsocketNotificationsService
+  declare private readonly socket: WebsocketNotificationsService
 
   private onMessage = ((messageData: WebsocketMessage) => {
     if (messageData.type === 'file-change') {

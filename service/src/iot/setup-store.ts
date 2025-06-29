@@ -8,26 +8,26 @@ import { withRole } from '../authorization/with-role.js'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
 
 class DeviceModel extends Model<Device, Device> implements Device {
-  public declare name: string
-  public declare ipAddress: string | undefined
-  public declare macAddress: string | undefined
-  public declare createdAt: string
-  public declare updatedAt: string
+  declare public name: string
+  declare public ipAddress: string | undefined
+  declare public macAddress: string | undefined
+  declare public createdAt: string
+  declare public updatedAt: string
 }
 
 class DeviceAwakeHistoryModel extends Model<DeviceAwakeHistory, DeviceAwakeHistory> implements DeviceAwakeHistory {
-  public declare id: string
-  public declare name: string
-  public declare createdAt: string
-  public declare success: boolean
+  declare public id: string
+  declare public name: string
+  declare public createdAt: string
+  declare public success: boolean
 }
 
 class DevicePingHistoryModel extends Model<DevicePingHistory, DevicePingHistory> implements DevicePingHistory {
-  public declare id: string
-  public declare name: string
-  public declare createdAt: string
-  public declare isAvailable: boolean
-  public declare ping: number
+  declare public id: string
+  declare public name: string
+  declare public createdAt: string
+  declare public isAvailable: boolean
+  declare public ping: number
 }
 
 export const setupIotStore = async (injector: Injector, logger: ScopedLogger) => {
@@ -72,7 +72,6 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      await DeviceModel.sync()
     },
   })
 
@@ -106,7 +105,7 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      await DeviceAwakeHistoryModel.sync()
+      // await DeviceAwakeHistoryModel.sync()
     },
   })
 
@@ -144,7 +143,7 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      await DevicePingHistoryModel.sync()
+      // await DevicePingHistoryModel.sync()
     },
   })
 

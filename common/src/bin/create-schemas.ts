@@ -13,6 +13,16 @@ export interface SchemaGenerationSetting {
  */
 export const entityValues: SchemaGenerationSetting[] = [
   {
+    inputFile: './src/models/ai/*.ts',
+    outputFile: './schemas/ai-entities.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/models/chat/*.ts',
+    outputFile: './schemas/chat-entities.json',
+    type: '*',
+  },
+  {
     inputFile: './src/models/config/*.ts',
     outputFile: './schemas/config-entities.json',
     type: '*',
@@ -50,6 +60,16 @@ export const entityValues: SchemaGenerationSetting[] = [
 ]
 
 export const apiValues: SchemaGenerationSetting[] = [
+  {
+    inputFile: './src/apis/ai.ts',
+    outputFile: './schemas/ai-api.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/apis/chat.ts',
+    outputFile: './schemas/chat-api.json',
+    type: '*',
+  },
   {
     inputFile: './src/apis/config.ts',
     outputFile: './schemas/config-api.json',

@@ -8,7 +8,7 @@ import type { PiRatFile } from 'common'
 @Injectable({ lifetime: 'singleton' })
 export class WatchProgressService {
   @Injected(MediaApiClient)
-  private declare readonly mediaApiClient: MediaApiClient
+  declare private readonly mediaApiClient: MediaApiClient
 
   private watchProgressCache = new Cache({
     capacity: 100,

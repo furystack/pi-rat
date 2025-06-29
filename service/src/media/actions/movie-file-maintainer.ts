@@ -11,8 +11,8 @@ import { linkMovie } from './link-movie-action.js'
 @Injectable({ lifetime: 'singleton' })
 export class MovieMaintainerService {
   @Injected((i) => getLogger(i).withScope('MovieFileMaintainer'))
-  private declare logger: ScopedLogger
-  private declare injector: Injector
+  declare private logger: ScopedLogger
+  declare private injector: Injector
   private onUnlink = async (file: PiRatFile) => {
     try {
       const store = this.injector.getInstance(StoreManager).getStoreFor(MovieFile, 'id')
@@ -83,13 +83,13 @@ export class MovieMaintainerService {
   }
 
   @Injected(FileWatcherService)
-  private declare fileWatcherService: FileWatcherService
+  declare private fileWatcherService: FileWatcherService
 
-  private declare addSubsciption: Disposable
+  declare private addSubsciption: Disposable
 
-  private declare unlinkDirSubscription: Disposable
+  declare private unlinkDirSubscription: Disposable
 
-  private declare unlinkSubscription: Disposable
+  declare private unlinkSubscription: Disposable
 
   public init(injector: Injector) {
     const fileWatcherService = injector.getInstance(FileWatcherService)

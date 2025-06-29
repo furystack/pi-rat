@@ -1,10 +1,10 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Device } from 'common'
-import { GenericEditor } from '../../components/generic-editor/index.js'
+import iotSchemas from 'common/schemas/iot-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
-import iotSchemas from 'common/schemas/iot-entities.json'
+import { GenericEditor } from '../../components/generic-editor/index.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
+import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const IotDevicesPage = Shade({
   shadowDomName: 'shade-app-iot-devices-page',

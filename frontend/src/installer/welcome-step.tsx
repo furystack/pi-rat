@@ -1,8 +1,8 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
-import { WizardStep } from '../components/wizard-step.js'
 import '@furystack/shades-lottie'
-import welcome from './welcome.json'
+import { WizardStep } from '../components/wizard-step.js'
+import welcome from './welcome.json' with { type: 'json' }
 
 export const WelcomeStep = Shade<WizardStepProps>({
   shadowDomName: 'welcome-step',

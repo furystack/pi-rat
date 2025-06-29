@@ -248,6 +248,10 @@
                     {
                       "type": "string",
                       "const": "MOVIES_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "OLLAMA_CONFIG"
                     }
                   ],
                   "description": "Configuration entry for the OMDB API"
@@ -270,6 +274,10 @@
                     {
                       "type": "string",
                       "const": "MOVIES_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "OLLAMA_CONFIG"
                     }
                   ],
                   "description": "Configuration entry for the OMDB API"
@@ -292,6 +300,10 @@
                     {
                       "type": "string",
                       "const": "MOVIES_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "OLLAMA_CONFIG"
                     }
                   ],
                   "description": "Configuration entry for the OMDB API"
@@ -314,6 +326,10 @@
                     {
                       "type": "string",
                       "const": "MOVIES_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "OLLAMA_CONFIG"
                     }
                   ],
                   "description": "Configuration entry for the OMDB API"
@@ -342,6 +358,10 @@
                     {
                       "type": "string",
                       "const": "MOVIES_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "OLLAMA_CONFIG"
                     }
                   ],
                   "description": "Configuration entry for the OMDB API"
@@ -364,6 +384,10 @@
                     {
                       "type": "string",
                       "const": "MOVIES_CONFIG"
+                    },
+                    {
+                      "type": "string",
+                      "const": "OLLAMA_CONFIG"
                     }
                   ],
                   "description": "Configuration entry for the OMDB API"
@@ -394,6 +418,10 @@
                       {
                         "type": "string",
                         "const": "MOVIES_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "OLLAMA_CONFIG"
                       }
                     ],
                     "description": "Configuration entry for the OMDB API"
@@ -419,6 +447,10 @@
                       {
                         "type": "string",
                         "const": "MOVIES_CONFIG"
+                      },
+                      {
+                        "type": "string",
+                        "const": "OLLAMA_CONFIG"
                       }
                     ],
                     "description": "Configuration entry for the OMDB API"
@@ -520,6 +552,17 @@
                       },
                       "required": ["enableNfoParsing", "watchFiles"],
                       "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "host": {
+                          "type": "string",
+                          "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                        }
+                      },
+                      "required": ["host"],
+                      "additionalProperties": false
                     }
                   ]
                 },
@@ -608,6 +651,17 @@
                         }
                       },
                       "required": ["enableNfoParsing", "watchFiles"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "host": {
+                          "type": "string",
+                          "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                        }
+                      },
+                      "required": ["host"],
                       "additionalProperties": false
                     }
                   ]
@@ -706,6 +760,17 @@
                         },
                         "required": ["enableNfoParsing", "watchFiles"],
                         "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "host": {
+                            "type": "string",
+                            "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                          }
+                        },
+                        "required": ["host"],
+                        "additionalProperties": false
                       }
                     ]
                   }
@@ -797,6 +862,17 @@
                           }
                         },
                         "required": ["enableNfoParsing", "watchFiles"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "host": {
+                            "type": "string",
+                            "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                          }
+                        },
+                        "required": ["host"],
                         "additionalProperties": false
                       }
                     ]
@@ -969,6 +1045,10 @@
             {
               "type": "string",
               "const": "MOVIES_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "OLLAMA_CONFIG"
             }
           ],
           "description": "Configuration entry for the OMDB API"
@@ -1058,6 +1138,17 @@
                 }
               },
               "required": ["enableNfoParsing", "watchFiles"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                }
+              },
+              "required": ["host"],
               "additionalProperties": false
             }
           ]
@@ -1112,6 +1203,10 @@
                 {
                   "type": "string",
                   "const": "MOVIES_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "OLLAMA_CONFIG"
                 }
               ],
               "description": "The entity's unique identifier"
@@ -1163,6 +1258,10 @@
             {
               "type": "string",
               "const": "MOVIES_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "OLLAMA_CONFIG"
             }
           ],
           "description": "Configuration entry for the OMDB API"
@@ -1253,6 +1352,17 @@
               },
               "required": ["enableNfoParsing", "watchFiles"],
               "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                }
+              },
+              "required": ["host"],
+              "additionalProperties": false
             }
           ]
         }
@@ -1287,6 +1397,10 @@
                 {
                   "type": "string",
                   "const": "MOVIES_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "OLLAMA_CONFIG"
                 }
               ],
               "description": "Configuration entry for the OMDB API"
@@ -1324,6 +1438,10 @@
             {
               "type": "string",
               "const": "MOVIES_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "OLLAMA_CONFIG"
             }
           ],
           "description": "Configuration entry for the OMDB API"
@@ -1413,6 +1531,17 @@
                 }
               },
               "required": ["enableNfoParsing", "watchFiles"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                }
+              },
+              "required": ["host"],
               "additionalProperties": false
             }
           ]
@@ -1452,6 +1581,10 @@
                 {
                   "type": "string",
                   "const": "MOVIES_CONFIG"
+                },
+                {
+                  "type": "string",
+                  "const": "OLLAMA_CONFIG"
                 }
               ],
               "description": "Configuration entry for the OMDB API"
