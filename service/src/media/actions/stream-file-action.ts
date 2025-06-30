@@ -3,14 +3,19 @@ import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
-import type { StreamEndpoint } from 'common'
+import type { StreamFileEndpoint } from 'common'
 import { Drive } from 'common'
 import ffmpeg from 'fluent-ffmpeg'
 import mime from 'mime'
 import { join } from 'path'
 import { FfprobeService } from '../../ffprobe-service.js'
 
-export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, response, getQuery }) => {
+export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
+  injector,
+  getUrlParams,
+  response,
+  getQuery,
+}) => {
   const logger = getLogger(injector).withScope('StreamAction')
 
   const { letter, path } = getUrlParams()
