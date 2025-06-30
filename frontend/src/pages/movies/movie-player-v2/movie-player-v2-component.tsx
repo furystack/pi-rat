@@ -147,7 +147,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           }}
           onseeked={(ev) => {
             const { currentTime } = ev.currentTarget as HTMLVideoElement
-            void mediaService.loadChunkForProgress(currentTime)
+            void mediaService.onProgressChange(currentTime)
           }}
           currentTime={watchProgress?.watchedSeconds || 0}
           src={mediaService.url}

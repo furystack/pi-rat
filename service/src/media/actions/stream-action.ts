@@ -99,7 +99,6 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
 
   if (from) {
     command.seekInput(from)
-    command.seek(from)
   }
 
   if (to) {
