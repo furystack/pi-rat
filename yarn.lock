@@ -1415,6 +1415,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vercel/edge@npm:^1.2.1":
+  version: 1.2.2
+  resolution: "@vercel/edge@npm:1.2.2"
+  checksum: 10c0/524115e7baef7867fc14669e5f57e4f4180eecabe32328c4d418754bfe82a21b9519fbc65dcafaf1b6d526651506e9d4955a2dfc319337a35868635e8cec5ec3
+  languageName: node
+  linkType: hard
+
 "@videojs/http-streaming@npm:^3.17.0":
   version: 3.17.0
   resolution: "@videojs/http-streaming@npm:3.17.0"
@@ -2061,6 +2068,15 @@ __metadata:
   version: 3.1.0
   resolution: "callsites@npm:3.1.0"
   checksum: 10c0/fff92277400eb06c3079f9e74f3af120db9f8ea03bad0e84d9aede54bbe2d44a56cccb5f6cf12211f93f52306df87077ecec5b712794c5a9b5dac6d615a3f301
+  languageName: node
+  linkType: hard
+
+"ce-la-react@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "ce-la-react@npm:0.3.0"
+  peerDependencies:
+    react: ">=17.0.0"
+  checksum: 10c0/29378f5a5bbdf8a8ded546edd3894ad487258d6163b6a91e69d17436cdbb483f95837d27208c5e6a3ce4930a3ae8065fa724d5ae80ae70b5aadee8ed8be88666
   languageName: node
   linkType: hard
 
@@ -3191,6 +3207,7 @@ __metadata:
     "@types/node": "npm:^24.0.3"
     common: "workspace:^"
     marked: "npm:^15.0.12"
+    media-chrome: "npm:^4.11.1"
     monaco-editor: "npm:^0.52.2"
     ollama: "npm:^0.5.16"
     path-to-regexp: "npm:^8.2.0"
@@ -4439,6 +4456,16 @@ __metadata:
   version: 1.1.0
   resolution: "math-intrinsics@npm:1.1.0"
   checksum: 10c0/7579ff94e899e2f76ab64491d76cf606274c874d8f2af4a442c016bd85688927fcfca157ba6bf74b08e9439dc010b248ce05b96cc7c126a354c3bae7fcb48b7f
+  languageName: node
+  linkType: hard
+
+"media-chrome@npm:^4.11.1":
+  version: 4.11.1
+  resolution: "media-chrome@npm:4.11.1"
+  dependencies:
+    "@vercel/edge": "npm:^1.2.1"
+    ce-la-react: "npm:^0.3.0"
+  checksum: 10c0/e81574370ac05b5bdda094a3595e17675f78375ae260766d2952da36461c52c4567fc12db0074d7d87d907a6caca2d0bca4d70e7940ba48e561ed54e2d843543
   languageName: node
   linkType: hard
 

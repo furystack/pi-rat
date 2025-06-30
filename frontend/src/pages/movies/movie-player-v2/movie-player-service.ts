@@ -48,7 +48,7 @@ export class MoviePlayerService implements AsyncDisposable {
       void this.logger.verbose({ message: 'MediaSource ended' })
     })
 
-    this.chunkLength = 2
+    this.chunkLength = 20
 
     void this.loadChunkForProgress(this.currentProgress)
   }
