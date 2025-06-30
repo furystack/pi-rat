@@ -15,7 +15,8 @@ export class OmdbClientService {
 
   public async init(injector: Injector) {
     await this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
-    const config = await getStoreManager(injector).getStoreFor(Config, 'id').get('OMDB_CONFIG')
+    const configStore = getStoreManager(injector).getStoreFor(Config, 'id')
+    const config = await configStore.get('OMDB_CONFIG')
     if (!config) {
       this.config = undefined
       await this.logger.information({
@@ -27,6 +28,36 @@ export class OmdbClientService {
       })
     }
     this.config = config as OmdbConfig
+
+    configStore.subscribe('onEntityAdded', ({ entity }) => {
+      if (entity.id === 'OMDB_CONFIG') {
+        this.config = entity as OmdbConfig
+      }
+      void this.logger.information({
+        message: `🎬   OMDB Service config added`,
+      })
+    })
+    configStore.subscribe('onEntityUpdated', ({ change }) => {
+      if (change.id === 'OMDB_CONFIG') {
+        this.config = {
+          ...this.config,
+          ...change,
+        } as OmdbConfig
+        void this.logger.information({
+          message: `🎬   OMDB Service config updated`,
+          data: change,
+        })
+      }
+    })
+
+    configStore.subscribe('onEntityRemoved', ({ key }) => {
+      if (key === 'OMDB_CONFIG') {
+        this.config = undefined
+        void this.logger.information({
+          message: '🚫   OMDB Service config removed, service will not be able to fetch metadata',
+        })
+      }
+    })
   }
 
   public async fetchOmdbMovieMetadata({

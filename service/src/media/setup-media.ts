@@ -1,9 +1,9 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 
-import { Config, Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
+import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 
-import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
+import { getCurrentUser, isAuthorized } from '@furystack/core'
 import type { AuthorizationResult } from '@furystack/repository'
 import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
@@ -667,26 +667,7 @@ export const setupMovies = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  const omdbClientService = injector.getInstance(OmdbClientService)
-
-  const configStore = getStoreManager(injector).getStoreFor(Config, 'id')
-
-  configStore.subscribe('onEntityAdded', ({ entity }) => {
-    if (entity.id === 'OMDB_CONFIG') {
-      void omdbClientService.init(injector)
-    }
-  })
-  configStore.subscribe('onEntityUpdated', ({ change }) => {
-    if (change.id === 'OMDB_CONFIG') {
-      void omdbClientService.init(injector)
-    }
-  })
-
-  configStore.subscribe('onEntityRemoved', ({ key }) => {
-    if (key === 'OMDB_CONFIG') {
-      void omdbClientService.init(injector)
-    }
-  })
+  injector.getInstance(OmdbClientService)
 
   useMovieFileMaintainer(injector)
 
