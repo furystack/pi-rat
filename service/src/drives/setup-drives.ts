@@ -11,7 +11,7 @@ import { getDefaultDbSettings } from '../get-default-db-options.js'
 import { existsAsync } from '../utils/exists-async.js'
 import { useFileWatchers } from './file-watcher-service.js'
 
-const ensureFolder = async (path: string, mode: number = constants.W_OK) => {
+const ensureFolder = async (path: string, mode: number = constants.F_OK) => {
   const exists = await existsAsync(path, mode)
   if (!exists) {
     await mkdir(path, { recursive: true })
