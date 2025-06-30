@@ -582,7 +582,69 @@
         "type": ["string", "number"]
       }
     },
-    "StreamEndpoint": {
+    "StreamQueryParams": {
+      "type": "object",
+      "properties": {
+        "audio": {
+          "type": "object",
+          "properties": {
+            "trackId": {
+              "type": "number",
+              "description": "Selects the audio track to stream. If not provided, the first audio track will be played"
+            },
+            "audioCodec": {
+              "type": "string",
+              "const": "aac",
+              "description": "Select the codec for audio encoding. If not provided, the original encoding will be used"
+            },
+            "mixdown": {
+              "type": "boolean",
+              "description": "Mix down multi-channel audio to stereo"
+            },
+            "bitrate": {
+              "type": "number",
+              "description": "The bitrate for the audio stream. If not provided, the original bitrate will be used"
+            }
+          },
+          "required": ["trackId"],
+          "additionalProperties": false,
+          "description": "Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc..."
+        },
+        "video": {
+          "type": "object",
+          "properties": {
+            "codec": {
+              "type": "string",
+              "const": "libx264",
+              "description": "The codec for video encoding. If not provided, the original encoding will be used"
+            },
+            "resolution": {
+              "type": "string",
+              "enum": ["4k", "1080p", "720p", "480p", "360p"],
+              "description": "The output resolution for the video stream. If not provided, the original resolution will be used"
+            },
+            "quality": {
+              "type": "string",
+              "enum": ["high", "medium", "low"],
+              "description": "Preset options"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc..."
+        },
+        "from": {
+          "type": "number",
+          "description": "The start time in seconds"
+        },
+        "to": {
+          "type": "number",
+          "description": "The end time in seconds"
+        }
+      },
+      "required": ["from", "to"],
+      "additionalProperties": false
+    },
+    "StreamFileEndpoint": {
       "type": "object",
       "properties": {
         "url": {
@@ -599,70 +661,56 @@
           "additionalProperties": false
         },
         "query": {
-          "type": "object",
-          "properties": {
-            "audio": {
-              "type": "object",
-              "properties": {
-                "trackId": {
-                  "type": "number",
-                  "description": "Selects the audio track to stream. If not provided, the first audio track will be played"
-                },
-                "audioCodec": {
-                  "type": "string",
-                  "const": "aac",
-                  "description": "Select the codec for audio encoding. If not provided, the original encoding will be used"
-                },
-                "mixdown": {
-                  "type": "boolean",
-                  "description": "Mix down multi-channel audio to stereo"
-                },
-                "bitrate": {
-                  "type": "number",
-                  "description": "The bitrate for the audio stream. If not provided, the original bitrate will be used"
-                }
-              },
-              "required": ["trackId"],
-              "additionalProperties": false,
-              "description": "Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc..."
-            },
-            "video": {
-              "type": "object",
-              "properties": {
-                "codec": {
-                  "type": "string",
-                  "const": "libx264",
-                  "description": "The codec for video encoding. If not provided, the original encoding will be used"
-                },
-                "resolution": {
-                  "type": "string",
-                  "enum": ["4k", "1080p", "720p", "480p", "360p"],
-                  "description": "The output resolution for the video stream. If not provided, the original resolution will be used"
-                },
-                "quality": {
-                  "type": "string",
-                  "enum": ["high", "medium", "low"],
-                  "description": "Preset options"
-                }
-              },
-              "additionalProperties": false,
-              "description": "Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc..."
-            },
-            "from": {
-              "type": "number",
-              "description": "The start time in seconds"
-            },
-            "to": {
-              "type": "number",
-              "description": "The end time in seconds"
-            }
-          },
-          "required": ["from", "to"],
-          "additionalProperties": false
+          "$ref": "#/definitions/StreamQueryParams"
         },
         "result": {}
       },
       "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
+    "GetM3U8Endpoint": {
+      "type": "object",
+      "properties": {
+        "result": {},
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "url"],
+      "additionalProperties": false
+    },
+    "GetM3U8SegmentEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "segmentFile": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path", "segmentFile"],
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "result"],
       "additionalProperties": false
     },
     "MediaApi": {
@@ -748,11 +796,17 @@
             "/movie-files": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieFile%3E"
             },
-            "/files/:letter/:path/stream": {
-              "$ref": "#/definitions/StreamEndpoint"
-            },
             "/movie-files/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22id%22%3E"
+            },
+            "/files/:letter/:path/stream": {
+              "$ref": "#/definitions/StreamFileEndpoint"
+            },
+            "/files/:letter/:path/m3u8": {
+              "$ref": "#/definitions/GetM3U8Endpoint"
+            },
+            "/files/:letter/:path/m3u8/:segmentFile": {
+              "$ref": "#/definitions/GetM3U8SegmentEndpoint"
             }
           },
           "required": [
@@ -769,8 +823,10 @@
             "/omdb-series-metadata",
             "/omdb-series-metadata/:id",
             "/movie-files",
+            "/movie-files/:id",
             "/files/:letter/:path/stream",
-            "/movie-files/:id"
+            "/files/:letter/:path/m3u8",
+            "/files/:letter/:path/m3u8/:segmentFile"
           ],
           "additionalProperties": false
         },

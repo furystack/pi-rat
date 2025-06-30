@@ -72,6 +72,20 @@
               "type": "boolean",
               "description": "If true, all movies on all drives will be synced on startup or config change."
             },
+            "tempFiles": {
+              "type": "object",
+              "properties": {
+                "letter": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": ["letter", "path"],
+              "additionalProperties": false,
+              "description": "A location where temporary files (e.g. transcoded files) will be stored."
+            },
             "watchFiles": {
               "anyOf": [
                 {
@@ -264,6 +278,20 @@
                 "fullSyncOnStartup": {
                   "type": "boolean",
                   "description": "If true, all movies on all drives will be synced on startup or config change."
+                },
+                "tempFiles": {
+                  "type": "object",
+                  "properties": {
+                    "letter": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["letter", "path"],
+                  "additionalProperties": false,
+                  "description": "A location where temporary files (e.g. transcoded files) will be stored."
                 },
                 "watchFiles": {
                   "anyOf": [

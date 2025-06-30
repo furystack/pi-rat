@@ -12,6 +12,14 @@ export interface MoviesConfig {
     fullSyncOnStartup?: boolean
 
     /**
+     * A location where temporary files (e.g. transcoded files) will be stored.
+     */
+    tempFiles?: {
+      letter: string
+      path: string
+    }
+
+    /**
      * 'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically.
      */
     watchFiles:

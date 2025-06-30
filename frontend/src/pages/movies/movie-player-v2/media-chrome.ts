@@ -1,11 +1,15 @@
 import type { PartialElement } from '@furystack/shades'
-import 'media-chrome'
+import 'media-chrome/all'
 import type {
   MediaAirplayButton,
   MediaCaptionsButton,
+  MediaCaptionsMenu,
   MediaCastButton,
   MediaChromeButton,
   MediaChromeDialog,
+  MediaChromeMenu,
+  MediaChromeMenuButton,
+  MediaChromeMenuItem,
   MediaChromeRange,
   MediaContainer,
   MediaControlBar,
@@ -26,12 +30,15 @@ import type {
   MediaPreviewTimeDisplay,
   MediaSeekBackwardButton,
   MediaSeekForwardButton,
+  MediaSettingsMenu,
+  MediaSettingsMenuButton,
+  MediaSettingsMenuItem,
   MediaTextDisplay,
   MediaTimeDisplay,
   MediaTimeRange,
   MediaTooltip,
   MediaVolumeRange,
-} from 'media-chrome'
+} from 'media-chrome/all'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -68,6 +75,16 @@ declare global {
       'media-time-range': PartialElement<MediaTimeRange>
       'media-tooltip': PartialElement<MediaTooltip>
       'media-volume-range': PartialElement<MediaVolumeRange>
+      'media-chrome-menu': PartialElement<MediaChromeMenu>
+      'media-chrome-menu-button': PartialElement<MediaChromeMenuButton>
+      'media-chrome-menu-item': PartialElement<MediaChromeMenuItem>
+      'media-captions-menu': PartialElement<MediaCaptionsMenu>
+      'media-settings-menu': PartialElement<MediaSettingsMenu>
+      'media-settings-menu-button': PartialElement<MediaSettingsMenuButton>
+      'media-settings-menu-item': PartialElement<MediaSettingsMenuItem>
+      'media-rendition-menu': PartialElement<MediaSettingsMenuItem>
+      'media-audio-track-menu': PartialElement<MediaSettingsMenuItem>
+      'media-playback-rate-menu': PartialElement<MediaSettingsMenuItem>
     }
   }
 }

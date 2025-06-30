@@ -7,6 +7,7 @@ import { MediaApiClient } from '../../../services/api-clients/media-api-client.j
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
 import { getSubtitleTracks } from './getSubtitleTracks.js'
+import './hls-video-element.js'
 import './media-chrome.js'
 import { MoviePlayerService } from './movie-player-service.js'
 import { MovieTitle } from './title.js'
@@ -143,6 +144,32 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               objectFit: 'cover',
             }}
           >
+            <media-settings-menu anchor="auto" hidden>
+              <media-settings-menu-item>
+                Speed
+                <media-playback-rate-menu slot="submenu" hidden>
+                  <div slot="title">Speed</div>
+                </media-playback-rate-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item>
+                Quality
+                <media-rendition-menu slot="submenu" hidden>
+                  <div slot="title">Quality</div>
+                </media-rendition-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item>
+                Captions
+                <media-captions-menu slot="submenu" hidden>
+                  <div slot="title">Captions</div>
+                </media-captions-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item>
+                Audio
+                <media-audio-track-menu slot="submenu" hidden>
+                  <div slot="title">Audio</div>
+                </media-audio-track-menu>
+              </media-settings-menu-item>
+            </media-settings-menu>
             <video
               slot="media"
               crossOrigin="use-credentials"
@@ -180,6 +207,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               <media-fullscreen-button />
               <media-pip-button />
               <media-captions-button />
+              <media-settings-menu-button></media-settings-menu-button>
             </media-control-bar>
           </media-controller>
         </div>

@@ -19,7 +19,7 @@ import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
 import { ScanForMoviesAction } from './actions/scan-for-movies-action.js'
-import { StreamAction } from './actions/stream-action.js'
+import { StreamAction } from './actions/stream-file-action.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -75,7 +75,7 @@ export const setupMoviesRestApi = async (injector: Injector) => {
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
         '/files/:letter/:path/stream': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'StreamEndpoint' })(StreamAction),
+          Validate({ schema: mediaApiSchema, schemaName: 'StreamFileEndpoint' })(StreamAction),
         ),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"id">' })(
           createGetEntityEndpoint({ model: MovieFile, primaryKey: 'id' }),

@@ -29,6 +29,7 @@
     "@furystack/utils": "^8.1.1",
     "@types/node": "^24.0.3",
     "common": "workspace:^",
+    "hls-video-element": "^1.5.5",
     "marked": "^15.0.12",
     "media-chrome": "^4.11.1",
     "monaco-editor": "^0.52.2",
