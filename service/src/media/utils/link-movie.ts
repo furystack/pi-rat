@@ -16,7 +16,6 @@ import { announceNewMovie } from './announce-new-movie.js'
 import { ensureMovieExists } from './ensure-movie-exists.js'
 import { ensureOmdbMovieExists } from './ensure-omdb-movie-exists.js'
 import { ensureOmdbSeriesExists } from './ensure-omdb-series-exists.js'
-import { extractSubtitles } from './extract-subtitles.js'
 
 export const linkMovie = async (options: { injector: Injector; file: PiRatFile }) => {
   const { injector } = options
@@ -87,7 +86,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       movieFile: newMovieFile,
     })
 
-    return { status: 'linked' } as const
+    return { status: 'linked', movieFile: newMovieFile, movie } as const
   }
 
   const omdbClientService = injector.getInstance(OmdbClientService)
@@ -115,8 +114,6 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     imdbId: added.imdbID,
     ffprobe: ffprobeResult,
   })
-
-  await extractSubtitles({ injector, file: { driveLetter, path } })
 
   await announceNewMovie({
     injector,

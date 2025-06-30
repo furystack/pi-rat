@@ -38,6 +38,16 @@ export type SaveWatchProgress = {
   result: WatchHistoryEntry
 }
 
+export type ScanForMoviesEndpoint = {
+  body: {
+    root: PiRatFile
+    autoExtractSubtitles?: boolean
+  }
+  result: {
+    added: MovieFile[]
+  }
+}
+
 export type StreamEndpoint = {
   url: {
     letter: string
@@ -128,6 +138,7 @@ export interface MediaApi extends RestApi {
     '/link-movie': LinkMovie
     '/extract-subtitles': ExtractSubtitles
     '/save-watch-progress': SaveWatchProgress
+    '/scan-for-movies': ScanForMoviesEndpoint
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>

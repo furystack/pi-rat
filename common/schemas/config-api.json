@@ -518,9 +518,13 @@
                     {
                       "type": "object",
                       "properties": {
-                        "enableNfoParsing": {
+                        "autoExtractSubtitles": {
                           "type": "boolean",
-                          "description": "Search .nfo files for imdb id"
+                          "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                        },
+                        "fullSyncOnStartup": {
+                          "type": "boolean",
+                          "description": "If true, all movies on all drives will be synced on startup or config change."
                         },
                         "watchFiles": {
                           "anyOf": [
@@ -547,10 +551,10 @@
                               }
                             }
                           ],
-                          "description": "'all' or a list of directories to watch for new movies."
+                          "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
                         }
                       },
-                      "required": ["enableNfoParsing", "watchFiles"],
+                      "required": ["watchFiles"],
                       "additionalProperties": false
                     },
                     {
@@ -618,9 +622,13 @@
                     {
                       "type": "object",
                       "properties": {
-                        "enableNfoParsing": {
+                        "autoExtractSubtitles": {
                           "type": "boolean",
-                          "description": "Search .nfo files for imdb id"
+                          "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                        },
+                        "fullSyncOnStartup": {
+                          "type": "boolean",
+                          "description": "If true, all movies on all drives will be synced on startup or config change."
                         },
                         "watchFiles": {
                           "anyOf": [
@@ -647,10 +655,10 @@
                               }
                             }
                           ],
-                          "description": "'all' or a list of directories to watch for new movies."
+                          "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
                         }
                       },
-                      "required": ["enableNfoParsing", "watchFiles"],
+                      "required": ["watchFiles"],
                       "additionalProperties": false
                     },
                     {
@@ -726,9 +734,13 @@
                       {
                         "type": "object",
                         "properties": {
-                          "enableNfoParsing": {
+                          "autoExtractSubtitles": {
                             "type": "boolean",
-                            "description": "Search .nfo files for imdb id"
+                            "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                          },
+                          "fullSyncOnStartup": {
+                            "type": "boolean",
+                            "description": "If true, all movies on all drives will be synced on startup or config change."
                           },
                           "watchFiles": {
                             "anyOf": [
@@ -755,10 +767,10 @@
                                 }
                               }
                             ],
-                            "description": "'all' or a list of directories to watch for new movies."
+                            "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
                           }
                         },
-                        "required": ["enableNfoParsing", "watchFiles"],
+                        "required": ["watchFiles"],
                         "additionalProperties": false
                       },
                       {
@@ -829,9 +841,13 @@
                       {
                         "type": "object",
                         "properties": {
-                          "enableNfoParsing": {
+                          "autoExtractSubtitles": {
                             "type": "boolean",
-                            "description": "Search .nfo files for imdb id"
+                            "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                          },
+                          "fullSyncOnStartup": {
+                            "type": "boolean",
+                            "description": "If true, all movies on all drives will be synced on startup or config change."
                           },
                           "watchFiles": {
                             "anyOf": [
@@ -858,10 +874,10 @@
                                 }
                               }
                             ],
-                            "description": "'all' or a list of directories to watch for new movies."
+                            "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
                           }
                         },
-                        "required": ["enableNfoParsing", "watchFiles"],
+                        "required": ["watchFiles"],
                         "additionalProperties": false
                       },
                       {
@@ -1105,9 +1121,13 @@
             {
               "type": "object",
               "properties": {
-                "enableNfoParsing": {
+                "autoExtractSubtitles": {
                   "type": "boolean",
-                  "description": "Search .nfo files for imdb id"
+                  "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                },
+                "fullSyncOnStartup": {
+                  "type": "boolean",
+                  "description": "If true, all movies on all drives will be synced on startup or config change."
                 },
                 "watchFiles": {
                   "anyOf": [
@@ -1134,10 +1154,10 @@
                       }
                     }
                   ],
-                  "description": "'all' or a list of directories to watch for new movies."
+                  "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
                 }
               },
-              "required": ["enableNfoParsing", "watchFiles"],
+              "required": ["watchFiles"],
               "additionalProperties": false
             },
             {
@@ -1318,9 +1338,13 @@
             {
               "type": "object",
               "properties": {
-                "enableNfoParsing": {
+                "autoExtractSubtitles": {
                   "type": "boolean",
-                  "description": "Search .nfo files for imdb id"
+                  "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                },
+                "fullSyncOnStartup": {
+                  "type": "boolean",
+                  "description": "If true, all movies on all drives will be synced on startup or config change."
                 },
                 "watchFiles": {
                   "anyOf": [
@@ -1347,10 +1371,10 @@
                       }
                     }
                   ],
-                  "description": "'all' or a list of directories to watch for new movies."
+                  "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
                 }
               },
-              "required": ["enableNfoParsing", "watchFiles"],
+              "required": ["watchFiles"],
               "additionalProperties": false
             },
             {
@@ -1498,9 +1522,13 @@
             {
               "type": "object",
               "properties": {
-                "enableNfoParsing": {
+                "autoExtractSubtitles": {
                   "type": "boolean",
-                  "description": "Search .nfo files for imdb id"
+                  "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                },
+                "fullSyncOnStartup": {
+                  "type": "boolean",
+                  "description": "If true, all movies on all drives will be synced on startup or config change."
                 },
                 "watchFiles": {
                   "anyOf": [
@@ -1527,10 +1555,10 @@
                       }
                     }
                   ],
-                  "description": "'all' or a list of directories to watch for new movies."
+                  "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
                 }
               },
-              "required": ["enableNfoParsing", "watchFiles"],
+              "required": ["watchFiles"],
               "additionalProperties": false
             },
             {

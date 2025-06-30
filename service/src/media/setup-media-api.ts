@@ -18,6 +18,7 @@ import { getPort } from '../get-port.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
+import { ScanForMoviesAction } from './actions/scan-for-movies-action.js'
 import { StreamAction } from './actions/stream-action.js'
 
 export const setupMoviesRestApi = async (injector: Injector) => {
@@ -96,6 +97,12 @@ export const setupMoviesRestApi = async (injector: Injector) => {
         ),
         '/save-watch-progress': Authenticate()(
           Validate({ schema: mediaApiSchema, schemaName: 'SaveWatchProgress' })(SaveWatchProgressAction),
+        ),
+        '/scan-for-movies': Authorize('admin')(
+          Validate({
+            schema: mediaApiSchema,
+            schemaName: 'ScanForMoviesEndpoint',
+          })(ScanForMoviesAction),
         ),
       },
       PATCH: {
