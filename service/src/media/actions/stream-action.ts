@@ -44,6 +44,8 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
     .format('mp4')
     .outputOptions(['-movflags empty_moov+frag_keyframe+faststart+default_base_moof'])
     .addOutputOption('-map 0:v:0')
+    .addOutputOption('-fflags +genpts')
+    .addOutputOption('-avoid_negative_ts make_zero')
 
   if (audio) {
     if (!isNaN(audio.trackId)) {
@@ -94,7 +96,7 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
       }
     }
   } else {
-    command.videoCodec('copy')
+    // command.videoCodec('copy')
   }
 
   if (from) {

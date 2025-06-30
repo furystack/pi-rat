@@ -241,7 +241,7 @@ export class MoviePlayerService implements AsyncDisposable {
     const sb = await this.getActiveSourceBuffer()
     if (!sb.buffered.length) {
       void this.logger.information({ message: 'No buffered data, loading a chunk...', data: { progress } })
-      void this.loadChunkForProgress(progress)
+      await this.loadChunkForProgress(progress)
       return
     }
 
@@ -251,7 +251,7 @@ export class MoviePlayerService implements AsyncDisposable {
         void this.logger.information({
           message: 'Progress inside a buffer gap',
         })
-        void this.loadChunkForProgress(progress)
+        await this.loadChunkForProgress(progress)
       }
     }
 
@@ -265,7 +265,7 @@ export class MoviePlayerService implements AsyncDisposable {
         void this.logger.information({
           message: 'Gap approaching, write queue clear, loading a chunk...',
         })
-        void this.loadChunkForProgress(isGapApproaching[0])
+        await this.loadChunkForProgress(isGapApproaching[0])
       }
     }
   }
