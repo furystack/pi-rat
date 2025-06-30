@@ -13,8 +13,8 @@ import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
 import type { FfprobeResult } from '../ffprobe-service.js'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
-import { useMovieFileMaintainer } from './actions/movie-file-maintainer.js'
 import { OmdbClientService } from './metadata-services/omdb-client-service.js'
+import { useMovieFileMaintainer } from './services/movie-file-maintainer.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
   declare title: string

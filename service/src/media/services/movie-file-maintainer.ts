@@ -6,7 +6,7 @@ import { PathHelper } from '@furystack/utils'
 import type { PiRatFile } from 'common'
 import { MovieFile } from 'common'
 import { FileWatcherService } from '../../drives/file-watcher-service.js'
-import { linkMovie } from './link-movie-action.js'
+import { linkMovie } from '../utils/link-movie.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class MovieMaintainerService {
