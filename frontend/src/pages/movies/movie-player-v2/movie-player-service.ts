@@ -162,7 +162,6 @@ export class MoviePlayerService implements AsyncDisposable {
       const sourceBuffer = await this.getActiveSourceBuffer()
       const start = new Date().getTime()
       const audioTracks = this.getAudioTracks()
-
       const audio = audioTracks.find((track) => track.id === this.audioTrackId.getValue()) || audioTracks[0]
 
       const video = this.getVideoTrack()
@@ -307,7 +306,8 @@ export class MoviePlayerService implements AsyncDisposable {
   }
 
   private getMimeType() {
-    const audio = this.getAudioTracks()[this.audioTrackId.getValue()]
+    const audioTracks = this.getAudioTracks()
+    const audio = audioTracks.find((track) => track.id === this.audioTrackId.getValue()) || audioTracks[0]
     const video = this.getVideoTrack()
     const videoCodecMime = video.needsTranscoding ? videoCodecs.h264 : video.codecMime
     const audioCodecMime = audio.needsTranscoding ? audioCodecs.aac : audio.codecMime
