@@ -12,7 +12,7 @@ export const getSubtitleTracks = (file: PiRatFile, ffProbeData: FfprobeData) => 
 
   return (
     ffProbeData.streams
-      .filter((stream) => (stream.codec_type as any) === 'subtitle')
+      .filter((stream) => stream.codec_type === 'subtitle')
       .map((subtitle) => (
         <track
           kind="captions"

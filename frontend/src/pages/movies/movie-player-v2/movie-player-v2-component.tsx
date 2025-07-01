@@ -7,7 +7,6 @@ import { MediaApiClient } from '../../../services/api-clients/media-api-client.j
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
 import { getSubtitleTracks } from './get-subtitle-tracks.js'
-import './hls-video-element.js'
 import './media-chrome.js'
 import { MoviePlayerService } from './movie-player-service.js'
 import { MovieTitle } from './title.js'
