@@ -1,4 +1,4 @@
-import type { FfprobeData } from 'fluent-ffmpeg'
+import type { FfprobeData } from './ffprobe-data.js'
 
 export class MovieFile {
   id!: string

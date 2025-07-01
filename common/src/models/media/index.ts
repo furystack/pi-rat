@@ -1,3 +1,4 @@
+export * from './ffprobe-data.js'
 export * from './movie-file.js'
 export * from './movie-watch-history.js'
 export * from './movie.js'

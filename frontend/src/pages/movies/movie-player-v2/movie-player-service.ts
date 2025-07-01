@@ -1,7 +1,6 @@
 import type { ScopedLogger } from '@furystack/logging'
 import { ObservableValue } from '@furystack/utils'
-import type { PiRatFile } from 'common'
-import type { FfprobeData } from 'fluent-ffmpeg'
+import type { FfprobeData, PiRatFile } from 'common'
 import { Lock } from 'semaphore-async-await'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 
@@ -274,7 +273,13 @@ export class MoviePlayerService implements AsyncDisposable {
 
   private readonly chunkLength: number
 
-  public getAudioTracks() {
+  public getAudioTracks(): Array<{
+    stream: FfprobeData['streams'][number]
+    id: number
+    codecName: string | undefined
+    codecMime: string
+    needsTranscoding: boolean
+  }> {
     return this.ffprobe.streams
       .filter((s) => s.codec_type === 'audio')
       .map((stream) => ({
