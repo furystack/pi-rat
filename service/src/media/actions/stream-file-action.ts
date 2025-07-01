@@ -52,6 +52,14 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
     .addOutputOption('-fflags +genpts')
     .addOutputOption('-avoid_negative_ts make_zero')
 
+  if (from) {
+    command.seekInput(from)
+  }
+
+  if (to) {
+    command.duration(to - from)
+  }
+
   if (audio) {
     const audioStreamIndex = audioStreams.findIndex((stream) => stream === audioStream)
     if (audioStreamIndex > -1) {
@@ -68,7 +76,7 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
       command.audioChannels(2)
     }
   } else {
-    command.audioCodec('copy')
+    // command.audioCodec('copy')
   }
 
   if (video) {
@@ -105,16 +113,14 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
     // command.videoCodec('copy')
   }
 
-  if (from) {
-    command.seekInput(from)
-  }
-
-  if (to) {
-    command.duration(to - from)
-  }
-
   command.on('start', (commandLine) => {
     void logger.verbose({ message: `Spawned Ffmpeg with command: ${commandLine}` })
+  })
+
+  // Abort ffmpeg if response is terminated
+  response.on('close', () => {
+    void logger.verbose({ message: 'Response closed, aborting ffmpeg process.' })
+    command.kill('SIGKILL')
   })
 
   try {
