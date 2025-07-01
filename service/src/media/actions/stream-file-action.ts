@@ -46,36 +46,30 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
   })
 
   // Build ffmpeg args
-  const ffmpegArgs: string[] = [
-    '-i',
-    fullPath,
-    '-f',
-    'mp4',
-    '-movflags',
-    'empty_moov+frag_keyframe+faststart+default_base_moof',
-    '-fflags',
-    '+genpts',
-    '-avoid_negative_ts',
-    'make_zero',
-    '-map',
-    '0:v:0',
-  ]
+  const ffmpegArgs: string[] = []
 
+  // Fast input seeking for better performance
   if (typeof from === 'number') {
     ffmpegArgs.push('-ss', String(from))
   }
+
+  ffmpegArgs.push('-i', fullPath, '-f', 'mp4', '-movflags', 'empty_moov+frag_keyframe+faststart+default_base_moof')
+
   if (typeof to === 'number' && typeof from === 'number') {
     ffmpegArgs.push('-t', String(Math.max(to - from, 1)))
   }
 
-  const audioStreamIndex = audioStreams.findIndex((stream) => stream === audioStream)
-  if (audioStreamIndex > -1) {
-    ffmpegArgs.push('-map', `0:a:${audioStreamIndex}`)
-  }
+  const audioStreamIndex = Math.max(
+    0,
+    audioStreams.findIndex((stream) => stream === audioStream),
+  )
+  ffmpegArgs.push('-map', `0:a:${audioStreamIndex}`)
+
   if (audio?.audioCodec) {
     ffmpegArgs.push('-c:a', audio.audioCodec)
   } else {
-    ffmpegArgs.push('-c:a', 'copy')
+    ffmpegArgs.push('-c:a', 'aac')
+    ffmpegArgs.push('-b:a', '128k')
   }
   if (audio?.bitrate) {
     ffmpegArgs.push('-b:a', String(audio.bitrate))
@@ -84,10 +78,13 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
     ffmpegArgs.push('-ac', '2')
   }
 
+  const videoStreamIndex = 0
+  ffmpegArgs.push('-map', `0:v:${videoStreamIndex}`)
   if (video?.codec) {
     ffmpegArgs.push('-c:v', video.codec)
   } else {
-    ffmpegArgs.push('-c:v', 'copy')
+    ffmpegArgs.push('-c:v', 'libx264')
+    ffmpegArgs.push('-preset', 'ultrafast') // Use a fast preset for lower latency
   }
   if (video?.resolution) {
     switch (video.resolution) {
@@ -111,16 +108,21 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
     }
   }
 
+  const abortController = new AbortController()
+
   ffmpegArgs.push('pipe:1') // Output to stdout
 
   await logger.verbose({ message: `Spawning ffmpeg with args: ${ffmpegArgs.join(' ')}` })
 
-  const ffmpegProcess = spawn('ffmpeg', ffmpegArgs, { stdio: ['ignore', 'pipe', 'pipe'] })
+  const ffmpegProcess = spawn('ffmpeg', ffmpegArgs, {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    signal: abortController.signal,
+  })
 
   // Abort ffmpeg if response is terminated
   response.on('close', () => {
     void logger.verbose({ message: 'Response closed, aborting ffmpeg process.' })
-    ffmpegProcess.kill('SIGKILL')
+    abortController.abort()
   })
 
   ffmpegProcess.stdout.pipe(response)
