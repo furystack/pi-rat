@@ -6,6 +6,7 @@ import type { AudioTrack } from 'media-chrome/dist/media-store/state-mediator.js
 import { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
+import { getChaptersTrack } from './get-chapters-track.js'
 import { getSubtitleTracks } from './get-subtitle-tracks.js'
 import './media-chrome.js'
 import { MoviePlayerService } from './movie-player-service.js'
@@ -213,6 +214,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               src={mediaService.url}
             >
               {...getSubtitleTracks(props.file, props.ffprobe)}
+              {getChaptersTrack(props.ffprobe)}
             </video>
 
             <media-loading-indicator slot="centered-chrome"></media-loading-indicator>
