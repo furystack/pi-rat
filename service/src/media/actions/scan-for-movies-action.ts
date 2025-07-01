@@ -1,4 +1,5 @@
 import { getStoreManager } from '@furystack/core'
+import { getLogger } from '@furystack/logging'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
 import { Drive, MovieFile, type ScanForMoviesEndpoint } from 'common'
@@ -8,6 +9,8 @@ import { linkMovie } from '../utils/link-movie.js'
 
 export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async ({ injector, getBody }) => {
   const { root, autoExtractSubtitles } = await getBody()
+
+  const logger = getLogger(injector).withScope('ScanForMoviesAction')
 
   const maintainer = injector.getInstance(MovieMaintainerService)
   const storeManager = getStoreManager(injector)
@@ -19,10 +22,19 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
   }
 
   const movieFilesStore = storeManager.getStoreFor(MovieFile, 'id')
-
   const alreadyAddedMovieFiles = await movieFilesStore.find({})
 
+  await logger.verbose({
+    message: `Scanning for movie files in ${root.path} on drive ${drive.letter}`,
+    data: { root, autoExtractSubtitles },
+  })
+
   const toBeAdded = (await maintainer.checkFolderForPossibleMovieFiles(root.path, drive, alreadyAddedMovieFiles)).flat()
+
+  await logger.verbose({
+    message: `Found ${toBeAdded.length} movie files to be added`,
+    data: { toBeAdded },
+  })
 
   const added: Array<Awaited<ReturnType<typeof linkMovie>>> = []
   for (const file of toBeAdded) {
@@ -30,6 +42,7 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
       injector,
       file,
     })
+
     if (autoExtractSubtitles) {
       await extractSubtitles({
         injector,
