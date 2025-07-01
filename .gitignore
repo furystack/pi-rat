@@ -76,3 +76,4 @@ service/data/*.sqlite
 data/*.sqlite
 
 browser-temp
+test-results
