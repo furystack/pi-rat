@@ -3,9 +3,9 @@ import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
+import { spawn } from 'child_process'
 import type { StreamFileEndpoint } from 'common'
 import { Drive } from 'common'
-import ffmpeg from 'fluent-ffmpeg'
 import mime from 'mime'
 import { join } from 'path'
 import { FfprobeService } from '../../ffprobe-service.js'
@@ -45,99 +45,99 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
     data: { fullPath, from, to, audio, video, audioStream, videoStream },
   })
 
-  const command = ffmpeg(fullPath)
-    .format('mp4')
-    .outputOptions(['-movflags empty_moov+frag_keyframe+faststart+default_base_moof'])
-    .addOutputOption('-map 0:v:0')
-    .addOutputOption('-fflags +genpts')
-    .addOutputOption('-avoid_negative_ts make_zero')
+  // Build ffmpeg args
+  const ffmpegArgs: string[] = [
+    '-i',
+    fullPath,
+    '-f',
+    'mp4',
+    '-movflags',
+    'empty_moov+frag_keyframe+faststart+default_base_moof',
+    '-fflags',
+    '+genpts',
+    '-avoid_negative_ts',
+    'make_zero',
+    '-map',
+    '0:v:0',
+  ]
 
-  if (from) {
-    command.seekInput(from)
+  if (typeof from === 'number') {
+    ffmpegArgs.push('-ss', String(from))
+  }
+  if (typeof to === 'number' && typeof from === 'number') {
+    ffmpegArgs.push('-t', String(Math.max(to - from, 1)))
   }
 
-  if (to) {
-    command.duration(to - from)
+  const audioStreamIndex = audioStreams.findIndex((stream) => stream === audioStream)
+  if (audioStreamIndex > -1) {
+    ffmpegArgs.push('-map', `0:a:${audioStreamIndex}`)
   }
-
-  if (audio) {
-    const audioStreamIndex = audioStreams.findIndex((stream) => stream === audioStream)
-    if (audioStreamIndex > -1) {
-      command.addOutputOption(`-map 0:a:${audioStreamIndex}`)
-    }
-    if (audio.audioCodec) {
-      command.audioCodec('aac')
-    }
-    if (audio.bitrate) {
-      command.audioBitrate(audio.bitrate)
-    }
-
-    if (audio.mixdown) {
-      command.audioChannels(2)
-    }
+  if (audio?.audioCodec) {
+    ffmpegArgs.push('-c:a', audio.audioCodec)
   } else {
-    // command.audioCodec('copy')
+    ffmpegArgs.push('-c:a', 'copy')
+  }
+  if (audio?.bitrate) {
+    ffmpegArgs.push('-b:a', String(audio.bitrate))
+  }
+  if (audio?.mixdown) {
+    ffmpegArgs.push('-ac', '2')
   }
 
-  if (video) {
-    if (video.codec) {
-      command.videoCodec(video.codec)
-    }
-
-    if (video.quality) {
-      // TODO: Figure out how to set quality
-    }
-
-    if (video.resolution) {
-      switch (video.resolution) {
-        case '4k':
-          command.size('3840x2160')
-          break
-        case '1080p':
-          command.size('1920x1080')
-          break
-        case '720p':
-          command.size('1280x720')
-          break
-        case '480p':
-          command.size('854x480')
-          break
-        case '360p':
-          command.size('640x360')
-          break
-        default:
-          break
-      }
-    }
+  if (video?.codec) {
+    ffmpegArgs.push('-c:v', video.codec)
   } else {
-    // command.videoCodec('copy')
+    ffmpegArgs.push('-c:v', 'copy')
+  }
+  if (video?.resolution) {
+    switch (video.resolution) {
+      case '4k':
+        ffmpegArgs.push('-s', '3840x2160')
+        break
+      case '1080p':
+        ffmpegArgs.push('-s', '1920x1080')
+        break
+      case '720p':
+        ffmpegArgs.push('-s', '1280x720')
+        break
+      case '480p':
+        ffmpegArgs.push('-s', '854x480')
+        break
+      case '360p':
+        ffmpegArgs.push('-s', '640x360')
+        break
+      default:
+        break
+    }
   }
 
-  command.on('start', (commandLine) => {
-    void logger.verbose({ message: `Spawned Ffmpeg with command: ${commandLine}` })
-  })
+  ffmpegArgs.push('pipe:1') // Output to stdout
+
+  await logger.verbose({ message: `Spawning ffmpeg with args: ${ffmpegArgs.join(' ')}` })
+
+  const ffmpegProcess = spawn('ffmpeg', ffmpegArgs, { stdio: ['ignore', 'pipe', 'pipe'] })
 
   // Abort ffmpeg if response is terminated
   response.on('close', () => {
     void logger.verbose({ message: 'Response closed, aborting ffmpeg process.' })
-    command.kill('SIGKILL')
+    ffmpegProcess.kill('SIGKILL')
   })
 
-  try {
-    command
-      .on('error', (err, stdout, stderr) => {
-        void logger.error({ message: `an error happened: ${err.message}`, data: { err, stdout, stderr } })
-      })
-      .on('end', () => {
-        void logger.verbose({ message: 'file has been converted succesfully' })
-      })
-      .on('progress', (progress) => {
-        void logger.verbose({ message: `Processing: ${progress.percent}%` })
-      })
-      .pipe(response, { end: true })
-  } catch (error) {
-    await logger.error({ message: 'Stream error', data: { error } })
-  }
+  ffmpegProcess.stdout.pipe(response)
+
+  ffmpegProcess.stderr.on('data', (data) => {
+    void logger.verbose({ message: `ffmpeg stderr: ${data}` })
+  })
+
+  ffmpegProcess.on('error', (err) => {
+    void logger.error({ message: `ffmpeg process error: ${err.message}`, data: { err } })
+    response.end()
+  })
+
+  ffmpegProcess.on('close', (code) => {
+    void logger.verbose({ message: `ffmpeg process exited with code ${code}` })
+    response.end()
+  })
 
   return BypassResult()
 }
