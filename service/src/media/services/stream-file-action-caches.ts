@@ -110,6 +110,7 @@ export class StreamFileActionCaches {
         ffmpegArgs.push('-c:v', 'libx264')
       }
       ffmpegArgs.push('-preset', config.value.preset || 'ultrafast')
+
       if (video?.resolution) {
         switch (video.resolution) {
           case '4k':
@@ -137,4 +138,14 @@ export class StreamFileActionCaches {
       return ffmpegArgs
     },
   })
+
+  public init() {
+    getStoreManager(this.injector)
+      .getStoreFor(Config, 'id')
+      .subscribe('onEntityUpdated', ({ id }) => {
+        if (id === 'MOVIES_CONFIG') {
+          this.moviesConfigCache.setObsolete()
+        }
+      })
+  }
 }

@@ -57,7 +57,7 @@ export class MoviePlayerService implements AsyncDisposable {
   private loadLock = new Lock()
   public audioTrackId = new ObservableValue(0)
 
-  public resolution = new ObservableValue<Required<StreamQueryParams>['video']['resolution'] | null>(null)
+  public resolution = new ObservableValue<Required<StreamQueryParams>['video']['resolution'] | undefined>(undefined)
 
   public async [Symbol.asyncDispose]() {
     this.progress[Symbol.dispose]()
@@ -194,9 +194,14 @@ export class MoviePlayerService implements AsyncDisposable {
             ? {
                 video: {
                   codec: 'libx264',
+                  ...(this.resolution.getValue() ? { resolution: this.resolution.getValue() } : {}),
                 },
               }
-            : {}),
+            : {
+                video: {
+                  ...(this.resolution.getValue() ? { resolution: this.resolution.getValue() } : {}),
+                },
+              }),
         },
         responseParser: async (r) => {
           return { response: r, result: null as any }
