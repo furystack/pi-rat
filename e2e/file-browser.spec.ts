@@ -36,7 +36,7 @@ const openFile = async (page: Page, fileName: string) => {
 }
 
 const deleteFile = async (page: Page, fileName: string) => {
-  const file = page.getByText('upload.md').nth(0)
+  const file = page.getByText(fileName).nth(0)
   await file.click()
   await page.keyboard.press('Delete')
   await assertAndDismissNoty(page, 'The file is deleted succesfully')
