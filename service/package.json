@@ -1,6 +1,6 @@
 {
   "name": "service",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "main": "dist/index.js",
   "license": "GPL-2.0-only",
   "private": true,

@@ -1,6 +1,6 @@
 {
   "name": "common",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "license": "GPL-2.0-only",
   "private": true,
   "type": "module",
