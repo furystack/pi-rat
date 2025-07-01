@@ -113,23 +113,6 @@ export type StreamFileEndpoint = {
   result: unknown
 }
 
-export type GetM3U8Endpoint = {
-  result: unknown
-  url: {
-    letter: string
-    path: string
-  }
-}
-
-export type GetM3U8SegmentEndpoint = {
-  url: {
-    letter: string
-    path: string
-    segmentFile: string
-  }
-  result: unknown
-}
-
 export interface MediaApi extends RestApi {
   GET: {
     '/movies': GetCollectionEndpoint<Movie>

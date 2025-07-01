@@ -48,7 +48,7 @@ export class MoviePlayerService implements AsyncDisposable {
       void this.logger.verbose({ message: 'MediaSource ended' })
     })
 
-    this.chunkLength = 20
+    this.chunkLength = 10
 
     void this.loadChunkForProgress(this.currentProgress)
   }
@@ -162,7 +162,9 @@ export class MoviePlayerService implements AsyncDisposable {
 
       const sourceBuffer = await this.getActiveSourceBuffer()
       const start = new Date().getTime()
-      const audio = this.getAudioTracks()[this.audioTrackId.getValue()]
+      const audioTracks = this.getAudioTracks()
+
+      const audio = audioTracks.find((track) => track.id === this.audioTrackId.getValue()) || audioTracks[0]
 
       const video = this.getVideoTrack()
 
@@ -177,7 +179,7 @@ export class MoviePlayerService implements AsyncDisposable {
           from,
           to,
           audio: {
-            trackId: this.audioTrackId.getValue(),
+            trackId: audio.id,
             ...(audio?.needsTranscoding
               ? {
                   audioCodec: 'aac',

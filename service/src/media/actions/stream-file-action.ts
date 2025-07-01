@@ -37,7 +37,7 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
   const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile({ driveLetter: letter, path })
 
   const audioStreams = ffprobe.streams.filter((stream) => stream.codec_type === 'audio')
-  const audioStream = audioStreams[audio?.trackId || 0]
+  const audioStream = audioStreams.find((track) => track.index === audio?.trackId) || audioStreams[0]
   const videoStream = ffprobe.streams.find((stream) => stream.codec_type === 'video')
 
   await logger.information({
@@ -53,8 +53,9 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
     .addOutputOption('-avoid_negative_ts make_zero')
 
   if (audio) {
-    if (!isNaN(audio.trackId)) {
-      command.addOutputOption(`-map 0:a:${audio.trackId}`)
+    const audioStreamIndex = audioStreams.findIndex((stream) => stream === audioStream)
+    if (audioStreamIndex > -1) {
+      command.addOutputOption(`-map 0:a:${audioStreamIndex}`)
     }
     if (audio.audioCodec) {
       command.audioCodec('aac')

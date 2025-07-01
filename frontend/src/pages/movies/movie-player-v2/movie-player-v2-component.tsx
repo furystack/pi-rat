@@ -3,11 +3,11 @@ import { Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 import { type Movie, type PiRatFile, type WatchHistoryEntry } from 'common'
 import type { FfprobeData } from 'fluent-ffmpeg'
+import type { AudioTrack } from 'media-chrome/dist/media-store/state-mediator.js'
 import { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
 import { getSubtitleTracks } from './get-subtitle-tracks.js'
-import './hls-video-element.js'
 import './media-chrome.js'
 import { MoviePlayerService } from './movie-player-service.js'
 import { MovieTitle } from './title.js'
@@ -165,7 +165,16 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               </media-settings-menu-item>
               <media-settings-menu-item>
                 Audio
-                <media-audio-track-menu slot="submenu" hidden>
+                <media-audio-track-menu
+                  slot="submenu"
+                  hidden
+                  onchange={(ev) => {
+                    const newId = parseInt((ev.target as HTMLInputElement).value, 10)
+                    if (!isNaN(newId)) {
+                      mediaService.audioTrackId.setValue(newId)
+                    }
+                  }}
+                >
                   <div slot="title">Audio</div>
                 </media-audio-track-menu>
               </media-settings-menu-item>
@@ -174,6 +183,25 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               slot="media"
               crossOrigin="use-credentials"
               autoplay
+              onloadstart={(ev) => {
+                const audioTracks = mediaService.getAudioTracks()
+                const video = ev.currentTarget as HTMLVideoElement & { audioTracks: AudioTrack[] }
+                video.audioTracks = audioTracks.map((track, index) => {
+                  const id = track.stream.index.toFixed(0)
+                  const { language = 'unknown' } = track.stream.tags as { language?: string }
+                  const { title = language } = track.stream.tags as { title?: string }
+                  const label = language || title || `Audio Track ${index + 1}`
+                  return {
+                    id,
+                    label,
+                    language,
+                    enabled: false,
+                    kind: title,
+                  }
+                })
+                video.audioTracks[0].enabled = true
+                mediaService.audioTrackId.setValue(parseInt(video.audioTracks[0].id as string, 10))
+              }}
               ontimeupdate={(ev) => {
                 const { currentTime } = ev.currentTarget as HTMLVideoElement
                 mediaService.progress.setValue(currentTime || 0)
