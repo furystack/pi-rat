@@ -8,7 +8,10 @@ import { existsAsync } from './utils/exists-async.js'
 import { getPhysicalPath } from './utils/physical-path-utils.js'
 
 async function runFfprobe(filePath: string): Promise<FfprobeData> {
-  const stdout = await execAsync(`ffprobe -v error -print_format json -show_format -show_streams ${filePath}`, {})
+  const stdout = await execAsync(
+    `ffprobe -v error -print_format json -show_format -show_streams -show_chapters ${filePath}`,
+    {},
+  )
   return JSON.parse(stdout) as FfprobeData
 }
 
