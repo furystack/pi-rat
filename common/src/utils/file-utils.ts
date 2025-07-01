@@ -1,13 +1,14 @@
+import { PathHelper } from '@furystack/utils'
 import type { PiRatFile } from '../models/pirat-file.js'
 
 export const getFileName = (file: PiRatFile) => {
-  return file.path.split('/').pop() as string
+  return PathHelper.getSegments(file.path).pop() as string
 }
 
 export const getParentPath = (file: PiRatFile) => {
-  return file.path.split('/').slice(0, -1).join('/')
+  return PathHelper.getParentPath(file.path)
 }
 
 export const getFullPath = (parentPath: string, fileName: string) => {
-  return `${parentPath}/${fileName}`
+  return PathHelper.normalize(`${parentPath}/${fileName}`)
 }

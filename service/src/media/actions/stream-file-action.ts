@@ -3,14 +3,19 @@ import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
-import type { StreamEndpoint } from 'common'
+import type { StreamFileEndpoint } from 'common'
 import { Drive } from 'common'
 import ffmpeg from 'fluent-ffmpeg'
 import mime from 'mime'
 import { join } from 'path'
 import { FfprobeService } from '../../ffprobe-service.js'
 
-export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, getUrlParams, response, getQuery }) => {
+export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
+  injector,
+  getUrlParams,
+  response,
+  getQuery,
+}) => {
   const logger = getLogger(injector).withScope('StreamAction')
 
   const { letter, path } = getUrlParams()
@@ -32,7 +37,7 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
   const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile({ driveLetter: letter, path })
 
   const audioStreams = ffprobe.streams.filter((stream) => stream.codec_type === 'audio')
-  const audioStream = audioStreams[audio?.trackId || 0]
+  const audioStream = audioStreams.find((track) => track.index === audio?.trackId) || audioStreams[0]
   const videoStream = ffprobe.streams.find((stream) => stream.codec_type === 'video')
 
   await logger.information({
@@ -44,10 +49,13 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
     .format('mp4')
     .outputOptions(['-movflags empty_moov+frag_keyframe+faststart+default_base_moof'])
     .addOutputOption('-map 0:v:0')
+    .addOutputOption('-fflags +genpts')
+    .addOutputOption('-avoid_negative_ts make_zero')
 
   if (audio) {
-    if (!isNaN(audio.trackId)) {
-      command.addOutputOption(`-map 0:a:${audio.trackId}`)
+    const audioStreamIndex = audioStreams.findIndex((stream) => stream === audioStream)
+    if (audioStreamIndex > -1) {
+      command.addOutputOption(`-map 0:a:${audioStreamIndex}`)
     }
     if (audio.audioCodec) {
       command.audioCodec('aac')
@@ -94,12 +102,11 @@ export const StreamAction: RequestAction<StreamEndpoint> = async ({ injector, ge
       }
     }
   } else {
-    command.videoCodec('copy')
+    // command.videoCodec('copy')
   }
 
   if (from) {
     command.seekInput(from)
-    command.seek(from)
   }
 
   if (to) {

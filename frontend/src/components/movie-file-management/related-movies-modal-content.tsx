@@ -1,10 +1,10 @@
-import { Shade, createComponent } from '@furystack/shades'
-import { getFullPath, type DirectoryEntry } from 'common'
-import { MovieFilesService } from '../../services/movie-files-service.js'
 import { isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import { Shade, createComponent } from '@furystack/shades'
 import { Button, Skeleton } from '@furystack/shades-common-components'
-import { InstallService } from '../../services/install-service.js'
+import { getFullPath, type DirectoryEntry } from 'common'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
+import { InstallService } from '../../services/install-service.js'
+import { MovieFilesService } from '../../services/movie-files-service.js'
 import { MovieWidget } from '../dashboard/movie-widget.js'
 
 export const RelatedMoviesModalContent = Shade<{
@@ -22,7 +22,7 @@ export const RelatedMoviesModalContent = Shade<{
       linkedFilesService.findMovieFileAsObservable({
         filter: {
           driveLetter: { $eq: drive },
-          path: { $eq: path },
+          path: { $eq: getFullPath(path, file.name) },
         },
       }),
     )

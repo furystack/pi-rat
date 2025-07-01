@@ -3,23 +3,12 @@ import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
-import type { DirectoryEntry, GetDirectoryEntries } from 'common'
+import type { GetDirectoryEntries } from 'common'
 import { Drive } from 'common'
-import type { Dirent } from 'fs'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { existsAsync } from '../../utils/exists-async.js'
-
-const direntToApiModel = (dirent: Dirent): DirectoryEntry => ({
-  name: dirent.name,
-  isFile: dirent.isFile(),
-  isDirectory: dirent.isDirectory(),
-  isBlockDevice: dirent.isBlockDevice(),
-  isCharacterDevice: dirent.isCharacterDevice(),
-  isSymbolicLink: dirent.isSymbolicLink(),
-  isFIFO: dirent.isFIFO(),
-  isSocket: dirent.isSocket(),
-})
+import { direntToApiModel } from '../utils/dirent-to-api-model.js'
 
 export const GetDirectoryEntriesAction: RequestAction<GetDirectoryEntries> = async ({ injector, getUrlParams }) => {
   const { letter, path } = getUrlParams()

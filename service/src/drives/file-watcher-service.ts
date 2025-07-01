@@ -3,7 +3,7 @@ import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
-import { EventHub } from '@furystack/utils'
+import { EventHub, PathHelper } from '@furystack/utils'
 import type { FSWatcher } from 'chokidar'
 import { watch } from 'chokidar'
 import type { PiRatFile } from 'common'
@@ -41,7 +41,7 @@ export class FileWatcherService extends EventHub<{
     await this.logger.verbose({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
     const watcher = watch(drive.physicalPath, { ignoreInitial: true })
     watcher.on('all', (event, path) => {
-      const relativePath = path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/')
+      const relativePath = PathHelper.normalize(path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/'))
       void this.logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
       this.emit(event, { path: relativePath, driveLetter: drive.letter })
 

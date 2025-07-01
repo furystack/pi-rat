@@ -17,14 +17,18 @@ export const setupAi = async (injector: Injector) => {
 
   const configStore = storeManager.getStoreFor(Config, 'id')
 
-  configStore.subscribe('onEntityAdded', async () => {
-    await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
-    await clientService.init(injector)
+  configStore.subscribe('onEntityAdded', async ({ entity }) => {
+    if (entity.id === 'OLLAMA_CONFIG') {
+      await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
+      await clientService.init(injector)
+    }
   })
 
-  configStore.subscribe('onEntityUpdated', async () => {
-    await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
-    await clientService.init(injector)
+  configStore.subscribe('onEntityUpdated', async ({ id }) => {
+    if (id === 'OLLAMA_CONFIG') {
+      await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
+      await clientService.init(injector)
+    }
   })
 
   await setupAiStore(injector)

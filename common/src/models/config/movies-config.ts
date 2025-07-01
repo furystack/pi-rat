@@ -2,12 +2,25 @@ export interface MoviesConfig {
   id: 'MOVIES_CONFIG'
   value: {
     /**
-     * Search .nfo files for imdb id
+     * If true, the subtitles from the movie file will be extracted automatically on discovery
      */
-    enableNfoParsing: boolean
+    autoExtractSubtitles?: boolean
 
     /**
-     * 'all' or a list of directories to watch for new movies.
+     * If true, all movies on all drives will be synced on startup or config change.
+     */
+    fullSyncOnStartup?: boolean
+
+    /**
+     * A location where temporary files (e.g. transcoded files) will be stored.
+     */
+    tempFiles?: {
+      letter: string
+      path: string
+    }
+
+    /**
+     * 'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically.
      */
     watchFiles:
       | 'all'

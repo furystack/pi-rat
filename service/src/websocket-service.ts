@@ -20,10 +20,14 @@ export class WebsocketService {
     shouldAnnounce: (options: { injector: Injector }) => Promise<boolean> = async () => true,
   ) => {
     await this.webSocketApi.broadcast(async (options) => {
-      if (await shouldAnnounce(options)) {
-        // ws types are not resolved by eslint
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        options.ws.send(JSON.stringify(message))
+      try {
+        if (await shouldAnnounce(options)) {
+          // ws types are not resolved by eslint
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          options.ws.send(JSON.stringify(message))
+        }
+      } catch (error) {
+        // Ignore, maybe injector is already in a disposed state
       }
     })
   }

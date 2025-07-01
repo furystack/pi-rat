@@ -5,7 +5,6 @@ import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { SequelizeStore } from '@furystack/sequelize-store'
 import { EventHub } from '@furystack/utils'
-import { useWebsockets } from '@furystack/websocket-api'
 import { User } from 'common'
 import { setupAiRestApi } from './ai/setup-ai-rest-api.js'
 import { setupAi } from './ai/setup-ai.js'
@@ -17,7 +16,6 @@ import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api.j
 import { setupDashboards } from './dashboards/setup-dashboards.js'
 import { setupDrivesRestApi } from './drives/setup-drives-rest-api.js'
 import { setupDrives } from './drives/setup-drives.js'
-import { getPort } from './get-port.js'
 import { setupIdentityRestApi } from './identity/setup-identity-rest-api.js'
 import { setupIdentity } from './identity/setup-identity.js'
 import { setupInstallRestApi } from './install/setup-install-rest-api.js'
@@ -28,6 +26,7 @@ import { setupMoviesRestApi } from './media/setup-media-api.js'
 import { setupMovies } from './media/setup-media.js'
 import { setupPatcher } from './patcher/setup-patcher.js'
 import { setupFrontendBundle } from './setup-frontend-bundle.js'
+import { WebsocketService } from './websocket-service.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class PiRatRootService extends EventHub<{ initialized: undefined }> {
@@ -83,9 +82,9 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupAiRestApi(injector),
     ])
 
-    useWebsockets(injector, {
-      port: getPort(),
-      path: '/api/ws',
+    const wsService = injector.getInstance(WebsocketService)
+    await wsService.announce({
+      type: 'service-started',
     })
 
     await setupFrontendBundle(injector)

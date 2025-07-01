@@ -1,12 +1,12 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { ContextMenu } from '../../components/context-menu.js'
-import type { DirectoryEntry } from 'common'
-import { isMovieFile, getFallbackMetadata, isSampleFile, getFullPath } from 'common'
+import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import { FileInfoModal } from './file-info-modal.js'
+import type { DirectoryEntry } from 'common'
+import { getFallbackMetadata, getFullPath, isMovieFile, isSampleFile } from 'common'
+import { ContextMenu } from '../../components/context-menu.js'
 import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
-import { NotyService } from '@furystack/shades-common-components'
+import { FileInfoModal } from './file-info-modal.js'
 
 export const FileContextMenu = Shade<{
   entry: DirectoryEntry
@@ -22,6 +22,8 @@ export const FileContextMenu = Shade<{
 
     const path = `${currentDriveLetter}:${currentPath}/${entry.name}`
     const movieMetadata = props.entry.isFile && !isSampleFile(path) && isMovieFile(path) && getFallbackMetadata(path)
+
+    const allowScanForMovies = props.entry.isDirectory
 
     return (
       <>
@@ -73,6 +75,44 @@ export const FileContextMenu = Shade<{
                             type: 'error',
                             title: 'Subtitles extraction failed',
                             body: <>Subtitles extraction failed for file {entry.name}</>,
+                          })
+                        })
+                    },
+                  },
+                ]
+              : []),
+            ...(allowScanForMovies
+              ? [
+                  {
+                    icon: { type: 'font', value: '🎬' } as const,
+                    label: 'Scan for movies',
+                    onClick: () => {
+                      const notyService = injector.getInstance(NotyService)
+                      injector
+                        .getInstance(MediaApiClient)
+                        .call({
+                          method: 'POST',
+                          action: '/scan-for-movies',
+                          body: {
+                            root: {
+                              driveLetter: currentDriveLetter,
+                              path: getFullPath(currentPath, entry.name),
+                            },
+                            autoExtractSubtitles: true,
+                          },
+                        })
+                        .then(() => {
+                          notyService.emit('onNotyAdded', {
+                            type: 'success',
+                            title: 'Movies scanned',
+                            body: <>Movies scanned successfully for folder {entry.name}</>,
+                          })
+                        })
+                        .catch(() => {
+                          notyService.emit('onNotyAdded', {
+                            type: 'error',
+                            title: 'Movies scanning failed',
+                            body: <>Movies scanning failed for folder {entry.name}</>,
                           })
                         })
                     },
