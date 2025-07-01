@@ -377,66 +377,48 @@
       "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
-    "MovieFile": {
+    "FfprobeStreamDisposition": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "default": {
+          "type": "number"
         },
-        "imdbId": {
-          "type": "string"
+        "dub": {
+          "type": "number"
         },
-        "driveLetter": {
-          "type": "string"
+        "original": {
+          "type": "number"
         },
-        "path": {
-          "type": "string"
+        "comment": {
+          "type": "number"
         },
-        "ffprobe": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeData"
+        "lyrics": {
+          "type": "number"
         },
-        "relatedFiles": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": ["subtitle", "audio", "trailer", "info", "other"]
-              },
-              "path": {
-                "type": "string"
-              }
-            },
-            "required": ["type", "path"],
-            "additionalProperties": false
-          }
+        "karaoke": {
+          "type": "number"
+        },
+        "forced": {
+          "type": "number"
+        },
+        "hearing_impaired": {
+          "type": "number"
+        },
+        "visual_impaired": {
+          "type": "number"
+        },
+        "clean_effects": {
+          "type": "number"
+        },
+        "attached_pic": {
+          "type": "number"
+        },
+        "timed_thumbnails": {
+          "type": "number"
         }
-      },
-      "required": ["id", "driveLetter", "path", "ffprobe"],
-      "additionalProperties": false
+      }
     },
-    "Ffmpeg.FfprobeData": {
-      "type": "object",
-      "properties": {
-        "streams": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Ffmpeg.FfprobeStream"
-          }
-        },
-        "format": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeFormat"
-        },
-        "chapters": {
-          "type": "array",
-          "items": {}
-        }
-      },
-      "required": ["streams", "format", "chapters"],
-      "additionalProperties": false
-    },
-    "Ffmpeg.FfprobeStream": {
+    "FfprobeStream": {
       "type": "object",
       "properties": {
         "index": {
@@ -572,7 +554,7 @@
           "type": "number"
         },
         "disposition": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeStreamDisposition"
+          "$ref": "#/definitions/FfprobeStreamDisposition"
         },
         "rotation": {
           "type": ["string", "number"]
@@ -580,48 +562,7 @@
       },
       "required": ["index"]
     },
-    "Ffmpeg.FfprobeStreamDisposition": {
-      "type": "object",
-      "properties": {
-        "default": {
-          "type": "number"
-        },
-        "dub": {
-          "type": "number"
-        },
-        "original": {
-          "type": "number"
-        },
-        "comment": {
-          "type": "number"
-        },
-        "lyrics": {
-          "type": "number"
-        },
-        "karaoke": {
-          "type": "number"
-        },
-        "forced": {
-          "type": "number"
-        },
-        "hearing_impaired": {
-          "type": "number"
-        },
-        "visual_impaired": {
-          "type": "number"
-        },
-        "clean_effects": {
-          "type": "number"
-        },
-        "attached_pic": {
-          "type": "number"
-        },
-        "timed_thumbnails": {
-          "type": "number"
-        }
-      }
-    },
-    "Ffmpeg.FfprobeFormat": {
+    "FfprobeFormat": {
       "type": "object",
       "properties": {
         "filename": {
@@ -664,6 +605,102 @@
       "additionalProperties": {
         "type": ["string", "number"]
       }
+    },
+    "ChapterData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "start": {
+          "type": "number"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "end": {
+          "type": "number"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "time_base": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": ["title"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
+      "additionalProperties": false
+    },
+    "FfprobeData": {
+      "type": "object",
+      "properties": {
+        "streams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FfprobeStream"
+          }
+        },
+        "format": {
+          "$ref": "#/definitions/FfprobeFormat"
+        },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChapterData"
+          }
+        }
+      },
+      "required": ["streams", "format", "chapters"],
+      "additionalProperties": false
+    },
+    "MovieFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "driveLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "ffprobe": {
+          "$ref": "#/definitions/FfprobeData"
+        },
+        "relatedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": ["type", "path"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["id", "driveLetter", "path", "ffprobe"],
+      "additionalProperties": false
     }
   }
 }

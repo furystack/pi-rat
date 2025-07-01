@@ -284,33 +284,35 @@
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeData"
+          "$ref": "#/definitions/FfprobeData"
         }
       },
       "required": ["url", "result"],
       "additionalProperties": false
     },
-    "Ffmpeg.FfprobeData": {
+    "FfprobeData": {
       "type": "object",
       "properties": {
         "streams": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Ffmpeg.FfprobeStream"
+            "$ref": "#/definitions/FfprobeStream"
           }
         },
         "format": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeFormat"
+          "$ref": "#/definitions/FfprobeFormat"
         },
         "chapters": {
           "type": "array",
-          "items": {}
+          "items": {
+            "$ref": "#/definitions/ChapterData"
+          }
         }
       },
       "required": ["streams", "format", "chapters"],
       "additionalProperties": false
     },
-    "Ffmpeg.FfprobeStream": {
+    "FfprobeStream": {
       "type": "object",
       "properties": {
         "index": {
@@ -446,7 +448,7 @@
           "type": "number"
         },
         "disposition": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeStreamDisposition"
+          "$ref": "#/definitions/FfprobeStreamDisposition"
         },
         "rotation": {
           "type": ["string", "number"]
@@ -454,7 +456,7 @@
       },
       "required": ["index"]
     },
-    "Ffmpeg.FfprobeStreamDisposition": {
+    "FfprobeStreamDisposition": {
       "type": "object",
       "properties": {
         "default": {
@@ -495,7 +497,7 @@
         }
       }
     },
-    "Ffmpeg.FfprobeFormat": {
+    "FfprobeFormat": {
       "type": "object",
       "properties": {
         "filename": {
@@ -538,6 +540,41 @@
       "additionalProperties": {
         "type": ["string", "number"]
       }
+    },
+    "ChapterData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "start": {
+          "type": "number"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "end": {
+          "type": "number"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "time_base": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": ["title"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
+      "additionalProperties": false
     },
     "SaveTextFileEndpoint": {
       "type": "object",
