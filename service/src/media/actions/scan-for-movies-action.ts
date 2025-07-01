@@ -38,18 +38,25 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
 
   const added: Array<Awaited<ReturnType<typeof linkMovie>>> = []
   for (const file of toBeAdded) {
-    const addedMovieFile = await linkMovie({
-      injector,
-      file,
-    })
-
-    if (autoExtractSubtitles) {
-      await extractSubtitles({
+    try {
+      const addedMovieFile = await linkMovie({
         injector,
         file,
       })
+
+      if (autoExtractSubtitles) {
+        await extractSubtitles({
+          injector,
+          file,
+        })
+      }
+      added.push(addedMovieFile)
+    } catch (error) {
+      await logger.error({
+        message: `Error linking movie file ${file.path}`,
+        data: { file, error },
+      })
     }
-    added.push(addedMovieFile)
   }
 
   return JsonResult({

@@ -117,7 +117,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     episode,
   })
 
-  if (!result) {
+  if (!result || !result.imdbID) {
     throw new RequestError('Metadata not found', 404)
   }
 
