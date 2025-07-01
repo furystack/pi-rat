@@ -78,8 +78,28 @@ interface FfprobeFormat {
   probe_score?: number | undefined
   tags?: Record<string, string | number> | undefined
 }
+
+export type ChapterData = {
+  // e.g.: 4866327983123609000
+  id: number
+  // e.g.: 6000000000
+  start: number
+  // e.g.: 6.000000
+  start_time: string
+  // e.g.: 219000000000
+  end: number
+  // e.g.: 219.000000
+  end_time: string
+  // e.g.: 1/1000000000
+  time_base: string
+  tags: {
+    // e.g.: "Previously on"
+    title: string
+  }
+}
+
 export interface FfprobeData {
   streams: FfprobeStream[]
   format: FfprobeFormat
-  chapters: any[]
+  chapters: ChapterData[]
 }
