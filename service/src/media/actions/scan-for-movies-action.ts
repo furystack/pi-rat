@@ -24,21 +24,20 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
 
   const toBeAdded = (await maintainer.checkFolderForPossibleMovieFiles(root.path, drive, alreadyAddedMovieFiles)).flat()
 
-  const added = await Promise.all(
-    toBeAdded.map(async (file) => {
-      const addedMovieFile = await linkMovie({
+  const added: Array<Awaited<ReturnType<typeof linkMovie>>> = []
+  for (const file of toBeAdded) {
+    const addedMovieFile = await linkMovie({
+      injector,
+      file,
+    })
+    if (autoExtractSubtitles) {
+      await extractSubtitles({
         injector,
         file,
       })
-      if (autoExtractSubtitles) {
-        await extractSubtitles({
-          injector,
-          file,
-        })
-      }
-      return addedMovieFile
-    }),
-  )
+    }
+    added.push(addedMovieFile)
+  }
 
   return JsonResult({
     status: true,
