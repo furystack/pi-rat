@@ -1,14 +1,13 @@
 import { getLogger } from '@furystack/logging'
-import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
 import { spawn } from 'child_process'
 import type { StreamFileEndpoint } from 'common'
-import { Drive } from 'common'
 import mime from 'mime'
 import { join } from 'path'
 import { FfprobeService } from '../../ffprobe-service.js'
+import { StreamFileActionCaches } from '../services/stream-file-action-caches.js'
 
 export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
   injector,
@@ -21,7 +20,10 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
   const { letter, path } = getUrlParams()
   const { from, to, audio, video } = getQuery()
 
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
+  const caches = injector.getInstance(StreamFileActionCaches)
+
+  const drive = await caches.driveCache.get(letter)
+
   if (!drive) {
     throw new RequestError(`Drive ${letter} not found`, 404)
   }
