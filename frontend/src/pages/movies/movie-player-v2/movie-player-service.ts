@@ -1,6 +1,6 @@
 import type { ScopedLogger } from '@furystack/logging'
 import { ObservableValue } from '@furystack/utils'
-import type { FfprobeData, PiRatFile } from 'common'
+import type { FfprobeData, PiRatFile, StreamQueryParams } from 'common'
 import { Lock } from 'semaphore-async-await'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 
@@ -56,6 +56,9 @@ export class MoviePlayerService implements AsyncDisposable {
   public readonly url: string
   private loadLock = new Lock()
   public audioTrackId = new ObservableValue(0)
+
+  public resolution = new ObservableValue<Required<StreamQueryParams>['video']['resolution'] | null>(null)
+
   public async [Symbol.asyncDispose]() {
     this.progress[Symbol.dispose]()
     this.bufferZoneChangeSubscription[Symbol.dispose]()
@@ -63,6 +66,7 @@ export class MoviePlayerService implements AsyncDisposable {
     this.gapsInBuffersChangeSubscription[Symbol.dispose]()
     this.gapsInBuffers[Symbol.dispose]()
     this.lastLoadTime[Symbol.dispose]()
+    this.resolution[Symbol.dispose]()
     this.MediaSource.endOfStream()
     ;[...this.MediaSource.sourceBuffers].forEach((sb) => {
       try {

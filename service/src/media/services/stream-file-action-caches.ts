@@ -1,8 +1,9 @@
 import { Cache } from '@furystack/cache'
 import { getStoreManager } from '@furystack/core'
 import { Injectable, type Injector } from '@furystack/inject'
-import { Drive, type PiRatFile, type StreamQueryParams } from 'common'
+import { Config, Drive, type PiRatFile, type StreamQueryParams } from 'common'
 import { join } from 'path'
+import type { MoviesConfig } from '../../../../common/src/models/config/movies-config.js'
 import { FfprobeService } from '../../ffprobe-service.js'
 
 @Injectable({
@@ -19,6 +20,28 @@ export class StreamFileActionCaches {
     },
   })
 
+  public moviesConfigCache = new Cache({
+    load: async () => {
+      const moviesStore = getStoreManager(this.injector).getStoreFor(Config, 'id')
+      const moviesConfig = await moviesStore.get('MOVIES_CONFIG')
+
+      if (!moviesConfig) {
+        return {
+          id: 'MOVIES_CONFIG',
+          value: {
+            autoExtractSubtitles: false,
+            fullSyncOnStartup: false,
+            preset: 'ultrafast',
+            id: 'MOVIES_CONFIG',
+            watchFiles: 'all',
+          },
+        } as MoviesConfig
+      }
+
+      return moviesConfig as MoviesConfig
+    },
+  })
+
   public ffMpegArgsCache = new Cache({
     capacity: 100,
     load: async ({
@@ -32,8 +55,9 @@ export class StreamFileActionCaches {
     }) => {
       const { audio, video, from, to } = queryParams
 
-      const [drive, ffprobe] = await Promise.all([
+      const [drive, config, ffprobe] = await Promise.all([
         this.driveCache.get(file.driveLetter),
+        this.moviesConfigCache.get(),
         injector.getInstance(FfprobeService).getFfprobeForPiratFile(file),
       ])
 
@@ -84,8 +108,8 @@ export class StreamFileActionCaches {
         ffmpegArgs.push('-c:v', video.codec)
       } else {
         ffmpegArgs.push('-c:v', 'libx264')
-        ffmpegArgs.push('-preset', 'ultrafast') // Use a fast preset for lower latency
       }
+      ffmpegArgs.push('-preset', config.value.preset || 'ultrafast')
       if (video?.resolution) {
         switch (video.resolution) {
           case '4k':
@@ -107,6 +131,7 @@ export class StreamFileActionCaches {
             break
         }
       }
+
       ffmpegArgs.push('pipe:1') // Output to stdout
 
       return ffmpegArgs
