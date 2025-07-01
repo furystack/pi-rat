@@ -36,7 +36,7 @@ jobs:
       - run: yarn test:e2e:install
         name: 'Test Installer'
 
-      - run: yarn test:e2e
+      - run: yarn test:e2e --workers 1
         name: 'E2E tests'
         env:
           E2E_TEMP: /home/node/app/tmp
