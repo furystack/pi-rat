@@ -125,7 +125,8 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
       this.emit('onFilesystemChanged', messageData as FileChangeMessage)
 
       this.fileListCache.obsoleteRange((fileList) => {
-        const parentPath = PathHelper.getParentPath(messageData.path)
+        const rootPath = PathHelper.getParentPath(messageData.path)
+        const parentPath = rootPath === messageData.path ? '' : rootPath
         const currentPath = PathHelper.normalize(fileList.path)
         return (
           fileList.letter === messageData.drive &&

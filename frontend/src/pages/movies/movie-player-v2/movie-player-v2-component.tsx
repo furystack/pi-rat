@@ -6,9 +6,13 @@ import type { FfprobeData } from 'fluent-ffmpeg'
 import { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
-import { getSubtitleTracks } from './getSubtitleTracks.js'
+import { getSubtitleTracks } from './get-subtitle-tracks.js'
+import './hls-video-element.js'
+import './media-chrome.js'
 import { MoviePlayerService } from './movie-player-service.js'
 import { MovieTitle } from './title.js'
+
+const ENABLE_MEDIA_CHROME = true
 
 interface MoviePlayerProps {
   file: PiRatFile
@@ -119,6 +123,97 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       }
     })
 
+    if (ENABLE_MEDIA_CHROME) {
+      return (
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+          }}
+        >
+          <media-controller
+            style={{
+              // position: 'fixed',
+              // top: '0',
+              // left: '0',
+              display: 'flex',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          >
+            <media-settings-menu anchor="auto" hidden>
+              <media-settings-menu-item>
+                Speed
+                <media-playback-rate-menu slot="submenu" hidden>
+                  <div slot="title">Speed</div>
+                </media-playback-rate-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item>
+                Quality
+                <media-rendition-menu slot="submenu" hidden>
+                  <div slot="title">Quality</div>
+                </media-rendition-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item>
+                Captions
+                <media-captions-menu slot="submenu" hidden>
+                  <div slot="title">Captions</div>
+                </media-captions-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item>
+                Audio
+                <media-audio-track-menu slot="submenu" hidden>
+                  <div slot="title">Audio</div>
+                </media-audio-track-menu>
+              </media-settings-menu-item>
+            </media-settings-menu>
+            <video
+              slot="media"
+              crossOrigin="use-credentials"
+              autoplay
+              ontimeupdate={(ev) => {
+                const { currentTime } = ev.currentTarget as HTMLVideoElement
+                mediaService.progress.setValue(currentTime || 0)
+              }}
+              onseeked={(ev) => {
+                const { currentTime } = ev.currentTarget as HTMLVideoElement
+                void mediaService.onProgressChange(currentTime)
+              }}
+              currentTime={watchProgress?.watchedSeconds || 0}
+              src={mediaService.url}
+            >
+              {...getSubtitleTracks(props.file, props.ffprobe)}
+            </video>
+
+            <media-loading-indicator slot="centered-chrome"></media-loading-indicator>
+            <media-error-dialog slot="dialog"></media-error-dialog>
+            <media-poster-image slot="poster" src={props.movie?.thumbnailImageUrl} />
+
+            <media-control-bar
+              style={{
+                width: '100%',
+              }}
+            >
+              <media-play-button />
+
+              <media-time-display />
+              <media-time-range />
+              <media-duration-display />
+              <media-volume-range />
+              <media-mute-button />
+              <media-fullscreen-button />
+              <media-pip-button />
+              <media-captions-button />
+              <media-settings-menu-button></media-settings-menu-button>
+            </media-control-bar>
+          </media-controller>
+        </div>
+      )
+    }
+
     return (
       <div
         style={{
@@ -147,7 +242,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
           }}
           onseeked={(ev) => {
             const { currentTime } = ev.currentTarget as HTMLVideoElement
-            void mediaService.loadChunkForProgress(currentTime)
+            void mediaService.onProgressChange(currentTime)
           }}
           currentTime={watchProgress?.watchedSeconds || 0}
           src={mediaService.url}

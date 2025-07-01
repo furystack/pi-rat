@@ -1415,6 +1415,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vercel/edge@npm:^1.2.1":
+  version: 1.2.2
+  resolution: "@vercel/edge@npm:1.2.2"
+  checksum: 10c0/524115e7baef7867fc14669e5f57e4f4180eecabe32328c4d418754bfe82a21b9519fbc65dcafaf1b6d526651506e9d4955a2dfc319337a35868635e8cec5ec3
+  languageName: node
+  linkType: hard
+
 "@videojs/http-streaming@npm:^3.17.0":
   version: 3.17.0
   resolution: "@videojs/http-streaming@npm:3.17.0"
@@ -2064,6 +2071,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ce-la-react@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "ce-la-react@npm:0.3.0"
+  peerDependencies:
+    react: ">=17.0.0"
+  checksum: 10c0/29378f5a5bbdf8a8ded546edd3894ad487258d6163b6a91e69d17436cdbb483f95837d27208c5e6a3ce4930a3ae8065fa724d5ae80ae70b5aadee8ed8be88666
+  languageName: node
+  linkType: hard
+
 "chai@npm:^5.2.0":
   version: 5.2.0
   resolution: "chai@npm:5.2.0"
@@ -2246,6 +2262,13 @@ __metadata:
     shebang-command: "npm:^2.0.0"
     which: "npm:^2.0.1"
   checksum: 10c0/053ea8b2135caff68a9e81470e845613e374e7309a47731e81639de3eaeb90c3d01af0e0b44d2ab9d50b43467223b88567dfeb3262db942dc063b9976718ffc1
+  languageName: node
+  linkType: hard
+
+"custom-media-element@npm:^1.4.5":
+  version: 1.4.5
+  resolution: "custom-media-element@npm:1.4.5"
+  checksum: 10c0/450885d514f6aa319fb3d20938eb47b835a7419a7421b1c91fb36e73f3432e3b21c365db1d10aac185f9b3cf3c8f3b8e3bcfa0e02be8d503e324ee73649f6890
   languageName: node
   linkType: hard
 
@@ -3190,7 +3213,9 @@ __metadata:
     "@types/marked": "npm:^6.0.0"
     "@types/node": "npm:^24.0.3"
     common: "workspace:^"
+    hls-video-element: "npm:^1.5.5"
     marked: "npm:^15.0.12"
+    media-chrome: "npm:^4.11.1"
     monaco-editor: "npm:^0.52.2"
     ollama: "npm:^0.5.16"
     path-to-regexp: "npm:^8.2.0"
@@ -3550,6 +3575,24 @@ __metadata:
   dependencies:
     function-bind: "npm:^1.1.2"
   checksum: 10c0/3769d434703b8ac66b209a4cca0737519925bbdb61dd887f93a16372b14694c63ff4e797686d87c90f08168e81082248b9b028bad60d4da9e0d1148766f56eb9
+  languageName: node
+  linkType: hard
+
+"hls-video-element@npm:^1.5.5":
+  version: 1.5.5
+  resolution: "hls-video-element@npm:1.5.5"
+  dependencies:
+    custom-media-element: "npm:^1.4.5"
+    hls.js: "npm:^1.6.5"
+    media-tracks: "npm:^0.3.3"
+  checksum: 10c0/d55d18ff37c7a4390f667f440a25923a48260d8d18a8a5c84e2d8345e085b24f27766a8937129d59506a16c45ca4c0915bba0e74289e543c62256a93c8580be5
+  languageName: node
+  linkType: hard
+
+"hls.js@npm:^1.6.5":
+  version: 1.6.5
+  resolution: "hls.js@npm:1.6.5"
+  checksum: 10c0/b156c31c1050b5be0d135b81c149d06656667d4d6f5de666a4ee41f7ee99e779c7cbd43e8a90ff5d0c7ab1c74e0d06cba52cfc10b8c2ccc2b49cbce67b0072ad
   languageName: node
   linkType: hard
 
@@ -4439,6 +4482,23 @@ __metadata:
   version: 1.1.0
   resolution: "math-intrinsics@npm:1.1.0"
   checksum: 10c0/7579ff94e899e2f76ab64491d76cf606274c874d8f2af4a442c016bd85688927fcfca157ba6bf74b08e9439dc010b248ce05b96cc7c126a354c3bae7fcb48b7f
+  languageName: node
+  linkType: hard
+
+"media-chrome@npm:^4.11.1":
+  version: 4.11.1
+  resolution: "media-chrome@npm:4.11.1"
+  dependencies:
+    "@vercel/edge": "npm:^1.2.1"
+    ce-la-react: "npm:^0.3.0"
+  checksum: 10c0/e81574370ac05b5bdda094a3595e17675f78375ae260766d2952da36461c52c4567fc12db0074d7d87d907a6caca2d0bca4d70e7940ba48e561ed54e2d843543
+  languageName: node
+  linkType: hard
+
+"media-tracks@npm:^0.3.3":
+  version: 0.3.3
+  resolution: "media-tracks@npm:0.3.3"
+  checksum: 10c0/ecd57e628222b6e0611f21813a291a47b30c96aa1c9d7e13546932b59e8bb206651961a36360cc5584bf76bf890ce01be3bb0c045facf76ab8b1cfacecf9808b
   languageName: node
   linkType: hard
 

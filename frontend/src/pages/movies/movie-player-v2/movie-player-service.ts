@@ -48,7 +48,7 @@ export class MoviePlayerService implements AsyncDisposable {
       void this.logger.verbose({ message: 'MediaSource ended' })
     })
 
-    this.chunkLength = 2
+    this.chunkLength = 20
 
     void this.loadChunkForProgress(this.currentProgress)
   }
@@ -95,15 +95,30 @@ export class MoviePlayerService implements AsyncDisposable {
     void this.logger.verbose({ message: 'Gaps in buffers changed', data: { next } })
   })
 
-  private getActiveSourceBuffer = () => {
+  private getActiveSourceBuffer = async () => {
     const existing = this.MediaSource.activeSourceBuffers[0]
     if (existing) {
       return existing
     }
+
+    if (this.MediaSource.readyState !== 'open') {
+      void this.logger.verbose({
+        message: `MediaSource is not open but ${this.MediaSource.readyState}, awaiting opening state`,
+      })
+      await new Promise<void>((resolve) => {
+        this.MediaSource.addEventListener(
+          'sourceopen',
+          () => {
+            resolve()
+          },
+          { once: true },
+        )
+      })
+    }
+
     void this.logger.verbose({ message: 'Creating new source buffer' })
     const newSourceBuffer = this.MediaSource.addSourceBuffer(this.getMimeType())
     newSourceBuffer.mode = 'segments'
-    newSourceBuffer.timestampOffset = this.progress.getValue()
     return newSourceBuffer
   }
 
@@ -139,11 +154,13 @@ export class MoviePlayerService implements AsyncDisposable {
   }
 
   public async loadChunkForProgress(progress: number) {
-    const from = this.getSegmentStartForProgress(progress)
-    const to = from + this.chunkLength
-    await this.logger.verbose({ message: `Loading chunk from ${from} to ${to}` })
     try {
       await this.loadLock.acquire()
+      const from = this.getSegmentStartForProgress(progress)
+      const to = from + this.chunkLength
+      void this.logger.verbose({ message: `Loading chunk from ${from} to ${to}` })
+
+      const sourceBuffer = await this.getActiveSourceBuffer()
       const start = new Date().getTime()
       const audio = this.getAudioTracks()[this.audioTrackId.getValue()]
 
@@ -186,19 +203,31 @@ export class MoviePlayerService implements AsyncDisposable {
       }
 
       const arrayBuffer = await response.arrayBuffer()
-      const sourceBuffer = this.getActiveSourceBuffer()
+
+      if (sourceBuffer.updating) {
+        void this.logger.verbose({ message: 'SourceBuffer is updating, waiting for it to finish' })
+        await new Promise<void>((resolve) => {
+          sourceBuffer.addEventListener(
+            'updateend',
+            () => {
+              resolve()
+            },
+            { once: true },
+          )
+        })
+      }
 
       sourceBuffer.timestampOffset = from
       sourceBuffer.appendBuffer(arrayBuffer)
 
       const end = new Date().getTime()
       this.lastLoadTime.setValue((end - start) / 1000)
+      void this.logger.verbose({ message: `Loading ${from}-${to} loading finished` })
     } catch (error) {
-      await this.logger.error({ message: 'Chunk loading error', data: { error } })
+      void this.logger.error({ message: 'Chunk loading error', data: { error } })
     } finally {
       this.loadLock.release()
     }
-    await this.logger.verbose({ message: `Loading ${from}-${to} loading finished` })
   }
 
   public progress: ObservableValue<number>
@@ -207,12 +236,12 @@ export class MoviePlayerService implements AsyncDisposable {
     return Math.floor(progress / this.chunkLength) * this.chunkLength
   }
 
-  private onProgressChange = (progress: number) => {
+  public onProgressChange = async (progress: number) => {
     this.updateBufferZones()
-    const sb = this.getActiveSourceBuffer()
+    const sb = await this.getActiveSourceBuffer()
     if (!sb.buffered.length) {
       void this.logger.information({ message: 'No buffered data, loading a chunk...', data: { progress } })
-      void this.loadChunkForProgress(progress)
+      await this.loadChunkForProgress(progress)
       return
     }
 
@@ -222,7 +251,7 @@ export class MoviePlayerService implements AsyncDisposable {
         void this.logger.information({
           message: 'Progress inside a buffer gap',
         })
-        void this.loadChunkForProgress(progress)
+        await this.loadChunkForProgress(progress)
       }
     }
 
@@ -236,7 +265,7 @@ export class MoviePlayerService implements AsyncDisposable {
         void this.logger.information({
           message: 'Gap approaching, write queue clear, loading a chunk...',
         })
-        void this.loadChunkForProgress(isGapApproaching[0])
+        await this.loadChunkForProgress(isGapApproaching[0])
       }
     }
   }

@@ -38,65 +38,94 @@ export type SaveWatchProgress = {
   result: WatchHistoryEntry
 }
 
-export type StreamEndpoint = {
+export type ScanForMoviesEndpoint = {
+  body: {
+    root: PiRatFile
+    autoExtractSubtitles?: boolean
+  }
+  result: {
+    added: MovieFile[]
+  }
+}
+
+export type StreamQueryParams = {
+  /**
+   * Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc...
+   */
+  audio?: {
+    /**
+     * Selects the audio track to stream. If not provided, the first audio track will be played
+     */
+    trackId: number
+    /**
+     * Select the codec for audio encoding. If not provided, the original encoding will be used
+     */
+    audioCodec?: 'aac'
+
+    /**
+     * Mix down multi-channel audio to stereo
+     */
+    mixdown?: boolean
+
+    /**
+     * The bitrate for the audio stream. If not provided, the original bitrate will be used
+     */
+    bitrate?: number
+  }
+
+  /**
+   * Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc...
+   */
+  video?: {
+    /**
+     * The codec for video encoding. If not provided, the original encoding will be used
+     */
+    codec?: 'libx264'
+
+    /**
+     * The output resolution for the video stream. If not provided, the original resolution will be used
+     */
+    resolution?: '4k' | '1080p' | '720p' | '480p' | '360p'
+
+    /**
+     * Preset options
+     */
+    quality?: 'high' | 'medium' | 'low'
+  }
+
+  /**
+   * The start time in seconds
+   */
+  from: number
+
+  /**
+   * The end time in seconds
+   */
+  to: number
+}
+
+export type StreamFileEndpoint = {
   url: {
     letter: string
     path: string
   }
-  query: {
-    /**
-     * Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc...
-     */
-    audio?: {
-      /**
-       * Selects the audio track to stream. If not provided, the first audio track will be played
-       */
-      trackId: number
-      /**
-       * Select the codec for audio encoding. If not provided, the original encoding will be used
-       */
-      audioCodec?: 'aac'
+  query: StreamQueryParams
+  result: unknown
+}
 
-      /**
-       * Mix down multi-channel audio to stereo
-       */
-      mixdown?: boolean
+export type GetM3U8Endpoint = {
+  result: unknown
+  url: {
+    letter: string
+    path: string
+  }
+}
 
-      /**
-       * The bitrate for the audio stream. If not provided, the original bitrate will be used
-       */
-      bitrate?: number
-    }
-
-    /**
-     * Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc...
-     */
-    video?: {
-      /**
-       * The codec for video encoding. If not provided, the original encoding will be used
-       */
-      codec?: 'libx264'
-
-      /**
-       * The output resolution for the video stream. If not provided, the original resolution will be used
-       */
-      resolution?: '4k' | '1080p' | '720p' | '480p' | '360p'
-
-      /**
-       * Preset options
-       */
-      quality?: 'high' | 'medium' | 'low'
-    }
-
-    /**
-     * The start time in seconds
-     */
-    from: number
-
-    /**
-     * The end time in seconds
-     */
-    to: number
+export type GetM3U8SegmentEndpoint = {
+  url: {
+    letter: string
+    path: string
+    segmentFile: string
   }
   result: unknown
 }
@@ -119,8 +148,8 @@ export interface MediaApi extends RestApi {
     '/omdb-series-metadata': GetCollectionEndpoint<OmdbSeriesMetadata>
     '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
     '/movie-files': GetCollectionEndpoint<MovieFile>
-    '/files/:letter/:path/stream': StreamEndpoint
     '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
+    '/files/:letter/:path/stream': StreamFileEndpoint
   }
   POST: {
     '/movies': PostEndpoint<Movie, 'imdbId', Omit<Movie, 'createdAt' | 'updatedAt'>>
@@ -128,6 +157,7 @@ export interface MediaApi extends RestApi {
     '/link-movie': LinkMovie
     '/extract-subtitles': ExtractSubtitles
     '/save-watch-progress': SaveWatchProgress
+    '/scan-for-movies': ScanForMoviesEndpoint
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>

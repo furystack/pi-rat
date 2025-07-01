@@ -1,5 +1,4 @@
-import { getStoreManager } from '@furystack/core'
-import type { Injector } from '@furystack/inject'
+import { getStoreManager, type PhysicalStore } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
@@ -13,9 +12,12 @@ export class OmdbClientService {
   @Injected((injector) => getLogger(injector).withScope('OMDB Client Service'))
   declare private logger: ScopedLogger
 
-  public async init(injector: Injector) {
+  @Injected((injector) => getStoreManager(injector).getStoreFor(Config, 'id'))
+  declare private configStore: PhysicalStore<Config, 'id'>
+
+  public async init() {
     await this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
-    const config = await getStoreManager(injector).getStoreFor(Config, 'id').get('OMDB_CONFIG')
+    const config = await this.configStore.get('OMDB_CONFIG')
     if (!config) {
       this.config = undefined
       await this.logger.information({
@@ -27,6 +29,36 @@ export class OmdbClientService {
       })
     }
     this.config = config as OmdbConfig
+
+    this.configStore.subscribe('onEntityAdded', ({ entity }) => {
+      if (entity.id === 'OMDB_CONFIG') {
+        this.config = entity as OmdbConfig
+      }
+      void this.logger.information({
+        message: `🎬   OMDB Service config added`,
+      })
+    })
+    this.configStore.subscribe('onEntityUpdated', ({ change }) => {
+      if (change.id === 'OMDB_CONFIG') {
+        this.config = {
+          ...this.config,
+          ...change,
+        } as OmdbConfig
+        void this.logger.information({
+          message: `🎬   OMDB Service config updated`,
+          data: change,
+        })
+      }
+    })
+
+    this.configStore.subscribe('onEntityRemoved', ({ key }) => {
+      if (key === 'OMDB_CONFIG') {
+        this.config = undefined
+        void this.logger.information({
+          message: '🚫   OMDB Service config removed, service will not be able to fetch metadata',
+        })
+      }
+    })
   }
 
   public async fetchOmdbMovieMetadata({

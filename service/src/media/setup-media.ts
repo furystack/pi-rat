@@ -1,9 +1,9 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 
-import { Config, Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
+import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 
-import { getCurrentUser, getStoreManager, isAuthorized } from '@furystack/core'
+import { getCurrentUser, isAuthorized } from '@furystack/core'
 import type { AuthorizationResult } from '@furystack/repository'
 import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
@@ -13,8 +13,8 @@ import { authorizedOnly } from '../authorization/authorized-only.js'
 import { withRole } from '../authorization/with-role.js'
 import type { FfprobeResult } from '../ffprobe-service.js'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
-import { useMovieFileMaintainer } from './actions/movie-file-maintainer.js'
 import { OmdbClientService } from './metadata-services/omdb-client-service.js'
+import { useMovieFileMaintainer } from './services/movie-file-maintainer.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
   declare title: string
@@ -667,26 +667,7 @@ export const setupMovies = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  const omdbClientService = injector.getInstance(OmdbClientService)
-
-  const configStore = getStoreManager(injector).getStoreFor(Config, 'id')
-
-  configStore.subscribe('onEntityAdded', ({ entity }) => {
-    if (entity.id === 'OMDB_CONFIG') {
-      void omdbClientService.init(injector)
-    }
-  })
-  configStore.subscribe('onEntityUpdated', ({ change }) => {
-    if (change.id === 'OMDB_CONFIG') {
-      void omdbClientService.init(injector)
-    }
-  })
-
-  configStore.subscribe('onEntityRemoved', ({ key }) => {
-    if (key === 'OMDB_CONFIG') {
-      void omdbClientService.init(injector)
-    }
-  })
+  injector.getInstance(OmdbClientService)
 
   useMovieFileMaintainer(injector)
 
