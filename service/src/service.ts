@@ -82,7 +82,10 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       await setupAiRestApi(injector),
     ])
 
-    injector.getInstance(WebsocketService)
+    const wsService = injector.getInstance(WebsocketService)
+    await wsService.announce({
+      type: 'service-started',
+    })
 
     await setupFrontendBundle(injector)
 
