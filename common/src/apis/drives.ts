@@ -7,9 +7,9 @@ import type {
   PatchEndpoint,
   RestApi,
 } from '@furystack/rest'
-import type { FfprobeData } from 'fluent-ffmpeg'
 import type { DirectoryEntry } from '../models/drives/directory-entry.js'
 import type { Drive } from '../models/drives/drive.js'
+import type { FfprobeData } from '../models/index.js'
 
 export type GetDirectoryEntries = {
   url: {

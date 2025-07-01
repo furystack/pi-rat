@@ -1,7 +1,6 @@
 import { createComponent } from '@furystack/shades'
-import type { PiRatFile } from 'common'
+import type { FfprobeData, PiRatFile } from 'common'
 import { getFileName, getParentPath } from 'common'
-import type { FfprobeData } from 'fluent-ffmpeg'
 
 import { environmentOptions } from '../../../environment-options.js'
 

@@ -98,7 +98,7 @@ export const FileContextMenu = Shade<{
                               driveLetter: currentDriveLetter,
                               path: getFullPath(currentPath, entry.name),
                             },
-                            autoExtractSubtitles: true,
+                            autoExtractSubtitles: false,
                           },
                         })
                         .then(() => {

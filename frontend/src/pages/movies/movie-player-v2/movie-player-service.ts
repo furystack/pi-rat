@@ -1,7 +1,6 @@
 import type { ScopedLogger } from '@furystack/logging'
 import { ObservableValue } from '@furystack/utils'
-import type { PiRatFile } from 'common'
-import type { FfprobeData } from 'fluent-ffmpeg'
+import type { FfprobeData, PiRatFile, StreamQueryParams } from 'common'
 import { Lock } from 'semaphore-async-await'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 
@@ -57,6 +56,9 @@ export class MoviePlayerService implements AsyncDisposable {
   public readonly url: string
   private loadLock = new Lock()
   public audioTrackId = new ObservableValue(0)
+
+  public resolution = new ObservableValue<Required<StreamQueryParams>['video']['resolution'] | undefined>(undefined)
+
   public async [Symbol.asyncDispose]() {
     this.progress[Symbol.dispose]()
     this.bufferZoneChangeSubscription[Symbol.dispose]()
@@ -64,6 +66,7 @@ export class MoviePlayerService implements AsyncDisposable {
     this.gapsInBuffersChangeSubscription[Symbol.dispose]()
     this.gapsInBuffers[Symbol.dispose]()
     this.lastLoadTime[Symbol.dispose]()
+    this.resolution[Symbol.dispose]()
     this.MediaSource.endOfStream()
     ;[...this.MediaSource.sourceBuffers].forEach((sb) => {
       try {
@@ -163,7 +166,6 @@ export class MoviePlayerService implements AsyncDisposable {
       const sourceBuffer = await this.getActiveSourceBuffer()
       const start = new Date().getTime()
       const audioTracks = this.getAudioTracks()
-
       const audio = audioTracks.find((track) => track.id === this.audioTrackId.getValue()) || audioTracks[0]
 
       const video = this.getVideoTrack()
@@ -192,9 +194,14 @@ export class MoviePlayerService implements AsyncDisposable {
             ? {
                 video: {
                   codec: 'libx264',
+                  ...(this.resolution.getValue() ? { resolution: this.resolution.getValue() } : {}),
                 },
               }
-            : {}),
+            : {
+                video: {
+                  ...(this.resolution.getValue() ? { resolution: this.resolution.getValue() } : {}),
+                },
+              }),
         },
         responseParser: async (r) => {
           return { response: r, result: null as any }
@@ -274,7 +281,13 @@ export class MoviePlayerService implements AsyncDisposable {
 
   private readonly chunkLength: number
 
-  public getAudioTracks() {
+  public getAudioTracks(): Array<{
+    stream: FfprobeData['streams'][number]
+    id: number
+    codecName: string | undefined
+    codecMime: string
+    needsTranscoding: boolean
+  }> {
     return this.ffprobe.streams
       .filter((s) => s.codec_type === 'audio')
       .map((stream) => ({
@@ -302,7 +315,8 @@ export class MoviePlayerService implements AsyncDisposable {
   }
 
   private getMimeType() {
-    const audio = this.getAudioTracks()[this.audioTrackId.getValue()]
+    const audioTracks = this.getAudioTracks()
+    const audio = audioTracks.find((track) => track.id === this.audioTrackId.getValue()) || audioTracks[0]
     const video = this.getVideoTrack()
     const videoCodecMime = video.needsTranscoding ? videoCodecs.h264 : video.codecMime
     const audioCodecMime = audio.needsTranscoding ? audioCodecs.aac : audio.codecMime

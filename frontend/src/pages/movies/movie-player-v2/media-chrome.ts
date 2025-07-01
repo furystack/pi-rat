@@ -28,6 +28,8 @@ import type {
   MediaPreviewChapterDisplay,
   MediaPreviewThumbnail,
   MediaPreviewTimeDisplay,
+  MediaRenditionMenu,
+  MediaRenditionMenuButton,
   MediaSeekBackwardButton,
   MediaSeekForwardButton,
   MediaSettingsMenu,
@@ -82,7 +84,8 @@ declare global {
       'media-settings-menu': PartialElement<MediaSettingsMenu>
       'media-settings-menu-button': PartialElement<MediaSettingsMenuButton>
       'media-settings-menu-item': PartialElement<MediaSettingsMenuItem>
-      'media-rendition-menu': PartialElement<MediaSettingsMenuItem>
+      'media-rendition-menu': PartialElement<MediaRenditionMenu>
+      'media-rendition-menu-button': PartialElement<MediaRenditionMenuButton>
       'media-audio-track-menu': PartialElement<MediaSettingsMenuItem>
       'media-playback-rate-menu': PartialElement<MediaSettingsMenuItem>
     }

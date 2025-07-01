@@ -1,5 +1,6 @@
 import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
+import { getLogger } from '@furystack/logging'
 import { RequestError } from '@furystack/rest'
 import {
   getFallbackMetadata,
@@ -18,15 +19,25 @@ import { ensureOmdbMovieExists } from './ensure-omdb-movie-exists.js'
 import { ensureOmdbSeriesExists } from './ensure-omdb-series-exists.js'
 
 export const linkMovie = async (options: { injector: Injector; file: PiRatFile }) => {
-  const { injector } = options
-  const { driveLetter, path } = options.file
-  const fileName = getFileName(options.file)
+  const logger = getLogger(options.injector).withScope('linkMovie')
+
+  const { injector, file } = options
+  const { driveLetter, path } = file
+  const fileName = getFileName(file)
 
   if (!isMovieFile(fileName)) {
+    await logger.debug({
+      message: `File ${fileName} is not a movie file, skipping link process.`,
+      data: { file },
+    })
     return { status: 'not-movie-file' } as const
   }
 
   if (isSampleFile(fileName)) {
+    await logger.debug({
+      message: `File ${fileName} is a sample file, skipping link process.`,
+      data: { file },
+    })
     return { status: 'not-movie-file' } as const
   }
 
@@ -42,10 +53,14 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   })
 
   if (storedMovieFile.length > 0) {
+    await logger.debug({
+      message: `File ${fileName} is already linked to a movie file.`,
+      data: { file, storedMovieFile },
+    })
     return { status: 'already-linked' } as const
   }
 
-  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(options.file)
+  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 
   const omdbStore = getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
   const storedResult = await omdbStore.find({
@@ -86,6 +101,11 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       movieFile: newMovieFile,
     })
 
+    await logger.debug({
+      message: `File ${fileName} linked succesfully.`,
+      data: { file, movieFile: newMovieFile, movie },
+    })
+
     return { status: 'linked', movieFile: newMovieFile, movie } as const
   }
 
@@ -97,7 +117,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     episode,
   })
 
-  if (!result) {
+  if (!result || !result.imdbID) {
     throw new RequestError('Metadata not found', 404)
   }
 

@@ -72,19 +72,14 @@
               "type": "boolean",
               "description": "If true, all movies on all drives will be synced on startup or config change."
             },
-            "tempFiles": {
-              "type": "object",
-              "properties": {
-                "letter": {
-                  "type": "string"
-                },
-                "path": {
-                  "type": "string"
-                }
-              },
-              "required": ["letter", "path"],
-              "additionalProperties": false,
-              "description": "A location where temporary files (e.g. transcoded files) will be stored."
+            "preset": {
+              "type": "string",
+              "enum": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"],
+              "description": "The default preset for transcoding movies."
+            },
+            "threads": {
+              "type": "number",
+              "description": "The number of threads to use for transcoding."
             },
             "watchFiles": {
               "anyOf": [
@@ -279,19 +274,24 @@
                   "type": "boolean",
                   "description": "If true, all movies on all drives will be synced on startup or config change."
                 },
-                "tempFiles": {
-                  "type": "object",
-                  "properties": {
-                    "letter": {
-                      "type": "string"
-                    },
-                    "path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["letter", "path"],
-                  "additionalProperties": false,
-                  "description": "A location where temporary files (e.g. transcoded files) will be stored."
+                "preset": {
+                  "type": "string",
+                  "enum": [
+                    "ultrafast",
+                    "superfast",
+                    "veryfast",
+                    "faster",
+                    "fast",
+                    "medium",
+                    "slow",
+                    "slower",
+                    "veryslow"
+                  ],
+                  "description": "The default preset for transcoding movies."
+                },
+                "threads": {
+                  "type": "number",
+                  "description": "The number of threads to use for transcoding."
                 },
                 "watchFiles": {
                   "anyOf": [
