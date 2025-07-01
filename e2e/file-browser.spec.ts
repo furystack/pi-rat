@@ -32,7 +32,9 @@ const selectDrive = async (page: Page, driveLetter: string) => {
 }
 
 const openFile = async (page: Page, fileName: string) => {
-  await page.getByText(fileName).nth(0).dblclick()
+  const fileEntry = page.locator('folder-panel shades-data-grid-row').getByText(fileName).nth(0)
+
+  await fileEntry.dblclick()
 }
 
 const deleteFile = async (page: Page, fileName: string) => {
