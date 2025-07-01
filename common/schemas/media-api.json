@@ -310,7 +310,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeData"
+          "$ref": "#/definitions/FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -333,27 +333,29 @@
       "required": ["id", "driveLetter", "path", "ffprobe"],
       "additionalProperties": false
     },
-    "Ffmpeg.FfprobeData": {
+    "FfprobeData": {
       "type": "object",
       "properties": {
         "streams": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Ffmpeg.FfprobeStream"
+            "$ref": "#/definitions/FfprobeStream"
           }
         },
         "format": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeFormat"
+          "$ref": "#/definitions/FfprobeFormat"
         },
         "chapters": {
           "type": "array",
-          "items": {}
+          "items": {
+            "$ref": "#/definitions/ChapterData"
+          }
         }
       },
       "required": ["streams", "format", "chapters"],
       "additionalProperties": false
     },
-    "Ffmpeg.FfprobeStream": {
+    "FfprobeStream": {
       "type": "object",
       "properties": {
         "index": {
@@ -489,7 +491,7 @@
           "type": "number"
         },
         "disposition": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeStreamDisposition"
+          "$ref": "#/definitions/FfprobeStreamDisposition"
         },
         "rotation": {
           "type": ["string", "number"]
@@ -497,7 +499,7 @@
       },
       "required": ["index"]
     },
-    "Ffmpeg.FfprobeStreamDisposition": {
+    "FfprobeStreamDisposition": {
       "type": "object",
       "properties": {
         "default": {
@@ -538,7 +540,7 @@
         }
       }
     },
-    "Ffmpeg.FfprobeFormat": {
+    "FfprobeFormat": {
       "type": "object",
       "properties": {
         "filename": {
@@ -581,6 +583,41 @@
       "additionalProperties": {
         "type": ["string", "number"]
       }
+    },
+    "ChapterData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "start": {
+          "type": "number"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "end": {
+          "type": "number"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "time_base": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": ["title"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
+      "additionalProperties": false
     },
     "StreamQueryParams": {
       "type": "object",
@@ -666,51 +703,6 @@
         "result": {}
       },
       "required": ["url", "query", "result"],
-      "additionalProperties": false
-    },
-    "GetM3U8Endpoint": {
-      "type": "object",
-      "properties": {
-        "result": {},
-        "url": {
-          "type": "object",
-          "properties": {
-            "letter": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": ["letter", "path"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["result", "url"],
-      "additionalProperties": false
-    },
-    "GetM3U8SegmentEndpoint": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "object",
-          "properties": {
-            "letter": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            },
-            "segmentFile": {
-              "type": "string"
-            }
-          },
-          "required": ["letter", "path", "segmentFile"],
-          "additionalProperties": false
-        },
-        "result": {}
-      },
-      "required": ["url", "result"],
       "additionalProperties": false
     },
     "MediaApi": {
@@ -801,12 +793,6 @@
             },
             "/files/:letter/:path/stream": {
               "$ref": "#/definitions/StreamFileEndpoint"
-            },
-            "/files/:letter/:path/m3u8": {
-              "$ref": "#/definitions/GetM3U8Endpoint"
-            },
-            "/files/:letter/:path/m3u8/:segmentFile": {
-              "$ref": "#/definitions/GetM3U8SegmentEndpoint"
             }
           },
           "required": [
@@ -824,9 +810,7 @@
             "/omdb-series-metadata/:id",
             "/movie-files",
             "/movie-files/:id",
-            "/files/:letter/:path/stream",
-            "/files/:letter/:path/m3u8",
-            "/files/:letter/:path/m3u8/:segmentFile"
+            "/files/:letter/:path/stream"
           ],
           "additionalProperties": false
         },
@@ -7099,10 +7083,10 @@
               "type": "object",
               "properties": {
                 "$eq": {
-                  "$ref": "#/definitions/Ffmpeg.FfprobeData"
+                  "$ref": "#/definitions/FfprobeData"
                 },
                 "$ne": {
-                  "$ref": "#/definitions/Ffmpeg.FfprobeData"
+                  "$ref": "#/definitions/FfprobeData"
                 }
               },
               "additionalProperties": false
@@ -7113,13 +7097,13 @@
                 "$in": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/Ffmpeg.FfprobeData"
+                    "$ref": "#/definitions/FfprobeData"
                   }
                 },
                 "$nin": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/Ffmpeg.FfprobeData"
+                    "$ref": "#/definitions/FfprobeData"
                   }
                 }
               },
@@ -7380,7 +7364,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeData"
+          "$ref": "#/definitions/FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -7418,7 +7402,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeData"
+          "$ref": "#/definitions/FfprobeData"
         },
         "relatedFiles": {
           "type": "array",
@@ -7548,7 +7532,7 @@
           "type": "string"
         },
         "ffprobe": {
-          "$ref": "#/definitions/Ffmpeg.FfprobeData"
+          "$ref": "#/definitions/FfprobeData"
         },
         "relatedFiles": {
           "type": "array",

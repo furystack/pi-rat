@@ -12,12 +12,14 @@ export interface MoviesConfig {
     fullSyncOnStartup?: boolean
 
     /**
-     * A location where temporary files (e.g. transcoded files) will be stored.
+     * The default preset for transcoding movies.
      */
-    tempFiles?: {
-      letter: string
-      path: string
-    }
+    preset?: 'ultrafast' | 'superfast' | 'veryfast' | 'faster' | 'fast' | 'medium' | 'slow' | 'slower' | 'veryslow'
+
+    /**
+     * The number of threads to use for transcoding.
+     */
+    threads?: number
 
     /**
      * 'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically.
