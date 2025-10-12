@@ -67,7 +67,7 @@ test.describe('File Browser', () => {
     await openFile(page, fileName)
 
     const fileContent = await readFile('./e2e/test-files/upload.md', { encoding: 'utf-8' })
-    const editor = page.locator('monaco-editor').getByRole('textbox')
+    const editor = page.getByRole('textbox')
     expect(fileContent.replace(/[^a-zA-Z ]/g, '')).toContain((await editor.inputValue()).replace(/[^a-zA-Z ]/g, ''))
 
     await gotoFileBrowser(page)
