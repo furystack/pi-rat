@@ -40,15 +40,15 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
      */
     await this.logger.information({ message: '📦 Setting up stores and repositories...' })
     await Promise.all([
-      await setupConfig(injector),
-      await setupIdentity(injector),
-      await setupDrives(injector),
-      await setupInstall(injector),
-      await setupDashboards(injector),
-      await setupMovies(injector),
-      await setupIot(injector),
-      await setupChat(injector),
-      await setupAi(injector),
+      setupConfig(injector),
+      setupIdentity(injector),
+      setupDrives(injector),
+      setupInstall(injector),
+      setupDashboards(injector),
+      setupMovies(injector),
+      setupIot(injector),
+      setupChat(injector),
+      setupAi(injector),
     ])
 
     await this.logger.information({ message: '🔄 Syncing models...' })
@@ -71,15 +71,15 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
      * Setup REST APIs
      */
     await Promise.all([
-      await setupConfigRestApi(injector),
-      await setupIdentityRestApi(injector),
-      await setupDrivesRestApi(injector),
-      await setupInstallRestApi(injector),
-      await setupDashboardsRestApi(injector),
-      await setupMoviesRestApi(injector),
-      await setupIotApi(injector),
-      await setupChatRestApi(injector),
-      await setupAiRestApi(injector),
+      setupConfigRestApi(injector),
+      setupIdentityRestApi(injector),
+      setupDrivesRestApi(injector),
+      setupInstallRestApi(injector),
+      setupDashboardsRestApi(injector),
+      setupMoviesRestApi(injector),
+      setupIotApi(injector),
+      setupChatRestApi(injector),
+      setupAiRestApi(injector),
     ])
 
     const wsService = injector.getInstance(WebsocketService)

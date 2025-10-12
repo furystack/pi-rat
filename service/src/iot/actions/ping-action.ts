@@ -18,18 +18,22 @@ export const PingAction: RequestAction<PingEndpoint> = async ({ injector, getUrl
     throw new RequestError(`device with name '${id}' not found`, 404)
   }
 
-  if (!device.ipAddress) {
+  const { ipAddress } = device
+
+  if (!ipAddress) {
     throw new RequestError(`device with name '${id}' has no ip address`, 400)
   }
 
-  const result = await ping.promise.probe(device.ipAddress)
+  const result = await ping.promise.probe(ipAddress)
+
+  const { alive, time } = result
 
   const pingEntry = await getDataSetFor(injector, DevicePingHistory, 'id').add(injector, {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     name: device.name,
-    isAvailable: result.alive,
-    ping: isNaN(result.time as number) ? 0 : parseFloat(result.time as string),
+    isAvailable: alive,
+    ping: isNaN(time) ? 0 : time,
   })
 
   if (!result.alive) {

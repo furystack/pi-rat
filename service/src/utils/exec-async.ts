@@ -7,7 +7,7 @@ export const execAsync = async (command: string, options: ExecOptions) => {
       if (err) {
         reject(err)
       } else {
-        resolve(stdout)
+        resolve(stdout.toString().trim())
       }
     }),
   )

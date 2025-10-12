@@ -9,11 +9,15 @@ const navigateToDashboardList = async (page: Page) => {
 }
 
 const setMonacoValue = async (page: Page, value: any) => {
-  const monaco = page.locator('textarea')
-  await monaco.press('Control+a')
-  await monaco.fill(JSON.stringify(value, null, 2), {})
-  await monaco.press('Control+End')
-  await monaco.press('Backspace')
+  await page.locator('.monaco-editor').click()
+
+  const monaco = page.getByRole('textbox', { name: 'Editor content' })
+
+  await monaco.press('ControlOrMeta+a')
+
+  await monaco.type(JSON.stringify(value, null, 2))
+  await monaco.press('ControlOrMeta+End', { delay: 10 })
+  await monaco.press('Backspace', { delay: 10 })
 }
 
 const trySaveDashboard = async (page: Page) => {
