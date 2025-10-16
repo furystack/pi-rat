@@ -1,8 +1,11 @@
+import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import type { SequelizeStore } from '@furystack/sequelize-store'
 import { EventHub } from '@furystack/utils'
+import { User } from 'common'
 import { AiAppModel } from './ai/ai-app-model.js'
 import { AppModelManager } from './AppModelManager.js'
 import { ChatAppModel } from './chat/chat-app-model.js'
@@ -13,6 +16,7 @@ import { IdentityAppModel } from './identity/identity-app-model.js'
 import { InstallAppModel } from './install/install-app-model.js'
 import { IotAppModel } from './iot/iot-app-model.js'
 import { MediaAppModel } from './media/media-app-model.js'
+import { setupPatcher } from './patcher/setup-patcher.js'
 import { setupFrontendBundle } from './setup-frontend-bundle.js'
 import { WebsocketService } from './websocket-service.js'
 
@@ -43,7 +47,17 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       type: 'service-started',
     })
 
+    const userStore = getStoreManager(injector).getStoreFor(User, 'username') as unknown as SequelizeStore<
+      User,
+      any,
+      'username',
+      User
+    >
+    await userStore.sequelizeModel.sequelize?.sync()
+
     await setupFrontendBundle(injector)
+
+    await setupPatcher(injector)
 
     this.emit('initialized', undefined)
   }

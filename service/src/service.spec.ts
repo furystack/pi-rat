@@ -1,14 +1,15 @@
-import { injector as rootInjector } from './root-injector.js'
-import { PiRatRootService } from './service.js'
+import { Injector } from '@furystack/inject'
+import { usingAsync } from '@furystack/utils'
 import { describe, expect, it } from 'vitest'
+import { PiRatRootService } from './service.js'
 
 describe('Service', () => {
   it('should be initialized', async () => {
-    const instance = rootInjector.getInstance(PiRatRootService)
-    await new Promise((resolve) => instance.addListener('initialized', resolve))
+    await usingAsync(new Injector(), async (injector) => {
+      const instance = injector.getInstance(PiRatRootService)
+      await new Promise((resolve) => instance.addListener('initialized', resolve))
 
-    expect(instance).toBeDefined()
-
-    await rootInjector[Symbol.asyncDispose]()
+      expect(instance).toBeDefined()
+    })
   })
 })

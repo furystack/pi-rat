@@ -96,7 +96,6 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      // await PasswordCredentialModel.sync()
     },
   })
 
@@ -121,7 +120,6 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      // await SessionModel.sync()
     },
   })
 

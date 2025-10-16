@@ -235,8 +235,6 @@ export const setupMedia = async (injector: Injector) => {
         },
         { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path'], unique: true }] },
       )
-
-      // await MovieFileModel.sync()
     },
   })
 
@@ -289,7 +287,6 @@ export const setupMedia = async (injector: Injector) => {
           indexes: [{ fields: ['userName', 'driveLetter', 'path'], unique: true }],
         },
       )
-      // await WatchHistoryEntryModel.sync()
     },
   })
 
@@ -333,7 +330,6 @@ export const setupMedia = async (injector: Injector) => {
         },
         { sequelize },
       )
-      // await SeriesModel.sync()
     },
   })
 
@@ -470,7 +466,6 @@ export const setupMedia = async (injector: Injector) => {
         },
         { sequelize },
       )
-      // await OmdbMovieMetadataModel.sync()
     },
   })
 
@@ -583,7 +578,6 @@ export const setupMedia = async (injector: Injector) => {
         },
         { sequelize },
       )
-      // await OmdbSeriesMetadataModel.sync()
     },
   })
 
