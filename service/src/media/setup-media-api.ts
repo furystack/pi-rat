@@ -21,7 +21,7 @@ import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js
 import { ScanForMoviesAction } from './actions/scan-for-movies-action.js'
 import { StreamAction } from './actions/stream-file-action.js'
 
-export const setupMoviesRestApi = async (injector: Injector) => {
+export const setupMediaRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
     injector,
     root: 'api/media',

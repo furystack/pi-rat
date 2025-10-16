@@ -6,18 +6,15 @@ import { EventHub } from '@furystack/utils'
 import { setupAiRestApi } from './ai/setup-ai-rest-api.js'
 import { setupAi } from './ai/setup-ai.js'
 import { AppModelManager } from './AppModelManager.js'
-import { ChatAppModel } from './chat/index.js'
-import { ConfigAppModel } from './config/index.js'
-import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api.js'
-import { setupDashboards } from './dashboards/setup-dashboards.js'
-import { DrivesAppModel } from './drives/index.js'
-import { IdentityAppModel } from './identity/index.js'
-import { setupInstallRestApi } from './install/setup-install-rest-api.js'
-import { setupInstall } from './install/setup-install.js'
+import { ChatAppModel } from './chat/chat-app-model.js'
+import { ConfigAppModel } from './config/config-app-model.js'
+import { DashboardsAppModel } from './dashboards/dashboard-app-model.js'
+import { DrivesAppModel } from './drives/drives-app-model.js'
+import { IdentityAppModel } from './identity/identity-app-model.js'
+import { InstallAppModel } from './install/install-app-model.js'
 import { setupIotApi } from './iot/setup-iot-api.js'
 import { setupIot } from './iot/setup-iot.js'
-import { setupMoviesRestApi } from './media/setup-media-api.js'
-import { setupMovies } from './media/setup-media.js'
+import { MediaAppModel } from './media/media-app-model.js'
 import { setupFrontendBundle } from './setup-frontend-bundle.js'
 import { WebsocketService } from './websocket-service.js'
 
@@ -34,7 +31,10 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
     await appModelManager.registerInternalAppModels(
       injector.getInstance(ConfigAppModel),
       injector.getInstance(IdentityAppModel),
+      injector.getInstance(InstallAppModel),
       injector.getInstance(DrivesAppModel),
+      injector.getInstance(DashboardsAppModel),
+      injector.getInstance(MediaAppModel),
       injector.getInstance(ChatAppModel),
     )
 
@@ -42,24 +42,12 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
      * Set up stores and repositories
      */
     await this.logger.information({ message: '📦 Setting up stores and repositories...' })
-    await Promise.all([
-      setupInstall(injector),
-      setupDashboards(injector),
-      setupMovies(injector),
-      setupIot(injector),
-      setupAi(injector),
-    ])
+    await Promise.all([setupIot(injector), setupAi(injector)])
 
     /**
      * Setup REST APIs
      */
-    await Promise.all([
-      setupInstallRestApi(injector),
-      setupDashboardsRestApi(injector),
-      setupMoviesRestApi(injector),
-      setupIotApi(injector),
-      setupAiRestApi(injector),
-    ])
+    await Promise.all([setupIotApi(injector), setupAiRestApi(injector)])
 
     const wsService = injector.getInstance(WebsocketService)
     await wsService.announce({
