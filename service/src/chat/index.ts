@@ -1,25 +1,19 @@
-import { Injectable, Injected, Injector } from '@furystack/inject'
-import type { AppModel } from 'common'
-import { AppModelManager } from '../AppModelManager.js'
+import { Injectable, Injector } from '@furystack/inject'
+import { type InternalAppModel } from '../AppModelManager.js'
 import { ChatAppManifest } from './manifest.js'
-
 import { setupChatRestApi } from './setup-chat-api.js'
-import { setupChat } from './setup-chat.js'
+import { setupChatStore } from './setup-chat-store.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class ChatAppModel implements AppModel {
+export class ChatAppModel implements InternalAppModel {
   public manifest = ChatAppManifest
   public state = {
     type: 'initializing' as const,
   }
 
-  @Injected(AppModelManager)
-  declare private appModelManager: AppModelManager
+  declare private injector: Injector
 
-  public async register(injector: Injector) {
-    this.appModelManager.registerInternalAppModel(this)
-    await setupChat(injector)
-    await setupChatRestApi(injector)
-    this.appModelManager.updateAppModelState(this.manifest.id, { type: 'running', lastHealthCheck: new Date() })
+  public async setup() {
+    await Promise.all([setupChatStore(this.injector), setupChatRestApi(this.injector)])
   }
 }

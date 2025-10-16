@@ -5,15 +5,13 @@ import { getLogger } from '@furystack/logging'
 import { EventHub } from '@furystack/utils'
 import { setupAiRestApi } from './ai/setup-ai-rest-api.js'
 import { setupAi } from './ai/setup-ai.js'
+import { AppModelManager } from './AppModelManager.js'
 import { ChatAppModel } from './chat/index.js'
-import { setupConfigRestApi } from './config/setup-config-rest-api.js'
-import { setupConfig } from './config/setup-config.js'
+import { ConfigAppModel } from './config/index.js'
 import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api.js'
 import { setupDashboards } from './dashboards/setup-dashboards.js'
-import { setupDrivesRestApi } from './drives/setup-drives-rest-api.js'
-import { setupDrives } from './drives/setup-drives.js'
-import { setupIdentityRestApi } from './identity/setup-identity-rest-api.js'
-import { setupIdentity } from './identity/setup-identity.js'
+import { DrivesAppModel } from './drives/index.js'
+import { IdentityAppModel } from './identity/index.js'
 import { setupInstallRestApi } from './install/setup-install-rest-api.js'
 import { setupInstall } from './install/setup-install.js'
 import { setupIotApi } from './iot/setup-iot-api.js'
@@ -30,14 +28,21 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
 
   public async init(injector: Injector) {
     await this.logger.information({ message: '🐀 Starting PI-RAT service...' })
+
+    const appModelManager = injector.getInstance(AppModelManager)
+
+    await appModelManager.registerInternalAppModels(
+      injector.getInstance(ConfigAppModel),
+      injector.getInstance(IdentityAppModel),
+      injector.getInstance(DrivesAppModel),
+      injector.getInstance(ChatAppModel),
+    )
+
     /**
      * Set up stores and repositories
      */
     await this.logger.information({ message: '📦 Setting up stores and repositories...' })
     await Promise.all([
-      setupConfig(injector),
-      setupIdentity(injector),
-      setupDrives(injector),
       setupInstall(injector),
       setupDashboards(injector),
       setupMovies(injector),
@@ -49,17 +54,12 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
      * Setup REST APIs
      */
     await Promise.all([
-      setupConfigRestApi(injector),
-      setupIdentityRestApi(injector),
-      setupDrivesRestApi(injector),
       setupInstallRestApi(injector),
       setupDashboardsRestApi(injector),
       setupMoviesRestApi(injector),
       setupIotApi(injector),
       setupAiRestApi(injector),
     ])
-
-    await injector.getInstance(ChatAppModel).register(injector)
 
     const wsService = injector.getInstance(WebsocketService)
     await wsService.announce({

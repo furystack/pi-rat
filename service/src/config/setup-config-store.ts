@@ -18,8 +18,6 @@ class ConfigModel extends Model<Config, Config> implements Config {
 export const setupConfig = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Config')
 
-  await logger.verbose({ message: '🔧  Setting up Config models and repository' })
-
   const dbOptions = getDefaultDbSettings('config.sqlite', logger)
 
   useSequelize({
@@ -58,6 +56,4 @@ export const setupConfig = async (injector: Injector) => {
     authorizeUpdate: withRole('admin'),
     authorizeRemove: withRole('admin'),
   })
-
-  await logger.verbose({ message: '✅  Config setup completed' })
 }
