@@ -50,7 +50,7 @@ export class AppModelManager {
     )
   }
 
-  public updateAppModelState(appModelId: string, state: AppModel['state']) {
+  private updateAppModelState(appModelId: string, state: AppModel['state']) {
     const appModel = this.appModels.get(appModelId)
     if (!appModel) {
       const error = new Error(`App model with id ${appModelId} is not registered`)
@@ -64,11 +64,11 @@ export class AppModelManager {
       })
       throw error
     }
-    const oldStateType = appModel.state.type
+    const oldState = appModel.state
     appModel.state = state
     void this.logger.information({
-      message: `App model state for ${appModel.manifest.name} updated from "${oldStateType}" to "${state.type}"`,
-      data: { appModel, state },
+      message: `App model state for ${appModel.manifest.name} updated from "${oldState.type}" to "${state.type}"`,
+      data: { appModel, oldState, state },
     })
   }
 }

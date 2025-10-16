@@ -67,7 +67,6 @@ export const setupDashboards = async (injector: Injector) => {
       )
     },
   })
-  await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(Dashboard, 'id', {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),

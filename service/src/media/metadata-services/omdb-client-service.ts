@@ -16,7 +16,6 @@ export class OmdbClientService {
   declare private configStore: PhysicalStore<Config, 'id'>
 
   public async init() {
-    await this.logger.verbose({ message: '🎬   Initializing OMDB Service' })
     const config = await this.configStore.get('OMDB_CONFIG')
     if (!config) {
       this.config = undefined
