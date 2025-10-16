@@ -1,4 +1,5 @@
 export * from './ai/index.js'
+export * from './app-model/index.js'
 export * from './chat/index.js'
 export * from './config/index.js'
 export * from './dashboard/index.js'
