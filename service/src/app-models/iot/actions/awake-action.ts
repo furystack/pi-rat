@@ -4,7 +4,7 @@ import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import { Device, DeviceAwakeHistory, type AwakeEndpoint } from 'common'
-import { wakeOnLan } from '../../utils/wake-on-lan.js'
+import { wakeOnLan } from '../../../utils/wake-on-lan.js'
 
 export const AwakeAction: RequestAction<AwakeEndpoint> = async ({ injector, getUrlParams }) => {
   if (!(await isAuthorized(injector, 'admin'))) {

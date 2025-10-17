@@ -4,8 +4,8 @@ import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
 import { DataTypes, Model } from 'sequelize'
-import { withRole } from '../authorization/with-role.js'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { withRole } from '../../authorization/with-role.js'
+import { getDefaultDbSettings } from '../../get-default-db-options.js'
 
 class DeviceModel extends Model<Device, Device> implements Device {
   declare public name: string

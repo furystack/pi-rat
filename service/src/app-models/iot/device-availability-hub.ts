@@ -4,9 +4,8 @@ import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { EventHub, sleepAsync } from '@furystack/utils'
-import { Config, Device, DevicePingHistory } from 'common'
+import { Config, Device, DevicePingHistory, type IotConfig } from 'common'
 import ping from 'ping'
-import type { IotConfig } from '../../../common/src/models/config/iot-config.js'
 
 const defaultIotConfig: IotConfig = {
   id: 'IOT_CONFIG',

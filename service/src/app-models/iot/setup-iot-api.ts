@@ -11,9 +11,9 @@ import {
 import type { IotApi } from 'common'
 import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
 import iotApiSchema from 'common/schemas/iot-api.json' with { type: 'json' }
-import { getCorsOptions } from '../get-cors-options.js'
-import { getPort } from '../get-port.js'
-import { WebsocketService } from '../websocket-service.js'
+import { getCorsOptions } from '../../get-cors-options.js'
+import { getPort } from '../../get-port.js'
+import { WebsocketService } from '../../websocket-service.js'
 import { AwakeAction } from './actions/awake-action.js'
 import { PingAction } from './actions/ping-action.js'
 import { DeviceAvailabilityHub } from './device-availability-hub.js'
