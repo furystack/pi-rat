@@ -231,7 +231,7 @@ export const setupChatStore = async (injector: Injector) => {
 
       return { isAllowed: true }
     },
-    authroizeRemoveEntity: async ({ injector: i, entity }) => {
+    authorizeRemoveEntity: async ({ injector: i, entity }) => {
       const user = await getCurrentUser(i)
 
       if (!user) {
@@ -287,7 +287,7 @@ export const setupChatStore = async (injector: Injector) => {
 
       return { isAllowed: true }
     },
-    authroizeRemoveEntity: async ({ injector: i, entity }) => {
+    authorizeRemoveEntity: async ({ injector: i, entity }) => {
       const user = await getCurrentUser(i)
 
       if (!user) {

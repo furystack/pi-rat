@@ -7,13 +7,16 @@ import { getPort } from './get-port.js'
 @Injectable({ lifetime: 'singleton' })
 export class WebsocketService {
   @Injected((injector) => {
-    useWebsockets(injector, {
-      port: getPort(),
-      path: '/api/ws',
-    })
     return injector.getInstance(WebSocketApi)
   })
   declare private webSocketApi: WebSocketApi
+
+  public async init(injector: Injector) {
+    await useWebsockets(injector, {
+      port: getPort(),
+      path: '/api/ws',
+    })
+  }
 
   public announce = async (
     message: WebsocketMessage,
