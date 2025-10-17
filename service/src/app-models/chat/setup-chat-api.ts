@@ -10,8 +10,8 @@ import {
 } from '@furystack/rest-service'
 import { Chat, ChatInvitation, ChatMessage, type ChatApi } from 'common'
 import chatApiSchema from 'common/schemas/chat-api.json' with { type: 'json' }
-import { getCorsOptions } from '../get-cors-options.js'
-import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../../get-cors-options.js'
+import { getPort } from '../../get-port.js'
 import { AcceptInvitationAction } from './actions/accept-invitation-action.js'
 import { RejectInvitationAction } from './actions/reject-invitation.js'
 import { RevokeInvitationAction } from './actions/revoke-intivation.js'

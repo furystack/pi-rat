@@ -5,8 +5,8 @@ import { getRepository } from '@furystack/repository'
 import { SequelizeStore, useSequelize } from '@furystack/sequelize-store'
 import { Chat, ChatInvitation, ChatMessage } from 'common'
 import { DATE, JSON, Model, STRING } from 'sequelize'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
-import { WebsocketService } from '../websocket-service.js'
+import { getDefaultDbSettings } from '../../get-default-db-options.js'
+import { WebsocketService } from '../../websocket-service.js'
 
 class ChatModel extends Model<Chat, Chat> implements Chat {
   declare id: string
