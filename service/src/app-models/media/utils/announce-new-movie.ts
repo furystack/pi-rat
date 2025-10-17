@@ -1,7 +1,7 @@
 import { isAuthorized } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import type { Movie, MovieFile, PiRatFile } from 'common'
-import { WebsocketService } from '../../websocket-service.js'
+import { WebsocketService } from '../../../websocket-service.js'
 
 export const announceNewMovie = async ({
   injector,

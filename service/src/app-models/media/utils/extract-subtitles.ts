@@ -2,21 +2,18 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
-import { Drive, getFileName, getParentPath } from 'common'
+import { Drive, getFileName } from 'common'
 import { promises } from 'fs'
-import { join } from 'path'
-import { FfprobeService } from '../../ffprobe-service.js'
-import { execAsync } from '../../utils/exec-async.js'
-import { getPhysicalPath } from '../../utils/physical-path-utils.js'
+import { FfprobeService } from '../../../ffprobe-service.js'
+import { execAsync } from '../../../utils/exec-async.js'
+import { getPhysicalParentPath, getPhysicalPath } from '../../../utils/physical-path-utils.js'
 
-export const extractAudio = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
-  const logger = getLogger(injector).withScope('extract-audio-tracks')
+export const extractSubtitles = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
+  const logger = getLogger(injector).withScope('extract-subtitles')
 
   await logger.verbose({
-    message: `Starting to extract audio tracks for movie file '${file.driveLetter}:${file.path}'`,
-    data: {
-      file,
-    },
+    message: `Starting to extract subtitles for movie file '${file.driveLetter}:${file.path}'`,
+    data: file,
   })
 
   const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, file.driveLetter)
@@ -26,25 +23,23 @@ export const extractAudio = async ({ injector, file }: { injector: Injector; fil
   }
 
   const fullPath = getPhysicalPath(drive, file)
-
   const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 
-  const audioTracks: Array<{
+  const subtitles: Array<{
     streamIndex: number
   }> =
     ffprobeResult.streams
-      .filter((stream) => stream.codec_type === 'audio')
+      .filter((stream) => (stream.codec_type as any) === 'subtitle' && stream.codec_name === 'subrip')
       .map((stream) => ({
         streamIndex: stream.index,
       })) || []
 
-  const cwd = join(drive.physicalPath, getParentPath(file))
-  const fileName = getFileName(file)
+  const cwd = getPhysicalParentPath(drive, file)
   await promises.mkdir(cwd, { recursive: true })
-
+  const fileName = getFileName(file)
   await execAsync(
-    `ffmpeg -i ${fullPath} -acodec libopus ${audioTracks
-      .map((s, i) => `-map 0:a:${i} -acodec aac ${fileName}-audio-track-${s.streamIndex}.aac`)
+    `ffmpeg -i ${fullPath} -f webvtt ${subtitles
+      .map((s, i) => `-map 0:s:${i} ${fileName}-subtitle-${s.streamIndex}.vtt`)
       .join(' ')} -y`,
     {
       cwd,
@@ -55,7 +50,7 @@ export const extractAudio = async ({ injector, file }: { injector: Injector; fil
     message: `Subtitles has been extracted from stream for movie '${fileName}'`,
     data: {
       file,
-      audioTracks,
+      subtitles,
     },
   })
 }

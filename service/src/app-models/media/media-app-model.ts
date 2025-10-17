@@ -1,6 +1,6 @@
 import { Injectable, type Injector } from '@furystack/inject'
 import type { AppState } from 'common'
-import type { InternalAppModel } from '../AppModelManager.js'
+import type { InternalAppModel } from '../../AppModelManager.js'
 import { MediaManifest } from './media-manifest.js'
 import { setupMediaRestApi } from './setup-media-api.js'
 import { setupMedia } from './setup-media.js'

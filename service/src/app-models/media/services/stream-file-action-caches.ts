@@ -1,10 +1,9 @@
 import { Cache } from '@furystack/cache'
 import { getStoreManager } from '@furystack/core'
 import { Injectable, type Injector } from '@furystack/inject'
-import { Config, Drive, type PiRatFile, type StreamQueryParams } from 'common'
+import { Config, Drive, type MoviesConfig, type PiRatFile, type StreamQueryParams } from 'common'
 import { join } from 'path'
-import type { MoviesConfig } from '../../../../common/src/models/config/movies-config.js'
-import { FfprobeService } from '../../ffprobe-service.js'
+import { FfprobeService } from '../../../ffprobe-service.js'
 
 @Injectable({
   lifetime: 'singleton',
@@ -21,7 +20,7 @@ export class StreamFileActionCaches {
   })
 
   public moviesConfigCache = new Cache({
-    load: async () => {
+    load: async (): Promise<MoviesConfig> => {
       const moviesStore = getStoreManager(this.injector).getStoreFor(Config, 'id')
       const moviesConfig = await moviesStore.get('MOVIES_CONFIG')
 
@@ -32,10 +31,9 @@ export class StreamFileActionCaches {
             autoExtractSubtitles: false,
             fullSyncOnStartup: false,
             preset: 'ultrafast',
-            id: 'MOVIES_CONFIG',
             watchFiles: 'all',
           },
-        } as MoviesConfig
+        }
       }
 
       return moviesConfig as MoviesConfig
@@ -109,7 +107,7 @@ export class StreamFileActionCaches {
       } else {
         ffmpegArgs.push('-c:v', 'libx264')
       }
-      ffmpegArgs.push('-preset', config.value.preset || 'ultrafast')
+      ffmpegArgs.push('-preset', config?.value?.preset ?? 'ultrafast')
 
       if (video?.resolution) {
         switch (video.resolution) {

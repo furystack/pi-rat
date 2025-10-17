@@ -13,8 +13,8 @@ import {
 import type { MediaApi } from 'common'
 import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 import mediaApiSchema from 'common/schemas/media-api.json' with { type: 'json' }
-import { getCorsOptions } from '../get-cors-options.js'
-import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../../get-cors-options.js'
+import { getPort } from '../../get-port.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'

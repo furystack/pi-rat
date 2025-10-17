@@ -11,7 +11,7 @@ import {
   OmdbMovieMetadata,
   type PiRatFile,
 } from 'common'
-import { FfprobeService } from '../../ffprobe-service.js'
+import { FfprobeService } from '../../../ffprobe-service.js'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { announceNewMovie } from './announce-new-movie.js'
 import { ensureMovieExists } from './ensure-movie-exists.js'
