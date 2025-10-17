@@ -1,7 +1,7 @@
 import type { ChildrenList } from '@furystack/shades'
 import { createComponent } from '@furystack/shades'
-import type { Icon as IconModel } from '../../../common/src/models/icon.js'
 import '@furystack/shades-lottie'
+import type { Icon as IconModel } from 'common'
 
 type IconProps = IconModel & {
   title?: string
