@@ -51,7 +51,8 @@
             "movie-file",
             "omdb-movie-metadata",
             "omdb-series-metadata",
-            "device"
+            "device",
+            "log-entry"
           ]
         }
       },

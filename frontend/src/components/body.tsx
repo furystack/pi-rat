@@ -8,6 +8,7 @@ import { dashboardRoutes } from './routes/dashboard-routes.js'
 import { entityRoutes } from './routes/entity-routes.js'
 import { fileBrowserRoutes } from './routes/file-browser-routes.js'
 import { iotRoutes } from './routes/iot-routes.js'
+import { loggingRoutes } from './routes/logging-routes.js'
 import { movieRoutes } from './routes/movie-routes.js'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
@@ -28,7 +29,7 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
           <Router
             routes={[
               ...movieRoutes,
-              ...(hasAdminRole ? [...entityRoutes, ...fileBrowserRoutes, ...iotRoutes] : []),
+              ...(hasAdminRole ? [...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes] : []),
               ...dashboardRoutes,
               ...chatRoutes,
               ...aiRoutes,

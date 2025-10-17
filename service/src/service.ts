@@ -14,6 +14,7 @@ import { DrivesAppModel } from './app-models/drives/drives-app-model.js'
 import { IdentityAppModel } from './app-models/identity/identity-app-model.js'
 import { InstallAppModel } from './app-models/install/install-app-model.js'
 import { IotAppModel } from './app-models/iot/iot-app-model.js'
+import { LoggingAppModel } from './app-models/logging/logging-app-model.js'
 import { MediaAppModel } from './app-models/media/media-app-model.js'
 import { AppModelManager } from './AppModelManager.js'
 import { setupPatcher } from './patcher/setup-patcher.js'
@@ -31,6 +32,7 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
     const appModelManager = injector.getInstance(AppModelManager)
 
     await appModelManager.registerInternalAppModels(
+      injector.getInstance(LoggingAppModel),
       injector.getInstance(ConfigAppModel),
       injector.getInstance(IdentityAppModel),
       injector.getInstance(InstallAppModel),

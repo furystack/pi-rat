@@ -57,6 +57,11 @@ export const entityValues: SchemaGenerationSetting[] = [
     outputFile: './schemas/media-entities.json',
     type: '*',
   },
+  {
+    inputFile: './src/models/logging/*.ts',
+    outputFile: './schemas/logging-entities.json',
+    type: '*',
+  },
 ]
 
 export const apiValues: SchemaGenerationSetting[] = [
@@ -98,6 +103,11 @@ export const apiValues: SchemaGenerationSetting[] = [
   {
     inputFile: './src/apis/iot.ts',
     outputFile: './schemas/iot-api.json',
+    type: '*',
+  },
+  {
+    inputFile: './src/apis/logging.ts',
+    outputFile: './schemas/logging-api.json',
     type: '*',
   },
   {

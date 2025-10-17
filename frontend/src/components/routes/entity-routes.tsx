@@ -1,6 +1,6 @@
-import { createComponent } from '@furystack/shades'
-import { onLeave, onVisit } from './route-animations.js'
+import { createComponent, type Route } from '@furystack/shades'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import { onLeave, onVisit } from './route-animations.js'
 
 export const entityDrivesRoute = {
   url: '/entities/drives',
@@ -14,7 +14,7 @@ export const entityDrivesRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityUsersRoute = {
   url: '/entities/users',
@@ -28,7 +28,7 @@ export const entityUsersRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityDashboardsRoute = {
   url: '/entities/dashboards',
@@ -42,7 +42,7 @@ export const entityDashboardsRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityMoviesRoute = {
   url: '/entities/movies',
@@ -56,7 +56,7 @@ export const entityMoviesRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityMovieFilesRoute = {
   url: '/entities/movie-files',
@@ -70,7 +70,7 @@ export const entityMovieFilesRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityOmdbMovieMetadataRoute = {
   url: '/entities/omdb-movie-metadata',
@@ -84,7 +84,7 @@ export const entityOmdbMovieMetadataRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityOmdbSeriesMetadataRoute = {
   url: '/entities/omdb-series-metadata',
@@ -98,7 +98,7 @@ export const entityOmdbSeriesMetadataRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityConfigRoute = {
   url: '/entities/config',
@@ -112,7 +112,7 @@ export const entityConfigRoute = {
       }}
     />
   ),
-}
+} satisfies Route
 
 export const entityDeviceRoute = {
   url: '/entities/iot-devices',
@@ -126,7 +126,21 @@ export const entityDeviceRoute = {
       }}
     />
   ),
-}
+} satisfies Route
+
+export const entityLoggingRoute = {
+  url: '/entities/logging',
+  onVisit,
+  onLeave,
+  component: () => (
+    <PiRatLazyLoad
+      component={async () => {
+        const { LoggingPage } = await import('../../pages/entities/logging.js')
+        return <LoggingPage />
+      }}
+    />
+  ),
+} satisfies Route
 
 export const entityRoutes = [
   entityDrivesRoute,
@@ -138,4 +152,5 @@ export const entityRoutes = [
   entityOmdbSeriesMetadataRoute,
   entityConfigRoute,
   entityDeviceRoute,
+  entityLoggingRoute,
 ]

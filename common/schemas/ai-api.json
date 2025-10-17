@@ -115,7 +115,23 @@
               }
             },
             "think": {
-              "type": "boolean"
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "const": "high"
+                },
+                {
+                  "type": "string",
+                  "const": "medium"
+                },
+                {
+                  "type": "string",
+                  "const": "low"
+                }
+              ]
             },
             "options": {
               "$ref": "#/definitions/Partial%3COptions%3E"
@@ -165,7 +181,23 @@
           }
         },
         "think": {
-          "type": "boolean"
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "high"
+            },
+            {
+              "type": "string",
+              "const": "medium"
+            },
+            {
+              "type": "string",
+              "const": "low"
+            }
+          ]
         },
         "options": {
           "$ref": "#/definitions/Partial%3COptions%3E"
@@ -207,6 +239,9 @@
           "items": {
             "$ref": "#/definitions/ToolCall"
           }
+        },
+        "tool_name": {
+          "type": "string"
         }
       },
       "required": ["role", "content"],

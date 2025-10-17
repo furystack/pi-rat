@@ -1,6 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { AppBarLink } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
+import { aiPageRoute } from '../routes/ai-routes.js'
 
 export const AiIcon = Shade({
   shadowDomName: 'shade-app-ai-icon',
@@ -13,7 +14,7 @@ export const AiIcon = Shade({
     }
 
     return (
-      <AppBarLink title="Ai" href="/ai">
+      <AppBarLink title="Ai" href={aiPageRoute.url}>
         {sessionState === 'authenticated' ? '🤖' : '🔒 Login to Ai'}
       </AppBarLink>
     )
