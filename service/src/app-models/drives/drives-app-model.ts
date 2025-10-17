@@ -1,5 +1,5 @@
 import { Injectable, type Injector } from '@furystack/inject'
-import type { InternalAppModel } from '../AppModelManager.js'
+import type { InternalAppModel } from '../../AppModelManager.js'
 import { DrivesManifest } from './drives-manifest.js'
 import { setupDrivesRestApi } from './setup-drives-rest-api.js'
 import { setupDrives } from './setup-drives.js'

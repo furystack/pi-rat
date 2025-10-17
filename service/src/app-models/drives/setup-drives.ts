@@ -6,9 +6,9 @@ import { Drive } from 'common'
 import { constants } from 'fs'
 import { access, mkdir } from 'fs/promises'
 import { DataTypes, Model } from 'sequelize'
-import { withRole } from '../authorization/with-role.js'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
-import { existsAsync } from '../utils/exists-async.js'
+import { withRole } from '../../authorization/with-role.js'
+import { getDefaultDbSettings } from '../../get-default-db-options.js'
+import { existsAsync } from '../../utils/exists-async.js'
 import { useFileWatchers } from './file-watcher-service.js'
 
 const ensureFolder = async (path: string, mode: number = constants.F_OK) => {

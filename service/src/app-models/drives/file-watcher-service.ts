@@ -9,7 +9,7 @@ import { watch } from 'chokidar'
 import type { PiRatFile } from 'common'
 import { Drive } from 'common'
 import { sep } from 'path'
-import { WebsocketService } from '../websocket-service.js'
+import { WebsocketService } from '../../websocket-service.js'
 
 type EventParam = PiRatFile
 

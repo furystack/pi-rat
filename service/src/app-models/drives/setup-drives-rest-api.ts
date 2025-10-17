@@ -1,4 +1,5 @@
-import type { DrivesApi } from 'common'
+import type { Injector } from '@furystack/inject'
+import '@furystack/repository'
 import {
   createDeleteEndpoint,
   createGetCollectionEndpoint,
@@ -8,18 +9,17 @@ import {
   useRestService,
   Validate,
 } from '@furystack/rest-service'
-import '@furystack/repository'
+import type { DrivesApi } from 'common'
 import { Drive } from 'common'
 import drivesApiSchema from 'common/schemas/drives-api.json' with { type: 'json' }
-import type { Injector } from '@furystack/inject'
-import { GetDirectoryEntriesAction } from './actions/get-directory-entries.js'
-import { getPort } from '../get-port.js'
-import { getCorsOptions } from '../get-cors-options.js'
-import { UploadAction } from './actions/upload-action.js'
+import { getCorsOptions } from '../../get-cors-options.js'
+import { getPort } from '../../get-port.js'
 import { DeleteFileAction } from './actions/delete-file-action.js'
 import { DownloadAction } from './actions/download-action.js'
 import { FfprobeAction } from './actions/ffprobe-action.js'
+import { GetDirectoryEntriesAction } from './actions/get-directory-entries.js'
 import { SaveTextFileAction } from './actions/save-text-file-action.js'
+import { UploadAction } from './actions/upload-action.js'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({

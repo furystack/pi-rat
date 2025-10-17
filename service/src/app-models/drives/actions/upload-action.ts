@@ -9,7 +9,7 @@ import { Drive } from 'common'
 import type { Fields, Files } from 'formidable'
 import { IncomingForm } from 'formidable'
 import { join } from 'path'
-import { existsAsync } from '../../utils/exists-async.js'
+import { existsAsync } from '../../../utils/exists-async.js'
 import { createDirentListFromFiles } from '../create-dirent-list-from-files.js'
 
 export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, getUrlParams, request }) => {
