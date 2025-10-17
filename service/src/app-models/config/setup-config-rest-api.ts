@@ -11,8 +11,8 @@ import {
 import type { ConfigApi } from 'common'
 import { Config } from 'common'
 import configApiSchema from 'common/schemas/config-api.json' with { type: 'json' }
-import { getCorsOptions } from '../get-cors-options.js'
-import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../../get-cors-options.js'
+import { getPort } from '../../get-port.js'
 
 export const setupConfigRestApi = async (injector: Injector) => {
   await useRestService<ConfigApi>({

@@ -1,6 +1,6 @@
 import { Injectable, type Injector } from '@furystack/inject'
 import type { AppState } from 'common'
-import type { InternalAppModel } from '../AppModelManager.js'
+import type { InternalAppModel } from '../../AppModelManager.js'
 import { configManifest } from './config-manifest.js'
 import { setupConfigRestApi } from './setup-config-rest-api.js'
 import { setupConfig } from './setup-config-store.js'

@@ -5,8 +5,8 @@ import { useSequelize } from '@furystack/sequelize-store'
 import type { ConfigType } from 'common'
 import { Config } from 'common'
 import { DataTypes, Model } from 'sequelize'
-import { withRole } from '../authorization/with-role.js'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { withRole } from '../../authorization/with-role.js'
+import { getDefaultDbSettings } from '../../get-default-db-options.js'
 
 class ConfigModel extends Model<Config, Config> implements Config {
   declare id: ConfigType['id']
