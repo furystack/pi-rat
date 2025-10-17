@@ -1559,6 +1559,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xterm/addon-fit@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "@xterm/addon-fit@npm:0.10.0"
+  peerDependencies:
+    "@xterm/xterm": ^5.0.0
+  checksum: 10c0/76926120fc940376afef2cb68b15aec2a99fc628b6e3cc84f2bcb1682ca9b87f982b3c10ff206faf4ebc5b410467b81a7b5e83be37b4ac386586f472e4fa1c61
+  languageName: node
+  linkType: hard
+
+"@xterm/addon-search@npm:^0.15.0":
+  version: 0.15.0
+  resolution: "@xterm/addon-search@npm:0.15.0"
+  peerDependencies:
+    "@xterm/xterm": ^5.0.0
+  checksum: 10c0/2d68233d234eabc9ffe1bc9e4fcd28cd50c1f8c316b0e71a81ee2005b5e4da87c1c0361f2aa117ec566afbbbc35cd37456c7eb889ebc936416d14953c82e5a2a
+  languageName: node
+  linkType: hard
+
+"@xterm/addon-web-links@npm:^0.11.0":
+  version: 0.11.0
+  resolution: "@xterm/addon-web-links@npm:0.11.0"
+  peerDependencies:
+    "@xterm/xterm": ^5.0.0
+  checksum: 10c0/9426bed80afa954b0ea97771d041eb44e77a64e560ce8b8ef507a5d3a763979af18ae9f74ed54007bb7e235d0daf035be2a33f90d8edfecb431caf8ba0b0664e
+  languageName: node
+  linkType: hard
+
+"@xterm/xterm@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "@xterm/xterm@npm:5.5.0"
+  checksum: 10c0/358801feece58617d777b2783bec68dac1f52f736da3b0317f71a34f4e25431fb0b1920244f678b8d673f797145b4858c2a5ccb463a4a6df7c10c9093f1c9267
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:1":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -3135,6 +3169,10 @@ __metadata:
     "@furystack/utils": "npm:^8.1.4"
     "@types/marked": "npm:^6.0.0"
     "@types/node": "npm:^24.8.1"
+    "@xterm/addon-fit": "npm:^0.10.0"
+    "@xterm/addon-search": "npm:^0.15.0"
+    "@xterm/addon-web-links": "npm:^0.11.0"
+    "@xterm/xterm": "npm:^5.5.0"
     common: "workspace:^"
     marked: "npm:^16.4.1"
     media-chrome: "npm:^4.14.0"
