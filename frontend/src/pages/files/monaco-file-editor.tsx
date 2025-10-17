@@ -107,9 +107,10 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
       <div
         style={{
           position: 'fixed',
-          top: '54px',
+          top: '60px',
           width: '100%',
-          height: 'calc(100% - 64px)',
+          height: 'calc(100% - 60px)',
+          overflow: 'hidden',
         }}
       >
         <MonacoEditor
