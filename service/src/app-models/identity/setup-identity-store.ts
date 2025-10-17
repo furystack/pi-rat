@@ -7,8 +7,8 @@ import { PasswordCredential, usePasswordPolicy } from '@furystack/security'
 import { useSequelize } from '@furystack/sequelize-store'
 import { User, type Roles } from 'common'
 import { DataTypes, Model } from 'sequelize'
-import { withRole } from '../authorization/with-role.js'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { withRole } from '../../authorization/with-role.js'
+import { getDefaultDbSettings } from '../../get-default-db-options.js'
 
 class UserModel extends Model<User, User> implements User {
   declare username: string

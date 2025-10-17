@@ -16,8 +16,8 @@ import {
 import type { GetCurrentUserAction, IdentityApi, LoginAction as PiRatLoginAction } from 'common'
 import { User } from 'common'
 import identityApiSchema from 'common/schemas/identity-api.json' with { type: 'json' }
-import { getCorsOptions } from '../get-cors-options.js'
-import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../../get-cors-options.js'
+import { getPort } from '../../get-port.js'
 
 export const setupIdentityRestApi = async (injector: Injector) => {
   await useRestService<IdentityApi>({

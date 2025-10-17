@@ -1,5 +1,5 @@
 import { Injectable, type Injector } from '@furystack/inject'
-import type { InternalAppModel } from '../AppModelManager.js'
+import type { InternalAppModel } from '../../AppModelManager.js'
 import { IdentityManifest } from './identity-manifest.js'
 import { setupIdentityRestApi } from './setup-identity-rest-api.js'
 import { setupIdentity } from './setup-identity-store.js'
