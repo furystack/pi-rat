@@ -1,5 +1,5 @@
 import { Injectable, type Injector } from '@furystack/inject'
-import type { InternalAppModel } from '../AppModelManager.js'
+import type { InternalAppModel } from '../../AppModelManager.js'
 import { DashboardsManifest } from './dashboards-manifest.js'
 import { setupDashboardsRestApi } from './setup-dashboards-rest-api.js'
 import { setupDashboards } from './setup-dashboards.js'

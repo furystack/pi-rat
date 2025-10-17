@@ -6,8 +6,8 @@ import { useSequelize } from '@furystack/sequelize-store'
 import type { Widget } from 'common'
 import { Dashboard } from 'common'
 import { DataTypes, Model } from 'sequelize'
-import { withRole } from '../authorization/with-role.js'
-import { getDefaultDbSettings } from '../get-default-db-options.js'
+import { withRole } from '../../authorization/with-role.js'
+import { getDefaultDbSettings } from '../../get-default-db-options.js'
 
 class DashboardModel extends Model<Dashboard, Dashboard> implements Dashboard {
   declare id: string
