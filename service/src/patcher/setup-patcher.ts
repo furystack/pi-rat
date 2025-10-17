@@ -25,7 +25,6 @@ class PatchModel extends Model<PatchRun, PatchRun> implements PatchRun {
 
 export const setupPatcher = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Patcher')
-  await logger.verbose({ message: '🩹  Initializing Patcher...' })
 
   useSequelize({
     injector,
@@ -97,6 +96,4 @@ export const setupPatcher = async (injector: Injector) => {
   for (const patchInstance of patchList) {
     await runPatch(injector, patchInstance, patchRunStore)
   }
-
-  await logger.verbose({ message: '✅  Patches executed' })
 }
