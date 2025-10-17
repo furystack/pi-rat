@@ -22,10 +22,10 @@ export class DbLogger extends AbstractLogger {
       createdAt: new Date().toISOString(),
     }
 
-    await this.logEntryStore.add(logEntry)
+    void this.logEntryStore.add(logEntry)
 
     // Broadcast the new log entry to admin users only
-    await this.websocketService.announce(
+    void this.websocketService.announce(
       {
         type: 'log-entry-added',
         logEntry,
