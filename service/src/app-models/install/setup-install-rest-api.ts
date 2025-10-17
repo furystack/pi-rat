@@ -4,8 +4,8 @@ import { useRestService, Validate } from '@furystack/rest-service'
 import type { InstallApi } from 'common'
 import installApiSchema from 'common/schemas/install-api.json' with { type: 'json' }
 
-import { getCorsOptions } from '../get-cors-options.js'
-import { getPort } from '../get-port.js'
+import { getCorsOptions } from '../../get-cors-options.js'
+import { getPort } from '../../get-port.js'
 import { GetServiceStatus } from './actions/get-service-status.js'
 import { PostInstallAction } from './actions/post-install-action.js'
 

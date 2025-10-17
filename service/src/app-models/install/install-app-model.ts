@@ -1,5 +1,5 @@
 import { Injectable, type Injector } from '@furystack/inject'
-import { type InternalAppModel } from '../AppModelManager.js'
+import { type InternalAppModel } from '../../AppModelManager.js'
 import { InstallManifest } from './install-manifest.js'
 import { setupInstallRestApi } from './setup-install-rest-api.js'
 import { setupInstall } from './setup-install.js'
