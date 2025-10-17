@@ -635,7 +635,7 @@ export const setupMedia = async (injector: Injector) => {
       } as typeof filter
     },
     authorizeUpdateEntity: onlyOwned,
-    authroizeRemoveEntity: onlyOwned,
+    authorizeRemoveEntity: onlyOwned,
   })
 
   repo.createDataSet(Series, 'imdbId', {

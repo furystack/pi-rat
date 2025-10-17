@@ -23,7 +23,7 @@ export class FileWatcherService extends EventHub<{
   all: EventParam
   ready: EventParam
   raw: EventParam
-  error: EventParam
+  error: EventParam & { errorMessage: string; error: unknown }
 }> {
   private watchers: { [key: string]: FSWatcher } = {}
 
@@ -40,6 +40,18 @@ export class FileWatcherService extends EventHub<{
 
     await this.logger.verbose({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
     const watcher = watch(drive.physicalPath, { ignoreInitial: true })
+
+    watcher.on('error', (error) => {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      void this.logger.error({ message: `Error watching volume '${drive.letter}': ${errorMessage}`, data: { error } })
+      this.emit('error', { path: '', driveLetter: drive.letter, errorMessage, error })
+
+      void this.webSocketService.announce(
+        { type: 'file-change', event: 'error', path: '', drive: drive.letter },
+        ({ injector }) => isAuthorized(injector, 'admin'),
+      )
+    })
+
     watcher.on('all', (event, path) => {
       const relativePath = PathHelper.normalize(path.toString().replace(drive.physicalPath, '').replaceAll(sep, '/'))
       void this.logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })

@@ -127,7 +127,7 @@ export const setupIdentity = async (injector: Injector) => {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeRemove: withRole('admin'),
-    authroizeRemoveEntity: async (args) => {
+    authorizeRemoveEntity: async (args) => {
       const currentUser = await getCurrentUser(args.injector)
       if (currentUser?.username === args.entity.username) {
         return { isAllowed: false, message: 'Cannot remove your own account' }

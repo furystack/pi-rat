@@ -71,7 +71,7 @@ export const setupDashboards = async (injector: Injector) => {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeRemove: withRole('admin'),
-    authroizeRemoveEntity: async (args) => {
+    authorizeRemoveEntity: async (args) => {
       const currentUser = await getCurrentUser(args.injector)
       if (currentUser?.username === args.entity.owner) {
         return { isAllowed: true }
