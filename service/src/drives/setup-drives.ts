@@ -28,7 +28,6 @@ class DriveModel extends Model<Drive, Drive> implements Drive {
 
 export const setupDrives = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Drives')
-  await logger.verbose({ message: '📁  Setting up drives store and repository...' })
 
   useSequelize({
     injector,
@@ -63,7 +62,6 @@ export const setupDrives = async (injector: Injector) => {
     },
   })
 
-  await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(Drive, 'letter', {
     authorizeGet: withRole('admin'),
     authorizeUpdate: async (args) => {
@@ -107,8 +105,5 @@ export const setupDrives = async (injector: Injector) => {
     },
   })
 
-  await logger.verbose({ message: '💾  Setting up FileWatchers...' })
   await useFileWatchers(injector)
-
-  await logger.verbose({ message: '✅  Drives store and repository has been set up' })
 }

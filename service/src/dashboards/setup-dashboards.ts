@@ -21,7 +21,6 @@ class DashboardModel extends Model<Dashboard, Dashboard> implements Dashboard {
 
 export const setupDashboards = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Dashboards')
-  await logger.verbose({ message: '📔  Setting up Dashboards store and repository...' })
 
   useSequelize({
     injector,
@@ -68,7 +67,6 @@ export const setupDashboards = async (injector: Injector) => {
       )
     },
   })
-  await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(Dashboard, 'id', {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
@@ -82,6 +80,4 @@ export const setupDashboards = async (injector: Injector) => {
     },
     authorizeUpdate: withRole('admin'),
   })
-
-  await logger.verbose({ message: '✅  Dashboard setup completed' })
 }

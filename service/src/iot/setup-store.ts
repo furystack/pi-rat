@@ -1,5 +1,5 @@
 import type { Injector } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
+import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
@@ -30,7 +30,9 @@ class DevicePingHistoryModel extends Model<DevicePingHistory, DevicePingHistory>
   declare public ping: number
 }
 
-export const setupIotStore = async (injector: Injector, logger: ScopedLogger) => {
+export const setupIotStore = async (injector: Injector) => {
+  const logger = getLogger(injector).withScope('IOT')
+
   const dbOptions = getDefaultDbSettings('iot.sqlite', logger)
   useSequelize({
     injector,
@@ -105,7 +107,6 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      // await DeviceAwakeHistoryModel.sync()
     },
   })
 
@@ -143,7 +144,6 @@ export const setupIotStore = async (injector: Injector, logger: ScopedLogger) =>
           sequelize,
         },
       )
-      // await DevicePingHistoryModel.sync()
     },
   })
 

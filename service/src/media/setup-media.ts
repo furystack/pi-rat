@@ -124,10 +124,8 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
   declare updatedAt: string
 }
 
-export const setupMovies = async (injector: Injector) => {
+export const setupMedia = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Movies')
-
-  await logger.verbose({ message: '🎥  Setting up Media store and repository...' })
 
   const dbOptions = getDefaultDbSettings('movies.sqlite', logger)
 
@@ -237,8 +235,6 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize, indexes: [{ fields: ['imdbId'] }, { fields: ['driveLetter', 'path'], unique: true }] },
       )
-
-      // await MovieFileModel.sync()
     },
   })
 
@@ -291,7 +287,6 @@ export const setupMovies = async (injector: Injector) => {
           indexes: [{ fields: ['userName', 'driveLetter', 'path'], unique: true }],
         },
       )
-      // await WatchHistoryEntryModel.sync()
     },
   })
 
@@ -335,7 +330,6 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      // await SeriesModel.sync()
     },
   })
 
@@ -472,7 +466,6 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      // await OmdbMovieMetadataModel.sync()
     },
   })
 
@@ -585,7 +578,6 @@ export const setupMovies = async (injector: Injector) => {
         },
         { sequelize },
       )
-      // await OmdbSeriesMetadataModel.sync()
     },
   })
 
@@ -670,6 +662,4 @@ export const setupMovies = async (injector: Injector) => {
   injector.getInstance(OmdbClientService)
 
   useMovieFileMaintainer(injector)
-
-  await logger.verbose({ message: '✅  Media setup completed' })
 }

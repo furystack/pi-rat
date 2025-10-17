@@ -74,7 +74,6 @@ export class OllamaClientService {
   }
 
   public async init(injector: Injector) {
-    await this.logger.verbose({ message: '🤖   Initializing Ollama Service' })
     const config = await this.getOllamaConfig(injector)
     if (!config) {
       this.config = undefined

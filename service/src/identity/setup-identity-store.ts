@@ -34,7 +34,6 @@ class SessionModel extends Model<DefaultSession, DefaultSession> implements Defa
 
 export const setupIdentity = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Identity')
-  await logger.verbose({ message: '👤  Setting up Identity stores and repository...' })
 
   const options = getDefaultDbSettings('identity.sqlite', logger)
 
@@ -97,7 +96,6 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      // await PasswordCredentialModel.sync()
     },
   })
 
@@ -122,11 +120,9 @@ export const setupIdentity = async (injector: Injector) => {
           sequelize,
         },
       )
-      // await SessionModel.sync()
     },
   })
 
-  await logger.verbose({ message: 'Setting up repository...' })
   getRepository(injector).createDataSet(User, 'username', {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
@@ -141,14 +137,11 @@ export const setupIdentity = async (injector: Injector) => {
     authorizeUpdate: withRole('admin'),
   })
 
-  await logger.verbose({ message: 'Setting up password policy...' })
   usePasswordPolicy(injector)
 
-  await logger.verbose({ message: 'Setting up HTTP Authentication...' })
   useHttpAuthentication(injector, {
     getUserStore: (sm) => sm.getStoreFor(User, 'username'),
     getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
     enableBasicAuth: false,
   })
-  await logger.verbose({ message: '✅  Identity stores and repo setup completed' })
 }
