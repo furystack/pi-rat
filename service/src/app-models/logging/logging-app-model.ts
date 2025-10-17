@@ -1,7 +1,8 @@
 import { Injectable, type Injector } from '@furystack/inject'
 import type { InternalAppModel } from '../../AppModelManager.js'
 import { LoggingManifest } from './logging-manifest.js'
-import { setupLogging } from './setup-logging.js'
+import { setupLoggerInstance } from './setup-logger-instance.js'
+import { setupLoggingStorage } from './setup-logging-storage.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class LoggingAppModel implements InternalAppModel {
@@ -14,6 +15,6 @@ export class LoggingAppModel implements InternalAppModel {
   }
 
   public async setup() {
-    await Promise.all([setupLogging(this.injector)])
+    await Promise.all([setupLoggingStorage(this.injector), setupLoggerInstance(this.injector)])
   }
 }

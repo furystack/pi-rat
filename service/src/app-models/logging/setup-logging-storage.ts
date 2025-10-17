@@ -14,7 +14,7 @@ class LogEntryModel extends Model<LogEntry, LogEntry> implements LogEntry {
   declare createdAt: string
 }
 
-export const setupLogging = async (injector: Injector) => {
+export const setupLoggingStorage = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('Logging')
 
   useSequelize({
