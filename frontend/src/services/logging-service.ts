@@ -1,7 +1,7 @@
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
-import type { LogEntry } from 'common'
+import type { LogEntry, WebsocketMessage } from 'common'
 import { LoggingApiClient } from './api-clients/logging-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
@@ -54,7 +54,24 @@ export class LoggingService {
   public findLogEntry = this.logEntryQueryCache.get.bind(this.logEntryQueryCache)
   public findLogEntryAsObservable = this.logEntryQueryCache.getObservable.bind(this.logEntryQueryCache)
 
+  private onMessage = ((messageData: WebsocketMessage) => {
+    if (messageData.type === 'log-entry-added') {
+      // Update the cache with the new log entry
+      this.logEntryCache.setExplicitValue({
+        loadArgs: [messageData.logEntry.id],
+        value: { status: 'loaded', value: messageData.logEntry, updatedAt: new Date() },
+      })
+
+      // Invalidate query cache to ensure fresh results on next load
+      this.logEntryQueryCache.flushAll()
+    }
+  }).bind(this)
+
   public init() {
-    // TODO: PUSH when adding a new log entry?
+    this.websocketNotificationsService.addListener('onMessage', this.onMessage)
+  }
+
+  public dispose() {
+    this.websocketNotificationsService.removeListener('onMessage', this.onMessage)
   }
 }

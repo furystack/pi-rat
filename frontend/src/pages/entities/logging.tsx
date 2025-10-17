@@ -11,6 +11,14 @@ export const LoggingPage = Shade({
   render: ({ useDisposable, injector }) => {
     const loggingService = injector.getInstance(LoggingService)
 
+    // Initialize the logging service to listen for WebSocket messages
+    useDisposable('logging-service-websocket', () => {
+      loggingService.init()
+      return {
+        [Symbol.dispose]: () => loggingService.dispose(),
+      }
+    })
+
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
     const modelUri = modelProvider.getModelUriForEntityType({

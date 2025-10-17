@@ -10,4 +10,5 @@ export interface EntityShortcutWidget {
     | 'omdb-movie-metadata'
     | 'omdb-series-metadata'
     | 'device'
+    | 'log-entry'
 }
