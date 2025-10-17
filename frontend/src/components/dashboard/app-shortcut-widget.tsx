@@ -1,5 +1,9 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { AppShortcutWidget as AppShortcutWidgetData } from 'common'
+import { defaultDashboardRoute } from '../routes/dashboard-routes.js'
+import { fileBrowserRoute } from '../routes/file-browser-routes.js'
+import { iotDeviceListRoute } from '../routes/iot-routes.js'
+import { movieListRoute, seriesListRoute } from '../routes/movie-routes.js'
 import { IconUrlWidget } from './icon-url-widget.js'
 export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
   shadowDomName: 'pi-rat-app-shortcut-widget',
@@ -7,15 +11,15 @@ export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
     const { appName, ...rest } = props
     switch (props.appName) {
       case 'home':
-        return <IconUrlWidget {...rest} name="Home" url="/" icon={<>🐀</>} />
+        return <IconUrlWidget {...rest} name="Home" url={defaultDashboardRoute.url} icon={<>🐀</>} />
       case 'browser':
-        return <IconUrlWidget {...rest} name="File Browser" url="/file-browser" icon={<>📂</>} />
+        return <IconUrlWidget {...rest} name="File Browser" url={fileBrowserRoute.url} icon={<>📂</>} />
       case 'movies':
-        return <IconUrlWidget {...rest} name="Movies" url="/movies" icon={<>🎥</>} />
+        return <IconUrlWidget {...rest} name="Movies" url={movieListRoute.url} icon={<>🎥</>} />
       case 'series':
-        return <IconUrlWidget {...rest} name="Series" url="/series" icon={<>📺</>} />
+        return <IconUrlWidget {...rest} name="Series" url={seriesListRoute.url} icon={<>📺</>} />
       case 'iot':
-        return <IconUrlWidget {...rest} name="IOT Devices" url="/iot/devices" icon={<>📡</>} />
+        return <IconUrlWidget {...rest} name="IOT Devices" url={iotDeviceListRoute.url} icon={<>📡</>} />
       default:
         return <IconUrlWidget {...rest} name={appName} url={`/${appName}`} icon={<>🚫</>} />
     }
