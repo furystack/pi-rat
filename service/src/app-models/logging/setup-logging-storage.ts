@@ -1,8 +1,11 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger, type LogLevel } from '@furystack/logging'
+import { getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { LogEntry } from 'common'
 import { DataTypes, Model } from 'sequelize'
+import { alwaysDeny } from '../../authorization/always-deny.js'
+import { withRole } from '../../authorization/with-role.js'
 import { getDefaultDbSettings } from '../../get-default-db-options.js'
 
 class LogEntryModel extends Model<LogEntry, LogEntry> implements LogEntry {
@@ -71,5 +74,12 @@ export const setupLoggingStorage = async (injector: Injector) => {
         },
       )
     },
+  })
+
+  getRepository(injector).createDataSet(LogEntry, 'id', {
+    authorizeGet: withRole('admin'),
+    authorizeUpdate: alwaysDeny,
+    authorizeRemove: alwaysDeny,
+    authorizeAdd: alwaysDeny,
   })
 }

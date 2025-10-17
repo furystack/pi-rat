@@ -1,6 +1,6 @@
 import { createComponent } from '@furystack/shades'
-import { onLeave, onVisit } from './route-animations.js'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import { onLeave, onVisit } from './route-animations.js'
 
 export const entityDrivesRoute = {
   url: '/entities/drives',
@@ -128,6 +128,20 @@ export const entityDeviceRoute = {
   ),
 }
 
+export const entityLoggingRoute = {
+  url: '/entities/logging',
+  onVisit,
+  onLeave,
+  component: () => (
+    <PiRatLazyLoad
+      component={async () => {
+        const { LoggingPage } = await import('../../pages/entities/logging.js')
+        return <LoggingPage />
+      }}
+    />
+  ),
+}
+
 export const entityRoutes = [
   entityDrivesRoute,
   entityUsersRoute,
@@ -138,4 +152,5 @@ export const entityRoutes = [
   entityOmdbSeriesMetadataRoute,
   entityConfigRoute,
   entityDeviceRoute,
+  entityLoggingRoute,
 ]
