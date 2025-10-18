@@ -1,12 +1,12 @@
 import { StoreManager } from '@furystack/core'
 import { getLogger } from '@furystack/logging'
 import { RequestError } from '@furystack/rest'
-import { JsonResult, type RequestAction } from '@furystack/rest-service'
+import { HttpUserContext, JsonResult, type RequestAction } from '@furystack/rest-service'
 import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
 import type { RegisterAction as RegisterActionType } from 'common'
 import { User } from 'common'
 
-export const RegisterAction: RequestAction<RegisterActionType> = async ({ injector, getBody }) => {
+export const RegisterAction: RequestAction<RegisterActionType> = async ({ injector, getBody, response }) => {
   const logger = getLogger(injector).withScope('Register')
   const postBody = await getBody()
   const { username, password } = postBody as { username: string; password: string }
@@ -25,7 +25,6 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
   try {
     // Create password credential first (this can fail early if password is invalid)
     const credential = await authenticator.hasher.createCredential(username, password)
-    await logger.information({ message: `Password credential created for: ${username}` })
 
     // Create user with default (empty) roles
     const newUser: User = {
@@ -41,6 +40,10 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
     // Now add the credential to the store
     await storeManager.getStoreFor(PasswordCredential, 'userName').add(credential)
     await logger.information({ message: `Registration completed for: ${username}` })
+
+    const userContext = injector.getInstance(HttpUserContext)
+    const user = await userContext.authenticateUser(username, password)
+    await userContext.cookieLogin(user, response)
 
     return JsonResult({
       username: newUser.username,

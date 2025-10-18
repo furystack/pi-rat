@@ -38,15 +38,16 @@ test('User Registration and Login Flow', async ({ page }) => {
   await createAccountButton.click()
   await expect(registerForm).toBeVisible()
 
-  // Test registration with mismatched passwords
+  // Test registration with mismatched passwords - client-side validation should prevent submission
   const testEmail = `testuser-${Date.now()}@example.com`
   await usernameInput.fill(testEmail)
   await passwordInput.fill('testpassword123')
   await confirmPasswordInput.fill('differentpassword')
   await createAccountSubmitButton.click()
 
-  // Should show password mismatch error (though this might not be visible in the UI)
-  // Let's continue with correct registration
+  // Form validation should prevent submission, so we should still be on registration page
+  await expect(registerForm).toBeVisible()
+  // Continue with correct registration
 
   // Test successful registration
   await usernameInput.fill(testEmail)
@@ -103,25 +104,38 @@ test('Registration validation', async ({ page }) => {
   const confirmPasswordInput = registerForm.locator('input[name="confirmPassword"]')
   const createAccountSubmitButton = page.locator('shade-register button', { hasText: 'Create Account' })
 
-  // Test with invalid email format
+  // Test with invalid email format - browser validation should prevent submission
   await usernameInput.fill('invalid-email')
   await passwordInput.fill('testpassword123')
   await confirmPasswordInput.fill('testpassword123')
-  await createAccountSubmitButton.click()
 
-  // Should show registration failed notification
-  await assertAndDismissNoty(page, 'Registration failed')
+  // Check that email input shows validation error
+  await expect(usernameInput).toHaveJSProperty('validity.valid', false)
+  await expect(usernameInput).toHaveJSProperty('validity.typeMismatch', true)
 
-  // Test with short password
+  // Test with short password - HTML5 validation should prevent submission
   await usernameInput.fill('test@example.com')
   await passwordInput.fill('123')
   await confirmPasswordInput.fill('123')
+
+  // Check that password inputs show validation errors for minlength
+  await expect(passwordInput).toHaveJSProperty('validity.valid', false)
+  await expect(passwordInput).toHaveJSProperty('validity.tooShort', true)
+  await expect(confirmPasswordInput).toHaveJSProperty('validity.valid', false)
+  await expect(confirmPasswordInput).toHaveJSProperty('validity.tooShort', true)
+
+  // Test with mismatched passwords - form validation should disable submit
+  await usernameInput.fill('test@example.com')
+  await passwordInput.fill('testpassword123')
+  await confirmPasswordInput.fill('differentpassword')
+
+  // The form should be invalid due to password mismatch, button should be disabled
+  // (This depends on the Form component implementation, may need adjustment)
   await createAccountSubmitButton.click()
+  // Form validation should prevent submission, so we should still be on registration page
+  await expect(registerForm).toBeVisible()
 
-  // Should show registration failed notification
-  await assertAndDismissNoty(page, 'Registration failed')
-
-  // Test with existing user (using the admin user created in install)
+  // Test with existing user (this is the only case that reaches server validation)
   await usernameInput.fill('testuser@gmail.com')
   await passwordInput.fill('testpassword123')
   await confirmPasswordInput.fill('testpassword123')
