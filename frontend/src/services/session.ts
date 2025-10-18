@@ -3,7 +3,7 @@ import { Injectable, Injected, type Injector } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue, usingAsync } from '@furystack/utils'
 import type { Roles } from 'common'
-import { loginRoute } from '../components/routes/auth-routes.js'
+import { defaultAuthRoute } from '../components/routes/auth-routes.js'
 import { defaultDashboardRoute } from '../components/routes/dashboard-routes.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
@@ -104,12 +104,30 @@ export class SessionService implements IdentityContext {
         title: 'You have been logged out',
         type: 'info',
       })
-      navigateToRoute(this.injector, loginRoute, {})
+      navigateToRoute(this.injector, defaultAuthRoute, {})
     })
   }
 
   public async isAuthenticated(): Promise<boolean> {
     return this.state.getValue() === 'authenticated'
+  }
+
+  public async resetPassword(currentPassword: string, newPassword: string): Promise<void> {
+    await usingAsync(this.operation(), async () => {
+      const { result } = await this.api.call({
+        method: 'POST',
+        action: '/password-reset',
+        body: { currentPassword, newPassword },
+      })
+
+      if (result.success) {
+        this.notys.emit('onNotyAdded', {
+          body: 'Your password has been updated successfully',
+          title: 'Password updated',
+          type: 'success',
+        })
+      }
+    })
   }
   public async isAuthorized(...roles: Roles): Promise<boolean> {
     const currentUser = await this.getCurrentUser()

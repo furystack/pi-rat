@@ -15,35 +15,49 @@ export const login = async (page: Page, username = 'testuser@gmail.com', passwor
   await expect(loginForm).toBeVisible()
 
   const usernameInput = loginForm.locator('input[name="userName"]')
-  await expect(usernameInput).toBeVisible()
-
   const passwordInput = loginForm.locator('input[name="password"]')
-  await expect(passwordInput).toBeVisible()
-
-  const submitButton = page.locator('shade-login button', { hasText: 'Login' })
-  await expect(submitButton).toBeVisible()
-  await expect(submitButton).toBeEnabled()
-  await expect(submitButton).toHaveText('Login')
+  const submitButton = page.getByRole('button', { name: 'Login' })
 
   await usernameInput.fill(username)
   await passwordInput.fill(password)
-
   await submitButton.click()
 
   await assertAndDismissNoty(page, 'Welcome back ;)')
 
-  page.locator('button', { hasText: 'Log Out' })
+  // Verify user is logged in by checking for user avatar (should contain first letter of username)
+  const firstLetter = username.charAt(0).toUpperCase()
+  const userAvatar = page.getByText(firstLetter).first()
+  await expect(userAvatar).toBeVisible()
 }
 
 export const logout = async (page: Page) => {
-  const logoutButton = page.locator('shade-app-bar button', { hasText: 'Log Out' })
+  // Find and click the user avatar (circular div with user's first letter)
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await expect(userAvatar).toBeVisible()
+  await userAvatar.click()
+
+  // Wait for dropdown menu and click logout - use getByRole for better accessibility
+  const logoutButton = page.getByRole('button', { name: /log out/i })
   await expect(logoutButton).toBeVisible()
-  await expect(logoutButton).toBeEnabled()
-  await expect(logoutButton).toHaveText('Log Out')
   await logoutButton.click()
 
-  const loggedOutLoginForm = page.locator('shade-login form.login-form')
-  await expect(loggedOutLoginForm).toBeVisible()
+  // Wait for logout to complete and verify login form appears
+  const loginForm = page.locator('shade-login form')
+  await expect(loginForm).toBeVisible()
+}
+
+export const navigateToUserSettings = async (page: Page) => {
+  // Click on the user avatar to open the menu
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await userAvatar.click()
+
+  // Click on Settings option
+  const settingsButton = page.getByRole('button', { name: /settings/i })
+  await settingsButton.click()
+
+  // Verify we're on the settings page
+  const settingsPage = page.locator('user-settings-page')
+  await expect(settingsPage).toBeVisible()
 }
 
 export const uploadFile = async (page: Page, filePath: string, mime: string) => {

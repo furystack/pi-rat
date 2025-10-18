@@ -156,3 +156,144 @@ public async register(username: string, password: string): Promise<void> {
 - Helpful error messages with next steps
 - Consistent notification styling
 - Proper form state management
+
+## Password Reset Patterns
+
+### 1. Use PasswordAuthenticator for Password Operations
+
+**✅ Correct - Use authenticator's built-in methods:**
+
+```typescript
+export const PasswordResetAction: RequestAction<PasswordResetActionType> = async ({ injector, getBody }) => {
+  const currentUser = await getCurrentUser(injector)
+  const { currentPassword, newPassword } = await getBody()
+
+  const authenticator = injector.getInstance(PasswordAuthenticator)
+
+  try {
+    // This method handles everything:
+    // - Password complexity validation
+    // - Current password verification
+    // - Creating and storing new credential
+    await authenticator.setPasswordForUser(currentUser.username, currentPassword, newPassword)
+
+    return JsonResult({ success: true })
+  } catch (error) {
+    if (error instanceof UnauthenticatedError) {
+      throw new RequestError('Current password is incorrect', 400)
+    }
+    if (error instanceof PasswordComplexityError) {
+      throw new RequestError('Password does not meet complexity requirements', 400)
+    }
+    throw new RequestError('Password reset failed', 500)
+  }
+}
+```
+
+**❌ Incorrect - Manual credential management:**
+
+```typescript
+// Don't do this - manual verification and storage
+const credentialStore = storeManager.getStoreFor(PasswordCredential, 'userName')
+const currentCredential = await credentialStore.get(currentUser.username)
+const isCurrentPasswordValid = await authenticator.hasher.verifyCredential(currentPassword, currentCredential)
+const newCredential = await authenticator.hasher.createCredential(currentUser.username, newPassword)
+await credentialStore.update(currentUser.username, newCredential)
+```
+
+### 2. Password Reset Frontend Integration
+
+```typescript
+// SessionService method
+public async resetPassword(currentPassword: string, newPassword: string): Promise<void> {
+  await usingAsync(this.operation(), async () => {
+    const { result } = await this.api.call({
+      method: 'POST',
+      action: '/password-reset',
+      body: { currentPassword, newPassword },
+    })
+
+    if (result.success) {
+      this.notys.emit('onNotyAdded', {
+        body: 'Your password has been updated successfully',
+        title: 'Password updated',
+        type: 'success',
+      })
+    }
+  })
+}
+```
+
+### 3. User Interface Patterns
+
+#### User Avatar Menu Component
+
+```typescript
+const UserAvatarMenu = Shade({
+  shadowDomName: 'user-avatar-menu',
+  render: ({ injector, useObservable, useDisposable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+    const isMenuOpen = useDisposable('isMenuOpen', () => new ObservableValue(false))
+
+    const handleSettingsClick = () => {
+      const userSettingsRoute: Route<Record<string, never>> = {
+        url: '/user/settings',
+        component: () => <div>Loading...</div>,
+      }
+      navigateToRoute(injector, userSettingsRoute, {})
+      isMenuOpen.setValue(false)
+    }
+
+    // Avatar with dropdown menu implementation...
+  }
+})
+```
+
+#### Password Reset Form Best Practices
+
+- Remove client-side password length checks - let server handle complexity validation
+- Show specific error messages from server (complexity vs authentication errors)
+- Clear form after successful password change
+- Disable form during submission
+- Provide clear feedback for all states
+
+```typescript
+const handlePasswordReset = async (data: PasswordResetPayload) => {
+  if (data.newPassword !== data.confirmPassword) {
+    error.setValue('New passwords do not match')
+    return
+  }
+
+  // Don't validate length client-side - let server handle complexity
+  isLoading.setValue(true)
+  error.setValue('')
+
+  try {
+    await session.resetPassword(data.currentPassword, data.newPassword)
+    // Clear form after success
+    const form = document.querySelector('form[data-password-reset-form]') as HTMLFormElement
+    form?.reset()
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Failed to update password'
+    error.setValue(errorMessage)
+  } finally {
+    isLoading.setValue(false)
+  }
+}
+```
+
+### 4. User Settings Page Structure
+
+- **Profile Section**: Display read-only user information (username, roles)
+- **Security Section**: Password reset functionality
+- **Proper Form Validation**: Confirm password matching, async submission
+- **Error Display**: Clear error states with specific messaging
+- **Loading States**: Disable form and show loading during operations
+
+### 5. Important Security Principles
+
+- **Don't update user records during password changes** - password operations should only affect credentials
+- **Use framework password policies** - don't implement custom complexity validation
+- **Proper error types** - distinguish between authentication and complexity errors
+- **Clean separation** - user profile changes vs credential changes are separate concerns

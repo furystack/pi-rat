@@ -58,10 +58,6 @@ test('User Registration and Login Flow', async ({ page }) => {
   // Should be logged in automatically after successful registration
   await assertAndDismissNoty(page, 'Account created successfully')
 
-  // Verify user is logged in by checking for logout button
-  const logoutButton = page.locator('button', { hasText: 'Log Out' })
-  await expect(logoutButton).toBeVisible()
-
   // Test logout and login with the newly created account
   await logout(page)
 
@@ -85,8 +81,10 @@ test('User Registration and Login Flow', async ({ page }) => {
   // Should be logged in successfully
   await assertAndDismissNoty(page, 'Welcome back ;)')
 
-  // Verify user is logged in
-  await expect(logoutButton).toBeVisible()
+  // Verify user is logged in by checking for user avatar with first letter
+  const firstLetter = testEmail.charAt(0).toUpperCase()
+  const userAvatar = page.getByText(firstLetter).first()
+  await expect(userAvatar).toBeVisible()
 })
 
 test('Registration validation', async ({ page }) => {

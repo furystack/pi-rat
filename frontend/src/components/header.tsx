@@ -10,6 +10,7 @@ import { defaultDashboardRoute } from './routes/dashboard-routes.js'
 import { fileBrowserRoute } from './routes/file-browser-routes.js'
 import { movieListRoute, seriesListRoute } from './routes/movie-routes.js'
 import { ThemeSwitch } from './theme-switch/index.js'
+import { UserAvatarMenu } from './user-avatar-menu.js'
 
 export interface HeaderProps {
   title: string
@@ -72,11 +73,7 @@ export const Header = Shade<HeaderProps>({
           </Button>
           <ChatIcon />
           <AiIcon />
-          {sessionState === 'authenticated' ? (
-            <Button variant="outlined" onclick={() => injector.getInstance(SessionService).logout()}>
-              Log Out
-            </Button>
-          ) : null}
+          {sessionState === 'authenticated' ? <UserAvatarMenu /> : null}
         </div>
       </AppBar>
     )

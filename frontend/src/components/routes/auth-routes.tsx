@@ -3,13 +3,6 @@ import { Login } from '../../pages/login.js'
 import { Register } from '../../pages/register.js'
 import { onLeave, onVisit } from './route-animations.js'
 
-export const loginRoute = {
-  url: '/login',
-  onVisit,
-  onLeave,
-  component: () => <Login />,
-} satisfies Route<unknown>
-
 export const registerRoute = {
   url: '/register',
   onVisit,
@@ -24,4 +17,4 @@ export const defaultAuthRoute = {
   component: () => <Login />,
 } satisfies Route<unknown>
 
-export const authRoutes = [loginRoute, registerRoute, defaultAuthRoute] as const
+export const authRoutes = [registerRoute, defaultAuthRoute] as const

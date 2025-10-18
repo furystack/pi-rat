@@ -11,6 +11,7 @@ import { fileBrowserRoutes } from './routes/file-browser-routes.js'
 import { iotRoutes } from './routes/iot-routes.js'
 import { loggingRoutes } from './routes/logging-routes.js'
 import { movieRoutes } from './routes/movie-routes.js'
+import { userRoutes } from './routes/user-routes.js'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
@@ -34,6 +35,7 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
               ...dashboardRoutes,
               ...chatRoutes,
               ...aiRoutes,
+              ...userRoutes,
             ]}
           />
         )

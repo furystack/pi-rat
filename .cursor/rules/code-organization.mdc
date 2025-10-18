@@ -151,3 +151,214 @@ frontend/src/
 - Exposing internal errors to users
 - Inconsistent error handling patterns
 - Not following established module structure
+
+## User Interface Component Organization
+
+### 1. User Management Components Structure
+
+```
+frontend/src/
+├── components/
+│   ├── user-avatar-menu.tsx          # Avatar with dropdown
+│   ├── routes/user-routes.tsx        # User-related routes
+│   └── header.tsx                    # Updated with avatar menu
+├── pages/
+│   └── user/
+│       └── settings.tsx              # User settings page
+└── services/
+    └── session.ts                    # Updated with password reset
+```
+
+### 2. Component Composition Patterns
+
+#### User Settings Page Structure
+
+```typescript
+// Organize settings into logical sections
+const UserSettingsPage = Shade({
+  render: ({ injector, useObservable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+
+    return (
+      <div style={{ /* container styles */ }}>
+        <h1>User Settings</h1>
+        <ProfileSection />      {/* Read-only user info */}
+        <SecuritySection />     {/* Password reset form */}
+      </div>
+    )
+  }
+})
+
+// Separate section components for better organization
+const SecuritySection = Shade({
+  render: ({ injector, useDisposable }) => {
+    const session = injector.getInstance(SessionService)
+    const notyService = injector.getInstance(NotyService)
+
+    // Form handling logic...
+  }
+})
+```
+
+#### Avatar Menu Component Pattern
+
+```typescript
+// Composite component with sub-components
+const UserAvatarMenu = Shade({
+  render: ({ injector, useObservable, useDisposable }) => (
+    <div style={{ position: 'relative' }}>
+      <UserAvatar onclick={toggleMenu} />
+      {isMenuOpen && <UserDropdownMenu />}
+      {isMenuOpen && <ClickOutsideOverlay />}
+    </div>
+  )
+})
+
+const UserAvatar = Shade<{ username: string; onClick?: () => void }>({
+  render: ({ props }) => (
+    <div onclick={props.onClick} style={{ /* avatar styles */ }}>
+      {props.username?.charAt(0)?.toUpperCase()}
+    </div>
+  )
+})
+```
+
+### 3. State Management Patterns
+
+#### Observable State for UI Components
+
+```typescript
+const ComponentWithState = Shade({
+  render: ({ useDisposable, useObservable }) => {
+    // Component-specific state
+    const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue<string>(''))
+
+    // Global state subscription
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+
+    // State management logic...
+  },
+})
+```
+
+### 4. Form Handling Organization
+
+#### Password Reset Form Pattern
+
+```typescript
+type PasswordResetPayload = {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+const SecuritySection = Shade({
+  render: ({ injector, useDisposable }) => {
+    const session = injector.getInstance(SessionService)
+    const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue<string>(''))
+
+    const handlePasswordReset = async (data: PasswordResetPayload) => {
+      // Client-side validation
+      if (data.newPassword !== data.confirmPassword) {
+        error.setValue('New passwords do not match')
+        return
+      }
+
+      isLoading.setValue(true)
+      error.setValue('')
+
+      try {
+        await session.resetPassword(data.currentPassword, data.newPassword)
+        // Success handling...
+      } catch (err: unknown) {
+        // Error handling...
+      } finally {
+        isLoading.setValue(false)
+      }
+    }
+
+    return (
+      <Form<PasswordResetPayload>
+        validate={(data): data is PasswordResetPayload => {
+          return !!(
+            (data as PasswordResetPayload)?.currentPassword?.length &&
+            (data as PasswordResetPayload)?.newPassword?.length &&
+            (data as PasswordResetPayload)?.confirmPassword?.length
+          )
+        }}
+        onSubmit={(data) => void handlePasswordReset(data)}
+      >
+        {/* Form inputs */}
+      </Form>
+    )
+  }
+})
+```
+
+### 5. Service Layer Integration
+
+#### Session Service Extensions
+
+```typescript
+// Extend existing services rather than creating new ones
+export class SessionService {
+  // Existing methods...
+
+  // New password reset functionality
+  public async resetPassword(currentPassword: string, newPassword: string): Promise<void> {
+    await usingAsync(this.operation(), async () => {
+      const { result } = await this.api.call({
+        method: 'POST',
+        action: '/password-reset',
+        body: { currentPassword, newPassword },
+      })
+
+      if (result.success) {
+        this.notys.emit('onNotyAdded', {
+          body: 'Your password has been updated successfully',
+          title: 'Password updated',
+          type: 'success',
+        })
+      }
+    })
+  }
+}
+```
+
+### 6. Component Interaction Patterns
+
+#### Header Integration
+
+```typescript
+// Replace logout button with avatar menu
+export const Header = Shade<HeaderProps>({
+  render: ({ props, injector, useObservable }) => {
+    const session = injector.getInstance(SessionService)
+    const [sessionState] = useObservable('sessionState', session.state)
+
+    return (
+      <AppBar id="header">
+        {/* Navigation links */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <ThemeSwitch />
+          <ChatIcon />
+          <AiIcon />
+          {sessionState === 'authenticated' ? <UserAvatarMenu /> : null}
+        </div>
+      </AppBar>
+    )
+  }
+})
+```
+
+This organization ensures:
+
+- **Clear separation of concerns** between profile display and security operations
+- **Reusable components** that can be composed in different contexts
+- **Consistent state management** using the established patterns
+- **Proper error handling** at the appropriate component level
+- **Maintainable code structure** that follows established conventions

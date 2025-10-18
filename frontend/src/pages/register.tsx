@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
-import { loginRoute } from '../components/routes/auth-routes.js'
+import { defaultAuthRoute } from '../components/routes/auth-routes.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -72,7 +72,7 @@ export const Register = Shade({
             <Button variant="contained" color="primary" type="submit">
               Create Account
             </Button>
-            <Button variant="outlined" onclick={() => navigateToRoute(injector, loginRoute, {})}>
+            <Button variant="outlined" onclick={() => navigateToRoute(injector, defaultAuthRoute, {})}>
               Back to Login
             </Button>
           </div>

@@ -102,6 +102,36 @@
       "required": ["result", "body"],
       "additionalProperties": false
     },
+    "PasswordResetAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          },
+          "required": ["success"],
+          "additionalProperties": false
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "currentPassword": {
+              "type": "string"
+            },
+            "newPassword": {
+              "type": "string"
+            }
+          },
+          "required": ["currentPassword", "newPassword"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "body"],
+      "additionalProperties": false
+    },
     "PostUserEndpoint": {
       "type": "object",
       "properties": {
@@ -196,9 +226,12 @@
             },
             "/users": {
               "$ref": "#/definitions/PostUserEndpoint"
+            },
+            "/password-reset": {
+              "$ref": "#/definitions/PasswordResetAction"
             }
           },
-          "required": ["/login", "/logout", "/register", "/users"],
+          "required": ["/login", "/logout", "/register", "/users", "/password-reset"],
           "additionalProperties": false
         },
         "PATCH": {

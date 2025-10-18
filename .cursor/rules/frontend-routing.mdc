@@ -84,3 +84,160 @@ export const moduleRoutes = [route1, route2, route3] as const
 - Maintain consistency with existing route patterns
 - Always test navigation flows after changes
 - Consider accessibility when implementing custom navigation
+
+## User-Focused Routes
+
+### 1. User Settings Routes
+
+```typescript
+// frontend/src/components/routes/user-routes.tsx
+import { createComponent, type Route } from '@furystack/shades'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import { onLeave, onVisit } from './route-animations.js'
+
+export const userSettingsRoute = {
+  url: '/user/settings',
+  onVisit,
+  onLeave,
+  component: () => {
+    return (
+      <PiRatLazyLoad
+        component={async () => {
+          const { UserSettingsPage } = await import('../../pages/user/settings.js')
+          return <UserSettingsPage />
+        }}
+      />
+    )
+  },
+} satisfies Route<unknown>
+
+export const userRoutes = [userSettingsRoute] as const
+```
+
+### 2. Navigation from Components
+
+**✅ Correct - Using route definitions:**
+
+```typescript
+// In component
+const handleSettingsClick = () => {
+  const userSettingsRoute: Route<Record<string, never>> = {
+    url: '/user/settings',
+    component: () => <div>Loading...</div>,
+  }
+  navigateToRoute(injector, userSettingsRoute, {})
+}
+```
+
+**✅ Better - Import actual route definition:**
+
+```typescript
+import { userSettingsRoute } from './routes/user-routes.js'
+
+const handleSettingsClick = () => {
+  navigateToRoute(injector, userSettingsRoute, {})
+}
+```
+
+### 3. User Interface Navigation Patterns
+
+#### Avatar Menu Navigation
+
+- Use dropdown menus for user-specific actions
+- Provide clear visual feedback for active states
+- Include proper keyboard navigation support
+- Close menus when clicking outside or on action
+
+```typescript
+const UserAvatarMenu = Shade({
+  render: ({ injector, useObservable, useDisposable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+    const isMenuOpen = useDisposable('isMenuOpen', () => new ObservableValue(false))
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <UserAvatar username={currentUser.username} onClick={() => isMenuOpen.setValue(!isMenuOpen.getValue())} />
+
+        {isMenuOpen.getValue() && (
+          <>
+            <div style={{ /* dropdown menu styles */ }}>
+              <Button onclick={() => navigateToRoute(injector, userSettingsRoute, {})}>
+                ⚙️ Settings
+              </Button>
+              <Button onclick={() => void session.logout()}>
+                🚪 Log Out
+              </Button>
+            </div>
+
+            {/* Click-outside overlay */}
+            <div
+              style={{ position: 'fixed', top: '0', left: '0', width: '100vw', height: '100vh' }}
+              onclick={() => isMenuOpen.setValue(false)}
+            />
+          </>
+        )}
+      </div>
+    )
+  }
+})
+```
+
+### 4. Route Integration Best Practices
+
+#### Adding New Route Groups
+
+1. Create the route file in `components/routes/`
+2. Import and add to `components/body.tsx`:
+
+```typescript
+import { userRoutes } from './routes/user-routes.js'
+
+// In authenticated routes section
+<Router
+  routes={[
+    ...movieRoutes,
+    ...dashboardRoutes,
+    ...chatRoutes,
+    ...aiRoutes,
+    ...userRoutes, // Add new route group
+  ]}
+/>
+```
+
+#### Protected Routes
+
+- User settings should only be accessible when authenticated
+- Include user routes in the authenticated section only
+- Provide appropriate fallbacks for unauthenticated users
+
+### 5. User Experience Patterns
+
+#### Settings Page Organization
+
+```typescript
+// Structure for settings pages
+export const UserSettingsPage = Shade({
+  render: ({ injector }) => (
+    <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
+      <h1>User Settings</h1>
+
+      <ProfileSection />     {/* Read-only user info */}
+      <SecuritySection />    {/* Password reset, etc. */}
+      <PreferencesSection /> {/* User preferences */}
+    </div>
+  )
+})
+```
+
+#### Navigation Breadcrumbs
+
+- Provide clear navigation context
+- Show current location in app hierarchy
+- Enable easy navigation back to main areas
+
+#### Mobile-Responsive Navigation
+
+- Ensure avatar menus work on touch devices
+- Provide appropriate touch targets
+- Consider mobile-specific navigation patterns

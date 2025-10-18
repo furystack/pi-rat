@@ -18,6 +18,7 @@ import { User } from 'common'
 import identityApiSchema from 'common/schemas/identity-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
+import { PasswordResetAction } from './actions/password-reset-action.js'
 import { RegisterAction } from './actions/register-action.js'
 
 export const setupIdentityRestApi = async (injector: Injector) => {
@@ -54,6 +55,9 @@ export const setupIdentityRestApi = async (injector: Injector) => {
             model: User,
             primaryKey: 'username',
           }),
+        ),
+        '/password-reset': Validate({ schema: identityApiSchema, schemaName: 'PasswordResetAction' })(
+          PasswordResetAction,
         ),
       },
       PATCH: {

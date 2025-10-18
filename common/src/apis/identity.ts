@@ -14,6 +14,14 @@ export type RegisterAction = { result: FurystackUser; body: { username: string; 
 
 export type PostUserEndpoint = { result: User; body: WithOptionalId<FurystackUser, 'username'> }
 
+export type PasswordResetAction = {
+  result: { success: boolean }
+  body: {
+    currentPassword: string
+    newPassword: string
+  }
+}
+
 export interface IdentityApi extends RestApi {
   GET: {
     '/isAuthenticated': IsAuthenticatedAction
@@ -26,6 +34,7 @@ export interface IdentityApi extends RestApi {
     '/logout': LogoutAction
     '/register': RegisterAction
     '/users': PostUserEndpoint
+    '/password-reset': PasswordResetAction
   }
   PATCH: {
     '/users/:id': PatchEndpoint<Omit<User, 'createdAt' | 'updatedAt'>, 'username'>
