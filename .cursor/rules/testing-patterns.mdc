@@ -1,0 +1,135 @@
+# E2E Testing Patterns
+
+## Playwright Best Practices
+
+### Locator Strategy (Priority Order)
+
+1. **Semantic first**: `page.getByRole('button', { name: 'Login' })`
+2. **Content-based**: `page.getByText('Username')`
+3. **Form elements**: `page.locator('input[name="username"]')`
+4. **Component-specific**: `page.locator('shade-login form')`
+5. **Style-based (last resort)**: `page.locator('[style*="border-radius: 50%"]')`
+
+### Helper Function Pattern
+
+```typescript
+export const login = async (page: Page, username = 'testuser@gmail.com', password = 'password') => {
+  const loginForm = page.locator('shade-login form')
+  await loginForm.locator('input[name="userName"]').fill(username)
+  await loginForm.locator('input[name="password"]').fill(password)
+  await page.getByRole('button', { name: 'Login' }).click()
+
+  // Helper handles verification internally
+  await expect(page.locator('shade-noty', { hasText: 'Welcome back' })).toBeVisible()
+  const firstLetter = username.charAt(0).toUpperCase()
+  await expect(page.getByText(firstLetter).first()).toBeVisible()
+}
+
+export const logout = async (page: Page) => {
+  // Handle complete logout workflow
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await userAvatar.click()
+
+  const logoutButton = page.getByRole('button', { name: /log out/i })
+  await logoutButton.click()
+
+  // Verify logout success
+  await expect(page.locator('shade-login form')).toBeVisible()
+}
+```
+
+## Test Organization
+
+### Test Structure
+
+```typescript
+test('Feature Name', async ({ page }) => {
+  // Setup
+  await page.goto('/')
+  await login(page)
+
+  // Action
+  await performUserAction(page)
+
+  // Verification
+  await expect(result).toBeVisible()
+})
+```
+
+### Test Categories
+
+- **Navigation tests**: Verify routing and page access
+- **Form interaction tests**: Input handling, validation
+- **Workflow tests**: Complete user journeys end-to-end
+- **Error scenario tests**: Test failure conditions
+
+## Critical Testing Rules
+
+### ✅ Test What EXISTS
+
+```typescript
+// Good - test actual behavior
+const form = page.locator('form[data-form-id]')
+await form.locator('input[name="username"]').fill('test')
+await expect(form.locator('input[name="username"]')).toHaveValue('test')
+```
+
+### ❌ Don't Test Assumptions
+
+```typescript
+// Bad - assuming validation that doesn't exist
+const errorMessage = page.locator('div', { hasText: 'Password too short' })
+await expect(errorMessage).toBeVisible() // This might not exist!
+```
+
+### Dynamic Content Handling
+
+```typescript
+// Handle dynamic test data
+const testEmail = `user-${Date.now()}@example.com`
+const firstLetter = testEmail.charAt(0).toUpperCase()
+
+// Use in tests
+await usernameInput.fill(testEmail)
+// Later verify avatar shows correct letter
+await expect(page.getByText(firstLetter).first()).toBeVisible()
+```
+
+### Error Testing
+
+```typescript
+// Test general error handling, not specific messages
+await submitInvalidForm()
+
+// Look for ANY error notification, not specific text
+const errorNoty = page.locator('shade-noty').first()
+await expect(errorNoty).toBeVisible()
+```
+
+## Test Maintenance
+
+### Helper Centralization
+
+Create helpers that encapsulate:
+
+- Complex component interactions (avatar dropdown)
+- Multi-step workflows (login, logout, navigation)
+- Assertion patterns (notification handling)
+- Setup/teardown operations
+
+### Avoid Brittleness
+
+- Use semantic locators over CSS selectors
+- Handle dynamic content appropriately
+- Test user workflows, not implementation details
+- Keep tests independent and parallelizable
+
+### Skip Unimplemented Features
+
+```typescript
+test.skip('Future Feature', async ({ page }) => {
+  // Mark unimplemented features for later
+})
+```
+
+This prevents test failures on functionality that doesn't exist yet while maintaining a plan for future testing.

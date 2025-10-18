@@ -1,0 +1,236 @@
+# Frontend Development Patterns
+
+## Routing
+
+### Route Definition
+
+```typescript
+import { createComponent, type Route } from '@furystack/shades'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import { onLeave, onVisit } from './route-animations.js'
+
+export const myRoute = {
+  url: '/path/:param',
+  onVisit, onLeave,
+  component: ({ match }) => (
+    <PiRatLazyLoad
+      component={async () => {
+        const { MyPage } = await import('../../pages/my-page.js')
+        return <MyPage param={match.params.param} />
+      }}
+    />
+  ),
+} satisfies Route<{ param: string }>
+
+export const myRoutes = [myRoute] as const
+```
+
+### Navigation & Integration
+
+```typescript
+// ✅ Always use navigateToRoute()
+import { navigateToRoute } from '../navigate-to-route.js'
+import { myRoute } from './routes/my-routes.js'
+
+onclick={() => navigateToRoute(injector, myRoute, { param: 'value' })}
+
+// Add routes to body.tsx
+import { myRoutes } from './routes/my-routes.js'
+
+<Router routes={[...existingRoutes, ...myRoutes]} />
+```
+
+## Component Architecture
+
+### Shade Component Pattern
+
+```typescript
+const MyComponent = Shade<{ prop: string }>({
+  shadowDomName: 'my-component',
+  render: ({ props, injector, useObservable, useDisposable }) => {
+    // Global state subscriptions
+    const session = injector.getInstance(SessionService)
+    const [user] = useObservable('user', session.currentUser)
+
+    // Component-specific state
+    const isLoading = useDisposable('loading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue<string>(''))
+
+    return <div>{/* Component JSX */}</div>
+  }
+})
+```
+
+### State Management Rules
+
+- **Global state**: `useObservable` with services (SessionService, etc.)
+- **Local state**: `useDisposable` with `ObservableValue`
+- **Loading states**: Boolean observables for async operations
+- **Error states**: String observables for error messages
+
+## Form Patterns
+
+### Standard Form Structure
+
+```typescript
+type FormPayload = { field1: string; field2: string }
+
+const MyForm = Shade({
+  render: ({ injector, useDisposable }) => {
+    const service = injector.getInstance(MyService)
+    const isLoading = useDisposable('loading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue(''))
+
+    const handleSubmit = async (data: FormPayload) => {
+      // Client-side validation only
+      if (data.field1 !== data.field2) {
+        error.setValue('Fields must match')
+        return
+      }
+
+      isLoading.setValue(true)
+      error.setValue('')
+
+      try {
+        await service.performAction(data)
+        // Success handling (clear form, show notification)
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Operation failed'
+        error.setValue(message)
+      } finally {
+        isLoading.setValue(false)
+      }
+    }
+
+    return (
+      <Form<FormPayload>
+        validate={(data): data is FormPayload => !!(data?.field1?.length && data?.field2?.length)}
+        onSubmit={(data) => void handleSubmit(data)}
+      >
+        <Input name="field1" required />
+        {error.getValue() && <ErrorDisplay message={error.getValue()} />}
+        <Button type="submit" disabled={isLoading.getValue()}>
+          {isLoading.getValue() ? 'Processing...' : 'Submit'}
+        </Button>
+      </Form>
+    )
+  }
+})
+```
+
+## UI Component Patterns
+
+### User Avatar with Dropdown
+
+```typescript
+const UserAvatarMenu = Shade({
+  render: ({ injector, useObservable, useDisposable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+    const isMenuOpen = useDisposable('isMenuOpen', () => new ObservableValue(false))
+
+    if (!currentUser) return null
+
+    return (
+      <div style={{ position: 'relative' }}>
+        {/* Circular avatar */}
+        <div
+          onclick={() => isMenuOpen.setValue(!isMenuOpen.getValue())}
+          style={{
+            width: '32px', height: '32px', borderRadius: '50%',
+            backgroundColor: '#2196f3', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', fontWeight: 'bold'
+          }}
+        >
+          {currentUser.username.charAt(0).toUpperCase()}
+        </div>
+
+        {isMenuOpen.getValue() && (
+          <>
+            <div style={{ /* dropdown positioning and styling */ }}>
+              <Button onclick={() => navigateToRoute(injector, settingsRoute, {})}>
+                ⚙️ Settings
+              </Button>
+              <Button onclick={() => void session.logout()}>
+                🚪 Log Out
+              </Button>
+            </div>
+
+            {/* Click-outside overlay */}
+            <div
+              style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
+              onclick={() => isMenuOpen.setValue(false)}
+            />
+          </>
+        )}
+      </div>
+    )
+  }
+})
+```
+
+### Settings Page Structure
+
+Organize complex pages into logical sections:
+
+```typescript
+const UserSettingsPage = Shade({
+  render: ({ injector, useObservable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+
+    if (!currentUser) return <div>Please log in</div>
+
+    return (
+      <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
+        <h1>User Settings</h1>
+        <ProfileSection />
+        <SecuritySection />
+      </div>
+    )
+  }
+})
+
+const SecuritySection = Shade({
+  shadowDomName: 'user-settings-security',
+  render: ({ injector, useDisposable }) => {
+    // Form logic here
+    return (
+      <div>
+        <h3>🔒 Security</h3>
+        <Paper><Form>/* Password reset form */</Form></Paper>
+      </div>
+    )
+  }
+})
+```
+
+## Styling Guidelines
+
+### CSS Variables
+
+Always use theme variables:
+
+```typescript
+style={{
+  backgroundColor: 'var(--theme-background-default)',
+  color: 'var(--theme-text-primary)',
+  border: '1px solid var(--theme-border-default)',
+  borderRadius: '8px',
+}}
+```
+
+### Common UI States
+
+- **Loading**: Disable forms, show spinner/loading text
+- **Error**: Red background, clear error messaging
+- **Success**: Green notifications, form clearing
+- **Focus**: Proper focus management for accessibility
+- **Mobile**: 44px minimum touch targets
+
+### Layout Patterns
+
+- **Settings pages**: Centered, max-width 800px, section-based
+- **Forms**: Max-width 400px, consistent spacing
+- **Dropdowns**: Absolute positioning, z-index management, click-outside handling

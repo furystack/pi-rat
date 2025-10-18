@@ -1,84 +1,67 @@
-# PI-RAT Development Rules
+# PI-RAT Development Guide
 
-This project follows specific patterns and conventions. Please review the detailed rules in the `.cursor/rules/` directory:
+This is a **FuryStack-based** application with Shades components, REST APIs, and Observable patterns.
 
-## Quick Reference
+## 🚀 Quick Start
 
-### 🔧 API Development
+### New API Endpoint
 
-- **New Endpoints**: Common → Schema → Action → REST setup
-- **Actions**: Separate files in `actions/` directory
-- **Errors**: Use `RequestError` with proper HTTP codes
-- **Pattern**: Fail fast, clean up on errors
+1. Define in `common/src/apis/[module].ts`
+2. Run `yarn create-schemas`
+3. Create action in `service/src/app-models/[module]/actions/`
+4. Register in `setup-[module]-rest-api.ts`
 
-### 🎯 Frontend Routing
+### New Frontend Route
 
-- **Routes**: Create in `components/routes/[module]-routes.tsx`
-- **Navigation**: Always use `navigateToRoute()`, never direct hash manipulation
-- **Structure**: Export individual routes + array as const
-- **Types**: Use `satisfies Route<T>` for type safety
+1. Create in `frontend/src/components/routes/[module]-routes.tsx`
+2. Add to `components/body.tsx` router
+3. Use `navigateToRoute()` for navigation
 
-### 🔐 Authentication
+### New UI Component
 
-- **Registration**: Credential first, then user (fail fast)
-- **Errors**: 409 for conflicts, 400 for validation
-- **Cleanup**: Remove partial state on failures
-- **UX**: Auto-login after successful registration
+1. Create Shade component with `shadowDomName`
+2. Use `useObservable` for global state, `useDisposable` for local state
+3. Follow existing styling patterns with CSS variables
 
-### 📁 Code Organization
-
-- **Modules**: Follow established directory structure
-- **Imports**: Group logically (framework, common, local)
-- **Actions**: One action per file, descriptive names
-- **Services**: Injectable, singleton for stateful
-
-## Development Workflow
-
-1. **Define API** in common package
-2. **Regenerate schemas** with `yarn create-schemas`
-3. **Implement actions** in separate files
-4. **Create/update routes** following patterns
-5. **Build UI components** with proper error handling
-6. **Write E2E tests** for complete flows
-7. **Test thoroughly** before committing
-
-## Key Patterns
+## 📋 Core Principles
 
 ### ✅ Do
 
-- Use `JsonResult()` for action responses
-- Use `RequestError()` for HTTP errors
-- Use `navigateToRoute()` for navigation
-- Create routes in dedicated files
-- Follow existing naming conventions
-- Implement proper error handling
-- Log with meaningful context
+- Use `RequestError` with proper HTTP codes (409=conflict, 400=validation, 401=unauthorized)
+- Use `navigateToRoute()` for all navigation
+- Create separate files for each action/route
+- Use framework security methods (`PasswordAuthenticator.setPasswordForUser`)
+- Test what IS implemented, not what SHOULD be
 
 ### ❌ Don't
 
-- Use direct hash manipulation
-- Inline route definitions in body component
+- Use direct hash manipulation for navigation
 - Implement custom password validation
 - Expose internal errors to users
-- Skip schema regeneration
-- Mix different patterns in same module
+- Test assumed functionality that doesn't exist
+- Mix different patterns in the same module
 
-## File References
+## 🔗 Detailed Guides
 
-- `api-development.mdc` - Complete API development guide
-- `frontend-routing.mdc` - Routing patterns and navigation
-- `authentication-patterns.mdc` - Auth implementation patterns
-- `code-organization.mdc` - Project structure and best practices
+- `development-patterns.mdc` - API, actions, authentication, errors
+- `frontend-patterns.mdc` - Routing, components, UI, forms
+- `testing-patterns.mdc` - E2E testing with Playwright
 
-## Framework Context
+## 🏗️ Architecture Overview
 
-This is a **FuryStack-based** application with:
+```
+service/src/app-models/[module]/
+├── actions/[action-name]-action.ts    # Individual REST actions
+├── setup-[module]-rest-api.ts         # API endpoint registration
+└── setup-[module]-store.ts            # Database models
 
-- **Backend**: Node.js with FuryStack REST services
-- **Frontend**: FuryStack Shades (Shadow DOM components)
-- **Database**: Sequelize ORM
-- **Authentication**: Built-in FuryStack auth system
-- **Routing**: FuryStack router with path-to-regexp
-- **State**: Observable patterns with FuryStack utils
+frontend/src/
+├── components/routes/[module]-routes.tsx  # Route definitions
+├── pages/[module]/                        # Page components
+├── services/                              # Business logic
+└── components/                            # Reusable UI components
 
-Always consider the framework's patterns and conventions when implementing new features.
+common/src/apis/[module].ts                # API type definitions
+```
+
+Each module follows this structure for consistency and maintainability.
