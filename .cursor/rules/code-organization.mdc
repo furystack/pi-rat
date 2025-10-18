@@ -1,0 +1,153 @@
+# Code Organization and Structure Rules
+
+## Project Structure Patterns
+
+### 1. Module Organization
+
+```
+service/src/app-models/[module]/
+├── actions/              # Individual action files
+├── [module]-app-model.ts
+├── [module]-manifest.ts
+├── setup-[module]-rest-api.ts
+└── setup-[module]-store.ts
+```
+
+### 2. Action File Structure
+
+- Create separate files for each action in `actions/` directory
+- Use descriptive names: `[action-name]-action.ts`
+- Export a single action per file following this pattern:
+  ```typescript
+  export const ActionName: RequestAction<ActionType> = async ({ injector, getBody }) => {
+    // Implementation
+  }
+  ```
+
+### 3. Import Organization
+
+- Group imports logically:
+  1. External framework imports
+  2. Internal common imports
+  3. Local module imports
+- Use consistent import naming
+- Follow existing patterns in the codebase
+
+## Frontend Structure Patterns
+
+### 1. Component Organization
+
+```
+frontend/src/
+├── components/
+│   ├── routes/          # Route definitions
+│   ├── [module]/        # Module-specific components
+│   └── shared/          # Shared components
+├── pages/               # Page components
+├── services/            # Business logic services
+└── utils/               # Utility functions
+```
+
+### 2. Service Layer Pattern
+
+- Use injectable services for business logic
+- Follow singleton pattern for stateful services
+- Implement proper error handling and logging
+- Use observables for reactive state management
+
+### 3. Page Component Structure
+
+- Use Shade component pattern consistently
+- Implement proper lifecycle management
+- Handle loading and error states
+- Follow accessibility best practices
+
+## Development Workflow
+
+### 1. Feature Development Order
+
+1. Define API endpoints in common package
+2. Regenerate schemas
+3. Implement backend actions
+4. Create/update frontend routes
+5. Implement UI components
+6. Write E2E tests
+7. Update documentation
+
+### 2. Testing Patterns
+
+- Create E2E tests for complete user flows
+- Test both happy path and error scenarios
+- Use descriptive test names and descriptions
+- Follow existing test patterns and helpers
+
+### 3. Error Handling Strategy
+
+- Use proper HTTP status codes
+- Log errors with appropriate context
+- Implement graceful degradation
+- Provide user-friendly error messages
+
+## Best Practices
+
+### 1. Code Quality
+
+- Follow existing naming conventions
+- Use TypeScript strictly (avoid `any`)
+- Implement proper error boundaries
+- Keep functions focused and small
+
+### 2. Documentation
+
+- Update README when adding new features
+- Document complex business logic
+- Maintain API documentation
+- Keep cursor rules up to date
+
+### 3. Performance Considerations
+
+- Use lazy loading for heavy components
+- Implement proper caching strategies
+- Optimize bundle size
+- Monitor performance metrics
+
+### 4. Security Practices
+
+- Validate all user input
+- Use proper authentication/authorization
+- Sanitize data appropriately
+- Follow security best practices
+
+## Refactoring Guidelines
+
+### 1. When to Refactor
+
+- When adding similar functionality
+- When patterns become inconsistent
+- When code becomes difficult to maintain
+- When performance issues arise
+
+### 2. Refactoring Process
+
+- Extract common patterns into reusable utilities
+- Follow established architectural patterns
+- Maintain backward compatibility when possible
+- Update tests and documentation
+
+### 3. Code Review Focus Areas
+
+- Consistency with existing patterns
+- Proper error handling
+- Security considerations
+- Performance implications
+- Test coverage
+
+## Common Anti-Patterns to Avoid
+
+- Direct DOM manipulation instead of using framework patterns
+- Inline route definitions instead of using route files
+- Manual hash manipulation instead of using navigateToRoute
+- Custom validation instead of using framework validation
+- Exposing internal errors to users
+- Inconsistent error handling patterns
+- Not following established module structure

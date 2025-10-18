@@ -63,6 +63,32 @@ export class SessionService implements IdentityContext {
     })
   }
 
+  public async register(username: string, password: string): Promise<void> {
+    await usingAsync(this.operation(), async () => {
+      try {
+        const { result: usr } = await this.api.call({
+          method: 'POST',
+          action: '/register',
+          body: { username, password },
+        })
+        this.currentUser.setValue({ username: usr.username, roles: usr.roles })
+        this.state.setValue('authenticated')
+        this.notys.emit('onNotyAdded', {
+          body: 'Welcome to PI-RAT!',
+          title: 'Account created successfully',
+          type: 'success',
+        })
+      } catch (error) {
+        this.loginError.setValue(error instanceof Error ? error.message : '')
+        this.notys.emit('onNotyAdded', {
+          body: 'Please check your details and try again',
+          title: 'Registration failed',
+          type: 'warning',
+        })
+      }
+    })
+  }
+
   public async logout(): Promise<void> {
     return await usingAsync(this.operation(), async () => {
       void this.api.call({ method: 'POST', action: '/logout' })

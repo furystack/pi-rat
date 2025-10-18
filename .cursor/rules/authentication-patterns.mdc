@@ -1,0 +1,158 @@
+# Authentication and User Management Patterns
+
+## User Registration Implementation
+
+### 1. Registration Flow Best Practices
+
+- Create password credential **before** creating user record to fail fast
+- Use proper validation through the password hasher (don't implement custom validation)
+- Implement proper cleanup on failures
+- Auto-login users after successful registration
+
+### 2. Registration Action Pattern
+
+```typescript
+export const RegisterAction: RequestAction<RegisterActionType> = async ({ injector, getBody }) => {
+  const logger = getLogger(injector).withScope('Register')
+  const { username, password } = await getBody()
+
+  const storeManager = injector.getInstance(StoreManager)
+  const authenticator = injector.getInstance(PasswordAuthenticator)
+
+  // Check if user exists first
+  const userStore = storeManager.getStoreFor(User, 'username')
+  const existingUser = await userStore.get(username)
+  if (existingUser) {
+    await logger.warning({ message: `Registration attempt for existing user: ${username}` })
+    throw new RequestError('User already exists', 409)
+  }
+
+  try {
+    // Create credential first (fail fast if invalid)
+    const credential = await authenticator.hasher.createCredential(username, password)
+
+    // Create user
+    const newUser: User = {
+      username,
+      roles: [], // Default to empty roles for new users
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    await userStore.add(newUser)
+    await storeManager.getStoreFor(PasswordCredential, 'userName').add(credential)
+
+    return JsonResult({ username: newUser.username, roles: newUser.roles })
+  } catch (error) {
+    // Cleanup on failure
+    try {
+      await userStore.remove(username)
+    } catch (cleanupError) {
+      // Log but don't fail on cleanup errors
+    }
+    throw new RequestError('Registration failed', 400)
+  }
+}
+```
+
+### 3. Frontend Integration
+
+- Add registration method to SessionService
+- Follow the same pattern as login method
+- Show appropriate success/error notifications
+- Navigate to appropriate route after successful registration
+
+### 4. Session Service Pattern
+
+```typescript
+public async register(username: string, password: string): Promise<void> {
+  await usingAsync(this.operation(), async () => {
+    try {
+      const { result: usr } = await this.api.call({
+        method: 'POST',
+        action: '/register',
+        body: { username, password }
+      })
+
+      // Auto-login after registration
+      this.currentUser.setValue({ username: usr.username, roles: usr.roles })
+      this.state.setValue('authenticated')
+
+      this.notys.emit('onNotyAdded', {
+        body: 'Welcome to PI-RAT!',
+        title: 'Account created successfully',
+        type: 'success',
+      })
+    } catch (error) {
+      this.loginError.setValue(error instanceof Error ? error.message : '')
+      this.notys.emit('onNotyAdded', {
+        body: 'Please check your details and try again',
+        title: 'Registration failed',
+        type: 'warning',
+      })
+    }
+  })
+}
+```
+
+## Error Handling Patterns
+
+### 1. HTTP Status Codes
+
+- `409 Conflict` - User already exists
+- `400 Bad Request` - Invalid input/validation errors
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+
+### 2. User-Friendly Messages
+
+- Don't expose internal errors to users
+- Provide clear, actionable error messages
+- Log detailed errors server-side for debugging
+- Use consistent error message patterns
+
+## Security Best Practices
+
+### 1. Password Handling
+
+- Never log passwords or credentials
+- Let the framework handle password validation
+- Use secure credential creation methods
+- Don't implement custom password validation
+
+### 2. User Creation
+
+- Default to minimal permissions (empty roles)
+- Validate user input appropriately
+- Use proper logging for security events
+- Implement proper session management
+
+### 3. Form Validation
+
+- Validate on both client and server side
+- Use consistent validation patterns
+- Provide real-time feedback when appropriate
+- Handle edge cases gracefully
+
+## UI/UX Patterns
+
+### 1. Registration Forms
+
+- Include confirm password field
+- Provide clear validation feedback
+- Disable form during submission
+- Show loading states appropriately
+
+### 2. Navigation Flow
+
+- Easy access to registration from login
+- Clear navigation back to login
+- Proper route handling for authenticated users
+- Consistent navigation patterns
+
+### 3. Success/Error States
+
+- Clear success messages after registration
+- Helpful error messages with next steps
+- Consistent notification styling
+- Proper form state management
