@@ -18,6 +18,7 @@ import { User } from 'common'
 import identityApiSchema from 'common/schemas/identity-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
+import { RegisterAction } from './actions/register-action.js'
 
 export const setupIdentityRestApi = async (injector: Injector) => {
   await useRestService<IdentityApi>({
@@ -47,6 +48,7 @@ export const setupIdentityRestApi = async (injector: Injector) => {
       POST: {
         '/login': LoginAction as RequestAction<PiRatLoginAction>,
         '/logout': LogoutAction,
+        '/register': Validate({ schema: identityApiSchema, schemaName: 'RegisterAction' })(RegisterAction),
         '/users': Validate({ schema: identityApiSchema, schemaName: 'PostUserEndpoint' })(
           createPostEndpoint({
             model: User,

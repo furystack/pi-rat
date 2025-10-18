@@ -1,14 +1,18 @@
 import type { IdentityContext, User } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { Injectable, Injected, type Injector } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue, usingAsync } from '@furystack/utils'
 import type { Roles } from 'common'
+import { loginRoute } from '../components/routes/auth-routes.js'
+import { defaultDashboardRoute } from '../components/routes/dashboard-routes.js'
+import { navigateToRoute } from '../navigate-to-route.js'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
 
 @Injectable({ lifetime: 'singleton' })
 export class SessionService implements IdentityContext {
+  declare private readonly injector: Injector
   private readonly operation = () => {
     this.isOperationInProgress.setValue(true)
     return { [Symbol.dispose]: () => this.isOperationInProgress.setValue(false) }
@@ -63,6 +67,33 @@ export class SessionService implements IdentityContext {
     })
   }
 
+  public async register(username: string, password: string): Promise<void> {
+    await usingAsync(this.operation(), async () => {
+      try {
+        const { result: usr } = await this.api.call({
+          method: 'POST',
+          action: '/register',
+          body: { username, password },
+        })
+        this.currentUser.setValue({ username: usr.username, roles: usr.roles })
+        this.state.setValue('authenticated')
+        navigateToRoute(this.injector, defaultDashboardRoute, {})
+        this.notys.emit('onNotyAdded', {
+          body: 'Welcome to PI-RAT!',
+          title: 'Account created successfully',
+          type: 'success',
+        })
+      } catch (error) {
+        this.loginError.setValue(error instanceof Error ? error.message : '')
+        this.notys.emit('onNotyAdded', {
+          body: 'Please check your details and try again',
+          title: 'Registration failed',
+          type: 'warning',
+        })
+      }
+    })
+  }
+
   public async logout(): Promise<void> {
     return await usingAsync(this.operation(), async () => {
       void this.api.call({ method: 'POST', action: '/logout' })
@@ -73,6 +104,7 @@ export class SessionService implements IdentityContext {
         title: 'You have been logged out',
         type: 'info',
       })
+      navigateToRoute(this.injector, loginRoute, {})
     })
   }
 

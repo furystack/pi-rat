@@ -1,0 +1,86 @@
+# Frontend Routing Rules
+
+## Route Structure and Organization
+
+### 1. Route File Organization
+
+- Create route files in `frontend/src/components/routes/` directory
+- Use descriptive names: `[module]-routes.tsx` (e.g., `auth-routes.tsx`, `movie-routes.tsx`)
+- Follow the established pattern from existing route files
+
+### 2. Route Definition Pattern
+
+```typescript
+import { createComponent, type Route } from '@furystack/shades'
+import { onLeave, onVisit } from './route-animations.js'
+
+export const routeName = {
+  url: '/path',
+  onVisit,
+  onLeave,
+  component: ({ match }: { match: MatchResult<{ param: string }> }) => <Component />,
+} satisfies Route<{ param: string }>
+
+// For routes without parameters
+export const simpleRoute = {
+  url: '/path',
+  onVisit,
+  onLeave,
+  component: () => <Component />,
+} satisfies Route<unknown>
+
+export const moduleRoutes = [route1, route2, route3] as const
+```
+
+### 3. Navigation Best Practices
+
+- **Always use `navigateToRoute()`** instead of direct hash manipulation
+- Import route definitions and use them consistently:
+
+  ```typescript
+  // ✅ Correct
+  import { navigateToRoute } from '../navigate-to-route.js'
+  import { targetRoute } from '../components/routes/module-routes.js'
+
+  onclick={() => navigateToRoute(injector, targetRoute, { param: value })}
+
+  // ❌ Incorrect
+  onclick={() => (window.location.hash = '#/path')}
+  ```
+
+### 4. Route Integration in Body Component
+
+- Import route arrays in `components/body.tsx`
+- Use spread operator to include routes: `...moduleRoutes`
+- Group related routes logically
+- Follow the established pattern for authenticated vs unauthenticated routes
+
+### 5. Route Parameters and Types
+
+- Always define parameter types for routes with dynamic segments
+- Use `MatchResult<T>` type for route parameters
+- Validate parameters when necessary
+- Use meaningful parameter names
+
+## Animation and Transitions
+
+### 1. Route Animations
+
+- Always include `onVisit` and `onLeave` for consistent animations
+- Import from `'./route-animations.js'`
+- Follow the established animation patterns
+
+### 2. Lazy Loading
+
+- Use `PiRatLazyLoad` for heavy components
+- Implement dynamic imports for code splitting
+- Follow the pattern from existing lazy-loaded routes
+
+## Best Practices
+
+- Export individual routes and route arrays as const
+- Use TypeScript `satisfies` for better type checking
+- Keep route definitions close to their components
+- Maintain consistency with existing route patterns
+- Always test navigation flows after changes
+- Consider accessibility when implementing custom navigation

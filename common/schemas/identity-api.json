@@ -79,6 +79,29 @@
       "required": ["result"],
       "additionalProperties": false
     },
+    "RegisterAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/FurystackUser"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          },
+          "required": ["username", "password"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "body"],
+      "additionalProperties": false
+    },
     "PostUserEndpoint": {
       "type": "object",
       "properties": {
@@ -168,11 +191,14 @@
             "/logout": {
               "$ref": "#/definitions/LogoutAction"
             },
+            "/register": {
+              "$ref": "#/definitions/RegisterAction"
+            },
             "/users": {
               "$ref": "#/definitions/PostUserEndpoint"
             }
           },
-          "required": ["/login", "/logout", "/users"],
+          "required": ["/login", "/logout", "/register", "/users"],
           "additionalProperties": false
         },
         "PATCH": {

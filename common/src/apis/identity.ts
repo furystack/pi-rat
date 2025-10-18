@@ -10,6 +10,8 @@ export type GetCurrentUserAction = { result: FurystackUser }
 export type LoginAction = { result: FurystackUser; body: { username: string; password: string } }
 export type LogoutAction = { result: unknown }
 
+export type RegisterAction = { result: FurystackUser; body: { username: string; password: string } }
+
 export type PostUserEndpoint = { result: User; body: WithOptionalId<FurystackUser, 'username'> }
 
 export interface IdentityApi extends RestApi {
@@ -22,6 +24,7 @@ export interface IdentityApi extends RestApi {
   POST: {
     '/login': LoginAction
     '/logout': LogoutAction
+    '/register': RegisterAction
     '/users': PostUserEndpoint
   }
   PATCH: {

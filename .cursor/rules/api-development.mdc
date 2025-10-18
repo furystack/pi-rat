@@ -1,0 +1,58 @@
+# API Development Rules
+
+## Adding New REST Endpoints
+
+### 1. Common Package - API Definition
+
+- Always start by defining the endpoint in `common/src/apis/[module].ts`
+- Follow the pattern: `export type [ActionName]Action = { result: ResultType; body: BodyType }`
+- Add to the interface in the POST/GET/PATCH/DELETE sections
+- Use descriptive names that clearly indicate the action
+
+### 2. Schema Regeneration
+
+- After modifying API definitions, always run: `yarn create-schemas`
+- Verify the generated schema files in `common/schemas/` directory
+- Commit both the TypeScript definitions and generated JSON schemas
+
+### 3. Action Implementation
+
+- Create actions in `service/src/app-models/[module]/actions/` directory
+- Use separate files for each action: `[action-name]-action.ts`
+- Follow this pattern:
+
+  ```typescript
+  import { JsonResult, type RequestAction } from '@furystack/rest-service'
+  import { RequestError } from '@furystack/rest'
+  import type { ActionType } from 'common'
+
+  export const ActionName: RequestAction<ActionType> = async ({ injector, getBody }) => {
+    // Implementation
+    return JsonResult(result)
+  }
+  ```
+
+### 4. Error Handling
+
+- Use `RequestError` for HTTP errors with proper status codes:
+  - `409` - Conflict (resource already exists)
+  - `400` - Bad Request (validation errors)
+  - `404` - Not Found
+  - `401` - Unauthorized
+- Always include meaningful error messages
+- Log errors with proper scope using `getLogger(injector).withScope('ActionName')`
+
+### 5. REST API Setup
+
+- Import the action in `setup-[module]-rest-api.ts`
+- Add to the appropriate HTTP method section
+- Always wrap with `Validate()` using the generated schema
+- Follow existing patterns for endpoint registration
+
+## Best Practices
+
+- Create credentials/resources before dependent entities to fail fast
+- Implement proper cleanup in try/catch blocks
+- Use meaningful log messages with context
+- Follow the existing naming conventions
+- Test endpoints thoroughly before committing
