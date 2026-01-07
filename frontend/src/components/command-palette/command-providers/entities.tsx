@@ -6,6 +6,7 @@ import {
   entityDashboardsRoute,
   entityDeviceRoute,
   entityDrivesRoute,
+  entityLoggingRoute,
   entityMovieFilesRoute,
   entityMoviesRoute,
   entityOmdbMovieMetadataRoute,
@@ -95,6 +96,15 @@ const EntitySuggestions: SuggestionOptions[] = [
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, entityDeviceRoute, {})
+    },
+  },
+  {
+    name: 'Log entries',
+    description: 'View the log entries',
+    icon: '📝',
+    score: 1,
+    onSelected: ({ injector }) => {
+      navigateToRoute(injector, entityLoggingRoute, {})
     },
   },
 ]

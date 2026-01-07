@@ -1,6 +1,6 @@
 import { StoreManager } from '@furystack/core'
-import type { Patch } from './patch.js'
 import { Dashboard } from 'common'
+import type { Patch } from './patch.js'
 
 export const addDefaultDashboardPatcher: Patch = {
   id: '002-add-default-dashboard',
@@ -29,6 +29,10 @@ export const addDefaultDashboardPatcher: Patch = {
             {
               type: 'app-shortcut',
               appName: 'movies',
+            },
+            {
+              type: 'app-shortcut',
+              appName: 'logging-terminal',
             },
           ],
         },
