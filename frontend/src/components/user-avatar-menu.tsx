@@ -73,7 +73,7 @@ export const UserAvatarMenu = Shade({
                   color: 'var(--theme-text-primary)',
                 }}
               >
-                ⚙️ Settings
+                👤 User Settings
               </Button>
 
               <Button
