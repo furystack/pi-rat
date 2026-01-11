@@ -1,14 +1,3 @@
----
-name: Performance Optimization
-description: Observable subscription optimization, lazy loading, disposal patterns, and debouncing
-globs:
-  - '**/*.ts'
-  - '**/*.tsx'
-  - '**/components/**'
-  - '**/services/**'
-alwaysApply: false
----
-
 # Performance Optimization Guidelines
 
 ## Observable Subscription Optimization

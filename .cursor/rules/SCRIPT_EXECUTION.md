@@ -1,13 +1,3 @@
----
-name: Script Execution
-description: Package manager detection, script simplification, and CI/CD best practices
-globs:
-  - 'package.json'
-  - '**/*.sh'
-  - '.github/workflows/**'
-alwaysApply: false
----
-
 # Script Execution Guidelines
 
 ## Package Manager Detection

@@ -1,14 +1,3 @@
----
-name: Observable State
-description: ObservableValue usage, useObservable, useDisposable, subscriptions, and state management patterns
-globs:
-  - '**/*.ts'
-  - '**/*.tsx'
-  - '**/services/**'
-  - '**/stores/**'
-alwaysApply: false
----
-
 # Observable State Management
 
 ## Core Concepts

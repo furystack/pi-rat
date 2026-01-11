@@ -1,13 +1,3 @@
----
-name: Testing Guidelines
-description: Vitest patterns, Playwright E2E testing, and mocking strategies
-globs:
-  - '**/*.spec.ts'
-  - '**/*.spec.tsx'
-  - '**/*.e2e.spec.ts'
-alwaysApply: false
----
-
 # Testing Guidelines
 
 ## Test File Naming

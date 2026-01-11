@@ -1,12 +1,3 @@
----
-name: Cache Handling
-description: FuryStack Cache patterns, cache invalidation, and observable cache subscriptions
-globs:
-  - '**/*.ts'
-  - '**/services/**'
-alwaysApply: false
----
-
 # Cache Handling Guidelines
 
 ## Core Principle

@@ -1,14 +1,3 @@
----
-name: Error Handling
-description: Error patterns for FuryStack, RequestError usage, Observable error states, and Cache error handling
-globs:
-  - '**/*.ts'
-  - '**/*.tsx'
-  - '**/actions/**'
-  - '**/services/**'
-alwaysApply: false
----
-
 # Error Handling Guidelines
 
 ## RequestError Usage
