@@ -32,7 +32,9 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
           <Router
             routes={[
               ...movieRoutes,
-              ...(hasAdminRole ? [...adminRoutes, ...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes] : []),
+              ...(hasAdminRole
+                ? [...adminRoutes, ...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes]
+                : []),
               ...dashboardRoutes,
               ...chatRoutes,
               ...aiRoutes,
