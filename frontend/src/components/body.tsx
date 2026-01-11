@@ -2,6 +2,7 @@ import { createComponent, Router, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
 import { Init, Offline } from '../pages/index.js'
 import { SessionService } from '../services/session.js'
+import { adminRoutes } from './routes/admin-routes.js'
 import { aiRoutes } from './routes/ai-routes.js'
 import { authRoutes } from './routes/auth-routes.js'
 import { chatRoutes } from './routes/chat-routes.js'
@@ -31,7 +32,7 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
           <Router
             routes={[
               ...movieRoutes,
-              ...(hasAdminRole ? [...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes] : []),
+              ...(hasAdminRole ? [...adminRoutes, ...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes] : []),
               ...dashboardRoutes,
               ...chatRoutes,
               ...aiRoutes,
