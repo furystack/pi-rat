@@ -193,18 +193,11 @@ const ProfileSection = Shade({
 
 export const UserSettingsPage = Shade({
   shadowDomName: 'user-settings-page',
-  render: ({ injector, useObservable }) => {
-    const session = injector.getInstance(SessionService)
-    const [currentUser] = useObservable('currentUser', session.currentUser)
-
-    if (!currentUser) {
-      return <div>Please log in to access user settings.</div>
-    }
-
+  render: () => {
     return (
       <div
         style={{
-          padding: '24px',
+          padding: '48px',
           maxWidth: '800px',
           margin: '0 auto',
         }}

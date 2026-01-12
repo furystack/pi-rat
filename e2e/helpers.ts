@@ -51,13 +51,27 @@ export const navigateToUserSettings = async (page: Page) => {
   const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
   await userAvatar.click()
 
-  // Click on Settings option
-  const settingsButton = page.getByRole('button', { name: /settings/i })
+  // Click on User Settings option
+  const settingsButton = page.getByRole('button', { name: /user settings/i })
   await settingsButton.click()
 
   // Verify we're on the settings page
   const settingsPage = page.locator('user-settings-page')
   await expect(settingsPage).toBeVisible()
+}
+
+export const navigateToAdminSettings = async (page: Page) => {
+  // Click on the user avatar to open the menu
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await userAvatar.click()
+
+  // Click on Admin Settings option (only visible to admin users)
+  const adminSettingsButton = page.getByRole('button', { name: /admin settings/i })
+  await adminSettingsButton.click()
+
+  // Verify we're on the admin settings page
+  const adminSettingsPage = page.locator('admin-settings-page')
+  await expect(adminSettingsPage).toBeVisible()
 }
 
 export const uploadFile = async (page: Page, filePath: string, mime: string) => {
