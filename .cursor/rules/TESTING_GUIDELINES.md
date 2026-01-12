@@ -28,16 +28,16 @@ Organize tests clearly using the Arrange-Act-Assert pattern:
 describe('SessionService', () => {
   it('should set current user when login succeeds', async () => {
     // Arrange
-    const sessionService = injector.getInstance(SessionService);
-    const testUser = { id: '1', username: 'test@example.com' };
+    const sessionService = injector.getInstance(SessionService)
+    const testUser = { id: '1', username: 'test@example.com' }
 
     // Act
-    await sessionService.login('test@example.com', 'password');
+    await sessionService.login('test@example.com', 'password')
 
     // Assert
-    expect(sessionService.currentUser.getValue()).toEqual(testUser);
-  });
-});
+    expect(sessionService.currentUser.getValue()).toEqual(testUser)
+  })
+})
 ```
 
 ### Descriptive Test Names
@@ -52,24 +52,24 @@ describe('UserService', () => {
   describe('when user is authenticated', () => {
     it('should return user profile', async () => {
       // Test implementation
-    });
+    })
 
     it('should allow updating user preferences', async () => {
       // Test implementation
-    });
-  });
+    })
+  })
 
   describe('when user is not authenticated', () => {
     it('should throw authentication error', async () => {
       // Test implementation
-    });
-  });
-});
+    })
+  })
+})
 
 // ❌ Avoid - unclear test names
-it('test 1', () => {});
-it('works', () => {});
-it('user', () => {});
+it('test 1', () => {})
+it('works', () => {})
+it('user', () => {})
 ```
 
 ## Vitest Mocking Patterns
@@ -88,31 +88,31 @@ When using `vi.mock()`, define the mock implementations for specific functions u
 
 ```typescript
 // ✅ Good - hoist the mocks at the top
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest'
 
-const mockGetUser = vi.hoisted(() => vi.fn());
-const mockSaveUser = vi.hoisted(() => vi.fn());
+const mockGetUser = vi.hoisted(() => vi.fn())
+const mockSaveUser = vi.hoisted(() => vi.fn())
 
 vi.mock('./user-api-client', () => ({
   UserApiClient: class {
-    getUser = mockGetUser;
-    saveUser = mockSaveUser;
+    getUser = mockGetUser
+    saveUser = mockSaveUser
   },
-}));
+}))
 
 // ... rest of the test file (imports, describe blocks, etc.)
 
 describe('UserService', () => {
   it('should fetch user data', async () => {
-    mockGetUser.mockResolvedValue({ id: '1', name: 'Test User' });
-    
-    const userService = injector.getInstance(UserService);
-    const user = await userService.getUser('1');
-    
-    expect(user.name).toBe('Test User');
-    expect(mockGetUser).toHaveBeenCalledWith('1');
-  });
-});
+    mockGetUser.mockResolvedValue({ id: '1', name: 'Test User' })
+
+    const userService = injector.getInstance(UserService)
+    const user = await userService.getUser('1')
+
+    expect(user.name).toBe('Test User')
+    expect(mockGetUser).toHaveBeenCalledWith('1')
+  })
+})
 ```
 
 ### Type-Safe Mocking
@@ -121,25 +121,25 @@ describe('UserService', () => {
 
 ```typescript
 // ✅ Good - properly typed mock callbacks
-const mockUpload = vi.hoisted(() => vi.fn());
+const mockUpload = vi.hoisted(() => vi.fn())
 
 // In test
 const uploadCallbacks = mockUpload.mock.calls[0][1] as {
-  onSuccess: () => void;
-  onError: () => void;
-};
-uploadCallbacks.onSuccess(); // Type-safe
+  onSuccess: () => void
+  onError: () => void
+}
+uploadCallbacks.onSuccess() // Type-safe
 
 // ✅ Good - properly typed mock parameters
 const uploadCall = mockUpload.mock.calls[0][0] as {
-  fileId: string;
-  file: File;
-};
-expect(uploadCall.fileId).toBe('file-123');
+  fileId: string
+  file: File
+}
+expect(uploadCall.fileId).toBe('file-123')
 
 // ❌ Avoid - untyped mock access (causes linter errors)
-const uploadCallbacks = mockUpload.mock.calls[0][1]; // any type
-uploadCallbacks.onSuccess(); // Unsafe call of any
+const uploadCallbacks = mockUpload.mock.calls[0][1] // any type
+uploadCallbacks.onSuccess() // Unsafe call of any
 ```
 
 ### Mocking Observables
@@ -148,16 +148,16 @@ When mocking services that return Observables, return `ObservableValue` instance
 
 ```typescript
 // ✅ Good - mocking Observable returns
-import { ObservableValue } from '@furystack/utils';
+import { ObservableValue } from '@furystack/utils'
 
 const mockUserService = {
   currentUser: new ObservableValue({ id: '1', name: 'Test User' }),
   getUserById: vi.fn((id: string) => new ObservableValue({ id, name: 'Test User' })),
-};
+}
 
 vi.mock('../services/user-service', () => ({
   UserService: vi.fn(() => mockUserService),
-}));
+}))
 ```
 
 ### Mocking Cache
@@ -166,17 +166,17 @@ When mocking FuryStack Cache instances:
 
 ```typescript
 // ✅ Good - mocking Cache
-import { ObservableValue } from '@furystack/utils';
+import { ObservableValue } from '@furystack/utils'
 
 const mockUserCache = {
   get: vi.fn(async (id: string) => ({ id, name: 'Test User' })),
   getObservable: vi.fn((id: string) => new ObservableValue({ id, name: 'Test User' })),
   setExplicitValue: vi.fn(),
-};
+}
 
 @Injectable({ lifetime: 'singleton' })
 class MockUserService {
-  public userCache = mockUserCache;
+  public userCache = mockUserCache
 }
 ```
 
@@ -197,51 +197,51 @@ Create reusable helper functions for common workflows:
 ```typescript
 // ✅ Good - helper function with verification
 export const login = async (page: Page, username = 'testuser@gmail.com', password = 'password') => {
-  const loginForm = page.locator('shade-login form');
-  await loginForm.locator('input[name="userName"]').fill(username);
-  await loginForm.locator('input[name="password"]').fill(password);
-  await page.getByRole('button', { name: 'Login' }).click();
+  const loginForm = page.locator('shade-login form')
+  await loginForm.locator('input[name="userName"]').fill(username)
+  await loginForm.locator('input[name="password"]').fill(password)
+  await page.getByRole('button', { name: 'Login' }).click()
 
   // Helper handles verification internally
-  await expect(page.locator('shade-noty', { hasText: 'Welcome back' })).toBeVisible();
-  const firstLetter = username.charAt(0).toUpperCase();
-  await expect(page.getByText(firstLetter).first()).toBeVisible();
-};
+  await expect(page.locator('shade-noty', { hasText: 'Welcome back' })).toBeVisible()
+  const firstLetter = username.charAt(0).toUpperCase()
+  await expect(page.getByText(firstLetter).first()).toBeVisible()
+}
 
 export const logout = async (page: Page) => {
   // Handle complete logout workflow
-  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]');
-  await userAvatar.click();
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await userAvatar.click()
 
-  const logoutButton = page.getByRole('button', { name: /log out/i });
-  await logoutButton.click();
+  const logoutButton = page.getByRole('button', { name: /log out/i })
+  await logoutButton.click()
 
   // Verify logout success
-  await expect(page.locator('shade-login form')).toBeVisible();
-};
+  await expect(page.locator('shade-login form')).toBeVisible()
+}
 ```
 
 ### E2E Test Structure
 
 ```typescript
-import { test, expect } from '@playwright/test';
-import { login, logout } from './helpers/auth-helpers';
+import { test, expect } from '@playwright/test'
+import { login, logout } from './helpers/auth-helpers'
 
 test.describe('User Settings', () => {
   test('should update user profile', async ({ page }) => {
     // Setup
-    await page.goto('/');
-    await login(page);
+    await page.goto('/')
+    await login(page)
 
     // Action
-    await page.goto('/settings');
-    await page.locator('input[name="displayName"]').fill('New Name');
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.goto('/settings')
+    await page.locator('input[name="displayName"]').fill('New Name')
+    await page.getByRole('button', { name: 'Save' }).click()
 
     // Verification
-    await expect(page.locator('shade-noty', { hasText: 'Profile updated' })).toBeVisible();
-  });
-});
+    await expect(page.locator('shade-noty', { hasText: 'Profile updated' })).toBeVisible()
+  })
+})
 ```
 
 ### Critical E2E Testing Rules
@@ -250,41 +250,41 @@ test.describe('User Settings', () => {
 
 ```typescript
 // Good - test actual behavior
-const form = page.locator('form[data-form-id]');
-await form.locator('input[name="username"]').fill('test');
-await expect(form.locator('input[name="username"]')).toHaveValue('test');
+const form = page.locator('form[data-form-id]')
+await form.locator('input[name="username"]').fill('test')
+await expect(form.locator('input[name="username"]')).toHaveValue('test')
 ```
 
 #### ❌ Don't Test Assumptions
 
 ```typescript
 // Bad - assuming validation that doesn't exist
-const errorMessage = page.locator('div', { hasText: 'Password too short' });
-await expect(errorMessage).toBeVisible(); // This might not exist!
+const errorMessage = page.locator('div', { hasText: 'Password too short' })
+await expect(errorMessage).toBeVisible() // This might not exist!
 ```
 
 ### Dynamic Content Handling
 
 ```typescript
 // Handle dynamic test data
-const testEmail = `user-${Date.now()}@example.com`;
-const firstLetter = testEmail.charAt(0).toUpperCase();
+const testEmail = `user-${Date.now()}@example.com`
+const firstLetter = testEmail.charAt(0).toUpperCase()
 
 // Use in tests
-await usernameInput.fill(testEmail);
+await usernameInput.fill(testEmail)
 // Later verify avatar shows correct letter
-await expect(page.getByText(firstLetter).first()).toBeVisible();
+await expect(page.getByText(firstLetter).first()).toBeVisible()
 ```
 
 ### Error Testing
 
 ```typescript
 // Test general error handling, not specific messages
-await submitInvalidForm();
+await submitInvalidForm()
 
 // Look for ANY error notification, not specific text
-const errorNoty = page.locator('shade-noty').first();
-await expect(errorNoty).toBeVisible();
+const errorNoty = page.locator('shade-noty').first()
+await expect(errorNoty).toBeVisible()
 ```
 
 ## Unit Testing Best Practices
@@ -297,24 +297,24 @@ Test component behavior, not implementation:
 // ✅ Good - testing behavior
 describe('UserProfileComponent', () => {
   it('should display user information', () => {
-    const props = { user: { id: '1', name: 'Test User', email: 'test@example.com' } };
-    const component = createComponent(UserProfile, props);
-    
-    expect(component.textContent).toContain('Test User');
-    expect(component.textContent).toContain('test@example.com');
-  });
+    const props = { user: { id: '1', name: 'Test User', email: 'test@example.com' } }
+    const component = createComponent(UserProfile, props)
+
+    expect(component.textContent).toContain('Test User')
+    expect(component.textContent).toContain('test@example.com')
+  })
 
   it('should call onEdit when edit button is clicked', () => {
-    const mockOnEdit = vi.fn();
-    const props = { user: { id: '1', name: 'Test' }, onEdit: mockOnEdit };
-    const component = createComponent(UserProfile, props);
-    
-    const editButton = component.querySelector('button');
-    editButton?.click();
-    
-    expect(mockOnEdit).toHaveBeenCalledTimes(1);
-  });
-});
+    const mockOnEdit = vi.fn()
+    const props = { user: { id: '1', name: 'Test' }, onEdit: mockOnEdit }
+    const component = createComponent(UserProfile, props)
+
+    const editButton = component.querySelector('button')
+    editButton?.click()
+
+    expect(mockOnEdit).toHaveBeenCalledTimes(1)
+  })
+})
 ```
 
 ### Service Testing
@@ -323,56 +323,56 @@ Test service methods and state management:
 
 ```typescript
 // ✅ Good - service testing
-import { Injector } from '@furystack/inject';
-import { describe, expect, it, vi } from 'vitest';
+import { Injector } from '@furystack/inject'
+import { describe, expect, it, vi } from 'vitest'
 
 describe('UserService', () => {
   it('should update current user on successful login', async () => {
-    const injector = new Injector();
-    const userService = injector.getInstance(UserService);
-    
-    await userService.login('test@example.com', 'password');
-    
-    const currentUser = userService.currentUser.getValue();
-    expect(currentUser).toBeTruthy();
-    expect(currentUser?.email).toBe('test@example.com');
-  });
+    const injector = new Injector()
+    const userService = injector.getInstance(UserService)
+
+    await userService.login('test@example.com', 'password')
+
+    const currentUser = userService.currentUser.getValue()
+    expect(currentUser).toBeTruthy()
+    expect(currentUser?.email).toBe('test@example.com')
+  })
 
   it('should clear current user on logout', async () => {
-    const injector = new Injector();
-    const userService = injector.getInstance(UserService);
-    
-    await userService.login('test@example.com', 'password');
-    await userService.logout();
-    
-    expect(userService.currentUser.getValue()).toBeNull();
-  });
-});
+    const injector = new Injector()
+    const userService = injector.getInstance(UserService)
+
+    await userService.login('test@example.com', 'password')
+    await userService.logout()
+
+    expect(userService.currentUser.getValue()).toBeNull()
+  })
+})
 ```
 
 ### Testing Observable State
 
 ```typescript
 // ✅ Good - testing Observable state changes
-import { ObservableValue } from '@furystack/utils';
+import { ObservableValue } from '@furystack/utils'
 
 describe('DataService', () => {
   it('should update observable when data is loaded', async () => {
-    const dataService = injector.getInstance(DataService);
-    const states: string[] = [];
-    
+    const dataService = injector.getInstance(DataService)
+    const states: string[] = []
+
     // Subscribe to state changes
     dataService.loadingState.subscribe((state) => {
-      states.push(state.status);
-    });
-    
+      states.push(state.status)
+    })
+
     // Trigger data load
-    await dataService.loadData();
-    
+    await dataService.loadData()
+
     // Verify state transitions
-    expect(states).toEqual(['idle', 'loading', 'loaded']);
-  });
-});
+    expect(states).toEqual(['idle', 'loading', 'loaded'])
+  })
+})
 ```
 
 ## Test Organization
@@ -429,7 +429,7 @@ Create helpers that encapsulate:
 ```typescript
 test.skip('Future Feature', async ({ page }) => {
   // Mark unimplemented features for later
-});
+})
 ```
 
 This prevents test failures on functionality that doesn't exist yet while maintaining a plan for future testing.

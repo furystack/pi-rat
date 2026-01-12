@@ -62,23 +62,23 @@ Use `using` and `usingAsync` for automatic resource cleanup:
 // ✅ Good - using disposal pattern
 @Injectable({ lifetime: 'singleton' })
 export class DataService {
-  public isLoading = new ObservableValue(false);
+  public isLoading = new ObservableValue(false)
 
   private operation() {
-    this.isLoading.setValue(true);
+    this.isLoading.setValue(true)
     return {
       [Symbol.dispose]: () => {
-        this.isLoading.setValue(false);
+        this.isLoading.setValue(false)
       },
-    };
+    }
   }
 
   public async loadData() {
     await usingAsync(this.operation(), async () => {
       // Loading state automatically managed
-      const data = await this.fetchData();
-      this.data.setValue(data);
-    });
+      const data = await this.fetchData()
+      this.data.setValue(data)
+    })
   }
 }
 ```
@@ -91,18 +91,18 @@ Always clean up resources in services:
 // ✅ Good - proper resource cleanup
 @Injectable({ lifetime: 'singleton' })
 export class WebSocketService {
-  private socket?: WebSocket;
-  private subscriptions = new Set<() => void>();
+  private socket?: WebSocket
+  private subscriptions = new Set<() => void>()
 
   public connect() {
-    this.socket = new WebSocket('ws://example.com');
+    this.socket = new WebSocket('ws://example.com')
     // Setup socket
   }
 
   public [Symbol.dispose]() {
-    this.socket?.close();
-    this.subscriptions.forEach(unsub => unsub());
-    this.subscriptions.clear();
+    this.socket?.close()
+    this.subscriptions.forEach((unsub) => unsub())
+    this.subscriptions.clear()
   }
 }
 ```
@@ -138,13 +138,13 @@ Lazy load heavy dependencies:
 // ✅ Good - lazy loading heavy library
 @Injectable({ lifetime: 'singleton' })
 export class ChartService {
-  private chartLib?: typeof import('chart.js');
+  private chartLib?: typeof import('chart.js')
 
   public async createChart(data: ChartData) {
     if (!this.chartLib) {
-      this.chartLib = await import('chart.js');
+      this.chartLib = await import('chart.js')
     }
-    return new this.chartLib.Chart(data);
+    return new this.chartLib.Chart(data)
   }
 }
 ```
@@ -200,23 +200,23 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   fn: T,
   delay: number,
 ): (...args: Parameters<T>) => void {
-  let timeoutId: number | undefined;
+  let timeoutId: number | undefined
 
   return (...args: Parameters<T>) => {
     if (timeoutId) {
-      clearTimeout(timeoutId);
+      clearTimeout(timeoutId)
     }
 
     timeoutId = window.setTimeout(() => {
-      fn(...args);
-    }, delay);
-  };
+      fn(...args)
+    }, delay)
+  }
 }
 
 // Usage
 const debouncedSearch = debounce((term: string) => {
-  searchService.search(term);
-}, 300);
+  searchService.search(term)
+}, 300)
 ```
 
 ## Cache Optimization
@@ -235,7 +235,7 @@ export class DataService {
     load: async (id: string) => {
       // Load function
     },
-  });
+  })
 
   // Larger cache for stable data
   public userCache = new Cache({
@@ -243,7 +243,7 @@ export class DataService {
     load: async (id: string) => {
       // Load function
     },
-  });
+  })
 }
 ```
 
@@ -256,17 +256,14 @@ Preload data that will definitely be needed:
 @Injectable({ lifetime: 'singleton' })
 export class AppInitService {
   @Injected(UserService)
-  private declare userService: UserService;
+  declare private userService: UserService
 
   @Injected(ConfigService)
-  private declare configService: ConfigService;
+  declare private configService: ConfigService
 
   public async initialize() {
     // Preload in parallel
-    await Promise.all([
-      this.userService.loadCurrentUser(),
-      this.configService.loadConfig(),
-    ]);
+    await Promise.all([this.userService.loadCurrentUser(), this.configService.loadConfig()])
   }
 }
 ```
@@ -342,20 +339,20 @@ export class DataService {
       action: '/users/batch',
       body: { ids: userIds },
       query: {},
-    });
-    return result;
+    })
+    return result
   }
 }
 
 // ❌ Avoid - multiple sequential requests
 export class DataService {
   public async loadMultipleUsers(userIds: string[]) {
-    const users = [];
+    const users = []
     for (const id of userIds) {
-      const user = await this.loadUser(id); // Sequential!
-      users.push(user);
+      const user = await this.loadUser(id) // Sequential!
+      users.push(user)
     }
-    return users;
+    return users
   }
 }
 ```
@@ -374,9 +371,9 @@ export class DashboardService {
       this.userService.loadUsers(),
       this.statsService.loadStats(),
       this.notificationService.loadNotifications(),
-    ]);
+    ])
 
-    return { users, stats, notifications };
+    return { users, stats, notifications }
   }
 }
 ```
@@ -420,8 +417,8 @@ Clear caches when data becomes stale:
 export class SessionService {
   public async logout() {
     // Clear all user-specific caches
-    this.userService.userCache.clear();
-    this.preferencesService.clear();
+    this.userService.userCache.clear()
+    this.preferencesService.clear()
 
     // Logout logic
   }

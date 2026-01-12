@@ -15,36 +15,36 @@ Use proper HTTP status codes with `RequestError` from `@furystack/rest-service`:
 
 ```typescript
 // ✅ Good - proper RequestError usage
-import { RequestError, JsonResult, type RequestAction } from '@furystack/rest-service';
-import { getLogger } from '@furystack/logging';
+import { RequestError, JsonResult, type RequestAction } from '@furystack/rest-service'
+import { getLogger } from '@furystack/logging'
 
 export const CreateUserAction: RequestAction<typeof CreateUserApiEndpoint> = async ({ injector, getBody }) => {
-  const logger = getLogger(injector).withScope('CreateUserAction');
-  const body = await getBody();
+  const logger = getLogger(injector).withScope('CreateUserAction')
+  const body = await getBody()
 
   try {
     // Check if user already exists
-    const existingUser = await store.find({ filter: { email: { $eq: body.email } } });
+    const existingUser = await store.find({ filter: { email: { $eq: body.email } } })
     if (existingUser.count > 0) {
-      throw new RequestError('User with this email already exists', 409);
+      throw new RequestError('User with this email already exists', 409)
     }
 
     // Validate input
     if (!body.email || !body.password) {
-      throw new RequestError('Email and password are required', 400);
+      throw new RequestError('Email and password are required', 400)
     }
 
     // Create user
-    const user = await store.add(body);
-    return JsonResult(user);
+    const user = await store.add(body)
+    return JsonResult(user)
   } catch (error) {
     if (error instanceof RequestError) {
-      throw error;
+      throw error
     }
-    await logger.error({ message: 'Failed to create user', data: { error } });
-    throw new RequestError('Failed to create user', 500);
+    await logger.error({ message: 'Failed to create user', data: { error } })
+    throw new RequestError('Failed to create user', 500)
   }
-};
+}
 ```
 
 ### Error Logging
@@ -53,15 +53,15 @@ Always log errors with context information:
 
 ```typescript
 // ✅ Good - error logging with context
-import { getLogger } from '@furystack/logging';
+import { getLogger } from '@furystack/logging'
 
 export const UpdateUserAction: RequestAction<typeof UpdateUserApiEndpoint> = async ({ injector, getBody }) => {
-  const logger = getLogger(injector).withScope('UpdateUserAction');
+  const logger = getLogger(injector).withScope('UpdateUserAction')
 
   try {
-    const body = await getBody();
-    const result = await updateUser(body);
-    return JsonResult(result);
+    const body = await getBody()
+    const result = await updateUser(body)
+    return JsonResult(result)
   } catch (error) {
     await logger.error({
       message: 'Failed to update user',
@@ -70,10 +70,10 @@ export const UpdateUserAction: RequestAction<typeof UpdateUserApiEndpoint> = asy
         error: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
       },
-    });
-    throw new RequestError('Failed to update user. Please try again.', 500);
+    })
+    throw new RequestError('Failed to update user. Please try again.', 500)
   }
-};
+}
 ```
 
 ## Observable Error States
@@ -84,26 +84,26 @@ Use `ObservableValue` for error states in services and components:
 
 ```typescript
 // ✅ Good - Observable error state
-import { ObservableValue } from '@furystack/utils';
-import { Injectable } from '@furystack/inject';
+import { ObservableValue } from '@furystack/utils'
+import { Injectable } from '@furystack/inject'
 
 @Injectable({ lifetime: 'singleton' })
 export class UserService {
-  public error = new ObservableValue<string>('');
-  public isLoading = new ObservableValue(false);
+  public error = new ObservableValue<string>('')
+  public isLoading = new ObservableValue(false)
 
   public async loadUsers() {
-    this.isLoading.setValue(true);
-    this.error.setValue('');
+    this.isLoading.setValue(true)
+    this.error.setValue('')
 
     try {
-      const users = await this.apiClient.getUsers();
-      this.users.setValue(users);
+      const users = await this.apiClient.getUsers()
+      this.users.setValue(users)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load users';
-      this.error.setValue(message);
+      const message = err instanceof Error ? err.message : 'Failed to load users'
+      this.error.setValue(message)
     } finally {
-      this.isLoading.setValue(false);
+      this.isLoading.setValue(false)
     }
   }
 }
@@ -153,17 +153,17 @@ Handle errors in Cache load functions:
 
 ```typescript
 // ✅ Good - Cache with error handling
-import { Cache } from '@furystack/cache';
-import { Injectable, Injected } from '@furystack/inject';
-import { getLogger } from '@furystack/logging';
+import { Cache } from '@furystack/cache'
+import { Injectable, Injected } from '@furystack/inject'
+import { getLogger } from '@furystack/logging'
 
 @Injectable({ lifetime: 'singleton' })
 export class SeriesService {
   @Injected(MediaApiClient)
-  private declare readonly mediaApiClient: MediaApiClient;
+  declare private readonly mediaApiClient: MediaApiClient
 
   @Injected(getLogger)
-  private declare readonly logger: typeof getLogger;
+  declare private readonly logger: typeof getLogger
 
   public seriesCache = new Cache({
     capacity: 100,
@@ -174,17 +174,17 @@ export class SeriesService {
           action: '/series/:id',
           url: { id },
           query: {},
-        });
-        return result;
+        })
+        return result
       } catch (error) {
         await this.logger(this.mediaApiClient).error({
           message: 'Failed to load series',
           data: { id, error },
-        });
-        throw new Error(`Failed to load series: ${id}`);
+        })
+        throw new Error(`Failed to load series: ${id}`)
       }
     },
-  });
+  })
 }
 ```
 
@@ -278,13 +278,13 @@ export const RegistrationForm = Shade({
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Password" required />
         <input type="password" name="confirmPassword" placeholder="Confirm Password" required />
-        
+
         {error.getValue() && (
           <div style={{ color: 'red', padding: '8px' }}>
             {error.getValue()}
           </div>
         )}
-        
+
         <button type="submit" disabled={isLoading.getValue()}>
           {isLoading.getValue() ? 'Registering...' : 'Register'}
         </button>
@@ -305,38 +305,38 @@ Create utility functions for user-friendly error messages:
 export const getUserFriendlyErrorMessage = (error: unknown): string => {
   if (error instanceof RequestError) {
     // Return the user-friendly message from RequestError
-    return error.message;
+    return error.message
   }
 
   if (error instanceof Error) {
     // Check for specific error types
     if (error.message.includes('Network Error') || error.message.includes('fetch')) {
-      return 'Unable to connect to the server. Please check your internet connection.';
+      return 'Unable to connect to the server. Please check your internet connection.'
     }
 
     if (error.message.includes('401') || error.message.includes('Unauthorized')) {
-      return 'Your session has expired. Please log in again.';
+      return 'Your session has expired. Please log in again.'
     }
 
     if (error.message.includes('403') || error.message.includes('Forbidden')) {
-      return 'You do not have permission to perform this action.';
+      return 'You do not have permission to perform this action.'
     }
 
     if (error.message.includes('404') || error.message.includes('Not Found')) {
-      return 'The requested resource was not found.';
+      return 'The requested resource was not found.'
     }
 
     if (error.message.includes('500') || error.message.includes('Internal Server Error')) {
-      return 'Server error. Please try again later.';
+      return 'Server error. Please try again later.'
     }
 
     // Return the error message if it's user-friendly
-    return error.message;
+    return error.message
   }
 
   // Default error message
-  return 'Something went wrong. Please try again.';
-};
+  return 'Something went wrong. Please try again.'
+}
 ```
 
 ### Using Error Utility in Components
@@ -380,28 +380,24 @@ Implement retry logic with exponential backoff:
 
 ```typescript
 // ✅ Good - retry with exponential backoff
-export async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries = 3,
-  initialDelay = 1000,
-): Promise<T> {
-  let lastError: unknown;
+export async function retryWithBackoff<T>(fn: () => Promise<T>, maxRetries = 3, initialDelay = 1000): Promise<T> {
+  let lastError: unknown
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      return await fn();
+      return await fn()
     } catch (error) {
-      lastError = error;
-      
+      lastError = error
+
       if (attempt < maxRetries) {
         // Calculate exponential backoff: 1s, 2s, 4s, 8s (max 30s)
-        const delay = Math.min(initialDelay * 2 ** attempt, 30000);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        const delay = Math.min(initialDelay * 2 ** attempt, 30000)
+        await new Promise((resolve) => setTimeout(resolve, delay))
       }
     }
   }
 
-  throw lastError;
+  throw lastError
 }
 
 // Usage
@@ -414,12 +410,12 @@ export class DataService {
           method: 'GET',
           action: '/critical-data',
           query: {},
-        });
-        return result;
+        })
+        return result
       },
       3,
       1000,
-    );
+    )
   }
 }
 ```
@@ -487,25 +483,25 @@ Validate inputs early to prevent errors:
 ```typescript
 // ✅ Good - early validation
 export const UpdateUserAction: RequestAction<typeof UpdateUserApiEndpoint> = async ({ injector, getBody }) => {
-  const body = await getBody();
+  const body = await getBody()
 
   // Validate input format
   if (!body.id || typeof body.id !== 'string') {
-    throw new RequestError('Invalid user ID', 400);
+    throw new RequestError('Invalid user ID', 400)
   }
 
   if (body.email && !isValidEmail(body.email)) {
-    throw new RequestError('Invalid email format', 400);
+    throw new RequestError('Invalid email format', 400)
   }
 
   if (body.age && (body.age < 0 || body.age > 150)) {
-    throw new RequestError('Invalid age value', 400);
+    throw new RequestError('Invalid age value', 400)
   }
 
   // Proceed with update
-  const result = await updateUser(body);
-  return JsonResult(result);
-};
+  const result = await updateUser(body)
+  return JsonResult(result)
+}
 ```
 
 ## Summary

@@ -5,6 +5,7 @@
 FuryStack uses **Observable patterns** for reactive state management instead of React hooks or external state libraries.
 
 Key classes:
+
 - `ObservableValue<T>` - Reactive value container
 - `useObservable` - Subscribe to observables in Shades components
 - `useDisposable` - Create local disposable state in components
@@ -15,14 +16,14 @@ Key classes:
 
 ```typescript
 // ✅ Good - Observable in service
-import { ObservableValue } from '@furystack/utils';
-import { Injectable } from '@furystack/inject';
+import { ObservableValue } from '@furystack/utils'
+import { Injectable } from '@furystack/inject'
 
 @Injectable({ lifetime: 'singleton' })
 export class SessionService {
-  public currentUser = new ObservableValue<User | null>(null);
-  public isAuthenticated = new ObservableValue(false);
-  public error = new ObservableValue('');
+  public currentUser = new ObservableValue<User | null>(null)
+  public isAuthenticated = new ObservableValue(false)
+  public error = new ObservableValue('')
 }
 ```
 
@@ -32,20 +33,20 @@ export class SessionService {
 // ✅ Good - setting observable values
 @Injectable({ lifetime: 'singleton' })
 export class SessionService {
-  public currentUser = new ObservableValue<User | null>(null);
+  public currentUser = new ObservableValue<User | null>(null)
 
   public async login(email: string, password: string) {
     try {
-      const user = await this.authApi.login({ email, password });
-      this.currentUser.setValue(user);
+      const user = await this.authApi.login({ email, password })
+      this.currentUser.setValue(user)
     } catch (error) {
-      this.currentUser.setValue(null);
-      throw error;
+      this.currentUser.setValue(null)
+      throw error
     }
   }
 
   public logout() {
-    this.currentUser.setValue(null);
+    this.currentUser.setValue(null)
   }
 }
 ```
@@ -56,11 +57,11 @@ export class SessionService {
 // ✅ Good - getting current value
 @Injectable({ lifetime: 'singleton' })
 export class UserService {
-  public currentUser = new ObservableValue<User | null>(null);
+  public currentUser = new ObservableValue<User | null>(null)
 
   public getCurrentUserName(): string {
-    const user = this.currentUser.getValue();
-    return user?.name ?? 'Anonymous';
+    const user = this.currentUser.getValue()
+    return user?.name ?? 'Anonymous'
   }
 }
 ```
@@ -211,28 +212,28 @@ Services should expose observables for reactive state:
 @Injectable({ lifetime: 'singleton' })
 export class TodoService {
   @Injected(TodoApiClient)
-  private declare apiClient: TodoApiClient;
+  declare private apiClient: TodoApiClient
 
-  public todos = new ObservableValue<Todo[]>([]);
-  public isLoading = new ObservableValue(false);
-  public error = new ObservableValue('');
+  public todos = new ObservableValue<Todo[]>([])
+  public isLoading = new ObservableValue(false)
+  public error = new ObservableValue('')
 
   public async loadTodos() {
-    this.isLoading.setValue(true);
-    this.error.setValue('');
+    this.isLoading.setValue(true)
+    this.error.setValue('')
 
     try {
       const { result } = await this.apiClient.call({
         method: 'GET',
         action: '/todos',
         query: {},
-      });
-      this.todos.setValue(result);
+      })
+      this.todos.setValue(result)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load todos';
-      this.error.setValue(message);
+      const message = err instanceof Error ? err.message : 'Failed to load todos'
+      this.error.setValue(message)
     } finally {
-      this.isLoading.setValue(false);
+      this.isLoading.setValue(false)
     }
   }
 
@@ -242,12 +243,12 @@ export class TodoService {
       action: '/todos',
       body: todo,
       query: {},
-    });
+    })
 
     // Update observable state
-    const currentTodos = this.todos.getValue();
-    this.todos.setValue([...currentTodos, result]);
-    return result;
+    const currentTodos = this.todos.getValue()
+    this.todos.setValue([...currentTodos, result])
+    return result
   }
 }
 ```
@@ -260,25 +261,25 @@ Create derived observables from other observables:
 // ✅ Good - computed observables
 @Injectable({ lifetime: 'singleton' })
 export class TodoService {
-  public todos = new ObservableValue<Todo[]>([]);
+  public todos = new ObservableValue<Todo[]>([])
 
   // Computed value based on todos
   public get completedTodosCount(): number {
-    return this.todos.getValue().filter(t => t.completed).length;
+    return this.todos.getValue().filter((t) => t.completed).length
   }
 
   // Or use a separate observable that updates when todos change
-  public completedCount = new ObservableValue(0);
+  public completedCount = new ObservableValue(0)
 
   private updateCompletedCount() {
-    const count = this.todos.getValue().filter(t => t.completed).length;
-    this.completedCount.setValue(count);
+    const count = this.todos.getValue().filter((t) => t.completed).length
+    this.completedCount.setValue(count)
   }
 
   public async loadTodos() {
-    const { result } = await this.fetchTodos();
-    this.todos.setValue(result);
-    this.updateCompletedCount(); // Update computed value
+    const { result } = await this.fetchTodos()
+    this.todos.setValue(result)
+    this.updateCompletedCount() // Update computed value
   }
 }
 ```
@@ -294,23 +295,23 @@ When manually subscribing, always clean up:
 @Injectable({ lifetime: 'singleton' })
 export class SyncService {
   @Injected(DataService)
-  private declare dataService: DataService;
+  declare private dataService: DataService
 
-  private subscription?: { dispose: () => void };
+  private subscription?: { dispose: () => void }
 
   public startSync() {
     this.subscription = this.dataService.data.subscribe((value) => {
-      this.syncToServer(value);
-    });
+      this.syncToServer(value)
+    })
   }
 
   public stopSync() {
-    this.subscription?.dispose();
-    this.subscription = undefined;
+    this.subscription?.dispose()
+    this.subscription = undefined
   }
 
   public [Symbol.dispose]() {
-    this.stopSync();
+    this.stopSync()
   }
 }
 ```
@@ -360,30 +361,30 @@ Create operation wrappers for automatic loading state management:
 // ✅ Good - operation wrapper pattern
 @Injectable({ lifetime: 'singleton' })
 export class DataService {
-  public isLoading = new ObservableValue(false);
-  public data = new ObservableValue<Data | null>(null);
+  public isLoading = new ObservableValue(false)
+  public data = new ObservableValue<Data | null>(null)
 
   private operation() {
-    this.isLoading.setValue(true);
+    this.isLoading.setValue(true)
     return {
       [Symbol.dispose]: () => {
-        this.isLoading.setValue(false);
+        this.isLoading.setValue(false)
       },
-    };
+    }
   }
 
   public async loadData() {
     await usingAsync(this.operation(), async () => {
-      const result = await this.fetchData();
-      this.data.setValue(result);
-    });
+      const result = await this.fetchData()
+      this.data.setValue(result)
+    })
   }
 
   public async updateData(updates: Partial<Data>) {
     await usingAsync(this.operation(), async () => {
-      const result = await this.updateDataOnServer(updates);
-      this.data.setValue(result);
-    });
+      const result = await this.updateDataOnServer(updates)
+      this.data.setValue(result)
+    })
   }
 }
 ```

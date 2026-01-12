@@ -20,19 +20,19 @@ When you open or edit a file, Cursor automatically loads the relevant rules base
 
 ## Rule Applicability Matrix
 
-| Rule File | Auto-Apply | File Patterns | Description |
-| --- | --- | --- | --- |
-| [CODE_STYLE.mdc](./CODE_STYLE.mdc) | ✅ Always | `**/*.ts`, `**/*.tsx` | Formatting, naming, organization |
-| [TYPESCRIPT_GUIDELINES.mdc](./TYPESCRIPT_GUIDELINES.mdc) | ✅ Always | `**/*.ts`, `**/*.tsx` | Type safety, NO `any`, generics |
-| [TESTING_GUIDELINES.mdc](./TESTING_GUIDELINES.mdc) | 🎯 Auto | `**/*.spec.ts`, `**/*.spec.tsx`, `**/*.e2e.spec.ts` | Vitest, Playwright, mocking |
-| [ERROR_HANDLING.mdc](./ERROR_HANDLING.mdc) | 🎯 Auto | `**/*.ts`, `**/*.tsx`, `**/actions/**`, `**/services/**` | RequestError, Observable errors |
-| [CACHE_HANDLING.mdc](./CACHE_HANDLING.mdc) | 🎯 Auto | `**/*.ts`, `**/services/**` | FuryStack Cache patterns |
-| [OBSERVABLE_STATE.mdc](./OBSERVABLE_STATE.mdc) | 🎯 Auto | `**/*.ts`, `**/*.tsx`, `**/services/**` | ObservableValue, useObservable |
-| [PERFORMANCE_OPTIMIZATION.mdc](./PERFORMANCE_OPTIMIZATION.mdc) | 🎯 Auto | `**/*.ts`, `**/*.tsx`, `**/components/**`, `**/services/**` | Optimization, disposal |
-| [SCRIPT_EXECUTION.mdc](./SCRIPT_EXECUTION.mdc) | 🎯 Auto | `package.json`, `**/*.sh` | Package manager, CI/CD |
-| [BACKEND_PATTERNS.mdc](./BACKEND_PATTERNS.mdc) | 📘 Manual | Backend development | API, actions, authentication |
-| [FRONTEND_PATTERNS.mdc](./FRONTEND_PATTERNS.mdc) | 📘 Manual | Frontend development | Routing, Shades components, forms |
-| [main.mdc](./main.mdc) | 📘 Manual | Overview | Quick start guide |
+| Rule File                                                    | Auto-Apply | File Patterns                                               | Description                       |
+| ------------------------------------------------------------ | ---------- | ----------------------------------------------------------- | --------------------------------- |
+| [CODE_STYLE.mdc](./CODE_STYLE.mdc)                           | ✅ Always  | `**/*.ts`, `**/*.tsx`                                       | Formatting, naming, organization  |
+| [TYPESCRIPT_GUIDELINES.mdc](./TYPESCRIPT_GUIDELINES.mdc)     | ✅ Always  | `**/*.ts`, `**/*.tsx`                                       | Type safety, NO `any`, generics   |
+| [TESTING_GUIDELINES.md](./TESTING_GUIDELINES.md)             | 🎯 Auto    | `**/*.spec.ts`, `**/*.spec.tsx`, `**/*.e2e.spec.ts`         | Vitest, Playwright, mocking       |
+| [ERROR_HANDLING.md](./ERROR_HANDLING.md)                     | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/actions/**`, `**/services/**`    | RequestError, Observable errors   |
+| [CACHE_HANDLING.md](./CACHE_HANDLING.md)                     | 🎯 Auto    | `**/*.ts`, `**/services/**`                                 | FuryStack Cache patterns          |
+| [OBSERVABLE_STATE.md](./OBSERVABLE_STATE.md)                 | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/services/**`                     | ObservableValue, useObservable    |
+| [PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md) | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/components/**`, `**/services/**` | Optimization, disposal            |
+| [SCRIPT_EXECUTION.md](./SCRIPT_EXECUTION.md)                 | 🎯 Auto    | `package.json`, `**/*.sh`                                   | Package manager, CI/CD            |
+| [BACKEND_PATTERNS.mdc](./BACKEND_PATTERNS.mdc)               | 📘 Manual  | Backend development                                         | API, actions, authentication      |
+| [FRONTEND_PATTERNS.mdc](./FRONTEND_PATTERNS.mdc)             | 📘 Manual  | Frontend development                                        | Routing, Shades components, forms |
+| [main.mdc](./main.mdc)                                       | 📘 Manual  | Overview                                                    | Quick start guide                 |
 
 **Legend:**
 
@@ -49,7 +49,7 @@ When you open or edit a file, Cursor automatically loads the relevant rules base
 1. **BACKEND_PATTERNS.mdc** - Action pattern, RequestError usage
 2. **TYPESCRIPT_GUIDELINES.mdc** - Type safety, no `any`
 3. **CODE_STYLE.mdc** - Naming, imports, file organization
-4. **ERROR_HANDLING.mdc** - RequestError codes, logging
+4. **ERROR_HANDLING.md** - RequestError codes, logging
 
 **Workflow:**
 
@@ -63,21 +63,21 @@ When you open or edit a file, Cursor automatically loads the relevant rules base
 **Apply in order:**
 
 1. **FRONTEND_PATTERNS.mdc** - Shades component pattern, routing
-2. **OBSERVABLE_STATE.mdc** - useObservable, useDisposable
+2. **OBSERVABLE_STATE.md** - useObservable, useDisposable
 3. **TYPESCRIPT_GUIDELINES.mdc** - Props types, type safety
 4. **CODE_STYLE.mdc** - Naming, file structure
 
 **Optional (based on complexity):**
 
-- **CACHE_HANDLING.mdc** - If component uses cached data
-- **ERROR_HANDLING.mdc** - If component handles async operations
-- **PERFORMANCE_OPTIMIZATION.mdc** - If component is expensive
+- **CACHE_HANDLING.md** - If component uses cached data
+- **ERROR_HANDLING.md** - If component handles async operations
+- **PERFORMANCE_OPTIMIZATION.md** - If component is expensive
 
 ### Writing Tests
 
 **Apply in order:**
 
-1. **TESTING_GUIDELINES.mdc** - Test structure, mocking, Playwright
+1. **TESTING_GUIDELINES.md** - Test structure, mocking, Playwright
 2. **TYPESCRIPT_GUIDELINES.mdc** - Type-safe mocks, no `any`
 3. **CODE_STYLE.mdc** - Test file organization
 
@@ -92,11 +92,11 @@ When you open or edit a file, Cursor automatically loads the relevant rules base
 
 **Apply in order:**
 
-1. **BACKEND_PATTERNS.mdc** or **OBSERVABLE_STATE.mdc** - Service patterns
-2. **CACHE_HANDLING.mdc** - If service uses Cache
+1. **BACKEND_PATTERNS.mdc** or **OBSERVABLE_STATE.md** - Service patterns
+2. **CACHE_HANDLING.md** - If service uses Cache
 3. **TYPESCRIPT_GUIDELINES.mdc** - Injectable types, generics
 4. **CODE_STYLE.mdc** - Class naming, organization
-5. **ERROR_HANDLING.mdc** - Error handling in services
+5. **ERROR_HANDLING.md** - Error handling in services
 
 ## Rule Categories
 
@@ -114,8 +114,8 @@ These rules should be applied to all code:
 
 Apply when working with FuryStack-specific features:
 
-- **OBSERVABLE_STATE.mdc**: ObservableValue, useObservable, useDisposable
-- **CACHE_HANDLING.mdc**: Cache configuration, methods, invalidation
+- **OBSERVABLE_STATE.md**: ObservableValue, useObservable, useDisposable
+- **CACHE_HANDLING.md**: Cache configuration, methods, invalidation
 - **BACKEND_PATTERNS.mdc**: Actions, RequestError, authentication
 - **FRONTEND_PATTERNS.mdc**: Shades components, routing, forms
 
@@ -126,9 +126,9 @@ Apply when working with FuryStack-specific features:
 
 Apply when ensuring quality or optimizing:
 
-- **TESTING_GUIDELINES.mdc**: Test structure, mocking, E2E patterns
-- **ERROR_HANDLING.mdc**: RequestError, Observable errors, user-friendly messages
-- **PERFORMANCE_OPTIMIZATION.mdc**: Disposal, debouncing, lazy loading
+- **TESTING_GUIDELINES.md**: Test structure, mocking, E2E patterns
+- **ERROR_HANDLING.md**: RequestError, Observable errors, user-friendly messages
+- **PERFORMANCE_OPTIMIZATION.md**: Disposal, debouncing, lazy loading
 
 **Priority**: Medium to High
 **Enforcement**: Test coverage, code review
@@ -137,7 +137,7 @@ Apply when ensuring quality or optimizing:
 
 Apply when setting up infrastructure or scripts:
 
-- **SCRIPT_EXECUTION.mdc**: Package manager detection, workspace commands
+- **SCRIPT_EXECUTION.md**: Package manager detection, workspace commands
 
 **Priority**: Medium
 **Enforcement**: CI/CD validation
@@ -147,23 +147,23 @@ Apply when setting up infrastructure or scripts:
 ### Critical (MUST follow)
 
 - No `any` type (TYPESCRIPT_GUIDELINES.mdc)
-- RequestError for API errors (ERROR_HANDLING.mdc)
-- Proper disposal patterns (OBSERVABLE_STATE.mdc)
+- RequestError for API errors (ERROR_HANDLING.md)
+- Proper disposal patterns (OBSERVABLE_STATE.md)
 - shadowDomName for Shades components (FRONTEND_PATTERNS.mdc)
 
 ### High (SHOULD follow)
 
 - TypeScript strict mode (TYPESCRIPT_GUIDELINES.mdc)
-- Cache for data fetching (CACHE_HANDLING.mdc)
-- Observable state management (OBSERVABLE_STATE.mdc)
+- Cache for data fetching (CACHE_HANDLING.md)
+- Observable state management (OBSERVABLE_STATE.md)
 - navigateToRoute for navigation (FRONTEND_PATTERNS.mdc)
 
 ### Medium (RECOMMENDED)
 
-- Debouncing for user input (PERFORMANCE_OPTIMIZATION.mdc)
-- Operation wrappers for loading states (OBSERVABLE_STATE.mdc)
-- Hoisted mocks in tests (TESTING_GUIDELINES.mdc)
-- Helper functions in E2E tests (TESTING_GUIDELINES.mdc)
+- Debouncing for user input (PERFORMANCE_OPTIMIZATION.md)
+- Operation wrappers for loading states (OBSERVABLE_STATE.md)
+- Hoisted mocks in tests (TESTING_GUIDELINES.md)
+- Helper functions in E2E tests (TESTING_GUIDELINES.md)
 
 ## Context-Based Application
 
@@ -173,25 +173,25 @@ Apply when setting up infrastructure or scripts:
 
 - ✅ CODE_STYLE.mdc (always applied)
 - ✅ TYPESCRIPT_GUIDELINES.mdc (always applied)
-- ✅ OBSERVABLE_STATE.mdc (auto-applied: `**/services/**`)
-- ✅ CACHE_HANDLING.mdc (auto-applied: `**/services/**`)
-- ✅ ERROR_HANDLING.mdc (auto-applied: `**/services/**`)
+- ✅ OBSERVABLE_STATE.md (auto-applied: `**/services/**`)
+- ✅ CACHE_HANDLING.md (auto-applied: `**/services/**`)
+- ✅ ERROR_HANDLING.md (auto-applied: `**/services/**`)
 
 **Scenario 2: You open `login.e2e.spec.ts`**
 
 - ✅ CODE_STYLE.mdc (always applied)
 - ✅ TYPESCRIPT_GUIDELINES.mdc (always applied)
-- ✅ TESTING_GUIDELINES.mdc (auto-applied: test file)
+- ✅ TESTING_GUIDELINES.md (auto-applied: test file)
 
 **Scenario 3: You open `create-user-action.ts` in `service/src/app-models/auth/actions/`**
 
 - ✅ CODE_STYLE.mdc (always applied)
 - ✅ TYPESCRIPT_GUIDELINES.mdc (always applied)
-- ✅ ERROR_HANDLING.mdc (auto-applied: `**/actions/**`)
+- ✅ ERROR_HANDLING.md (auto-applied: `**/actions/**`)
 
 **Scenario 4: You open `package.json`**
 
-- ✅ SCRIPT_EXECUTION.mdc (auto-applied: package.json)
+- ✅ SCRIPT_EXECUTION.md (auto-applied: package.json)
 
 ## Summary
 

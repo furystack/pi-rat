@@ -5,6 +5,7 @@
 **FuryStack Cache from `@furystack/cache` provides a powerful caching mechanism with Observable integration.**
 
 This guide covers:
+
 - Cache configuration and setup
 - Cache methods (get, getObservable, setExplicitValue)
 - Cache population patterns
@@ -17,15 +18,15 @@ This guide covers:
 
 ```typescript
 // ✅ Good - basic Cache setup
-import { Cache } from '@furystack/cache';
-import { Injectable, Injected } from '@furystack/inject';
-import type { FindOptions } from '@furystack/core';
-import type { User } from 'common';
+import { Cache } from '@furystack/cache'
+import { Injectable, Injected } from '@furystack/inject'
+import type { FindOptions } from '@furystack/core'
+import type { User } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class UserService {
   @Injected(UserApiClient)
-  private declare readonly apiClient: UserApiClient;
+  declare private readonly apiClient: UserApiClient
 
   public userCache = new Cache({
     capacity: 100,
@@ -35,14 +36,14 @@ export class UserService {
         action: '/users/:id',
         url: { id },
         query: {},
-      });
-      return result;
+      })
+      return result
     },
-  });
+  })
 
   // Expose cache methods
-  public getUser = this.userCache.get.bind(this.userCache);
-  public getUserAsObservable = this.userCache.getObservable.bind(this.userCache);
+  public getUser = this.userCache.get.bind(this.userCache)
+  public getUserAsObservable = this.userCache.getObservable.bind(this.userCache)
 }
 ```
 
@@ -55,7 +56,7 @@ Create separate caches for list queries:
 @Injectable({ lifetime: 'singleton' })
 export class SeriesService {
   @Injected(MediaApiClient)
-  private declare readonly mediaApiClient: MediaApiClient;
+  declare private readonly mediaApiClient: MediaApiClient
 
   // Cache for individual series by ID
   public seriesCache = new Cache({
@@ -66,10 +67,10 @@ export class SeriesService {
         action: '/series/:id',
         url: { id },
         query: {},
-      });
-      return result;
+      })
+      return result
     },
-  });
+  })
 
   // Cache for series queries
   public seriesQueryCache = new Cache({
@@ -81,25 +82,25 @@ export class SeriesService {
         query: {
           findOptions,
         },
-      });
+      })
 
       // Populate individual series cache from query results
       result.entries.forEach((entry) => {
         this.seriesCache.setExplicitValue({
           loadArgs: [entry.imdbId],
           value: { status: 'loaded', value: entry, updatedAt: new Date() },
-        });
-      });
+        })
+      })
 
-      return result;
+      return result
     },
-  });
+  })
 
   // Expose methods
-  public getSeries = this.seriesCache.get.bind(this.seriesCache);
-  public getSeriesAsObservable = this.seriesCache.getObservable.bind(this.seriesCache);
-  public findSeries = this.seriesQueryCache.get.bind(this.seriesQueryCache);
-  public findSeriesAsObservable = this.seriesQueryCache.getObservable.bind(this.seriesQueryCache);
+  public getSeries = this.seriesCache.get.bind(this.seriesCache)
+  public getSeriesAsObservable = this.seriesCache.getObservable.bind(this.seriesCache)
+  public findSeries = this.seriesQueryCache.get.bind(this.seriesQueryCache)
+  public findSeriesAsObservable = this.seriesQueryCache.getObservable.bind(this.seriesQueryCache)
 }
 ```
 
@@ -116,11 +117,11 @@ export class MovieService {
   public async loadMovieDetails(movieId: string) {
     try {
       // Cache automatically handles loading and caching
-      const movie = await this.movieCache.get(movieId);
-      return movie;
+      const movie = await this.movieCache.get(movieId)
+      return movie
     } catch (error) {
-      console.error('Failed to load movie:', error);
-      throw error;
+      console.error('Failed to load movie:', error)
+      throw error
     }
   }
 }
@@ -191,7 +192,7 @@ export class UserService {
       url: { id: userId },
       body: updates,
       query: {},
-    });
+    })
 
     // Update cache with new data
     this.userCache.setExplicitValue({
@@ -201,9 +202,9 @@ export class UserService {
         value: result,
         updatedAt: new Date(),
       },
-    });
+    })
 
-    return result;
+    return result
   }
 }
 ```
@@ -225,19 +226,19 @@ export class SeriesService {
         method: 'GET',
         action: '/series',
         query: { findOptions },
-      });
+      })
 
       // Populate individual series cache from query results
       result.entries.forEach((entry) => {
         this.seriesCache.setExplicitValue({
           loadArgs: [entry.imdbId],
           value: { status: 'loaded', value: entry, updatedAt: new Date() },
-        });
-      });
+        })
+      })
 
-      return result;
+      return result
     },
-  });
+  })
 }
 ```
 
@@ -256,7 +257,7 @@ export class MovieService {
       action: '/movies',
       body: movie,
       query: {},
-    });
+    })
 
     // Add to individual cache
     this.movieCache.setExplicitValue({
@@ -266,14 +267,14 @@ export class MovieService {
         value: result,
         updatedAt: new Date(),
       },
-    });
+    })
 
     // Invalidate list caches (they need to be refetched)
     // Note: Cache doesn't have built-in invalidation, so you might need
     // to clear or update the relevant query caches manually
     // Or simply rely on cache capacity and freshness
 
-    return result;
+    return result
   }
 }
 ```
@@ -295,11 +296,11 @@ export class MovieService {
       action: '/movies/:id',
       url: { id: movieId },
       query: {},
-    });
+    })
 
     // Remove from cache by setting to an "empty" or error state
     // Or let it expire naturally based on cache capacity
-    
+
     // Option: Mark as deleted
     this.movieCache.setExplicitValue({
       loadArgs: [movieId],
@@ -308,7 +309,7 @@ export class MovieService {
         error: new Error('Movie deleted'),
         updatedAt: new Date(),
       },
-    });
+    })
   }
 }
 ```
@@ -323,13 +324,13 @@ Force a cache refresh by re-fetching:
 export class UserService {
   public async refreshUser(userId: string) {
     // Force a fresh fetch (Cache's get() will call load again)
-    const user = await this.userCache.get(userId);
-    return user;
+    const user = await this.userCache.get(userId)
+    return user
   }
 
   // Or trigger a background refresh
   public refreshUserInBackground(userId: string) {
-    void this.userCache.get(userId);
+    void this.userCache.get(userId)
   }
 }
 ```
@@ -459,7 +460,7 @@ export class DataService {
     load: async (id: string) => {
       // Load function
     },
-  });
+  })
 
   // Larger cache for stable data
   public userPreferencesCache = new Cache({
@@ -467,7 +468,7 @@ export class DataService {
     load: async (userId: string) => {
       // Load function
     },
-  });
+  })
 
   // Medium cache for moderate use
   public movieCache = new Cache({
@@ -475,7 +476,7 @@ export class DataService {
     load: async (movieId: string) => {
       // Load function
     },
-  });
+  })
 }
 ```
 
@@ -488,7 +489,7 @@ Always handle errors in cache load functions:
 @Injectable({ lifetime: 'singleton' })
 export class SeriesService {
   @Injected(getLogger)
-  private declare readonly logger: typeof getLogger;
+  declare private readonly logger: typeof getLogger
 
   public seriesCache = new Cache({
     capacity: 100,
@@ -499,17 +500,17 @@ export class SeriesService {
           action: '/series/:id',
           url: { id },
           query: {},
-        });
-        return result;
+        })
+        return result
       } catch (error) {
         await this.logger(this.mediaApiClient).error({
           message: 'Failed to load series from cache',
           data: { seriesId: id, error },
-        });
-        throw new Error(`Failed to load series: ${id}`);
+        })
+        throw new Error(`Failed to load series: ${id}`)
       }
     },
-  });
+  })
 }
 ```
 
@@ -519,7 +520,7 @@ Ensure type safety with cache generics:
 
 ```typescript
 // ✅ Good - type-safe cache
-import type { Series, FindOptions } from 'common';
+import type { Series, FindOptions } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class SeriesService {
@@ -532,24 +533,23 @@ export class SeriesService {
         action: '/series/:id',
         url: { id },
         query: {},
-      });
-      return result;
+      })
+      return result
     },
-  });
+  })
 
   // Query cache with FindOptions
-  public seriesQueryCache: Cache<[FindOptions<Series, Array<keyof Series>>], SeriesQueryResult> =
-    new Cache({
-      capacity: 100,
-      load: async (findOptions) => {
-        const { result } = await this.mediaApiClient.call({
-          method: 'GET',
-          action: '/series',
-          query: { findOptions },
-        });
-        return result;
-      },
-    });
+  public seriesQueryCache: Cache<[FindOptions<Series, Array<keyof Series>>], SeriesQueryResult> = new Cache({
+    capacity: 100,
+    load: async (findOptions) => {
+      const { result } = await this.mediaApiClient.call({
+        method: 'GET',
+        action: '/series',
+        query: { findOptions },
+      })
+      return result
+    },
+  })
 }
 ```
 
