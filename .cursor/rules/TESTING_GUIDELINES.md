@@ -1,0 +1,485 @@
+# Testing Guidelines
+
+## Test File Naming
+
+### File Naming Conventions
+
+- Use `*.spec.ts` or `*.spec.tsx` for unit and component tests
+- Use `*.e2e.spec.ts` for Playwright E2E tests
+- Co-locate tests with the files they test
+
+```typescript
+// ✅ Good - unit test file
+// session-service.ts
+// session-service.spec.ts
+
+// ✅ Good - E2E test file
+// e2e/login.e2e.spec.ts
+```
+
+## Test Structure
+
+### Arrange-Act-Assert Pattern
+
+Organize tests clearly using the Arrange-Act-Assert pattern:
+
+```typescript
+// ✅ Good - clear test structure
+describe('SessionService', () => {
+  it('should set current user when login succeeds', async () => {
+    // Arrange
+    const sessionService = injector.getInstance(SessionService)
+    const testUser = { id: '1', username: 'test@example.com' }
+
+    // Act
+    await sessionService.login('test@example.com', 'password')
+
+    // Assert
+    expect(sessionService.currentUser.getValue()).toEqual(testUser)
+  })
+})
+```
+
+### Descriptive Test Names
+
+- Use clear, descriptive test names that explain what is being tested
+- Follow the "should [expected behavior] when [condition]" pattern
+- Group related tests in `describe` blocks
+
+```typescript
+// ✅ Good - descriptive test names
+describe('UserService', () => {
+  describe('when user is authenticated', () => {
+    it('should return user profile', async () => {
+      // Test implementation
+    })
+
+    it('should allow updating user preferences', async () => {
+      // Test implementation
+    })
+  })
+
+  describe('when user is not authenticated', () => {
+    it('should throw authentication error', async () => {
+      // Test implementation
+    })
+  })
+})
+
+// ❌ Avoid - unclear test names
+it('test 1', () => {})
+it('works', () => {})
+it('user', () => {})
+```
+
+## Vitest Mocking Patterns
+
+### Minimal Mocking
+
+**Keep mocking to the bare minimum.** Only mock what is necessary for the test to run in isolation and verify its specific behavior.
+
+**Recommendation:** Avoid over-mocking. Prefer testing with real implementations when feasible.
+
+### Hoisted Mock Definitions
+
+When using `vi.mock()`, define the mock implementations for specific functions using `vi.fn()` within a `vi.hoisted()` callback at the top of the test file.
+
+**Recommendation:** Place hoisted mocks before any imports from the modules they are mocking.
+
+```typescript
+// ✅ Good - hoist the mocks at the top
+import { describe, expect, it, vi } from 'vitest'
+
+const mockGetUser = vi.hoisted(() => vi.fn())
+const mockSaveUser = vi.hoisted(() => vi.fn())
+
+vi.mock('./user-api-client', () => ({
+  UserApiClient: class {
+    getUser = mockGetUser
+    saveUser = mockSaveUser
+  },
+}))
+
+// ... rest of the test file (imports, describe blocks, etc.)
+
+describe('UserService', () => {
+  it('should fetch user data', async () => {
+    mockGetUser.mockResolvedValue({ id: '1', name: 'Test User' })
+
+    const userService = injector.getInstance(UserService)
+    const user = await userService.getUser('1')
+
+    expect(user.name).toBe('Test User')
+    expect(mockGetUser).toHaveBeenCalledWith('1')
+  })
+})
+```
+
+### Type-Safe Mocking
+
+**CRITICAL:** Always add proper types to mock data and callbacks to avoid `any` type errors.
+
+```typescript
+// ✅ Good - properly typed mock callbacks
+const mockUpload = vi.hoisted(() => vi.fn())
+
+// In test
+const uploadCallbacks = mockUpload.mock.calls[0][1] as {
+  onSuccess: () => void
+  onError: () => void
+}
+uploadCallbacks.onSuccess() // Type-safe
+
+// ✅ Good - properly typed mock parameters
+const uploadCall = mockUpload.mock.calls[0][0] as {
+  fileId: string
+  file: File
+}
+expect(uploadCall.fileId).toBe('file-123')
+
+// ❌ Avoid - untyped mock access (causes linter errors)
+const uploadCallbacks = mockUpload.mock.calls[0][1] // any type
+uploadCallbacks.onSuccess() // Unsafe call of any
+```
+
+### Mocking Observables
+
+When mocking services that return Observables, return `ObservableValue` instances:
+
+```typescript
+// ✅ Good - mocking Observable returns
+import { ObservableValue } from '@furystack/utils'
+
+const mockUserService = {
+  currentUser: new ObservableValue({ id: '1', name: 'Test User' }),
+  getUserById: vi.fn((id: string) => new ObservableValue({ id, name: 'Test User' })),
+}
+
+vi.mock('../services/user-service', () => ({
+  UserService: vi.fn(() => mockUserService),
+}))
+```
+
+### Mocking Cache
+
+When mocking FuryStack Cache instances:
+
+```typescript
+// ✅ Good - mocking Cache
+import { ObservableValue } from '@furystack/utils'
+
+const mockUserCache = {
+  get: vi.fn(async (id: string) => ({ id, name: 'Test User' })),
+  getObservable: vi.fn((id: string) => new ObservableValue({ id, name: 'Test User' })),
+  setExplicitValue: vi.fn(),
+}
+
+@Injectable({ lifetime: 'singleton' })
+class MockUserService {
+  public userCache = mockUserCache
+}
+```
+
+## Playwright E2E Testing
+
+### Locator Strategy (Priority Order)
+
+1. **Semantic first**: `page.getByRole('button', { name: 'Login' })`
+2. **Content-based**: `page.getByText('Username')`
+3. **Form elements**: `page.locator('input[name="username"]')`
+4. **Component-specific**: `page.locator('shade-login form')`
+5. **Style-based (last resort)**: `page.locator('[style*="border-radius: 50%"]')`
+
+### Helper Function Pattern
+
+Create reusable helper functions for common workflows:
+
+```typescript
+// ✅ Good - helper function with verification
+export const login = async (page: Page, username = 'testuser@gmail.com', password = 'password') => {
+  const loginForm = page.locator('shade-login form')
+  await loginForm.locator('input[name="userName"]').fill(username)
+  await loginForm.locator('input[name="password"]').fill(password)
+  await page.getByRole('button', { name: 'Login' }).click()
+
+  // Helper handles verification internally
+  await expect(page.locator('shade-noty', { hasText: 'Welcome back' })).toBeVisible()
+  const firstLetter = username.charAt(0).toUpperCase()
+  await expect(page.getByText(firstLetter).first()).toBeVisible()
+}
+
+export const logout = async (page: Page) => {
+  // Handle complete logout workflow
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await userAvatar.click()
+
+  const logoutButton = page.getByRole('button', { name: /log out/i })
+  await logoutButton.click()
+
+  // Verify logout success
+  await expect(page.locator('shade-login form')).toBeVisible()
+}
+```
+
+### E2E Test Structure
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { login, logout } from './helpers/auth-helpers'
+
+test.describe('User Settings', () => {
+  test('should update user profile', async ({ page }) => {
+    // Setup
+    await page.goto('/')
+    await login(page)
+
+    // Action
+    await page.goto('/settings')
+    await page.locator('input[name="displayName"]').fill('New Name')
+    await page.getByRole('button', { name: 'Save' }).click()
+
+    // Verification
+    await expect(page.locator('shade-noty', { hasText: 'Profile updated' })).toBeVisible()
+  })
+})
+```
+
+### Critical E2E Testing Rules
+
+#### ✅ Test What EXISTS
+
+```typescript
+// Good - test actual behavior
+const form = page.locator('form[data-form-id]')
+await form.locator('input[name="username"]').fill('test')
+await expect(form.locator('input[name="username"]')).toHaveValue('test')
+```
+
+#### ❌ Don't Test Assumptions
+
+```typescript
+// Bad - assuming validation that doesn't exist
+const errorMessage = page.locator('div', { hasText: 'Password too short' })
+await expect(errorMessage).toBeVisible() // This might not exist!
+```
+
+### Dynamic Content Handling
+
+```typescript
+// Handle dynamic test data
+const testEmail = `user-${Date.now()}@example.com`
+const firstLetter = testEmail.charAt(0).toUpperCase()
+
+// Use in tests
+await usernameInput.fill(testEmail)
+// Later verify avatar shows correct letter
+await expect(page.getByText(firstLetter).first()).toBeVisible()
+```
+
+### Error Testing
+
+```typescript
+// Test general error handling, not specific messages
+await submitInvalidForm()
+
+// Look for ANY error notification, not specific text
+const errorNoty = page.locator('shade-noty').first()
+await expect(errorNoty).toBeVisible()
+```
+
+## Unit Testing Best Practices
+
+### Component Testing
+
+Test component behavior, not implementation:
+
+```typescript
+// ✅ Good - testing behavior
+describe('UserProfileComponent', () => {
+  it('should display user information', () => {
+    const props = { user: { id: '1', name: 'Test User', email: 'test@example.com' } }
+    const component = createComponent(UserProfile, props)
+
+    expect(component.textContent).toContain('Test User')
+    expect(component.textContent).toContain('test@example.com')
+  })
+
+  it('should call onEdit when edit button is clicked', () => {
+    const mockOnEdit = vi.fn()
+    const props = { user: { id: '1', name: 'Test' }, onEdit: mockOnEdit }
+    const component = createComponent(UserProfile, props)
+
+    const editButton = component.querySelector('button')
+    editButton?.click()
+
+    expect(mockOnEdit).toHaveBeenCalledTimes(1)
+  })
+})
+```
+
+### Service Testing
+
+Test service methods and state management:
+
+```typescript
+// ✅ Good - service testing
+import { Injector } from '@furystack/inject'
+import { describe, expect, it, vi } from 'vitest'
+
+describe('UserService', () => {
+  it('should update current user on successful login', async () => {
+    const injector = new Injector()
+    const userService = injector.getInstance(UserService)
+
+    await userService.login('test@example.com', 'password')
+
+    const currentUser = userService.currentUser.getValue()
+    expect(currentUser).toBeTruthy()
+    expect(currentUser?.email).toBe('test@example.com')
+  })
+
+  it('should clear current user on logout', async () => {
+    const injector = new Injector()
+    const userService = injector.getInstance(UserService)
+
+    await userService.login('test@example.com', 'password')
+    await userService.logout()
+
+    expect(userService.currentUser.getValue()).toBeNull()
+  })
+})
+```
+
+### Testing Observable State
+
+```typescript
+// ✅ Good - testing Observable state changes
+import { ObservableValue } from '@furystack/utils'
+
+describe('DataService', () => {
+  it('should update observable when data is loaded', async () => {
+    const dataService = injector.getInstance(DataService)
+    const states: string[] = []
+
+    // Subscribe to state changes
+    dataService.loadingState.subscribe((state) => {
+      states.push(state.status)
+    })
+
+    // Trigger data load
+    await dataService.loadData()
+
+    // Verify state transitions
+    expect(states).toEqual(['idle', 'loading', 'loaded'])
+  })
+})
+```
+
+## Test Organization
+
+### Co-location
+
+- Keep tests close to the code they test
+- Use descriptive test file names
+- Group related tests logically
+
+```
+frontend/src/services/
+├── user-service.ts
+├── user-service.spec.ts
+└── session-service.ts
+    └── session-service.spec.ts
+
+e2e/
+├── login.e2e.spec.ts
+├── registration.e2e.spec.ts
+└── helpers/
+    ├── auth-helpers.ts
+    └── navigation-helpers.ts
+```
+
+### Test Categories
+
+- **Unit tests**: Test individual functions, services, utilities
+- **Component tests**: Test Shades components in isolation
+- **Integration tests**: Test service interactions
+- **E2E tests**: Test complete user workflows with Playwright
+
+## Test Maintenance
+
+### Helper Centralization
+
+Create helpers that encapsulate:
+
+- Complex component interactions (dropdown menus, modals)
+- Multi-step workflows (login, logout, navigation)
+- Assertion patterns (notification handling, error states)
+- Setup/teardown operations (test data creation, cleanup)
+
+### Avoid Brittleness
+
+- Use semantic locators over CSS selectors
+- Handle dynamic content appropriately
+- Test user workflows, not implementation details
+- Keep tests independent and parallelizable
+- Don't rely on test execution order
+
+### Skip Unimplemented Features
+
+```typescript
+test.skip('Future Feature', async ({ page }) => {
+  // Mark unimplemented features for later
+})
+```
+
+This prevents test failures on functionality that doesn't exist yet while maintaining a plan for future testing.
+
+## Running Tests
+
+### Test Scripts
+
+```bash
+# Unit tests
+yarn test:unit
+
+# E2E tests
+yarn test:e2e
+
+# E2E installation test (run once)
+yarn test:e2e:install
+
+# Watch mode (unit tests)
+vitest
+```
+
+## Summary
+
+**Key Principles:**
+
+1. **Minimal mocking** - Only mock what's necessary
+2. **Type-safe mocks** - Always type mock callbacks and data
+3. **Arrange-Act-Assert** - Follow clear test structure
+4. **Semantic locators** - Use accessible queries in E2E tests
+5. **Helper functions** - Encapsulate common workflows
+6. **Test behavior** - Not implementation details
+7. **Co-locate tests** - Keep tests near the code they test
+8. **Descriptive names** - Make test names clear and specific
+9. **Hoisted mocks** - Define mocks at the top of test files
+10. **Independent tests** - Each test should run in isolation
+
+**Testing Checklist:**
+
+- [ ] Tests use Arrange-Act-Assert pattern
+- [ ] Mocks are hoisted and properly typed
+- [ ] E2E tests use semantic locators
+- [ ] Helper functions for common workflows
+- [ ] Tests are independent and parallelizable
+- [ ] Observable state changes are tested
+- [ ] Error scenarios are covered
+- [ ] No brittle CSS selectors
+
+**Tools:**
+
+- Unit/Integration: `vitest`
+- E2E: `@playwright/test`
+- Test Runner: `yarn test:unit` or `yarn test:e2e`

@@ -43,9 +43,18 @@ This is a **FuryStack-based** application with Shades components, REST APIs, and
 
 ## 🔗 Detailed Guides
 
-- `development-patterns.mdc` - API, actions, authentication, errors
-- `frontend-patterns.mdc` - Routing, components, UI, forms
-- `testing-patterns.mdc` - E2E testing with Playwright
+For comprehensive guidelines, see:
+- `README.md` - Rule index and quick reference
+- `BACKEND_PATTERNS.mdc` - API, actions, authentication, errors
+- `FRONTEND_PATTERNS.mdc` - Routing, components, UI, forms
+- `OBSERVABLE_STATE.mdc` - Observable patterns and state management
+- `CACHE_HANDLING.mdc` - FuryStack Cache patterns
+- `TESTING_GUIDELINES.mdc` - Unit and E2E testing
+- `CODE_STYLE.mdc` - Naming, formatting, imports
+- `TYPESCRIPT_GUIDELINES.mdc` - Type safety and strict typing
+- `ERROR_HANDLING.mdc` - Error patterns and RequestError
+- `PERFORMANCE_OPTIMIZATION.mdc` - Performance best practices
+- `SCRIPT_EXECUTION.mdc` - Script and build commands
 
 ## 🏗️ Architecture Overview
 
