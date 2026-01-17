@@ -39,9 +39,7 @@ describe('checkForOrphanedPatch', () => {
 
   it('should set single running patch to orphaned', async () => {
     const mockStore = createMockStore()
-    mockStore.find.mockResolvedValue([
-      { id: 'patch-run-1', patchId: 'test-patch', status: 'running', log: [] },
-    ])
+    mockStore.find.mockResolvedValue([{ id: 'patch-run-1', patchId: 'test-patch', status: 'running', log: [] }])
     mockStore.update.mockResolvedValue(undefined)
 
     await usingAsync(new Injector(), async (injector) => {
@@ -65,7 +63,12 @@ describe('checkForOrphanedPatch', () => {
     const mockStore = createMockStore()
     mockStore.find.mockResolvedValue([
       { id: 'patch-run-1', patchId: 'test-patch-1', status: 'running', log: [] },
-      { id: 'patch-run-2', patchId: 'test-patch-2', status: 'running', log: [{ timestamp: '2024-01-01', message: 'Started' }] },
+      {
+        id: 'patch-run-2',
+        patchId: 'test-patch-2',
+        status: 'running',
+        log: [{ timestamp: '2024-01-01', message: 'Started' }],
+      },
     ])
     mockStore.update.mockResolvedValue(undefined)
 

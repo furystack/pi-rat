@@ -132,9 +132,7 @@ describe('linkMovie', () => {
   describe('linking with existing OMDB data', () => {
     it('should link movie when OMDB data exists in store', async () => {
       mockMovieFileStoreFind.mockResolvedValue([])
-      mockOmdbStoreFind.mockResolvedValue([
-        { imdbID: 'tt1234567', Title: 'Test Movie', Year: '2024' },
-      ])
+      mockOmdbStoreFind.mockResolvedValue([{ imdbID: 'tt1234567', Title: 'Test Movie', Year: '2024' }])
       mockMovieFileStoreAdd.mockResolvedValue({
         created: [{ id: 'new-file-id', path: 'movies/test.mkv', imdbId: 'tt1234567' }],
       })
