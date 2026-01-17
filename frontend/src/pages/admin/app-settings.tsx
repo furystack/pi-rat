@@ -1,31 +1,87 @@
-import { createComponent, Shade } from '@furystack/shades'
-import { Paper } from '@furystack/shades-common-components'
+import { createComponent, LocationService, Router, Shade } from '@furystack/shades'
+import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
+import { SettingsMenuItem, SettingsMenuSection, SettingsSidebar } from '../../components/settings-sidebar/index.js'
+
+const settingsRoutes = [
+  {
+    url: '/app-settings/omdb',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { OmdbSettingsPage } = await import('./omdb-settings.js')
+          return <OmdbSettingsPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/app-settings/streaming',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { StreamingSettingsPage } = await import('./streaming-settings.js')
+          return <StreamingSettingsPage />
+        }}
+      />
+    ),
+  },
+]
 
 export const AppSettingsPage = Shade({
   shadowDomName: 'app-settings-page',
-  render: () => {
+  style: {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+  },
+  render: ({ injector, useObservable }) => {
+    const locationService = injector.getInstance(LocationService)
+    const [currentPath] = useObservable('currentPath', locationService.onLocationPathChanged)
+
+    // Redirect to OMDB settings if on base /app-settings path
+    if (currentPath === '/app-settings') {
+      window.history.replaceState({}, '', '/app-settings/omdb')
+      locationService.updateState()
+      return null
+    }
+
+    const isOmdbActive = currentPath === '/app-settings/omdb'
+    const isStreamingActive = currentPath === '/app-settings/streaming'
+
     return (
       <div
         style={{
-          padding: '48px',
-          maxWidth: '800px',
-          margin: '0 auto',
+          display: 'flex',
+          height: '100%',
+          width: '100%',
+          overflow: 'hidden',
+          marginTop: '48px',
         }}
       >
-        <h1
+        <SettingsSidebar>
+          <SettingsMenuSection title="Media">
+            <SettingsMenuItem icon={<>🎬</>} label="OMDB Settings" href="/app-settings/omdb" isActive={isOmdbActive} />
+            <SettingsMenuItem
+              icon={<>📺</>}
+              label="Streaming Settings"
+              href="/app-settings/streaming"
+              isActive={isStreamingActive}
+            />
+          </SettingsMenuSection>
+        </SettingsSidebar>
+
+        <div
           style={{
-            marginBottom: '32px',
-            color: 'var(--theme-text-primary)',
-            borderBottom: '2px solid var(--theme-primary-main)',
-            paddingBottom: '8px',
+            flex: '1',
+            overflow: 'auto',
+            padding: '24px 48px',
           }}
         >
-          Application Settings
-        </h1>
-
-        <Paper elevation={1} style={{ padding: '24px' }}>
-          <p style={{ color: 'var(--theme-text-secondary)' }}>Application settings will be available here.</p>
-        </Paper>
+          <Router routes={settingsRoutes} />
+        </div>
       </div>
     )
   },
