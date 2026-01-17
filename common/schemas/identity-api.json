@@ -102,36 +102,6 @@
       "required": ["result", "body"],
       "additionalProperties": false
     },
-    "PasswordResetAction": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean"
-            }
-          },
-          "required": ["success"],
-          "additionalProperties": false
-        },
-        "body": {
-          "type": "object",
-          "properties": {
-            "currentPassword": {
-              "type": "string"
-            },
-            "newPassword": {
-              "type": "string"
-            }
-          },
-          "required": ["currentPassword", "newPassword"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["result", "body"],
-      "additionalProperties": false
-    },
     "PostUserEndpoint": {
       "type": "object",
       "properties": {
@@ -188,6 +158,36 @@
         }
       },
       "required": ["roles"],
+      "additionalProperties": false
+    },
+    "PasswordResetAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          },
+          "required": ["success"],
+          "additionalProperties": false
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "currentPassword": {
+              "type": "string"
+            },
+            "newPassword": {
+              "type": "string"
+            }
+          },
+          "required": ["currentPassword", "newPassword"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "body"],
       "additionalProperties": false
     },
     "IdentityApi": {

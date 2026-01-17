@@ -24,6 +24,15 @@ export const UserAvatarMenu = Shade({
       setIsMenuOpen(false)
     }
 
+    const handleAppSettingsClick = () => {
+      const appSettingsRoute: Route<Record<string, never>> = {
+        url: '/app-settings',
+        component: () => <div>Loading...</div>,
+      }
+      navigateToRoute(injector, appSettingsRoute, {})
+      setIsMenuOpen(false)
+    }
+
     const handleSettingsClick = () => {
       // Navigate to user settings - defining inline to avoid import issues
       const userSettingsRoute: Route<Record<string, never>> = {
@@ -86,6 +95,23 @@ export const UserAvatarMenu = Shade({
                   }}
                 >
                   ⚙️ Admin Settings
+                </Button>
+              )}
+
+              {isAdmin && (
+                <Button
+                  onclick={handleAppSettingsClick}
+                  style={{
+                    width: '100%',
+                    justifyContent: 'flex-start',
+                    padding: '8px 12px',
+                    fontSize: '14px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--theme-text-primary)',
+                  }}
+                >
+                  🔧 Application Settings
                 </Button>
               )}
 

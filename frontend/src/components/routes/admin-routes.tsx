@@ -18,4 +18,20 @@ export const adminSettingsRoute = {
   },
 } satisfies Route<unknown>
 
-export const adminRoutes = [adminSettingsRoute] as const
+export const appSettingsRoute = {
+  url: '/app-settings',
+  onVisit,
+  onLeave,
+  component: () => {
+    return (
+      <PiRatLazyLoad
+        component={async () => {
+          const { AppSettingsPage } = await import('../../pages/admin/app-settings.js')
+          return <AppSettingsPage />
+        }}
+      />
+    )
+  },
+} satisfies Route<unknown>
+
+export const adminRoutes = [adminSettingsRoute, appSettingsRoute] as const
