@@ -25,6 +25,17 @@ const settingsRoutes = [
       />
     ),
   },
+  {
+    url: '/app-settings',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { OmdbSettingsPage } = await import('./omdb-settings.js')
+          return <OmdbSettingsPage />
+        }}
+      />
+    ),
+  },
 ]
 
 export const AppSettingsPage = Shade({
@@ -43,9 +54,10 @@ export const AppSettingsPage = Shade({
 
     // Redirect to OMDB settings if on base /app-settings path
     if (currentPath === '/app-settings') {
-      window.history.replaceState({}, '', '/app-settings/omdb')
-      locationService.updateState()
-      return null
+      requestAnimationFrame(() => {
+        window.history.replaceState({}, '', '/app-settings/omdb')
+        locationService.updateState()
+      })
     }
 
     const isOmdbActive = currentPath === '/app-settings/omdb'
