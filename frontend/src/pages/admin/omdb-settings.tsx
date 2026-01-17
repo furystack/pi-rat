@@ -14,7 +14,8 @@ export const OmdbSettingsPage = Shade({
 
     const [config] = useObservable('omdbConfig', configService.getConfigAsObservable('OMDB_CONFIG'))
 
-    const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
+    const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
+    const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
 
     const toggleApiKeyVisibility = () => {
       const input = element.querySelector<HTMLInputElement>('input[name="apiKey"]')
@@ -33,7 +34,7 @@ export const OmdbSettingsPage = Shade({
         autoDownloadMetadata: formData.autoDownloadMetadata === 'on',
       }
 
-      isLoading.setValue(true)
+      isLoadingObservable.setValue(true)
       try {
         await configService.saveConfig('OMDB_CONFIG', data)
         notyService.emit('onNotyAdded', {
@@ -49,7 +50,7 @@ export const OmdbSettingsPage = Shade({
           type: 'error',
         })
       } finally {
-        isLoading.setValue(false)
+        isLoadingObservable.setValue(false)
       }
     }
 
@@ -167,8 +168,8 @@ export const OmdbSettingsPage = Shade({
             </div>
 
             <div style={{ borderTop: '1px solid var(--theme-background-default)', paddingTop: '16px' }}>
-              <Button type="submit" variant="contained" color="primary" disabled={isLoading.getValue()}>
-                {isLoading.getValue() ? 'Saving...' : 'Save Settings'}
+              <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'Save Settings'}
               </Button>
             </div>
           </Form>
