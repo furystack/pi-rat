@@ -64,4 +64,14 @@ For each issue, be specific: file, line, problem, suggested fix.
 
 **4. Pull Request Description:** Generate as a copyable markdown code block with relevant emojis per header.
 
+**5. Learnings & Rule Updates:**
+
+At the end of the review, summarize any patterns or learnings that emerged from the review (or from user feedback during the review process) that could be codified into rules. Ask the user if they would like to:
+
+- Update an existing rule file in `.cursor/rules/`
+- Create a new rule file for the pattern
+- Skip persisting the learning
+
+This ensures that recurring feedback and discovered patterns are captured for future development.
+
 **Style:** Be critical, specific, and concise. No fluff. If unsure, ask for clarification.

@@ -128,6 +128,71 @@ export const Dashboard = Shade({
 
 ## useDisposable Hook
 
+### Critical: Pairing useDisposable with useObservable
+
+**When you need the component to re-render when an observable value changes**, you must subscribe to it with `useObservable`. Using `getValue()` directly in render will NOT trigger re-renders.
+
+```typescript
+// ✅ Good - component re-renders when value changes
+export const FormComponent = Shade({
+  shadowDomName: 'form-component',
+  render: ({ useDisposable, useObservable }) => {
+    // Create the observable with useDisposable
+    const isLoadingObs = useDisposable('isLoading', () => new ObservableValue(false))
+    const errorObs = useDisposable('error', () => new ObservableValue<string>(''))
+
+    // Subscribe with useObservable to trigger re-renders
+    const [isLoading] = useObservable('isLoadingValue', isLoadingObs)
+    const [error] = useObservable('errorValue', errorObs)
+
+    const handleSubmit = async () => {
+      isLoadingObs.setValue(true)
+      try {
+        await doSomething()
+      } catch (err) {
+        errorObs.setValue(err instanceof Error ? err.message : 'Failed')
+      } finally {
+        isLoadingObs.setValue(false)
+      }
+    }
+
+    return (
+      <div>
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        <button disabled={isLoading} onclick={() => void handleSubmit()}>
+          {isLoading ? 'Loading...' : 'Submit'}
+        </button>
+      </div>
+    )
+  },
+})
+
+// ❌ Bad - component won't re-render when values change!
+export const BrokenFormComponent = Shade({
+  shadowDomName: 'broken-form',
+  render: ({ useDisposable }) => {
+    const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue<string>(''))
+
+    // These getValue() calls only get current value at render time
+    // They do NOT subscribe, so changes won't trigger re-renders!
+    return (
+      <div>
+        {error.getValue() && <div>{error.getValue()}</div>}
+        <button disabled={isLoading.getValue()}>
+          {isLoading.getValue() ? 'Loading...' : 'Submit'}
+        </button>
+      </div>
+    )
+  },
+})
+```
+
+**Rule of thumb:**
+
+- Use `useDisposable` alone when you only need to **set** values (e.g., in event handlers)
+- Pair with `useObservable` when you need the UI to **react** to value changes
+
 ### Local Component State
 
 Use `useDisposable` for component-local reactive state:
@@ -499,6 +564,118 @@ export const LoginForm = Shade({
 });
 ```
 
+## Service Initialization and Disposal
+
+### Services with Event Listeners
+
+When services need to add event listeners (e.g., WebSocket messages), implement proper `init()` and `dispose()` methods:
+
+```typescript
+// ✅ Good - service with init/dispose pattern
+@Injectable({ lifetime: 'singleton' })
+export class LoggingService {
+  @Injected(WebsocketNotificationsService)
+  declare readonly websocketNotificationsService: WebsocketNotificationsService
+
+  private logEntryCache = new Cache({
+    capacity: 100,
+    load: async (id: string) => {
+      // Load logic
+    },
+  })
+
+  // Bind the handler to preserve 'this' context
+  private onMessage = ((messageData: WebsocketMessage) => {
+    if (messageData.type === 'log-entry-added') {
+      this.logEntryCache.setExplicitValue({
+        loadArgs: [messageData.logEntry.id],
+        value: { status: 'loaded', value: messageData.logEntry, updatedAt: new Date() },
+      })
+    }
+  }).bind(this)
+
+  public init() {
+    this.websocketNotificationsService.addListener('onMessage', this.onMessage)
+  }
+
+  public dispose() {
+    this.websocketNotificationsService.removeListener('onMessage', this.onMessage)
+  }
+
+  // Implement Symbol.dispose for automatic cleanup
+  public [Symbol.dispose]() {
+    this.dispose()
+  }
+}
+```
+
+### Service Initialization Patterns
+
+Services that require initialization should be initialized explicitly:
+
+```typescript
+// ✅ Good - explicit service initialization
+// In app setup or component
+const loggingService = injector.getInstance(LoggingService)
+loggingService.init()
+
+// Or use useDisposable for automatic disposal
+export const LogViewer = Shade({
+  shadowDomName: 'log-viewer',
+  render: ({ injector, useDisposable }) => {
+    const loggingService = useDisposable('loggingService', () => {
+      const service = injector.getInstance(LoggingService)
+      service.init()
+      return {
+        service,
+        [Symbol.dispose]: () => service.dispose(),
+      }
+    })
+
+    return <div>Log viewer content</div>
+  },
+})
+```
+
+### Avoiding Memory Leaks
+
+Always ensure listeners are removed when the service is no longer needed:
+
+```typescript
+// ❌ Bad - listener never removed
+@Injectable({ lifetime: 'singleton' })
+export class BrokenService {
+  @Injected(EventService)
+  declare readonly eventService: EventService
+
+  constructor() {
+    // Memory leak: listener added but never removed
+    this.eventService.addListener('event', (data) => {
+      this.handleEvent(data)
+    })
+  }
+}
+
+// ✅ Good - listener properly managed
+@Injectable({ lifetime: 'singleton' })
+export class ProperService {
+  @Injected(EventService)
+  declare readonly eventService: EventService
+
+  private handleEvent = ((data: EventData) => {
+    // Handle event
+  }).bind(this)
+
+  public init() {
+    this.eventService.addListener('event', this.handleEvent)
+  }
+
+  public [Symbol.dispose]() {
+    this.eventService.removeListener('event', this.handleEvent)
+  }
+}
+```
+
 ## Summary
 
 **Key Principles:**
@@ -513,6 +690,7 @@ export const LoginForm = Shade({
 8. **Manual subscriptions** must be disposed manually
 9. **Computed observables** for derived state
 10. **Symbol.dispose** for resource cleanup
+11. **init/dispose pattern** for services with event listeners
 
 **Observable State Checklist:**
 
@@ -525,6 +703,8 @@ export const LoginForm = Shade({
 - [ ] Symbol.dispose for service cleanup
 - [ ] No memory leaks (subscriptions cleaned up)
 - [ ] Type-safe observables
+- [ ] Services with listeners have init/dispose methods
+- [ ] Event handlers are bound to preserve `this` context
 
 **Common Patterns:**
 

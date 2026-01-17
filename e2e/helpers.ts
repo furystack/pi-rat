@@ -60,19 +60,29 @@ export const navigateToUserSettings = async (page: Page) => {
   await expect(settingsPage).toBeVisible()
 }
 
-export const navigateToAdminSettings = async (page: Page) => {
+export const navigateToAppSettings = async (page: Page) => {
   // Click on the user avatar to open the menu
   const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await expect(userAvatar).toBeVisible()
   await userAvatar.click()
 
-  // Click on Admin Settings option (only visible to admin users)
-  const adminSettingsButton = page.getByRole('button', { name: /admin settings/i })
-  await adminSettingsButton.click()
+  // Click on Application Settings option (only visible to admin users)
+  const appSettingsButton = page.getByRole('button', { name: /application settings/i })
+  await expect(appSettingsButton).toBeVisible()
+  await appSettingsButton.click()
 
-  // Verify we're on the admin settings page
-  const adminSettingsPage = page.locator('admin-settings-page')
-  await expect(adminSettingsPage).toBeVisible()
+  // Wait for URL to change to app-settings
+  await page.waitForURL(/\/app-settings/)
+
+  // Verify we're on the app settings page (may need to wait for lazy load)
+  const appSettingsPage = page.locator('app-settings-page')
+  await expect(appSettingsPage).toBeVisible({ timeout: 10000 })
 }
+
+/**
+ * @deprecated Use navigateToAppSettings instead
+ */
+export const navigateToAdminSettings = navigateToAppSettings
 
 export const uploadFile = async (page: Page, filePath: string, mime: string) => {
   const fileContent = await readFile(filePath, { encoding: 'utf-8' })

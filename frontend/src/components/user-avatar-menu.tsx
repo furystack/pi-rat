@@ -15,15 +15,6 @@ export const UserAvatarMenu = Shade({
 
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
-    const handleAdminSettingsClick = () => {
-      const adminSettingsRoute: Route<Record<string, never>> = {
-        url: '/admin',
-        component: () => <div>Loading...</div>,
-      }
-      navigateToRoute(injector, adminSettingsRoute, {})
-      setIsMenuOpen(false)
-    }
-
     const handleAppSettingsClick = () => {
       const appSettingsRoute: Route<Record<string, never>> = {
         url: '/app-settings',
@@ -80,23 +71,6 @@ export const UserAvatarMenu = Shade({
               >
                 {currentUser.username}
               </div>
-
-              {isAdmin && (
-                <Button
-                  onclick={handleAdminSettingsClick}
-                  style={{
-                    width: '100%',
-                    justifyContent: 'flex-start',
-                    padding: '8px 12px',
-                    fontSize: '14px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--theme-text-primary)',
-                  }}
-                >
-                  ⚙️ Admin Settings
-                </Button>
-              )}
 
               {isAdmin && (
                 <Button

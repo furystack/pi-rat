@@ -34,13 +34,13 @@ export const setupConfigRestApi = async (injector: Injector) => {
       POST: {
         '/config': Validate({
           schema: configApiSchema,
-          schemaName: 'PostEndpoint<Config,"id",Pick<Config,("id"|"value")>>',
+          schemaName: 'PostConfigEndpoint',
         })(createPostEndpoint({ model: Config, primaryKey: 'id' })),
       },
       PATCH: {
         '/config/:id': Validate({
           schema: configApiSchema,
-          schemaName: 'PatchEndpoint<Config,"id">',
+          schemaName: 'PatchConfigEndpoint',
         })(createPatchEndpoint({ model: Config, primaryKey: 'id' })),
       },
       DELETE: {

@@ -68,6 +68,89 @@ const MyComponent = Shade<{ prop: string }>({
 - **Loading states**: Boolean observables for async operations
 - **Error states**: String observables for error messages
 
+## DOM Access in Shades Components
+
+### Avoid Global Document Queries
+
+Never use `document.querySelector()` in Shades components. It bypasses shadow DOM boundaries and may not find elements correctly.
+
+```typescript
+// ❌ Bad - using document.querySelector
+export const MyForm = Shade({
+  shadowDomName: 'my-form',
+  render: ({ useDisposable }) => {
+    const handleSubmit = async () => {
+      // This may fail due to shadow DOM encapsulation
+      const form = document.querySelector('form[data-my-form]') as HTMLFormElement
+      form?.reset()
+    }
+
+    return <form data-my-form>{/* Form content */}</form>
+  },
+})
+
+// ✅ Good - use element from Shades context
+export const MyForm = Shade({
+  shadowDomName: 'my-form',
+  render: ({ element, useDisposable }) => {
+    const handleSubmit = async () => {
+      // Use element.querySelector to query within component's shadow DOM
+      const form = element.querySelector<HTMLFormElement>('form[data-my-form]')
+      form?.reset()
+    }
+
+    return <form data-my-form>{/* Form content */}</form>
+  },
+})
+
+// ✅ Better - use state to trigger re-render instead of DOM manipulation
+export const MyForm = Shade({
+  shadowDomName: 'my-form',
+  render: ({ useDisposable, useObservable }) => {
+    const formKey = useDisposable('formKey', () => new ObservableValue(0))
+    const [key] = useObservable('formKeyValue', formKey)
+
+    const handleSubmit = async () => {
+      // Success - increment key to force form re-render with fresh state
+      formKey.setValue(key + 1)
+    }
+
+    return <form key={key}>{/* Form content with fresh state */}</form>
+  },
+})
+```
+
+### Accessing DOM Elements in Components
+
+When you need to access DOM elements within a Shades component:
+
+1. **Use `element` from render context** - This is the component's shadow root
+2. **Use `element.querySelector()`** - Queries within the shadow DOM
+3. **Prefer state-driven updates** - Use ObservableValue to trigger re-renders instead of direct DOM manipulation
+
+```typescript
+// ✅ Good - using element context for input focus
+export const SearchInput = Shade({
+  shadowDomName: 'search-input',
+  constructed: ({ element }) => {
+    // Safe to use element.querySelector after construction
+    element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
+  },
+  render: ({ element }) => {
+    const focusInput = () => {
+      element.querySelector<HTMLInputElement>('input')?.focus()
+    }
+
+    return (
+      <div>
+        <input type="text" autofocus />
+        <button onclick={focusInput}>Focus</button>
+      </div>
+    )
+  },
+})
+```
+
 ## Form Patterns
 
 ### Standard Form Structure

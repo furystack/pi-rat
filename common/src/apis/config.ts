@@ -4,9 +4,13 @@ import type {
   GetEntityEndpoint,
   PatchEndpoint,
   PostEndpoint,
+  RestApi,
 } from '@furystack/rest'
-import type { RestApi } from '@furystack/rest'
 import type { Config } from '../models/config/index.js'
+
+type PostConfigEndpoint = PostEndpoint<Config, 'id', Pick<Config, 'id' | 'value'>>
+
+type PatchConfigEndpoint = PatchEndpoint<Config, 'id', Pick<Config, 'value'>>
 
 export interface ConfigApi extends RestApi {
   GET: {
@@ -14,10 +18,10 @@ export interface ConfigApi extends RestApi {
     '/config/:id': GetEntityEndpoint<Config, 'id'>
   }
   POST: {
-    '/config': PostEndpoint<Config, 'id', Pick<Config, 'id' | 'value'>>
+    '/config': PostConfigEndpoint
   }
   PATCH: {
-    '/config/:id': PatchEndpoint<Config, 'id'>
+    '/config/:id': PatchConfigEndpoint
   }
   DELETE: {
     '/config/:id': DeleteEndpoint<Config, 'id'>
