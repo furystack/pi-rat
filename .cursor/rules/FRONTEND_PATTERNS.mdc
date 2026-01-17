@@ -234,3 +234,126 @@ style={{
 - **Settings pages**: Centered, max-width 800px, section-based
 - **Forms**: Max-width 400px, consistent spacing
 - **Dropdowns**: Absolute positioning, z-index management, click-outside handling
+
+## UI Feature Entry Points
+
+When adding a new UI feature, consider which entry points are appropriate. **Always ask the user** which entry points should be added when implementing a new feature.
+
+### Available Entry Points
+
+| Entry Point | Location | Access Control | Use Case |
+|-------------|----------|----------------|----------|
+| **Avatar Menu** | `user-avatar-menu.tsx` | Role-based (`isAdmin`) | User/admin actions, settings, logout |
+| **Command Palette** | `command-palette/command-providers/` | Role-based in provider | Quick navigation, search, actions |
+| **App Shortcut Widget** | `dashboard/app-shortcut-widget.tsx` | Dashboard owner/admin | Dashboard shortcuts to app pages |
+| **Entity Shortcut Widget** | `dashboard/entity-shortcut-widget.tsx` | Dashboard owner/admin | Dashboard shortcuts to entity pages |
+| **App Bar** | `layout.tsx` | Visibility-based | Global navigation, always visible |
+| **Default Dashboard Patch** | Database seed/migration | All users | Pre-configured dashboard widgets |
+
+### Entry Point Checklist
+
+When implementing a new feature page, ask the user about:
+
+1. **Avatar Menu**: Should a menu item be added? (usually for settings/admin pages)
+2. **Command Palette**: Should a command provider be created? (for searchable/quick-access features)
+3. **Widget Support**: Should a new widget type or app shortcut be added? (for dashboard integration)
+4. **Default Dashboard**: Should the default dashboard include this feature? (for prominent features)
+5. **App Bar**: Should it appear in the main navigation? (rarely needed, for core features only)
+
+### Implementation Patterns
+
+#### Adding to Avatar Menu
+
+```typescript
+// user-avatar-menu.tsx
+const handleMyFeatureClick = () => {
+  const myFeatureRoute: Route<Record<string, never>> = {
+    url: '/my-feature',
+    component: () => <div>Loading...</div>,
+  }
+  navigateToRoute(injector, myFeatureRoute, {})
+  setIsMenuOpen(false)
+}
+
+// In render, add button (with role check if needed)
+{isAdmin && (
+  <Button onclick={handleMyFeatureClick}>
+    🔧 My Feature
+  </Button>
+)}
+```
+
+#### Adding Command Palette Provider
+
+```typescript
+// command-providers/my-feature.tsx
+import { getCurrentUser } from '@furystack/core'
+import type { CommandProvider } from '@furystack/shades-common-components'
+import { navigateToRoute } from '../../../navigate-to-route.js'
+import { myFeatureRoute } from '../../routes/my-routes.js'
+import type { SuggestionOptions } from './create-suggestion.js'
+import { createSuggestion, distinctByName } from './create-suggestion.js'
+
+const MyFeatureSuggestions: SuggestionOptions[] = [
+  {
+    name: 'My Feature',
+    description: 'Description of the feature',
+    icon: '🔧',
+    score: 1,
+    onSelected: ({ injector }) => {
+      navigateToRoute(injector, myFeatureRoute, {})
+    },
+  },
+]
+
+export const myFeatureCommandProvider: CommandProvider = async ({ term, injector }) => {
+  if (!term) return []
+
+  // Optional: role-based access
+  if (!(await getCurrentUser(injector))?.roles?.includes('admin')) return []
+
+  const fullHits = MyFeatureSuggestions.filter((c) => c.name.toLowerCase() === term.toLowerCase())
+    .map((c) => createSuggestion({ ...c, score: 1 }))
+  const startsWith = MyFeatureSuggestions.filter((c) => c.name.toLowerCase().startsWith(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
+  const contains = MyFeatureSuggestions.filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 3 }))
+  const descriptionContains = MyFeatureSuggestions.filter((c) => c.description.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
+
+  return distinctByName(...fullHits, ...startsWith, ...contains, ...descriptionContains)
+}
+
+// Register in command-palette/index.tsx
+import { myFeatureCommandProvider } from './command-providers/my-feature.js'
+
+commandProviders={[
+  myFeatureCommandProvider,
+  // ... other providers
+]}
+```
+
+#### Adding App Shortcut Widget
+
+```typescript
+// 1. Update common/src/models/dashboard/app-shortcut-widget.ts
+export interface AppShortcutWidget {
+  type: 'app-shortcut'
+  appName: 'home' | 'browser' | /* ... */ | 'my-feature'
+}
+
+// 2. Update frontend/src/components/dashboard/app-shortcut-widget.tsx
+import { myFeatureRoute } from '../routes/my-routes.js'
+
+case 'my-feature':
+  return <IconUrlWidget {...rest} name="My Feature" url={myFeatureRoute.url} icon={<>🔧</>} />
+```
+
+### Access Control Patterns
+
+| Pattern | Implementation | Use Case |
+|---------|----------------|----------|
+| **Admin-only** | `isAdmin && <Button>` or `roles?.includes('admin')` | Admin features |
+| **Authenticated** | `currentUser && <Button>` | User features |
+| **Public** | Always render | Public features |
+| **Role-based** | `roles?.includes('role')` | Specific role features |

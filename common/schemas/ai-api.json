@@ -133,6 +133,12 @@
                 }
               ]
             },
+            "logprobs": {
+              "type": "boolean"
+            },
+            "top_logprobs": {
+              "type": "number"
+            },
             "options": {
               "$ref": "#/definitions/Partial%3COptions%3E"
             }
@@ -198,6 +204,12 @@
               "const": "low"
             }
           ]
+        },
+        "logprobs": {
+          "type": "boolean"
+        },
+        "top_logprobs": {
+          "type": "number"
         },
         "options": {
           "$ref": "#/definitions/Partial%3COptions%3E"
@@ -511,6 +523,12 @@
         },
         "eval_duration": {
           "type": "number"
+        },
+        "logprobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Logprob"
+          }
         }
       },
       "required": [
@@ -526,6 +544,38 @@
         "eval_count",
         "eval_duration"
       ],
+      "additionalProperties": false
+    },
+    "Logprob": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "logprob": {
+          "type": "number"
+        },
+        "top_logprobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TokenLogprob"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["logprob", "token"]
+    },
+    "TokenLogprob": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "logprob": {
+          "type": "number"
+        }
+      },
+      "required": ["token", "logprob"],
       "additionalProperties": false
     },
     "AiApi": {

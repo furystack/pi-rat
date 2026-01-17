@@ -20,19 +20,19 @@ When you open or edit a file, Cursor automatically loads the relevant rules base
 
 ## Rule Applicability Matrix
 
-| Rule File                                                    | Auto-Apply | File Patterns                                               | Description                       |
-| ------------------------------------------------------------ | ---------- | ----------------------------------------------------------- | --------------------------------- |
-| [CODE_STYLE.mdc](./CODE_STYLE.mdc)                           | ✅ Always  | `**/*.ts`, `**/*.tsx`                                       | Formatting, naming, organization  |
-| [TYPESCRIPT_GUIDELINES.mdc](./TYPESCRIPT_GUIDELINES.mdc)     | ✅ Always  | `**/*.ts`, `**/*.tsx`                                       | Type safety, NO `any`, generics   |
-| [TESTING_GUIDELINES.md](./TESTING_GUIDELINES.md)             | 🎯 Auto    | `**/*.spec.ts`, `**/*.spec.tsx`, `**/*.e2e.spec.ts`         | Vitest, Playwright, mocking       |
-| [ERROR_HANDLING.md](./ERROR_HANDLING.md)                     | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/actions/**`, `**/services/**`    | RequestError, Observable errors   |
-| [CACHE_HANDLING.md](./CACHE_HANDLING.md)                     | 🎯 Auto    | `**/*.ts`, `**/services/**`                                 | FuryStack Cache patterns          |
-| [OBSERVABLE_STATE.md](./OBSERVABLE_STATE.md)                 | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/services/**`                     | ObservableValue, useObservable    |
-| [PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md) | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/components/**`, `**/services/**` | Optimization, disposal            |
-| [SCRIPT_EXECUTION.md](./SCRIPT_EXECUTION.md)                 | 🎯 Auto    | `package.json`, `**/*.sh`                                   | Package manager, CI/CD            |
-| [BACKEND_PATTERNS.mdc](./BACKEND_PATTERNS.mdc)               | 📘 Manual  | Backend development                                         | API, actions, authentication      |
-| [FRONTEND_PATTERNS.mdc](./FRONTEND_PATTERNS.mdc)             | 📘 Manual  | Frontend development                                        | Routing, Shades components, forms |
-| [main.mdc](./main.mdc)                                       | 📘 Manual  | Overview                                                    | Quick start guide                 |
+| Rule File                                                    | Auto-Apply | File Patterns                                               | Description                                        |
+| ------------------------------------------------------------ | ---------- | ----------------------------------------------------------- | -------------------------------------------------- |
+| [CODE_STYLE.mdc](./CODE_STYLE.mdc)                           | ✅ Always  | `**/*.ts`, `**/*.tsx`                                       | Formatting, naming, organization                   |
+| [TYPESCRIPT_GUIDELINES.mdc](./TYPESCRIPT_GUIDELINES.mdc)     | ✅ Always  | `**/*.ts`, `**/*.tsx`                                       | Type safety, NO `any`, generics                    |
+| [TESTING_GUIDELINES.md](./TESTING_GUIDELINES.md)             | 🎯 Auto    | `**/*.spec.ts`, `**/*.spec.tsx`, `**/*.e2e.spec.ts`         | Vitest, Playwright, mocking                        |
+| [ERROR_HANDLING.md](./ERROR_HANDLING.md)                     | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/actions/**`, `**/services/**`    | RequestError, Observable errors                    |
+| [CACHE_HANDLING.md](./CACHE_HANDLING.md)                     | 🎯 Auto    | `**/*.ts`, `**/services/**`                                 | FuryStack Cache patterns                           |
+| [OBSERVABLE_STATE.md](./OBSERVABLE_STATE.md)                 | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/services/**`                     | ObservableValue, useObservable                     |
+| [PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md) | 🎯 Auto    | `**/*.ts`, `**/*.tsx`, `**/components/**`, `**/services/**` | Optimization, disposal                             |
+| [SCRIPT_EXECUTION.md](./SCRIPT_EXECUTION.md)                 | 🎯 Auto    | `package.json`, `**/*.sh`                                   | Package manager, CI/CD                             |
+| [BACKEND_PATTERNS.mdc](./BACKEND_PATTERNS.mdc)               | 📘 Manual  | Backend development                                         | API, actions, authentication                       |
+| [FRONTEND_PATTERNS.mdc](./FRONTEND_PATTERNS.mdc)             | 📘 Manual  | Frontend development                                        | Routing, Shades components, forms, UI entry points |
+| [main.mdc](./main.mdc)                                       | 📘 Manual  | Overview                                                    | Quick start guide                                  |
 
 **Legend:**
 
@@ -72,6 +72,18 @@ When you open or edit a file, Cursor automatically loads the relevant rules base
 - **CACHE_HANDLING.md** - If component uses cached data
 - **ERROR_HANDLING.md** - If component handles async operations
 - **PERFORMANCE_OPTIMIZATION.md** - If component is expensive
+
+### Adding a New UI Feature/Page
+
+**Apply:** FRONTEND_PATTERNS.mdc (see "UI Feature Entry Points" section)
+
+**Entry Point Checklist** - Ask user which to include:
+
+- [ ] Avatar Menu - menu item for user/admin actions
+- [ ] Command Palette - searchable command provider
+- [ ] App Shortcut Widget - dashboard widget support
+- [ ] Default Dashboard - pre-configured widget placement
+- [ ] App Bar - main navigation (rarely needed)
 
 ### Writing Tests
 

@@ -1,5 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { AppShortcutWidget as AppShortcutWidgetData } from 'common'
+import { appSettingsRoute } from '../routes/admin-routes.js'
 import { defaultDashboardRoute } from '../routes/dashboard-routes.js'
 import { fileBrowserRoute } from '../routes/file-browser-routes.js'
 import { iotDeviceListRoute } from '../routes/iot-routes.js'
@@ -23,6 +24,8 @@ export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
         return <IconUrlWidget {...rest} name="IOT Devices" url={iotDeviceListRoute.url} icon={<>📡</>} />
       case 'logging-terminal':
         return <IconUrlWidget {...rest} name="Logging Terminal" url={LogEntriesTerminalRoute.url} icon={<>💻</>} />
+      case 'app-settings':
+        return <IconUrlWidget {...rest} name="Application Settings" url={appSettingsRoute.url} icon={<>🔧</>} />
       default:
         return <IconUrlWidget {...rest} name={appName} url={`/${appName}`} icon={<>🚫</>} />
     }
