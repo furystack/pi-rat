@@ -15,7 +15,6 @@ export const UserAvatarMenu = Shade({
 
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
-
     const handleAppSettingsClick = () => {
       const appSettingsRoute: Route<Record<string, never>> = {
         url: '/app-settings',
@@ -72,7 +71,6 @@ export const UserAvatarMenu = Shade({
               >
                 {currentUser.username}
               </div>
-
 
               {isAdmin && (
                 <Button

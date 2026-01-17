@@ -375,6 +375,155 @@ describe('DataService', () => {
 })
 ```
 
+## Backend Action Testing
+
+### Testing REST Actions
+
+Test backend actions with proper mocking of injector dependencies:
+
+```typescript
+// ✅ Good - backend action unit test
+import { Injector } from '@furystack/inject'
+import { StoreManager } from '@furystack/core'
+import { describe, expect, it, vi } from 'vitest'
+import { RegisterAction } from './register-action.js'
+
+describe('RegisterAction', () => {
+  const createTestInjector = () => {
+    const injector = new Injector()
+
+    // Mock store manager
+    const mockUserStore = {
+      get: vi.fn(),
+      add: vi.fn(),
+      remove: vi.fn(),
+    }
+
+    const mockCredentialStore = {
+      add: vi.fn(),
+    }
+
+    injector.setExplicitInstance(
+      {
+        getStoreFor: vi.fn((model) => {
+          if (model.name === 'User') return mockUserStore
+          if (model.name === 'PasswordCredential') return mockCredentialStore
+          throw new Error(`Unknown model: ${model.name}`)
+        }),
+      } as unknown as StoreManager,
+      StoreManager,
+    )
+
+    return { injector, mockUserStore, mockCredentialStore }
+  }
+
+  it('should create a new user when username does not exist', async () => {
+    const { injector, mockUserStore, mockCredentialStore } = createTestInjector()
+
+    mockUserStore.get.mockResolvedValue(null) // User doesn't exist
+    mockUserStore.add.mockResolvedValue({ username: 'test@example.com', roles: [] })
+    mockCredentialStore.add.mockResolvedValue({})
+
+    const result = await RegisterAction({
+      injector,
+      getBody: async () => ({ username: 'test@example.com', password: 'password123' }),
+      response: {} as Response,
+      request: {} as Request,
+    })
+
+    expect(mockUserStore.add).toHaveBeenCalledWith(expect.objectContaining({ username: 'test@example.com' }))
+  })
+
+  it('should throw 409 when user already exists', async () => {
+    const { injector, mockUserStore } = createTestInjector()
+
+    mockUserStore.get.mockResolvedValue({ username: 'existing@example.com' })
+
+    await expect(
+      RegisterAction({
+        injector,
+        getBody: async () => ({ username: 'existing@example.com', password: 'password123' }),
+        response: {} as Response,
+        request: {} as Request,
+      }),
+    ).rejects.toThrow('User already exists')
+  })
+})
+```
+
+### Action Test Patterns
+
+When testing backend actions:
+
+1. **Mock StoreManager** - Provide mock stores for each entity type
+2. **Mock Authentication** - Use `HttpUserContext` for authenticated actions
+3. **Test error cases** - Verify proper RequestError codes (400, 401, 404, 409, 500)
+4. **Test cleanup logic** - Verify partial state is cleaned up on failure
+
+```typescript
+// ✅ Good - testing authenticated action
+import { getCurrentUser } from '@furystack/core'
+
+vi.mock('@furystack/core', () => ({
+  getCurrentUser: vi.fn(),
+}))
+
+describe('PasswordResetAction', () => {
+  it('should throw 401 when user is not authenticated', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(null)
+
+    await expect(PasswordResetAction({ injector, getBody: async () => ({}) })).rejects.toThrow('User not authenticated')
+  })
+
+  it('should throw 400 when current password is incorrect', async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ username: 'test@example.com' })
+    mockAuthenticator.setPasswordForUser.mockRejectedValue(new UnauthenticatedError())
+
+    await expect(
+      PasswordResetAction({
+        injector,
+        getBody: async () => ({ currentPassword: 'wrong', newPassword: 'new123' }),
+      }),
+    ).rejects.toThrow('Current password is incorrect')
+  })
+})
+```
+
+### RequestError Testing
+
+Test that actions throw appropriate HTTP error codes:
+
+```typescript
+// ✅ Good - testing RequestError codes
+import { RequestError } from '@furystack/rest'
+
+it('should throw 409 for duplicate resource', async () => {
+  // Setup duplicate condition
+  mockStore.find.mockResolvedValue({ count: 1 })
+
+  try {
+    await CreateResourceAction({ injector, getBody: async () => ({}) })
+    fail('Expected RequestError to be thrown')
+  } catch (error) {
+    expect(error).toBeInstanceOf(RequestError)
+    expect((error as RequestError).responseCode).toBe(409)
+  }
+})
+
+it('should throw 400 for validation errors', async () => {
+  try {
+    await CreateResourceAction({
+      injector,
+      getBody: async () => ({ invalidField: true }),
+    })
+    fail('Expected RequestError to be thrown')
+  } catch (error) {
+    expect(error).toBeInstanceOf(RequestError)
+    expect((error as RequestError).responseCode).toBe(400)
+  }
+})
+```
+
 ## Test Organization
 
 ### Co-location
