@@ -128,6 +128,70 @@ export const Dashboard = Shade({
 
 ## useDisposable Hook
 
+### Critical: Pairing useDisposable with useObservable
+
+**When you need the component to re-render when an observable value changes**, you must subscribe to it with `useObservable`. Using `getValue()` directly in render will NOT trigger re-renders.
+
+```typescript
+// ✅ Good - component re-renders when value changes
+export const FormComponent = Shade({
+  shadowDomName: 'form-component',
+  render: ({ useDisposable, useObservable }) => {
+    // Create the observable with useDisposable
+    const isLoadingObs = useDisposable('isLoading', () => new ObservableValue(false))
+    const errorObs = useDisposable('error', () => new ObservableValue<string>(''))
+
+    // Subscribe with useObservable to trigger re-renders
+    const [isLoading] = useObservable('isLoadingValue', isLoadingObs)
+    const [error] = useObservable('errorValue', errorObs)
+
+    const handleSubmit = async () => {
+      isLoadingObs.setValue(true)
+      try {
+        await doSomething()
+      } catch (err) {
+        errorObs.setValue(err instanceof Error ? err.message : 'Failed')
+      } finally {
+        isLoadingObs.setValue(false)
+      }
+    }
+
+    return (
+      <div>
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        <button disabled={isLoading} onclick={() => void handleSubmit()}>
+          {isLoading ? 'Loading...' : 'Submit'}
+        </button>
+      </div>
+    )
+  },
+})
+
+// ❌ Bad - component won't re-render when values change!
+export const BrokenFormComponent = Shade({
+  shadowDomName: 'broken-form',
+  render: ({ useDisposable }) => {
+    const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue<string>(''))
+
+    // These getValue() calls only get current value at render time
+    // They do NOT subscribe, so changes won't trigger re-renders!
+    return (
+      <div>
+        {error.getValue() && <div>{error.getValue()}</div>}
+        <button disabled={isLoading.getValue()}>
+          {isLoading.getValue() ? 'Loading...' : 'Submit'}
+        </button>
+      </div>
+    )
+  },
+})
+```
+
+**Rule of thumb:**
+- Use `useDisposable` alone when you only need to **set** values (e.g., in event handlers)
+- Pair with `useObservable` when you need the UI to **react** to value changes
+
 ### Local Component State
 
 Use `useDisposable` for component-local reactive state:
