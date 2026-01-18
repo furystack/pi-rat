@@ -26,6 +26,28 @@ const settingsRoutes = [
     ),
   },
   {
+    url: '/app-settings/iot',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { IotSettingsPage } = await import('./iot-settings.js')
+          return <IotSettingsPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/app-settings/ai',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { AiSettingsPage } = await import('./ai-settings.js')
+          return <AiSettingsPage />
+        }}
+      />
+    ),
+  },
+  {
     url: '/app-settings',
     component: () => (
       <PiRatLazyLoad
@@ -60,9 +82,6 @@ export const AppSettingsPage = Shade({
       })
     }
 
-    const isOmdbActive = currentPath === '/app-settings/omdb'
-    const isStreamingActive = currentPath === '/app-settings/streaming'
-
     return (
       <div
         style={{
@@ -75,13 +94,14 @@ export const AppSettingsPage = Shade({
       >
         <SettingsSidebar>
           <SettingsMenuSection title="Media">
-            <SettingsMenuItem icon={<>🎬</>} label="OMDB Settings" href="/app-settings/omdb" isActive={isOmdbActive} />
-            <SettingsMenuItem
-              icon={<>📺</>}
-              label="Streaming Settings"
-              href="/app-settings/streaming"
-              isActive={isStreamingActive}
-            />
+            <SettingsMenuItem icon="🎬" label="OMDB Settings" href="/app-settings/omdb" />
+            <SettingsMenuItem icon="📺" label="Streaming Settings" href="/app-settings/streaming" />
+          </SettingsMenuSection>
+          <SettingsMenuSection title="IOT">
+            <SettingsMenuItem icon="📡" label="Device Availability" href="/app-settings/iot" />
+          </SettingsMenuSection>
+          <SettingsMenuSection title="AI">
+            <SettingsMenuItem icon="🤖" label="Ollama Settings" href="/app-settings/ai" />
           </SettingsMenuSection>
         </SettingsSidebar>
 

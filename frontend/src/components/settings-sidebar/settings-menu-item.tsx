@@ -1,17 +1,21 @@
-import { createComponent, RouteLink, Shade } from '@furystack/shades'
+import { createComponent, LocationService, RouteLink, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
+import { match, type MatchOptions } from 'path-to-regexp'
 
 type SettingsMenuItemProps = {
-  icon: JSX.Element
+  icon: string
   label: string
   href: string
-  isActive?: boolean
+  routingOptions?: MatchOptions
 }
 
 export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
   shadowDomName: 'settings-menu-item',
-  render: ({ props }) => {
-    const { icon, label, href, isActive } = props
+  render: ({ props, injector, useObservable }) => {
+    const { icon, label, href, routingOptions } = props
+
+    const [currentPath] = useObservable('locationChange', injector.getInstance(LocationService).onLocationPathChanged)
+    const isActive = !!match(href, routingOptions)(currentPath)
 
     return (
       <RouteLink
