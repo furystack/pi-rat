@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot } from '@furystack/shades'
+import { createComponent, initializeShadeRoot, LocationService } from '@furystack/shades'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { SettingsMenuItem } from './settings-menu-item.js'
@@ -17,10 +17,13 @@ describe('SettingsMenuItem', () => {
     const injector = new Injector()
     const rootElement = document.getElementById('root') as HTMLDivElement
 
+    history.pushState(null, '', '/other')
+    injector.getInstance(LocationService).updateState()
+
     initializeShadeRoot({
       injector,
       rootElement,
-      jsxElement: <SettingsMenuItem icon={<span>🏠</span>} label="Home" href="/home" />,
+      jsxElement: <SettingsMenuItem icon="🏠" label="Home" href="/home" />,
     })
 
     const menuItem = document.querySelector('settings-menu-item')
@@ -33,14 +36,17 @@ describe('SettingsMenuItem', () => {
     expect(link?.textContent).toContain('🏠')
   })
 
-  it('should render with active state styling', () => {
+  it('should render with active state when URL matches href', () => {
     const injector = new Injector()
     const rootElement = document.getElementById('root') as HTMLDivElement
+
+    history.pushState(null, '', '/settings')
+    injector.getInstance(LocationService).updateState()
 
     initializeShadeRoot({
       injector,
       rootElement,
-      jsxElement: <SettingsMenuItem icon={<span>⚙️</span>} label="Settings" href="/settings" isActive={true} />,
+      jsxElement: <SettingsMenuItem icon="⚙️" label="Settings" href="/settings" />,
     })
 
     const menuItem = document.querySelector('settings-menu-item')
@@ -52,14 +58,17 @@ describe('SettingsMenuItem', () => {
     expect(link?.textContent).toContain('Settings')
   })
 
-  it('should render with inactive state by default', () => {
+  it('should render with inactive state when URL does not match href', () => {
     const injector = new Injector()
     const rootElement = document.getElementById('root') as HTMLDivElement
+
+    history.pushState(null, '', '/other-page')
+    injector.getInstance(LocationService).updateState()
 
     initializeShadeRoot({
       injector,
       rootElement,
-      jsxElement: <SettingsMenuItem icon={<span>📁</span>} label="Files" href="/files" />,
+      jsxElement: <SettingsMenuItem icon="📁" label="Files" href="/files" />,
     })
 
     const menuItem = document.querySelector('settings-menu-item')
@@ -70,14 +79,17 @@ describe('SettingsMenuItem', () => {
     expect(link?.getAttribute('href')).toBe('/files')
   })
 
-  it('should render with explicit inactive state', () => {
+  it('should render correctly with different URLs', () => {
     const injector = new Injector()
     const rootElement = document.getElementById('root') as HTMLDivElement
+
+    history.pushState(null, '', '/something-else')
+    injector.getInstance(LocationService).updateState()
 
     initializeShadeRoot({
       injector,
       rootElement,
-      jsxElement: <SettingsMenuItem icon={<span>🎬</span>} label="Movies" href="/movies" isActive={false} />,
+      jsxElement: <SettingsMenuItem icon="🎬" label="Movies" href="/movies" />,
     })
 
     const menuItem = document.querySelector('settings-menu-item')
