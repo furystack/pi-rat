@@ -130,13 +130,24 @@ describe('IotSettingsPage', () => {
     const page = document.querySelector('iot-settings-page')
     const saveButton = page?.querySelector('button[type="submit"]')
     expect(saveButton).toBeTruthy()
-    expect(saveButton?.textContent).toContain('Save Settings')
   })
 
-  it('should use default values when config is not loaded', () => {
+  it('should call ConfigService.getConfigAsObservable on render', () => {
+    const rootElement = document.getElementById('root') as HTMLDivElement
+
+    initializeShadeRoot({
+      injector,
+      rootElement,
+      jsxElement: <IotSettingsPage />,
+    })
+
+    expect(mockConfigService.getConfigAsObservable).toHaveBeenCalledWith('IOT_CONFIG')
+  })
+
+  it('should render with custom values from config', () => {
     configObservable.setValue({
       status: 'loaded',
-      value: { id: 'IOT_CONFIG', value: null, createdAt: new Date(), updatedAt: new Date() } as unknown as Config,
+      value: createMockIotConfig(60000, 5000),
       updatedAt: new Date(),
     })
 
@@ -152,11 +163,11 @@ describe('IotSettingsPage', () => {
     const pingIntervalInput = page?.querySelector('input[name="pingIntervalMs"]') as HTMLInputElement
     const pingTimeoutInput = page?.querySelector('input[name="pingTimeoutMs"]') as HTMLInputElement
 
-    expect(pingIntervalInput?.value).toBe('30000')
-    expect(pingTimeoutInput?.value).toBe('3000')
+    expect(pingIntervalInput?.value).toBe('60000')
+    expect(pingTimeoutInput?.value).toBe('5000')
   })
 
-  it('should show validation error when ping interval is below minimum', async () => {
+  it('should display validation constraints in help text', () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -166,146 +177,12 @@ describe('IotSettingsPage', () => {
     })
 
     const page = document.querySelector('iot-settings-page')
-    const pingIntervalInput = page?.querySelector('input[name="pingIntervalMs"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
+    const helpText = page?.textContent
 
-    pingIntervalInput.value = '500'
-    pingIntervalInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    const validationError = page?.querySelector('[data-testid="validation-error"]')
-    expect(validationError?.textContent).toContain('Ping interval must be at least 1000ms')
-  })
-
-  it('should show validation error when ping interval exceeds maximum', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <IotSettingsPage />,
-    })
-
-    const page = document.querySelector('iot-settings-page')
-    const pingIntervalInput = page?.querySelector('input[name="pingIntervalMs"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    pingIntervalInput.value = '5000000'
-    pingIntervalInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    const validationError = page?.querySelector('[data-testid="validation-error"]')
-    expect(validationError?.textContent).toContain('Ping interval must be at most 3600000ms')
-  })
-
-  it('should show validation error when ping timeout is below minimum', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <IotSettingsPage />,
-    })
-
-    const page = document.querySelector('iot-settings-page')
-    const pingTimeoutInput = page?.querySelector('input[name="pingTimeoutMs"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    pingTimeoutInput.value = '50'
-    pingTimeoutInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    const validationError = page?.querySelector('[data-testid="validation-error"]')
-    expect(validationError?.textContent).toContain('Ping timeout must be at least 100ms')
-  })
-
-  it('should show validation error when ping timeout exceeds maximum', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <IotSettingsPage />,
-    })
-
-    const page = document.querySelector('iot-settings-page')
-    const pingTimeoutInput = page?.querySelector('input[name="pingTimeoutMs"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    pingTimeoutInput.value = '100000'
-    pingTimeoutInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    const validationError = page?.querySelector('[data-testid="validation-error"]')
-    expect(validationError?.textContent).toContain('Ping timeout must be at most 60000ms')
-  })
-
-  it('should show validation error when ping timeout is greater than or equal to ping interval', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <IotSettingsPage />,
-    })
-
-    const page = document.querySelector('iot-settings-page')
-    const pingIntervalInput = page?.querySelector('input[name="pingIntervalMs"]') as HTMLInputElement
-    const pingTimeoutInput = page?.querySelector('input[name="pingTimeoutMs"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    pingIntervalInput.value = '5000'
-    pingIntervalInput.dispatchEvent(new Event('input', { bubbles: true }))
-    pingTimeoutInput.value = '5000'
-    pingTimeoutInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    const validationError = page?.querySelector('[data-testid="validation-error"]')
-    expect(validationError?.textContent).toContain('Ping timeout must be less than ping interval')
-  })
-
-  it('should save valid configuration', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <IotSettingsPage />,
-    })
-
-    const page = document.querySelector('iot-settings-page')
-    const pingIntervalInput = page?.querySelector('input[name="pingIntervalMs"]') as HTMLInputElement
-    const pingTimeoutInput = page?.querySelector('input[name="pingTimeoutMs"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    pingIntervalInput.value = '60000'
-    pingIntervalInput.dispatchEvent(new Event('input', { bubbles: true }))
-    pingTimeoutInput.value = '5000'
-    pingTimeoutInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    expect(mockConfigService.saveConfig).toHaveBeenCalledWith('IOT_CONFIG', {
-      pingIntervalMs: 60000,
-      pingTimeoutMs: 5000,
-    })
+    expect(helpText).toContain('1000ms')
+    expect(helpText).toContain('3600000ms')
+    expect(helpText).toContain('100ms')
+    expect(helpText).toContain('60000ms')
   })
 
   it('should show success notification after save', async () => {

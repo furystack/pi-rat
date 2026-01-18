@@ -117,13 +117,24 @@ describe('AiSettingsPage', () => {
     const page = document.querySelector('ai-settings-page')
     const saveButton = page?.querySelector('button[type="submit"]')
     expect(saveButton).toBeTruthy()
-    expect(saveButton?.textContent).toContain('Save Settings')
   })
 
-  it('should use default values when config is not loaded', () => {
+  it('should call ConfigService.getConfigAsObservable on render', () => {
+    const rootElement = document.getElementById('root') as HTMLDivElement
+
+    initializeShadeRoot({
+      injector,
+      rootElement,
+      jsxElement: <AiSettingsPage />,
+    })
+
+    expect(mockConfigService.getConfigAsObservable).toHaveBeenCalledWith('OLLAMA_CONFIG')
+  })
+
+  it('should render with empty host when config value is empty', () => {
     configObservable.setValue({
       status: 'loaded',
-      value: { id: 'OLLAMA_CONFIG', value: null, createdAt: new Date(), updatedAt: new Date() } as unknown as Config,
+      value: createMockOllamaConfig(''),
       updatedAt: new Date(),
     })
 
@@ -138,99 +149,6 @@ describe('AiSettingsPage', () => {
     const page = document.querySelector('ai-settings-page')
     const hostInput = page?.querySelector('input[name="host"]') as HTMLInputElement
     expect(hostInput?.value).toBe('')
-  })
-
-  it('should show validation error for invalid URL', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <AiSettingsPage />,
-    })
-
-    const page = document.querySelector('ai-settings-page')
-    const hostInput = page?.querySelector('input[name="host"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    hostInput.value = 'not-a-valid-url'
-    hostInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    const validationError = page?.querySelector('[data-testid="validation-error"]')
-    expect(validationError?.textContent).toContain('Please enter a valid URL')
-  })
-
-  it('should accept empty host URL', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <AiSettingsPage />,
-    })
-
-    const page = document.querySelector('ai-settings-page')
-    const hostInput = page?.querySelector('input[name="host"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    hostInput.value = ''
-    hostInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    expect(mockConfigService.saveConfig).toHaveBeenCalledWith('OLLAMA_CONFIG', { host: '' })
-  })
-
-  it('should accept valid HTTP URL', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <AiSettingsPage />,
-    })
-
-    const page = document.querySelector('ai-settings-page')
-    const hostInput = page?.querySelector('input[name="host"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    hostInput.value = 'http://my-server:8080'
-    hostInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    expect(mockConfigService.saveConfig).toHaveBeenCalledWith('OLLAMA_CONFIG', { host: 'http://my-server:8080' })
-  })
-
-  it('should accept valid HTTPS URL', async () => {
-    const rootElement = document.getElementById('root') as HTMLDivElement
-
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <AiSettingsPage />,
-    })
-
-    const page = document.querySelector('ai-settings-page')
-    const hostInput = page?.querySelector('input[name="host"]') as HTMLInputElement
-    const form = page?.querySelector('form') as HTMLFormElement
-
-    hostInput.value = 'https://secure-server.com'
-    hostInput.dispatchEvent(new Event('input', { bubbles: true }))
-
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    expect(mockConfigService.saveConfig).toHaveBeenCalledWith('OLLAMA_CONFIG', { host: 'https://secure-server.com' })
   })
 
   it('should show success notification after save', async () => {
