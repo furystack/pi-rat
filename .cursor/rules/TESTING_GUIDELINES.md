@@ -383,14 +383,12 @@ describe('DashboardService', () => {
     })
 
     it('should throw RequestError when API returns 404', async () => {
-      const mockCall = vi.fn().mockRejectedValue(
-        new RequestError('Dashboard not found', 404)
-      )
+      const mockCall = vi.fn().mockRejectedValue(new RequestError('Dashboard not found', 404))
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(DashboardService)
-        
+
         await expect(service.getDashboard('invalid-id')).rejects.toThrow('Dashboard not found')
       })
     })
@@ -401,20 +399,18 @@ describe('DashboardService', () => {
 
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(DashboardService)
-        
+
         await expect(service.getDashboard('dashboard-1')).rejects.toThrow('Network error')
       })
     })
 
     it('should handle server errors', async () => {
-      const mockCall = vi.fn().mockRejectedValue(
-        new RequestError('Internal server error', 500)
-      )
+      const mockCall = vi.fn().mockRejectedValue(new RequestError('Internal server error', 500))
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(DashboardService)
-        
+
         await expect(service.getDashboard('dashboard-1')).rejects.toThrow('Internal server error')
       })
     })
@@ -422,31 +418,27 @@ describe('DashboardService', () => {
 
   describe('createDashboard', () => {
     it('should throw validation error for invalid data', async () => {
-      const mockCall = vi.fn().mockRejectedValue(
-        new RequestError('Invalid dashboard data', 400)
-      )
+      const mockCall = vi.fn().mockRejectedValue(new RequestError('Invalid dashboard data', 400))
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(DashboardService)
-        
-        await expect(
-          service.createDashboard({ name: '', owner: '', description: '', widgets: [] })
-        ).rejects.toThrow('Invalid dashboard data')
+
+        await expect(service.createDashboard({ name: '', owner: '', description: '', widgets: [] })).rejects.toThrow(
+          'Invalid dashboard data',
+        )
       })
     })
 
     it('should throw conflict error when dashboard already exists', async () => {
-      const mockCall = vi.fn().mockRejectedValue(
-        new RequestError('Dashboard already exists', 409)
-      )
+      const mockCall = vi.fn().mockRejectedValue(new RequestError('Dashboard already exists', 409))
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(DashboardService)
-        
+
         await expect(
-          service.createDashboard({ name: 'Existing', owner: 'user', description: '', widgets: [] })
+          service.createDashboard({ name: 'Existing', owner: 'user', description: '', widgets: [] }),
         ).rejects.toThrow('Dashboard already exists')
       })
     })
@@ -474,10 +466,10 @@ describe('MovieService', () => {
 
     await usingAsync(injector, async (i) => {
       const service = i.getInstance(MovieService)
-      
+
       // First call should fail
       await expect(service.getMovie('tt1234567')).rejects.toThrow('API unavailable')
-      
+
       // Verify cache doesn't store failed result
       mockCall.mockResolvedValue({ result: createMockMovie() })
       const movie = await service.getMovie('tt1234567')
@@ -497,30 +489,30 @@ describe('DashboardService', () => {
   it('should fetch fresh data after cache invalidation', async () => {
     const originalDashboard = createMockDashboard('dashboard-1', 'Original')
     const updatedDashboard = createMockDashboard('dashboard-1', 'Updated')
-    
+
     const mockCall = vi
       .fn()
       .mockResolvedValueOnce({ result: originalDashboard })
       .mockResolvedValueOnce({ result: updatedDashboard })
       .mockResolvedValueOnce({ result: updatedDashboard })
-    
+
     const injector = createTestInjector(mockCall)
 
     await usingAsync(injector, async (i) => {
       const service = i.getInstance(DashboardService)
-      
+
       // Load initial data (API call #1)
       const initial = await service.getDashboard('dashboard-1')
       expect(initial.name).toBe('Original')
-      
+
       // Update dashboard (API call #2, invalidates cache)
-      await service.updateDashboard('dashboard-1', { 
+      await service.updateDashboard('dashboard-1', {
         name: 'Updated',
         owner: 'user',
         description: '',
-        widgets: []
+        widgets: [],
       })
-      
+
       // Fetch again should get fresh data (API call #3 due to invalidation)
       const fresh = await service.getDashboard('dashboard-1')
       expect(fresh.name).toBe('Updated')
@@ -550,18 +542,18 @@ describe('DataService', () => {
     await usingAsync(injector, async (i) => {
       const service = i.getInstance(DataService)
       const observable = service.getDataAsObservable('data-1')
-      
+
       // Track state changes
       const states: string[] = []
       observable.subscribe((state) => states.push(state.status))
-      
+
       // Trigger load
       try {
         await service.getData('data-1')
       } catch (error) {
         // Expected to fail
       }
-      
+
       // Verify error state transition
       expect(states).toContain('error')
       const currentState = observable.getValue()
@@ -585,24 +577,24 @@ describe('DashboardEditor', () => {
     const mockService = {
       updateDashboard: vi.fn().mockRejectedValue(new Error('Save failed'))
     }
-    
+
     const injector = new Injector()
     injector.setExplicitInstance(mockService, DashboardService)
-    
+
     const rootElement = document.getElementById('root') as HTMLDivElement
     initializeShadeRoot({
       injector,
       rootElement,
       jsxElement: <DashboardEditor dashboardId="dashboard-1" />
     })
-    
+
     // Trigger save
     const saveButton = rootElement.querySelector('button[type="submit"]') as HTMLButtonElement
     saveButton.click()
-    
+
     // Wait for error to be displayed
     await new Promise(resolve => setTimeout(resolve, 100))
-    
+
     // Verify error display
     const errorMessage = rootElement.textContent
     expect(errorMessage).toContain('Save failed')
@@ -612,23 +604,23 @@ describe('DashboardEditor', () => {
     const mockService = {
       getDashboard: vi.fn(() => new Promise(resolve => setTimeout(() => resolve(mockDashboard), 100)))
     }
-    
+
     const injector = new Injector()
     injector.setExplicitInstance(mockService, DashboardService)
-    
+
     const rootElement = document.getElementById('root') as HTMLDivElement
     initializeShadeRoot({
       injector,
       rootElement,
       jsxElement: <DashboardEditor dashboardId="dashboard-1" />
     })
-    
+
     // Verify loading state is shown
     expect(rootElement.textContent).toContain('Loading')
-    
+
     // Wait for load to complete
     await new Promise(resolve => setTimeout(resolve, 150))
-    
+
     // Verify content is displayed
     expect(rootElement.textContent).not.toContain('Loading')
   })
@@ -671,6 +663,187 @@ describe('DataService', () => {
     // Verify state transitions
     expect(states).toEqual(['idle', 'loading', 'loaded'])
   })
+})
+```
+
+### Handling Async Operations in Tests
+
+**CRITICAL:** Always await async operations in service methods that are called during tests to prevent unhandled rejections.
+
+#### The Problem: Unhandled Rejections
+
+When async operations (like cache reloads) are triggered with `void` or not awaited, they may continue running after the test completes and the injector is disposed, causing "Injector already disposed" errors.
+
+#### Service Method Guidelines
+
+```typescript
+// ❌ AVOID - Fire-and-forget async in methods called by tests
+public updateDevice = async (name: string, body: DeviceUpdate) => {
+  await this.apiClient.call({
+    method: 'PATCH',
+    action: '/devices/:id',
+    url: { id: name },
+    body,
+  })
+
+  void this.deviceCache.reload(name) // ❌ Will cause unhandled rejection in tests
+  this.deviceQueryCache.flushAll()
+}
+
+// ✅ GOOD - Await async operations
+public updateDevice = async (name: string, body: DeviceUpdate) => {
+  await this.apiClient.call({
+    method: 'PATCH',
+    action: '/devices/:id',
+    url: { id: name },
+    body,
+  })
+
+  await this.deviceCache.reload(name) // ✅ Properly awaited
+  this.deviceQueryCache.flushAll()
+}
+```
+
+#### Event Handlers and Callbacks
+
+For event handlers and callbacks where you cannot await (e.g., WebSocket listeners), add explicit error handling:
+
+```typescript
+// ✅ GOOD - Error handling in event listeners
+public init() {
+  this.websocketService.addListener('onMessage', (message) => {
+    if (message.type === 'device-connected') {
+      // Fire-and-forget is acceptable here with error handling
+      void this.deviceCache.reload(message.device.name).catch((error) => {
+        // Log error but don't throw (listener context)
+        console.error('Failed to reload device cache:', error)
+      })
+    }
+  })
+}
+
+// ❌ AVOID - No error handling
+public init() {
+  this.websocketService.addListener('onMessage', (message) => {
+    if (message.type === 'device-connected') {
+      void this.deviceCache.reload(message.device.name) // ❌ Unhandled rejection
+    }
+  })
+}
+```
+
+#### Test Setup with usingAsync
+
+Always use `usingAsync` to ensure proper cleanup:
+
+```typescript
+// ✅ GOOD - Proper injector lifecycle management
+import { usingAsync } from '@furystack/utils'
+
+describe('DeviceService', () => {
+  it('should update device and reload cache', async () => {
+    const mockDevice = createMockDevice()
+    const mockCall = vi.fn().mockResolvedValue({ result: mockDevice })
+    const injector = createTestInjector(mockCall)
+
+    await usingAsync(injector, async (i) => {
+      const service = i.getInstance(DeviceService)
+
+      // This will properly await the cache reload
+      await service.updateDevice('device-1', { ipAddress: '192.168.1.100' })
+
+      // Verify the reload happened
+      expect(mockCall).toHaveBeenCalledTimes(2) // PATCH + reload GET
+    })
+    // Injector is disposed here, after all async operations complete
+  })
+})
+
+// ❌ AVOID - Manual injector disposal without awaiting
+describe('DeviceService', () => {
+  it('should update device', async () => {
+    const injector = new Injector()
+    const service = injector.getInstance(DeviceService)
+
+    await service.updateDevice('device-1', { ipAddress: '192.168.1.100' })
+
+    injector.dispose() // ❌ May dispose while cache reload is still pending
+  })
+})
+```
+
+#### Mock Response Requirements
+
+When mocking API calls that trigger cache reloads, ensure mocks return appropriate responses:
+
+```typescript
+// ✅ GOOD - Mock returns proper response for reload
+it('should reload device cache after update', async () => {
+  const mockDevice = createMockDevice()
+  // Mock will be called twice: once for PATCH, once for reload GET
+  const mockCall = vi.fn().mockResolvedValue({ result: mockDevice })
+  const injector = createTestInjector(mockCall)
+
+  await usingAsync(injector, async (i) => {
+    const service = i.getInstance(DeviceService)
+    await service.updateDevice('device-1', { ipAddress: '192.168.1.100' })
+
+    expect(mockCall).toHaveBeenCalledTimes(2)
+  })
+})
+
+// ❌ AVOID - Mock doesn't handle reload call
+it('should update device', async () => {
+  const mockCall = vi.fn().mockResolvedValue({}) // ❌ Empty response fails reload
+  const injector = createTestInjector(mockCall)
+
+  await usingAsync(injector, async (i) => {
+    const service = i.getInstance(DeviceService)
+    await service.updateDevice('device-1', { ipAddress: '192.168.1.100' })
+    // Test may pass but leaves pending rejection
+  })
+})
+```
+
+#### Async Operation Checklist
+
+Before merging code with async operations:
+
+- [ ] All async operations in public service methods are properly awaited
+- [ ] Event handlers with fire-and-forget async have `.catch()` error handling
+- [ ] Tests use `usingAsync` for injector lifecycle management
+- [ ] Mock API responses handle all expected calls (including cache reloads)
+- [ ] No `void void` double-void patterns (typos)
+- [ ] Test suite shows "No unhandled errors" when running
+
+#### Common Patterns to Fix
+
+```typescript
+// Pattern 1: Cache reload in CRUD operations
+// ❌ AVOID
+public updateEntity = async (id: string, data: Entity) => {
+  await this.api.update(id, data)
+  void this.cache.reload(id) // Fix: await this.cache.reload(id)
+}
+
+// Pattern 2: Multiple async operations
+// ❌ AVOID
+public deleteEntity = async (id: string) => {
+  await this.api.delete(id)
+  this.cache.remove(id) // Sync, OK
+  this.queryCache.flushAll() // Sync, OK
+  void this.relatedCache.reload() // Fix: await this.relatedCache.reload()
+}
+
+// Pattern 3: Observable subscriptions in event handlers
+// ❌ AVOID
+this.events.on('update', (id) => {
+  void this.cache.reload(id) // Fix: add .catch()
+})
+
+// ✅ GOOD
+this.events.on('update', (id) => {
+  void this.cache.reload(id).catch(console.error)
 })
 ```
 

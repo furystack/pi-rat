@@ -241,7 +241,8 @@ describe('IotDevicesService', () => {
 
   describe('updateDevice', () => {
     it('should update an existing device', async () => {
-      const mockCall = vi.fn().mockResolvedValue({})
+      const mockDevice = createMockDevice()
+      const mockCall = vi.fn().mockResolvedValue({ result: mockDevice })
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
@@ -260,6 +261,25 @@ describe('IotDevicesService', () => {
           url: { id: 'test-device' },
           body,
         })
+      })
+    })
+
+    it('should reload device cache after update', async () => {
+      const mockDevice = createMockDevice()
+      const mockCall = vi.fn().mockResolvedValue({ result: mockDevice })
+      const injector = createTestInjector(mockCall)
+
+      await usingAsync(injector, async (i) => {
+        const service = i.getInstance(IotDevicesService)
+
+        const body = {
+          name: 'test-device',
+          ipAddress: '192.168.1.200',
+          macAddress: '00:11:22:33:44:55',
+        }
+        await service.updateDevice('test-device', body)
+
+        expect(mockCall).toHaveBeenCalledTimes(2)
       })
     })
   })
