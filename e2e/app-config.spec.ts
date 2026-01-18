@@ -206,6 +206,232 @@ test.describe('Streaming Settings', () => {
   })
 })
 
+test.describe('IOT Settings', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await login(page)
+    await navigateToAppSettings(page)
+    await page.waitForSelector('text=OMDB Settings')
+
+    // Navigate to IOT settings
+    const iotMenuItem = page.getByText('Device Availability')
+    await iotMenuItem.click()
+    await page.waitForSelector('text=📡 IOT Device Availability')
+  })
+
+  test('should display IOT settings form', async ({ page }) => {
+    // Verify IOT settings heading (using text selector to pierce shadow DOM)
+    await expect(page.locator('text=📡 IOT Device Availability').first()).toBeVisible()
+
+    const iotPage = page.locator('iot-settings-page')
+
+    // Verify form fields are present
+    const pingIntervalInput = iotPage.locator('input[name="pingIntervalMs"]')
+    await expect(pingIntervalInput).toBeVisible()
+
+    const pingTimeoutInput = iotPage.locator('input[name="pingTimeoutMs"]')
+    await expect(pingTimeoutInput).toBeVisible()
+
+    const saveButton = iotPage.getByRole('button', { name: /save settings/i })
+    await expect(saveButton).toBeVisible()
+  })
+
+  test('should validate ping interval input constraints', async ({ page }) => {
+    const iotPage = page.locator('iot-settings-page')
+    const pingIntervalInput = iotPage.locator('input[name="pingIntervalMs"]')
+
+    // Verify min/max attributes
+    await expect(pingIntervalInput).toHaveAttribute('min', '1000')
+    await expect(pingIntervalInput).toHaveAttribute('max', '3600000')
+    await expect(pingIntervalInput).toHaveAttribute('type', 'number')
+  })
+
+  test('should validate ping timeout input constraints', async ({ page }) => {
+    const iotPage = page.locator('iot-settings-page')
+    const pingTimeoutInput = iotPage.locator('input[name="pingTimeoutMs"]')
+
+    // Verify min/max attributes
+    await expect(pingTimeoutInput).toHaveAttribute('min', '100')
+    await expect(pingTimeoutInput).toHaveAttribute('max', '60000')
+    await expect(pingTimeoutInput).toHaveAttribute('type', 'number')
+  })
+
+  test('should save IOT settings successfully', async ({ page }) => {
+    const iotPage = page.locator('iot-settings-page')
+    const pingIntervalInput = iotPage.locator('input[name="pingIntervalMs"]')
+    const pingTimeoutInput = iotPage.locator('input[name="pingTimeoutMs"]')
+
+    // Set valid values
+    await pingIntervalInput.fill('60000')
+    await pingTimeoutInput.fill('5000')
+
+    // Submit the form
+    const saveButton = iotPage.getByRole('button', { name: /save settings/i })
+    await saveButton.click()
+
+    // Verify success notification
+    await assertAndDismissNoty(page, 'IOT settings saved successfully')
+  })
+
+  test('should persist IOT settings after save', async ({ page }) => {
+    const iotPage = page.locator('iot-settings-page')
+    const pingIntervalInput = iotPage.locator('input[name="pingIntervalMs"]')
+    const pingTimeoutInput = iotPage.locator('input[name="pingTimeoutMs"]')
+
+    // Set specific values
+    await pingIntervalInput.fill('45000')
+    await pingTimeoutInput.fill('4500')
+
+    // Submit the form
+    const saveButton = iotPage.getByRole('button', { name: /save settings/i })
+    await saveButton.click()
+    await assertAndDismissNoty(page, 'IOT settings saved successfully')
+
+    // Navigate away and back
+    await page.goto('/')
+    await page.waitForSelector('text=Apps')
+
+    // Navigate back to IOT settings
+    await navigateToAppSettings(page)
+    await page.waitForSelector('text=OMDB Settings')
+
+    const iotMenuItemAfter = page.getByText('Device Availability')
+    await iotMenuItemAfter.click()
+    await page.waitForSelector('text=📡 IOT Device Availability')
+
+    // Verify the values are persisted
+    const pingIntervalInputAfter = page.locator('iot-settings-page').locator('input[name="pingIntervalMs"]')
+    const pingTimeoutInputAfter = page.locator('iot-settings-page').locator('input[name="pingTimeoutMs"]')
+    await expect(pingIntervalInputAfter).toHaveValue('45000')
+    await expect(pingTimeoutInputAfter).toHaveValue('4500')
+  })
+
+  test('should show validation error when timeout is greater than interval', async ({ page }) => {
+    const iotPage = page.locator('iot-settings-page')
+    const pingIntervalInput = iotPage.locator('input[name="pingIntervalMs"]')
+    const pingTimeoutInput = iotPage.locator('input[name="pingTimeoutMs"]')
+
+    // Set invalid values (timeout >= interval)
+    await pingIntervalInput.fill('5000')
+    await pingTimeoutInput.fill('5000')
+
+    // Submit the form
+    const saveButton = iotPage.getByRole('button', { name: /save settings/i })
+    await saveButton.click()
+
+    // Verify validation error is shown
+    const validationError = iotPage.locator('[data-testid="validation-error"]')
+    await expect(validationError).toBeVisible()
+    await expect(validationError).toContainText('Ping timeout must be less than ping interval')
+  })
+})
+
+test.describe('AI Settings', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await login(page)
+    await navigateToAppSettings(page)
+    await page.waitForSelector('text=OMDB Settings')
+
+    // Navigate to AI settings
+    const aiMenuItem = page.getByText('Ollama Settings')
+    await aiMenuItem.click()
+    await page.waitForSelector('text=🤖 Ollama Integration')
+  })
+
+  test('should display AI settings form', async ({ page }) => {
+    // Verify AI settings heading (using text selector to pierce shadow DOM)
+    await expect(page.locator('text=🤖 Ollama Integration').first()).toBeVisible()
+
+    const aiPage = page.locator('ai-settings-page')
+
+    // Verify form fields are present
+    const hostInput = aiPage.locator('input[name="host"]')
+    await expect(hostInput).toBeVisible()
+    await expect(hostInput).toHaveAttribute('type', 'url')
+
+    const saveButton = aiPage.getByRole('button', { name: /save settings/i })
+    await expect(saveButton).toBeVisible()
+  })
+
+  test('should save AI settings successfully with valid URL', async ({ page }) => {
+    const aiPage = page.locator('ai-settings-page')
+    const hostInput = aiPage.locator('input[name="host"]')
+
+    // Set a valid URL
+    await hostInput.fill('http://localhost:11434')
+
+    // Submit the form
+    const saveButton = aiPage.getByRole('button', { name: /save settings/i })
+    await saveButton.click()
+
+    // Verify success notification
+    await assertAndDismissNoty(page, 'AI settings saved successfully')
+  })
+
+  test('should save AI settings successfully with empty URL (disable AI)', async ({ page }) => {
+    const aiPage = page.locator('ai-settings-page')
+    const hostInput = aiPage.locator('input[name="host"]')
+
+    // Clear the URL to disable AI features
+    await hostInput.fill('')
+
+    // Submit the form
+    const saveButton = aiPage.getByRole('button', { name: /save settings/i })
+    await saveButton.click()
+
+    // Verify success notification
+    await assertAndDismissNoty(page, 'AI settings saved successfully')
+  })
+
+  test('should persist AI settings after save', async ({ page }) => {
+    const aiPage = page.locator('ai-settings-page')
+    const hostInput = aiPage.locator('input[name="host"]')
+
+    // Set a specific URL
+    const testUrl = 'http://my-ollama-server:8080'
+    await hostInput.fill(testUrl)
+
+    // Submit the form
+    const saveButton = aiPage.getByRole('button', { name: /save settings/i })
+    await saveButton.click()
+    await assertAndDismissNoty(page, 'AI settings saved successfully')
+
+    // Navigate away and back
+    await page.goto('/')
+    await page.waitForSelector('text=Apps')
+
+    // Navigate back to AI settings
+    await navigateToAppSettings(page)
+    await page.waitForSelector('text=OMDB Settings')
+
+    const aiMenuItemAfter = page.getByText('Ollama Settings')
+    await aiMenuItemAfter.click()
+    await page.waitForSelector('text=🤖 Ollama Integration')
+
+    // Verify the value is persisted
+    const hostInputAfter = page.locator('ai-settings-page').locator('input[name="host"]')
+    await expect(hostInputAfter).toHaveValue(testUrl)
+  })
+
+  test('should show validation error for invalid URL', async ({ page }) => {
+    const aiPage = page.locator('ai-settings-page')
+    const hostInput = aiPage.locator('input[name="host"]')
+
+    // Set an invalid URL
+    await hostInput.fill('not-a-valid-url')
+
+    // Submit the form
+    const saveButton = aiPage.getByRole('button', { name: /save settings/i })
+    await saveButton.click()
+
+    // Verify validation error is shown
+    const validationError = aiPage.locator('[data-testid="validation-error"]')
+    await expect(validationError).toBeVisible()
+    await expect(validationError).toContainText('Please enter a valid URL')
+  })
+})
+
 test.describe('Settings Navigation', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
@@ -231,6 +457,29 @@ test.describe('Settings Navigation', () => {
     await omdbMenuItem.click()
     await page.waitForSelector('text=🎬 OMDB Settings')
 
+    await expect(page.locator('text=🎬 OMDB Settings').first()).toBeVisible()
+  })
+
+  test('should navigate to all settings sections', async ({ page }) => {
+    await navigateToAppSettings(page)
+    await page.waitForSelector('text=OMDB Settings')
+
+    // Navigate to IOT settings
+    const iotMenuItem = page.getByText('Device Availability')
+    await iotMenuItem.click()
+    await expect(page).toHaveURL(/\/app-settings\/iot/)
+    await expect(page.locator('text=📡 IOT Device Availability').first()).toBeVisible()
+
+    // Navigate to AI settings
+    const aiMenuItem = page.getByText('Ollama Settings')
+    await aiMenuItem.click()
+    await expect(page).toHaveURL(/\/app-settings\/ai/)
+    await expect(page.locator('text=🤖 Ollama Integration').first()).toBeVisible()
+
+    // Navigate back to OMDB
+    const omdbMenuItem = page.getByText('OMDB Settings')
+    await omdbMenuItem.click()
+    await expect(page).toHaveURL(/\/app-settings\/omdb/)
     await expect(page.locator('text=🎬 OMDB Settings').first()).toBeVisible()
   })
 

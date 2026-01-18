@@ -6,6 +6,16 @@ import { ConfigService } from '../../services/config-service.js'
 
 type OllamaFormData = OllamaConfig['value']
 
+const isValidUrl = (urlString: string): boolean => {
+  if (urlString === '') return true
+  try {
+    const url = new URL(urlString)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 export const AiSettingsPage = Shade({
   shadowDomName: 'ai-settings-page',
   render: ({ injector, useObservable, useDisposable }) => {
@@ -17,9 +27,28 @@ export const AiSettingsPage = Shade({
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
 
+    const validationErrorObservable = useDisposable('validationError', () => new ObservableValue<string | null>(null))
+    const [validationError] = useObservable('validationErrorValue', validationErrorObservable)
+
+    const validateForm = (formData: Record<string, unknown>): string | null => {
+      const host = (formData.host as string) ?? ''
+
+      if (host !== '' && !isValidUrl(host)) {
+        return 'Please enter a valid URL (e.g., http://localhost:11434)'
+      }
+      return null
+    }
+
     const handleSubmit = async (formData: Record<string, unknown>) => {
+      const error = validateForm(formData)
+      if (error) {
+        validationErrorObservable.setValue(error)
+        return
+      }
+      validationErrorObservable.setValue(null)
+
       const data: OllamaFormData = {
-        host: formData.host as string,
+        host: (formData.host as string) ?? '',
       }
 
       isLoadingObservable.setValue(true)
@@ -30,8 +59,8 @@ export const AiSettingsPage = Shade({
           body: 'AI settings saved successfully',
           type: 'success',
         })
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to save settings'
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to save settings'
         notyService.emit('onNotyAdded', {
           title: 'Error',
           body: errorMessage,
@@ -70,9 +99,9 @@ export const AiSettingsPage = Shade({
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<Record<string, unknown>>
             validate={(data): data is Record<string, unknown> => {
-              const formData = data as Record<string, unknown>
-              const host = formData.host as string
-              return typeof host === 'string'
+              const error = validateForm(data as Record<string, unknown>)
+              validationErrorObservable.setValue(error)
+              return error === null
             }}
             onSubmit={(data) => void handleSubmit(data)}
           >
@@ -89,6 +118,21 @@ export const AiSettingsPage = Shade({
                 The Ollama server URL including protocol (http or https). Leave empty to disable AI features.
               </small>
             </div>
+
+            {validationError && (
+              <div
+                style={{
+                  color: 'var(--theme-error-main)',
+                  backgroundColor: 'var(--theme-error-light)',
+                  padding: '12px',
+                  borderRadius: '4px',
+                  marginBottom: '16px',
+                }}
+                data-testid="validation-error"
+              >
+                {validationError}
+              </div>
+            )}
 
             <div style={{ borderTop: '1px solid var(--theme-background-default)', paddingTop: '16px' }}>
               <Button type="submit" variant="contained" color="primary" disabled={isLoading}>

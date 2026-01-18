@@ -14,10 +14,7 @@ export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
   render: ({ props, injector, useObservable }) => {
     const { icon, label, href, routingOptions } = props
 
-    const [currentPath] = useObservable(
-      'locationChange',
-      injector.getInstance(LocationService).onLocationPathChanged,
-    )
+    const [currentPath] = useObservable('locationChange', injector.getInstance(LocationService).onLocationPathChanged)
     const isActive = !!match(href, routingOptions)(currentPath)
 
     return (
