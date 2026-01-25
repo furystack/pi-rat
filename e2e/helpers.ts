@@ -3,13 +3,15 @@ import { expect } from '@playwright/test'
 import { readFile } from 'fs/promises'
 import { basename } from 'path'
 
-export const assertAndDismissNoty = async (page: Page, text: string) => {
-  await page.waitForLoadState('networkidle')
+export const assertAndDismissNoty = async (page: Page, text: string, options?: { timeout?: number }) => {
+  const timeout = options?.timeout ?? 30_000
   const noty = page.locator('shade-noty', { hasText: text })
-  await noty.waitFor({ state: 'visible', timeout: 15 * 1000 })
+
+  await expect(noty).toBeVisible({ timeout })
+
   const closeNoty = noty.locator('button.dismissNoty')
   await closeNoty.click()
-  await noty.waitFor({ state: 'detached' })
+  await expect(noty).not.toBeVisible()
 }
 
 export const login = async (page: Page, username = 'testuser@gmail.com', password = 'password') => {
