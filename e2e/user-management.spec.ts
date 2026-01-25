@@ -198,7 +198,7 @@ test.describe('Role Editing', () => {
     const secondOption = await options.nth(1).getAttribute('value')
     expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-    await roleSelect.selectOption(secondOption!)
+    await roleSelect.selectOption(secondOption)
 
     // Verify a new role tag appears
     const roleTags = detailsPage.locator('role-tag')
@@ -222,7 +222,7 @@ test.describe('Role Editing', () => {
     const secondOption = await options.nth(1).getAttribute('value')
     expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-    await roleSelect.selectOption(secondOption!)
+    await roleSelect.selectOption(secondOption)
 
     // Save button should now be enabled
     await expect(saveButton).toBeEnabled()
@@ -266,7 +266,7 @@ test.describe('Role Editing', () => {
     const secondOption = await options.nth(1).getAttribute('value')
     expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-    await roleSelect.selectOption(secondOption!)
+    await roleSelect.selectOption(secondOption)
 
     // Verify Save is now enabled
     await expect(saveButton).toBeEnabled()
@@ -306,7 +306,7 @@ test.describe('Save Role Changes', () => {
     const secondOption = await options.nth(1).getAttribute('value')
     expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-    await roleSelect.selectOption(secondOption!)
+    await roleSelect.selectOption(secondOption)
 
     // Save changes
     await saveButton.click()
