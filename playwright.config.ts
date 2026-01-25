@@ -12,7 +12,7 @@ const config: PlaywrightTestConfig = {
   timeout: 60000, // 60 second timeout per test
   reporter: isInCi ? 'github' : 'line',
   expect: {
-    timeout: 10000, // 10 second timeout for assertions
+    timeout: isInCi ? 30000 : 10000, // 30 second timeout for assertions in CI, 10 seconds locally
     toHaveScreenshot: {
       maxDiffPixelRatio: 0.05,
       threshold: 0.3,
@@ -21,8 +21,8 @@ const config: PlaywrightTestConfig = {
   use: {
     trace: 'on-first-retry',
     baseURL: 'http://localhost:9090',
-    actionTimeout: 15000, // 15 second timeout for actions like click, fill, etc.
-    navigationTimeout: 30000, // 30 second timeout for navigation
+    actionTimeout: isInCi ? 30000 : 15000, // 30 second timeout for actions like click, fill, etc. in CI, 15 seconds locally
+    navigationTimeout: isInCi ? 30000 : 15000, // 30 second timeout for navigation in CI, 15 seconds locally
   },
 
   projects: [
