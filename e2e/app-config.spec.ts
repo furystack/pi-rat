@@ -2,6 +2,9 @@ import { expect, test } from '@playwright/test'
 import { assertAndDismissNoty, login, navigateToAppSettings } from './helpers.js'
 
 test.describe('App Configuration Settings', () => {
+  // Run tests serially to prevent parallel execution issues with global singleton settings
+  test.describe.configure({ mode: 'serial' })
+
   test('Admin can configure OMDB settings, toggle visibility, save, and verify persistence', async ({ page }) => {
     // ============================================
     // STEP 1: Login and navigate to app settings
