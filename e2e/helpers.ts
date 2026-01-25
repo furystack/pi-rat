@@ -4,6 +4,7 @@ import { readFile } from 'fs/promises'
 import { basename } from 'path'
 
 export const assertAndDismissNoty = async (page: Page, text: string) => {
+  await page.waitForLoadState('networkidle')
   const noty = page.locator('shade-noty', { hasText: text })
   await noty.waitFor({ state: 'visible' })
   const closeNoty = noty.locator('button.dismissNoty')
