@@ -5,6 +5,7 @@ import { basename } from 'path'
 
 export const assertAndDismissNoty = async (page: Page, text: string) => {
   const noty = page.locator('shade-noty', { hasText: text })
+  await noty.waitFor({ state: 'visible' })
   const closeNoty = noty.locator('button.dismissNoty')
   await closeNoty.click()
   await noty.waitFor({ state: 'detached' })
