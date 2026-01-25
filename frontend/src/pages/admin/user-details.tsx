@@ -1,3 +1,4 @@
+import { hasCacheValue, isFailedCacheResult } from '@furystack/cache'
 import { createComponent, LocationService, Shade } from '@furystack/shades'
 import { Button, NotyService, Paper } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
@@ -215,7 +216,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           </Paper>
         )}
 
-        {userState.status === 'failed' && (
+        {isFailedCacheResult(userState) && (
           <Paper elevation={1} style={{ padding: '24px' }}>
             <p style={{ color: 'var(--theme-error-main)' }}>Error: {getErrorMessage(userState.error)}</p>
             <Button variant="outlined" onclick={navigateBack} style={{ marginTop: '12px' }}>
@@ -224,7 +225,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           </Paper>
         )}
 
-        {userState.status === 'loaded' && (
+        {hasCacheValue(userState) && (
           <>
             <Paper elevation={1} style={{ padding: '24px' }}>
               <h3 style={{ marginTop: '0', marginBottom: '16px', color: 'var(--theme-text-primary)' }}>

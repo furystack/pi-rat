@@ -1,6 +1,6 @@
-import { Injectable, Injected } from '@furystack/inject'
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
+import { Injectable, Injected } from '@furystack/inject'
 import type { Roles, User } from 'common'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
@@ -59,7 +59,7 @@ export class UsersService {
       url: { id: username },
       body,
     })
-    this.userCache.remove(username)
+    void this.userCache.reload(username)
     this.userQueryCache.flushAll()
     return result
   }
