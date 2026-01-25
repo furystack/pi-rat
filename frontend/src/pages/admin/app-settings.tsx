@@ -1,4 +1,5 @@
 import { createComponent, LocationService, Router, Shade } from '@furystack/shades'
+import type { MatchResult } from 'path-to-regexp'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { SettingsMenuItem, SettingsMenuSection, SettingsSidebar } from '../../components/settings-sidebar/index.js'
 
@@ -49,7 +50,7 @@ const settingsRoutes = [
   },
   {
     url: '/app-settings/users/:username',
-    component: ({ match }) => (
+    component: ({ match }: { match: MatchResult<{ username: string }> }) => (
       <PiRatLazyLoad
         component={async () => {
           const { UserDetailsPage } = await import('./user-details.js')

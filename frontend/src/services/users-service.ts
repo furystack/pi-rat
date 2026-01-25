@@ -59,10 +59,7 @@ export class UsersService {
       url: { id: username },
       body,
     })
-    this.userCache.setExplicitValue({
-      loadArgs: [username],
-      value: { status: 'loaded', value: result, updatedAt: new Date() },
-    })
+    this.userCache.setObsolete(username)
     this.userQueryCache.flushAll()
     return result
   }

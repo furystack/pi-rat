@@ -30,7 +30,7 @@ export const UserListPage = Shade<UserListPageProps>({
 
     const handleRetry = () => {
       usersService.userQueryCache.flushAll()
-      usersService.findUsers({})
+      void usersService.findUsers({})
     }
 
     const getErrorMessage = (error: unknown): string => {
