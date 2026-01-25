@@ -103,70 +103,72 @@ test.describe('User Management', () => {
     await expect(saveButton).toBeDisabled()
 
     // ============================================
-    // STEP 3: Test Cancel functionality
+    // STEP 3: Verify user starts with no roles
     // ============================================
-    const initialRoleCount = await detailsPage.locator('role-tag').count()
-    expect(initialRoleCount, 'User should have at least one role').toBeGreaterThan(0)
+    expect(await detailsPage.locator('role-tag').count(), 'New user should have no roles').toBe(0)
 
-    // Make a change (add a role)
+    // ============================================
+    // STEP 4: Test Cancel functionality - add a role then cancel
+    // ============================================
     const addedRole = await addRoleToUser(page)
     expect(addedRole, 'Should be able to add a role').not.toBeNull()
     await expect(saveButton).toBeEnabled()
 
-    // Cancel should restore original state
+    // Cancel should restore original state (no roles)
     await cancelButton.click()
     await expect(saveButton).toBeDisabled()
-    expect(await detailsPage.locator('role-tag').count()).toBe(initialRoleCount)
+    expect(await detailsPage.locator('role-tag').count()).toBe(0)
 
     // ============================================
-    // STEP 4: Test restore functionality after removing a role
-    // ============================================
-    const removed = await removeRole(page)
-    expect(removed).not.toBeNull()
-
-    // Restore button should appear
-    const restoreButton = detailsPage.locator('role-tag').locator('button', { hasText: '↩' }).first()
-    await expect(restoreButton).toBeVisible()
-    await restoreButton.click()
-
-    // No net changes, save should be disabled
-    await expect(saveButton).toBeDisabled()
-
-    // ============================================
-    // STEP 5: Test validation - cannot save with zero roles
-    // ============================================
-    let roleCount = await detailsPage.locator('role-tag').count()
-    while (roleCount > 0) {
-      const removeBtn = detailsPage.locator('role-tag').first().locator('button', { hasText: '×' })
-      if ((await removeBtn.count()) === 0) break
-      await removeBtn.click()
-      roleCount = await detailsPage.locator('role-tag').count()
-    }
-
-    await expect(saveButton).toBeEnabled()
-    await saveButton.click()
-    await expect(detailsPage.getByText('User must have at least one role')).toBeVisible()
-
-    // Cancel to restore
-    await cancelButton.click()
-
-    // ============================================
-    // STEP 6: Add a role and verify persistence
+    // STEP 5: Add a role and save
     // ============================================
     const roleToAdd = await addRoleToUser(page)
     expect(roleToAdd, 'Should be able to add a role').not.toBeNull()
 
     await saveButton.click()
     await assertAndDismissNoty(page, 'User roles updated successfully')
-    await expect(saveButton).toBeDisabled()
+
+    // Wait for the details page to stabilize after save
+    await expect(detailsPage).toBeVisible()
+    await expect(detailsPage.getByRole('button', { name: 'Save Changes' })).toBeDisabled()
 
     // Reload and verify persistence
     await page.reload()
     await expect(detailsPage).toBeVisible()
-    expect(await detailsPage.locator('role-tag').count()).toBe(initialRoleCount + 1)
+    expect(await detailsPage.locator('role-tag').count()).toBe(1)
+
+    // Re-locate buttons after reload
+    const saveButtonAfterReload = detailsPage.getByRole('button', { name: 'Save Changes' })
+    const cancelButtonAfterReload = detailsPage.getByRole('button', { name: 'Cancel' })
 
     // ============================================
-    // STEP 7: Navigate back to users list
+    // STEP 6: Test remove and restore functionality
+    // ============================================
+    const removed = await removeRole(page)
+    expect(removed).not.toBeNull()
+
+    // Restore button should appear for removed role
+    const restoreButton = detailsPage.locator('role-tag').locator('button', { hasText: '↩' }).first()
+    await expect(restoreButton).toBeVisible()
+    await restoreButton.click()
+
+    // No net changes after restore, save should be disabled
+    await expect(saveButtonAfterReload).toBeDisabled()
+
+    // ============================================
+    // STEP 7: Test validation - cannot save with zero roles
+    // ============================================
+    await removeRole(page)
+    await expect(saveButtonAfterReload).toBeEnabled()
+    await saveButtonAfterReload.click()
+    await expect(detailsPage.getByText('User must have at least one role')).toBeVisible()
+
+    // Cancel to restore the role
+    await cancelButtonAfterReload.click()
+    expect(await detailsPage.locator('role-tag').count()).toBe(1)
+
+    // ============================================
+    // STEP 8: Navigate back to users list
     // ============================================
     const backButton = detailsPage.getByRole('button', { name: /back/i })
     await backButton.click()
