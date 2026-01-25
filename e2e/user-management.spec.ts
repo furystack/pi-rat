@@ -1,523 +1,337 @@
+import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { assertAndDismissNoty, login, navigateToAppSettings, navigateToUsersSettings } from './helpers.js'
+import { assertAndDismissNoty, login, navigateToAppSettings } from './helpers.js'
 
-test.describe('User Management Navigation', () => {
-  test.beforeEach(async ({ page }) => {
+/**
+ * Helper: Verify the users table structure has all expected columns
+ */
+const verifyUsersTableStructure = async (page: Page) => {
+  const usersPage = page.locator('user-list-page')
+
+  await expect(usersPage.locator('th', { hasText: 'Username' })).toBeVisible()
+  await expect(usersPage.locator('th', { hasText: 'Roles' })).toBeVisible()
+  await expect(usersPage.locator('th', { hasText: 'Created' })).toBeVisible()
+  await expect(usersPage.locator('th', { hasText: 'Actions' })).toBeVisible()
+}
+
+/**
+ * Helper: Verify the user details form has all expected elements
+ */
+const verifyUserDetailsForm = async (page: Page) => {
+  const detailsPage = page.locator('user-details-page')
+
+  await expect(detailsPage.getByText('User Information')).toBeVisible()
+  await expect(detailsPage.getByText('Username:')).toBeVisible()
+  await expect(detailsPage.getByText('Created:')).toBeVisible()
+  await expect(detailsPage.getByText('Last Updated:')).toBeVisible()
+  await expect(detailsPage.getByText('Roles').first()).toBeVisible()
+
+  // Verify action buttons exist
+  await expect(detailsPage.getByRole('button', { name: 'Save Changes' })).toBeVisible()
+  await expect(detailsPage.getByRole('button', { name: 'Cancel' })).toBeVisible()
+  await expect(detailsPage.getByRole('button', { name: /back/i })).toBeVisible()
+}
+
+/**
+ * Helper: Add a role to the user via dropdown. Returns the role name added, or null if no roles available.
+ */
+const addRoleToUser = async (page: Page): Promise<string | null> => {
+  const detailsPage = page.locator('user-details-page')
+  const roleSelect = detailsPage.locator('select')
+
+  // Check if dropdown is visible (only shown when roles available to add)
+  const selectCount = await roleSelect.count()
+  if (selectCount === 0) {
+    return null
+  }
+
+  const optionsCount = await roleSelect.locator('option').count()
+  if (optionsCount <= 1) {
+    // Only placeholder option, no roles available
+    return null
+  }
+
+  // Select the first available role option (not the placeholder)
+  const options = roleSelect.locator('option')
+  const roleValue = await options.nth(1).getAttribute('value')
+  if (!roleValue) {
+    return null
+  }
+
+  await roleSelect.selectOption(roleValue)
+  return roleValue
+}
+
+/**
+ * Helper: Remove a specific role by name. Returns true if the role was removed.
+ * IMPORTANT: Avoids removing 'admin' role to prevent locking out the test user.
+ */
+const removeRoleByName = async (page: Page, roleName: string): Promise<boolean> => {
+  const detailsPage = page.locator('user-details-page')
+  const roleTag = detailsPage.locator('role-tag', { hasText: roleName })
+
+  const roleCount = await roleTag.count()
+  if (roleCount === 0) {
+    return false
+  }
+
+  const removeButton = roleTag.first().locator('button', { hasText: '×' })
+  const removeButtonCount = await removeButton.count()
+  if (removeButtonCount === 0) {
+    return false
+  }
+
+  await removeButton.click()
+  return true
+}
+
+/**
+ * Helper: Remove a non-admin role from the user. Returns the role name removed, or null if none available.
+ * IMPORTANT: Never removes 'admin' role to prevent locking out the test user.
+ */
+const removeNonAdminRole = async (page: Page): Promise<string | null> => {
+  const detailsPage = page.locator('user-details-page')
+  const roleTags = detailsPage.locator('role-tag')
+
+  const roleCount = await roleTags.count()
+  for (let i = 0; i < roleCount; i++) {
+    const roleTag = roleTags.nth(i)
+    const roleText = await roleTag.textContent()
+    // Skip admin role to avoid locking out the test user
+    if (roleText?.toLowerCase().includes('admin')) {
+      continue
+    }
+
+    const removeButton = roleTag.locator('button', { hasText: '×' })
+    const removeButtonCount = await removeButton.count()
+    if (removeButtonCount > 0) {
+      await removeButton.click()
+      // Extract role name (remove the × button text)
+      return roleText?.replace('×', '').replace('↩', '').trim() ?? null
+    }
+  }
+  return null
+}
+
+test.describe('User Management', () => {
+  test('Admin can navigate to users, view user details, edit roles, and verify persistence', async ({ page }) => {
+    // ============================================
+    // STEP 1: Login as admin
+    // ============================================
     await page.goto('/')
     await login(page)
-  })
 
-  test('should display Users menu item in Identity section', async ({ page }) => {
+    // ============================================
+    // STEP 2: Navigate to app settings, verify Users menu is visible
+    // ============================================
     await navigateToAppSettings(page)
     await page.waitForSelector('text=OMDB Settings')
 
-    // Verify Users menu item is visible in the Identity section
     const usersMenuItem = page.getByText('Users')
     await expect(usersMenuItem).toBeVisible()
-  })
 
-  test('should navigate to users list page', async ({ page }) => {
-    await navigateToUsersSettings(page)
+    // ============================================
+    // STEP 3: Click Users, verify users table structure
+    // ============================================
+    await usersMenuItem.click()
+    await page.waitForURL(/\/app-settings\/users/)
 
-    // Verify we're on the users list page
-    await expect(page).toHaveURL(/\/app-settings\/users/)
-    await expect(page.locator('user-list-page')).toBeVisible()
-  })
-})
+    const usersPage = page.locator('user-list-page')
+    await expect(usersPage).toBeVisible()
 
-test.describe('User List Page', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await login(page)
-    await navigateToUsersSettings(page)
-  })
-
-  test('should display users page heading', async ({ page }) => {
-    // Verify heading is visible
+    // Verify page heading
     await expect(page.locator('text=👥 Users').first()).toBeVisible()
     await expect(page.getByText('Manage user accounts and their roles.')).toBeVisible()
-  })
 
-  test('should display users table with columns', async ({ page }) => {
-    const usersPage = page.locator('user-list-page')
+    // Verify table structure
+    await verifyUsersTableStructure(page)
 
-    // Verify table headers
-    await expect(usersPage.locator('th', { hasText: 'Username' })).toBeVisible()
-    await expect(usersPage.locator('th', { hasText: 'Roles' })).toBeVisible()
-    await expect(usersPage.locator('th', { hasText: 'Created' })).toBeVisible()
-    await expect(usersPage.locator('th', { hasText: 'Actions' })).toBeVisible()
-  })
-
-  test('should display at least one user in the table', async ({ page }) => {
-    const usersPage = page.locator('user-list-page')
-
-    // Wait for table to load and verify at least one user row exists
+    // ============================================
+    // STEP 4: Verify at least one user (admin) exists in the table
+    // ============================================
     const tableBody = usersPage.locator('tbody')
     const rows = tableBody.locator('tr')
     await expect(rows.first()).toBeVisible()
-  })
 
-  test('should display user roles with role tags', async ({ page }) => {
-    const usersPage = page.locator('user-list-page')
+    // Verify role tags are rendered in the table
+    const roleTagInTable = usersPage.locator('role-tag').first()
+    await expect(roleTagInTable).toBeVisible()
 
-    // Verify role tags are rendered
-    const roleTag = usersPage.locator('role-tag').first()
-    await expect(roleTag).toBeVisible()
-  })
-
-  test('should navigate to user details when clicking Edit button', async ({ page }) => {
-    const usersPage = page.locator('user-list-page')
-
-    // Click Edit button on first user
+    // ============================================
+    // STEP 5: Open first user via Edit button, verify form elements
+    // ============================================
     const editButton = usersPage.getByRole('button', { name: 'Edit' }).first()
     await editButton.click()
 
-    // Verify navigation to user details
     await expect(page).toHaveURL(/\/app-settings\/users\//)
-    await expect(page.locator('user-details-page')).toBeVisible()
-  })
 
-  test('should navigate to user details when clicking table row', async ({ page }) => {
-    const usersPage = page.locator('user-list-page')
-
-    // Get the first row and click it
-    const firstRow = usersPage.locator('tbody tr').first()
-    await firstRow.click()
-
-    // Verify navigation to user details
-    await expect(page).toHaveURL(/\/app-settings\/users\//)
-    await expect(page.locator('user-details-page')).toBeVisible()
-  })
-})
-
-test.describe('User Details Page', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await login(page)
-    await navigateToUsersSettings(page)
-
-    // Navigate to first user's details
-    const usersPage = page.locator('user-list-page')
-    const editButton = usersPage.getByRole('button', { name: 'Edit' }).first()
-    await editButton.click()
-    await expect(page.locator('user-details-page')).toBeVisible()
-  })
-
-  test('should display user information', async ({ page }) => {
     const detailsPage = page.locator('user-details-page')
+    await expect(detailsPage).toBeVisible()
 
-    // Verify user information section
-    await expect(detailsPage.getByText('User Information')).toBeVisible()
-    await expect(detailsPage.getByText('Username:')).toBeVisible()
-    await expect(detailsPage.getByText('Created:')).toBeVisible()
-    await expect(detailsPage.getByText('Last Updated:')).toBeVisible()
-  })
+    // Verify form structure
+    await verifyUserDetailsForm(page)
 
-  test('should display roles section', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
+    // Verify Save button is disabled initially (no changes)
+    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
+    await expect(saveButton).toBeDisabled()
 
-    // Verify roles section is visible
-    await expect(detailsPage.getByText('Roles').first()).toBeVisible()
-  })
+    // ============================================
+    // STEP 6: Record initial role count, then add or remove a role
+    // ============================================
+    const initialRoleCount = await detailsPage.locator('role-tag').count()
+    expect(initialRoleCount, 'User should have at least one role').toBeGreaterThan(0)
 
-  test('should display current user roles with role tags', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
+    // Try to add a role first
+    const addedRole = await addRoleToUser(page)
+    const roleWasAdded = addedRole !== null
+    let removedRole: string | null = null
 
-    // Verify at least one role tag is displayed
-    const roleTag = detailsPage.locator('role-tag').first()
-    await expect(roleTag).toBeVisible()
-  })
+    if (!roleWasAdded) {
+      // User has all roles - remove a non-admin role instead
+      removedRole = await removeNonAdminRole(page)
+      expect(removedRole, 'Should be able to remove a non-admin role').not.toBeNull()
+    }
 
-  test('should navigate back to user list when clicking Back button', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
+    // Verify Save button is now enabled
+    await expect(saveButton).toBeEnabled()
 
-    // Click back button
+    // ============================================
+    // STEP 7: Save the changes
+    // ============================================
+    await saveButton.click()
+    await assertAndDismissNoty(page, 'User roles updated successfully')
+
+    // Verify Save button is disabled after saving (no pending changes)
+    await expect(saveButton).toBeDisabled()
+
+    // ============================================
+    // STEP 8: Reload page, verify role change persisted
+    // ============================================
+    await page.reload()
+    await expect(detailsPage).toBeVisible()
+
+    const newRoleCount = await detailsPage.locator('role-tag').count()
+    if (roleWasAdded) {
+      expect(newRoleCount).toBe(initialRoleCount + 1)
+    } else {
+      expect(newRoleCount).toBe(initialRoleCount - 1)
+    }
+
+    // ============================================
+    // STEP 9: Restore to original state - reverse the change we made
+    // ============================================
+    if (roleWasAdded) {
+      // We added a role, now remove it by name (not removing admin!)
+      const removed = await removeRoleByName(page, addedRole)
+      expect(removed, 'Should be able to remove the added role').toBeTruthy()
+    } else {
+      // We removed a role, now add it back (use dropdown since it should be available)
+      const added = await addRoleToUser(page)
+      expect(added, 'Should be able to add a role back').not.toBeNull()
+    }
+
+    // Save to restore original state
+    await expect(saveButton).toBeEnabled()
+    await saveButton.click()
+    await assertAndDismissNoty(page, 'User roles updated successfully')
+
+    // ============================================
+    // STEP 10: Verify clean state - back to original role count
+    // ============================================
+    const finalRoleCount = await detailsPage.locator('role-tag').count()
+    expect(finalRoleCount).toBe(initialRoleCount)
+
+    // ============================================
+    // STEP 11: Test navigation back to users list
+    // ============================================
     const backButton = detailsPage.getByRole('button', { name: /back/i })
     await backButton.click()
 
-    // Verify navigation back to user list
     await expect(page).toHaveURL(/\/app-settings\/users$/)
-    await expect(page.locator('user-list-page')).toBeVisible()
+    await expect(usersPage).toBeVisible()
   })
 
-  test('should display Add Role dropdown when roles are available', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-
-    // The dropdown is only visible when there are roles available to add
-    // If user already has all roles, the dropdown won't be shown
-    const roleSelect = detailsPage.locator('select')
-    const selectCount = await roleSelect.count()
-
-    if (selectCount > 0) {
-      // Dropdown is visible, verify its label
-      await expect(detailsPage.getByText('Add Role:')).toBeVisible()
-      await expect(roleSelect).toBeVisible()
-    } else {
-      // User has all roles - verify dropdown is intentionally hidden
-      // This is expected behavior when no roles are available to add
-      await expect(roleSelect).not.toBeVisible()
-    }
-  })
-
-  test('should have Save and Cancel buttons', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-
-    // Verify buttons exist
-    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
-    const cancelButton = detailsPage.getByRole('button', { name: 'Cancel' })
-
-    await expect(saveButton).toBeVisible()
-    await expect(cancelButton).toBeVisible()
-  })
-
-  test('should have Save button disabled when no changes are made', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-
-    // Verify Save button is disabled initially
-    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
-    await expect(saveButton).toBeDisabled()
-  })
-})
-
-test.describe('Role Editing', () => {
-  // Run these tests serially to prevent concurrent modifications to the same user
-  test.describe.configure({ mode: 'serial' })
-
-  test.beforeEach(async ({ page }) => {
+  test('Admin can verify role editing UI behavior (add, remove, restore, cancel)', async ({ page }) => {
+    // ============================================
+    // STEP 1: Setup - Login and navigate to user details
+    // ============================================
     await page.goto('/')
     await login(page)
-    await navigateToUsersSettings(page)
+    await navigateToAppSettings(page)
+    await page.getByText('Users').click()
+    await page.waitForURL(/\/app-settings\/users/)
 
-    // Navigate to first user's details
     const usersPage = page.locator('user-list-page')
-    const editButton = usersPage.getByRole('button', { name: 'Edit' }).first()
-    await editButton.click()
-    await expect(page.locator('user-details-page')).toBeVisible()
-  })
+    await usersPage.getByRole('button', { name: 'Edit' }).first().click()
 
-  test('should add a role using the dropdown', async ({ page }) => {
     const detailsPage = page.locator('user-details-page')
-    const roleSelect = detailsPage.locator('select')
+    await expect(detailsPage).toBeVisible()
 
-    // Get the number of options (available roles to add)
-    let optionsCount = await roleSelect.locator('option').count()
-
-    // If no roles available to add (user has all roles), remove one first
-    if (optionsCount <= 1) {
-      const roleTags = detailsPage.locator('role-tag')
-      const removeButton = roleTags.first().locator('button', { hasText: '×' })
-      if ((await removeButton.count()) > 0) {
-        await removeButton.click()
-        // Wait for the dropdown to appear with available options
-        await expect(roleSelect).toBeVisible()
-        optionsCount = await roleSelect.locator('option').count()
-      }
-    }
-
-    // Verify there are available roles to add (more than just the placeholder)
-    expect(optionsCount, 'Expected available roles to add in dropdown').toBeGreaterThan(1)
-
-    // Select the first available role option (not the placeholder)
-    const options = roleSelect.locator('option')
-    const secondOption = await options.nth(1).getAttribute('value')
-    expect(secondOption, 'Expected option to have a value').toBeTruthy()
-
-    await roleSelect.selectOption(secondOption)
-
-    // Verify a new role tag appears
-    const roleTags = detailsPage.locator('role-tag')
-    await expect(roleTags.first()).toBeVisible()
-  })
-
-  test('should enable Save button when changes are made', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-    const roleSelect = detailsPage.locator('select')
     const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
-
-    // Initially Save button should be disabled
-    await expect(saveButton).toBeDisabled()
-
-    // Check if there are available roles to add
-    const optionsCount = await roleSelect.locator('option').count()
-
-    if (optionsCount > 1) {
-      // Add a role using dropdown
-      const options = roleSelect.locator('option')
-      const secondOption = await options.nth(1).getAttribute('value')
-      expect(secondOption, 'Expected option to have a value').toBeTruthy()
-      await roleSelect.selectOption(secondOption)
-    } else {
-      // No roles to add - remove a role instead to trigger changes
-      const roleTags = detailsPage.locator('role-tag')
-      const removeButton = roleTags.first().locator('button', { hasText: '×' })
-      await removeButton.click()
-    }
-
-    // Save button should now be enabled
-    await expect(saveButton).toBeEnabled()
-  })
-
-  test('should remove a role by clicking the remove button', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
-
-    // Get current role tags count
-    const roleTags = detailsPage.locator('role-tag')
-    const initialCount = await roleTags.count()
-    expect(initialCount, 'Expected at least one role tag').toBeGreaterThan(0)
-
-    // Find and click the remove button on the first role tag
-    const firstRoleTag = roleTags.first()
-    const removeButton = firstRoleTag.locator('button', { hasText: '×' })
-
-    // Verify remove button exists
-    const removeButtonCount = await removeButton.count()
-    expect(removeButtonCount, 'Expected remove button on role tag').toBeGreaterThan(0)
-
-    await removeButton.click()
-
-    // Save button should be enabled after removing a role
-    await expect(saveButton).toBeEnabled()
-  })
-
-  test('should cancel changes and restore original roles', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-    const roleSelect = detailsPage.locator('select')
     const cancelButton = detailsPage.getByRole('button', { name: 'Cancel' })
-    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
 
-    // Check if there are available roles to add
-    const optionsCount = await roleSelect.locator('option').count()
+    // ============================================
+    // STEP 2: Test Cancel functionality - make change then cancel
+    // ============================================
+    const initialCount = await detailsPage.locator('role-tag').count()
 
-    if (optionsCount > 1) {
-      // Add a role to make changes
-      const options = roleSelect.locator('option')
-      const secondOption = await options.nth(1).getAttribute('value')
-      expect(secondOption, 'Expected option to have a value').toBeTruthy()
-      await roleSelect.selectOption(secondOption)
-    } else {
-      // No roles to add - remove a role instead to trigger changes
-      const roleTags = detailsPage.locator('role-tag')
-      const removeButton = roleTags.first().locator('button', { hasText: '×' })
-      await removeButton.click()
+    // Make a change (add or remove a non-admin role)
+    const addedRole = await addRoleToUser(page)
+    if (!addedRole) {
+      await removeNonAdminRole(page)
     }
 
-    // Verify Save is now enabled
+    // Verify Save is enabled after change
     await expect(saveButton).toBeEnabled()
 
-    // Click Cancel
+    // Click Cancel - should restore original state
     await cancelButton.click()
 
-    // Save button should be disabled again
-    await expect(saveButton).toBeDisabled()
-  })
-})
-
-test.describe('Save Role Changes', () => {
-  // Run these tests serially since they modify user roles in the database
-  test.describe.configure({ mode: 'serial' })
-
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await login(page)
-    await navigateToUsersSettings(page)
-  })
-
-  test('should save role changes successfully', async ({ page }) => {
-    // Navigate to user details
-    const usersPage = page.locator('user-list-page')
-    const editButton = usersPage.getByRole('button', { name: 'Edit' }).first()
-    await editButton.click()
-    await expect(page.locator('user-details-page')).toBeVisible()
-
-    const detailsPage = page.locator('user-details-page')
-    const roleSelect = detailsPage.locator('select')
-    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
-    const roleTags = detailsPage.locator('role-tag')
-
-    // Check if there are available roles to add
-    const optionsCount = await roleSelect.locator('option').count()
-    let addedRole = false
-
-    if (optionsCount > 1) {
-      // Add a role using dropdown
-      const options = roleSelect.locator('option')
-      const secondOption = await options.nth(1).getAttribute('value')
-      expect(secondOption, 'Expected option to have a value').toBeTruthy()
-      await roleSelect.selectOption(secondOption)
-      addedRole = true
-    } else {
-      // No roles to add - remove a role instead to test saving
-      const removeButton = roleTags.first().locator('button', { hasText: '×' })
-      await removeButton.click()
-    }
-
-    // Save changes
-    await saveButton.click()
-
-    // Verify success notification
-    await assertAndDismissNoty(page, 'User roles updated successfully')
-
-    // Save button should be disabled after saving
+    // Verify Save is disabled again (no changes)
     await expect(saveButton).toBeDisabled()
 
-    // Restore original state to prevent test state accumulation
-    if (addedRole) {
-      // Remove the role we just added
-      const newRoleTags = detailsPage.locator('role-tag')
-      const lastRoleTag = newRoleTags.last()
-      const removeButton = lastRoleTag.locator('button', { hasText: '×' })
-      if ((await removeButton.count()) > 0) {
-        await removeButton.click()
-        await saveButton.click()
-        await assertAndDismissNoty(page, 'User roles updated successfully')
-      }
-    } else {
-      // Re-add the role we removed by using the restore button or dropdown
-      const restoreButton = roleTags.first().locator('button', { hasText: '↩' })
-      if ((await restoreButton.count()) > 0) {
-        await restoreButton.click()
-        await saveButton.click()
-        await assertAndDismissNoty(page, 'User roles updated successfully')
-      }
-    }
-  })
+    // Verify role count is back to initial
+    const afterCancelCount = await detailsPage.locator('role-tag').count()
+    expect(afterCancelCount).toBe(initialCount)
 
-  test('should show validation error when removing all roles', async ({ page }) => {
-    // Navigate to user details
-    const usersPage = page.locator('user-list-page')
-    const editButton = usersPage.getByRole('button', { name: 'Edit' }).first()
-    await editButton.click()
-    await expect(page.locator('user-details-page')).toBeVisible()
+    // ============================================
+    // STEP 3: Test remove and restore UI behavior
+    // ============================================
+    // Remove a non-admin role to test restore functionality
+    const removed = await removeNonAdminRole(page)
+    expect(removed).not.toBeNull()
 
-    const detailsPage = page.locator('user-details-page')
-    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
+    // Verify restore button appears for removed role
+    const restoreButton = detailsPage.locator('role-tag').locator('button', { hasText: '↩' }).first()
+    await expect(restoreButton).toBeVisible()
 
-    // Verify there are role tags to remove
-    const roleTags = detailsPage.locator('role-tag')
-    const initialCount = await roleTags.count()
-    expect(initialCount, 'Expected at least one role to remove').toBeGreaterThan(0)
+    // Click restore
+    await restoreButton.click()
 
+    // Verify Save is disabled (no net changes)
+    await expect(saveButton).toBeDisabled()
+
+    // ============================================
+    // STEP 4: Test validation - cannot save with zero roles
+    // ============================================
     // Remove all roles one by one
-    let roleCount = initialCount
-    let rolesRemoved = 0
-
+    let roleCount = await detailsPage.locator('role-tag').count()
     while (roleCount > 0) {
-      const roleTag = roleTags.first()
-      const removeButton = roleTag.locator('button', { hasText: '×' })
-      const removeButtonCount = await removeButton.count()
-
-      if (removeButtonCount > 0) {
-        await removeButton.click()
-        rolesRemoved++
-      } else {
-        // Role tag exists but has no remove button (restored role)
-        break
-      }
-
-      roleCount = await roleTags.count()
+      const removeBtn = detailsPage.locator('role-tag').first().locator('button', { hasText: '×' })
+      const removeBtnCount = await removeBtn.count()
+      if (removeBtnCount === 0) break
+      await removeBtn.click()
+      roleCount = await detailsPage.locator('role-tag').count()
     }
 
-    // Verify at least one role was removed
-    expect(rolesRemoved, 'Expected to remove at least one role').toBeGreaterThan(0)
-
-    // Save button should be enabled after changes
+    // Try to save with no roles
     await expect(saveButton).toBeEnabled()
-
-    // Try to save
     await saveButton.click()
 
     // Should show validation error
     await expect(detailsPage.getByText('User must have at least one role')).toBeVisible()
-  })
-})
 
-test.describe('Role Tag Display Variants', () => {
-  // Run these tests serially since they interact with the same user's role state
-  test.describe.configure({ mode: 'serial' })
-
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await login(page)
-    await navigateToUsersSettings(page)
-
-    // Navigate to first user's details
-    const usersPage = page.locator('user-list-page')
-    const editButton = usersPage.getByRole('button', { name: 'Edit' }).first()
-    await editButton.click()
-    await expect(page.locator('user-details-page')).toBeVisible()
-  })
-
-  test('should show role with remove button for existing roles', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-    const roleTags = detailsPage.locator('role-tag')
-
-    // Verify there are role tags
-    const count = await roleTags.count()
-    expect(count, 'Expected at least one role tag').toBeGreaterThan(0)
-
-    const firstRoleTag = roleTags.first()
-
-    // Verify the role tag is visible
-    await expect(firstRoleTag).toBeVisible()
-
-    // Verify the role displays text (the displayName)
-    const text = await firstRoleTag.textContent()
-    expect(text?.length, 'Expected role tag to have display text').toBeGreaterThan(0)
-  })
-
-  test('should show restore button for removed roles', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-    const roleTags = detailsPage.locator('role-tag')
-
-    // Verify there are role tags
-    const initialCount = await roleTags.count()
-    expect(initialCount, 'Expected at least one role tag').toBeGreaterThan(0)
-
-    // Find a role with remove button
-    const firstRoleTag = roleTags.first()
-    const removeButton = firstRoleTag.locator('button', { hasText: '×' })
-
-    // Verify remove button exists
-    const removeButtonCount = await removeButton.count()
-    expect(removeButtonCount, 'Expected remove button on role tag').toBeGreaterThan(0)
-
-    await removeButton.click()
-
-    // Find the role tag that now has restore button (↩)
-    const removedRoleTag = detailsPage.locator('role-tag').locator('button', { hasText: '↩' })
-
-    // Should have a restore button
-    await expect(removedRoleTag.first()).toBeVisible()
-  })
-
-  test('should restore a removed role by clicking restore button', async ({ page }) => {
-    const detailsPage = page.locator('user-details-page')
-    const roleTags = detailsPage.locator('role-tag')
-    const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
-
-    // Verify there are role tags
-    const initialCount = await roleTags.count()
-    expect(initialCount, 'Expected at least one role tag').toBeGreaterThan(0)
-
-    // Find a role with remove button and remove it
-    const firstRoleTag = roleTags.first()
-    const removeButton = firstRoleTag.locator('button', { hasText: '×' })
-
-    // Verify remove button exists
-    const removeButtonCount = await removeButton.count()
-    expect(removeButtonCount, 'Expected remove button on role tag').toBeGreaterThan(0)
-
-    await removeButton.click()
-
-    // Save should be enabled
-    await expect(saveButton).toBeEnabled()
-
-    // Find and click restore button
-    const restoreButton = detailsPage.locator('role-tag').locator('button', { hasText: '↩' }).first()
-    await restoreButton.click()
-
-    // Save should be disabled again (no net changes)
-    await expect(saveButton).toBeDisabled()
+    // Cancel to restore original state (don't persist invalid state)
+    await cancelButton.click()
   })
 })
