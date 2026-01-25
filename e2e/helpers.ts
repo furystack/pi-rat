@@ -84,6 +84,20 @@ export const navigateToAppSettings = async (page: Page) => {
  */
 export const navigateToAdminSettings = navigateToAppSettings
 
+export const navigateToUsersSettings = async (page: Page) => {
+  await navigateToAppSettings(page)
+
+  // Click on Users menu item in the Identity section
+  await page.getByText('Users').click()
+
+  // Wait for URL to change to users list
+  await page.waitForURL(/\/app-settings\/users/)
+
+  // Verify we're on the users list page
+  const usersListPage = page.locator('user-list-page')
+  await expect(usersListPage).toBeVisible({ timeout: 10000 })
+}
+
 export const uploadFile = async (page: Page, filePath: string, mime: string) => {
   const fileContent = await readFile(filePath, { encoding: 'utf-8' })
   const fileName = basename(filePath)
