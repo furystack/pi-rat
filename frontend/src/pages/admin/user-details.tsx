@@ -1,17 +1,12 @@
 import { createComponent, LocationService, Shade } from '@furystack/shades'
 import { Button, NotyService, Paper } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import type { Roles, User } from 'common'
+import type { Roles } from 'common'
 import { getAllRoleDefinitions } from 'common'
 import { RoleTag } from '../../components/role-tag/index.js'
-import { IdentityApiClient } from '../../services/api-clients/identity-api-client.js'
+import { UsersService } from '../../services/users-service.js'
 
 type UserDetailsPageProps = Record<string, never>
-
-type UserState =
-  | { status: 'loading' }
-  | { status: 'loaded'; user: User }
-  | { status: 'error'; message: string }
 
 type RoleChange = {
   originalRoles: Roles
@@ -21,7 +16,7 @@ type RoleChange = {
 export const UserDetailsPage = Shade<UserDetailsPageProps>({
   shadowDomName: 'user-details-page',
   render: ({ injector, useObservable, useDisposable }) => {
-    const apiClient = injector.getInstance(IdentityApiClient)
+    const usersService = injector.getInstance(UsersService)
     const locationService = injector.getInstance(LocationService)
     const notyService = injector.getInstance(NotyService)
 
@@ -29,8 +24,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     const pathParts = window.location.pathname.split('/')
     const username = decodeURIComponent(pathParts[pathParts.length - 1])
 
-    const userStateObservable = useDisposable('userState', () => new ObservableValue<UserState>({ status: 'loading' }))
-    const [userState] = useObservable('userStateValue', userStateObservable)
+    const [userState] = useObservable('user', usersService.getUserAsObservable(username))
 
     const roleChangeObservable = useDisposable('roleChange', () => new ObservableValue<RoleChange | null>(null))
     const [roleChange] = useObservable('roleChangeValue', roleChangeObservable)
@@ -41,31 +35,13 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     const validationErrorObservable = useDisposable('validationError', () => new ObservableValue<string | null>(null))
     const [validationError] = useObservable('validationErrorValue', validationErrorObservable)
 
-    // Fetch user on mount
-    useDisposable('fetchUser', () => {
-      const fetchUser = async () => {
-        try {
-          const { result } = await apiClient.call({
-            method: 'GET',
-            action: '/users/:id',
-            url: { id: username },
-            query: {},
-          })
-          userStateObservable.setValue({ status: 'loaded', user: result })
-          roleChangeObservable.setValue({
-            originalRoles: [...result.roles],
-            currentRoles: [...result.roles],
-          })
-        } catch (error) {
-          userStateObservable.setValue({
-            status: 'error',
-            message: error instanceof Error ? error.message : 'Failed to load user',
-          })
-        }
-      }
-      void fetchUser()
-      return { [Symbol.dispose]: () => {} }
-    })
+    // Initialize role change state when user is loaded
+    if (userState.status === 'loaded' && !roleChange) {
+      roleChangeObservable.setValue({
+        originalRoles: [...userState.value.roles],
+        currentRoles: [...userState.value.roles],
+      })
+    }
 
     const navigateBack = () => {
       window.history.pushState({}, '', '/app-settings/users')
@@ -80,6 +56,11 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
         hour: '2-digit',
         minute: '2-digit',
       })
+    }
+
+    const getErrorMessage = (error: unknown): string => {
+      if (error instanceof Error) return error.message
+      return 'Failed to load user'
     }
 
     const addRole = (roleName: Roles[number]) => {
@@ -142,14 +123,9 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
       validationErrorObservable.setValue(null)
 
       try {
-        await apiClient.call({
-          method: 'PATCH',
-          action: '/users/:id',
-          url: { id: username },
-          body: {
-            username: userState.user.username,
-            roles: roleChange.currentRoles,
-          },
+        await usersService.updateUser(username, {
+          username: userState.value.username,
+          roles: roleChange.currentRoles,
         })
 
         notyService.emit('onNotyAdded', {
@@ -209,15 +185,15 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           <h2 style={{ margin: '0', color: 'var(--theme-text-primary)' }}>User Details</h2>
         </div>
 
-        {userState.status === 'loading' && (
+        {(userState.status === 'loading' || userState.status === 'uninitialized') && (
           <Paper elevation={1} style={{ padding: '24px' }}>
             <p style={{ color: 'var(--theme-text-secondary)' }}>Loading user...</p>
           </Paper>
         )}
 
-        {userState.status === 'error' && (
+        {userState.status === 'failed' && (
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-error-main)' }}>Error: {userState.message}</p>
+            <p style={{ color: 'var(--theme-error-main)' }}>Error: {getErrorMessage(userState.error)}</p>
             <Button variant="outlined" onclick={navigateBack} style={{ marginTop: '12px' }}>
               Go Back
             </Button>
@@ -233,13 +209,13 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
 
               <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: '12px', alignItems: 'center' }}>
                 <span style={{ color: 'var(--theme-text-secondary)', fontWeight: '500' }}>Username:</span>
-                <span style={{ color: 'var(--theme-text-primary)' }}>{userState.user.username}</span>
+                <span style={{ color: 'var(--theme-text-primary)' }}>{userState.value.username}</span>
 
                 <span style={{ color: 'var(--theme-text-secondary)', fontWeight: '500' }}>Created:</span>
-                <span style={{ color: 'var(--theme-text-primary)' }}>{formatDate(userState.user.createdAt)}</span>
+                <span style={{ color: 'var(--theme-text-primary)' }}>{formatDate(userState.value.createdAt)}</span>
 
                 <span style={{ color: 'var(--theme-text-secondary)', fontWeight: '500' }}>Last Updated:</span>
-                <span style={{ color: 'var(--theme-text-primary)' }}>{formatDate(userState.user.updatedAt)}</span>
+                <span style={{ color: 'var(--theme-text-primary)' }}>{formatDate(userState.value.updatedAt)}</span>
               </div>
             </Paper>
 

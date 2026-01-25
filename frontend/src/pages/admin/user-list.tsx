@@ -1,46 +1,17 @@
 import { createComponent, LocationService, Shade } from '@furystack/shades'
 import { Button, Paper } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
-import type { User } from 'common'
 import { RoleTag } from '../../components/role-tag/index.js'
-import { IdentityApiClient } from '../../services/api-clients/identity-api-client.js'
+import { UsersService } from '../../services/users-service.js'
 
 type UserListPageProps = Record<string, never>
 
-type UsersState =
-  | { status: 'loading' }
-  | { status: 'loaded'; users: User[] }
-  | { status: 'error'; message: string }
-
 export const UserListPage = Shade<UserListPageProps>({
   shadowDomName: 'user-list-page',
-  render: ({ injector, useObservable, useDisposable }) => {
-    const apiClient = injector.getInstance(IdentityApiClient)
+  render: ({ injector, useObservable }) => {
+    const usersService = injector.getInstance(UsersService)
     const locationService = injector.getInstance(LocationService)
 
-    const usersStateObservable = useDisposable('usersState', () => new ObservableValue<UsersState>({ status: 'loading' }))
-    const [usersState] = useObservable('usersStateValue', usersStateObservable)
-
-    // Fetch users on mount
-    useDisposable('fetchUsers', () => {
-      const fetchUsers = async () => {
-        try {
-          const { result } = await apiClient.call({
-            method: 'GET',
-            action: '/users',
-            query: {},
-          })
-          usersStateObservable.setValue({ status: 'loaded', users: result.entries })
-        } catch (error) {
-          usersStateObservable.setValue({
-            status: 'error',
-            message: error instanceof Error ? error.message : 'Failed to load users',
-          })
-        }
-      }
-      void fetchUsers()
-      return { [Symbol.dispose]: () => {} }
-    })
+    const [usersState] = useObservable('users', usersService.findUsersAsObservable({}))
 
     const navigateToUser = (username: string) => {
       window.history.pushState({}, '', `/app-settings/users/${encodeURIComponent(username)}`)
@@ -57,6 +28,16 @@ export const UserListPage = Shade<UserListPageProps>({
       })
     }
 
+    const handleRetry = () => {
+      usersService.userQueryCache.flushAll()
+      usersService.findUsers({})
+    }
+
+    const getErrorMessage = (error: unknown): string => {
+      if (error instanceof Error) return error.message
+      return 'Failed to load users'
+    }
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
         <h2 style={{ marginBottom: '8px', color: 'var(--theme-text-primary)' }}>👥 Users</h2>
@@ -64,33 +45,16 @@ export const UserListPage = Shade<UserListPageProps>({
           Manage user accounts and their roles.
         </p>
 
-        {usersState.status === 'loading' && (
+        {(usersState.status === 'loading' || usersState.status === 'uninitialized') && (
           <Paper elevation={1} style={{ padding: '24px' }}>
             <p style={{ color: 'var(--theme-text-secondary)' }}>Loading users...</p>
           </Paper>
         )}
 
-        {usersState.status === 'error' && (
+        {usersState.status === 'failed' && (
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-error-main)' }}>Error: {usersState.message}</p>
-            <Button
-              variant="outlined"
-              onclick={() => {
-                usersStateObservable.setValue({ status: 'loading' })
-                void apiClient
-                  .call({ method: 'GET', action: '/users', query: {} })
-                  .then(({ result }) => {
-                    usersStateObservable.setValue({ status: 'loaded', users: result.entries })
-                  })
-                  .catch((error) => {
-                    usersStateObservable.setValue({
-                      status: 'error',
-                      message: error instanceof Error ? error.message : 'Failed to load users',
-                    })
-                  })
-              }}
-              style={{ marginTop: '12px' }}
-            >
+            <p style={{ color: 'var(--theme-error-main)' }}>Error: {getErrorMessage(usersState.error)}</p>
+            <Button variant="outlined" onclick={handleRetry} style={{ marginTop: '12px' }}>
               Retry
             </Button>
           </Paper>
@@ -155,7 +119,7 @@ export const UserListPage = Shade<UserListPageProps>({
                 </tr>
               </thead>
               <tbody>
-                {usersState.users.map((user) => (
+                {usersState.value.entries.map((user) => (
                   <tr
                     style={{
                       borderBottom: '1px solid var(--theme-border-default)',
@@ -210,7 +174,7 @@ export const UserListPage = Shade<UserListPageProps>({
                     </td>
                   </tr>
                 ))}
-                {usersState.users.length === 0 && (
+                {usersState.value.entries.length === 0 && (
                   <tr>
                     <td
                       colSpan={4}
