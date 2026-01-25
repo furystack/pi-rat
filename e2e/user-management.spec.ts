@@ -170,6 +170,9 @@ test.describe('User Details Page', () => {
 })
 
 test.describe('Role Editing', () => {
+  // Run these tests serially to prevent concurrent modifications to the same user
+  test.describe.configure({ mode: 'serial' })
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await login(page)
@@ -280,6 +283,9 @@ test.describe('Role Editing', () => {
 })
 
 test.describe('Save Role Changes', () => {
+  // Run these tests serially since they modify user roles in the database
+  test.describe.configure({ mode: 'serial' })
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await login(page)
@@ -368,6 +374,9 @@ test.describe('Save Role Changes', () => {
 })
 
 test.describe('Role Tag Display Variants', () => {
+  // Run these tests serially since they interact with the same user's role state
+  test.describe.configure({ mode: 'serial' })
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await login(page)

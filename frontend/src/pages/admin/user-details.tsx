@@ -35,8 +35,12 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     const validationErrorObservable = useDisposable('validationError', () => new ObservableValue<string | null>(null))
     const [validationError] = useObservable('validationErrorValue', validationErrorObservable)
 
-    // Initialize role change state when user is loaded
-    if (userState.status === 'loaded' && !roleChange) {
+    // Track if role state has been initialized to prevent re-initialization during render cycles
+    const isRoleStateInitialized = useDisposable('isRoleStateInitialized', () => new ObservableValue(false))
+
+    // Initialize role change state when user is loaded (check synchronously to avoid race conditions)
+    if (userState.status === 'loaded' && !isRoleStateInitialized.getValue()) {
+      isRoleStateInitialized.setValue(true)
       roleChangeObservable.setValue({
         originalRoles: [...userState.value.roles],
         currentRoles: [...userState.value.roles],
