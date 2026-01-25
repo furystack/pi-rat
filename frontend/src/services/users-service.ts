@@ -59,7 +59,7 @@ export class UsersService {
       url: { id: username },
       body,
     })
-    this.userCache.setObsolete(username)
+    this.userCache.remove(username)
     this.userQueryCache.flushAll()
     return result
   }

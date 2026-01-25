@@ -247,13 +247,15 @@ describe('UsersService', () => {
       })
     })
 
-    it('should update cache with new user data after update', async () => {
+    it('should invalidate cache after update', async () => {
       const originalUser = createMockUser('testuser@example.com', ['admin'])
       const updatedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
+      const refetchedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
       const mockCall = vi
         .fn()
         .mockResolvedValueOnce({ result: originalUser })
         .mockResolvedValueOnce({ result: updatedUser })
+        .mockResolvedValueOnce({ result: refetchedUser })
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
@@ -269,8 +271,8 @@ describe('UsersService', () => {
 
         const result = await service.getUser('testuser@example.com')
 
-        expect(mockCall).toHaveBeenCalledTimes(2)
-        expect(result).toEqual(updatedUser)
+        expect(mockCall).toHaveBeenCalledTimes(3)
+        expect(result).toEqual(refetchedUser)
       })
     })
 
