@@ -146,11 +146,13 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           type: 'success',
         })
 
-        // Update the original roles to reflect saved state
-        roleChangeObservable.setValue({
-          originalRoles: [...current],
-          currentRoles: [...current],
-        })
+        // Update the original roles to reflect saved state (guard against disposal during async operation)
+        if (!roleChangeObservable.isDisposed) {
+          roleChangeObservable.setValue({
+            originalRoles: [...current],
+            currentRoles: [...current],
+          })
+        }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to save user'
         notyService.emit('onNotyAdded', {
@@ -159,7 +161,10 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           type: 'error',
         })
       } finally {
-        isSavingObservable.setValue(false)
+        // Guard against disposal during async operation (component may have unmounted)
+        if (!isSavingObservable.isDisposed) {
+          isSavingObservable.setValue(false)
+        }
       }
     }
 
