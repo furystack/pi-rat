@@ -189,20 +189,20 @@ test.describe('Role Editing', () => {
     // Get the number of options (available roles to add)
     const optionsCount = await roleSelect.locator('option').count()
 
-    // If there are available roles to add (more than just the placeholder)
-    if (optionsCount > 1) {
-      // Select the first available role option (not the placeholder)
-      const options = roleSelect.locator('option')
-      const secondOption = await options.nth(1).getAttribute('value')
+    // Verify there are available roles to add (more than just the placeholder)
+    // If not, this test should fail as it cannot test the intended behavior
+    expect(optionsCount, 'Expected available roles to add in dropdown').toBeGreaterThan(1)
 
-      if (secondOption) {
-        await roleSelect.selectOption(secondOption)
+    // Select the first available role option (not the placeholder)
+    const options = roleSelect.locator('option')
+    const secondOption = await options.nth(1).getAttribute('value')
+    expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-        // Verify a new role tag appears
-        const roleTags = detailsPage.locator('role-tag')
-        await expect(roleTags.first()).toBeVisible()
-      }
-    }
+    await roleSelect.selectOption(secondOption!)
+
+    // Verify a new role tag appears
+    const roleTags = detailsPage.locator('role-tag')
+    await expect(roleTags.first()).toBeVisible()
   })
 
   test('should enable Save button when changes are made', async ({ page }) => {
@@ -213,21 +213,19 @@ test.describe('Role Editing', () => {
     // Initially Save button should be disabled
     await expect(saveButton).toBeDisabled()
 
-    // Check if there are available roles to add
+    // Verify there are available roles to add
     const optionsCount = await roleSelect.locator('option').count()
+    expect(optionsCount, 'Expected available roles to add in dropdown').toBeGreaterThan(1)
 
-    if (optionsCount > 1) {
-      // Add a role
-      const options = roleSelect.locator('option')
-      const secondOption = await options.nth(1).getAttribute('value')
+    // Add a role
+    const options = roleSelect.locator('option')
+    const secondOption = await options.nth(1).getAttribute('value')
+    expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-      if (secondOption) {
-        await roleSelect.selectOption(secondOption)
+    await roleSelect.selectOption(secondOption!)
 
-        // Save button should now be enabled
-        await expect(saveButton).toBeEnabled()
-      }
-    }
+    // Save button should now be enabled
+    await expect(saveButton).toBeEnabled()
   })
 
   test('should remove a role by clicking the remove button', async ({ page }) => {
@@ -237,20 +235,20 @@ test.describe('Role Editing', () => {
     // Get current role tags count
     const roleTags = detailsPage.locator('role-tag')
     const initialCount = await roleTags.count()
+    expect(initialCount, 'Expected at least one role tag').toBeGreaterThan(0)
 
-    if (initialCount > 0) {
-      // Find and click the remove button on the first role tag
-      const firstRoleTag = roleTags.first()
-      const removeButton = firstRoleTag.locator('button', { hasText: '×' })
+    // Find and click the remove button on the first role tag
+    const firstRoleTag = roleTags.first()
+    const removeButton = firstRoleTag.locator('button', { hasText: '×' })
 
-      // Check if remove button exists (some roles may not have it)
-      if ((await removeButton.count()) > 0) {
-        await removeButton.click()
+    // Verify remove button exists
+    const removeButtonCount = await removeButton.count()
+    expect(removeButtonCount, 'Expected remove button on role tag').toBeGreaterThan(0)
 
-        // Save button should be enabled after removing a role
-        await expect(saveButton).toBeEnabled()
-      }
-    }
+    await removeButton.click()
+
+    // Save button should be enabled after removing a role
+    await expect(saveButton).toBeEnabled()
   })
 
   test('should cancel changes and restore original roles', async ({ page }) => {
@@ -259,27 +257,25 @@ test.describe('Role Editing', () => {
     const cancelButton = detailsPage.getByRole('button', { name: 'Cancel' })
     const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
 
-    // Check if there are available roles to add
+    // Verify there are available roles to add
     const optionsCount = await roleSelect.locator('option').count()
+    expect(optionsCount, 'Expected available roles to add in dropdown').toBeGreaterThan(1)
 
-    if (optionsCount > 1) {
-      // Add a role to make changes
-      const options = roleSelect.locator('option')
-      const secondOption = await options.nth(1).getAttribute('value')
+    // Add a role to make changes
+    const options = roleSelect.locator('option')
+    const secondOption = await options.nth(1).getAttribute('value')
+    expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-      if (secondOption) {
-        await roleSelect.selectOption(secondOption)
+    await roleSelect.selectOption(secondOption!)
 
-        // Verify Save is now enabled
-        await expect(saveButton).toBeEnabled()
+    // Verify Save is now enabled
+    await expect(saveButton).toBeEnabled()
 
-        // Click Cancel
-        await cancelButton.click()
+    // Click Cancel
+    await cancelButton.click()
 
-        // Save button should be disabled again
-        await expect(saveButton).toBeDisabled()
-      }
-    }
+    // Save button should be disabled again
+    await expect(saveButton).toBeDisabled()
   })
 })
 
@@ -301,27 +297,25 @@ test.describe('Save Role Changes', () => {
     const roleSelect = detailsPage.locator('select')
     const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
 
-    // Check if there are available roles to add
+    // Verify there are available roles to add
     const optionsCount = await roleSelect.locator('option').count()
+    expect(optionsCount, 'Expected available roles to add in dropdown').toBeGreaterThan(1)
 
-    if (optionsCount > 1) {
-      // Add a role
-      const options = roleSelect.locator('option')
-      const secondOption = await options.nth(1).getAttribute('value')
+    // Add a role
+    const options = roleSelect.locator('option')
+    const secondOption = await options.nth(1).getAttribute('value')
+    expect(secondOption, 'Expected option to have a value').toBeTruthy()
 
-      if (secondOption) {
-        await roleSelect.selectOption(secondOption)
+    await roleSelect.selectOption(secondOption!)
 
-        // Save changes
-        await saveButton.click()
+    // Save changes
+    await saveButton.click()
 
-        // Verify success notification
-        await assertAndDismissNoty(page, 'User roles updated successfully')
+    // Verify success notification
+    await assertAndDismissNoty(page, 'User roles updated successfully')
 
-        // Save button should be disabled after saving
-        await expect(saveButton).toBeDisabled()
-      }
-    }
+    // Save button should be disabled after saving
+    await expect(saveButton).toBeDisabled()
   })
 
   test('should show validation error when removing all roles', async ({ page }) => {
@@ -334,30 +328,42 @@ test.describe('Save Role Changes', () => {
     const detailsPage = page.locator('user-details-page')
     const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
 
-    // Remove all roles one by one
+    // Verify there are role tags to remove
     const roleTags = detailsPage.locator('role-tag')
-    let roleCount = await roleTags.count()
+    const initialCount = await roleTags.count()
+    expect(initialCount, 'Expected at least one role to remove').toBeGreaterThan(0)
+
+    // Remove all roles one by one
+    let roleCount = initialCount
+    let rolesRemoved = 0
 
     while (roleCount > 0) {
       const roleTag = roleTags.first()
       const removeButton = roleTag.locator('button', { hasText: '×' })
+      const removeButtonCount = await removeButton.count()
 
-      if ((await removeButton.count()) > 0) {
+      if (removeButtonCount > 0) {
         await removeButton.click()
+        rolesRemoved++
       } else {
+        // Role tag exists but has no remove button (restored role)
         break
       }
 
       roleCount = await roleTags.count()
     }
 
-    // Try to save
-    if (await saveButton.isEnabled()) {
-      await saveButton.click()
+    // Verify at least one role was removed
+    expect(rolesRemoved, 'Expected to remove at least one role').toBeGreaterThan(0)
 
-      // Should show validation error
-      await expect(detailsPage.getByText('User must have at least one role')).toBeVisible()
-    }
+    // Save button should be enabled after changes
+    await expect(saveButton).toBeEnabled()
+
+    // Try to save
+    await saveButton.click()
+
+    // Should show validation error
+    await expect(detailsPage.getByText('User must have at least one role')).toBeVisible()
   })
 })
 
@@ -378,43 +384,43 @@ test.describe('Role Tag Display Variants', () => {
     const detailsPage = page.locator('user-details-page')
     const roleTags = detailsPage.locator('role-tag')
 
-    // Check if there are any role tags
+    // Verify there are role tags
     const count = await roleTags.count()
+    expect(count, 'Expected at least one role tag').toBeGreaterThan(0)
 
-    if (count > 0) {
-      const firstRoleTag = roleTags.first()
+    const firstRoleTag = roleTags.first()
 
-      // Verify the role tag is visible
-      await expect(firstRoleTag).toBeVisible()
+    // Verify the role tag is visible
+    await expect(firstRoleTag).toBeVisible()
 
-      // Verify the role displays text (the displayName)
-      const text = await firstRoleTag.textContent()
-      expect(text?.length).toBeGreaterThan(0)
-    }
+    // Verify the role displays text (the displayName)
+    const text = await firstRoleTag.textContent()
+    expect(text?.length, 'Expected role tag to have display text').toBeGreaterThan(0)
   })
 
   test('should show restore button for removed roles', async ({ page }) => {
     const detailsPage = page.locator('user-details-page')
     const roleTags = detailsPage.locator('role-tag')
 
-    // Get initial role count
+    // Verify there are role tags
     const initialCount = await roleTags.count()
+    expect(initialCount, 'Expected at least one role tag').toBeGreaterThan(0)
 
-    if (initialCount > 0) {
-      // Find a role with remove button
-      const firstRoleTag = roleTags.first()
-      const removeButton = firstRoleTag.locator('button', { hasText: '×' })
+    // Find a role with remove button
+    const firstRoleTag = roleTags.first()
+    const removeButton = firstRoleTag.locator('button', { hasText: '×' })
 
-      if ((await removeButton.count()) > 0) {
-        await removeButton.click()
+    // Verify remove button exists
+    const removeButtonCount = await removeButton.count()
+    expect(removeButtonCount, 'Expected remove button on role tag').toBeGreaterThan(0)
 
-        // Find the role tag that now has restore button (↩)
-        const removedRoleTag = detailsPage.locator('role-tag').locator('button', { hasText: '↩' })
+    await removeButton.click()
 
-        // Should have a restore button
-        await expect(removedRoleTag.first()).toBeVisible()
-      }
-    }
+    // Find the role tag that now has restore button (↩)
+    const removedRoleTag = detailsPage.locator('role-tag').locator('button', { hasText: '↩' })
+
+    // Should have a restore button
+    await expect(removedRoleTag.first()).toBeVisible()
   })
 
   test('should restore a removed role by clicking restore button', async ({ page }) => {
@@ -422,27 +428,28 @@ test.describe('Role Tag Display Variants', () => {
     const roleTags = detailsPage.locator('role-tag')
     const saveButton = detailsPage.getByRole('button', { name: 'Save Changes' })
 
-    // Get initial role count
+    // Verify there are role tags
     const initialCount = await roleTags.count()
+    expect(initialCount, 'Expected at least one role tag').toBeGreaterThan(0)
 
-    if (initialCount > 0) {
-      // Find a role with remove button and remove it
-      const firstRoleTag = roleTags.first()
-      const removeButton = firstRoleTag.locator('button', { hasText: '×' })
+    // Find a role with remove button and remove it
+    const firstRoleTag = roleTags.first()
+    const removeButton = firstRoleTag.locator('button', { hasText: '×' })
 
-      if ((await removeButton.count()) > 0) {
-        await removeButton.click()
+    // Verify remove button exists
+    const removeButtonCount = await removeButton.count()
+    expect(removeButtonCount, 'Expected remove button on role tag').toBeGreaterThan(0)
 
-        // Save should be enabled
-        await expect(saveButton).toBeEnabled()
+    await removeButton.click()
 
-        // Find and click restore button
-        const restoreButton = detailsPage.locator('role-tag').locator('button', { hasText: '↩' }).first()
-        await restoreButton.click()
+    // Save should be enabled
+    await expect(saveButton).toBeEnabled()
 
-        // Save should be disabled again (no net changes)
-        await expect(saveButton).toBeDisabled()
-      }
-    }
+    // Find and click restore button
+    const restoreButton = detailsPage.locator('role-tag').locator('button', { hasText: '↩' }).first()
+    await restoreButton.click()
+
+    // Save should be disabled again (no net changes)
+    await expect(saveButton).toBeDisabled()
   })
 })

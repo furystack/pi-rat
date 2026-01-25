@@ -4,22 +4,18 @@ import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { User } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { type CacheState, createMockUser } from '../../test-utils/user-test-helpers.js'
 import { UsersService } from '../../services/users-service.js'
 import { UserDetailsPage } from './user-details.js'
 
-type CacheState<T> =
-  | { status: 'uninitialized' }
-  | { status: 'loading' }
-  | { status: 'obsolete'; value: T; updatedAt: Date }
-  | { status: 'loaded'; value: T; updatedAt: Date }
-  | { status: 'failed'; error: unknown; updatedAt: Date }
-
-const createMockUser = (username = 'testuser@example.com', roles: User['roles'] = ['admin']): User => ({
-  username,
-  roles,
-  createdAt: '2024-01-15T10:30:00.000Z',
-  updatedAt: '2024-01-20T14:45:00.000Z',
-})
+/**
+ * Helper to get action buttons (excluding buttons inside role-tags)
+ */
+const getActionButtons = (page: Element | null | undefined) => {
+  const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
+  // Filter out buttons that are inside role-tag elements
+  return allButtons.filter((btn) => !btn.closest('role-tag'))
+}
 
 describe('UserDetailsPage', () => {
   let injector: Injector
@@ -462,15 +458,6 @@ describe('UserDetailsPage', () => {
   })
 
   describe('save functionality', () => {
-    /**
-     * Helper to get action buttons (excluding buttons inside role-tags)
-     */
-    const getActionButtons = (page: Element | null | undefined) => {
-      const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
-      // Filter out buttons that are inside role-tag elements
-      return allButtons.filter((btn) => !btn.closest('role-tag'))
-    }
-
     it('should call updateUser when Save Changes is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -617,15 +604,6 @@ describe('UserDetailsPage', () => {
   })
 
   describe('validation', () => {
-    /**
-     * Helper to get action buttons (excluding buttons inside role-tags)
-     */
-    const getActionButtons = (page: Element | null | undefined) => {
-      const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
-      // Filter out buttons that are inside role-tag elements
-      return allButtons.filter((btn) => !btn.closest('role-tag'))
-    }
-
     it('should show validation error when trying to save with no roles', async () => {
       userObservable.setValue({
         status: 'loaded',

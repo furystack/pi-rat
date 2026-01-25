@@ -1,16 +1,10 @@
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
+import type { User } from 'common'
 import { describe, expect, it, vi } from 'vitest'
+import { createMockUser } from '../test-utils/user-test-helpers.js'
 import { UsersService } from './users-service.js'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
-import type { User } from 'common'
-
-const createMockUser = (username = 'testuser@example.com', roles: User['roles'] = ['admin']): User => ({
-  username,
-  roles,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-})
 
 describe('UsersService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {

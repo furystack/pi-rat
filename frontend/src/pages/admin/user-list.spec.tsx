@@ -3,22 +3,9 @@ import { createComponent, initializeShadeRoot, LocationService } from '@furystac
 import { ObservableValue } from '@furystack/utils'
 import type { User } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { type CacheState, createMockUser } from '../../test-utils/user-test-helpers.js'
 import { UsersService } from '../../services/users-service.js'
 import { UserListPage } from './user-list.js'
-
-type CacheState<T> =
-  | { status: 'uninitialized' }
-  | { status: 'loading' }
-  | { status: 'obsolete'; value: T; updatedAt: Date }
-  | { status: 'loaded'; value: T; updatedAt: Date }
-  | { status: 'failed'; error: unknown; updatedAt: Date }
-
-const createMockUser = (username = 'testuser@example.com', roles: User['roles'] = ['admin']): User => ({
-  username,
-  roles,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-})
 
 describe('UserListPage', () => {
   let injector: Injector
