@@ -376,6 +376,80 @@ test('User can create, customize, and delete a resource', async ({ page }) => {
 - Use unique identifiers (timestamps, UUIDs) for test data
 - Helper functions should be local to the test file unless truly reusable across multiple test files
 
+### Parallel Test Execution Between Projects
+
+When tests run in parallel across different browser projects (e.g., Chromium, Firefox), they share the same backend state. To avoid conflicts, **create project-specific resources** for each browser.
+
+**Pattern: Project-Specific Test Users**
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { login, logout, registerUser } from './helpers.js'
+
+const TEST_USER_PASSWORD = 'testpassword123'
+
+// Generate unique username per project (browser)
+const getTestUserName = (projectName: string) => `test-user-${projectName}@test.com`
+
+test.describe('User Management', () => {
+  test('Admin can edit user roles', async ({ page }, testInfo) => {
+    const projectName = testInfo.project.name // 'chromium', 'firefox', etc.
+    const testUserName = getTestUserName(projectName)
+
+    // Register the project-specific test user inside the test
+    await registerUser(page, testUserName, TEST_USER_PASSWORD)
+    await logout(page)
+
+    // Login as admin
+    await login(page)
+
+    // Navigate to users list and find the project-specific user
+    await navigateToUsersSettings(page)
+    const testUserRow = page.locator('tbody tr', { hasText: testUserName })
+    await testUserRow.getByRole('button', { name: 'Edit' }).click()
+
+    // Perform operations on the project-specific user
+    // ...
+  })
+})
+```
+
+**Note:** Register resources inside the test rather than in `beforeEach` to avoid conflicts when multiple tests would try to create the same resource.
+
+**Key Guidelines:**
+
+1. **Use `testInfo.project.name`** to get the current project (browser) name
+2. **Create unique resource names** by incorporating the project name (e.g., `role-tester-chromium@test.com`)
+3. **Register/create resources in `beforeEach` or `beforeAll`** hooks
+4. **Operate on project-specific resources** instead of shared resources
+5. **Expect clean application state** - don't handle "already exists" errors gracefully
+
+**When to Use This Pattern:**
+
+- Tests that create, modify, or delete shared resources (users, files, settings)
+- Tests that depend on specific resource state
+- Any test that could conflict with the same test running in another browser
+
+**Common Resource Types to Isolate:**
+
+- Users: `test-user-${projectName}@test.com`
+- Files/Folders: `test-folder-${projectName}`
+- Settings/Configs: Use project-specific identifiers
+- Any entity with unique constraints
+
+**Available Helpers in `e2e/helpers.ts`:**
+
+```typescript
+// Register a new user
+export const registerUser = async (page: Page, username: string, password: string) => { ... }
+
+// Login with credentials
+export const login = async (page: Page, username?: string, password?: string) => { ... }
+
+// Logout current user
+export const logout = async (page: Page) => { ... }
+```
+
 ## Unit Testing Best Practices
 
 ### Component Testing
