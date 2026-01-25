@@ -48,6 +48,28 @@ const settingsRoutes = [
     ),
   },
   {
+    url: '/app-settings/users/:username',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { UserDetailsPage } = await import('./user-details.js')
+          return <UserDetailsPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/app-settings/users',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { UserListPage } = await import('./user-list.js')
+          return <UserListPage />
+        }}
+      />
+    ),
+  },
+  {
     url: '/app-settings',
     component: () => (
       <PiRatLazyLoad
@@ -102,6 +124,9 @@ export const AppSettingsPage = Shade({
           </SettingsMenuSection>
           <SettingsMenuSection title="AI">
             <SettingsMenuItem icon="🤖" label="Ollama Settings" href="/app-settings/ai" />
+          </SettingsMenuSection>
+          <SettingsMenuSection title="Identity">
+            <SettingsMenuItem icon="👥" label="Users" href="/app-settings/users" />
           </SettingsMenuSection>
         </SettingsSidebar>
 
