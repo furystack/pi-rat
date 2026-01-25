@@ -6,7 +6,9 @@ import { getAllRoleDefinitions } from 'common'
 import { RoleTag } from '../../components/role-tag/index.js'
 import { UsersService } from '../../services/users-service.js'
 
-type UserDetailsPageProps = Record<string, never>
+type UserDetailsPageProps = {
+  username: string
+}
 
 type RoleChange = {
   originalRoles: Roles
@@ -15,14 +17,12 @@ type RoleChange = {
 
 export const UserDetailsPage = Shade<UserDetailsPageProps>({
   shadowDomName: 'user-details-page',
-  render: ({ injector, useObservable, useDisposable }) => {
+  render: ({ props, injector, useObservable, useDisposable }) => {
     const usersService = injector.getInstance(UsersService)
     const locationService = injector.getInstance(LocationService)
     const notyService = injector.getInstance(NotyService)
 
-    // Extract username from URL
-    const pathParts = window.location.pathname.split('/')
-    const username = decodeURIComponent(pathParts[pathParts.length - 1])
+    const { username } = props
 
     const [userState] = useObservable('user', usersService.getUserAsObservable(username))
 
@@ -64,37 +64,45 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     }
 
     const addRole = (roleName: Roles[number]) => {
-      if (!roleChange) return
-      if (roleChange.currentRoles.includes(roleName)) return
+      if (userState.status !== 'loaded') return
+      const current = roleChange?.currentRoles ?? userState.value.roles
+      const original = roleChange?.originalRoles ?? userState.value.roles
+      if (current.includes(roleName)) return
       roleChangeObservable.setValue({
-        ...roleChange,
-        currentRoles: [...roleChange.currentRoles, roleName],
+        originalRoles: [...original],
+        currentRoles: [...current, roleName],
       })
       validationErrorObservable.setValue(null)
     }
 
     const removeRole = (roleName: Roles[number]) => {
-      if (!roleChange) return
+      if (userState.status !== 'loaded') return
+      const current = roleChange?.currentRoles ?? userState.value.roles
+      const original = roleChange?.originalRoles ?? userState.value.roles
       roleChangeObservable.setValue({
-        ...roleChange,
-        currentRoles: roleChange.currentRoles.filter((r) => r !== roleName),
+        originalRoles: [...original],
+        currentRoles: current.filter((r) => r !== roleName),
       })
     }
 
     const restoreRole = (roleName: Roles[number]) => {
-      if (!roleChange) return
-      if (roleChange.currentRoles.includes(roleName)) return
+      if (userState.status !== 'loaded') return
+      const current = roleChange?.currentRoles ?? userState.value.roles
+      const original = roleChange?.originalRoles ?? userState.value.roles
+      if (current.includes(roleName)) return
       roleChangeObservable.setValue({
-        ...roleChange,
-        currentRoles: [...roleChange.currentRoles, roleName],
+        originalRoles: [...original],
+        currentRoles: [...current, roleName],
       })
       validationErrorObservable.setValue(null)
     }
 
     const getRoleVariant = (roleName: Roles[number]): 'default' | 'added' | 'removed' => {
-      if (!roleChange) return 'default'
-      const isInOriginal = roleChange.originalRoles.includes(roleName)
-      const isInCurrent = roleChange.currentRoles.includes(roleName)
+      if (userState.status !== 'loaded') return 'default'
+      const original = roleChange?.originalRoles ?? userState.value.roles
+      const current = roleChange?.currentRoles ?? userState.value.roles
+      const isInOriginal = original.includes(roleName)
+      const isInCurrent = current.includes(roleName)
 
       if (isInOriginal && isInCurrent) return 'default'
       if (!isInOriginal && isInCurrent) return 'added'
@@ -103,18 +111,22 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     }
 
     const hasChanges = () => {
-      if (!roleChange) return false
-      const originalSorted = [...roleChange.originalRoles].sort()
-      const currentSorted = [...roleChange.currentRoles].sort()
+      if (userState.status !== 'loaded') return false
+      const original = roleChange?.originalRoles ?? userState.value.roles
+      const current = roleChange?.currentRoles ?? userState.value.roles
+      const originalSorted = [...original].sort()
+      const currentSorted = [...current].sort()
       if (originalSorted.length !== currentSorted.length) return true
       return originalSorted.some((role, idx) => role !== currentSorted[idx])
     }
 
     const handleSave = async () => {
-      if (!roleChange || userState.status !== 'loaded') return
+      if (userState.status !== 'loaded') return
+
+      const current = roleChange?.currentRoles ?? userState.value.roles
 
       // Validation
-      if (roleChange.currentRoles.length === 0) {
+      if (current.length === 0) {
         validationErrorObservable.setValue('User must have at least one role')
         return
       }
@@ -125,7 +137,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
       try {
         await usersService.updateUser(username, {
           username: userState.value.username,
-          roles: roleChange.currentRoles,
+          roles: current,
         })
 
         notyService.emit('onNotyAdded', {
@@ -136,8 +148,8 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
 
         // Update the original roles to reflect saved state
         roleChangeObservable.setValue({
-          originalRoles: [...roleChange.currentRoles],
-          currentRoles: [...roleChange.currentRoles],
+          originalRoles: [...current],
+          currentRoles: [...current],
         })
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to save user'
@@ -162,19 +174,20 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     }
 
     const allRoles = getAllRoleDefinitions()
-    const availableRolesToAdd = roleChange
-      ? allRoles.filter((role) => !roleChange.currentRoles.includes(role.name))
-      : []
+
+    // Get current roles from roleChange if available, otherwise from userState
+    const currentRoles = roleChange?.currentRoles ?? (userState.status === 'loaded' ? userState.value.roles : [])
+    const originalRoles = roleChange?.originalRoles ?? (userState.status === 'loaded' ? userState.value.roles : [])
+
+    const availableRolesToAdd = allRoles.filter((role) => !currentRoles.includes(role.name))
 
     // Get all roles to display (current + removed)
-    const rolesToDisplay = roleChange
-      ? [
-          ...new Set([
-            ...roleChange.originalRoles, // Include original roles (may be removed)
-            ...roleChange.currentRoles, // Include current roles (may be added)
-          ]),
-        ]
-      : []
+    const rolesToDisplay = [
+      ...new Set([
+        ...originalRoles, // Include original roles (may be removed)
+        ...currentRoles, // Include current roles (may be added)
+      ]),
+    ]
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
@@ -185,7 +198,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           <h2 style={{ margin: '0', color: 'var(--theme-text-primary)' }}>User Details</h2>
         </div>
 
-        {(userState.status === 'loading' || userState.status === 'uninitialized') && (
+        {(userState.status === 'loading' || userState.status === 'uninitialized' || userState.status === 'obsolete') && (
           <Paper elevation={1} style={{ padding: '24px' }}>
             <p style={{ color: 'var(--theme-text-secondary)' }}>Loading user...</p>
           </Paper>
@@ -200,7 +213,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           </Paper>
         )}
 
-        {userState.status === 'loaded' && roleChange && (
+        {userState.status === 'loaded' && (
           <>
             <Paper elevation={1} style={{ padding: '24px' }}>
               <h3 style={{ marginTop: '0', marginBottom: '16px', color: 'var(--theme-text-primary)' }}>

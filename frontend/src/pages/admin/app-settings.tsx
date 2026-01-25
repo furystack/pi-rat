@@ -49,11 +49,11 @@ const settingsRoutes = [
   },
   {
     url: '/app-settings/users/:username',
-    component: () => (
+    component: ({ match }) => (
       <PiRatLazyLoad
         component={async () => {
           const { UserDetailsPage } = await import('./user-details.js')
-          return <UserDetailsPage />
+          return <UserDetailsPage username={match.params.username} />
         }}
       />
     ),
