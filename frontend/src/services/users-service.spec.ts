@@ -219,7 +219,11 @@ describe('UsersService', () => {
   describe('updateUser', () => {
     it('should update user roles', async () => {
       const updatedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
-      const mockCall = vi.fn().mockResolvedValue({ result: updatedUser })
+      const reloadedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
+      const mockCall = vi
+        .fn()
+        .mockResolvedValueOnce({ result: updatedUser }) // 1st: updateUser PATCH
+        .mockResolvedValueOnce({ result: reloadedUser }) // 2nd: reload triggered by updateUser
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
@@ -238,18 +242,24 @@ describe('UsersService', () => {
           body,
         })
         expect(result).toEqual(updatedUser)
+
+        // Wait for the async reload triggered by updateUser to complete
+        await vi.waitFor(() => {
+          expect(mockCall).toHaveBeenCalledTimes(2)
+        })
+        await new Promise((resolve) => setTimeout(resolve, 0))
       })
     })
 
     it('should invalidate cache after update', async () => {
       const originalUser = createMockUser('testuser@example.com', ['admin'])
       const updatedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
-      const refetchedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
+      const reloadedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
       const mockCall = vi
         .fn()
-        .mockResolvedValueOnce({ result: originalUser })
-        .mockResolvedValueOnce({ result: updatedUser })
-        .mockResolvedValueOnce({ result: refetchedUser })
+        .mockResolvedValueOnce({ result: originalUser }) // 1st: initial getUser
+        .mockResolvedValueOnce({ result: updatedUser }) // 2nd: updateUser PATCH
+        .mockResolvedValueOnce({ result: reloadedUser }) // 3rd: reload triggered by updateUser
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
@@ -263,10 +273,19 @@ describe('UsersService', () => {
         }
         await service.updateUser('testuser@example.com', body)
 
+        // Wait for the async reload triggered by updateUser to complete
+        await vi.waitFor(() => {
+          expect(mockCall).toHaveBeenCalledTimes(3)
+        })
+        // Flush pending microtasks to ensure reload fully completes
+        await new Promise((resolve) => setTimeout(resolve, 0))
+
+        // The reload already populated the cache with fresh data
         const result = await service.getUser('testuser@example.com')
 
+        // No additional API call needed - data comes from reload cache
         expect(mockCall).toHaveBeenCalledTimes(3)
-        expect(result).toEqual(refetchedUser)
+        expect(result).toEqual(reloadedUser)
       })
     })
 
@@ -276,15 +295,17 @@ describe('UsersService', () => {
         entries: [createMockUser('testuser@example.com', ['admin'])],
       }
       const updatedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
+      const reloadedUser = createMockUser('testuser@example.com', ['admin', 'viewer'])
       const updatedMockUsers = {
         count: 1,
         entries: [updatedUser],
       }
       const mockCall = vi
         .fn()
-        .mockResolvedValueOnce({ result: mockUsers })
-        .mockResolvedValueOnce({ result: updatedUser })
-        .mockResolvedValueOnce({ result: updatedMockUsers })
+        .mockResolvedValueOnce({ result: mockUsers }) // 1st: findUsers
+        .mockResolvedValueOnce({ result: updatedUser }) // 2nd: updateUser PATCH
+        .mockResolvedValueOnce({ result: reloadedUser }) // 3rd: reload triggered by updateUser
+        .mockResolvedValueOnce({ result: updatedMockUsers }) // 4th: findUsers after flush
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
@@ -297,9 +318,16 @@ describe('UsersService', () => {
           roles: ['admin', 'viewer'],
         })
 
+        // Wait for the async reload triggered by updateUser to complete
+        await vi.waitFor(() => {
+          expect(mockCall).toHaveBeenCalledTimes(3)
+        })
+        // Flush pending microtasks to ensure reload fully completes
+        await new Promise((resolve) => setTimeout(resolve, 0))
+
         await service.findUsers({ top: 10 })
 
-        expect(mockCall).toHaveBeenCalledTimes(3)
+        expect(mockCall).toHaveBeenCalledTimes(4)
       })
     })
 
