@@ -76,7 +76,7 @@ interface FfprobeFormat {
   size?: number | undefined
   bit_rate?: number | undefined
   probe_score?: number | undefined
-  tags?: Record<string, string | number> | undefined
+  tags?: unknown
 }
 
 export type ChapterData = {

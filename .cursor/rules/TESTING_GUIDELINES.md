@@ -287,6 +287,169 @@ const errorNoty = page.locator('shade-noty').first()
 await expect(errorNoty).toBeVisible()
 ```
 
+### User Journey Test Pattern
+
+E2E tests should follow user journeys, not component isolation. Each test should simulate a complete user workflow from start to finish.
+
+**Structure:**
+
+- One test per complete user workflow
+- Test from login to logical endpoint
+- Clean up any created/modified data at the end
+- Use helper functions for reusable steps within the test file
+
+**Good Example - User Journey:**
+
+```typescript
+test('Admin can navigate to users, edit roles, and verify persistence', async ({ page }) => {
+  // 1. Login as admin
+  await login(page)
+
+  // 2. Navigate to app settings, verify Users menu
+  await navigateToAppSettings(page)
+  await expect(page.getByText('Users')).toBeVisible()
+
+  // 3. Click Users, verify table structure
+  await page.getByText('Users').click()
+  await verifyUsersTableStructure(page)
+
+  // 4. Open user, record initial state
+  const initialRoleCount = await page.locator('role-tag').count()
+
+  // 5. Make changes (add a role)
+  await addRoleToUser(page)
+  await page.getByRole('button', { name: 'Save' }).click()
+
+  // 6. Reload and verify persistence
+  await page.reload()
+  await expect(page.locator('role-tag')).toHaveCount(initialRoleCount + 1)
+
+  // 7. Cleanup - restore original state
+  await removeRoleFromUser(page)
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.locator('role-tag')).toHaveCount(initialRoleCount)
+})
+```
+
+**Bad Example - Fragmented Tests:**
+
+```typescript
+// ❌ Don't split into many small tests - causes repeated setup and state issues
+test.describe('User Management', () => {
+  test('should display Users menu', ...)
+  test('should navigate to users list', ...)
+  test('should display table headers', ...)
+  test('should display at least one user', ...)
+  test('should open user details', ...)
+  test('should add a role', ...)
+  test('should save changes', ...)
+})
+```
+
+**Cleanup Pattern:**
+
+```typescript
+test('User can create, customize, and delete a resource', async ({ page }) => {
+  await login(page)
+
+  // Record initial state if needed
+  const initialCount = await page.locator('.resource').count()
+
+  // Create resource (use unique identifier)
+  const resourceName = `test-${Date.now()}`
+  await createResource(page, resourceName)
+
+  // Perform actions and verifications
+  await customizeResource(page, resourceName)
+  await verifyResource(page, resourceName)
+
+  // Cleanup - restore original state
+  await deleteResource(page, resourceName)
+  await expect(page.locator('.resource')).toHaveCount(initialCount)
+})
+```
+
+**Key Principles:**
+
+- Tests are self-contained and don't depend on other tests
+- Tests clean up after themselves to avoid state accumulation
+- Use unique identifiers (timestamps, UUIDs) for test data
+- Helper functions should be local to the test file unless truly reusable across multiple test files
+
+### Parallel Test Execution Between Projects
+
+When tests run in parallel across different browser projects (e.g., Chromium, Firefox), they share the same backend state. To avoid conflicts, **create project-specific resources** for each browser.
+
+**Pattern: Project-Specific Test Users**
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { login, logout, registerUser } from './helpers.js'
+
+const TEST_USER_PASSWORD = 'testpassword123'
+
+// Generate unique username per project (browser)
+const getTestUserName = (projectName: string) => `test-user-${projectName}@test.com`
+
+test.describe('User Management', () => {
+  test('Admin can edit user roles', async ({ page }, testInfo) => {
+    const projectName = testInfo.project.name // 'chromium', 'firefox', etc.
+    const testUserName = getTestUserName(projectName)
+
+    // Register the project-specific test user inside the test
+    await registerUser(page, testUserName, TEST_USER_PASSWORD)
+    await logout(page)
+
+    // Login as admin
+    await login(page)
+
+    // Navigate to users list and find the project-specific user
+    await navigateToUsersSettings(page)
+    const testUserRow = page.locator('tbody tr', { hasText: testUserName })
+    await testUserRow.getByRole('button', { name: 'Edit' }).click()
+
+    // Perform operations on the project-specific user
+    // ...
+  })
+})
+```
+
+**Note:** Register resources inside the test rather than in `beforeEach` to avoid conflicts when multiple tests would try to create the same resource.
+
+**Key Guidelines:**
+
+1. **Use `testInfo.project.name`** to get the current project (browser) name
+2. **Create unique resource names** by incorporating the project name (e.g., `role-tester-chromium@test.com`)
+3. **Register/create resources in `beforeEach` or `beforeAll`** hooks
+4. **Operate on project-specific resources** instead of shared resources
+5. **Expect clean application state** - don't handle "already exists" errors gracefully
+
+**When to Use This Pattern:**
+
+- Tests that create, modify, or delete shared resources (users, files, settings)
+- Tests that depend on specific resource state
+- Any test that could conflict with the same test running in another browser
+
+**Common Resource Types to Isolate:**
+
+- Users: `test-user-${projectName}@test.com`
+- Files/Folders: `test-folder-${projectName}`
+- Settings/Configs: Use project-specific identifiers
+- Any entity with unique constraints
+
+**Available Helpers in `e2e/helpers.ts`:**
+
+```typescript
+// Register a new user
+export const registerUser = async (page: Page, username: string, password: string) => { ... }
+
+// Login with credentials
+export const login = async (page: Page, username?: string, password?: string) => { ... }
+
+// Logout current user
+export const logout = async (page: Page) => { ... }
+```
+
 ## Unit Testing Best Practices
 
 ### Component Testing

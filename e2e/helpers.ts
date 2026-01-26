@@ -3,11 +3,15 @@ import { expect } from '@playwright/test'
 import { readFile } from 'fs/promises'
 import { basename } from 'path'
 
-export const assertAndDismissNoty = async (page: Page, text: string) => {
+export const assertAndDismissNoty = async (page: Page, text: string, options?: { timeout?: number }) => {
+  const timeout = options?.timeout ?? 30_000
   const noty = page.locator('shade-noty', { hasText: text })
+
+  await expect(noty).toBeVisible({ timeout })
+
   const closeNoty = noty.locator('button.dismissNoty')
   await closeNoty.click()
-  await noty.waitFor({ state: 'detached' })
+  await expect(noty).not.toBeVisible()
 }
 
 export const login = async (page: Page, username = 'testuser@gmail.com', password = 'password') => {
@@ -83,6 +87,46 @@ export const navigateToAppSettings = async (page: Page) => {
  * @deprecated Use navigateToAppSettings instead
  */
 export const navigateToAdminSettings = navigateToAppSettings
+
+export const navigateToUsersSettings = async (page: Page) => {
+  await navigateToAppSettings(page)
+
+  // Click on Users menu item in the Identity section
+  await page.getByText('Users').click()
+
+  // Wait for URL to change to users list
+  await page.waitForURL(/\/app-settings\/users/)
+
+  // Verify we're on the users list page
+  const usersListPage = page.locator('user-list-page')
+  await expect(usersListPage).toBeVisible({ timeout: 10000 })
+}
+
+export const registerUser = async (page: Page, username: string, password: string) => {
+  await page.goto('/')
+
+  // Navigate to registration page
+  const createAccountButton = page.locator('button', { hasText: 'Create Account' })
+  await expect(createAccountButton).toBeVisible()
+  await createAccountButton.click()
+
+  // Fill registration form
+  const registerForm = page.locator('shade-register form')
+  await expect(registerForm).toBeVisible()
+
+  const usernameInput = registerForm.locator('input[name="userName"]')
+  const passwordInput = registerForm.locator('input[name="password"]')
+  const confirmPasswordInput = registerForm.locator('input[name="confirmPassword"]')
+  const createAccountSubmitButton = page.locator('shade-register button', { hasText: 'Create Account' })
+
+  await usernameInput.fill(username)
+  await passwordInput.fill(password)
+  await confirmPasswordInput.fill(password)
+  await createAccountSubmitButton.click()
+
+  // Should be logged in automatically after successful registration
+  await assertAndDismissNoty(page, 'Account created successfully')
+}
 
 export const uploadFile = async (page: Page, filePath: string, mime: string) => {
   const fileContent = await readFile(filePath, { encoding: 'utf-8' })

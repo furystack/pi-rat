@@ -1,5 +1,207 @@
 # Frontend Development Patterns
 
+## Data Access Patterns
+
+### Service-Based Data Access with Caching
+
+**Never query entities directly from components.** Always use a service that abstracts caching and data fetching.
+
+```typescript
+// ✅ Good - Service with caching
+@Injectable({ lifetime: 'singleton' })
+export class UsersService {
+  @Injected(IdentityApiClient)
+  declare private readonly identityApiClient: IdentityApiClient
+
+  // Cache for individual entities
+  public userCache = new Cache({
+    capacity: 100,
+    load: async (username: string) => {
+      const { result } = await this.identityApiClient.call({
+        method: 'GET',
+        action: '/users/:id',
+        url: { id: username },
+        query: {},
+      })
+      return result
+    },
+  })
+
+  // Cache for list queries
+  public userQueryCache = new Cache({
+    capacity: 10,
+    load: async (findOptions: FindOptions<User, Array<keyof User>>) => {
+      const { result } = await this.identityApiClient.call({
+        method: 'GET',
+        action: '/users',
+        query: { findOptions },
+      })
+
+      // Populate individual cache from list results
+      result.entries.forEach((entry) => {
+        this.userCache.setExplicitValue({
+          loadArgs: [entry.username],
+          value: { status: 'loaded', value: entry, updatedAt: new Date() },
+        })
+      })
+
+      return result
+    },
+  })
+
+  // Expose cache methods
+  public getUser = this.userCache.get.bind(this.userCache)
+  public getUserAsObservable = this.userCache.getObservable.bind(this.userCache)
+  public findUsers = this.userQueryCache.get.bind(this.userQueryCache)
+  public findUsersAsObservable = this.userQueryCache.getObservable.bind(this.userQueryCache)
+
+  // Mutations invalidate cache
+  public updateUser = async (username: string, body: { username: string; roles: Roles }) => {
+    const { result } = await this.identityApiClient.call({
+      method: 'PATCH',
+      action: '/users/:id',
+      url: { id: username },
+      body,
+    })
+    this.userCache.remove(username)
+    this.userQueryCache.flushAll()
+    return result
+  }
+}
+
+// ❌ Bad - Direct API call in component
+const MyComponent = Shade({
+  render: ({ injector }) => {
+    const apiClient = injector.getInstance(IdentityApiClient)
+    // Don't do this - no caching, duplicate requests
+    const fetchUser = async () => {
+      const { result } = await apiClient.call({ method: 'GET', action: '/users/:id', ... })
+    }
+  }
+})
+
+// ✅ Good - Use service with observable
+const MyComponent = Shade({
+  render: ({ injector, useObservable }) => {
+    const usersService = injector.getInstance(UsersService)
+    const [userState] = useObservable('user', usersService.getUserAsObservable(username))
+    
+    // Handle cache states
+    if (userState.status === 'loading') return <div>Loading...</div>
+    if (userState.status === 'failed') return <div>Error: {userState.error}</div>
+    if (userState.status === 'loaded') return <div>{userState.value.username}</div>
+  }
+})
+```
+
+### Cache Invalidation on Mutations
+
+Always invalidate relevant caches after mutations:
+
+```typescript
+// ✅ Good - Invalidate after mutation
+public deleteUser = async (username: string) => {
+  await this.identityApiClient.call({
+    method: 'DELETE',
+    action: '/users/:id',
+    url: { id: username },
+  })
+  this.userCache.remove(username)      // Remove specific entry
+  this.userQueryCache.flushAll()       // Invalidate list queries
+}
+```
+
+## Props & State Architecture
+
+### Keep Props Simple
+
+Avoid prop drilling and complex prop passing through many layers. Use the injector for shared state.
+
+```typescript
+// ❌ Bad - Prop drilling
+const GrandparentComponent = Shade({
+  render: () => {
+    const user = /* ... */
+    const onUpdate = /* ... */
+    const permissions = /* ... */
+    
+    return <ParentComponent user={user} onUpdate={onUpdate} permissions={permissions} />
+  }
+})
+
+const ParentComponent = Shade<{ user: User; onUpdate: () => void; permissions: Permissions }>({
+  render: ({ props }) => {
+    // Just passing through...
+    return <ChildComponent user={props.user} onUpdate={props.onUpdate} permissions={props.permissions} />
+  }
+})
+
+// ✅ Good - Use injector for shared state
+@Injectable({ lifetime: 'singleton' })
+export class UserEditStateService {
+  public currentUser = new ObservableValue<User | null>(null)
+  public permissions = new ObservableValue<Permissions | null>(null)
+  
+  public async loadUser(username: string) { /* ... */ }
+  public async updateUser(changes: Partial<User>) { /* ... */ }
+}
+
+const ChildComponent = Shade({
+  render: ({ injector, useObservable }) => {
+    const stateService = injector.getInstance(UserEditStateService)
+    const [user] = useObservable('user', stateService.currentUser)
+    // Direct access to state, no prop drilling
+  }
+})
+```
+
+### When to Use Injectable State Services
+
+Create an injectable service when:
+- State needs to be shared across multiple components
+- Logic is becoming complex with multiple observables
+- You find yourself passing the same props through 3+ component levels
+- Multiple components need to trigger the same mutations
+
+```typescript
+// ✅ Good - Complex state in service
+@Injectable({ lifetime: 'singleton' })
+export class RoleEditorStateService {
+  public originalRoles = new ObservableValue<Roles>([])
+  public currentRoles = new ObservableValue<Roles>([])
+  public isModified = new ObservableValue(false)
+  
+  public addRole(role: Roles[number]) {
+    const current = this.currentRoles.getValue()
+    if (!current.includes(role)) {
+      this.currentRoles.setValue([...current, role])
+      this.updateModifiedState()
+    }
+  }
+  
+  public removeRole(role: Roles[number]) { /* ... */ }
+  
+  private updateModifiedState() {
+    const original = this.originalRoles.getValue()
+    const current = this.currentRoles.getValue()
+    this.isModified.setValue(
+      original.length !== current.length || 
+      !original.every(r => current.includes(r))
+    )
+  }
+}
+```
+
+### Props Guidelines
+
+| Scenario | Approach |
+|----------|----------|
+| Simple display data | Props are fine |
+| Callbacks for parent | Props are fine |
+| Data needed 3+ levels deep | Use injectable service |
+| Complex interdependent state | Use injectable service |
+| Shared across sibling components | Use injectable service |
+
 ## Routing
 
 ### Route Definition
@@ -25,15 +227,49 @@ export const myRoute = {
 export const myRoutes = [myRoute] as const
 ```
 
-### Navigation & Integration
+### Navigation
+
+**Always use `navigateToRoute()` for programmatic navigation.** Never manipulate `window.history` or `LocationService` directly in components.
 
 ```typescript
-// ✅ Always use navigateToRoute()
+// ✅ Good - Use navigateToRoute helper
 import { navigateToRoute } from '../navigate-to-route.js'
-import { myRoute } from './routes/my-routes.js'
+import { userDetailsRoute } from './routes/user-routes.js'
 
-onclick={() => navigateToRoute(injector, myRoute, { param: 'value' })}
+const MyComponent = Shade({
+  render: ({ injector }) => {
+    const handleUserClick = (username: string) => {
+      navigateToRoute(injector, userDetailsRoute, { username })
+    }
+    
+    return <button onclick={() => handleUserClick('john')}>View User</button>
+  }
+})
 
+// ❌ Bad - Direct history/location manipulation
+const MyComponent = Shade({
+  render: ({ injector }) => {
+    const locationService = injector.getInstance(LocationService)
+    
+    const handleUserClick = (username: string) => {
+      // Don't do this - bypasses route system, no type safety
+      window.history.pushState({}, '', `/users/${username}`)
+      locationService.updateState()
+    }
+  }
+})
+```
+
+### Why Use navigateToRoute
+
+1. **Type safety** - Route params are type-checked at compile time
+2. **Centralized routes** - Routes defined in one place, referenced everywhere
+3. **URL compilation** - Handles path-to-regexp compilation automatically
+4. **Consistency** - Same pattern across the codebase
+
+### Integration
+
+```typescript
 // Add routes to body.tsx
 import { myRoutes } from './routes/my-routes.js'
 

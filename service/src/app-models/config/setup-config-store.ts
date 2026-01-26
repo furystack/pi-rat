@@ -52,6 +52,7 @@ export const setupConfig = async (injector: Injector) => {
   })
 
   getRepository(injector).createDataSet(Config, 'id', {
+    authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeUpdate: withRole('admin'),
     authorizeRemove: withRole('admin'),

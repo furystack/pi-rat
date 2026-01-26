@@ -1,106 +1,113 @@
 import { expect, test } from '@playwright/test'
 import { login, navigateToUserSettings } from './helpers.js'
 
-test('User Settings Navigation', async ({ page }) => {
-  await page.goto('/')
-  await login(page)
+test.describe('User Settings', () => {
+  test('User can view profile, verify settings page structure, and interact with password form', async ({ page }) => {
+    // ============================================
+    // STEP 1: Login and navigate to user settings
+    // ============================================
+    await page.goto('/')
+    await login(page)
+    await navigateToUserSettings(page)
 
-  await navigateToUserSettings(page)
+    // ============================================
+    // STEP 2: Verify page structure and heading
+    // ============================================
+    const settingsHeading = page.locator('h1', { hasText: 'User Settings' })
+    await expect(settingsHeading).toBeVisible()
 
-  const settingsHeading = page.locator('h1', { hasText: 'User Settings' })
-  await expect(settingsHeading).toBeVisible()
+    // Verify Profile section is visible
+    const profileSection = page.locator('h3', { hasText: 'Profile' })
+    await expect(profileSection).toBeVisible()
 
-  // Verify Profile section is visible
-  const profileSection = page.locator('h3', { hasText: 'Profile' })
-  await expect(profileSection).toBeVisible()
+    // Verify Security section is visible
+    const securitySection = page.locator('h3', { hasText: 'Security' })
+    await expect(securitySection).toBeVisible()
 
-  // Verify Security section is visible
-  const securitySection = page.locator('h3', { hasText: 'Security' })
-  await expect(securitySection).toBeVisible()
+    // ============================================
+    // STEP 3: Verify user profile information display
+    // ============================================
+    const profileContainer = profileSection.locator('..') // Parent element
 
-  // Verify password change form is present
-  const passwordForm = page.locator('form[data-password-reset-form]')
-  await expect(passwordForm).toBeVisible()
+    // Check that username is displayed
+    const usernameLabel = profileContainer.locator('text=Username')
+    await expect(usernameLabel).toBeVisible()
 
-  // Verify form inputs are present
-  const currentPasswordInput = passwordForm.locator('input[name="currentPassword"]')
-  await expect(currentPasswordInput).toBeVisible()
+    const usernameValue = profileContainer.locator('text=testuser@gmail.com')
+    await expect(usernameValue).toBeVisible()
 
-  const newPasswordInput = passwordForm.locator('input[name="newPassword"]')
-  await expect(newPasswordInput).toBeVisible()
+    // Check that roles are displayed
+    const rolesLabel = profileContainer.locator('text=Roles')
+    await expect(rolesLabel).toBeVisible()
 
-  const confirmPasswordInput = passwordForm.locator('input[name="confirmPassword"]')
-  await expect(confirmPasswordInput).toBeVisible()
+    // The test user should have admin role
+    const adminRole = profileContainer.locator('text=admin')
+    await expect(adminRole).toBeVisible()
 
-  const updateButton = passwordForm.getByRole('button', { name: /update password/i })
-  await expect(updateButton).toBeVisible()
-})
+    // ============================================
+    // STEP 4: Verify password reset form structure
+    // ============================================
+    const passwordForm = page.locator('form[data-password-reset-form]')
+    await expect(passwordForm).toBeVisible()
 
-test('Password Reset Basic Flow', async ({ page }) => {
-  await page.goto('/')
-  await login(page)
+    const currentPasswordInput = passwordForm.locator('input[name="currentPassword"]')
+    const newPasswordInput = passwordForm.locator('input[name="newPassword"]')
+    const confirmPasswordInput = passwordForm.locator('input[name="confirmPassword"]')
+    const updateButton = passwordForm.getByRole('button', { name: /update password/i })
 
-  // Navigate to user settings
-  await navigateToUserSettings(page)
+    await expect(currentPasswordInput).toBeVisible()
+    await expect(currentPasswordInput).toHaveAttribute('type', 'password')
 
-  // Find the password form
-  const passwordForm = page.locator('form[data-password-reset-form]')
-  await expect(passwordForm).toBeVisible()
+    await expect(newPasswordInput).toBeVisible()
+    await expect(newPasswordInput).toHaveAttribute('type', 'password')
 
-  const currentPasswordInput = passwordForm.locator('input[name="currentPassword"]')
-  const newPasswordInput = passwordForm.locator('input[name="newPassword"]')
-  const confirmPasswordInput = passwordForm.locator('input[name="confirmPassword"]')
-  const updateButton = passwordForm.getByRole('button', { name: /update password/i })
+    await expect(confirmPasswordInput).toBeVisible()
+    await expect(confirmPasswordInput).toHaveAttribute('type', 'password')
 
-  // Test basic form interaction - just verify form can be filled
-  await currentPasswordInput.fill('password')
-  await newPasswordInput.fill('newPassword123')
-  await confirmPasswordInput.fill('newPassword123')
+    await expect(updateButton).toBeVisible()
+    await expect(updateButton).toBeEnabled()
 
-  // Verify form inputs work
-  await expect(currentPasswordInput).toHaveValue('password')
-  await expect(newPasswordInput).toHaveValue('newPassword123')
-  await expect(confirmPasswordInput).toHaveValue('newPassword123')
+    // ============================================
+    // STEP 5: Test form input functionality
+    // ============================================
+    // Fill in test values
+    await currentPasswordInput.fill('testCurrentPassword')
+    await newPasswordInput.fill('testNewPassword')
+    await confirmPasswordInput.fill('testConfirmPassword')
 
-  // Test that update button is clickable
-  await expect(updateButton).toBeEnabled()
-})
+    // Verify values are retained
+    await expect(currentPasswordInput).toHaveValue('testCurrentPassword')
+    await expect(newPasswordInput).toHaveValue('testNewPassword')
+    await expect(confirmPasswordInput).toHaveValue('testConfirmPassword')
 
-test.skip('Password Reset Error Handling', async ({ page }) => {
-  // Skip this test until error handling is fully implemented
-  // This test was testing functionality that isn't implemented yet
-  await page.goto('/')
-  await login(page)
+    // Test that inputs can be cleared
+    await currentPasswordInput.fill('')
+    await newPasswordInput.fill('')
+    await confirmPasswordInput.fill('')
 
-  await navigateToUserSettings(page)
+    await expect(currentPasswordInput).toHaveValue('')
+    await expect(newPasswordInput).toHaveValue('')
+    await expect(confirmPasswordInput).toHaveValue('')
 
-  // Just verify the form is accessible for now
-  const passwordForm = page.locator('form[data-password-reset-form]')
-  await expect(passwordForm).toBeVisible()
-})
+    // ============================================
+    // STEP 6: Test basic password reset flow (form interaction only)
+    // ============================================
+    // Fill form with valid-looking data (not actually submitting to change password)
+    await currentPasswordInput.fill('password')
+    await newPasswordInput.fill('newPassword123')
+    await confirmPasswordInput.fill('newPassword123')
 
-test('User Profile Information Display', async ({ page }) => {
-  await page.goto('/')
-  await login(page)
+    // Verify form inputs work correctly
+    await expect(currentPasswordInput).toHaveValue('password')
+    await expect(newPasswordInput).toHaveValue('newPassword123')
+    await expect(confirmPasswordInput).toHaveValue('newPassword123')
 
-  // Navigate to user settings
-  await navigateToUserSettings(page)
+    // Verify update button is clickable (but don't click to avoid changing password)
+    await expect(updateButton).toBeEnabled()
 
-  // Verify profile section shows user information
-  const profileSection = page.locator('h3', { hasText: 'Profile' }).locator('..') // Parent element
-
-  // Check that username is displayed
-  const usernameLabel = profileSection.locator('text=Username')
-  await expect(usernameLabel).toBeVisible()
-
-  const usernameValue = profileSection.locator('text=testuser@gmail.com')
-  await expect(usernameValue).toBeVisible()
-
-  // Check that roles are displayed
-  const rolesLabel = profileSection.locator('text=Roles')
-  await expect(rolesLabel).toBeVisible()
-
-  // The test user should have admin role
-  const adminRole = profileSection.locator('text=admin')
-  await expect(adminRole).toBeVisible()
+    // Clear form to leave clean state
+    await currentPasswordInput.fill('')
+    await newPasswordInput.fill('')
+    await confirmPasswordInput.fill('')
+  })
 })

@@ -1,4 +1,5 @@
 import { createComponent, LocationService, Router, Shade } from '@furystack/shades'
+import type { MatchResult } from 'path-to-regexp'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { SettingsMenuItem, SettingsMenuSection, SettingsSidebar } from '../../components/settings-sidebar/index.js'
 
@@ -43,6 +44,28 @@ const settingsRoutes = [
         component={async () => {
           const { AiSettingsPage } = await import('./ai-settings.js')
           return <AiSettingsPage />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/app-settings/users/:username',
+    component: ({ match }: { match: MatchResult<{ username: string }> }) => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { UserDetailsPage } = await import('./user-details.js')
+          return <UserDetailsPage username={match.params.username} />
+        }}
+      />
+    ),
+  },
+  {
+    url: '/app-settings/users',
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { UserListPage } = await import('./user-list.js')
+          return <UserListPage />
         }}
       />
     ),
@@ -102,6 +125,9 @@ export const AppSettingsPage = Shade({
           </SettingsMenuSection>
           <SettingsMenuSection title="AI">
             <SettingsMenuItem icon="🤖" label="Ollama Settings" href="/app-settings/ai" />
+          </SettingsMenuSection>
+          <SettingsMenuSection title="Identity">
+            <SettingsMenuItem icon="👥" label="Users" href="/app-settings/users" />
           </SettingsMenuSection>
         </SettingsSidebar>
 
