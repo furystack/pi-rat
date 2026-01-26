@@ -83,6 +83,9 @@
     },
     "getAllRoleDefinitions": {
       "$comment": "() => RoleDefinition[]"
+    },
+    "def-function": {
+      "$comment": "() =>undefined"
     }
   }
 }

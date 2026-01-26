@@ -1,5 +1,5 @@
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
-import type { ChatAction as ChatActionType } from 'common'
+import type { ChatAction as ChatActionType, ChatResponse } from 'common'
 import { OllamaClientService } from '../ollama-client-service.js'
 
 export const ChatAction: RequestAction<ChatActionType> = async ({ injector, getBody }) => {
@@ -7,7 +7,7 @@ export const ChatAction: RequestAction<ChatActionType> = async ({ injector, getB
 
   const ollamaService = injector.getInstance(OllamaClientService)
 
-  const result = await ollamaService.chat(payload)
+  const result = (await ollamaService.chat(payload)) as ChatResponse
 
   return JsonResult(result)
 }
