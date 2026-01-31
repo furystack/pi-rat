@@ -9,3 +9,4 @@ This file contains a list of helpful information and context that the agent can 
 - [ObservableValue usage, useObservable, useDisposable, subscriptions, and state management patterns](./OBSERVABLE_STATE.md)
 - [Package manager detection, script simplification, and CI/CD best practices](./SCRIPT_EXECUTION.md)
 - [Vitest patterns, Playwright E2E testing, and mocking strategies](./TESTING_GUIDELINES.md)
+- [Semantic versioning, changelog format, version bumps, and release workflow](./VERSIONING_AND_CHANGELOG.md)
