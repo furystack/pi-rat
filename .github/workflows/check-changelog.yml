@@ -11,6 +11,8 @@ on:
 jobs:
   check:
     name: Check changelog completion
+    permissions:
+      contents: read
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
