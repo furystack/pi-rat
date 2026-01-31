@@ -1,30 +1,28 @@
-name: Version checks
+name: Changelog checks
 on:
   push:
     branches-ignore:
       - 'release/**'
       - 'master'
       - 'develop'
+  pull_request:
+    branches:
+      - develop
 jobs:
-  build:
-    name: Check version bumps
+  check:
+    name: Check changelog completion
     timeout-minutes: 5
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [24.x]
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Check version bumps
-        run: yarn version check
+          node-version: '24'
+      - name: Check changelog entries
+        run: yarn changelog check
         env:
           CI: true

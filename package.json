@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@furystack/yarn-plugin-changelog": "^1.0.1",
     "@playwright/test": "^1.58.0",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^25.0.10",
@@ -64,7 +65,7 @@
     "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
     "lint": "eslint .",
     "bumpVersions": "yarn version check --interactive",
-    "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
+    "applyReleaseChanges": "yarn version apply --all && yarn changelog apply && yarn prettier:write",
     "dockerize": "docker build . --tag furystack/pi-rat:latest",
     "sshIntoDocker": "docker run -i -t furystack/pi-rat sh",
     "prettier:check": "prettier --check .",
