@@ -42,15 +42,15 @@ git diff origin/master...HEAD --name-only
 
 **Conservative skip rules (only skip when 100% safe):**
 
-| Reviewer                | Run         | Notes                                                            |
-| ----------------------- | ----------- | ---------------------------------------------------------------- |
-| `reviewer-prettier`     | ✅ Always   | Formats `.md`, `.json`, `.ts`, `.tsx`, etc.                      |
-| `reviewer-versioning`   | ✅ Always   | Fast validation, can fail early                                  |
-| `reviewer-changelog`    | ✅ Always   | Fast validation, can fail early                                  |
-| `reviewer-dependencies` | Conditional | Run if ANY `package.json` changed                                |
-| `reviewer-typescript`   | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed       |
-| `reviewer-eslint`       | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed       |
-| `reviewer-tests`        | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed       |
+| Reviewer                | Run         | Notes                                                      |
+| ----------------------- | ----------- | ---------------------------------------------------------- |
+| `reviewer-prettier`     | ✅ Always   | Formats `.md`, `.json`, `.ts`, `.tsx`, etc.                |
+| `reviewer-versioning`   | ✅ Always   | Fast validation, can fail early                            |
+| `reviewer-changelog`    | ✅ Always   | Fast validation, can fail early                            |
+| `reviewer-dependencies` | Conditional | Run if ANY `package.json` changed                          |
+| `reviewer-typescript`   | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed |
+| `reviewer-eslint`       | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed |
+| `reviewer-tests`        | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed |
 
 **When in doubt, run the check.** Fast failures are better than missed issues.
 

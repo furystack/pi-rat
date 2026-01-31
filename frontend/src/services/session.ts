@@ -12,7 +12,7 @@ export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'aut
 
 @Injectable({ lifetime: 'singleton' })
 export class SessionService implements IdentityContext {
-  declare private readonly injector: Injector
+  declare private injector: Injector
   private readonly operation = () => {
     this.isOperationInProgress.setValue(true)
     return { [Symbol.dispose]: () => this.isOperationInProgress.setValue(false) }

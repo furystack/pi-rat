@@ -69,11 +69,11 @@ Then use **Read** tool on changed files to understand the nature of changes:
 
 For each package with a version bump:
 
-| Declared Bump | Required Changes                | Issue if Mismatch                                                             |
-| ------------- | ------------------------------- | ----------------------------------------------------------------------------- |
-| **major**     | Breaking changes must exist     | Warning: "Package X has `major` bump but no breaking changes detected"        |
+| Declared Bump | Required Changes                | Issue if Mismatch                                                                    |
+| ------------- | ------------------------------- | ------------------------------------------------------------------------------------ |
+| **major**     | Breaking changes must exist     | Warning: "Package X has `major` bump but no breaking changes detected"               |
 | **minor**     | New features/exports must exist | Warning: "Package Y has `minor` bump but no new exports detected - consider `patch`" |
-| **patch**     | Only fixes, no new public API   | Warning: "Package Z has `patch` bump but adds new export `foo` - consider `minor`" |
+| **patch**     | Only fixes, no new public API   | Warning: "Package Z has `patch` bump but adds new export `foo` - consider `minor`"   |
 
 #### 2.4 Check for Missing Bumps
 
