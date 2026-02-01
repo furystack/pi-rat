@@ -1,5 +1,0 @@
-releases:
-  common: patch
-  frontend: patch
-  pi-rat: patch
-  service: patch
