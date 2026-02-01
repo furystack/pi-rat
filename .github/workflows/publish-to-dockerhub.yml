@@ -11,8 +11,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # Only allow running from master branch
-    if: github.ref == 'refs/heads/master'
+    # Only allow running from develop branch
+    if: github.ref == 'refs/heads/develop'
 
     steps:
       - uses: actions/create-github-app-token@v1
@@ -21,10 +21,10 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Checkout master branch
+      - name: Checkout develop branch
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: develop
           fetch-depth: 0 # Full history for merging
           token: ${{ steps.app-token.outputs.token }}
 
@@ -69,14 +69,14 @@ jobs:
             git commit -m "chore: release v${{ steps.version.outputs.version }}"
           fi
 
-      - name: Push master branch
-        run: git push origin master
+      - name: Push develop branch
+        run: git push origin develop
 
-      - name: Sync to develop
+      - name: Merge develop to master
         run: |
-          git checkout develop
-          git merge master --no-edit
-          git push origin develop
+          git checkout master
+          git merge develop --no-edit
+          git push origin master
 
       - name: Create and push release tag
         continue-on-error: true
