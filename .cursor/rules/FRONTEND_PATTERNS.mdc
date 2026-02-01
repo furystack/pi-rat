@@ -1,0 +1,678 @@
+# Frontend Development Patterns
+
+## Data Access Patterns
+
+### Service-Based Data Access with Caching
+
+**Never query entities directly from components.** Always use a service that abstracts caching and data fetching.
+
+```typescript
+// ✅ Good - Service with caching
+@Injectable({ lifetime: 'singleton' })
+export class UsersService {
+  @Injected(IdentityApiClient)
+  declare private readonly identityApiClient: IdentityApiClient
+
+  // Cache for individual entities
+  public userCache = new Cache({
+    capacity: 100,
+    load: async (username: string) => {
+      const { result } = await this.identityApiClient.call({
+        method: 'GET',
+        action: '/users/:id',
+        url: { id: username },
+        query: {},
+      })
+      return result
+    },
+  })
+
+  // Cache for list queries
+  public userQueryCache = new Cache({
+    capacity: 10,
+    load: async (findOptions: FindOptions<User, Array<keyof User>>) => {
+      const { result } = await this.identityApiClient.call({
+        method: 'GET',
+        action: '/users',
+        query: { findOptions },
+      })
+
+      // Populate individual cache from list results
+      result.entries.forEach((entry) => {
+        this.userCache.setExplicitValue({
+          loadArgs: [entry.username],
+          value: { status: 'loaded', value: entry, updatedAt: new Date() },
+        })
+      })
+
+      return result
+    },
+  })
+
+  // Expose cache methods
+  public getUser = this.userCache.get.bind(this.userCache)
+  public getUserAsObservable = this.userCache.getObservable.bind(this.userCache)
+  public findUsers = this.userQueryCache.get.bind(this.userQueryCache)
+  public findUsersAsObservable = this.userQueryCache.getObservable.bind(this.userQueryCache)
+
+  // Mutations invalidate cache
+  public updateUser = async (username: string, body: { username: string; roles: Roles }) => {
+    const { result } = await this.identityApiClient.call({
+      method: 'PATCH',
+      action: '/users/:id',
+      url: { id: username },
+      body,
+    })
+    this.userCache.remove(username)
+    this.userQueryCache.flushAll()
+    return result
+  }
+}
+
+// ❌ Bad - Direct API call in component
+const MyComponent = Shade({
+  render: ({ injector }) => {
+    const apiClient = injector.getInstance(IdentityApiClient)
+    // Don't do this - no caching, duplicate requests
+    const fetchUser = async () => {
+      const { result } = await apiClient.call({ method: 'GET', action: '/users/:id', ... })
+    }
+  }
+})
+
+// ✅ Good - Use service with observable
+const MyComponent = Shade({
+  render: ({ injector, useObservable }) => {
+    const usersService = injector.getInstance(UsersService)
+    const [userState] = useObservable('user', usersService.getUserAsObservable(username))
+    
+    // Handle cache states
+    if (userState.status === 'loading') return <div>Loading...</div>
+    if (userState.status === 'failed') return <div>Error: {userState.error}</div>
+    if (userState.status === 'loaded') return <div>{userState.value.username}</div>
+  }
+})
+```
+
+### Cache Invalidation on Mutations
+
+Always invalidate relevant caches after mutations:
+
+```typescript
+// ✅ Good - Invalidate after mutation
+public deleteUser = async (username: string) => {
+  await this.identityApiClient.call({
+    method: 'DELETE',
+    action: '/users/:id',
+    url: { id: username },
+  })
+  this.userCache.remove(username)      // Remove specific entry
+  this.userQueryCache.flushAll()       // Invalidate list queries
+}
+```
+
+## Props & State Architecture
+
+### Keep Props Simple
+
+Avoid prop drilling and complex prop passing through many layers. Use the injector for shared state.
+
+```typescript
+// ❌ Bad - Prop drilling
+const GrandparentComponent = Shade({
+  render: () => {
+    const user = /* ... */
+    const onUpdate = /* ... */
+    const permissions = /* ... */
+    
+    return <ParentComponent user={user} onUpdate={onUpdate} permissions={permissions} />
+  }
+})
+
+const ParentComponent = Shade<{ user: User; onUpdate: () => void; permissions: Permissions }>({
+  render: ({ props }) => {
+    // Just passing through...
+    return <ChildComponent user={props.user} onUpdate={props.onUpdate} permissions={props.permissions} />
+  }
+})
+
+// ✅ Good - Use injector for shared state
+@Injectable({ lifetime: 'singleton' })
+export class UserEditStateService {
+  public currentUser = new ObservableValue<User | null>(null)
+  public permissions = new ObservableValue<Permissions | null>(null)
+  
+  public async loadUser(username: string) { /* ... */ }
+  public async updateUser(changes: Partial<User>) { /* ... */ }
+}
+
+const ChildComponent = Shade({
+  render: ({ injector, useObservable }) => {
+    const stateService = injector.getInstance(UserEditStateService)
+    const [user] = useObservable('user', stateService.currentUser)
+    // Direct access to state, no prop drilling
+  }
+})
+```
+
+### When to Use Injectable State Services
+
+Create an injectable service when:
+- State needs to be shared across multiple components
+- Logic is becoming complex with multiple observables
+- You find yourself passing the same props through 3+ component levels
+- Multiple components need to trigger the same mutations
+
+```typescript
+// ✅ Good - Complex state in service
+@Injectable({ lifetime: 'singleton' })
+export class RoleEditorStateService {
+  public originalRoles = new ObservableValue<Roles>([])
+  public currentRoles = new ObservableValue<Roles>([])
+  public isModified = new ObservableValue(false)
+  
+  public addRole(role: Roles[number]) {
+    const current = this.currentRoles.getValue()
+    if (!current.includes(role)) {
+      this.currentRoles.setValue([...current, role])
+      this.updateModifiedState()
+    }
+  }
+  
+  public removeRole(role: Roles[number]) { /* ... */ }
+  
+  private updateModifiedState() {
+    const original = this.originalRoles.getValue()
+    const current = this.currentRoles.getValue()
+    this.isModified.setValue(
+      original.length !== current.length || 
+      !original.every(r => current.includes(r))
+    )
+  }
+}
+```
+
+### Props Guidelines
+
+| Scenario | Approach |
+|----------|----------|
+| Simple display data | Props are fine |
+| Callbacks for parent | Props are fine |
+| Data needed 3+ levels deep | Use injectable service |
+| Complex interdependent state | Use injectable service |
+| Shared across sibling components | Use injectable service |
+
+## Routing
+
+### Route Definition
+
+```typescript
+import { createComponent, type Route } from '@furystack/shades'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
+import { onLeave, onVisit } from './route-animations.js'
+
+export const myRoute = {
+  url: '/path/:param',
+  onVisit, onLeave,
+  component: ({ match }) => (
+    <PiRatLazyLoad
+      component={async () => {
+        const { MyPage } = await import('../../pages/my-page.js')
+        return <MyPage param={match.params.param} />
+      }}
+    />
+  ),
+} satisfies Route<{ param: string }>
+
+export const myRoutes = [myRoute] as const
+```
+
+### Navigation
+
+**Always use `navigateToRoute()` for programmatic navigation.** Never manipulate `window.history` or `LocationService` directly in components.
+
+```typescript
+// ✅ Good - Use navigateToRoute helper
+import { navigateToRoute } from '../navigate-to-route.js'
+import { userDetailsRoute } from './routes/user-routes.js'
+
+const MyComponent = Shade({
+  render: ({ injector }) => {
+    const handleUserClick = (username: string) => {
+      navigateToRoute(injector, userDetailsRoute, { username })
+    }
+    
+    return <button onclick={() => handleUserClick('john')}>View User</button>
+  }
+})
+
+// ❌ Bad - Direct history/location manipulation
+const MyComponent = Shade({
+  render: ({ injector }) => {
+    const locationService = injector.getInstance(LocationService)
+    
+    const handleUserClick = (username: string) => {
+      // Don't do this - bypasses route system, no type safety
+      window.history.pushState({}, '', `/users/${username}`)
+      locationService.updateState()
+    }
+  }
+})
+```
+
+### Why Use navigateToRoute
+
+1. **Type safety** - Route params are type-checked at compile time
+2. **Centralized routes** - Routes defined in one place, referenced everywhere
+3. **URL compilation** - Handles path-to-regexp compilation automatically
+4. **Consistency** - Same pattern across the codebase
+
+### Integration
+
+```typescript
+// Add routes to body.tsx
+import { myRoutes } from './routes/my-routes.js'
+
+<Router routes={[...existingRoutes, ...myRoutes]} />
+```
+
+## Component Architecture
+
+### Shade Component Pattern
+
+```typescript
+const MyComponent = Shade<{ prop: string }>({
+  shadowDomName: 'my-component',
+  render: ({ props, injector, useObservable, useDisposable }) => {
+    // Global state subscriptions
+    const session = injector.getInstance(SessionService)
+    const [user] = useObservable('user', session.currentUser)
+
+    // Component-specific state
+    const isLoading = useDisposable('loading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue<string>(''))
+
+    return <div>{/* Component JSX */}</div>
+  }
+})
+```
+
+### State Management Rules
+
+- **Global state**: `useObservable` with services (SessionService, etc.)
+- **Local state**: `useDisposable` with `ObservableValue`
+- **Loading states**: Boolean observables for async operations
+- **Error states**: String observables for error messages
+
+## DOM Access in Shades Components
+
+### Avoid Global Document Queries
+
+Never use `document.querySelector()` in Shades components. It bypasses shadow DOM boundaries and may not find elements correctly.
+
+```typescript
+// ❌ Bad - using document.querySelector
+export const MyForm = Shade({
+  shadowDomName: 'my-form',
+  render: ({ useDisposable }) => {
+    const handleSubmit = async () => {
+      // This may fail due to shadow DOM encapsulation
+      const form = document.querySelector('form[data-my-form]') as HTMLFormElement
+      form?.reset()
+    }
+
+    return <form data-my-form>{/* Form content */}</form>
+  },
+})
+
+// ✅ Good - use element from Shades context
+export const MyForm = Shade({
+  shadowDomName: 'my-form',
+  render: ({ element, useDisposable }) => {
+    const handleSubmit = async () => {
+      // Use element.querySelector to query within component's shadow DOM
+      const form = element.querySelector<HTMLFormElement>('form[data-my-form]')
+      form?.reset()
+    }
+
+    return <form data-my-form>{/* Form content */}</form>
+  },
+})
+
+// ✅ Better - use state to trigger re-render instead of DOM manipulation
+export const MyForm = Shade({
+  shadowDomName: 'my-form',
+  render: ({ useDisposable, useObservable }) => {
+    const formKey = useDisposable('formKey', () => new ObservableValue(0))
+    const [key] = useObservable('formKeyValue', formKey)
+
+    const handleSubmit = async () => {
+      // Success - increment key to force form re-render with fresh state
+      formKey.setValue(key + 1)
+    }
+
+    return <form key={key}>{/* Form content with fresh state */}</form>
+  },
+})
+```
+
+### Accessing DOM Elements in Components
+
+When you need to access DOM elements within a Shades component:
+
+1. **Use `element` from render context** - This is the component's shadow root
+2. **Use `element.querySelector()`** - Queries within the shadow DOM
+3. **Prefer state-driven updates** - Use ObservableValue to trigger re-renders instead of direct DOM manipulation
+
+```typescript
+// ✅ Good - using element context for input focus
+export const SearchInput = Shade({
+  shadowDomName: 'search-input',
+  constructed: ({ element }) => {
+    // Safe to use element.querySelector after construction
+    element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
+  },
+  render: ({ element }) => {
+    const focusInput = () => {
+      element.querySelector<HTMLInputElement>('input')?.focus()
+    }
+
+    return (
+      <div>
+        <input type="text" autofocus />
+        <button onclick={focusInput}>Focus</button>
+      </div>
+    )
+  },
+})
+```
+
+## Form Patterns
+
+### Standard Form Structure
+
+```typescript
+type FormPayload = { field1: string; field2: string }
+
+const MyForm = Shade({
+  render: ({ injector, useDisposable }) => {
+    const service = injector.getInstance(MyService)
+    const isLoading = useDisposable('loading', () => new ObservableValue(false))
+    const error = useDisposable('error', () => new ObservableValue(''))
+
+    const handleSubmit = async (data: FormPayload) => {
+      // Client-side validation only
+      if (data.field1 !== data.field2) {
+        error.setValue('Fields must match')
+        return
+      }
+
+      isLoading.setValue(true)
+      error.setValue('')
+
+      try {
+        await service.performAction(data)
+        // Success handling (clear form, show notification)
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Operation failed'
+        error.setValue(message)
+      } finally {
+        isLoading.setValue(false)
+      }
+    }
+
+    return (
+      <Form<FormPayload>
+        validate={(data): data is FormPayload => !!(data?.field1?.length && data?.field2?.length)}
+        onSubmit={(data) => void handleSubmit(data)}
+      >
+        <Input name="field1" required />
+        {error.getValue() && <ErrorDisplay message={error.getValue()} />}
+        <Button type="submit" disabled={isLoading.getValue()}>
+          {isLoading.getValue() ? 'Processing...' : 'Submit'}
+        </Button>
+      </Form>
+    )
+  }
+})
+```
+
+## UI Component Patterns
+
+### User Avatar with Dropdown
+
+```typescript
+const UserAvatarMenu = Shade({
+  render: ({ injector, useObservable, useDisposable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+    const isMenuOpen = useDisposable('isMenuOpen', () => new ObservableValue(false))
+
+    if (!currentUser) return null
+
+    return (
+      <div style={{ position: 'relative' }}>
+        {/* Circular avatar */}
+        <div
+          onclick={() => isMenuOpen.setValue(!isMenuOpen.getValue())}
+          style={{
+            width: '32px', height: '32px', borderRadius: '50%',
+            backgroundColor: '#2196f3', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', fontWeight: 'bold'
+          }}
+        >
+          {currentUser.username.charAt(0).toUpperCase()}
+        </div>
+
+        {isMenuOpen.getValue() && (
+          <>
+            <div style={{ /* dropdown positioning and styling */ }}>
+              <Button onclick={() => navigateToRoute(injector, settingsRoute, {})}>
+                ⚙️ Settings
+              </Button>
+              <Button onclick={() => void session.logout()}>
+                🚪 Log Out
+              </Button>
+            </div>
+
+            {/* Click-outside overlay */}
+            <div
+              style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
+              onclick={() => isMenuOpen.setValue(false)}
+            />
+          </>
+        )}
+      </div>
+    )
+  }
+})
+```
+
+### Settings Page Structure
+
+Organize complex pages into logical sections:
+
+```typescript
+const UserSettingsPage = Shade({
+  render: ({ injector, useObservable }) => {
+    const session = injector.getInstance(SessionService)
+    const [currentUser] = useObservable('currentUser', session.currentUser)
+
+    if (!currentUser) return <div>Please log in</div>
+
+    return (
+      <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
+        <h1>User Settings</h1>
+        <ProfileSection />
+        <SecuritySection />
+      </div>
+    )
+  }
+})
+
+const SecuritySection = Shade({
+  shadowDomName: 'user-settings-security',
+  render: ({ injector, useDisposable }) => {
+    // Form logic here
+    return (
+      <div>
+        <h3>🔒 Security</h3>
+        <Paper><Form>/* Password reset form */</Form></Paper>
+      </div>
+    )
+  }
+})
+```
+
+## Styling Guidelines
+
+### CSS Variables
+
+Always use theme variables:
+
+```typescript
+style={{
+  backgroundColor: 'var(--theme-background-default)',
+  color: 'var(--theme-text-primary)',
+  border: '1px solid var(--theme-border-default)',
+  borderRadius: '8px',
+}}
+```
+
+### Common UI States
+
+- **Loading**: Disable forms, show spinner/loading text
+- **Error**: Red background, clear error messaging
+- **Success**: Green notifications, form clearing
+- **Focus**: Proper focus management for accessibility
+- **Mobile**: 44px minimum touch targets
+
+### Layout Patterns
+
+- **Settings pages**: Centered, max-width 800px, section-based
+- **Forms**: Max-width 400px, consistent spacing
+- **Dropdowns**: Absolute positioning, z-index management, click-outside handling
+
+## UI Feature Entry Points
+
+When adding a new UI feature, consider which entry points are appropriate. **Always ask the user** which entry points should be added when implementing a new feature.
+
+### Available Entry Points
+
+| Entry Point | Location | Access Control | Use Case |
+|-------------|----------|----------------|----------|
+| **Avatar Menu** | `user-avatar-menu.tsx` | Role-based (`isAdmin`) | User/admin actions, settings, logout |
+| **Command Palette** | `command-palette/command-providers/` | Role-based in provider | Quick navigation, search, actions |
+| **App Shortcut Widget** | `dashboard/app-shortcut-widget.tsx` | Dashboard owner/admin | Dashboard shortcuts to app pages |
+| **Entity Shortcut Widget** | `dashboard/entity-shortcut-widget.tsx` | Dashboard owner/admin | Dashboard shortcuts to entity pages |
+| **App Bar** | `layout.tsx` | Visibility-based | Global navigation, always visible |
+| **Default Dashboard Patch** | Database seed/migration | All users | Pre-configured dashboard widgets |
+
+### Entry Point Checklist
+
+When implementing a new feature page, ask the user about:
+
+1. **Avatar Menu**: Should a menu item be added? (usually for settings/admin pages)
+2. **Command Palette**: Should a command provider be created? (for searchable/quick-access features)
+3. **Widget Support**: Should a new widget type or app shortcut be added? (for dashboard integration)
+4. **Default Dashboard**: Should the default dashboard include this feature? (for prominent features)
+5. **App Bar**: Should it appear in the main navigation? (rarely needed, for core features only)
+
+### Implementation Patterns
+
+#### Adding to Avatar Menu
+
+```typescript
+// user-avatar-menu.tsx
+const handleMyFeatureClick = () => {
+  const myFeatureRoute: Route<Record<string, never>> = {
+    url: '/my-feature',
+    component: () => <div>Loading...</div>,
+  }
+  navigateToRoute(injector, myFeatureRoute, {})
+  setIsMenuOpen(false)
+}
+
+// In render, add button (with role check if needed)
+{isAdmin && (
+  <Button onclick={handleMyFeatureClick}>
+    🔧 My Feature
+  </Button>
+)}
+```
+
+#### Adding Command Palette Provider
+
+```typescript
+// command-providers/my-feature.tsx
+import { getCurrentUser } from '@furystack/core'
+import type { CommandProvider } from '@furystack/shades-common-components'
+import { navigateToRoute } from '../../../navigate-to-route.js'
+import { myFeatureRoute } from '../../routes/my-routes.js'
+import type { SuggestionOptions } from './create-suggestion.js'
+import { createSuggestion, distinctByName } from './create-suggestion.js'
+
+const MyFeatureSuggestions: SuggestionOptions[] = [
+  {
+    name: 'My Feature',
+    description: 'Description of the feature',
+    icon: '🔧',
+    score: 1,
+    onSelected: ({ injector }) => {
+      navigateToRoute(injector, myFeatureRoute, {})
+    },
+  },
+]
+
+export const myFeatureCommandProvider: CommandProvider = async ({ term, injector }) => {
+  if (!term) return []
+
+  // Optional: role-based access
+  if (!(await getCurrentUser(injector))?.roles?.includes('admin')) return []
+
+  const fullHits = MyFeatureSuggestions.filter((c) => c.name.toLowerCase() === term.toLowerCase())
+    .map((c) => createSuggestion({ ...c, score: 1 }))
+  const startsWith = MyFeatureSuggestions.filter((c) => c.name.toLowerCase().startsWith(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
+  const contains = MyFeatureSuggestions.filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 3 }))
+  const descriptionContains = MyFeatureSuggestions.filter((c) => c.description.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
+
+  return distinctByName(...fullHits, ...startsWith, ...contains, ...descriptionContains)
+}
+
+// Register in command-palette/index.tsx
+import { myFeatureCommandProvider } from './command-providers/my-feature.js'
+
+commandProviders={[
+  myFeatureCommandProvider,
+  // ... other providers
+]}
+```
+
+#### Adding App Shortcut Widget
+
+```typescript
+// 1. Update common/src/models/dashboard/app-shortcut-widget.ts
+export interface AppShortcutWidget {
+  type: 'app-shortcut'
+  appName: 'home' | 'browser' | /* ... */ | 'my-feature'
+}
+
+// 2. Update frontend/src/components/dashboard/app-shortcut-widget.tsx
+import { myFeatureRoute } from '../routes/my-routes.js'
+
+case 'my-feature':
+  return <IconUrlWidget {...rest} name="My Feature" url={myFeatureRoute.url} icon={<>🔧</>} />
+```
+
+### Access Control Patterns
+
+| Pattern | Implementation | Use Case |
+|---------|----------------|----------|
+| **Admin-only** | `isAdmin && <Button>` or `roles?.includes('admin')` | Admin features |
+| **Authenticated** | `currentUser && <Button>` | User features |
+| **Public** | Always render | Public features |
+| **Role-based** | `roles?.includes('role')` | Specific role features |

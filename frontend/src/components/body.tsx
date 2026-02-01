@@ -1,14 +1,18 @@
 import { createComponent, Router, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
-import { Init, Login, Offline } from '../pages/index.js'
+import { Init, Offline } from '../pages/index.js'
 import { SessionService } from '../services/session.js'
+import { adminRoutes } from './routes/admin-routes.js'
 import { aiRoutes } from './routes/ai-routes.js'
+import { authRoutes } from './routes/auth-routes.js'
 import { chatRoutes } from './routes/chat-routes.js'
 import { dashboardRoutes } from './routes/dashboard-routes.js'
 import { entityRoutes } from './routes/entity-routes.js'
 import { fileBrowserRoutes } from './routes/file-browser-routes.js'
 import { iotRoutes } from './routes/iot-routes.js'
+import { loggingRoutes } from './routes/logging-routes.js'
 import { movieRoutes } from './routes/movie-routes.js'
+import { userRoutes } from './routes/user-routes.js'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
@@ -28,17 +32,20 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
           <Router
             routes={[
               ...movieRoutes,
-              ...(hasAdminRole ? [...entityRoutes, ...fileBrowserRoutes, ...iotRoutes] : []),
+              ...(hasAdminRole
+                ? [...adminRoutes, ...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes]
+                : []),
               ...dashboardRoutes,
               ...chatRoutes,
               ...aiRoutes,
+              ...userRoutes,
             ]}
           />
         )
       case 'offline':
         return <Offline />
       case 'unauthenticated':
-        return <Login />
+        return <Router routes={[...authRoutes]} />
       default:
         return <Init />
     }

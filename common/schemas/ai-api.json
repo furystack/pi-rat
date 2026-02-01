@@ -1,146 +1,97 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "GetModelsAction": {
+    "OllamaApiMessage": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ModelResponse"
-          }
-        }
-      },
-      "required": ["result"],
-      "additionalProperties": false
-    },
-    "ModelResponse": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "modified_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "model": {
-          "type": "string"
-        },
-        "size": {
-          "type": "number"
-        },
-        "digest": {
-          "type": "string"
-        },
-        "details": {
-          "$ref": "#/definitions/ModelDetails"
-        },
-        "expires_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "size_vram": {
-          "type": "number"
-        }
-      },
-      "required": ["name", "modified_at", "model", "size", "digest", "details", "expires_at", "size_vram"],
-      "additionalProperties": false
-    },
-    "ModelDetails": {
-      "type": "object",
-      "properties": {
-        "parent_model": {
-          "type": "string"
-        },
-        "format": {
-          "type": "string"
-        },
-        "family": {
-          "type": "string"
-        },
-        "families": {
+        "images": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "parameter_size": {
+        "role": {
           "type": "string"
         },
-        "quantization_level": {
+        "content": {
+          "type": "string"
+        },
+        "thinking": {
+          "type": "string"
+        },
+        "tool_calls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ToolCall"
+          }
+        },
+        "tool_name": {
           "type": "string"
         }
       },
-      "required": ["parent_model", "format", "family", "families", "parameter_size", "quantization_level"],
-      "additionalProperties": false
+      "required": ["content", "role"]
     },
-    "ChatAction": {
+    "Omit<Message,\"images\">": {
+      "$ref": "#/definitions/Pick%3CMessage%2CExclude%3C(%22role%22%7C%22content%22%7C%22thinking%22%7C%22images%22%7C%22tool_calls%22%7C%22tool_name%22)%2C%22images%22%3E%3E"
+    },
+    "Pick<Message,Exclude<(\"role\"|\"content\"|\"thinking\"|\"images\"|\"tool_calls\"|\"tool_name\"),\"images\">>": {
       "type": "object",
       "properties": {
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "stream": {
-              "type": "boolean",
-              "const": false
-            },
-            "model": {
-              "type": "string"
-            },
-            "messages": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Message"
-              }
-            },
-            "format": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object"
-                }
-              ]
-            },
-            "keep_alive": {
-              "type": ["string", "number"]
-            },
-            "tools": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Tool"
-              }
-            },
-            "think": {
-              "type": "boolean"
-            },
-            "options": {
-              "$ref": "#/definitions/Partial%3COptions%3E"
-            }
-          },
-          "required": ["model"]
+        "role": {
+          "type": "string"
         },
-        "result": {
-          "$ref": "#/definitions/ChatResponse"
+        "content": {
+          "type": "string"
+        },
+        "thinking": {
+          "type": "string"
+        },
+        "tool_calls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ToolCall"
+          }
+        },
+        "tool_name": {
+          "type": "string"
         }
       },
-      "required": ["body", "result"],
+      "required": ["role", "content"],
+      "additionalProperties": false
+    },
+    "ToolCall": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "arguments": {
+              "type": "object"
+            }
+          },
+          "required": ["name", "arguments"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["function"],
       "additionalProperties": false
     },
     "ChatRequest": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "model": {
-          "type": "string"
-        },
         "messages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Message"
+            "$ref": "#/definitions/OllamaApiMessage"
           }
+        },
+        "model": {
+          "type": "string"
         },
         "stream": {
           "type": "boolean"
@@ -165,108 +116,97 @@
           }
         },
         "think": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "high"
+            },
+            {
+              "type": "string",
+              "const": "medium"
+            },
+            {
+              "type": "string",
+              "const": "low"
+            }
+          ]
+        },
+        "logprobs": {
           "type": "boolean"
+        },
+        "top_logprobs": {
+          "type": "number"
+        },
+        "options": {
+          "$ref": "#/definitions/Partial%3COptions%3E"
+        }
+      },
+      "required": ["messages", "model"]
+    },
+    "Omit<ChatRequest,\"messages\">": {
+      "$ref": "#/definitions/Pick%3CChatRequest%2CExclude%3C(%22model%22%7C%22messages%22%7C%22stream%22%7C%22format%22%7C%22keep_alive%22%7C%22tools%22%7C%22think%22%7C%22logprobs%22%7C%22top_logprobs%22%7C%22options%22)%2C%22messages%22%3E%3E"
+    },
+    "Pick<ChatRequest,Exclude<(\"model\"|\"messages\"|\"stream\"|\"format\"|\"keep_alive\"|\"tools\"|\"think\"|\"logprobs\"|\"top_logprobs\"|\"options\"),\"messages\">>": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "stream": {
+          "type": "boolean"
+        },
+        "format": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "keep_alive": {
+          "type": ["string", "number"]
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tool"
+          }
+        },
+        "think": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "high"
+            },
+            {
+              "type": "string",
+              "const": "medium"
+            },
+            {
+              "type": "string",
+              "const": "low"
+            }
+          ]
+        },
+        "logprobs": {
+          "type": "boolean"
+        },
+        "top_logprobs": {
+          "type": "number"
         },
         "options": {
           "$ref": "#/definitions/Partial%3COptions%3E"
         }
       },
       "required": ["model"],
-      "additionalProperties": false
-    },
-    "Message": {
-      "type": "object",
-      "properties": {
-        "role": {
-          "type": "string"
-        },
-        "content": {
-          "type": "string"
-        },
-        "thinking": {
-          "type": "string"
-        },
-        "images": {
-          "anyOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Uint8Array"
-              }
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          ]
-        },
-        "tool_calls": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ToolCall"
-          }
-        }
-      },
-      "required": ["role", "content"],
-      "additionalProperties": false
-    },
-    "Uint8Array": {
-      "type": "object",
-      "properties": {
-        "BYTES_PER_ELEMENT": {
-          "type": "number"
-        },
-        "buffer": {
-          "$ref": "#/definitions/ArrayBufferLike"
-        },
-        "byteLength": {
-          "type": "number"
-        },
-        "byteOffset": {
-          "type": "number"
-        },
-        "length": {
-          "type": "number"
-        }
-      },
-      "required": ["BYTES_PER_ELEMENT", "buffer", "byteLength", "byteOffset", "length"],
-      "additionalProperties": {
-        "type": "number"
-      }
-    },
-    "ArrayBufferLike": {
-      "$ref": "#/definitions/ArrayBuffer"
-    },
-    "ArrayBuffer": {
-      "type": "object",
-      "properties": {
-        "byteLength": {
-          "type": "number"
-        }
-      },
-      "required": ["byteLength"],
-      "additionalProperties": false
-    },
-    "ToolCall": {
-      "type": "object",
-      "properties": {
-        "function": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "arguments": {
-              "type": "object"
-            }
-          },
-          "required": ["name", "arguments"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["function"],
       "additionalProperties": false
     },
     "Tool": {
@@ -442,16 +382,17 @@
     },
     "ChatResponse": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
+        "message": {
+          "$ref": "#/definitions/OllamaApiMessage"
+        },
         "model": {
           "type": "string"
         },
         "created_at": {
           "type": "string",
           "format": "date-time"
-        },
-        "message": {
-          "$ref": "#/definitions/Message"
         },
         "done": {
           "type": "boolean"
@@ -476,12 +417,75 @@
         },
         "eval_duration": {
           "type": "number"
+        },
+        "logprobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Logprob"
+          }
+        }
+      },
+      "required": [
+        "created_at",
+        "done",
+        "done_reason",
+        "eval_count",
+        "eval_duration",
+        "load_duration",
+        "message",
+        "model",
+        "prompt_eval_count",
+        "prompt_eval_duration",
+        "total_duration"
+      ]
+    },
+    "Omit<ChatResponse,\"message\">": {
+      "$ref": "#/definitions/Pick%3CChatResponse%2CExclude%3C(%22model%22%7C%22created_at%22%7C%22message%22%7C%22done%22%7C%22done_reason%22%7C%22total_duration%22%7C%22load_duration%22%7C%22prompt_eval_count%22%7C%22prompt_eval_duration%22%7C%22eval_count%22%7C%22eval_duration%22%7C%22logprobs%22)%2C%22message%22%3E%3E"
+    },
+    "Pick<ChatResponse,Exclude<(\"model\"|\"created_at\"|\"message\"|\"done\"|\"done_reason\"|\"total_duration\"|\"load_duration\"|\"prompt_eval_count\"|\"prompt_eval_duration\"|\"eval_count\"|\"eval_duration\"|\"logprobs\"),\"message\">>": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "done": {
+          "type": "boolean"
+        },
+        "done_reason": {
+          "type": "string"
+        },
+        "total_duration": {
+          "type": "number"
+        },
+        "load_duration": {
+          "type": "number"
+        },
+        "prompt_eval_count": {
+          "type": "number"
+        },
+        "prompt_eval_duration": {
+          "type": "number"
+        },
+        "eval_count": {
+          "type": "number"
+        },
+        "eval_duration": {
+          "type": "number"
+        },
+        "logprobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Logprob"
+          }
         }
       },
       "required": [
         "model",
         "created_at",
-        "message",
         "done",
         "done_reason",
         "total_duration",
@@ -491,6 +495,189 @@
         "eval_count",
         "eval_duration"
       ],
+      "additionalProperties": false
+    },
+    "Logprob": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "logprob": {
+          "type": "number"
+        },
+        "top_logprobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TokenLogprob"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["logprob", "token"]
+    },
+    "TokenLogprob": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "logprob": {
+          "type": "number"
+        }
+      },
+      "required": ["token", "logprob"],
+      "additionalProperties": false
+    },
+    "GetModelsAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelResponse"
+          }
+        }
+      },
+      "required": ["result"],
+      "additionalProperties": false
+    },
+    "ModelResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "modified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "model": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        },
+        "digest": {
+          "type": "string"
+        },
+        "details": {
+          "$ref": "#/definitions/ModelDetails"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size_vram": {
+          "type": "number"
+        }
+      },
+      "required": ["name", "modified_at", "model", "size", "digest", "details", "expires_at", "size_vram"],
+      "additionalProperties": false
+    },
+    "ModelDetails": {
+      "type": "object",
+      "properties": {
+        "parent_model": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "families": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parameter_size": {
+          "type": "string"
+        },
+        "quantization_level": {
+          "type": "string"
+        }
+      },
+      "required": ["parent_model", "format", "family", "families", "parameter_size", "quantization_level"],
+      "additionalProperties": false
+    },
+    "ChatAction": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "stream": {
+              "type": "boolean",
+              "const": false
+            },
+            "messages": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OllamaApiMessage"
+              }
+            },
+            "model": {
+              "type": "string"
+            },
+            "format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "keep_alive": {
+              "type": ["string", "number"]
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Tool"
+              }
+            },
+            "think": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "const": "high"
+                },
+                {
+                  "type": "string",
+                  "const": "medium"
+                },
+                {
+                  "type": "string",
+                  "const": "low"
+                }
+              ]
+            },
+            "logprobs": {
+              "type": "boolean"
+            },
+            "top_logprobs": {
+              "type": "number"
+            },
+            "options": {
+              "$ref": "#/definitions/Partial%3COptions%3E"
+            }
+          },
+          "required": ["messages", "model"]
+        },
+        "result": {
+          "$ref": "#/definitions/ChatResponse"
+        }
+      },
+      "required": ["body", "result"],
       "additionalProperties": false
     },
     "AiApi": {

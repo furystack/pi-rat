@@ -1,5 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
+import { registerRoute } from '../components/routes/auth-routes.js'
+import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
 type LoginPayload = {
@@ -55,6 +57,9 @@ export const Login = Shade({
           >
             <Button variant="contained" color="primary" type="submit">
               Login
+            </Button>
+            <Button variant="outlined" onclick={() => navigateToRoute(injector, registerRoute, {})}>
+              Create Account
             </Button>
           </div>
         </Form>

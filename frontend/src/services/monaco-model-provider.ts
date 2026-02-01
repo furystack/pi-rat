@@ -1,5 +1,6 @@
 import { Injectable } from '@furystack/inject'
-import { Uri, languages } from 'monaco-editor/esm/vs/editor/editor.api.js'
+
+import { json, Uri } from 'monaco-editor'
 
 @Injectable({ lifetime: 'singleton' })
 export class MonacoModelProvider {
@@ -10,10 +11,10 @@ export class MonacoModelProvider {
       return this.nameUriCache.get(schemaName) as Uri
     }
     const modelUri = Uri.parse(`pi-rat://shades/model-schemas-${schemaName}.json`)
-    languages.json.jsonDefaults.setDiagnosticsOptions({
+    json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
       schemas: [
-        ...(languages.json.jsonDefaults.diagnosticsOptions.schemas || []),
+        ...(json.jsonDefaults.diagnosticsOptions.schemas || []),
         {
           uri: `pi-rat://shades/model-schemas-${schemaName}.json`,
           fileMatch: [modelUri.toString()],

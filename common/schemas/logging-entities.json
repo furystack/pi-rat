@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/LogEntry",
+  "definitions": {
+    "LogEntry": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "description": "The scope of the log entry"
+        },
+        "message": {
+          "type": "string",
+          "description": "A short message describing the log entry"
+        },
+        "data": {
+          "description": "Additional structured data"
+        },
+        "level": {
+          "$ref": "#/definitions/LogLevel",
+          "description": "The log level"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the log entry"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The creation timestamp"
+        }
+      },
+      "required": ["createdAt", "id", "level", "message", "scope"],
+      "additionalProperties": false,
+      "description": "A log entry model"
+    },
+    "LogLevel": {
+      "type": "string",
+      "enum": ["verbose", "debug", "information", "warning", "error", "fatal"],
+      "description": "The verbosity level of a log entry"
+    }
+  }
+}

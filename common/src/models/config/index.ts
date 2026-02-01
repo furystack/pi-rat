@@ -1,5 +1,6 @@
 export * from './config.js'
 export * from './github-config.js'
 export * from './iot-config.js'
+export * from './movies-config.js'
 export * from './ollama-config.js'
 export * from './omdb-config.js'

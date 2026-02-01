@@ -3,11 +3,15 @@ import { expect } from '@playwright/test'
 import { readFile } from 'fs/promises'
 import { basename } from 'path'
 
-export const assertAndDismissNoty = async (page: Page, text: string) => {
+export const assertAndDismissNoty = async (page: Page, text: string, options?: { timeout?: number }) => {
+  const timeout = options?.timeout ?? 30_000
   const noty = page.locator('shade-noty', { hasText: text })
+
+  await expect(noty).toBeVisible({ timeout })
+
   const closeNoty = noty.locator('button.dismissNoty')
   await closeNoty.click()
-  await noty.waitFor({ state: 'detached' })
+  await expect(noty).not.toBeVisible()
 }
 
 export const login = async (page: Page, username = 'testuser@gmail.com', password = 'password') => {
@@ -15,35 +19,113 @@ export const login = async (page: Page, username = 'testuser@gmail.com', passwor
   await expect(loginForm).toBeVisible()
 
   const usernameInput = loginForm.locator('input[name="userName"]')
-  await expect(usernameInput).toBeVisible()
-
   const passwordInput = loginForm.locator('input[name="password"]')
-  await expect(passwordInput).toBeVisible()
-
-  const submitButton = page.locator('shade-login button', { hasText: 'Login' })
-  await expect(submitButton).toBeVisible()
-  await expect(submitButton).toBeEnabled()
-  await expect(submitButton).toHaveText('Login')
+  const submitButton = page.getByRole('button', { name: 'Login' })
 
   await usernameInput.fill(username)
   await passwordInput.fill(password)
-
   await submitButton.click()
 
   await assertAndDismissNoty(page, 'Welcome back ;)')
 
-  page.locator('button', { hasText: 'Log Out' })
+  // Verify user is logged in by checking for user avatar (should contain first letter of username)
+  const firstLetter = username.charAt(0).toUpperCase()
+  const userAvatar = page.getByText(firstLetter).first()
+  await expect(userAvatar).toBeVisible()
 }
 
 export const logout = async (page: Page) => {
-  const logoutButton = page.locator('shade-app-bar button', { hasText: 'Log Out' })
+  // Find and click the user avatar (circular div with user's first letter)
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await expect(userAvatar).toBeVisible()
+  await userAvatar.click()
+
+  // Wait for dropdown menu and click logout - use getByRole for better accessibility
+  const logoutButton = page.getByRole('button', { name: /log out/i })
   await expect(logoutButton).toBeVisible()
-  await expect(logoutButton).toBeEnabled()
-  await expect(logoutButton).toHaveText('Log Out')
   await logoutButton.click()
 
-  const loggedOutLoginForm = page.locator('shade-login form.login-form')
-  await expect(loggedOutLoginForm).toBeVisible()
+  // Wait for logout to complete and verify login form appears
+  const loginForm = page.locator('shade-login form')
+  await expect(loginForm).toBeVisible()
+}
+
+export const navigateToUserSettings = async (page: Page) => {
+  // Click on the user avatar to open the menu
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await userAvatar.click()
+
+  // Click on User Settings option
+  const settingsButton = page.getByRole('button', { name: /user settings/i })
+  await settingsButton.click()
+
+  // Verify we're on the settings page
+  const settingsPage = page.locator('user-settings-page')
+  await expect(settingsPage).toBeVisible()
+}
+
+export const navigateToAppSettings = async (page: Page) => {
+  // Click on the user avatar to open the menu
+  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  await expect(userAvatar).toBeVisible()
+  await userAvatar.click()
+
+  // Click on Application Settings option (only visible to admin users)
+  const appSettingsButton = page.getByRole('button', { name: /application settings/i })
+  await expect(appSettingsButton).toBeVisible()
+  await appSettingsButton.click()
+
+  // Wait for URL to change to app-settings
+  await page.waitForURL(/\/app-settings/)
+
+  // Verify we're on the app settings page (may need to wait for lazy load)
+  const appSettingsPage = page.locator('app-settings-page')
+  await expect(appSettingsPage).toBeVisible({ timeout: 10000 })
+}
+
+/**
+ * @deprecated Use navigateToAppSettings instead
+ */
+export const navigateToAdminSettings = navigateToAppSettings
+
+export const navigateToUsersSettings = async (page: Page) => {
+  await navigateToAppSettings(page)
+
+  // Click on Users menu item in the Identity section
+  await page.getByText('Users').click()
+
+  // Wait for URL to change to users list
+  await page.waitForURL(/\/app-settings\/users/)
+
+  // Verify we're on the users list page
+  const usersListPage = page.locator('user-list-page')
+  await expect(usersListPage).toBeVisible({ timeout: 10000 })
+}
+
+export const registerUser = async (page: Page, username: string, password: string) => {
+  await page.goto('/')
+
+  // Navigate to registration page
+  const createAccountButton = page.locator('button', { hasText: 'Create Account' })
+  await expect(createAccountButton).toBeVisible()
+  await createAccountButton.click()
+
+  // Fill registration form
+  const registerForm = page.locator('shade-register form')
+  await expect(registerForm).toBeVisible()
+
+  const usernameInput = registerForm.locator('input[name="userName"]')
+  const passwordInput = registerForm.locator('input[name="password"]')
+  const confirmPasswordInput = registerForm.locator('input[name="confirmPassword"]')
+  const createAccountSubmitButton = page.locator('shade-register button', { hasText: 'Create Account' })
+
+  await usernameInput.fill(username)
+  await passwordInput.fill(password)
+  await confirmPasswordInput.fill(password)
+  await createAccountSubmitButton.click()
+
+  // Should be logged in automatically after successful registration
+  await assertAndDismissNoty(page, 'Account created successfully')
 }
 
 export const uploadFile = async (page: Page, filePath: string, mime: string) => {

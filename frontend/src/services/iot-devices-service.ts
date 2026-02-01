@@ -118,7 +118,7 @@ export class IotDevicesService {
       body,
     })
 
-    void this.deviceCache.reload(name)
+    await this.deviceCache.reload(name)
     this.deviceQueryCache.flushAll()
     this.deviceAwakeHistoryCache.flushAll()
     this.devicePingHistoryCache.flushAll()
@@ -170,10 +170,16 @@ export class IotDevicesService {
   public init() {
     this.websocketNotificationsService.addListener('onMessage', (message) => {
       if (message.type === 'device-connected' || message.type === 'device-disconnected') {
-        void void this.deviceCache.reload(message.device.name)
+        void this.deviceCache.reload(message.device.name).catch((error) => {
+          console.error('Failed to reload device cache:', error)
+        })
         this.deviceAwakeHistoryCache.obsoleteRange((v) => v.entries.some((e) => e.name === message.device.name))
         this.devicePingHistoryCache.obsoleteRange((v) => v.entries.some((e) => e.name === message.device.name))
-        void this.devicePingHistoryCache.reload(message.device.name, { top: 1, order: { createdAt: 'DESC' } })
+        void this.devicePingHistoryCache
+          .reload(message.device.name, { top: 1, order: { createdAt: 'DESC' } })
+          .catch((error) => {
+            console.error('Failed to reload device ping history cache:', error)
+          })
       }
     })
   }

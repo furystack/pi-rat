@@ -10,7 +10,6 @@ import { setupAiStore } from './setup-ai-store.js'
 
 export const setupAi = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('AI Setup')
-  await logger.verbose({ message: '🤖   Initializing AI Services' })
   const clientService = injector.getInstance(OllamaClientService)
 
   const storeManager = getStoreManager(injector)

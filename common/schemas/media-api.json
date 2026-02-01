@@ -573,15 +573,7 @@
         "probe_score": {
           "type": "number"
         },
-        "tags": {
-          "$ref": "#/definitions/Record%3Cstring%2C(string%7Cnumber)%3E"
-        }
-      }
-    },
-    "Record<string,(string|number)>": {
-      "type": "object",
-      "additionalProperties": {
-        "type": ["string", "number"]
+        "tags": {}
       }
     },
     "ChapterData": {

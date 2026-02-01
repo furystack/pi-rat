@@ -1,0 +1,114 @@
+# Development Patterns
+
+## API Development
+
+### Action Pattern
+
+```typescript
+import { getCurrentUser } from '@furystack/core'
+import { getLogger } from '@furystack/logging'
+import { JsonResult, RequestError, type RequestAction } from '@furystack/rest-service'
+
+export const ActionName: RequestAction<ActionType> = async ({ injector, getBody }) => {
+  const logger = getLogger(injector).withScope('ActionName')
+  const currentUser = await getCurrentUser(injector) // If auth required
+
+  try {
+    const body = await getBody()
+    // Action logic here
+    return JsonResult(result)
+  } catch (error) {
+    await logger.error({ message: 'Action failed', data: { error } })
+    throw new RequestError('User-friendly message', 400)
+  }
+}
+```
+
+### Workflow
+
+1. **Define API**: Add to `common/src/apis/[module].ts`
+2. **Generate Schema**: Run `yarn create-schemas`
+3. **Implement Action**: Create in `service/src/app-models/[module]/actions/`
+4. **Register API**: Add to `setup-[module]-rest-api.ts` with validation
+
+### Error Handling
+
+- `409` - Resource already exists
+- `400` - Validation errors
+- `401` - Authentication required
+- `404` - Resource not found
+- `500` - Internal server error
+
+Always log errors with context but return user-friendly messages.
+
+## Authentication Patterns
+
+### Password Operations
+
+```typescript
+// ✅ Use framework methods
+await authenticator.setPasswordForUser(username, currentPassword, newPassword)
+
+// ❌ Don't implement custom validation
+const isValid = password.length >= 8 // Don't do this
+```
+
+### Registration Flow
+
+1. **Validate input** (email format, required fields)
+2. **Check existing user** (return 409 if exists)
+3. **Create credential first** (fail fast on invalid password)
+4. **Create user record**
+5. **Auto-login** on success
+6. **Cleanup** partial state on failure
+
+### Security Principles
+
+- Use `getCurrentUser(injector)` to verify authentication
+- Let `PasswordAuthenticator` handle complexity requirements
+- Don't update user records during credential operations
+- Log security events for audit purposes
+
+## Module Organization
+
+### Backend Structure
+
+```
+service/src/app-models/[module]/
+├── actions/
+│   ├── create-[entity]-action.ts
+│   ├── update-[entity]-action.ts
+│   └── delete-[entity]-action.ts
+├── setup-[module]-rest-api.ts
+└── setup-[module]-store.ts
+```
+
+### Action Best Practices
+
+- **One action per file** with descriptive names
+- **Import order**: Framework → Common → Local
+- **Fail fast**: Validate early, create resources in dependency order
+- **Clean up**: Remove partial state on failures
+- **Log appropriately**: Use scoped loggers with meaningful context
+
+### Service Layer
+
+```typescript
+@Injectable({ lifetime: 'singleton' })
+export class MyService {
+  // Use observables for reactive state
+  public data = new ObservableValue(initialValue)
+
+  // Use operation wrapper for loading states
+  private operation() {
+    this.isLoading.setValue(true)
+    return { [Symbol.dispose]: () => this.isLoading.setValue(false) }
+  }
+
+  public async performAction() {
+    await usingAsync(this.operation(), async () => {
+      // Action logic with automatic loading state management
+    })
+  }
+}
+```

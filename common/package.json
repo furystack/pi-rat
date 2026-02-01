@@ -1,6 +1,6 @@
 {
   "name": "common",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "license": "GPL-2.0-only",
   "private": true,
   "type": "module",
@@ -25,13 +25,13 @@
     "create-schemas": "node ./dist/bin/create-schemas.js"
   },
   "devDependencies": {
-    "@types/node": "^24.0.3",
+    "@types/node": "^25.0.10",
     "ts-json-schema-generator": "^2.4.0",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@furystack/core": "^15.0.22",
-    "@furystack/rest": "^8.0.22",
-    "ollama": "^0.5.16"
+    "@furystack/core": "^15.0.34",
+    "@furystack/rest": "^8.0.34",
+    "ollama": "^0.6.3"
   }
 }

@@ -18,7 +18,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "const": "admin"
+        "enum": ["admin", "media-manager", "viewer", "iot-manager"]
       }
     },
     "IsAuthenticatedAction": {
@@ -79,6 +79,29 @@
       "required": ["result"],
       "additionalProperties": false
     },
+    "RegisterAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/FurystackUser"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          },
+          "required": ["username", "password"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "body"],
+      "additionalProperties": false
+    },
     "PostUserEndpoint": {
       "type": "object",
       "properties": {
@@ -137,6 +160,36 @@
       "required": ["roles"],
       "additionalProperties": false
     },
+    "PasswordResetAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          },
+          "required": ["success"],
+          "additionalProperties": false
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "currentPassword": {
+              "type": "string"
+            },
+            "newPassword": {
+              "type": "string"
+            }
+          },
+          "required": ["currentPassword", "newPassword"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["result", "body"],
+      "additionalProperties": false
+    },
     "IdentityApi": {
       "type": "object",
       "properties": {
@@ -168,11 +221,17 @@
             "/logout": {
               "$ref": "#/definitions/LogoutAction"
             },
+            "/register": {
+              "$ref": "#/definitions/RegisterAction"
+            },
             "/users": {
               "$ref": "#/definitions/PostUserEndpoint"
+            },
+            "/password-reset": {
+              "$ref": "#/definitions/PasswordResetAction"
             }
           },
-          "required": ["/login", "/logout", "/users"],
+          "required": ["/login", "/logout", "/register", "/users", "/password-reset"],
           "additionalProperties": false
         },
         "PATCH": {

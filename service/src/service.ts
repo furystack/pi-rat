@@ -3,27 +3,20 @@ import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
-import { SequelizeStore } from '@furystack/sequelize-store'
+import type { SequelizeStore } from '@furystack/sequelize-store'
 import { EventHub } from '@furystack/utils'
 import { User } from 'common'
-import { setupAiRestApi } from './ai/setup-ai-rest-api.js'
-import { setupAi } from './ai/setup-ai.js'
-import { setupChatRestApi } from './chat/setup-chat-api.js'
-import { setupChat } from './chat/setup-chat.js'
-import { setupConfigRestApi } from './config/setup-config-rest-api.js'
-import { setupConfig } from './config/setup-config.js'
-import { setupDashboardsRestApi } from './dashboards/setup-dashboards-rest-api.js'
-import { setupDashboards } from './dashboards/setup-dashboards.js'
-import { setupDrivesRestApi } from './drives/setup-drives-rest-api.js'
-import { setupDrives } from './drives/setup-drives.js'
-import { setupIdentityRestApi } from './identity/setup-identity-rest-api.js'
-import { setupIdentity } from './identity/setup-identity.js'
-import { setupInstallRestApi } from './install/setup-install-rest-api.js'
-import { setupInstall } from './install/setup-install.js'
-import { setupIotApi } from './iot/setup-iot-api.js'
-import { setupIot } from './iot/setup-iot.js'
-import { setupMoviesRestApi } from './media/setup-media-api.js'
-import { setupMovies } from './media/setup-media.js'
+import { AiAppModel } from './ai/ai-app-model.js'
+import { ChatAppModel } from './app-models/chat/chat-app-model.js'
+import { ConfigAppModel } from './app-models/config/config-app-model.js'
+import { DashboardsAppModel } from './app-models/dashboards/dashboard-app-model.js'
+import { DrivesAppModel } from './app-models/drives/drives-app-model.js'
+import { IdentityAppModel } from './app-models/identity/identity-app-model.js'
+import { InstallAppModel } from './app-models/install/install-app-model.js'
+import { IotAppModel } from './app-models/iot/iot-app-model.js'
+import { LoggingAppModel } from './app-models/logging/logging-app-model.js'
+import { MediaAppModel } from './app-models/media/media-app-model.js'
+import { AppModelManager } from './AppModelManager.js'
 import { setupPatcher } from './patcher/setup-patcher.js'
 import { setupFrontendBundle } from './setup-frontend-bundle.js'
 import { WebsocketService } from './websocket-service.js'
@@ -35,59 +28,38 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
 
   public async init(injector: Injector) {
     await this.logger.information({ message: '🐀 Starting PI-RAT service...' })
-    /**
-     * Set up stores and repositories
-     */
-    await this.logger.information({ message: '📦 Setting up stores and repositories...' })
-    await Promise.all([
-      await setupConfig(injector),
-      await setupIdentity(injector),
-      await setupDrives(injector),
-      await setupInstall(injector),
-      await setupDashboards(injector),
-      await setupMovies(injector),
-      await setupIot(injector),
-      await setupChat(injector),
-      await setupAi(injector),
-    ])
 
-    await this.logger.information({ message: '🔄 Syncing models...' })
-    const store = getStoreManager(injector).getStoreFor(User, 'username')
-    if (store instanceof SequelizeStore) {
-      const model = await store.getModel()
-      if (model.sequelize) {
-        await model.sequelize.sync({
-          alter: true,
-        })
-      }
-    }
+    const appModelManager = injector.getInstance(AppModelManager)
 
-    /**
-     * Execute patches
-     */
-    await setupPatcher(injector)
-
-    /**
-     * Setup REST APIs
-     */
-    await Promise.all([
-      await setupConfigRestApi(injector),
-      await setupIdentityRestApi(injector),
-      await setupDrivesRestApi(injector),
-      await setupInstallRestApi(injector),
-      await setupDashboardsRestApi(injector),
-      await setupMoviesRestApi(injector),
-      await setupIotApi(injector),
-      await setupChatRestApi(injector),
-      await setupAiRestApi(injector),
-    ])
+    await appModelManager.registerInternalAppModels(
+      injector.getInstance(LoggingAppModel),
+      injector.getInstance(ConfigAppModel),
+      injector.getInstance(IdentityAppModel),
+      injector.getInstance(InstallAppModel),
+      injector.getInstance(DrivesAppModel),
+      injector.getInstance(DashboardsAppModel),
+      injector.getInstance(MediaAppModel),
+      injector.getInstance(IotAppModel),
+      injector.getInstance(ChatAppModel),
+      injector.getInstance(AiAppModel),
+    )
 
     const wsService = injector.getInstance(WebsocketService)
     await wsService.announce({
       type: 'service-started',
     })
 
+    const userStore = getStoreManager(injector).getStoreFor(User, 'username') as unknown as SequelizeStore<
+      User,
+      any,
+      'username',
+      User
+    >
+    await userStore.sequelizeModel.sequelize?.sync()
+
     await setupFrontendBundle(injector)
+
+    await setupPatcher(injector)
 
     this.emit('initialized', undefined)
   }

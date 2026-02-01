@@ -2,8 +2,7 @@ import { Cache } from '@furystack/cache'
 import type { FindOptions, WithOptionalId } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import { EventHub, PathHelper } from '@furystack/utils'
-import type { Drive, WebsocketMessage } from 'common'
-import type { FileChangeMessage } from '../../../common/src/websocket/file-change-message.js'
+import type { Drive, FileChangeMessage, WebsocketMessage } from 'common'
 import { DrivesApiClient } from './api-clients/drives-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
@@ -122,7 +121,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
 
   private onMessage = ((messageData: WebsocketMessage) => {
     if (messageData.type === 'file-change') {
-      this.emit('onFilesystemChanged', messageData as FileChangeMessage)
+      this.emit('onFilesystemChanged', messageData)
 
       this.fileListCache.obsoleteRange((fileList) => {
         const rootPath = PathHelper.getParentPath(messageData.path)

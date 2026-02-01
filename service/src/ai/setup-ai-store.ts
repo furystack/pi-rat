@@ -32,7 +32,6 @@ class AiChatMessageModel extends Model<AiChatMessage, AiChatMessage> implements 
 
 export const setupAiStore = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('AI Store Setup')
-  await logger.verbose({ message: '🤖   Initializing AI Store' })
 
   const dbOptions = getDefaultDbSettings('ai.sqlite', logger)
 

@@ -1,6 +1,6 @@
 {
   "name": "pi-rat",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "example web app based on furystack",
   "main": "service/src/index.ts",
   "repository": "https://github.com/furystack/pi-rat.git",
@@ -16,24 +16,27 @@
     ]
   },
   "devDependencies": {
-    "@eslint/js": "^9.29.0",
-    "@playwright/test": "^1.53.1",
-    "@types/node": "^24.0.3",
-    "@vitest/coverage-v8": "^3.2.4",
-    "eslint": "^9.29.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-import": "2.31.0",
-    "eslint-plugin-jsdoc": "^51.0.3",
-    "eslint-plugin-playwright": "^2.2.0",
-    "eslint-plugin-prettier": "^5.5.0",
+    "@eslint/js": "^9.39.2",
+    "@furystack/yarn-plugin-changelog": "^1.0.1",
+    "@playwright/test": "^1.58.0",
+    "@types/jsdom": "^27.0.0",
+    "@types/node": "^25.0.10",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-jsdoc": "^62.4.1",
+    "eslint-plugin-playwright": "^2.5.1",
+    "eslint-plugin-prettier": "^5.5.5",
     "husky": "^9.1.7",
-    "lint-staged": "^16.1.2",
-    "prettier": "^3.5.3",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.34.1",
-    "vite": "^6.3.5",
-    "vitest": "^3.2.4"
+    "jsdom": "^27.4.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.1",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
   },
   "husky": {
     "hooks": {
@@ -62,14 +65,14 @@
     "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
     "lint": "eslint .",
     "bumpVersions": "yarn version check --interactive",
-    "applyVersionBumps": "yarn version apply --all && echo TODO: Upgrade changelogs",
+    "applyReleaseChanges": "yarn version apply --all && yarn changelog apply && yarn format",
     "dockerize": "docker build . --tag furystack/pi-rat:latest",
     "sshIntoDocker": "docker run -i -t furystack/pi-rat sh",
-    "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
   },
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.12.0"
 }

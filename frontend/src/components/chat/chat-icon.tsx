@@ -1,6 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { AppBarLink } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
+import { chatPageRoute } from '../routes/chat-routes.js'
 
 export const ChatIcon = Shade({
   shadowDomName: 'shade-app-chat-icon',
@@ -13,7 +14,7 @@ export const ChatIcon = Shade({
     }
 
     return (
-      <AppBarLink title="Chat" href="/chat">
+      <AppBarLink title="Chat" href={chatPageRoute.url}>
         {sessionState === 'authenticated' ? '💬' : '🔒 Login to chat'}
       </AppBarLink>
     )
