@@ -13,13 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: yarn install --immutable
-      - name: Prettier check
-        run: yarn prettier:check
+      - name: Format check
+        run: yarn format:check
       - name: Build
         run: yarn build
         env:
@@ -30,7 +30,7 @@ jobs:
         run: yarn create-schemas && yarn build # an incremental rebuild is neccessary to use the updated schema
       - name: Test
         run: yarn test:unit
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
         env:

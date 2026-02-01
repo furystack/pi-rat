@@ -4,7 +4,11 @@ import { assertAndDismissNoty, login, logout, navigateToAppSettings, registerUse
 
 const TEST_USER_PASSWORD = 'testpassword123'
 
-const getTestUserName = (projectName: string) => `role-tester-${projectName}@test.com`
+/**
+ * Generate a unique test username per project and test attempt.
+ * This ensures retries don't fail due to user already existing from previous attempt.
+ */
+const getTestUserName = (projectName: string, testId: string) => `role-tester-${projectName}-${testId}@test.com`
 
 /**
  * Helper: Add a role to the user via dropdown. Returns the role name added, or null if no roles available.
@@ -61,7 +65,9 @@ const removeRole = async (page: Page): Promise<string | null> => {
 test.describe('User Management', () => {
   test('Admin can manage user roles', async ({ page }, testInfo) => {
     const projectName = testInfo.project.name
-    const testUserName = getTestUserName(projectName)
+    // Use retry count and timestamp to ensure unique username per test attempt
+    const testId = `${testInfo.retry}-${Date.now()}`
+    const testUserName = getTestUserName(projectName, testId)
 
     // ============================================
     // SETUP: Register a project-specific test user
@@ -135,6 +141,8 @@ test.describe('User Management', () => {
     // Reload and verify persistence
     await page.reload()
     await expect(detailsPage).toBeVisible()
+    // Wait for the role-tag to be rendered after the page fetches user data
+    await expect(detailsPage.locator('role-tag').first()).toBeVisible()
     expect(await detailsPage.locator('role-tag').count()).toBe(1)
 
     // Re-locate buttons after reload

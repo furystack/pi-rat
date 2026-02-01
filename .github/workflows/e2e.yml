@@ -11,10 +11,10 @@ jobs:
         node-version: [22.x, 24.x]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -30,7 +30,7 @@ jobs:
       - name: Dockerize
         run: yarn dockerize
 
-      - name: Start from Docker conatiner
+      - name: Start from Docker container
         run: docker run -d --name pi-rat -p 9090:9090 furystack/pi-rat
 
       - run: yarn test:e2e:install
