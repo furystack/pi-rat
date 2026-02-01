@@ -65,11 +65,11 @@
     "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
     "lint": "eslint .",
     "bumpVersions": "yarn version check --interactive",
-    "applyReleaseChanges": "yarn version apply --all && yarn changelog apply && yarn prettier:write",
+    "applyReleaseChanges": "yarn version apply --all && yarn changelog apply && yarn format",
     "dockerize": "docker build . --tag furystack/pi-rat:latest",
     "sshIntoDocker": "docker run -i -t furystack/pi-rat sh",
-    "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
   },
   "engines": {
     "node": ">=20.0.0"
