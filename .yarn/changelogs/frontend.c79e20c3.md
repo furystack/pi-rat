@@ -1,4 +1,5 @@
 <!-- version-type: patch -->
+
 # frontend
 
 <!--
@@ -18,15 +19,19 @@ appear before simple list items within each section.
 -->
 
 ## ✨ Features
+
 <!-- PLACEHOLDER: Describe your shiny new features (feat:) -->
 
 ## 🐛 Bug Fixes
+
 <!-- PLACEHOLDER: Describe the nasty little bugs that has been eradicated (fix:) -->
 
 ## 📚 Documentation
+
 <!-- PLACEHOLDER: Describe documentation changes (docs:) -->
 
 ## ⚡ Performance
+
 <!-- PLACEHOLDER: Describe performance improvements (perf:) -->
 
 ## ♻️ Refactoring
@@ -48,12 +53,15 @@ Migrated inline styles to CSS blocks using the Shades `css` property for better 
 - Login and registration pages
 
 ## 🧪 Tests
+
 <!-- PLACEHOLDER: Describe test changes (test:) -->
 
 ## 📦 Build
+
 <!-- PLACEHOLDER: Describe build system changes (build:) -->
 
 ## 👷 CI
+
 <!-- PLACEHOLDER: Describe CI configuration changes (ci:) -->
 
 ## ⬆️ Dependencies
@@ -64,4 +72,5 @@ Migrated inline styles to CSS blocks using the Shades `css` property for better 
 - Bumped `@types/node` to ^25.2.0
 
 ## 🔧 Chores
+
 <!-- PLACEHOLDER: Describe other changes (chore:) -->

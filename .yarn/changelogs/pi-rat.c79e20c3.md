@@ -1,4 +1,5 @@
 <!-- version-type: patch -->
+
 # pi-rat
 
 <!--
@@ -18,15 +19,19 @@ appear before simple list items within each section.
 -->
 
 ## ✨ Features
+
 <!-- PLACEHOLDER: Describe your shiny new features (feat:) -->
 
 ## 🐛 Bug Fixes
+
 <!-- PLACEHOLDER: Describe the nasty little bugs that has been eradicated (fix:) -->
 
 ## 📚 Documentation
+
 <!-- PLACEHOLDER: Describe documentation changes (docs:) -->
 
 ## ⚡ Performance
+
 <!-- PLACEHOLDER: Describe performance improvements (perf:) -->
 
 ## ♻️ Refactoring
@@ -40,6 +45,7 @@ appear before simple list items within each section.
 - Updated notification dismiss button selector from `.dismissNoty` to `.dismiss-button`
 
 ## 📦 Build
+
 <!-- PLACEHOLDER: Describe build system changes (build:) -->
 
 ## 👷 CI
@@ -56,4 +62,5 @@ appear before simple list items within each section.
 - Bumped `typescript-eslint` to ^8.54.0
 
 ## 🔧 Chores
+
 <!-- PLACEHOLDER: Describe other changes (chore:) -->
