@@ -17,6 +17,13 @@ export const Login = Shade({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    '& .button-row': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexDirection: 'row',
+      padding: '1em 0',
+    },
   },
   constructed: ({ element }) => {
     element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
@@ -46,15 +53,7 @@ export const Login = Shade({
           <h2>Login</h2>
           <Input labelTitle="E-mail address" name="userName" required autofocus type="email" />
           <Input labelTitle="Password" name="password" required minLength={4} type="password" />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
-              padding: '1em 0',
-            }}
-          >
+          <div className="button-row">
             <Button variant="contained" color="primary" type="submit">
               Login
             </Button>

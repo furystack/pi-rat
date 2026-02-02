@@ -11,6 +11,27 @@ export const FileInfoModal = Shade<{
   currentPath: string
 }>({
   shadowDomName: 'file-info-modal',
+  css: {
+    '& .modal-center': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+      height: '100%',
+    },
+    '& .modal-content': {
+      display: 'flex',
+      flexDirection: 'column',
+      minWidth: '300px',
+    },
+    '& .modal-content table': {
+      fontWeight: 'lighter',
+    },
+    '& .button-row': {
+      display: 'flex',
+      justifyContent: 'flex-end',
+    },
+  },
   render: ({ props }) => {
     const { entry, isInfoVisible, currentDriveLetter, currentPath } = props
     return (
@@ -25,22 +46,14 @@ export const FileInfoModal = Shade<{
         showAnimation={fadeIn}
         hideAnimation={fadeOut}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            height: '100%',
-          }}
-        >
-          <Paper style={{ display: 'flex', flexDirection: 'column', minWidth: '300px' }}>
+        <div className="modal-center">
+          <Paper className="modal-content">
             <h3>
               <FileIcon entry={entry} /> &nbsp;
               {entry.name}
             </h3>
 
-            <table style={{ fontWeight: 'lighter' }}>
+            <table>
               <tbody>
                 <tr>
                   <td>Drive</td>
@@ -77,7 +90,7 @@ export const FileInfoModal = Shade<{
               </tbody>
             </table>
 
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <div className="button-row">
               <Button onclick={() => isInfoVisible.setValue(false)}>Close</Button>
             </div>
           </Paper>

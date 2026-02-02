@@ -8,6 +8,63 @@ type OmdbFormData = OmdbConfig['value']
 
 export const OmdbSettingsPage = Shade({
   shadowDomName: 'omdb-settings-page',
+  css: {
+    '& .page-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '24px',
+      height: '100%',
+    },
+    '& .page-title': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .loading-text': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .api-key-row': {
+      display: 'flex',
+      alignItems: 'flex-end',
+      gap: '8px',
+    },
+    '& .api-key-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .api-key-hint a': {
+      color: 'var(--theme-primary-main)',
+    },
+    '& .checkbox-label': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      cursor: 'pointer',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .checkbox-label input': {
+      width: '18px',
+      height: '18px',
+      cursor: 'pointer',
+    },
+    '& .checkbox-title': {
+      fontWeight: '500',
+    },
+    '& .checkbox-description': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ injector, useObservable, useDisposable, element }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
@@ -57,9 +114,9 @@ export const OmdbSettingsPage = Shade({
     if (config.status === 'loading' || config.status === 'uninitialized') {
       return (
         <div>
-          <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>🎬 OMDB Settings</h2>
+          <h2 className="page-title">🎬 OMDB Settings</h2>
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-text-secondary)' }}>Loading settings...</p>
+            <p className="loading-text">Loading settings...</p>
           </Paper>
         </div>
       )
@@ -71,11 +128,9 @@ export const OmdbSettingsPage = Shade({
         : { apiKey: '', trySearchMovieFromTitle: true, autoDownloadMetadata: true }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-        <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>🎬 OMDB Settings</h2>
-        <p style={{ marginBottom: '24px', color: 'var(--theme-text-secondary)' }}>
-          Configure the OMDB API integration for fetching movie and series metadata.
-        </p>
+      <div className="page-container">
+        <h2 className="page-title">🎬 OMDB Settings</h2>
+        <p className="page-description">Configure the OMDB API integration for fetching movie and series metadata.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<Record<string, unknown>>
@@ -84,8 +139,8 @@ export const OmdbSettingsPage = Shade({
             }}
             onSubmit={(data) => void handleSubmit(data)}
           >
-            <div style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
+            <div className="form-field">
+              <div className="api-key-row">
                 <Input
                   labelTitle="API Key"
                   name="apiKey"
@@ -104,70 +159,39 @@ export const OmdbSettingsPage = Shade({
                   👁️ Show
                 </Button>
               </div>
-              <small style={{ color: 'var(--theme-text-secondary)', display: 'block', marginTop: '4px' }}>
+              <small className="api-key-hint">
                 Get your API key at{' '}
-                <a
-                  href="https://www.omdbapi.com/apikey.aspx"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: 'var(--theme-primary-main)' }}
-                >
+                <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener noreferrer">
                   omdbapi.com
                 </a>
               </small>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  cursor: 'pointer',
-                  color: 'var(--theme-text-primary)',
-                }}
-              >
-                <input
-                  type="checkbox"
-                  name="trySearchMovieFromTitle"
-                  checked={currentValues.trySearchMovieFromTitle}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
+            <div className="form-field">
+              <label className="checkbox-label">
+                <input type="checkbox" name="trySearchMovieFromTitle" checked={currentValues.trySearchMovieFromTitle} />
                 <div>
-                  <div style={{ fontWeight: '500' }}>Auto-search from filename</div>
-                  <small style={{ color: 'var(--theme-text-secondary)' }}>
+                  <div className="checkbox-title">Auto-search from filename</div>
+                  <small className="checkbox-description">
                     When a movie or series is added, automatically search for metadata based on the filename
                   </small>
                 </div>
               </label>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  cursor: 'pointer',
-                  color: 'var(--theme-text-primary)',
-                }}
-              >
-                <input
-                  type="checkbox"
-                  name="autoDownloadMetadata"
-                  checked={currentValues.autoDownloadMetadata}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
+            <div className="form-field">
+              <label className="checkbox-label">
+                <input type="checkbox" name="autoDownloadMetadata" checked={currentValues.autoDownloadMetadata} />
                 <div>
-                  <div style={{ fontWeight: '500' }}>Auto-download metadata</div>
-                  <small style={{ color: 'var(--theme-text-secondary)' }}>
+                  <div className="checkbox-title">Auto-download metadata</div>
+                  <small className="checkbox-description">
                     Automatically download metadata when a new IMDB ID is added
                   </small>
                 </div>
               </label>
             </div>
 
-            <div style={{ borderTop: '1px solid var(--theme-background-default)', paddingTop: '16px' }}>
+            <div className="form-footer">
               <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
                 {isLoading ? 'Saving...' : 'Save Settings'}
               </Button>

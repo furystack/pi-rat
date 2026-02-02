@@ -10,8 +10,32 @@ import { MessageList } from './message-list.js'
 
 export const ChatFlow = Shade({
   shadowDomName: 'shade-app-chat-flow',
-  style: {
+  css: {
     display: 'flex',
+    '& .empty-state': {
+      flexGrow: '1',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    '& .chat-container': {
+      flexGrow: '1',
+      display: 'flex',
+      width: 'calc(100% - 62px)',
+      flexDirection: 'column',
+      height: 'calc(100% - 28px)',
+      position: 'relative',
+    },
+    '& .chat-actions': {
+      position: 'absolute',
+      top: '8px',
+      right: '8px',
+    },
+    '& .messages-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+    },
   },
   render: ({ injector, useSearchState, useObservable }) => {
     const chatService = injector.getInstance(ChatService)
@@ -19,14 +43,7 @@ export const ChatFlow = Shade({
 
     if (!selectedChatId) {
       return (
-        <Paper
-          style={{
-            flexGrow: '1',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <Paper className="empty-state">
           <h2>Select a chat to start</h2>
         </Paper>
       )
@@ -50,29 +67,14 @@ export const ChatFlow = Shade({
     }
 
     return (
-      <Paper
-        style={{
-          flexGrow: '1',
-          display: 'flex',
-          width: 'calc(100% - 62px)',
-          flexDirection: 'column',
-          height: 'calc(100% - 28px)',
-          position: 'relative',
-        }}
-      >
+      <Paper className="chat-container">
         <h2>{selectedChat.value.name}</h2>
         <h5>{selectedChat.value.description}</h5>
-        <div
-          style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-          }}
-        >
+        <div className="chat-actions">
           <DeleteChatButton chat={selectedChat.value} />
           <InviteButton chat={selectedChat.value} />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className="messages-container">
           <MessageList
             style={{
               flexGrow: '1',
