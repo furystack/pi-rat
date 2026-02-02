@@ -1224,7 +1224,7 @@ This prevents test failures on functionality that doesn't exist yet while mainta
 
 ```bash
 # Unit tests
-yarn test:unit
+yarn test
 
 # E2E tests
 yarn test:e2e
@@ -1276,4 +1276,4 @@ vitest
 
 - Unit/Integration: `vitest`
 - E2E: `@playwright/test`
-- Test Runner: `yarn test:unit` or `yarn test:e2e`
+- Test Runner: `yarn test` or `yarn test:e2e`

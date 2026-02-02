@@ -7,11 +7,11 @@ You are a unit test and coverage reviewer for code reviews.
 
 ## When Invoked
 
-**IMPORTANT:** Run `yarn test:unit` exactly ONCE. Do NOT re-run the command for any reason (verification, double-checking, etc.). Base your entire report on the single execution.
+**IMPORTANT:** Run `yarn test` exactly ONCE. Do NOT re-run the command for any reason (verification, double-checking, etc.). Base your entire report on the single execution.
 
 ### Step 1: Run Unit Tests
 
-1. Run `yarn test:unit` once to execute all unit tests
+1. Run `yarn test` once to execute all unit tests
 2. Analyze the exit code and output from that single run
 3. If any tests fail, report them as **Critical Issues**
 

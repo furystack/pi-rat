@@ -1,5 +1,5 @@
 import type { Injector } from '@furystack/inject'
-import { createComponent } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import type { CommandPaletteSuggestionResult } from '@furystack/shades-common-components'
 
 export interface SuggestionOptions {
@@ -10,19 +10,54 @@ export interface SuggestionOptions {
   onSelected: (options: { injector: Injector }) => void
 }
 
+type SuggestionItemProps = {
+  name: string
+  description: string
+  icon: JSX.Element | string
+}
+
+const SuggestionItem = Shade<SuggestionItemProps>({
+  shadowDomName: 'command-palette-suggestion-item',
+  css: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    '& .suggestion-icon': {
+      flexGrow: '0',
+      margin: '0 15px 0 0',
+      fontSize: '1.5em',
+      width: '1.5em',
+    },
+    '& .suggestion-icon-inner': {
+      width: '100%',
+      height: '100%',
+    },
+    '& .suggestion-name': {
+      color: '#bbb',
+      fontWeight: 'bolder',
+    },
+    '& .suggestion-description': {
+      color: '#777',
+    },
+  },
+  render: ({ props }) => {
+    return (
+      <>
+        <div className="suggestion-icon">
+          <div className="suggestion-icon-inner">{props.icon}</div>
+        </div>
+        <div>
+          <div className="suggestion-name">{props.name}</div>
+          <div className="suggestion-description">{props.description}</div>
+        </div>
+      </>
+    )
+  },
+})
+
 export const createSuggestion = (options: SuggestionOptions) => ({
   name: options.name,
-  element: (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-      <div style={{ flexGrow: '0', margin: '0 15px 0 0', fontSize: '1.5em', width: '1.5em' }}>
-        <div style={{ width: '100%', height: '100%' }}>{options.icon}</div>
-      </div>
-      <div>
-        <div style={{ color: '#bbb', fontWeight: 'bolder' }}>{options.name}</div>
-        <div style={{ color: '#777' }}>{options.description}</div>
-      </div>
-    </div>
-  ),
+  element: <SuggestionItem name={options.name} description={options.description} icon={options.icon} />,
   score: options.score,
   onSelected: options.onSelected,
 })

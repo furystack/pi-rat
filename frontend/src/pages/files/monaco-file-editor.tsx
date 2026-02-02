@@ -85,6 +85,21 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
 
 const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onSave: (newValue: string) => void }>({
   shadowDomName: 'monaco-text-file-editor',
+  css: {
+    '& .editor-container': {
+      position: 'fixed',
+      top: '60px',
+      width: '100%',
+      height: 'calc(100% - 60px)',
+      overflow: 'hidden',
+    },
+    '& .button-bar': {
+      display: 'flex',
+      gap: '16px',
+      padding: '8px',
+      justifyContent: 'flex-end',
+    },
+  },
   render: ({ props, useDisposable }) => {
     const { initialValue, language } = props
 
@@ -104,15 +119,7 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
     })
 
     return (
-      <div
-        style={{
-          position: 'fixed',
-          top: '60px',
-          width: '100%',
-          height: 'calc(100% - 60px)',
-          overflow: 'hidden',
-        }}
-      >
+      <div className="editor-container">
         <MonacoEditor
           options={{
             language,
@@ -121,8 +128,7 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
           value={value.getValue()}
           onValueChange={(newValue) => value.setValue(newValue)}
         />
-        <div style={{ display: 'flex', gap: '16px', padding: '8px' }}>
-          <div style={{ flex: '1' }} />
+        <div className="button-bar">
           <Button className="revert" onclick={() => value.setValue(initialValue)}>
             Revert
           </Button>

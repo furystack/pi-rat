@@ -18,7 +18,7 @@
 # ✅ Good - using the correct package manager (pi-rat uses yarn)
 yarn install
 yarn build
-yarn test:unit
+yarn test
 
 # ❌ Avoid - using wrong package manager
 npm install       # When yarn.lock exists
@@ -34,7 +34,7 @@ When executing package.json scripts:
 yarn start:service
 yarn start:frontend
 yarn build
-yarn test:unit
+yarn test
 yarn test:e2e
 
 # ❌ Avoid - mixing package managers
@@ -52,7 +52,7 @@ Based on pi-rat's `package.json`:
     "create-schemas": "yarn workspace common create-schemas",
     "test:e2e:install": "yarn playwright test --grep @install --project chromium",
     "test:e2e": "yarn playwright test --grep-invert @install",
-    "test:unit": "vitest",
+    "test": "vitest",
     "start:service": "yarn workspace service start",
     "start:frontend": "yarn workspace frontend start",
     "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
@@ -81,7 +81,7 @@ yarn clean             # Clean build artifacts
 **Testing:**
 
 ```bash
-yarn test:unit              # Unit tests with vitest
+yarn test              # Unit tests with vitest
 yarn test:e2e:install       # Install test (run once)
 yarn test:e2e               # E2E tests with Playwright
 ```
@@ -150,7 +150,7 @@ Prefer using defined npm scripts over direct command execution:
 
 ```bash
 # ✅ Good - using defined scripts
-yarn test:unit
+yarn test
 yarn lint
 yarn prettier:write
 
@@ -167,7 +167,7 @@ prettier --write .
 ```bash
 # ✅ Good - production build sequence
 yarn lint           # Check code quality
-yarn test:unit      # Run unit tests
+yarn test      # Run unit tests
 yarn build          # Build and type check all workspaces
 ```
 
@@ -189,7 +189,7 @@ yarn start:frontend
 yarn install --frozen-lockfile  # Ensure exact versions
 yarn lint                       # Lint check
 yarn prettier:check             # Format check
-yarn test:unit                  # Unit tests
+yarn test:                  # Unit tests
 yarn build                      # Type check and build
 yarn test:e2e:install           # Install E2E prerequisites (once)
 yarn test:e2e                   # E2E tests
@@ -203,7 +203,7 @@ Use environment variables for configuration:
 
 ```bash
 # ✅ Good - using environment variables
-NODE_ENV=test yarn test:unit
+NODE_ENV=test yarn test
 NODE_ENV=production yarn build
 
 # ✅ Good - using cross-env for cross-platform compatibility
@@ -257,7 +257,7 @@ yarn build
 
 ```bash
 # ✅ Good - test workflows
-yarn test:unit              # Quick feedback
+yarn test              # Quick feedback
 yarn test:e2e:install       # One-time setup
 yarn test:e2e               # Full E2E suite
 ```
@@ -310,7 +310,7 @@ yarn build
 
 - Development: `yarn start:service` + `yarn start:frontend`
 - Build: `yarn build`
-- Test: `yarn test:unit` + `yarn test:e2e`
+- Test: `yarn test` + `yarn test:e2e`
 - Format: `yarn prettier:write`
 - Lint: `yarn lint`
 - Clean: `yarn clean`

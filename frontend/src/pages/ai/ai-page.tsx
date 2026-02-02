@@ -6,7 +6,7 @@ import { CreateAiChatButton } from './create-ai-chat-button.js'
 
 export const AiPage = Shade({
   shadowDomName: 'pi-rat-ai-page',
-  style: {
+  css: {
     marginTop: '48px',
     display: 'flex',
     flexDirection: 'column',
@@ -15,45 +15,42 @@ export const AiPage = Shade({
     height: 'calc(100% - 48px)',
     gap: '16px',
     overflow: 'hidden',
+    '& .ai-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: '1',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+    },
+    '& .ai-header': {
+      display: 'flex',
+      flexDirection: 'row',
+      flexGrow: '1',
+      flex: '5',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    '& .ai-body': {
+      display: 'flex',
+      flexDirection: 'row',
+      width: '100%',
+      overflow: 'hidden',
+      flexGrow: '1',
+    },
   },
   render: ({ useSearchState }) => {
     const [selectedChatId, setSelectedChatId] = useSearchState('selectedChat', '')
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: '1',
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-        }}
-      >
+      <div className="ai-container">
         <Paper style={{ display: 'flex', flexDirection: 'row', width: 'calc(100% - 48px)', flexGrow: '0' }}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexGrow: '1',
-              flex: '5',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
+          <div className="ai-header">
             <h1>AI Chats</h1>
             <CreateAiChatButton />
           </div>
         </Paper>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            width: '100%',
-            overflow: 'hidden',
-            flexGrow: '1',
-          }}
-        >
+        <div className="ai-body">
           <AiChatList
             style={{ height: '100%', minWidth: '250px' }}
             onSelect={({ id }) => setSelectedChatId(id)}

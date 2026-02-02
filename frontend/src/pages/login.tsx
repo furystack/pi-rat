@@ -11,6 +11,20 @@ type LoginPayload = {
 
 export const Login = Shade({
   shadowDomName: 'shade-login',
+  css: {
+    padding: '1em',
+    marginTop: '48px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    '& .button-row': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexDirection: 'row',
+      padding: '1em 0',
+    },
+  },
   constructed: ({ element }) => {
     element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
   },
@@ -27,13 +41,6 @@ export const Login = Shade({
         }
       },
     })
-    Object.assign(element.style, {
-      padding: '1em',
-      marginTop: '48px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    })
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>
         <Form<LoginPayload>
@@ -46,15 +53,7 @@ export const Login = Shade({
           <h2>Login</h2>
           <Input labelTitle="E-mail address" name="userName" required autofocus type="email" />
           <Input labelTitle="Password" name="password" required minLength={4} type="password" />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
-              padding: '1em 0',
-            }}
-          >
+          <div className="button-row">
             <Button variant="contained" color="primary" type="submit">
               Login
             </Button>

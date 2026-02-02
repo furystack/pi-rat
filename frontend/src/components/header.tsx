@@ -18,6 +18,11 @@ export interface HeaderProps {
 
 const AdminLinks = Shade({
   shadowDomName: 'shade-app-header-admin-links',
+  css: {
+    display: 'flex',
+    placeContent: 'center',
+    gap: '8px',
+  },
   render: ({ injector, useObservable }) => {
     const session = injector.getInstance(SessionService)
     const [currentUser] = useObservable('currentUser', session.currentUser)
@@ -25,17 +30,25 @@ const AdminLinks = Shade({
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
     return isAdmin ? (
-      <div style={{ display: 'flex', placeContent: 'center', gap: '8px' }}>
-        <AppBarLink href={fileBrowserRoute.url} title="Drives">
-          📂 Files
-        </AppBarLink>
-      </div>
+      <AppBarLink href={fileBrowserRoute.url} title="Drives">
+        📂 Files
+      </AppBarLink>
     ) : null
   },
 })
 
 export const Header = Shade<HeaderProps>({
   shadowDomName: 'shade-app-header',
+  css: {
+    '& .header-spacer': {
+      flex: '1',
+    },
+    '& .header-actions': {
+      display: 'flex',
+      placeContent: 'center',
+      marginRight: '24px',
+    },
+  },
   render: ({ props, injector, useObservable }) => {
     const session = injector.getInstance(SessionService)
     const [sessionState] = useObservable('sessionState', session.state)
@@ -60,9 +73,9 @@ export const Header = Shade<HeaderProps>({
           </>
         ) : null}
 
-        <div style={{ flex: '1' }}>{sessionState === 'authenticated' && <PiRatCommandPalette />}</div>
+        <div className="header-spacer">{sessionState === 'authenticated' && <PiRatCommandPalette />}</div>
 
-        <div style={{ display: 'flex', placeContent: 'center', marginRight: '24px' }}>
+        <div className="header-actions">
           <ThemeSwitch />
           <Button
             onclick={() => {

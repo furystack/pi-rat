@@ -3,7 +3,7 @@ import { cssVariableTheme } from '@furystack/shades-common-components'
 
 export const SettingsSidebar = Shade({
   shadowDomName: 'settings-sidebar',
-  style: {
+  css: {
     display: 'block',
     width: '240px',
     minWidth: '240px',

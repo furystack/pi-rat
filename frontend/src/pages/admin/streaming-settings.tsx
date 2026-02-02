@@ -20,6 +20,76 @@ const PRESET_OPTIONS = [
 
 export const StreamingSettingsPage = Shade({
   shadowDomName: 'streaming-settings-page',
+  css: {
+    '& .page-title': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .loading-text': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .section-title': {
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+      fontSize: '16px',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .checkbox-label': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      cursor: 'pointer',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .checkbox-label input': {
+      width: '18px',
+      height: '18px',
+      cursor: 'pointer',
+    },
+    '& .checkbox-title': {
+      fontWeight: '500',
+    },
+    '& .checkbox-description': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .section-divider': {
+      borderTop: '1px solid var(--theme-background-default)',
+      margin: '24px 0',
+      paddingTop: '24px',
+    },
+    '& .select-label': {
+      display: 'block',
+      marginBottom: '8px',
+      fontWeight: '500',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .select-input': {
+      width: '100%',
+      maxWidth: '300px',
+      padding: '8px 12px',
+      fontSize: '14px',
+      borderRadius: '4px',
+      border: '1px solid var(--theme-background-paper)',
+      backgroundColor: 'var(--theme-background-default)',
+      color: 'var(--theme-text-primary)',
+      cursor: 'pointer',
+    },
+    '& .field-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
@@ -61,9 +131,9 @@ export const StreamingSettingsPage = Shade({
     if (config.status === 'loading' || config.status === 'uninitialized') {
       return (
         <div>
-          <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>📺 Streaming Settings</h2>
+          <h2 className="page-title">📺 Streaming Settings</h2>
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-text-secondary)' }}>Loading settings...</p>
+            <p className="loading-text">Loading settings...</p>
           </Paper>
         </div>
       )
@@ -82,10 +152,8 @@ export const StreamingSettingsPage = Shade({
 
     return (
       <div>
-        <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>📺 Streaming Settings</h2>
-        <p style={{ marginBottom: '24px', color: 'var(--theme-text-secondary)' }}>
-          Configure media transcoding and file watching settings.
-        </p>
+        <h2 className="page-title">📺 Streaming Settings</h2>
+        <p className="page-description">Configure media transcoding and file watching settings.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<Record<string, unknown>>
@@ -96,80 +164,42 @@ export const StreamingSettingsPage = Shade({
             }}
             onSubmit={(data) => void handleSubmit(data)}
           >
-            <h3 style={{ marginBottom: '16px', color: 'var(--theme-text-primary)', fontSize: '16px' }}>
-              File Discovery
-            </h3>
+            <h3 className="section-title">File Discovery</h3>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  cursor: 'pointer',
-                  color: 'var(--theme-text-primary)',
-                }}
-              >
+            <div className="form-field">
+              <label className="checkbox-label">
                 <input
                   type="checkbox"
                   name="autoExtractSubtitles"
                   checked={currentValues.autoExtractSubtitles ?? false}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
                 <div>
-                  <div style={{ fontWeight: '500' }}>Auto-extract subtitles</div>
-                  <small style={{ color: 'var(--theme-text-secondary)' }}>
+                  <div className="checkbox-title">Auto-extract subtitles</div>
+                  <small className="checkbox-description">
                     Automatically extract embedded subtitles when new media files are discovered
                   </small>
                 </div>
               </label>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  cursor: 'pointer',
-                  color: 'var(--theme-text-primary)',
-                }}
-              >
-                <input
-                  type="checkbox"
-                  name="fullSyncOnStartup"
-                  checked={currentValues.fullSyncOnStartup ?? false}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
+            <div className="form-field">
+              <label className="checkbox-label">
+                <input type="checkbox" name="fullSyncOnStartup" checked={currentValues.fullSyncOnStartup ?? false} />
                 <div>
-                  <div style={{ fontWeight: '500' }}>Full sync on startup</div>
-                  <small style={{ color: 'var(--theme-text-secondary)' }}>
+                  <div className="checkbox-title">Full sync on startup</div>
+                  <small className="checkbox-description">
                     Scan all configured drives for media files when the service starts
                   </small>
                 </div>
               </label>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  cursor: 'pointer',
-                  color: 'var(--theme-text-primary)',
-                }}
-              >
-                <input
-                  type="checkbox"
-                  name="watchFiles"
-                  checked={currentValues.watchFiles === 'all'}
-                  value="all"
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
+            <div className="form-field">
+              <label className="checkbox-label">
+                <input type="checkbox" name="watchFiles" checked={currentValues.watchFiles === 'all'} value="all" />
                 <div>
-                  <div style={{ fontWeight: '500' }}>Watch all files</div>
-                  <small style={{ color: 'var(--theme-text-secondary)' }}>
+                  <div className="checkbox-title">Watch all files</div>
+                  <small className="checkbox-description">
                     Monitor all drives for new media files (uncheck for custom drive configuration via advanced
                     settings)
                   </small>
@@ -177,50 +207,24 @@ export const StreamingSettingsPage = Shade({
               </label>
             </div>
 
-            <div
-              style={{ borderTop: '1px solid var(--theme-background-default)', margin: '24px 0', paddingTop: '24px' }}
-            >
-              <h3 style={{ marginBottom: '16px', color: 'var(--theme-text-primary)', fontSize: '16px' }}>
-                Transcoding
-              </h3>
+            <div className="section-divider">
+              <h3 className="section-title">Transcoding</h3>
 
-              <div style={{ marginBottom: '24px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontWeight: '500',
-                    color: 'var(--theme-text-primary)',
-                  }}
-                >
-                  Preset
-                </label>
-                <select
-                  name="preset"
-                  style={{
-                    width: '100%',
-                    maxWidth: '300px',
-                    padding: '8px 12px',
-                    fontSize: '14px',
-                    borderRadius: '4px',
-                    border: '1px solid var(--theme-background-paper)',
-                    backgroundColor: 'var(--theme-background-default)',
-                    color: 'var(--theme-text-primary)',
-                    cursor: 'pointer',
-                  }}
-                >
+              <div className="form-field">
+                <label className="select-label">Preset</label>
+                <select name="preset" className="select-input">
                   {PRESET_OPTIONS.map((option) => (
                     <option value={option.value} selected={currentValues.preset === option.value}>
                       {option.label}
                     </option>
                   ))}
                 </select>
-                <small style={{ color: 'var(--theme-text-secondary)', display: 'block', marginTop: '4px' }}>
+                <small className="field-hint">
                   Faster presets = lower quality, slower presets = better quality at the cost of encoding time
                 </small>
               </div>
 
-              <div style={{ marginBottom: '24px' }}>
+              <div className="form-field">
                 <Input
                   labelTitle="Threads"
                   name="threads"
@@ -232,13 +236,11 @@ export const StreamingSettingsPage = Shade({
                   required
                   style={{ maxWidth: '150px' }}
                 />
-                <small style={{ color: 'var(--theme-text-secondary)', display: 'block', marginTop: '4px' }}>
-                  Number of CPU threads for transcoding (1-64).
-                </small>
+                <small className="field-hint">Number of CPU threads for transcoding (1-64).</small>
               </div>
             </div>
 
-            <div style={{ borderTop: '1px solid var(--theme-background-default)', paddingTop: '16px' }}>
+            <div className="form-footer">
               <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
                 {isLoading ? 'Saving...' : 'Save Settings'}
               </Button>

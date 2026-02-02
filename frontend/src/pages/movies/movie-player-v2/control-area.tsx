@@ -26,12 +26,17 @@ export const SoundControl = Shade<{
   volume: ObservableValue<number>
 }>({
   shadowDomName: 'pirat-movie-player-v2-sound-control',
+  css: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   render: ({ props, useObservable }) => {
     const [isMuted, setIsMuted] = useObservable('isMuted', props.isMuted)
     const [volume] = useObservable('volume', props.volume)
 
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <>
         <ControlButton title={isMuted ? 'Unmute' : 'Mute'} onclick={() => setIsMuted(!isMuted)}>
           {isMuted ? '🔇' : '🔊'}
         </ControlButton>
@@ -42,44 +47,45 @@ export const SoundControl = Shade<{
           value={volume.toString()}
           onchange={(e) => props.volume.setValue((e.target as HTMLInputElement).value as unknown as number)}
         />
-      </div>
+      </>
     )
   },
 })
 
 export const ControlArea = Shade<ControlAreaProps>({
   shadowDomName: 'pirat-movie-player-v2-control-area',
+  css: {
+    '& .control-bar': {
+      position: 'absolute',
+      bottom: '0',
+      background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0) 100%)',
+      width: '100%',
+      height: '4em',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: '2147483647',
+    },
+    '& .progress-bar': {
+      position: 'absolute',
+      top: '-15px',
+      left: '10px',
+      width: 'calc(100% - 20px)',
+    },
+  },
   render: ({ props, useObservable }) => {
     const [isPlaying, setIsPlaying] = useObservable('isPlaying', props.isPlaying)
     const [progress] = useObservable('progress', props.watchedSeconds)
     const [isFullScreen, setFullScreen] = useObservable('isFullScreen', props.isFullScreen)
 
     return (
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '0',
-          background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0) 100%)',
-          width: '100%',
-          height: '4em',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: '2147483647',
-        }}
-      >
+      <div className="control-bar">
         <Input
           className="progress-bar"
           type="range"
           min="0"
           max={props.lengthSeconds.toString()}
           value={progress.toString()}
-          style={{
-            position: 'absolute',
-            top: '-15px',
-            left: '10px',
-            width: 'calc(100% - 20px)',
-          }}
           onTextChange={(e) => props.seekTo(parseInt(e, 10))}
         />
         {isPlaying ? (

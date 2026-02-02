@@ -1,4 +1,5 @@
-.yarn
+.yarn/*
+!.yarn/changelogs
 */bundle
 */dist
 */node_modules

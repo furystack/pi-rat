@@ -3,32 +3,27 @@ import { Loader } from '@furystack/shades-common-components'
 
 export const Init = Shade({
   shadowDomName: 'shade-init',
+  css: {
+    display: 'flex',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '& .initLoader': {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  },
   render: () => (
-    <div
-      style={{
-        display: 'flex',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <div
-        className="initLoader"
+    <div className="initLoader">
+      <Loader
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: '128px',
+          height: '128px',
         }}
-      >
-        <Loader
-          style={{
-            width: '128px',
-            height: '128px',
-          }}
-        />
-        <h2>Initializing app...</h2>
-      </div>
+      />
+      <h2>Initializing app...</h2>
     </div>
   ),
 })

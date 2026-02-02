@@ -18,6 +18,38 @@ const isValidUrl = (urlString: string): boolean => {
 
 export const AiSettingsPage = Shade({
   shadowDomName: 'ai-settings-page',
+  css: {
+    '& .page-title': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .loading-text': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .field-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .validation-error': {
+      color: 'var(--theme-error-main)',
+      backgroundColor: 'var(--theme-error-light)',
+      padding: '12px',
+      borderRadius: '4px',
+      marginBottom: '16px',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
@@ -74,9 +106,9 @@ export const AiSettingsPage = Shade({
     if (config.status === 'loading' || config.status === 'uninitialized') {
       return (
         <div>
-          <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>🤖 Ollama Integration</h2>
+          <h2 className="page-title">🤖 Ollama Integration</h2>
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-text-secondary)' }}>Loading settings...</p>
+            <p className="loading-text">Loading settings...</p>
           </Paper>
         </div>
       )
@@ -91,10 +123,8 @@ export const AiSettingsPage = Shade({
 
     return (
       <div>
-        <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>🤖 Ollama Integration</h2>
-        <p style={{ marginBottom: '24px', color: 'var(--theme-text-secondary)' }}>
-          Configure the connection to your Ollama server for AI-powered features.
-        </p>
+        <h2 className="page-title">🤖 Ollama Integration</h2>
+        <p className="page-description">Configure the connection to your Ollama server for AI-powered features.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<Record<string, unknown>>
@@ -105,7 +135,7 @@ export const AiSettingsPage = Shade({
             }}
             onSubmit={(data) => void handleSubmit(data)}
           >
-            <div style={{ marginBottom: '24px' }}>
+            <div className="form-field">
               <Input
                 labelTitle="Ollama Host URL"
                 name="host"
@@ -114,27 +144,18 @@ export const AiSettingsPage = Shade({
                 placeholder="http://localhost:11434"
                 style={{ maxWidth: '400px' }}
               />
-              <small style={{ color: 'var(--theme-text-secondary)', display: 'block', marginTop: '4px' }}>
+              <small className="field-hint">
                 The Ollama server URL including protocol (http or https). Leave empty to disable AI features.
               </small>
             </div>
 
             {validationError && (
-              <div
-                style={{
-                  color: 'var(--theme-error-main)',
-                  backgroundColor: 'var(--theme-error-light)',
-                  padding: '12px',
-                  borderRadius: '4px',
-                  marginBottom: '16px',
-                }}
-                data-testid="validation-error"
-              >
+              <div className="validation-error" data-testid="validation-error">
                 {validationError}
               </div>
             )}
 
-            <div style={{ borderTop: '1px solid var(--theme-background-default)', paddingTop: '16px' }}>
+            <div className="form-footer">
               <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
                 {isLoading ? 'Saving...' : 'Save Settings'}
               </Button>

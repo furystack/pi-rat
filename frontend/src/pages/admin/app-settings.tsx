@@ -85,13 +85,25 @@ const settingsRoutes = [
 
 export const AppSettingsPage = Shade({
   shadowDomName: 'app-settings-page',
-  style: {
+  css: {
     position: 'fixed',
     top: '0',
     left: '0',
     width: '100%',
     height: '100%',
     overflow: 'hidden',
+    '& .settings-layout': {
+      display: 'flex',
+      height: '100%',
+      width: '100%',
+      overflow: 'hidden',
+      marginTop: '48px',
+    },
+    '& .settings-content': {
+      flex: '1',
+      overflow: 'auto',
+      padding: '24px 48px',
+    },
   },
   render: ({ injector, useObservable }) => {
     const locationService = injector.getInstance(LocationService)
@@ -106,15 +118,7 @@ export const AppSettingsPage = Shade({
     }
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          height: '100%',
-          width: '100%',
-          overflow: 'hidden',
-          marginTop: '48px',
-        }}
-      >
+      <div className="settings-layout">
         <SettingsSidebar>
           <SettingsMenuSection title="Media">
             <SettingsMenuItem icon="🎬" label="OMDB Settings" href="/app-settings/omdb" />
@@ -131,13 +135,7 @@ export const AppSettingsPage = Shade({
           </SettingsMenuSection>
         </SettingsSidebar>
 
-        <div
-          style={{
-            flex: '1',
-            overflow: 'auto',
-            padding: '24px 48px',
-          }}
-        >
+        <div className="settings-content">
           <Router routes={settingsRoutes} />
         </div>
       </div>

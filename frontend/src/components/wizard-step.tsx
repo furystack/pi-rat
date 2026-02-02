@@ -6,6 +6,32 @@ export const WizardStep = Shade<
   { title: string; onSubmit?: (ev: SubmitEvent) => void | Promise<void> } & WizardStepProps
 >({
   shadowDomName: 'wizard-step',
+  css: {
+    '& form': {
+      padding: '32px',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '430px',
+      justifyContent: 'space-between',
+      maxWidth: 'calc(100% - 32px)',
+      maxHeight: 'calc(100% - 32px)',
+    },
+    '& h1': {
+      opacity: '0',
+    },
+    '& .content': {
+      opacity: '0',
+      flexShrink: '1',
+      overflow: 'auto',
+      padding: '0 .1em',
+    },
+    '& .actions': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      paddingTop: '12px',
+      opacity: '0',
+    },
+  },
   render: ({ props, element, children, useObservable, injector }) => {
     setTimeout(() => {
       void showParallax(element.querySelector('h1'))
@@ -38,29 +64,10 @@ export const WizardStep = Shade<
             props.onNext?.()
           }
         }}
-        style={{
-          padding: '32px',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '430px',
-          justifyContent: 'space-between',
-          maxWidth: 'calc(100% - 32px)',
-          maxHeight: 'calc(100% - 32px)',
-        }}
       >
-        <h1 style={{ opacity: '0' }}>{props.title}</h1>
-        <div style={{ opacity: '0', flexShrink: '1', overflow: 'auto', padding: '0 .1em' }} className="content">
-          {children}
-        </div>
-        <div
-          className="actions"
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            paddingTop: '12px',
-            opacity: '0',
-          }}
-        >
+        <h1>{props.title}</h1>
+        <div className="content">{children}</div>
+        <div className="actions">
           <Button onclick={() => props.onPrev?.()} disabled={props.currentPage < 1} variant="outlined">
             Previous
           </Button>

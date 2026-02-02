@@ -7,6 +7,81 @@ type UserListPageProps = Record<string, never>
 
 export const UserListPage = Shade<UserListPageProps>({
   shadowDomName: 'user-list-page',
+  css: {
+    '& .page-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '24px',
+      height: '100%',
+    },
+    '& .page-title': {
+      marginBottom: '8px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .loading-text': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .error-text': {
+      color: 'var(--theme-error-main)',
+    },
+    '& .users-table': {
+      width: '100%',
+      borderCollapse: 'collapse',
+      fontSize: '14px',
+    },
+    '& thead tr': {
+      backgroundColor: 'var(--theme-background-default)',
+      borderBottom: '1px solid var(--theme-border-default)',
+    },
+    '& th': {
+      padding: '12px 16px',
+      textAlign: 'left',
+      fontWeight: '600',
+      color: 'var(--theme-text-primary)',
+    },
+    '& th.actions-col': {
+      textAlign: 'right',
+    },
+    '& tbody tr': {
+      borderBottom: '1px solid var(--theme-border-default)',
+      cursor: 'pointer',
+      transition: 'background-color 0.15s ease',
+    },
+    '& tbody tr:hover': {
+      backgroundColor: 'var(--theme-background-default)',
+    },
+    '& td': {
+      padding: '12px 16px',
+    },
+    '& .username-cell': {
+      color: 'var(--theme-text-primary)',
+      fontWeight: '500',
+    },
+    '& .roles-cell': {
+      display: 'flex',
+      gap: '8px',
+      flexWrap: 'wrap',
+    },
+    '& .no-roles': {
+      color: 'var(--theme-text-secondary)',
+      fontStyle: 'italic',
+    },
+    '& .created-cell': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .actions-cell': {
+      textAlign: 'right',
+    },
+    '& .empty-row td': {
+      padding: '24px 16px',
+      textAlign: 'center',
+      color: 'var(--theme-text-secondary)',
+    },
+  },
   render: ({ injector, useObservable }) => {
     const usersService = injector.getInstance(UsersService)
     const locationService = injector.getInstance(LocationService)
@@ -39,23 +114,21 @@ export const UserListPage = Shade<UserListPageProps>({
     }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-        <h2 style={{ marginBottom: '8px', color: 'var(--theme-text-primary)' }}>👥 Users</h2>
-        <p style={{ marginBottom: '24px', color: 'var(--theme-text-secondary)' }}>
-          Manage user accounts and their roles.
-        </p>
+      <div className="page-container">
+        <h2 className="page-title">👥 Users</h2>
+        <p className="page-description">Manage user accounts and their roles.</p>
 
         {(usersState.status === 'loading' ||
           usersState.status === 'uninitialized' ||
           usersState.status === 'obsolete') && (
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-text-secondary)' }}>Loading users...</p>
+            <p className="loading-text">Loading users...</p>
           </Paper>
         )}
 
         {usersState.status === 'failed' && (
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-error-main)' }}>Error: {getErrorMessage(usersState.error)}</p>
+            <p className="error-text">Error: {getErrorMessage(usersState.error)}</p>
             <Button variant="outlined" onclick={handleRetry} style={{ marginTop: '12px' }}>
               Retry
             </Button>
@@ -64,106 +137,30 @@ export const UserListPage = Shade<UserListPageProps>({
 
         {usersState.status === 'loaded' && (
           <Paper elevation={1} style={{ padding: '0', overflow: 'hidden' }}>
-            <table
-              style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                fontSize: '14px',
-              }}
-            >
+            <table className="users-table">
               <thead>
-                <tr
-                  style={{
-                    backgroundColor: 'var(--theme-background-default)',
-                    borderBottom: '1px solid var(--theme-border-default)',
-                  }}
-                >
-                  <th
-                    style={{
-                      padding: '12px 16px',
-                      textAlign: 'left',
-                      fontWeight: '600',
-                      color: 'var(--theme-text-primary)',
-                    }}
-                  >
-                    Username
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 16px',
-                      textAlign: 'left',
-                      fontWeight: '600',
-                      color: 'var(--theme-text-primary)',
-                    }}
-                  >
-                    Roles
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 16px',
-                      textAlign: 'left',
-                      fontWeight: '600',
-                      color: 'var(--theme-text-primary)',
-                    }}
-                  >
-                    Created
-                  </th>
-                  <th
-                    style={{
-                      padding: '12px 16px',
-                      textAlign: 'right',
-                      fontWeight: '600',
-                      color: 'var(--theme-text-primary)',
-                    }}
-                  >
-                    Actions
-                  </th>
+                <tr>
+                  <th>Username</th>
+                  <th>Roles</th>
+                  <th>Created</th>
+                  <th className="actions-col">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {usersState.value.entries.map((user) => (
-                  <tr
-                    style={{
-                      borderBottom: '1px solid var(--theme-border-default)',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.15s ease',
-                    }}
-                    onclick={() => navigateToUser(user.username)}
-                    onmouseenter={(e) => {
-                      ;(e.currentTarget as HTMLTableRowElement).style.backgroundColor =
-                        'var(--theme-background-default)'
-                    }}
-                    onmouseleave={(e) => {
-                      ;(e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''
-                    }}
-                  >
-                    <td
-                      style={{
-                        padding: '12px 16px',
-                        color: 'var(--theme-text-primary)',
-                        fontWeight: '500',
-                      }}
-                    >
-                      {user.username}
-                    </td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <tr onclick={() => navigateToUser(user.username)}>
+                    <td className="username-cell">{user.username}</td>
+                    <td>
+                      <div className="roles-cell">
                         {user.roles.length > 0 ? (
                           user.roles.map((roleName) => <RoleTag roleName={roleName} variant="default" />)
                         ) : (
-                          <span style={{ color: 'var(--theme-text-secondary)', fontStyle: 'italic' }}>No roles</span>
+                          <span className="no-roles">No roles</span>
                         )}
                       </div>
                     </td>
-                    <td
-                      style={{
-                        padding: '12px 16px',
-                        color: 'var(--theme-text-secondary)',
-                      }}
-                    >
-                      {formatDate(user.createdAt)}
-                    </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                    <td className="created-cell">{formatDate(user.createdAt)}</td>
+                    <td className="actions-cell">
                       <Button
                         variant="outlined"
                         onclick={(e) => {
@@ -177,17 +174,8 @@ export const UserListPage = Shade<UserListPageProps>({
                   </tr>
                 ))}
                 {usersState.value.entries.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      style={{
-                        padding: '24px 16px',
-                        textAlign: 'center',
-                        color: 'var(--theme-text-secondary)',
-                      }}
-                    >
-                      No users found.
-                    </td>
+                  <tr className="empty-row">
+                    <td colSpan={4}>No users found.</td>
                   </tr>
                 )}
               </tbody>

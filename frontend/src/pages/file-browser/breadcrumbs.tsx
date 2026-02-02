@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { ThemeProviderService } from '@furystack/shades-common-components'
+import { cssVariableTheme } from '@furystack/shades-common-components'
 
 export const BreadCrumbs = Shade<{
   currentDrive: string
@@ -7,11 +7,24 @@ export const BreadCrumbs = Shade<{
   onChangePath: (newPath: string) => void
 }>({
   shadowDomName: 'drives-breadcrumbs',
-  render: ({ props, injector }) => {
+  css: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0.5em',
+    letterSpacing: '0.1em',
+    '& a': {
+      color: cssVariableTheme.text.secondary,
+      textDecoration: 'none',
+      transition: 'color 0.2s ease-in-out',
+    },
+    '& a:hover': {
+      color: cssVariableTheme.text.primary,
+    },
+  },
+  render: ({ props }) => {
     const { currentDrive: drive, currentPath: path, onChangePath: setPath } = props
 
     const segments = path.split('/').filter((s) => !!s)
-    const { theme } = injector.getInstance(ThemeProviderService)
 
     const segmentsWithRelativePaths = segments.map((s, i) => ({
       name: s,
@@ -19,30 +32,14 @@ export const BreadCrumbs = Shade<{
     }))
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0.5em',
-          letterSpacing: '0.1em',
-        }}
-      >
+      <>
         {drive}:/
         {segmentsWithRelativePaths.map((s) => (
-          <a
-            style={{ color: theme.text.secondary, textDecoration: 'none', transition: 'color 0.2s ease-in-out' }}
-            title={`${drive}:/${s.path}`}
-            onmouseenter={(ev) => (ev.currentTarget as HTMLElement)?.style?.setProperty?.('color', theme.text.primary)}
-            onmouseleave={(ev) =>
-              (ev.currentTarget as HTMLElement)?.style?.setProperty?.('color', theme.text.secondary)
-            }
-            href="#"
-            onclick={() => setPath(s.path)}
-          >
+          <a title={`${drive}:/${s.path}`} href="#" onclick={() => setPath(s.path)}>
             {s.name}/
           </a>
         ))}
-      </div>
+      </>
     )
   },
 })

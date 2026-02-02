@@ -31,7 +31,7 @@ steps:
   - script: yarn workspace service build
     displayName: 'Build Service'
 
-  - script: yarn test:unit
+  - script: yarn test
     displayName: 'Unit tests'
 
   - task: PublishTestResults@2

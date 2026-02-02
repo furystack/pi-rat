@@ -10,7 +10,7 @@ import { SpeechSynthesisService } from './speech-synthesis-service.js'
 
 export const ChatPage = Shade({
   shadowDomName: 'shade-app-chat-page',
-  style: {
+  css: {
     marginTop: '48px',
     display: 'flex',
     flexDirection: 'column',
@@ -19,6 +19,36 @@ export const ChatPage = Shade({
     height: 'calc(100% - 48px)',
     gap: '16px',
     overflow: 'hidden',
+    '& .chat-header': {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: '8px',
+      flexGrow: '0',
+      width: '100%',
+    },
+    '& .chat-header h1': {
+      margin: '0',
+      marginLeft: '16px',
+    },
+    '& .chat-body': {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: '8px',
+      flexGrow: '1',
+      overflow: 'hidden',
+      height: '100%',
+      width: '100%',
+    },
+    '& .chat-sidebar': {
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: '0',
+      minWidth: '250px',
+      height: '100%',
+      overflow: 'hidden',
+    },
   },
   render: ({ injector }) => {
     const speechSynthesis = injector.getInstance(SpeechSynthesisService)
@@ -29,17 +59,8 @@ export const ChatPage = Shade({
 
     return (
       <>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '8px',
-            flexGrow: '0',
-            width: '100%',
-          }}
-        >
-          <h1 style={{ margin: '0', marginLeft: '16px' }}>Chat Page</h1>
+        <div className="chat-header">
+          <h1>Chat Page</h1>
           <div>
             <Button
               onclick={async () => {
@@ -53,28 +74,8 @@ export const ChatPage = Shade({
             <AddChatButton />
           </div>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: '8px',
-            flexGrow: '1',
-            overflow: 'hidden',
-            height: '100%',
-            width: '100%',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              flexGrow: '0',
-              minWidth: '250px',
-              height: '100%',
-              overflow: 'hidden',
-            }}
-          >
+        <div className="chat-body">
+          <div className="chat-sidebar">
             <ChatList
               style={{
                 height: '100%',

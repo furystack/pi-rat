@@ -18,6 +18,94 @@ type RoleChange = {
 
 export const UserDetailsPage = Shade<UserDetailsPageProps>({
   shadowDomName: 'user-details-page',
+  css: {
+    '& .page-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '24px',
+      height: '100%',
+    },
+    '& .page-header': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '16px',
+    },
+    '& .page-header h2': {
+      margin: '0',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .loading-text': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .error-text': {
+      color: 'var(--theme-error-main)',
+    },
+    '& .section-title': {
+      marginTop: '0',
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .info-grid': {
+      display: 'grid',
+      gridTemplateColumns: '150px 1fr',
+      gap: '12px',
+      alignItems: 'center',
+    },
+    '& .info-label': {
+      color: 'var(--theme-text-secondary)',
+      fontWeight: '500',
+    },
+    '& .info-value': {
+      color: 'var(--theme-text-primary)',
+    },
+    '& .roles-container': {
+      marginBottom: '16px',
+    },
+    '& .roles-list': {
+      display: 'flex',
+      gap: '8px',
+      flexWrap: 'wrap',
+      minHeight: '32px',
+    },
+    '& .no-roles': {
+      color: 'var(--theme-text-secondary)',
+      fontStyle: 'italic',
+    },
+    '& .add-role-container': {
+      marginBottom: '16px',
+    },
+    '& .add-role-label': {
+      display: 'block',
+      marginBottom: '8px',
+      color: 'var(--theme-text-secondary)',
+      fontWeight: '500',
+      fontSize: '14px',
+    },
+    '& .add-role-select': {
+      padding: '8px 12px',
+      fontSize: '14px',
+      borderRadius: '4px',
+      border: '1px solid var(--theme-border-default)',
+      backgroundColor: 'var(--theme-background-paper)',
+      color: 'var(--theme-text-primary)',
+      cursor: 'pointer',
+      minWidth: '200px',
+    },
+    '& .validation-error': {
+      color: 'var(--theme-error-main)',
+      backgroundColor: 'rgba(244, 67, 54, 0.1)',
+      padding: '12px',
+      borderRadius: '4px',
+      marginBottom: '16px',
+      fontSize: '14px',
+    },
+    '& .button-row': {
+      display: 'flex',
+      gap: '12px',
+      borderTop: '1px solid var(--theme-border-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ props, injector, useObservable, useDisposable }) => {
     const usersService = injector.getInstance(UsersService)
     const locationService = injector.getInstance(LocationService)
@@ -200,25 +288,25 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     ]
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className="page-container">
+        <div className="page-header">
           <Button variant="outlined" onclick={navigateBack}>
             ← Back
           </Button>
-          <h2 style={{ margin: '0', color: 'var(--theme-text-primary)' }}>User Details</h2>
+          <h2>User Details</h2>
         </div>
 
         {(userState.status === 'loading' ||
           userState.status === 'uninitialized' ||
           userState.status === 'obsolete') && (
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-text-secondary)' }}>Loading user...</p>
+            <p className="loading-text">Loading user...</p>
           </Paper>
         )}
 
         {isFailedCacheResult(userState) && (
           <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-error-main)' }}>Error: {getErrorMessage(userState.error)}</p>
+            <p className="error-text">Error: {getErrorMessage(userState.error)}</p>
             <Button variant="outlined" onclick={navigateBack} style={{ marginTop: '12px' }}>
               Go Back
             </Button>
@@ -228,27 +316,25 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
         {hasCacheValue(userState) && (
           <>
             <Paper elevation={1} style={{ padding: '24px' }}>
-              <h3 style={{ marginTop: '0', marginBottom: '16px', color: 'var(--theme-text-primary)' }}>
-                User Information
-              </h3>
+              <h3 className="section-title">User Information</h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: '12px', alignItems: 'center' }}>
-                <span style={{ color: 'var(--theme-text-secondary)', fontWeight: '500' }}>Username:</span>
-                <span style={{ color: 'var(--theme-text-primary)' }}>{userState.value.username}</span>
+              <div className="info-grid">
+                <span className="info-label">Username:</span>
+                <span className="info-value">{userState.value.username}</span>
 
-                <span style={{ color: 'var(--theme-text-secondary)', fontWeight: '500' }}>Created:</span>
-                <span style={{ color: 'var(--theme-text-primary)' }}>{formatDate(userState.value.createdAt)}</span>
+                <span className="info-label">Created:</span>
+                <span className="info-value">{formatDate(userState.value.createdAt)}</span>
 
-                <span style={{ color: 'var(--theme-text-secondary)', fontWeight: '500' }}>Last Updated:</span>
-                <span style={{ color: 'var(--theme-text-primary)' }}>{formatDate(userState.value.updatedAt)}</span>
+                <span className="info-label">Last Updated:</span>
+                <span className="info-value">{formatDate(userState.value.updatedAt)}</span>
               </div>
             </Paper>
 
             <Paper elevation={1} style={{ padding: '24px' }}>
-              <h3 style={{ marginTop: '0', marginBottom: '16px', color: 'var(--theme-text-primary)' }}>Roles</h3>
+              <h3 className="section-title">Roles</h3>
 
-              <div style={{ marginBottom: '16px' }}>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', minHeight: '32px' }}>
+              <div className="roles-container">
+                <div className="roles-list">
                   {rolesToDisplay.length > 0 ? (
                     rolesToDisplay.map((roleName) => {
                       const variant = getRoleVariant(roleName)
@@ -262,35 +348,16 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
                       )
                     })
                   ) : (
-                    <span style={{ color: 'var(--theme-text-secondary)', fontStyle: 'italic' }}>No roles assigned</span>
+                    <span className="no-roles">No roles assigned</span>
                   )}
                 </div>
               </div>
 
               {availableRolesToAdd.length > 0 && (
-                <div style={{ marginBottom: '16px' }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      marginBottom: '8px',
-                      color: 'var(--theme-text-secondary)',
-                      fontWeight: '500',
-                      fontSize: '14px',
-                    }}
-                  >
-                    Add Role:
-                  </label>
+                <div className="add-role-container">
+                  <label className="add-role-label">Add Role:</label>
                   <select
-                    style={{
-                      padding: '8px 12px',
-                      fontSize: '14px',
-                      borderRadius: '4px',
-                      border: '1px solid var(--theme-border-default)',
-                      backgroundColor: 'var(--theme-background-paper)',
-                      color: 'var(--theme-text-primary)',
-                      cursor: 'pointer',
-                      minWidth: '200px',
-                    }}
+                    className="add-role-select"
                     onchange={(e) => {
                       const select = e.target as HTMLSelectElement
                       const roleName = select.value as Roles[number]
@@ -308,29 +375,9 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
                 </div>
               )}
 
-              {validationError && (
-                <div
-                  style={{
-                    color: 'var(--theme-error-main)',
-                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                    padding: '12px',
-                    borderRadius: '4px',
-                    marginBottom: '16px',
-                    fontSize: '14px',
-                  }}
-                >
-                  {validationError}
-                </div>
-              )}
+              {validationError && <div className="validation-error">{validationError}</div>}
 
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '12px',
-                  borderTop: '1px solid var(--theme-border-default)',
-                  paddingTop: '16px',
-                }}
-              >
+              <div className="button-row">
                 <Button
                   variant="contained"
                   color="primary"

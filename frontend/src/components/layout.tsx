@@ -1,13 +1,13 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { cssVariableTheme, NotyList } from '@furystack/shades-common-components'
+import { InstallService } from '../services/install-service.js'
 import { Body } from './body.js'
 import { Header } from './header.js'
 import { PiRatLazyLoad } from './pirat-lazy-load.js'
-import { InstallService } from '../services/install-service.js'
 
 export const Layout = Shade({
   shadowDomName: 'shade-app-layout',
-  style: {
+  css: {
     width: '100%',
     height: '100%',
     position: 'absolute',

@@ -9,7 +9,7 @@ export const assertAndDismissNoty = async (page: Page, text: string, options?: {
 
   await expect(noty).toBeVisible({ timeout })
 
-  const closeNoty = noty.locator('button.dismissNoty')
+  const closeNoty = noty.locator('button.dismiss-button')
   await closeNoty.click()
   await expect(noty).not.toBeVisible()
 }
@@ -34,9 +34,13 @@ export const login = async (page: Page, username = 'testuser@gmail.com', passwor
   await expect(userAvatar).toBeVisible()
 }
 
+export const getUserAvatar = (page: Page) => {
+  return page.locator('user-avatar-menu')
+}
+
 export const logout = async (page: Page) => {
-  // Find and click the user avatar (circular div with user's first letter)
-  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  // Find and click the user avatar menu
+  const userAvatar = getUserAvatar(page)
   await expect(userAvatar).toBeVisible()
   await userAvatar.click()
 
@@ -52,7 +56,7 @@ export const logout = async (page: Page) => {
 
 export const navigateToUserSettings = async (page: Page) => {
   // Click on the user avatar to open the menu
-  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  const userAvatar = getUserAvatar(page)
   await userAvatar.click()
 
   // Click on User Settings option
@@ -66,7 +70,7 @@ export const navigateToUserSettings = async (page: Page) => {
 
 export const navigateToAppSettings = async (page: Page) => {
   // Click on the user avatar to open the menu
-  const userAvatar = page.locator('[style*="border-radius: 50%"][style*="cursor: pointer"]')
+  const userAvatar = getUserAvatar(page)
   await expect(userAvatar).toBeVisible()
   await userAvatar.click()
 

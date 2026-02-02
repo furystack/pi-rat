@@ -43,7 +43,7 @@ jobs:
         run: yarn lint
 
       - name: Test
-        run: yarn test:unit
+        run: yarn test
 
       - name: Apply release changes
         run: yarn applyReleaseChanges
