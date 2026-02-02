@@ -9,7 +9,7 @@ export const assertAndDismissNoty = async (page: Page, text: string, options?: {
 
   await expect(noty).toBeVisible({ timeout })
 
-  const closeNoty = noty.locator('button.dismissNoty')
+  const closeNoty = noty.locator('button.dismiss-button')
   await closeNoty.click()
   await expect(noty).not.toBeVisible()
 }
