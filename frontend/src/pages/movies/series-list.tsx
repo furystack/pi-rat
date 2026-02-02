@@ -5,6 +5,15 @@ import { SeriesService } from '../../services/series-service.js'
 
 export const SeriesList = Shade({
   shadowDomName: 'shade-movie-list',
+  css: {
+    '& .series-grid': {
+      marginTop: '64px',
+      display: 'flex',
+      width: '100%',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    },
+  },
   render: ({ injector }) => {
     const seriesService = injector.getInstance(SeriesService)
     return (
@@ -13,9 +22,7 @@ export const SeriesList = Shade({
           const series = await seriesService.findSeries({})
 
           return (
-            <div
-              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}
-            >
+            <div className="series-grid">
               {series.entries.map((movie, index) => (
                 <SeriesWidget index={index} imdbId={movie.imdbId} />
               ))}

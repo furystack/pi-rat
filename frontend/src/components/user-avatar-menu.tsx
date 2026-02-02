@@ -5,7 +5,13 @@ import { SessionService } from '../services/session.js'
 
 export const UserAvatarMenu = Shade({
   shadowDomName: 'user-avatar-menu',
-  style: { position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' },
+  css: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: '8px',
+  },
   render: ({ injector, useObservable, useState }) => {
     const session = injector.getInstance(SessionService)
     const [currentUser] = useObservable('currentUser', session.currentUser)

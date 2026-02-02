@@ -11,6 +11,25 @@ export type DriveLocation = {
 
 export const DrivesPage = Shade({
   shadowDomName: 'drives-page',
+  css: {
+    '& .empty-state': {
+      marginTop: '8em',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    '& .drives-container': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      top: '56px',
+      position: 'fixed',
+      flexDirection: 'row',
+      gap: '8px',
+      height: 'calc(100% - 48px)',
+      width: '100%',
+    },
+  },
   render: ({ injector, useObservable, useSearchState }) => {
     const drivesService = injector.getInstance(DrivesService)
     const [drives] = useObservable('drives', drivesService.getVolumesAsObservable({}))
@@ -27,7 +46,7 @@ export const DrivesPage = Shade({
 
     if (drives.value.entries.length === 0) {
       return (
-        <div style={{ marginTop: '8em', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="empty-state">
           <div>No drives has been created yet.</div>
           <CreateDriveWizard />
         </div>
@@ -35,19 +54,7 @@ export const DrivesPage = Shade({
     }
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          top: '56px',
-          position: 'fixed',
-          flexDirection: 'row',
-          gap: '8px',
-          height: 'calc(100% - 48px)',
-          width: '100%',
-        }}
-      >
+      <div className="drives-container">
         <FolderPanel
           focused={focused === 'ld'}
           searchStateKey="ld"

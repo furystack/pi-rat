@@ -8,6 +8,10 @@ export const BreadCrumbs = Shade<{
 }>({
   shadowDomName: 'drives-breadcrumbs',
   css: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0.5em',
+    letterSpacing: '0.1em',
     '& a': {
       color: cssVariableTheme.text.secondary,
       textDecoration: 'none',
@@ -28,21 +32,14 @@ export const BreadCrumbs = Shade<{
     }))
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0.5em',
-          letterSpacing: '0.1em',
-        }}
-      >
+      <>
         {drive}:/
         {segmentsWithRelativePaths.map((s) => (
           <a title={`${drive}:/${s.path}`} href="#" onclick={() => setPath(s.path)}>
             {s.name}/
           </a>
         ))}
-      </div>
+      </>
     )
   },
 })

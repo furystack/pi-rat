@@ -27,7 +27,20 @@ export const FolderPanel = Shade<{
   focused?: boolean
 }>({
   shadowDomName: 'folder-panel',
-  render: ({ props, element, injector, useDisposable, useSearchState, useObservable }) => {
+  css: {
+    height: '100%',
+    width: '50%',
+    flexGrow: '0',
+    flexShrink: '0',
+    '& .folder-panel-paper': {
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: '0',
+      flexShrink: '0',
+      height: 'calc(100% - 42px)',
+    },
+  },
+  render: ({ props, injector, useDisposable, useSearchState, useObservable }) => {
     const drivesService = injector.getInstance(DrivesService)
 
     const [currentDrive, setCurrentDrive] = useSearchState(props.searchStateKey, {
@@ -73,21 +86,8 @@ export const FolderPanel = Shade<{
 
     service.hasFocus.setValue(!!props.focused)
 
-    element.style.height = '100%'
-    element.style.width = '50%'
-    element.style.flexGrow = '0'
-    element.style.flexShrink = '0'
     return (
-      <Paper
-        elevation={1}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: '0',
-          flexShrink: '0',
-          height: 'calc(100% - 42px)',
-        }}
-      >
+      <Paper elevation={1} className="folder-panel-paper">
         <DriveSelector defaultDriveLetter={props.defaultDriveLetter} searchStateKey={props.searchStateKey} />
         <FileList
           service={service}

@@ -8,6 +8,27 @@ import { MovieFilesService } from '../../services/movie-files-service.js'
 
 export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProps>({
   shadowDomName: 'continue-watching-widget-group',
+  css: {
+    '& .continue-watching-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      overflow: 'hidden',
+      padding: '1em',
+    },
+    '& .continue-watching-content': {
+      overflow: 'hidden',
+      maxWidth: '100%',
+    },
+    '& .continue-watching-list': {
+      display: 'flex',
+      overflow: 'auto',
+      scrollSnapType: 'x mandatory',
+    },
+    '& .continue-watching-item': {
+      scrollSnapAlign: 'start',
+    },
+  },
   render: ({ props, injector }) => {
     const { count, size } = props
 
@@ -50,20 +71,12 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
           ])
 
           return (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                overflow: 'hidden',
-                padding: '1em',
-              }}
-            >
-              <div style={{ overflow: 'hidden', maxWidth: '100%' }}>
+            <div className="continue-watching-container">
+              <div className="continue-watching-content">
                 <h3>Continue watching</h3>
-                <div style={{ display: 'flex', overflow: 'auto', scrollSnapType: 'x mandatory' }}>
+                <div className="continue-watching-list">
                   {watchEntries.entries.map((entry, index) => (
-                    <div style={{ scrollSnapAlign: 'start' }}>
+                    <div className="continue-watching-item">
                       <MovieWidget
                         imdbId={
                           movieFiles.entries.find(

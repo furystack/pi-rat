@@ -95,7 +95,7 @@ const useLogEntries = ({ injector, useObservable }: RenderOptions<any>, terminal
 
 export const LogEntriesTerminal = Shade({
   shadowDomName: 'shade-app-log-entries-terminal-page',
-  style: {
+  css: {
     position: 'fixed',
     top: '0',
     left: '0',

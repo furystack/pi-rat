@@ -11,6 +11,13 @@ type LoginPayload = {
 
 export const Login = Shade({
   shadowDomName: 'shade-login',
+  css: {
+    padding: '1em',
+    marginTop: '48px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   constructed: ({ element }) => {
     element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
   },
@@ -26,13 +33,6 @@ export const Login = Shade({
           element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
         }
       },
-    })
-    Object.assign(element.style, {
-      padding: '1em',
-      marginTop: '48px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
     })
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>

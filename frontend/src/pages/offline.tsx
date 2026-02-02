@@ -3,26 +3,23 @@ import { environmentOptions } from '../environment-options.js'
 
 export const Offline = Shade({
   shadowDomName: 'shade-offline',
+  css: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0 100px',
+    '& #offline': {
+      display: 'flex',
+      flexDirection: 'column',
+      perspective: '400px',
+    },
+  },
   render: () => {
     return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 100px',
-        }}
-      >
-        <div
-          id="offline"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            perspective: '400px',
-          }}
-        >
+      <>
+        <div id="offline">
           <h1>WhoOoOops... 😱</h1>
           <h3>The service seems to be offline 😓</h3>
           <p>
@@ -44,7 +41,7 @@ export const Offline = Shade({
           </ul>
         </div>
         <a href="/">Reload page</a>
-      </div>
+      </>
     )
   },
 })

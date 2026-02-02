@@ -7,25 +7,31 @@ type SettingsMenuSectionProps = {
 
 export const SettingsMenuSection = Shade<SettingsMenuSectionProps>({
   shadowDomName: 'settings-menu-section',
+  css: {
+    display: 'block',
+    marginBottom: '16px',
+    '& .section-title': {
+      fontSize: '12px',
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: '0.5px',
+      color: cssVariableTheme.text.secondary,
+      padding: '8px 12px',
+    },
+    '& .section-content': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '2px',
+    },
+  },
   render: ({ props, children }) => {
     const { title } = props
 
     return (
-      <div style={{ marginBottom: '16px' }}>
-        <div
-          style={{
-            fontSize: '12px',
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            color: cssVariableTheme.text.secondary,
-            padding: '8px 12px',
-          }}
-        >
-          {title}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>{children}</div>
-      </div>
+      <>
+        <div className="section-title">{title}</div>
+        <div className="section-content">{children}</div>
+      </>
     )
   },
 })

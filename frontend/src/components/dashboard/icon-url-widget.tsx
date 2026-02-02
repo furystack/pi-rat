@@ -55,6 +55,39 @@ type IconUrlWidgetProps = {
 
 export const IconUrlWidget = Shade<IconUrlWidgetProps>({
   shadowDomName: 'icon-url-widget',
+  css: {
+    '& .widget-card': {
+      width: '256px',
+      height: '256px',
+      margin: '8px',
+      borderRadius: '8px',
+      transform: 'scale(0)',
+      overflow: 'hidden',
+      placeContent: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-evenly',
+      boxShadow: '1px 3px 6px rgba(0,0,0,0.3)',
+      background: 'rgba(128,128,128,0.15)',
+      opacity: '.7',
+    },
+    '& .cover': {
+      height: '128px',
+      fontSize: '96px',
+      lineHeight: '128px',
+      display: 'block',
+      width: '100%',
+      placeContent: 'center',
+      textAlign: 'center',
+      filter: 'drop-shadow(2px 4px 9px rgba(0,0,0,0.5))',
+    },
+    '& .widget-name': {
+      maxWidth: '100%',
+      overflow: 'hidden',
+      textAlign: 'center',
+      textOverflow: 'ellipsis',
+    },
+  },
   render: ({ props, element }) => {
     setTimeout(() => {
       const el = element.querySelector('a div')
@@ -71,25 +104,11 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
     return (
       <RouteLink title={props.description} href={props.url}>
         <div
+          className="widget-card"
           onmouseenter={(ev) => focus(ev.target as HTMLElement)}
           onfocus={(ev) => focus(ev.target as HTMLElement)}
           onmouseleave={(ev) => blur(ev.target as HTMLElement)}
           onblur={(ev) => blur(ev.target as HTMLElement)}
-          style={{
-            width: '256px',
-            height: '256px',
-            margin: '8px',
-            borderRadius: '8px',
-            transform: 'scale(0)',
-            overflow: 'hidden',
-            placeContent: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
-            boxShadow: '1px 3px 6px rgba(0,0,0,0.3)',
-            background: 'rgba(128,128,128,0.15)',
-            opacity: '.7',
-          }}
           onclick={(ev) => {
             if (props.url.startsWith('http') && new URL(props.url).href !== window.location.href) {
               ev.preventDefault()
@@ -98,31 +117,8 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
             }
           }}
         >
-          <div
-            className="cover"
-            style={{
-              height: '128px',
-              fontSize: '96px',
-              lineHeight: '128px',
-              display: 'block',
-              width: '100%',
-              placeContent: 'center',
-              textAlign: 'center',
-              filter: 'drop-shadow(2px 4px 9px rgba(0,0,0,0.5))',
-            }}
-          >
-            {props.icon}
-          </div>
-          <div
-            style={{
-              maxWidth: '100%',
-              overflow: 'hidden',
-              textAlign: 'center',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {props.name}
-          </div>
+          <div className="cover">{props.icon}</div>
+          <div className="widget-name">{props.name}</div>
         </div>
       </RouteLink>
     )

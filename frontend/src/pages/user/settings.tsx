@@ -11,6 +11,25 @@ type PasswordResetPayload = {
 
 const SecuritySection = Shade({
   shadowDomName: 'user-settings-security',
+  css: {
+    marginTop: '24px',
+    '& h3': {
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& h4': {
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .error-message': {
+      color: 'var(--theme-error-main)',
+      fontSize: '14px',
+      marginBottom: '16px',
+      padding: '8px',
+      backgroundColor: 'var(--theme-error-light)',
+      borderRadius: '4px',
+    },
+  },
   render: ({ injector, useDisposable }) => {
     const session = injector.getInstance(SessionService)
     const notyService = injector.getInstance(NotyService)
@@ -47,11 +66,11 @@ const SecuritySection = Shade({
     }
 
     return (
-      <div style={{ marginTop: '24px' }}>
-        <h3 style={{ marginBottom: '16px', color: 'var(--theme-text-primary)' }}>🔒 Security</h3>
+      <>
+        <h3>🔒 Security</h3>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <h4 style={{ marginBottom: '16px', color: 'var(--theme-text-primary)' }}>Change Password</h4>
+          <h4>Change Password</h4>
 
           <Form<PasswordResetPayload>
             validate={(data): data is PasswordResetPayload => {
@@ -92,20 +111,7 @@ const SecuritySection = Shade({
               style={{ marginBottom: '16px' }}
             />
 
-            {error.getValue() && (
-              <div
-                style={{
-                  color: 'var(--theme-error-main)',
-                  fontSize: '14px',
-                  marginBottom: '16px',
-                  padding: '8px',
-                  backgroundColor: 'var(--theme-error-light)',
-                  borderRadius: '4px',
-                }}
-              >
-                {error.getValue()}
-              </div>
-            )}
+            {error.getValue() && <div className="error-message">{error.getValue()}</div>}
 
             <Button
               type="submit"
@@ -118,13 +124,36 @@ const SecuritySection = Shade({
             </Button>
           </Form>
         </Paper>
-      </div>
+      </>
     )
   },
 })
 
 const ProfileSection = Shade({
   shadowDomName: 'user-settings-profile',
+  css: {
+    '& h3': {
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .field-group': {
+      marginBottom: '16px',
+    },
+    '& .field-label': {
+      display: 'block',
+      fontSize: '14px',
+      fontWeight: 'bold',
+      marginBottom: '4px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .field-value': {
+      padding: '8px 12px',
+      backgroundColor: 'var(--theme-background-paper)',
+      border: '1px solid var(--theme-border-default)',
+      borderRadius: '4px',
+      color: 'var(--theme-text-primary)',
+    },
+  },
   render: ({ injector, useObservable }) => {
     const session = injector.getInstance(SessionService)
     const [currentUser] = useObservable('currentUser', session.currentUser)
@@ -132,90 +161,46 @@ const ProfileSection = Shade({
     if (!currentUser) return null
 
     return (
-      <div>
-        <h3 style={{ marginBottom: '16px', color: 'var(--theme-text-primary)' }}>👤 Profile</h3>
+      <>
+        <h3>👤 Profile</h3>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <div style={{ marginBottom: '16px' }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                marginBottom: '4px',
-                color: 'var(--theme-text-secondary)',
-              }}
-            >
-              Username
-            </label>
-            <div
-              style={{
-                padding: '8px 12px',
-                backgroundColor: 'var(--theme-background-paper)',
-                border: '1px solid var(--theme-border-default)',
-                borderRadius: '4px',
-                color: 'var(--theme-text-primary)',
-              }}
-            >
-              {currentUser.username}
-            </div>
+          <div className="field-group">
+            <label className="field-label">Username</label>
+            <div className="field-value">{currentUser.username}</div>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                marginBottom: '4px',
-                color: 'var(--theme-text-secondary)',
-              }}
-            >
-              Roles
-            </label>
-            <div
-              style={{
-                padding: '8px 12px',
-                backgroundColor: 'var(--theme-background-paper)',
-                border: '1px solid var(--theme-border-default)',
-                borderRadius: '4px',
-                color: 'var(--theme-text-primary)',
-              }}
-            >
-              {currentUser.roles?.join(', ') || 'No roles assigned'}
-            </div>
+          <div className="field-group">
+            <label className="field-label">Roles</label>
+            <div className="field-value">{currentUser.roles?.join(', ') || 'No roles assigned'}</div>
           </div>
         </Paper>
-      </div>
+      </>
     )
   },
 })
 
 export const UserSettingsPage = Shade({
   shadowDomName: 'user-settings-page',
+  css: {
+    padding: '48px',
+    maxWidth: '800px',
+    margin: '0 auto',
+    '& h1': {
+      marginBottom: '32px',
+      color: 'var(--theme-text-primary)',
+      borderBottom: '2px solid var(--theme-primary-main)',
+      paddingBottom: '8px',
+    },
+  },
   render: () => {
     return (
-      <div
-        style={{
-          padding: '48px',
-          maxWidth: '800px',
-          margin: '0 auto',
-        }}
-      >
-        <h1
-          style={{
-            marginBottom: '32px',
-            color: 'var(--theme-text-primary)',
-            borderBottom: '2px solid var(--theme-primary-main)',
-            paddingBottom: '8px',
-          }}
-        >
-          User Settings
-        </h1>
+      <>
+        <h1>User Settings</h1>
 
         <ProfileSection />
         <SecuritySection />
-      </div>
+      </>
     )
   },
 })

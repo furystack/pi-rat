@@ -16,7 +16,7 @@ import { userRoutes } from './routes/user-routes.js'
 
 export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
   shadowDomName: 'shade-app-body',
-  style: {
+  css: {
     color: cssVariableTheme.text.secondary,
   },
   render: ({ useObservable, injector }) => {

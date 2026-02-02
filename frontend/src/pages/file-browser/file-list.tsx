@@ -19,6 +19,21 @@ export const FileList = Shade<{
   service: CollectionService<DirectoryEntry>
 }>({
   shadowDomName: 'file-list',
+  css: {
+    '& .file-row': {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      gap: '16px',
+    },
+    '& .file-name': {
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      maxWidth: '35vw',
+      overflow: 'hidden',
+    },
+  },
   render: ({ useDisposable, props, injector }) => {
     const { currentDriveLetter, currentPath, service } = props
 
@@ -165,25 +180,14 @@ export const FileList = Shade<{
                 currentPath={currentPath}
                 open={activate}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    gap: '16px',
-                  }}
-                  title={entry.name}
-                >
+                <div className="file-row" title={entry.name}>
                   <div>
                     <SelectionCell entry={entry} service={service} />
                   </div>
                   <div>
                     <DirectoryEntryIcon entry={entry} />
                   </div>
-                  <div style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '35vw', overflow: 'hidden' }}>
-                    {entry.name}
-                  </div>
+                  <div className="file-name">{entry.name}</div>
                 </div>
               </FileContextMenu>
             ),

@@ -5,15 +5,22 @@ import { Widget } from '../../components/dashboard/widget.js'
 
 export const DeviceList = Shade({
   shadowDomName: 'pi-rat-device-list',
+  css: {
+    '& .device-grid': {
+      marginTop: '64px',
+      display: 'flex',
+      width: '100%',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    },
+  },
   render: ({ injector }) => {
     return (
       <PiRatLazyLoad
         component={async () => {
           const devices = await injector.getInstance(IotDevicesService).findDevice({})
           return (
-            <div
-              style={{ marginTop: '64px', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}
-            >
+            <div className="device-grid">
               {devices.entries.map((device) => (
                 <Widget type="device-availability" deviceName={device.name} enableWakeUp />
               ))}
