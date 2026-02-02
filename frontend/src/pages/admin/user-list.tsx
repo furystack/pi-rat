@@ -7,6 +7,14 @@ type UserListPageProps = Record<string, never>
 
 export const UserListPage = Shade<UserListPageProps>({
   shadowDomName: 'user-list-page',
+  css: {
+    '& tbody tr': {
+      transition: 'background-color 0.15s ease',
+    },
+    '& tbody tr:hover': {
+      backgroundColor: 'var(--theme-background-default)',
+    },
+  },
   render: ({ injector, useObservable }) => {
     const usersService = injector.getInstance(UsersService)
     const locationService = injector.getInstance(LocationService)
@@ -126,16 +134,8 @@ export const UserListPage = Shade<UserListPageProps>({
                     style={{
                       borderBottom: '1px solid var(--theme-border-default)',
                       cursor: 'pointer',
-                      transition: 'background-color 0.15s ease',
                     }}
                     onclick={() => navigateToUser(user.username)}
-                    onmouseenter={(e) => {
-                      ;(e.currentTarget as HTMLTableRowElement).style.backgroundColor =
-                        'var(--theme-background-default)'
-                    }}
-                    onmouseleave={(e) => {
-                      ;(e.currentTarget as HTMLTableRowElement).style.backgroundColor = ''
-                    }}
                   >
                     <td
                       style={{

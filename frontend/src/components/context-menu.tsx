@@ -12,6 +12,14 @@ type MenuItemProps = {
 
 const MenuItem = Shade<MenuItemProps>({
   shadowDomName: 'shade-app-menu-item',
+  css: {
+    '& > div': {
+      transition: 'background-color 0.15s ease',
+    },
+    '& > div:hover': {
+      backgroundColor: 'rgba(0,0,0,0.1)',
+    },
+  },
   render: ({ props }) => {
     return (
       <div
@@ -21,12 +29,6 @@ const MenuItem = Shade<MenuItemProps>({
           alignItems: 'center',
           padding: '8px',
           cursor: 'pointer',
-        }}
-        onmouseenter={(ev) => {
-          ;(ev.target as HTMLElement).style.backgroundColor = 'rgba(0,0,0,0.1)'
-        }}
-        onmouseleave={(ev) => {
-          ;(ev.target as HTMLElement).style.backgroundColor = 'transparent'
         }}
         onclick={props.onClick}
       >

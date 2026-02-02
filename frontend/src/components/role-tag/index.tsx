@@ -11,6 +11,15 @@ type RoleTagProps = {
 
 export const RoleTag = Shade<RoleTagProps>({
   shadowDomName: 'role-tag',
+  css: {
+    '& button': {
+      opacity: '0.7',
+      transition: 'opacity 0.2s ease',
+    },
+    '& button:hover': {
+      opacity: '1',
+    },
+  },
   render: ({ props }) => {
     const role = getRoleDefinition(props.roleName)
     const baseStyle: Partial<CSSStyleDeclaration> = {
@@ -52,8 +61,6 @@ export const RoleTag = Shade<RoleTagProps>({
       marginLeft: '4px',
       fontSize: '14px',
       lineHeight: '1',
-      opacity: '0.7',
-      transition: 'opacity 0.2s ease',
     }
 
     const style = { ...baseStyle, ...variantStyles[props.variant] }
@@ -73,12 +80,6 @@ export const RoleTag = Shade<RoleTagProps>({
               ...buttonBaseStyle,
               color: 'var(--theme-error-dark, #c62828)',
             }}
-            onmouseenter={(e) => {
-              ;(e.target as HTMLButtonElement).style.opacity = '1'
-            }}
-            onmouseleave={(e) => {
-              ;(e.target as HTMLButtonElement).style.opacity = '0.7'
-            }}
           >
             ↩
           </button>
@@ -94,12 +95,6 @@ export const RoleTag = Shade<RoleTagProps>({
             style={{
               ...buttonBaseStyle,
               color: props.variant === 'added' ? 'var(--theme-success-dark, #2e7d32)' : 'var(--theme-text-secondary)',
-            }}
-            onmouseenter={(e) => {
-              ;(e.target as HTMLButtonElement).style.opacity = '1'
-            }}
-            onmouseleave={(e) => {
-              ;(e.target as HTMLButtonElement).style.opacity = '0.7'
             }}
           >
             ×

@@ -29,7 +29,7 @@ jobs:
       - name: Recreate JSON Schemas
         run: yarn create-schemas && yarn build # an incremental rebuild is neccessary to use the updated schema
       - name: Test
-        run: yarn test:unit
+        run: yarn test
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

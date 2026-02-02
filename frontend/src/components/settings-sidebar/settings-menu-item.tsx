@@ -11,6 +11,11 @@ type SettingsMenuItemProps = {
 
 export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
   shadowDomName: 'settings-menu-item',
+  css: {
+    '& a:hover': {
+      backgroundColor: cssVariableTheme.background.paper,
+    },
+  },
   render: ({ props, injector, useObservable }) => {
     const { icon, label, href, routingOptions } = props
 
@@ -32,18 +37,6 @@ export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
           borderRadius: '0 6px 6px 0',
           cursor: 'pointer',
           transition: 'background-color 0.15s ease, color 0.15s ease',
-        }}
-        onmouseenter={(e) => {
-          if (!isActive) {
-            const target = e.currentTarget as HTMLElement
-            target.style.backgroundColor = cssVariableTheme.background.paper
-          }
-        }}
-        onmouseleave={(e) => {
-          if (!isActive) {
-            const target = e.currentTarget as HTMLElement
-            target.style.backgroundColor = 'transparent'
-          }
         }}
       >
         <span style={{ fontSize: '16px', lineHeight: '1' }}>{icon}</span>
