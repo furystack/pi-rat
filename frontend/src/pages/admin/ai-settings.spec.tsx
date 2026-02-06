@@ -56,7 +56,8 @@ describe('AiSettingsPage', () => {
     injector.setExplicitInstance(mockNotyService as unknown as NotyService, NotyService)
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    await injector[Symbol.asyncDispose]()
     document.body.innerHTML = ''
   })
 

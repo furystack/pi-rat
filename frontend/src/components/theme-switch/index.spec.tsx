@@ -1,10 +1,11 @@
 import { Injector } from '@furystack/inject'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
+import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ThemeSwitch } from './index.js'
 import { darkTheme } from '../../themes/dark.js'
 import { lightTheme } from '../../themes/light.js'
+import { ThemeSwitch } from './index.js'
 
 const createMockThemeProviderService = (theme = darkTheme) => {
   const mockService = {
@@ -24,110 +25,117 @@ describe('ThemeSwitch', () => {
     document.body.innerHTML = ''
   })
 
-  it('should render with correct shadow DOM name', () => {
-    const injector = new Injector()
-    injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
-    const rootElement = document.getElementById('root') as HTMLDivElement
+  it('should render with correct shadow DOM name', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
 
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <ThemeSwitch />,
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <ThemeSwitch />,
+      })
+
+      const themeSwitch = rootElement.querySelector('theme-switch')
+      expect(themeSwitch).toBeTruthy()
     })
-
-    const themeSwitch = rootElement.querySelector('theme-switch')
-    expect(themeSwitch).toBeTruthy()
   })
 
-  it('should render with dark theme', () => {
-    const injector = new Injector()
-    injector.setExplicitInstance(createMockThemeProviderService(darkTheme), ThemeProviderService)
-    const rootElement = document.getElementById('root') as HTMLDivElement
+  it('should render with dark theme', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(createMockThemeProviderService(darkTheme), ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
 
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <ThemeSwitch />,
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <ThemeSwitch />,
+      })
+
+      const themeSwitch = rootElement.querySelector('theme-switch')
+      expect(themeSwitch).toBeTruthy()
     })
-
-    const themeSwitch = rootElement.querySelector('theme-switch')
-    expect(themeSwitch).toBeTruthy()
   })
 
-  it('should render with light theme', () => {
-    const injector = new Injector()
-    injector.setExplicitInstance(createMockThemeProviderService(lightTheme), ThemeProviderService)
-    const rootElement = document.getElementById('root') as HTMLDivElement
+  it('should render with light theme', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(createMockThemeProviderService(lightTheme), ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
 
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <ThemeSwitch />,
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <ThemeSwitch />,
+      })
+
+      const themeSwitch = rootElement.querySelector('theme-switch')
+      expect(themeSwitch).toBeTruthy()
     })
-
-    const themeSwitch = rootElement.querySelector('theme-switch')
-    expect(themeSwitch).toBeTruthy()
   })
 
-  it('should use theme provider service', () => {
-    const mockThemeProvider = createMockThemeProviderService(darkTheme)
-    const injector = new Injector()
-    injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
-    const rootElement = document.getElementById('root') as HTMLDivElement
+  it('should use theme provider service', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      const mockThemeProvider = createMockThemeProviderService(darkTheme)
+      injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
 
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <ThemeSwitch />,
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <ThemeSwitch />,
+      })
+
+      const themeSwitch = rootElement.querySelector('theme-switch')
+      expect(themeSwitch).toBeTruthy()
     })
-
-    const themeSwitch = rootElement.querySelector('theme-switch')
-    expect(themeSwitch).toBeTruthy()
   })
 
-  it('should accept additional props', () => {
-    const mockThemeProvider = createMockThemeProviderService(lightTheme)
-    const injector = new Injector()
-    injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
-    const rootElement = document.getElementById('root') as HTMLDivElement
+  it('should accept additional props', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      const mockThemeProvider = createMockThemeProviderService(lightTheme)
+      injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
 
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <ThemeSwitch />,
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <ThemeSwitch />,
+      })
+
+      const themeSwitch = rootElement.querySelector('theme-switch')
+      expect(themeSwitch).toBeTruthy()
     })
-
-    const themeSwitch = rootElement.querySelector('theme-switch')
-    expect(themeSwitch).toBeTruthy()
   })
 
-  it('should subscribe to theme changes', () => {
-    const mockThemeProvider = createMockThemeProviderService()
-    const injector = new Injector()
-    injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
-    const rootElement = document.getElementById('root') as HTMLDivElement
+  it('should subscribe to theme changes', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      const mockThemeProvider = createMockThemeProviderService()
+      injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
 
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <ThemeSwitch />,
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <ThemeSwitch />,
+      })
+
+      expect(mockThemeProvider.subscribe).toHaveBeenCalledWith('themeChanged', expect.any(Function))
     })
-
-    expect(mockThemeProvider.subscribe).toHaveBeenCalledWith('themeChanged', expect.any(Function))
   })
 
-  it('should render with custom variant prop', () => {
-    const injector = new Injector()
-    injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
-    const rootElement = document.getElementById('root') as HTMLDivElement
+  it('should render with custom variant prop', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
 
-    initializeShadeRoot({
-      injector,
-      rootElement,
-      jsxElement: <ThemeSwitch variant="outlined" />,
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <ThemeSwitch variant="outlined" />,
+      })
+
+      const themeSwitch = rootElement.querySelector('theme-switch')
+      expect(themeSwitch).toBeTruthy()
     })
-
-    const themeSwitch = rootElement.querySelector('theme-switch')
-    expect(themeSwitch).toBeTruthy()
   })
 })
