@@ -8,7 +8,6 @@ import { Terminal } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
 import type { LogEntry } from 'common'
 import { compile, match, type MatchResult } from 'path-to-regexp'
-import { logEntryRoute } from '../../components/routes/logging-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { LoggingService } from '../../services/logging-service.js'
 
@@ -31,11 +30,11 @@ const useDisposableTerminal = (
       linkHandler: {
         activate: (ev: MouseEvent, url: string) => {
           const { pathname } = new URL(url)
-          const id = (match(logEntryRoute.url)(pathname) as MatchResult<{ id: string }>)?.params?.id
+          const id = (match('/logging/log-entry/:id')(pathname) as MatchResult<{ id: string }>)?.params?.id
           if (id) {
             ev.preventDefault()
             ev.stopPropagation()
-            navigateToRoute(injector, logEntryRoute, { id })
+            navigateToRoute(injector, '/logging/log-entry/:id', { id })
           }
           return true
         },
@@ -81,7 +80,7 @@ const fillTerminalWithLogEntries = (terminal: Terminal, logEntries: CacheResult<
                 ? '\x1B[36mD\x1B[0m'
                 : '\x1B[32mI\x1B[0m'
 
-    const url = compile(logEntryRoute.url)({ id: logEntry.id })
+    const url = compile('/logging/log-entry/:id')({ id: logEntry.id })
 
     const showMoreLink = `\x1B]8;;${window.location.origin}${url}\x1B\\[show more]\x1B]8;;\x1B\\`
     terminal.write(

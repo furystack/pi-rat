@@ -1,15 +1,14 @@
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
-import { NestedRouteLink, Shade, compileRoute, createComponent } from '@furystack/shades'
+import { Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import type { DeviceAvailability as DeviceAvailabilityProps } from 'common'
+import { AppLink } from '../../app-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 import { SessionService } from '../../services/session.js'
 import { Icon } from '../Icon.js'
 import { DeviceAvailabilityPanel } from '../iot-devices/device-availability-panel.js'
-import { entityDeviceRoute } from '../routes/entity-routes.js'
-import { iotDeviceRoute } from '../routes/iot-routes.js'
 
 const focus = (el: HTMLElement) => {
   void promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
@@ -56,10 +55,11 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
 
     if (isLoadedCacheResult(device)) {
       return (
-        <NestedRouteLink
+        <AppLink
           tabIndex={0}
           title={device.value.name}
-          href={compileRoute(iotDeviceRoute.url, { id: props.deviceName })}
+          href="/iot/device/:id"
+          params={{ id: props.deviceName }}
           style={{
             textDecoration: 'none',
           }}
@@ -107,12 +107,9 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                     onclick={(ev) => {
                       ev.preventDefault()
                       ev.stopImmediatePropagation()
-                      navigateToRoute(
-                        injector,
-                        entityDeviceRoute,
-                        {},
-                        serializeToQueryString({ gedst: { mode: 'edit', currentId: device.value.name } }),
-                      )
+                      navigateToRoute(injector, '/entities/iot-devices', {}, {
+                        queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: device.value.name } }),
+                      })
                     }}
                     title="Edit device details"
                   >
@@ -153,7 +150,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               {device.value.name}
             </div>
           </div>
-        </NestedRouteLink>
+        </AppLink>
       )
     } else if (isPendingCacheResult(device)) {
       return <Skeleton />

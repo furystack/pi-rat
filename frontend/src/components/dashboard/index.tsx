@@ -1,10 +1,9 @@
-import { LocationService, Shade, createComponent } from '@furystack/shades'
+import { Shade, createComponent } from '@furystack/shades'
 import type { Dashboard as DashboardData } from 'common'
 import { Widget } from './widget.js'
 import { ContextMenu } from '../context-menu.js'
 import { SessionService } from '../../services/session.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
-import { entityDashboardsRoute } from '../routes/entity-routes.js'
 import { serializeToQueryString } from '@furystack/rest'
 
 export const Dashboard = Shade<DashboardData>({
@@ -27,14 +26,9 @@ export const Dashboard = Shade<DashboardData>({
                     icon: { type: 'font', value: '📝' } as const,
                     label: 'Edit this dashboard',
                     onClick: () => {
-                      navigateToRoute(
-                        injector,
-                        entityDashboardsRoute,
-                        {},
-                        serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
-                      )
-
-                      injector.getInstance(LocationService).updateState()
+                      navigateToRoute(injector, '/entities/dashboards', {}, {
+                        queryString: serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
+                      })
                     },
                   },
                 ]

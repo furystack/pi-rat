@@ -1,6 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
-import { defaultAuthRoute } from '../components/routes/auth-routes.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -81,7 +80,7 @@ export const Register = Shade({
             </Button>
             <Button
               variant="outlined"
-              onclick={() => navigateToRoute(injector, defaultAuthRoute, {})}
+              onclick={() => navigateToRoute(injector, '/')}
               disabled={isOperationInProgress}
             >
               Back to Login

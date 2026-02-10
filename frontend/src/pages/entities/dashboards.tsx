@@ -1,4 +1,5 @@
-import { createComponent, NestedRouteLink, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
+import { AppLink } from '../../app-routes.js'
 import { Dashboard } from 'common'
 import dashboardSchemas from 'common/schemas/dashboard-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
@@ -55,7 +56,7 @@ export const DashboardsPage = Shade({
         styles={{}}
         rowComponents={{
           id: ({ id }) => {
-            return <NestedRouteLink href={`/dashboards/${id}`}>Preview</NestedRouteLink>
+            return <AppLink href="/dashboards/:id" params={{ id }}>Preview</AppLink>
           },
         }}
         modelUri={modelUri}

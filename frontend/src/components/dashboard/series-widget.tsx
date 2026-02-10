@@ -1,6 +1,7 @@
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
-import { NestedRouteLink, Shade, createComponent } from '@furystack/shades'
+import { Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
+import { AppLink } from '../../app-routes.js'
 import { SeriesService } from '../../services/series-service.js'
 
 const focus = (el: HTMLElement) => {
@@ -61,7 +62,7 @@ export const SeriesWidget = Shade<{
 
     if (isLoadedCacheResult(series)) {
       return (
-        <NestedRouteLink tabIndex={0} title={series.value.plot || series.value.title} href={url}>
+        <AppLink tabIndex={0} title={series.value.plot || series.value.title} href="/series/:imdbId" params={{ imdbId }}>
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -119,7 +120,7 @@ export const SeriesWidget = Shade<{
               {series.value.title}
             </div>
           </div>
-        </NestedRouteLink>
+        </AppLink>
       )
     } else if (isPendingCacheResult(series)) {
       return <Skeleton />

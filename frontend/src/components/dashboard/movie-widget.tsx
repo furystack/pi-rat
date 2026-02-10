@@ -1,14 +1,13 @@
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
-import { LazyLoad, NestedRouteLink, Shade, createComponent } from '@furystack/shades'
+import { LazyLoad, Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
+import { AppLink } from '../../app-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { MoviesService } from '../../services/movies-service.js'
 import { SessionService } from '../../services/session.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
-import { entityMoviesRoute } from '../routes/entity-routes.js'
-import { watchMovieRoute } from '../routes/movie-routes.js'
 
 const focus = (el: HTMLElement) => {
   void promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
@@ -72,11 +71,9 @@ export const MovieWidget = Shade<{
       movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: imdbId } } }),
     )
 
-    const url = `/movies/${imdbId}/overview`
-
     if (isLoadedCacheResult(movie)) {
       return (
-        <NestedRouteLink tabIndex={0} title={movie.value.plot || movie.value.title} href={url}>
+        <AppLink tabIndex={0} title={movie.value.plot || movie.value.title} href="/movies/:imdbId/overview" params={{ imdbId }}>
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -96,13 +93,6 @@ export const MovieWidget = Shade<{
               margin: '8px',
               overflow: 'hidden',
               color: 'white',
-            }}
-            onclick={(ev) => {
-              if (url.startsWith('http') && new URL(url).href !== window.location.href) {
-                ev.preventDefault()
-                ev.stopImmediatePropagation()
-                window.location.replace(url)
-              }
             }}
           >
             <div
@@ -127,7 +117,7 @@ export const MovieWidget = Shade<{
                     onclick={(ev) => {
                       ev.stopImmediatePropagation()
                       ev.preventDefault()
-                      navigateToRoute(injector, watchMovieRoute, { id: movieFile.value.entries[0].id })
+                      navigateToRoute(injector, '/movies/:id/watch', { id: movieFile.value.entries[0].id })
                     }}
                   >
                     ▶️
@@ -142,12 +132,9 @@ export const MovieWidget = Shade<{
                     onclick={(ev) => {
                       ev.preventDefault()
                       ev.stopImmediatePropagation()
-                      navigateToRoute(
-                        injector,
-                        entityMoviesRoute,
-                        {},
-                        serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
-                      )
+                      navigateToRoute(injector, '/entities/movies', {}, {
+                        queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
+                      })
                     }}
                     title="Edit movie details"
                   >
@@ -218,7 +205,7 @@ export const MovieWidget = Shade<{
               />
             </div>
           </div>
-        </NestedRouteLink>
+        </AppLink>
       )
     } else if (isPendingCacheResult(movie)) {
       return <Skeleton />

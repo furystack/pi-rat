@@ -1,7 +1,6 @@
 import { getCurrentUser } from '@furystack/core'
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../../../navigate-to-route.js'
-import { appSettingsRoute } from '../../routes/admin-routes.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 
@@ -12,7 +11,7 @@ const AppSettingsSuggestions: SuggestionOptions[] = [
     icon: '🔧',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, appSettingsRoute, {})
+      navigateToRoute(injector, '/app-settings')
     },
   },
 ]

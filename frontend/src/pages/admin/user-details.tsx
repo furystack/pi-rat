@@ -1,9 +1,10 @@
 import { hasCacheValue, isFailedCacheResult } from '@furystack/cache'
-import { createComponent, LocationService, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import { Button, NotyService, Paper } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Roles } from 'common'
 import { getAllRoleDefinitions } from 'common'
+import { navigateToRoute } from '../../navigate-to-route.js'
 import { RoleTag } from '../../components/role-tag/index.js'
 import { UsersService } from '../../services/users-service.js'
 
@@ -108,7 +109,6 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
   },
   render: ({ props, injector, useObservable, useDisposable }) => {
     const usersService = injector.getInstance(UsersService)
-    const locationService = injector.getInstance(LocationService)
     const notyService = injector.getInstance(NotyService)
 
     const { username } = props
@@ -137,8 +137,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     }
 
     const navigateBack = () => {
-      window.history.pushState({}, '', '/app-settings/users')
-      locationService.updateState()
+      navigateToRoute(injector, '/app-settings/users')
     }
 
     const formatDate = (dateString: string) => {

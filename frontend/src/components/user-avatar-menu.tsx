@@ -1,4 +1,4 @@
-import { createComponent, Shade, type Route } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import { Avatar, Button, Paper } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
@@ -58,20 +58,12 @@ export const UserAvatarMenu = Shade({
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
     const handleAppSettingsClick = () => {
-      const appSettingsRoute: Route<Record<string, never>> = {
-        url: '/app-settings',
-        component: () => <div>Loading...</div>,
-      }
-      navigateToRoute(injector, appSettingsRoute, {})
+      navigateToRoute(injector, '/app-settings')
       setIsMenuOpen(false)
     }
 
     const handleSettingsClick = () => {
-      const userSettingsRoute: Route<Record<string, never>> = {
-        url: '/user/settings',
-        component: () => <div>Loading...</div>,
-      }
-      navigateToRoute(injector, userSettingsRoute, {})
+      navigateToRoute(injector, '/user/settings')
       setIsMenuOpen(false)
     }
 

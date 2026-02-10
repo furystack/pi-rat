@@ -2,8 +2,6 @@ import { isLoadedCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { Button, promisifyAnimation, Skeleton } from '@furystack/shades-common-components'
-import { entityMoviesRoute } from '../../components/routes/entity-routes.js'
-import { watchMovieRoute } from '../../components/routes/movie-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { MoviesService } from '../../services/movies-service.js'
@@ -46,7 +44,7 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                     variant="contained"
                     color="primary"
                     onclick={() => {
-                      navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
+                      navigateToRoute(injector, '/movies/:id/watch', { id: movieFile.id })
                     }}
                   >
                     Continue from{' '}
@@ -59,7 +57,7 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                   <Button
                     onclick={async () => {
                       await watchProgressService.deleteWatchEntry(watchProgressResult.value.entries[0].id)
-                      navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
+                      navigateToRoute(injector, '/movies/:id/watch', { id: movieFile.id })
                     }}
                   >
                     Watch from the beginning
@@ -74,7 +72,7 @@ export const PlayButtons = Shade<{ imdbId: string }>({
                   variant="contained"
                   color="primary"
                   onclick={() => {
-                    navigateToRoute(injector, watchMovieRoute, { id: movieFile.id })
+                    navigateToRoute(injector, '/movies/:id/watch', { id: movieFile.id })
                   }}
                 >
                   Start watching
@@ -150,12 +148,9 @@ export const MovieOverview = Shade<{ imdbId: string }>({
                   <span>
                     <Button
                       onclick={() => {
-                        navigateToRoute(
-                          injector,
-                          entityMoviesRoute,
-                          {},
-                          serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
-                        )
+                        navigateToRoute(injector, '/entities/movies', {}, {
+                          queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
+                        })
                       }}
                     >
                       Edit

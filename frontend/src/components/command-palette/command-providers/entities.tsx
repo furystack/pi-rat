@@ -1,18 +1,6 @@
 import { getCurrentUser } from '@furystack/core'
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../../../navigate-to-route.js'
-import {
-  entityConfigRoute,
-  entityDashboardsRoute,
-  entityDeviceRoute,
-  entityDrivesRoute,
-  entityLoggingRoute,
-  entityMovieFilesRoute,
-  entityMoviesRoute,
-  entityOmdbMovieMetadataRoute,
-  entityOmdbSeriesMetadataRoute,
-  entityUsersRoute,
-} from '../../routes/entity-routes.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 
@@ -23,7 +11,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '⚙️',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityConfigRoute, {})
+      navigateToRoute(injector, '/entities/config')
     },
   },
   {
@@ -32,7 +20,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '📔',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityDashboardsRoute, {})
+      navigateToRoute(injector, '/entities/dashboards')
     },
   },
   {
@@ -41,7 +29,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '💽',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityDrivesRoute, {})
+      navigateToRoute(injector, '/entities/drives')
     },
   },
   {
@@ -50,7 +38,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '👤',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityUsersRoute, {})
+      navigateToRoute(injector, '/entities/users')
     },
   },
   {
@@ -59,7 +47,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🎥',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityMoviesRoute, {})
+      navigateToRoute(injector, '/entities/movies')
     },
   },
   {
@@ -68,7 +56,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🎞️',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityMovieFilesRoute, {})
+      navigateToRoute(injector, '/entities/movie-files')
     },
   },
   {
@@ -77,7 +65,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🌐',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityOmdbMovieMetadataRoute, {})
+      navigateToRoute(injector, '/entities/omdb-movie-metadata')
     },
   },
   {
@@ -86,7 +74,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '🌐',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityOmdbSeriesMetadataRoute, {})
+      navigateToRoute(injector, '/entities/omdb-series-metadata')
     },
   },
   {
@@ -95,7 +83,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '📡',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityDeviceRoute, {})
+      navigateToRoute(injector, '/entities/iot-devices')
     },
   },
   {
@@ -104,7 +92,7 @@ const EntitySuggestions: SuggestionOptions[] = [
     icon: '📝',
     score: 1,
     onSelected: ({ injector }) => {
-      navigateToRoute(injector, entityLoggingRoute, {})
+      navigateToRoute(injector, '/entities/logging')
     },
   },
 ]
