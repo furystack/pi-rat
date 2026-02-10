@@ -6,13 +6,15 @@ import { ChatMessageService } from './chat-messages-service.js'
 
 export const MessageInput = Shade<{ chat: Chat }>({
   shadowDomName: 'shade-app-message-input',
-  render: ({ injector, props, element }) => {
+  render: ({ injector, props, useRef }) => {
     const chatService = injector.getInstance(ChatMessageService)
     const session = injector.getInstance(SessionService)
     const theme = injector.getInstance(ThemeProviderService)
+    const formRef = useRef<HTMLElement>('form')
 
     return (
       <Form<{ content: string }>
+        ref={formRef}
         onSubmit={(formData) => {
           void chatService.addChatMessage({
             id: crypto.randomUUID(),
@@ -22,9 +24,9 @@ export const MessageInput = Shade<{ chat: Chat }>({
             owner: session.currentUser.getValue()?.username || '',
             attachments: [],
           })
-          const form = element.firstElementChild as HTMLFormElement
-          if (form) {
-            form.reset()
+          const form = formRef.current?.querySelector('form') ?? formRef.current
+          if (form && 'reset' in form) {
+            ;(form as HTMLFormElement).reset()
           }
         }}
         validate={(formData: unknown): formData is { content: string } => {

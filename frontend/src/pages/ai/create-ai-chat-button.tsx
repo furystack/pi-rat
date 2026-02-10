@@ -1,6 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, Form, Input, Modal, NotyService, Paper } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { AiChat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { SessionService } from '../../services/session.js'
@@ -9,9 +8,9 @@ import { AiModelSelector } from './ai-model-selector.js'
 
 export const CreateAiChatButton = Shade({
   shadowDomName: 'pi-rat-create-ai-chat-button',
-  render: ({ injector, useDisposable }) => {
+  render: ({ injector, useState }) => {
     const aiChatService = injector.getInstance(AiChatService)
-    const isModalOpen = useDisposable('isModalOpen', () => new ObservableValue(false))
+    const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
     const session = injector.getInstance(SessionService)
 
     const noty = injector.getInstance(NotyService)
@@ -21,14 +20,14 @@ export const CreateAiChatButton = Shade({
         <Button
           style={{ padding: '8px 16px', cursor: 'pointer' }}
           onclick={() => {
-            isModalOpen.setValue(true)
+            setIsModalOpen(true)
           }}
         >
           ➕ New AI Chat
         </Button>
         <Modal
           isVisible={isModalOpen}
-          onClose={() => isModalOpen.setValue(false)}
+          onClose={() => setIsModalOpen(false)}
           backdropStyle={{
             position: 'fixed',
             top: '0',
@@ -60,7 +59,7 @@ export const CreateAiChatButton = Shade({
                     name: chat.name.trim(),
                   })
                   .then(() => {
-                    isModalOpen.setValue(false)
+                    setIsModalOpen(false)
                     noty.emit('onNotyAdded', {
                       type: 'success',
                       body: `AI chat "${chat.name}" created successfully!`,

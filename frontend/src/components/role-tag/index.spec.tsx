@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot } from '@furystack/shades'
+import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -24,6 +24,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="default" />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         expect(roleTag).toBeTruthy()
@@ -40,6 +41,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="media-manager" variant="default" />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         expect(roleTag?.textContent).toContain('Media Manager')
@@ -55,6 +57,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="viewer" variant="default" />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         expect(roleTag?.textContent).toContain('Viewer')
@@ -70,6 +73,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="iot-manager" variant="default" />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         expect(roleTag?.textContent).toContain('IoT Manager')
@@ -85,6 +89,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="default" />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const span = roleTag?.querySelector('span')
@@ -103,6 +108,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="default" />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const buttons = roleTag?.querySelectorAll('button')
@@ -120,6 +126,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="default" onRemove={onRemove} />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const removeButton = roleTag?.querySelector('button')
@@ -139,6 +146,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="viewer" variant="added" onRemove={onRemove} />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const removeButton = roleTag?.querySelector('button')
@@ -157,6 +165,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="removed" onRestore={onRestore} />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const restoreButton = roleTag?.querySelector('button')
@@ -177,6 +186,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="removed" onRemove={onRemove} onRestore={onRestore} />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const buttons = roleTag?.querySelectorAll('button')
@@ -198,6 +208,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="default" onRemove={onRemove} />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const removeButton = roleTag?.querySelector('button') as HTMLButtonElement
@@ -217,6 +228,7 @@ describe('RoleTag', () => {
           rootElement,
           jsxElement: <RoleTag roleName="admin" variant="removed" onRestore={onRestore} />,
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const restoreButton = roleTag?.querySelector('button') as HTMLButtonElement
@@ -241,6 +253,7 @@ describe('RoleTag', () => {
             </div>
           ),
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const removeButton = roleTag?.querySelector('button') as HTMLButtonElement
@@ -266,6 +279,7 @@ describe('RoleTag', () => {
             </div>
           ),
         })
+        await flushUpdates()
 
         const roleTag = document.querySelector('role-tag')
         const restoreButton = roleTag?.querySelector('button') as HTMLButtonElement

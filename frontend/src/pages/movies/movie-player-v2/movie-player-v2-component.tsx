@@ -23,13 +23,17 @@ interface MoviePlayerProps {
 
 export const MoviePlayerV2 = Shade<MoviePlayerProps>({
   shadowDomName: 'pirat-movie-player-v2',
-  constructed: ({ useDisposable, element, injector, props }) => {
-    const getVideo = () => element.querySelector('video') as HTMLVideoElement
+  render: ({ props, useDisposable, useRef, injector }) => {
+    const videoRef = useRef<HTMLVideoElement>('video')
+    const containerRef = useRef<HTMLElement>('container')
 
     const { driveLetter, path } = props.file
     const watchProgressService = injector.getInstance(WatchProgressService)
-    const watchProgressUpdater = useDisposable('watchProgressUpdater', () => {
-      const video = getVideo()
+    useDisposable('watchProgressUpdater', () => {
+      const video = videoRef.current
+      if (!video) {
+        return { [Symbol.asyncDispose]: async () => {} }
+      }
       return new WatchProgressUpdater({
         intervalMs: 10 * 1000,
         onSave: async (progress) => {
@@ -44,12 +48,6 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
         videoElement: video,
       })
     })
-
-    return () => {
-      void watchProgressUpdater[Symbol.asyncDispose]()
-    }
-  },
-  render: ({ props, element, useDisposable, injector }) => {
     const { watchProgress, file } = props
 
     const api = injector.getInstance(MediaApiClient)
@@ -66,11 +64,16 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     })
 
     useDisposable('mouseMoveListener', () => {
+      const container = containerRef.current
+      if (!container) {
+        return { [Symbol.dispose]: () => {} }
+      }
+
       const elementHideDelay = 3000
 
       const createTimedOutHide = () =>
         setTimeout(() => {
-          element.querySelectorAll('.hideOnPlay').forEach((el) => {
+          container.querySelectorAll('.hideOnPlay').forEach((el) => {
             void promisifyAnimation(
               el,
               [
@@ -94,7 +97,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
       const onMouseMove = () => {
         clearTimeout(timeoutId)
-        element.querySelectorAll('.hideOnPlay').forEach((el) => {
+        container.querySelectorAll('.hideOnPlay').forEach((el) => {
           void promisifyAnimation(
             el,
             [
@@ -114,11 +117,11 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
         })
         timeoutId = createTimedOutHide()
       }
-      element.addEventListener('mousemove', onMouseMove)
+      container.addEventListener('mousemove', onMouseMove)
 
       return {
         [Symbol.dispose]: () => {
-          element.removeEventListener('mousemove', onMouseMove)
+          container.removeEventListener('mousemove', onMouseMove)
         },
       }
     })
@@ -126,6 +129,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     if (ENABLE_MEDIA_CHROME) {
       return (
         <div
+          ref={containerRef}
           style={{
             position: 'relative',
             width: '100%',
@@ -220,6 +224,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               </media-settings-menu-item>
             </media-settings-menu>
             <video
+              ref={videoRef}
               slot="media"
               crossOrigin="use-credentials"
               autoplay
@@ -348,6 +353,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
     return (
       <div
+        ref={containerRef}
         style={{
           position: 'relative',
           width: '100%',
@@ -356,6 +362,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
         }}
       >
         <video
+          ref={videoRef}
           crossOrigin="use-credentials"
           controls
           autoplay

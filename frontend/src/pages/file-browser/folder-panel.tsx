@@ -4,7 +4,6 @@ import { CollectionService, Paper } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { encode, getFullPath } from 'common'
-import { fileBrowserOpenFileRoute } from '../../components/routes/file-browser-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { DriveSelector } from './drive-selector.js'
@@ -104,7 +103,7 @@ export const FolderPanel = Shade<{
                   : PathHelper.joinPaths(path || '/', v.name)
               setCurrentDrive({ letter, path: newPath })
             } else {
-              navigateToRoute(injector, fileBrowserOpenFileRoute, {
+              navigateToRoute(injector, '/file-browser/openFile/:driveLetter/:path', {
                 driveLetter: encode(currentDrive.letter),
                 path: encode(getFullPath(path, v.name)),
               })

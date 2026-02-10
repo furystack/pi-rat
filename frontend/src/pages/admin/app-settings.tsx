@@ -1,89 +1,11 @@
-import { createComponent, LocationService, Router, Shade } from '@furystack/shades'
-import type { MatchResult } from 'path-to-regexp'
-import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
+import { createComponent, Shade } from '@furystack/shades'
 import { SettingsMenuItem, SettingsMenuSection, SettingsSidebar } from '../../components/settings-sidebar/index.js'
 
-const settingsRoutes = [
-  {
-    url: '/app-settings/omdb',
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { OmdbSettingsPage } = await import('./omdb-settings.js')
-          return <OmdbSettingsPage />
-        }}
-      />
-    ),
-  },
-  {
-    url: '/app-settings/streaming',
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { StreamingSettingsPage } = await import('./streaming-settings.js')
-          return <StreamingSettingsPage />
-        }}
-      />
-    ),
-  },
-  {
-    url: '/app-settings/iot',
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { IotSettingsPage } = await import('./iot-settings.js')
-          return <IotSettingsPage />
-        }}
-      />
-    ),
-  },
-  {
-    url: '/app-settings/ai',
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { AiSettingsPage } = await import('./ai-settings.js')
-          return <AiSettingsPage />
-        }}
-      />
-    ),
-  },
-  {
-    url: '/app-settings/users/:username',
-    component: ({ match }: { match: MatchResult<{ username: string }> }) => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { UserDetailsPage } = await import('./user-details.js')
-          return <UserDetailsPage username={match.params.username} />
-        }}
-      />
-    ),
-  },
-  {
-    url: '/app-settings/users',
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { UserListPage } = await import('./user-list.js')
-          return <UserListPage />
-        }}
-      />
-    ),
-  },
-  {
-    url: '/app-settings',
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { OmdbSettingsPage } = await import('./omdb-settings.js')
-          return <OmdbSettingsPage />
-        }}
-      />
-    ),
-  },
-]
+type AppSettingsPageProps = {
+  outlet?: JSX.Element
+}
 
-export const AppSettingsPage = Shade({
+export const AppSettingsPage = Shade<AppSettingsPageProps>({
   shadowDomName: 'app-settings-page',
   css: {
     position: 'fixed',
@@ -105,18 +27,7 @@ export const AppSettingsPage = Shade({
       padding: '24px 48px',
     },
   },
-  render: ({ injector, useObservable }) => {
-    const locationService = injector.getInstance(LocationService)
-    const [currentPath] = useObservable('currentPath', locationService.onLocationPathChanged)
-
-    // Redirect to OMDB settings if on base /app-settings path
-    if (currentPath === '/app-settings') {
-      requestAnimationFrame(() => {
-        window.history.replaceState({}, '', '/app-settings/omdb')
-        locationService.updateState()
-      })
-    }
-
+  render: ({ props }) => {
     return (
       <div className="settings-layout">
         <SettingsSidebar>
@@ -135,9 +46,7 @@ export const AppSettingsPage = Shade({
           </SettingsMenuSection>
         </SettingsSidebar>
 
-        <div className="settings-content">
-          <Router routes={settingsRoutes} />
-        </div>
+        <div className="settings-content">{props.outlet}</div>
       </div>
     )
   },

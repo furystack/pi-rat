@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot, LocationService } from '@furystack/shades'
+import { LocationService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
@@ -24,15 +24,16 @@ describe('SettingsMenuItem', () => {
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <SettingsMenuItem icon="🏠" label="Home" href="/home" />,
+        jsxElement: <SettingsMenuItem icon="🏠" label="Home" href="/" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()
 
       const link = menuItem?.querySelector('a')
       expect(link).toBeTruthy()
-      expect(link?.getAttribute('href')).toBe('/home')
+      expect(link?.getAttribute('href')).toBe('/')
       expect(link?.textContent).toContain('Home')
       expect(link?.textContent).toContain('🏠')
     })
@@ -42,22 +43,23 @@ describe('SettingsMenuItem', () => {
     await usingAsync(new Injector(), async (injector) => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
-      history.pushState(null, '', '/settings')
+      history.pushState(null, '', '/app-settings/omdb')
       injector.getInstance(LocationService).updateState()
 
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <SettingsMenuItem icon="⚙️" label="Settings" href="/settings" />,
+        jsxElement: <SettingsMenuItem icon="⚙️" label="OMDB Settings" href="/app-settings/omdb" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()
 
       const link = menuItem?.querySelector('a')
       expect(link).toBeTruthy()
-      expect(link?.getAttribute('href')).toBe('/settings')
-      expect(link?.textContent).toContain('Settings')
+      expect(link?.getAttribute('href')).toBe('/app-settings/omdb')
+      expect(link?.textContent).toContain('OMDB Settings')
     })
   })
 
@@ -71,15 +73,16 @@ describe('SettingsMenuItem', () => {
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <SettingsMenuItem icon="📁" label="Files" href="/files" />,
+        jsxElement: <SettingsMenuItem icon="📂" label="File Browser" href="/file-browser" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()
 
       const link = menuItem?.querySelector('a')
       expect(link).toBeTruthy()
-      expect(link?.getAttribute('href')).toBe('/files')
+      expect(link?.getAttribute('href')).toBe('/file-browser')
     })
   })
 
@@ -95,6 +98,7 @@ describe('SettingsMenuItem', () => {
         rootElement,
         jsxElement: <SettingsMenuItem icon="🎬" label="Movies" href="/movies" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()

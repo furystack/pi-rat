@@ -1,14 +1,12 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { AppBar, AppBarLink, Button } from '@furystack/shades-common-components'
+import { AppBar, Button } from '@furystack/shades-common-components'
+import { AppBarAppLink } from '../app-routes.js'
 import { environmentOptions } from '../environment-options.js'
 import { SessionService } from '../services/session.js'
 import { AiIcon } from './ai/ai-icon.js'
 import { ChatIcon } from './chat/chat-icon.js'
 import { PiRatCommandPalette } from './command-palette/index.js'
 import { GithubLogo } from './github-logo/index.js'
-import { defaultDashboardRoute } from './routes/dashboard-routes.js'
-import { fileBrowserRoute } from './routes/file-browser-routes.js'
-import { movieListRoute, seriesListRoute } from './routes/movie-routes.js'
 import { ThemeSwitch } from './theme-switch/index.js'
 import { UserAvatarMenu } from './user-avatar-menu.js'
 
@@ -30,9 +28,9 @@ const AdminLinks = Shade({
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
     return isAdmin ? (
-      <AppBarLink href={fileBrowserRoute.url} title="Drives">
+      <AppBarAppLink href="/file-browser" title="Drives">
         📂 Files
-      </AppBarLink>
+      </AppBarAppLink>
     ) : null
   },
 })
@@ -56,20 +54,20 @@ export const Header = Shade<HeaderProps>({
 
     return (
       <AppBar id="header">
-        <AppBarLink title={props.title} href={defaultDashboardRoute.url}>
+        <AppBarAppLink title={props.title} href="/" routingOptions={{ end: false }}>
           {props.title}
-        </AppBarLink>
+        </AppBarAppLink>
         {sessionState === 'authenticated' ? (
           <>
             {currentUser?.roles?.includes('admin') ? <AdminLinks /> : null}
 
-            <AppBarLink title="Movies" href={movieListRoute.url}>
+            <AppBarAppLink title="Movies" href="/movies">
               🎥 Movies
-            </AppBarLink>
+            </AppBarAppLink>
 
-            <AppBarLink title="Series" href={seriesListRoute.url}>
+            <AppBarAppLink title="Series" href="/series">
               📺 Series
-            </AppBarLink>
+            </AppBarAppLink>
           </>
         ) : null}
 

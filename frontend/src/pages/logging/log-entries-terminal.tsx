@@ -1,6 +1,6 @@
 import type { CacheResult } from '@furystack/cache'
 import type { GetCollectionResult } from '@furystack/rest'
-import { Shade, type RenderOptions } from '@furystack/shades'
+import { Shade, createComponent, type RenderOptions } from '@furystack/shades'
 import { FitAddon } from '@xterm/addon-fit'
 import { SearchAddon } from '@xterm/addon-search'
 import { WebLinksAddon } from '@xterm/addon-web-links'
@@ -8,21 +8,33 @@ import { Terminal } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
 import type { LogEntry } from 'common'
 import { compile, match, type MatchResult } from 'path-to-regexp'
-import { logEntryRoute } from '../../components/routes/logging-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { LoggingService } from '../../services/logging-service.js'
 
-const useDisposableTerminal = ({ useDisposable, element, injector }: RenderOptions<any>) => {
+const useDisposableTerminal = (
+  { useDisposable, injector }: Pick<RenderOptions<object>, 'useDisposable' | 'injector'>,
+  containerEl: HTMLElement | null,
+) => {
   return useDisposable('terminal', () => {
+    if (!containerEl) {
+      const dummyTerminal = new Terminal()
+      return {
+        terminal: dummyTerminal,
+        fitAddon: new FitAddon(),
+        searchAddon: new SearchAddon(),
+        webLinksAddon: new WebLinksAddon(),
+        [Symbol.dispose]: () => dummyTerminal.dispose(),
+      }
+    }
     const terminal = new Terminal({
       linkHandler: {
         activate: (ev: MouseEvent, url: string) => {
           const { pathname } = new URL(url)
-          const id = (match(logEntryRoute.url)(pathname) as MatchResult<{ id: string }>)?.params?.id
+          const id = (match('/logging/log-entry/:id')(pathname) as MatchResult<{ id: string }>)?.params?.id
           if (id) {
             ev.preventDefault()
             ev.stopPropagation()
-            navigateToRoute(injector, logEntryRoute, { id })
+            navigateToRoute(injector, '/logging/log-entry/:id', { id })
           }
           return true
         },
@@ -34,7 +46,7 @@ const useDisposableTerminal = ({ useDisposable, element, injector }: RenderOptio
     terminal.loadAddon(fitAddon)
     terminal.loadAddon(searchAddon)
     terminal.loadAddon(webLinksAddon)
-    terminal.open(element)
+    terminal.open(containerEl)
     fitAddon.fit()
 
     return {
@@ -68,9 +80,7 @@ const fillTerminalWithLogEntries = (terminal: Terminal, logEntries: CacheResult<
                 ? '\x1B[36mD\x1B[0m'
                 : '\x1B[32mI\x1B[0m'
 
-    // Try the OSC8 link syntax
-
-    const url = compile(logEntryRoute.url)({ id: logEntry.id })
+    const url = compile('/logging/log-entry/:id')({ id: logEntry.id })
 
     const showMoreLink = `\x1B]8;;${window.location.origin}${url}\x1B\\[show more]\x1B]8;;\x1B\\`
     terminal.write(
@@ -79,7 +89,10 @@ const fillTerminalWithLogEntries = (terminal: Terminal, logEntries: CacheResult<
   })
 }
 
-const useLogEntries = ({ injector, useObservable }: RenderOptions<any>, terminal: Terminal) => {
+const useLogEntries = (
+  { injector, useObservable }: Pick<RenderOptions<object>, 'injector' | 'useObservable'>,
+  terminal: Terminal,
+) => {
   return useObservable(
     'logEntries',
     injector.getInstance(LoggingService).findLogEntryAsObservable({
@@ -102,13 +115,13 @@ export const LogEntriesTerminal = Shade({
     width: '100%',
     height: '100%',
   },
-  constructed: (renderOptions) => {
-    const { terminal } = useDisposableTerminal(renderOptions)
+  render: (renderOptions) => {
+    const containerRef = renderOptions.useRef<HTMLDivElement>('container')
+    const { terminal } = useDisposableTerminal(renderOptions, containerRef.current)
     const [entries] = useLogEntries(renderOptions, terminal)
 
     fillTerminalWithLogEntries(terminal, entries)
-  },
-  render: () => {
-    return null
+
+    return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
   },
 })

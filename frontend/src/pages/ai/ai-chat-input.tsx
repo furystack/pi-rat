@@ -11,10 +11,11 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
     flexDirection: 'row',
     width: '100%',
   },
-  render: ({ props, injector, useObservable, element }) => {
+  render: ({ props, injector, useObservable, useRef }) => {
     const aiChatMessageService = injector.getInstance(AiChatMessageService)
     const aiChatService = injector.getInstance(AiChatService)
     const sessionService = injector.getInstance(SessionService)
+    const formRef = useRef<HTMLElement>('form')
 
     const [selectedChat] = useObservable(
       'selectedChat',
@@ -27,6 +28,7 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
 
     return (
       <Form<{ message: string }>
+        ref={formRef}
         onSubmit={({ message }) => {
           void aiChatMessageService
             .createChatMessage({
@@ -38,7 +40,12 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
               owner: sessionService.currentUser.getValue()!.username,
               visibility: selectedChat?.value?.entries[0]?.visibility ?? 'private',
             })
-            .then(() => element.querySelector<HTMLFormElement>('form')?.reset())
+            .then(() => {
+              const form = formRef.current?.querySelector('form') ?? formRef.current
+              if (form && 'reset' in form) {
+                ;(form as HTMLFormElement).reset()
+              }
+            })
         }}
         validate={(formData): formData is { message: string } => {
           return (

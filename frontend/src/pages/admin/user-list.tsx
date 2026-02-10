@@ -1,5 +1,6 @@
-import { createComponent, LocationService, Shade } from '@furystack/shades'
+import { createComponent, Shade } from '@furystack/shades'
 import { Button, Paper } from '@furystack/shades-common-components'
+import { navigateToRoute } from '../../navigate-to-route.js'
 import { RoleTag } from '../../components/role-tag/index.js'
 import { UsersService } from '../../services/users-service.js'
 
@@ -84,13 +85,11 @@ export const UserListPage = Shade<UserListPageProps>({
   },
   render: ({ injector, useObservable }) => {
     const usersService = injector.getInstance(UsersService)
-    const locationService = injector.getInstance(LocationService)
 
     const [usersState] = useObservable('users', usersService.findUsersAsObservable({}))
 
     const navigateToUser = (username: string) => {
-      window.history.pushState({}, '', `/app-settings/users/${encodeURIComponent(username)}`)
-      locationService.updateState()
+      navigateToRoute(injector, '/app-settings/users/:username', { username })
     }
 
     const formatDate = (dateString: string) => {

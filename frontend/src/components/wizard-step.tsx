@@ -32,30 +32,39 @@ export const WizardStep = Shade<
       opacity: '0',
     },
   },
-  render: ({ props, element, children, useObservable, injector }) => {
+  render: ({ props, children, useObservable, injector, useRef }) => {
+    const h1Ref = useRef<HTMLHeadingElement>('h1')
+    const contentRef = useRef<HTMLDivElement>('content')
+    const actionsRef = useRef<HTMLDivElement>('actions')
+    const formRef = useRef<HTMLFormElement>('form')
+
     setTimeout(() => {
-      void showParallax(element.querySelector('h1'))
-      void showParallax(element.querySelector('div.content'), { delay: 200, duration: 600 })
-      void showParallax(element.querySelector('div.actions'), { delay: 400, duration: 2000 })
+      void showParallax(h1Ref.current)
+      void showParallax(contentRef.current, { delay: 200, duration: 600 })
+      void showParallax(actionsRef.current, { delay: 400, duration: 2000 })
     }, 1)
 
-    const updateScreenSize = (isLargeScreen: boolean) => {
-      const form = element?.querySelector('form')
-      if (form) {
-        form.style.padding = '16px'
-        form.style.width = isLargeScreen ? '800px' : `${window.innerWidth - 16}px`
-        form.style.height = isLargeScreen ? '500px' : `${window.innerHeight - 192}px`
-      }
-    }
-
     const [isLargeScreen] = useObservable('screenSize', injector.getInstance(ScreenService).screenSize.atLeast.md, {
-      onChange: updateScreenSize,
+      onChange: (isLarge) => {
+        const form = formRef.current
+        if (form) {
+          form.style.padding = '16px'
+          form.style.width = isLarge ? '800px' : `${window.innerWidth - 16}px`
+          form.style.height = isLarge ? '500px' : `${window.innerHeight - 192}px`
+        }
+      },
     })
 
-    updateScreenSize(isLargeScreen)
+    const form = formRef.current
+    if (form) {
+      form.style.padding = '16px'
+      form.style.width = isLargeScreen ? '800px' : `${window.innerWidth - 16}px`
+      form.style.height = isLargeScreen ? '500px' : `${window.innerHeight - 192}px`
+    }
 
     return (
       <form
+        ref={formRef}
         onsubmit={async (ev) => {
           ev.preventDefault()
           if (props.onSubmit) {
@@ -65,9 +74,11 @@ export const WizardStep = Shade<
           }
         }}
       >
-        <h1>{props.title}</h1>
-        <div className="content">{children}</div>
-        <div className="actions">
+        <h1 ref={h1Ref}>{props.title}</h1>
+        <div ref={contentRef} className="content">
+          {children}
+        </div>
+        <div ref={actionsRef} className="actions">
           <Button onclick={() => props.onPrev?.()} disabled={props.currentPage < 1} variant="outlined">
             Previous
           </Button>

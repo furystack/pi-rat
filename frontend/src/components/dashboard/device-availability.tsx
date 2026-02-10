@@ -1,15 +1,14 @@
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
-import { LinkToRoute, Shade, createComponent } from '@furystack/shades'
+import { Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import type { DeviceAvailability as DeviceAvailabilityProps } from 'common'
+import { AppLink } from '../../app-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 import { SessionService } from '../../services/session.js'
 import { Icon } from '../Icon.js'
 import { DeviceAvailabilityPanel } from '../iot-devices/device-availability-panel.js'
-import { entityDeviceRoute } from '../routes/entity-routes.js'
-import { iotDeviceRoute } from '../routes/iot-routes.js'
 
 const focus = (el: HTMLElement) => {
   void promisifyAnimation(el, [{ filter: 'saturate(0.3)brightness(0.6)' }, { filter: 'saturate(1)brightness(1)' }], {
@@ -45,16 +44,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
   shadowDomName: 'pi-rat-device-availability-widget',
   elementBase: HTMLDivElement,
   elementBaseName: 'div',
-  constructed: ({ props, element }) => {
-    element.style.transform = 'scale(0)'
-    void promisifyAnimation(element, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-      fill: 'forwards',
-      delay: (props.index || 0) * 160 + Math.random() * 100,
-      duration: 700,
-      easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-    })
-  },
-  render: ({ props, injector, useObservable }) => {
+  render: ({ props, injector, useObservable, useHostProps }) => {
+    useHostProps({ style: { transform: 'scale(0)' } })
     const { size = 256 } = props
 
     const iotDevices = injector.getInstance(IotDevicesService)
@@ -64,10 +55,10 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
 
     if (isLoadedCacheResult(device)) {
       return (
-        <LinkToRoute
+        <AppLink
           tabIndex={0}
           title={device.value.name}
-          route={iotDeviceRoute}
+          href="/iot/device/:id"
           params={{ id: props.deviceName }}
           style={{
             textDecoration: 'none',
@@ -118,9 +109,13 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                       ev.stopImmediatePropagation()
                       navigateToRoute(
                         injector,
-                        entityDeviceRoute,
+                        '/entities/iot-devices',
                         {},
-                        serializeToQueryString({ gedst: { mode: 'edit', currentId: device.value.name } }),
+                        {
+                          queryString: serializeToQueryString({
+                            gedst: { mode: 'edit', currentId: device.value.name },
+                          }),
+                        },
                       )
                     }}
                     title="Edit device details"
@@ -162,7 +157,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               {device.value.name}
             </div>
           </div>
-        </LinkToRoute>
+        </AppLink>
       )
     } else if (isPendingCacheResult(device)) {
       return <Skeleton />

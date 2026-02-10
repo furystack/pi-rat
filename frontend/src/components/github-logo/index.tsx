@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { attachStyles, Shade } from '@furystack/shades'
+import { Shade } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 // @ts-ignore
 import ghLight from './gh-light.png'
@@ -14,7 +14,7 @@ export const GithubLogo = Shade<GithubLogoProps>({
   shadowDomName: 'github-logo',
   elementBaseName: 'img',
   elementBase: HTMLImageElement,
-  render: ({ props, useDisposable, useState, injector, element }) => {
+  render: ({ props, useDisposable, useState, injector, useHostProps }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
     const [theme, setTheme] = useState(
       'themeName',
@@ -27,10 +27,10 @@ export const GithubLogo = Shade<GithubLogoProps>({
       }),
     )
 
-    attachStyles(element, props)
-    Object.assign(element, {
+    useHostProps({
       src: theme === 'dark' ? ghLight : ghDark,
       alt: 'gh-logo',
+      style: props.style as Record<string, string> | undefined,
     })
 
     return null

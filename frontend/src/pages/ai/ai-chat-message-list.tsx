@@ -9,16 +9,17 @@ export const AiChatMessageList = Shade<{
   selectedChatId: string
 }>({
   shadowDomName: 'pi-rat-ai-chat-message-list',
-  style: {
+  css: {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
     height: 'calc(100% - 124px)',
     overflowY: 'auto',
   },
-  render: ({ useObservable, injector, props, element, useDisposable }) => {
+  render: ({ useObservable, injector, props, useDisposable, useRef }) => {
     const { selectedChatId } = props
     const aiChatService = injector.getInstance(AiChatMessageService)
+    const containerRef = useRef<HTMLDivElement>('container')
 
     const [messages] = useObservable(
       'messages',
@@ -46,10 +47,13 @@ export const AiChatMessageList = Shade<{
     const scrollToBottom = (behavior: ScrollBehavior = 'instant') => {
       setTimeout(() => {
         requestAnimationFrame(() => {
-          element.scrollTo({
-            top: element.scrollHeight,
-            behavior,
-          })
+          const el = containerRef.current
+          if (el) {
+            el.scrollTo({
+              top: el.scrollHeight,
+              behavior,
+            })
+          }
         })
       }, 1)
     }

@@ -1,14 +1,13 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, Form, Input, Modal, Paper } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { Chat } from 'common'
 import { SessionService } from '../../services/session.js'
 import { ChatService } from './chat-service.js'
 
 export const AddChatButton = Shade({
   shadowDomName: 'shade-app-chat-add-chat-button',
-  render: ({ useDisposable, injector }) => {
-    const isModalOpen = useDisposable('isModalOpen', () => new ObservableValue(false))
+  render: ({ useState, injector }) => {
+    const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
 
     const session = injector.getInstance(SessionService)
 
@@ -16,10 +15,10 @@ export const AddChatButton = Shade({
 
     return (
       <>
-        <Button onclick={() => isModalOpen.setValue(true)}>Add Chat</Button>
+        <Button onclick={() => setIsModalOpen(true)}>Add Chat</Button>
         <Modal
           isVisible={isModalOpen}
-          onClose={() => isModalOpen.setValue(false)}
+          onClose={() => setIsModalOpen(false)}
           backdropStyle={{
             position: 'fixed',
             top: '0',
@@ -47,7 +46,7 @@ export const AddChatButton = Shade({
                     owner: session.currentUser.getValue()?.username || '',
                   })
                   .then(() => {
-                    isModalOpen.setValue(false)
+                    setIsModalOpen(false)
                   })
                   .catch((error) => {
                     console.error('Error adding chat:', error)
@@ -60,7 +59,7 @@ export const AddChatButton = Shade({
               <Input name="name" labelTitle="Chat Name" placeholder="Enter chat name" required />
               <Input name="description" labelTitle="Description" placeholder="Enter chat description" />
 
-              <Button onclick={() => isModalOpen.setValue(false)}>Close</Button>
+              <Button onclick={() => setIsModalOpen(false)}>Close</Button>
               <Button type="submit">Create</Button>
             </Form>
           </Paper>

@@ -1,6 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
-import { defaultAuthRoute } from '../components/routes/auth-routes.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -26,22 +25,9 @@ export const Register = Shade({
       padding: '1em 0',
     },
   },
-  constructed: ({ element }) => {
-    element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
-  },
-  render: ({ injector, useObservable, element }) => {
+  render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService)
-    useObservable('isOperationInProgress', sessionService.isOperationInProgress, {
-      onChange: (isOperationInProgress) => {
-        const els = [...element.querySelectorAll('input').values(), ...element.querySelectorAll('button').values()]
-        els.forEach((el) => {
-          el.disabled = isOperationInProgress
-        })
-        if (!isOperationInProgress) {
-          element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
-        }
-      },
-    })
+    const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>
         <Form<RegisterPayload>
@@ -64,14 +50,35 @@ export const Register = Shade({
           }}
         >
           <h2>Create Account</h2>
-          <Input labelTitle="E-mail address" name="userName" required autofocus type="email" />
-          <Input labelTitle="Password" name="password" required minLength={6} type="password" />
-          <Input labelTitle="Confirm Password" name="confirmPassword" required minLength={6} type="password" />
+          <Input
+            labelTitle="E-mail address"
+            name="userName"
+            required
+            autofocus
+            type="email"
+            disabled={isOperationInProgress}
+          />
+          <Input
+            labelTitle="Password"
+            name="password"
+            required
+            minLength={6}
+            type="password"
+            disabled={isOperationInProgress}
+          />
+          <Input
+            labelTitle="Confirm Password"
+            name="confirmPassword"
+            required
+            minLength={6}
+            type="password"
+            disabled={isOperationInProgress}
+          />
           <div className="button-row">
-            <Button variant="contained" color="primary" type="submit">
+            <Button variant="contained" color="primary" type="submit" disabled={isOperationInProgress}>
               Create Account
             </Button>
-            <Button variant="outlined" onclick={() => navigateToRoute(injector, defaultAuthRoute, {})}>
+            <Button variant="outlined" onclick={() => navigateToRoute(injector, '/')} disabled={isOperationInProgress}>
               Back to Login
             </Button>
           </div>

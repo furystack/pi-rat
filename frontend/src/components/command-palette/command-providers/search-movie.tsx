@@ -1,7 +1,6 @@
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { createSuggestion } from './create-suggestion.js'
 import { navigateToRoute } from '../../../navigate-to-route.js'
-import { movieOverviewRoute } from '../../routes/movie-routes.js'
 import { createComponent } from '@furystack/shades'
 import { MoviesService } from '../../../services/movies-service.js'
 
@@ -35,7 +34,7 @@ export const searchMovieCommandProvider: CommandProvider = async ({ term, inject
         description: movie.plot || '',
         score: 5,
         onSelected: () => {
-          navigateToRoute(injector, movieOverviewRoute, { imdbId: movie.imdbId })
+          navigateToRoute(injector, '/movies/:imdbId/overview', { imdbId: movie.imdbId })
         },
       }),
     )

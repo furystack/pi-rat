@@ -1,6 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, Form, Input, Modal, NotyService, Paper } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { Chat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { SessionService } from '../../services/session.js'
@@ -8,8 +7,8 @@ import { ChatInvitationService } from './chat-intivation-service.js'
 
 export const InviteButton = Shade<{ chat: Chat }>({
   shadowDomName: 'shade-app-invite-button',
-  render: ({ useDisposable, props, injector }) => {
-    const isModalOpen = useDisposable('isModalOpen', () => new ObservableValue(false))
+  render: ({ useState, props, injector }) => {
+    const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
 
     const currentUser = injector.getInstance(SessionService).currentUser.getValue()
 
@@ -18,7 +17,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
 
     return (
       <>
-        <Button onclick={() => isModalOpen.setValue(true)}>Invite</Button>
+        <Button onclick={() => setIsModalOpen(true)}>Invite</Button>
         <Modal
           backdropStyle={{
             position: 'fixed',
@@ -33,7 +32,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
             background: 'rgba(128,128,128, 0.3)',
             backdropFilter: 'blur(5px)',
           }}
-          onClose={() => isModalOpen.setValue(false)}
+          onClose={() => setIsModalOpen(false)}
           isVisible={isModalOpen}
         >
           <Paper onclick={(ev) => ev.stopPropagation()}>
@@ -56,7 +55,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
                     message: formData.message.trim() || '',
                   })
                   .then(() => {
-                    isModalOpen.setValue(false)
+                    setIsModalOpen(false)
                     noty.emit('onNotyAdded', {
                       type: 'success',
                       title: '✅ Success',
@@ -93,7 +92,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
               </div>
 
               <div>
-                <Button onclick={() => isModalOpen.setValue(false)}>Close</Button>
+                <Button onclick={() => setIsModalOpen(false)}>Close</Button>
                 <Button type="submit">Invite</Button>
               </div>
             </Form>

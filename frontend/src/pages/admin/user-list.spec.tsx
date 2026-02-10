@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot, LocationService } from '@furystack/shades'
+import { LocationService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { ObservableValue } from '@furystack/utils'
 import type { User } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -47,7 +47,7 @@ describe('UserListPage', () => {
   })
 
   describe('rendering', () => {
-    it('should render the user list page with header', () => {
+    it('should render the user list page with header', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -55,6 +55,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       expect(page).toBeTruthy()
@@ -62,7 +63,7 @@ describe('UserListPage', () => {
       expect(page?.textContent).toContain('Manage user accounts and their roles.')
     })
 
-    it('should display loading state', () => {
+    it('should display loading state', async () => {
       usersObservable.setValue({ status: 'loading' })
 
       const rootElement = document.getElementById('root') as HTMLDivElement
@@ -72,12 +73,13 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       expect(page?.textContent).toContain('Loading users...')
     })
 
-    it('should display uninitialized state as loading', () => {
+    it('should display uninitialized state as loading', async () => {
       usersObservable.setValue({ status: 'uninitialized' })
 
       const rootElement = document.getElementById('root') as HTMLDivElement
@@ -87,12 +89,13 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       expect(page?.textContent).toContain('Loading users...')
     })
 
-    it('should display error state with retry button', () => {
+    it('should display error state with retry button', async () => {
       usersObservable.setValue({
         status: 'failed',
         error: new Error('Network error'),
@@ -106,6 +109,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       expect(page?.textContent).toContain('Error: Network error')
@@ -115,7 +119,7 @@ describe('UserListPage', () => {
       expect(retryButton).toBeTruthy()
     })
 
-    it('should display error message for non-Error objects', () => {
+    it('should display error message for non-Error objects', async () => {
       usersObservable.setValue({
         status: 'failed',
         error: 'string error',
@@ -129,6 +133,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       expect(page?.textContent).toContain('Failed to load users')
@@ -136,7 +141,7 @@ describe('UserListPage', () => {
   })
 
   describe('table display', () => {
-    it('should render table with headers', () => {
+    it('should render table with headers', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -144,6 +149,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       const headers = page?.querySelectorAll('th')
@@ -155,7 +161,7 @@ describe('UserListPage', () => {
       expect(headers?.[3]?.textContent).toContain('Actions')
     })
 
-    it('should render users in table rows', () => {
+    it('should render users in table rows', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -163,6 +169,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       const rows = page?.querySelectorAll('tbody tr')
@@ -172,7 +179,7 @@ describe('UserListPage', () => {
       expect(rows?.[1]?.textContent).toContain('user2@example.com')
     })
 
-    it('should render role tags for each user', () => {
+    it('should render role tags for each user', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -180,6 +187,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       const roleTags = page?.querySelectorAll('role-tag')
@@ -187,7 +195,7 @@ describe('UserListPage', () => {
       expect(roleTags?.length).toBe(2) // One for admin, one for viewer
     })
 
-    it('should display "No roles" message for user without roles', () => {
+    it('should display "No roles" message for user without roles', async () => {
       usersObservable.setValue({
         status: 'loaded',
         value: {
@@ -204,12 +212,13 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       expect(page?.textContent).toContain('No roles')
     })
 
-    it('should display empty state when no users exist', () => {
+    it('should display empty state when no users exist', async () => {
       usersObservable.setValue({
         status: 'loaded',
         value: {
@@ -226,12 +235,13 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       expect(page?.textContent).toContain('No users found.')
     })
 
-    it('should render Edit button for each user', () => {
+    it('should render Edit button for each user', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -239,6 +249,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       // Button component renders button elements within table rows
@@ -252,7 +263,7 @@ describe('UserListPage', () => {
   })
 
   describe('navigation', () => {
-    it('should navigate to user details when Edit button is clicked', () => {
+    it('should navigate to user details when Edit button is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
       const locationService = injector.getInstance(LocationService)
       const updateStateSpy = vi.spyOn(locationService, 'updateState')
@@ -262,6 +273,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       const editButton = page?.querySelector('tbody button') as HTMLButtonElement
@@ -271,7 +283,7 @@ describe('UserListPage', () => {
       expect(updateStateSpy).toHaveBeenCalled()
     })
 
-    it('should navigate to user details when table row is clicked', () => {
+    it('should navigate to user details when table row is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
       const locationService = injector.getInstance(LocationService)
       const updateStateSpy = vi.spyOn(locationService, 'updateState')
@@ -281,6 +293,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       const row = page?.querySelector('tbody tr') as HTMLTableRowElement
@@ -290,7 +303,7 @@ describe('UserListPage', () => {
       expect(updateStateSpy).toHaveBeenCalled()
     })
 
-    it('should encode username in URL to handle special characters', () => {
+    it('should encode username in URL to handle special characters', async () => {
       usersObservable.setValue({
         status: 'loaded',
         value: {
@@ -307,6 +320,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       const row = page?.querySelector('tbody tr') as HTMLTableRowElement
@@ -331,6 +345,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-list-page')
       const retryButton = page?.querySelector('button') as HTMLButtonElement
@@ -342,7 +357,7 @@ describe('UserListPage', () => {
   })
 
   describe('service integration', () => {
-    it('should call findUsersAsObservable on render', () => {
+    it('should call findUsersAsObservable on render', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -350,6 +365,7 @@ describe('UserListPage', () => {
         rootElement,
         jsxElement: <UserListPage />,
       })
+      await flushUpdates()
 
       expect(mockUsersService.findUsersAsObservable).toHaveBeenCalledWith({})
     })

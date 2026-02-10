@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot, LocationService } from '@furystack/shades'
+import { LocationService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { User } from 'common'
@@ -57,7 +57,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('rendering', () => {
-    it('should render the user details page with header', () => {
+    it('should render the user details page with header', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -65,13 +65,14 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page).toBeTruthy()
       expect(page?.textContent).toContain('User Details')
     })
 
-    it('should display loading state', () => {
+    it('should display loading state', async () => {
       userObservable.setValue({ status: 'loading' })
 
       const rootElement = document.getElementById('root') as HTMLDivElement
@@ -81,12 +82,13 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Loading user...')
     })
 
-    it('should display error state with go back button', () => {
+    it('should display error state with go back button', async () => {
       userObservable.setValue({
         status: 'failed',
         error: new Error('User not found'),
@@ -100,6 +102,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="nonexistent@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Error: User not found')
@@ -109,7 +112,7 @@ describe('UserDetailsPage', () => {
       expect(buttons?.length).toBeGreaterThanOrEqual(1)
     })
 
-    it('should display fallback error message for non-Error objects', () => {
+    it('should display fallback error message for non-Error objects', async () => {
       userObservable.setValue({
         status: 'failed',
         error: 'string error',
@@ -123,6 +126,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Failed to load user')
@@ -130,7 +134,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('user information display', () => {
-    it('should display username', () => {
+    it('should display username', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -138,13 +142,14 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Username:')
       expect(page?.textContent).toContain('testuser@example.com')
     })
 
-    it('should display created date', () => {
+    it('should display created date', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -152,12 +157,13 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Created:')
     })
 
-    it('should display last updated date', () => {
+    it('should display last updated date', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -165,6 +171,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Last Updated:')
@@ -172,7 +179,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('roles section', () => {
-    it('should display roles section header', () => {
+    it('should display roles section header', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -180,12 +187,13 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Roles')
     })
 
-    it('should render role tags for user roles', () => {
+    it('should render role tags for user roles', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -193,6 +201,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const roleTags = page?.querySelectorAll('role-tag')
@@ -200,7 +209,7 @@ describe('UserDetailsPage', () => {
       expect(roleTags?.length).toBe(1)
     })
 
-    it('should render multiple role tags for user with multiple roles', () => {
+    it('should render multiple role tags for user with multiple roles', async () => {
       userObservable.setValue({
         status: 'loaded',
         value: createMockUser('testuser@example.com', ['admin', 'viewer', 'media-manager']),
@@ -214,6 +223,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const roleTags = page?.querySelectorAll('role-tag')
@@ -221,7 +231,7 @@ describe('UserDetailsPage', () => {
       expect(roleTags?.length).toBe(3)
     })
 
-    it('should display "No roles assigned" for user without roles', () => {
+    it('should display "No roles assigned" for user without roles', async () => {
       userObservable.setValue({
         status: 'loaded',
         value: createMockUser('testuser@example.com', []),
@@ -235,6 +245,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('No roles assigned')
@@ -242,7 +253,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('add role dropdown', () => {
-    it('should display Add Role dropdown', () => {
+    it('should display Add Role dropdown', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -250,6 +261,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       expect(page?.textContent).toContain('Add Role:')
@@ -258,7 +270,7 @@ describe('UserDetailsPage', () => {
       expect(select).toBeTruthy()
     })
 
-    it('should show available roles that user does not have', () => {
+    it('should show available roles that user does not have', async () => {
       userObservable.setValue({
         status: 'loaded',
         value: createMockUser('testuser@example.com', ['admin']),
@@ -272,6 +284,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select')
@@ -286,7 +299,7 @@ describe('UserDetailsPage', () => {
       expect(select?.textContent).not.toContain('Application Admin')
     })
 
-    it('should not show dropdown when user has all roles', () => {
+    it('should not show dropdown when user has all roles', async () => {
       userObservable.setValue({
         status: 'loaded',
         value: createMockUser('testuser@example.com', ['admin', 'viewer', 'media-manager', 'iot-manager']),
@@ -300,6 +313,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select')
@@ -308,7 +322,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('action buttons', () => {
-    it('should render action buttons', () => {
+    it('should render action buttons', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -316,6 +330,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       // Back button, Save Changes button, and Cancel button
@@ -323,7 +338,7 @@ describe('UserDetailsPage', () => {
       expect(buttons?.length).toBeGreaterThanOrEqual(3)
     })
 
-    it('should have Save Changes and Cancel buttons disabled when no changes', () => {
+    it('should have Save Changes and Cancel buttons disabled when no changes', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -331,6 +346,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       // Button component sets disabled attribute on the button element
@@ -341,7 +357,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('navigation', () => {
-    it('should navigate back to user list when Back button is clicked', () => {
+    it('should navigate back to user list when Back button is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
       const locationService = injector.getInstance(LocationService)
       const updateStateSpy = vi.spyOn(locationService, 'updateState')
@@ -351,6 +367,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       // Back button is the first button element in the page
@@ -364,7 +381,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('role editing', () => {
-    it('should add role when selected from dropdown', () => {
+    it('should add role when selected from dropdown', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -372,6 +389,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
@@ -379,6 +397,7 @@ describe('UserDetailsPage', () => {
       // Simulate selecting a role
       select.value = 'viewer'
       select.dispatchEvent(new Event('change', { bubbles: true }))
+      await flushUpdates()
 
       // Should now have 2 role tags (admin + viewer)
       const roleTags = page?.querySelectorAll('role-tag')
@@ -403,6 +422,8 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
 
@@ -413,6 +434,8 @@ describe('UserDetailsPage', () => {
 
       // Wait for re-render
       await new Promise((resolve) => setTimeout(resolve, 10))
+      await flushUpdates()
+      await flushUpdates()
 
       // No disabled buttons (Save and Cancel are enabled)
       const disabledButtons = page?.querySelectorAll('button[disabled]')
@@ -427,6 +450,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
@@ -467,6 +491,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
@@ -500,6 +525,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
@@ -534,6 +560,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
@@ -576,6 +603,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
@@ -619,6 +647,8 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
+      await flushUpdates()
 
       const page = document.querySelector('user-details-page')
 
@@ -628,6 +658,8 @@ describe('UserDetailsPage', () => {
       removeButton?.click()
 
       await new Promise((resolve) => setTimeout(resolve, 10))
+      await flushUpdates()
+      await flushUpdates()
 
       // Click Save (index 1 of action buttons, excluding role-tag buttons)
       const actionButtons = getActionButtons(page)
@@ -635,6 +667,8 @@ describe('UserDetailsPage', () => {
       saveButton.click()
 
       await new Promise((resolve) => setTimeout(resolve, 10))
+      await flushUpdates()
+      await flushUpdates()
 
       expect(page?.textContent).toContain('User must have at least one role')
       expect(mockUsersService.updateUser).not.toHaveBeenCalled()
@@ -642,7 +676,7 @@ describe('UserDetailsPage', () => {
   })
 
   describe('service integration', () => {
-    it('should call getUserAsObservable with username on render', () => {
+    it('should call getUserAsObservable with username on render', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -650,6 +684,7 @@ describe('UserDetailsPage', () => {
         rootElement,
         jsxElement: <UserDetailsPage username="testuser@example.com" />,
       })
+      await flushUpdates()
 
       expect(mockUsersService.getUserAsObservable).toHaveBeenCalledWith('testuser@example.com')
     })
