@@ -1,11 +1,8 @@
 import { createComponent } from '@furystack/shades'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
-import { onLeave, onVisit } from './route-animations.js'
 
 export const entityDrivesRoute = {
   url: '/entities/drives',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -18,8 +15,6 @@ export const entityDrivesRoute = {
 
 export const entityUsersRoute = {
   url: '/entities/users',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -32,8 +27,6 @@ export const entityUsersRoute = {
 
 export const entityDashboardsRoute = {
   url: '/entities/dashboards',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -46,8 +39,6 @@ export const entityDashboardsRoute = {
 
 export const entityMoviesRoute = {
   url: '/entities/movies',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -60,8 +51,6 @@ export const entityMoviesRoute = {
 
 export const entityMovieFilesRoute = {
   url: '/entities/movie-files',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -74,8 +63,6 @@ export const entityMovieFilesRoute = {
 
 export const entityOmdbMovieMetadataRoute = {
   url: '/entities/omdb-movie-metadata',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -88,8 +75,6 @@ export const entityOmdbMovieMetadataRoute = {
 
 export const entityOmdbSeriesMetadataRoute = {
   url: '/entities/omdb-series-metadata',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -102,8 +87,6 @@ export const entityOmdbSeriesMetadataRoute = {
 
 export const entityConfigRoute = {
   url: '/entities/config',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -116,8 +99,6 @@ export const entityConfigRoute = {
 
 export const entityDeviceRoute = {
   url: '/entities/iot-devices',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -130,8 +111,6 @@ export const entityDeviceRoute = {
 
 export const entityLoggingRoute = {
   url: '/entities/logging',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {

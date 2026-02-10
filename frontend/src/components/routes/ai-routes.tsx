@@ -1,11 +1,8 @@
 import { createComponent } from '@furystack/shades'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
-import { onLeave, onVisit } from './route-animations.js'
 
 export const aiPageRoute = {
   url: '/ai',
-  onVisit,
-  onLeave,
   component: () => {
     return (
       <PiRatLazyLoad

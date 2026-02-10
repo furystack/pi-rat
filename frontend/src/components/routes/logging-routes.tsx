@@ -1,11 +1,8 @@
 import { createComponent } from '@furystack/shades'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
-import { onLeave, onVisit } from './route-animations.js'
 
 export const LogEntriesTerminalRoute = {
   url: '/logging/terminal',
-  onVisit,
-  onLeave,
   component: () => {
     return (
       <PiRatLazyLoad
@@ -20,8 +17,6 @@ export const LogEntriesTerminalRoute = {
 
 export const logEntryRoute = {
   url: '/logging/log-entry/:id',
-  onVisit,
-  onLeave,
   component: ({ match }: { match: { params: { id: string } } }) => {
     return (
       <PiRatLazyLoad

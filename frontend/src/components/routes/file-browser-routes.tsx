@@ -1,13 +1,10 @@
 import { createComponent } from '@furystack/shades'
-import { onLeave, onVisit } from './route-animations.js'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import { decode } from 'common'
 import type { MatchResult } from 'path-to-regexp'
 
 export const fileBrowserRoute = {
   url: '/file-browser',
-  onVisit,
-  onLeave,
   component: () => (
     <PiRatLazyLoad
       component={async () => {
@@ -20,8 +17,6 @@ export const fileBrowserRoute = {
 
 export const fileBrowserOpenFileRoute = {
   url: '/file-browser/openFile/:driveLetter/:path',
-  onVisit,
-  onLeave,
   component: ({ match }: { match: MatchResult<{ driveLetter: string; path: string }> }) => (
     <PiRatLazyLoad
       component={async () => {

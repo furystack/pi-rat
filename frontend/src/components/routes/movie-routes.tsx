@@ -1,5 +1,4 @@
 import { createComponent } from '@furystack/shades'
-import { onLeave, onVisit } from './route-animations.js'
 import { MovieList } from '../../pages/movies/movie-list.js'
 import type { MatchResult } from 'path-to-regexp'
 import { MovieOverview } from '../../pages/movies/movie-overview.js'
@@ -9,8 +8,6 @@ import { MovieLoader } from '../../pages/movies/movie-loader.js'
 
 export const movieListRoute = {
   url: '/movies',
-  onVisit,
-  onLeave,
   component: () => {
     return <MovieList />
   },
@@ -18,8 +15,6 @@ export const movieListRoute = {
 
 export const watchMovieRoute = {
   url: '/movies/:id/watch',
-  onVisit,
-  onLeave,
   component: ({ match }: { match: MatchResult<{ id: string }> }) => {
     return <MovieLoader movieFileId={match.params.id} />
   },
@@ -27,8 +22,6 @@ export const watchMovieRoute = {
 
 export const movieOverviewRoute = {
   url: '/movies/:imdbId/overview',
-  onVisit,
-  onLeave,
   component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => {
     return <MovieOverview imdbId={match.params.imdbId} />
   },
@@ -36,15 +29,11 @@ export const movieOverviewRoute = {
 
 export const seriesListRoute = {
   url: '/series',
-  onVisit,
-  onLeave,
   component: () => <SeriesList />,
 }
 
 export const seriesOverviewRoute = {
   url: '/series/:imdbId',
-  onVisit,
-  onLeave,
   component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => {
     return <SeriesOverview imdbId={match.params.imdbId} />
   },
