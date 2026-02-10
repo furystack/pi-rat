@@ -73,7 +73,12 @@ export const MovieWidget = Shade<{
 
     if (isLoadedCacheResult(movie)) {
       return (
-        <AppLink tabIndex={0} title={movie.value.plot || movie.value.title} href="/movies/:imdbId/overview" params={{ imdbId }}>
+        <AppLink
+          tabIndex={0}
+          title={movie.value.plot || movie.value.title}
+          href="/movies/:imdbId/overview"
+          params={{ imdbId }}
+        >
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -132,9 +137,14 @@ export const MovieWidget = Shade<{
                     onclick={(ev) => {
                       ev.preventDefault()
                       ev.stopImmediatePropagation()
-                      navigateToRoute(injector, '/entities/movies', {}, {
-                        queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
-                      })
+                      navigateToRoute(
+                        injector,
+                        '/entities/movies',
+                        {},
+                        {
+                          queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
+                        },
+                      )
                     }}
                     title="Edit movie details"
                   >

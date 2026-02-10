@@ -18,9 +18,7 @@ export const EntityShortcutWidget = Shade<EntityShortcutWidgetData>({
       case 'movie-file':
         return <IconUrlWidget {...rest} name="Movie files" url="/entities/movie-files" icon={<>🎞️</>} />
       case 'omdb-movie-metadata':
-        return (
-          <IconUrlWidget {...rest} name="OMDB Movie Metadata" url="/entities/omdb-movie-metadata" icon={<>🌐</>} />
-        )
+        return <IconUrlWidget {...rest} name="OMDB Movie Metadata" url="/entities/omdb-movie-metadata" icon={<>🌐</>} />
       case 'omdb-series-metadata':
         return (
           <IconUrlWidget {...rest} name="OMDB Series Metadata" url="/entities/omdb-series-metadata" icon={<>🌐</>} />

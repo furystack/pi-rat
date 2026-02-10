@@ -107,9 +107,16 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
                     onclick={(ev) => {
                       ev.preventDefault()
                       ev.stopImmediatePropagation()
-                      navigateToRoute(injector, '/entities/iot-devices', {}, {
-                        queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: device.value.name } }),
-                      })
+                      navigateToRoute(
+                        injector,
+                        '/entities/iot-devices',
+                        {},
+                        {
+                          queryString: serializeToQueryString({
+                            gedst: { mode: 'edit', currentId: device.value.name },
+                          }),
+                        },
+                      )
                     }}
                     title="Edit device details"
                   >

@@ -30,17 +30,15 @@ test.describe('App Configuration Settings', () => {
     // ============================================
     // STEP 3: Test API key visibility toggle
     // ============================================
-    const toggleButton = omdbPage.getByRole('button', { name: /show/i })
-
     // Initially password should be hidden
     await expect(apiKeyInput).toHaveAttribute('type', 'password')
 
     // Click toggle to show
-    await toggleButton.click()
+    await omdbPage.getByRole('button', { name: /show/i }).click()
     await expect(apiKeyInput).toHaveAttribute('type', 'text')
 
     // Click toggle to hide again
-    await toggleButton.click()
+    await omdbPage.getByRole('button', { name: /hide/i }).click()
     await expect(apiKeyInput).toHaveAttribute('type', 'password')
 
     // ============================================

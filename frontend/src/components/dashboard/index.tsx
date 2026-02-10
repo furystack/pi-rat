@@ -26,9 +26,14 @@ export const Dashboard = Shade<DashboardData>({
                     icon: { type: 'font', value: '📝' } as const,
                     label: 'Edit this dashboard',
                     onClick: () => {
-                      navigateToRoute(injector, '/entities/dashboards', {}, {
-                        queryString: serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
-                      })
+                      navigateToRoute(
+                        injector,
+                        '/entities/dashboards',
+                        {},
+                        {
+                          queryString: serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
+                        },
+                      )
                     },
                   },
                 ]

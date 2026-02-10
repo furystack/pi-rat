@@ -148,9 +148,14 @@ export const MovieOverview = Shade<{ imdbId: string }>({
                   <span>
                     <Button
                       onclick={() => {
-                        navigateToRoute(injector, '/entities/movies', {}, {
-                          queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
-                        })
+                        navigateToRoute(
+                          injector,
+                          '/entities/movies',
+                          {},
+                          {
+                            queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
+                          },
+                        )
                       }}
                     >
                       Edit

@@ -78,11 +78,7 @@ export const Register = Shade({
             <Button variant="contained" color="primary" type="submit" disabled={isOperationInProgress}>
               Create Account
             </Button>
-            <Button
-              variant="outlined"
-              onclick={() => navigateToRoute(injector, '/')}
-              disabled={isOperationInProgress}
-            >
+            <Button variant="outlined" onclick={() => navigateToRoute(injector, '/')} disabled={isOperationInProgress}>
               Back to Login
             </Button>
           </div>

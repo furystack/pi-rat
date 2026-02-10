@@ -56,7 +56,11 @@ export const DashboardsPage = Shade({
         styles={{}}
         rowComponents={{
           id: ({ id }) => {
-            return <AppLink href="/dashboards/:id" params={{ id }}>Preview</AppLink>
+            return (
+              <AppLink href="/dashboards/:id" params={{ id }}>
+                Preview
+              </AppLink>
+            )
           },
         }}
         modelUri={modelUri}

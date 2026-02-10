@@ -62,7 +62,12 @@ export const SeriesWidget = Shade<{
 
     if (isLoadedCacheResult(series)) {
       return (
-        <AppLink tabIndex={0} title={series.value.plot || series.value.title} href="/series/:imdbId" params={{ imdbId }}>
+        <AppLink
+          tabIndex={0}
+          title={series.value.plot || series.value.title}
+          href="/series/:imdbId"
+          params={{ imdbId }}
+        >
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
