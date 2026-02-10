@@ -1,5 +1,6 @@
 import { NestedRouteLink, Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
+import type { AppPaths } from '../../app-routes.js'
 
 const focus = (el: HTMLElement) => {
   void promisifyAnimation(
@@ -48,7 +49,7 @@ const blur = (el: HTMLElement) => {
 type IconUrlWidgetProps = {
   index?: number
   description?: string
-  url: string
+  url: AppPaths
   icon: JSX.Element
   name: string
 }
@@ -102,8 +103,10 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
       }
     })
 
+    const urlString: string = props.url
+
     return (
-      <NestedRouteLink title={props.description} href={props.url}>
+      <NestedRouteLink title={props.description} href={urlString}>
         <div
           ref={cardRef}
           className="widget-card"
@@ -111,13 +114,6 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
           onfocus={(ev) => focus(ev.target as HTMLElement)}
           onmouseleave={(ev) => blur(ev.target as HTMLElement)}
           onblur={(ev) => blur(ev.target as HTMLElement)}
-          onclick={(ev) => {
-            if (props.url.startsWith('http') && new URL(props.url).href !== window.location.href) {
-              ev.preventDefault()
-              ev.stopImmediatePropagation()
-              window.location.replace(props.url)
-            }
-          }}
         >
           <div className="cover">{props.icon}</div>
           <div className="widget-name">{props.name}</div>

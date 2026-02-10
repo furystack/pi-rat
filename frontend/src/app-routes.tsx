@@ -334,63 +334,6 @@ export const authRoutes = {
 
 export type AppPaths = ExtractRoutePaths<typeof appRoutes & typeof authRoutes>
 
-export const movieRoutes = {
-  '/movies': appRoutes['/movies'],
-  '/movies/:id/watch': appRoutes['/movies/:id/watch'],
-  '/movies/:imdbId/overview': appRoutes['/movies/:imdbId/overview'],
-  '/series': appRoutes['/series'],
-  '/series/:imdbId': appRoutes['/series/:imdbId'],
-}
-
-export const adminRoutes = {
-  '/app-settings': appRoutes['/app-settings'],
-}
-
-export const entityRoutes = {
-  '/entities/drives': appRoutes['/entities/drives'],
-  '/entities/users': appRoutes['/entities/users'],
-  '/entities/dashboards': appRoutes['/entities/dashboards'],
-  '/entities/movies': appRoutes['/entities/movies'],
-  '/entities/movie-files': appRoutes['/entities/movie-files'],
-  '/entities/omdb-movie-metadata': appRoutes['/entities/omdb-movie-metadata'],
-  '/entities/omdb-series-metadata': appRoutes['/entities/omdb-series-metadata'],
-  '/entities/config': appRoutes['/entities/config'],
-  '/entities/iot-devices': appRoutes['/entities/iot-devices'],
-  '/entities/logging': appRoutes['/entities/logging'],
-}
-
-export const fileBrowserRoutes = {
-  '/file-browser': appRoutes['/file-browser'],
-  '/file-browser/openFile/:driveLetter/:path': appRoutes['/file-browser/openFile/:driveLetter/:path'],
-}
-
-export const iotRoutes = {
-  '/iot/devices': appRoutes['/iot/devices'],
-  '/iot/device/:id': appRoutes['/iot/device/:id'],
-}
-
-export const loggingRoutes = {
-  '/logging/terminal': appRoutes['/logging/terminal'],
-  '/logging/log-entry/:id': appRoutes['/logging/log-entry/:id'],
-}
-
-export const dashboardRoutes = {
-  '/dashboards/:id': appRoutes['/dashboards/:id'],
-  '/': appRoutes['/'],
-}
-
-export const chatRoutes = {
-  '/chat': appRoutes['/chat'],
-}
-
-export const aiRoutes = {
-  '/ai': appRoutes['/ai'],
-}
-
-export const userRoutes = {
-  '/user/settings': appRoutes['/user/settings'],
-}
-
 export const AppLink = NestedRouteLink as unknown as <TPath extends AppPaths>(
   props: TypedNestedRouteLinkProps<TPath>,
   children?: ChildrenList,

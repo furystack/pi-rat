@@ -1,5 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { AppShortcutWidget as AppShortcutWidgetData } from 'common'
+import type { AppPaths } from '../../app-routes.js'
 import { IconUrlWidget } from './icon-url-widget.js'
 
 export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
@@ -22,7 +23,7 @@ export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
       case 'app-settings':
         return <IconUrlWidget {...rest} name="Application Settings" url="/app-settings" icon={<>🔧</>} />
       default:
-        return <IconUrlWidget {...rest} name={appName} url={`/${appName}`} icon={<>🚫</>} />
+        return <IconUrlWidget {...rest} name={appName} url={`/${appName}` as AppPaths} icon={<>🚫</>} />
     }
   },
 })

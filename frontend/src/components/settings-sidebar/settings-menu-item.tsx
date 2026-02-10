@@ -1,11 +1,12 @@
 import { createComponent, LocationService, NestedRouteLink, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
 import { match, type MatchOptions } from 'path-to-regexp'
+import type { AppPaths } from '../../app-routes.js'
 
 type SettingsMenuItemProps = {
   icon: string
   label: string
-  href: string
+  href: AppPaths
   routingOptions?: MatchOptions
 }
 
@@ -39,9 +40,11 @@ export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
     const [currentPath] = useObservable('locationChange', injector.getInstance(LocationService).onLocationPathChanged)
     const isActive = !!match(href, routingOptions)(currentPath)
 
+    const hrefString: string = href
+
     return (
       <NestedRouteLink
-        href={href}
+        href={hrefString}
         style={{
           color: isActive ? cssVariableTheme.text.primary : cssVariableTheme.text.secondary,
           backgroundColor: isActive ? cssVariableTheme.background.paper : 'transparent',

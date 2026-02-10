@@ -24,7 +24,7 @@ describe('SettingsMenuItem', () => {
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <SettingsMenuItem icon="🏠" label="Home" href="/home" />,
+        jsxElement: <SettingsMenuItem icon="🏠" label="Home" href="/" />,
       })
       await flushUpdates()
 
@@ -33,7 +33,7 @@ describe('SettingsMenuItem', () => {
 
       const link = menuItem?.querySelector('a')
       expect(link).toBeTruthy()
-      expect(link?.getAttribute('href')).toBe('/home')
+      expect(link?.getAttribute('href')).toBe('/')
       expect(link?.textContent).toContain('Home')
       expect(link?.textContent).toContain('🏠')
     })
@@ -43,13 +43,13 @@ describe('SettingsMenuItem', () => {
     await usingAsync(new Injector(), async (injector) => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
-      history.pushState(null, '', '/settings')
+      history.pushState(null, '', '/app-settings/omdb')
       injector.getInstance(LocationService).updateState()
 
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <SettingsMenuItem icon="⚙️" label="Settings" href="/settings" />,
+        jsxElement: <SettingsMenuItem icon="⚙️" label="OMDB Settings" href="/app-settings/omdb" />,
       })
       await flushUpdates()
 
@@ -58,8 +58,8 @@ describe('SettingsMenuItem', () => {
 
       const link = menuItem?.querySelector('a')
       expect(link).toBeTruthy()
-      expect(link?.getAttribute('href')).toBe('/settings')
-      expect(link?.textContent).toContain('Settings')
+      expect(link?.getAttribute('href')).toBe('/app-settings/omdb')
+      expect(link?.textContent).toContain('OMDB Settings')
     })
   })
 
@@ -73,7 +73,7 @@ describe('SettingsMenuItem', () => {
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <SettingsMenuItem icon="📁" label="Files" href="/files" />,
+        jsxElement: <SettingsMenuItem icon="📂" label="File Browser" href="/file-browser" />,
       })
       await flushUpdates()
 
@@ -82,7 +82,7 @@ describe('SettingsMenuItem', () => {
 
       const link = menuItem?.querySelector('a')
       expect(link).toBeTruthy()
-      expect(link?.getAttribute('href')).toBe('/files')
+      expect(link?.getAttribute('href')).toBe('/file-browser')
     })
   })
 
