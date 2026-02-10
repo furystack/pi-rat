@@ -103,10 +103,10 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
       }
     })
 
-    const urlString: string = props.url
+    const href: string = props.url
 
     return (
-      <NestedRouteLink title={props.description} href={urlString}>
+      <NestedRouteLink title={props.description} href={href}>
         <div
           ref={cardRef}
           className="widget-card"

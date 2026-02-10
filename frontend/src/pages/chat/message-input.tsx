@@ -10,7 +10,7 @@ export const MessageInput = Shade<{ chat: Chat }>({
     const chatService = injector.getInstance(ChatMessageService)
     const session = injector.getInstance(SessionService)
     const theme = injector.getInstance(ThemeProviderService)
-    const formRef = useRef<HTMLElement>('form')
+    const formRef = useRef<HTMLFormElement>('form')
 
     return (
       <Form<{ content: string }>
@@ -24,10 +24,7 @@ export const MessageInput = Shade<{ chat: Chat }>({
             owner: session.currentUser.getValue()?.username || '',
             attachments: [],
           })
-          const form = formRef.current?.querySelector('form') ?? formRef.current
-          if (form && 'reset' in form) {
-            ;(form as HTMLFormElement).reset()
-          }
+          formRef.current?.reset()
         }}
         validate={(formData: unknown): formData is { content: string } => {
           return (
