@@ -46,7 +46,14 @@ export const Login = Shade({
             type="email"
             disabled={isOperationInProgress}
           />
-          <Input labelTitle="Password" name="password" required minLength={4} type="password" disabled={isOperationInProgress} />
+          <Input
+            labelTitle="Password"
+            name="password"
+            required
+            minLength={4}
+            type="password"
+            disabled={isOperationInProgress}
+          />
           <div className="button-row">
             <Button variant="contained" color="primary" type="submit" disabled={isOperationInProgress}>
               Login

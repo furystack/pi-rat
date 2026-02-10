@@ -1,7 +1,7 @@
 import { createComponent } from '@furystack/shades'
-import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import { decode } from 'common'
 import type { MatchResult } from 'path-to-regexp'
+import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 
 export const fileBrowserRoute = {
   url: '/file-browser',

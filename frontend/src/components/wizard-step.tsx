@@ -75,7 +75,9 @@ export const WizardStep = Shade<
         }}
       >
         <h1 ref={h1Ref}>{props.title}</h1>
-        <div ref={contentRef} className="content">{children}</div>
+        <div ref={contentRef} className="content">
+          {children}
+        </div>
         <div ref={actionsRef} className="actions">
           <Button onclick={() => props.onPrev?.()} disabled={props.currentPage < 1} variant="outlined">
             Previous

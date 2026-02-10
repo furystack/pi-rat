@@ -1,7 +1,7 @@
 import { createComponent } from '@furystack/shades'
+import type { MatchResult } from 'path-to-regexp'
 import { LoadableDashboard } from '../dashboard/LoadableDashboard.js'
 import { DefaultDashboard } from '../dashboard/default-dashboard.js'
-import type { MatchResult } from 'path-to-regexp'
 
 export const loadableDashboardRoute = {
   url: '/dashboards/:id',

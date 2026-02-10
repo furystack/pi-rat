@@ -114,7 +114,9 @@ export const BubbleBackground = Shade({
       const randomizeHandler = () => {
         const container = containerRef.current
         if (!container) return
-        container.querySelectorAll('shade-bubbles-blob-group').forEach((el) => randomizeBlobGroupVars(el as HTMLElement))
+        container
+          .querySelectorAll('shade-bubbles-blob-group')
+          .forEach((el) => randomizeBlobGroupVars(el as HTMLElement))
         container.querySelectorAll('shade-bubbles-blob').forEach((el) => randomizeBlobVars(el as HTMLElement))
       }
       document.addEventListener('mouseup', randomizeHandler)

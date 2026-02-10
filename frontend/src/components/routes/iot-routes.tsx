@@ -1,6 +1,6 @@
 import { createComponent } from '@furystack/shades'
-import { DeviceList } from '../../pages/iot/device-list.js'
 import type { MatchResult } from 'path-to-regexp'
+import { DeviceList } from '../../pages/iot/device-list.js'
 
 export const iotDeviceListRoute = {
   url: '/iot/devices',

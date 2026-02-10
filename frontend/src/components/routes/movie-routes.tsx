@@ -1,10 +1,10 @@
 import { createComponent } from '@furystack/shades'
-import { MovieList } from '../../pages/movies/movie-list.js'
 import type { MatchResult } from 'path-to-regexp'
+import { MovieList } from '../../pages/movies/movie-list.js'
+import { MovieLoader } from '../../pages/movies/movie-loader.js'
 import { MovieOverview } from '../../pages/movies/movie-overview.js'
 import { SeriesList } from '../../pages/movies/series-list.js'
 import { SeriesOverview } from '../../pages/movies/series-overview.js'
-import { MovieLoader } from '../../pages/movies/movie-loader.js'
 
 export const movieListRoute = {
   url: '/movies',
