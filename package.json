@@ -45,13 +45,10 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --ext .tsx,.ts --cache --fix",
-      "prettier --write",
-      "git add"
+      "eslint --fix"
     ],
-    "*.{js,jsx}": [
-      "prettier --write",
-      "git add"
+    "*": [
+      "prettier --write --ignore-unknown"
     ]
   },
   "scripts": {
