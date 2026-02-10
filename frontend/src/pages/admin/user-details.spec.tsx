@@ -4,8 +4,8 @@ import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { User } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { type CacheState, createMockUser } from '../../test-utils/user-test-helpers.js'
 import { UsersService } from '../../services/users-service.js'
+import { type CacheState, createMockUser } from '../../test-utils/user-test-helpers.js'
 import { UserDetailsPage } from './user-details.js'
 
 /**
@@ -51,7 +51,8 @@ describe('UserDetailsPage', () => {
     injector.setExplicitInstance(mockNotyService as unknown as NotyService, NotyService)
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    await injector[Symbol.asyncDispose]()
     document.body.innerHTML = ''
   })
 
