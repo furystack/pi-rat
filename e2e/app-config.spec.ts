@@ -30,7 +30,7 @@ test.describe('App Configuration Settings', () => {
     // ============================================
     // STEP 3: Test API key visibility toggle
     // ============================================
-    const toggleButton = omdbPage.locator('[data-toggle-visibility]')
+    const toggleButton = omdbPage.getByRole('button', { name: /show/i })
 
     // Initially password should be hidden
     await expect(apiKeyInput).toHaveAttribute('type', 'password')

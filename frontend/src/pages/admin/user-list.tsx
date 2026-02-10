@@ -89,7 +89,7 @@ export const UserListPage = Shade<UserListPageProps>({
     const [usersState] = useObservable('users', usersService.findUsersAsObservable({}))
 
     const navigateToUser = (username: string) => {
-      navigateToRoute(injector, '/app-settings/users/:username', { username: encodeURIComponent(username) })
+      navigateToRoute(injector, '/app-settings/users/:username', { username })
     }
 
     const formatDate = (dateString: string) => {

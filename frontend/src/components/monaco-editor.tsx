@@ -32,34 +32,32 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
     )
 
     useDisposable('monacoEditor', () => {
-      const container = containerRef.current
-      if (!container) {
-        return { [Symbol.dispose]: () => {} }
-      }
+      let editorInstance: editor.IStandaloneCodeEditor | null = null
+      let model: editor.ITextModel | null = null
 
-      const editorInstance = editor.create(container, { ...props.options, theme })
-      editorInstance.setValue(props.value || '')
+      queueMicrotask(() => {
+        const container = containerRef.current
+        if (!container) return
 
-      if (props.onValueChange) {
-        editorInstance.onKeyUp(() => {
-          props.onValueChange?.(editorInstance.getValue())
-        })
-      }
+        editorInstance = editor.create(container, { ...props.options, theme })
+        editorInstance.setValue(props.value || '')
 
-      if (props.modelUri) {
-        const model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
-        editorInstance.setModel(model)
-        return {
-          [Symbol.dispose]: () => {
-            model.dispose()
-            editorInstance.dispose()
-          },
+        if (props.onValueChange) {
+          editorInstance.onKeyUp(() => {
+            props.onValueChange?.(editorInstance!.getValue())
+          })
         }
-      }
+
+        if (props.modelUri) {
+          model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
+          editorInstance.setModel(model)
+        }
+      })
 
       return {
         [Symbol.dispose]: () => {
-          editorInstance.dispose()
+          model?.dispose()
+          editorInstance?.dispose()
         },
       }
     })
