@@ -16,6 +16,16 @@ const useDisposableTerminal = (
   containerRef: { current: HTMLElement | null },
 ) => {
   return useDisposable('terminal', () => {
+    if (!containerRef.current) {
+      const dummyTerminal = new Terminal()
+      return {
+        terminal: dummyTerminal,
+        fitAddon: new FitAddon(),
+        searchAddon: new SearchAddon(),
+        webLinksAddon: new WebLinksAddon(),
+        [Symbol.dispose]: () => dummyTerminal.dispose(),
+      }
+    }
     const terminal = new Terminal({
       linkHandler: {
         activate: (ev: MouseEvent, url: string) => {
