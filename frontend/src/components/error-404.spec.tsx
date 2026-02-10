@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot, ScreenService } from '@furystack/shades'
+import { ScreenService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { ObservableValue, usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -46,6 +46,7 @@ describe('Error404', () => {
         rootElement,
         jsxElement: <Error404 />,
       })
+      await flushUpdates()
 
       const error404 = rootElement.querySelector('shade-404-not-found')
       expect(error404).toBeTruthy()
@@ -63,6 +64,7 @@ describe('Error404', () => {
         rootElement,
         jsxElement: <Error404 />,
       })
+      await flushUpdates()
 
       const error404 = rootElement.querySelector('shade-404-not-found')
       expect(error404?.textContent).toContain('The page you are looking for is not exists')
@@ -80,6 +82,7 @@ describe('Error404', () => {
         rootElement,
         jsxElement: <Error404 />,
       })
+      await flushUpdates()
 
       const error404 = rootElement.querySelector('shade-404-not-found')
       expect(error404?.textContent).toContain('The URL above is correct')
@@ -99,6 +102,7 @@ describe('Error404', () => {
         rootElement,
         jsxElement: <Error404 />,
       })
+      await flushUpdates()
 
       const genericErrorPage = rootElement.querySelector('multiverse-generic-error-page')
       expect(genericErrorPage).toBeTruthy()

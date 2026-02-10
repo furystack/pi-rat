@@ -18,4 +18,6 @@ export const chatPageRoute = {
   },
 }
 
-export const chatRoutes = [chatPageRoute] as const
+export const chatRoutes = {
+  [chatPageRoute.url]: chatPageRoute,
+}

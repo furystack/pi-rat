@@ -1,6 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { NotyService } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { getFallbackMetadata, getFullPath, isMovieFile, isSampleFile } from 'common'
 import { ContextMenu } from '../../components/context-menu.js'
@@ -15,10 +14,10 @@ export const FileContextMenu = Shade<{
   open: () => void
 }>({
   shadowDomName: 'file-context-menu',
-  render: ({ children, props, useDisposable, injector }) => {
+  render: ({ children, props, useState, injector }) => {
     const { entry, currentDriveLetter, currentPath, open } = props
-    const isInfoVisible = useDisposable('isInfoVisible', () => new ObservableValue(false))
-    const isRelatedMoviesVisible = useDisposable('isRelatedMoviesVisible', () => new ObservableValue(false))
+    const [isInfoVisible, setInfoVisible] = useState('isInfoVisible', false)
+    const [isRelatedMoviesVisible, setRelatedMoviesVisible] = useState('isRelatedMoviesVisible', false)
 
     const path = `${currentDriveLetter}:${currentPath}/${entry.name}`
     const movieMetadata = props.entry.isFile && !isSampleFile(path) && isMovieFile(path) && getFallbackMetadata(path)
@@ -45,7 +44,7 @@ export const FileContextMenu = Shade<{
                       movieMetadata.type === 'episode' ? `S${movieMetadata.season}E${movieMetadata.episode}` : ''
                     }`,
                     onClick: () => {
-                      isRelatedMoviesVisible.setValue(true)
+                      setRelatedMoviesVisible(true)
                     },
                   },
                   {
@@ -123,7 +122,7 @@ export const FileContextMenu = Shade<{
               icon: { type: 'font', value: 'ℹ️' } as const,
               label: 'Show file info',
               onClick: () => {
-                isInfoVisible.setValue(true)
+                setInfoVisible(true)
               },
             },
           ]}
@@ -133,6 +132,7 @@ export const FileContextMenu = Shade<{
         <FileInfoModal
           entry={entry}
           isInfoVisible={isInfoVisible}
+          onClose={() => setInfoVisible(false)}
           currentDriveLetter={currentDriveLetter}
           currentPath={currentPath}
         />
@@ -142,6 +142,7 @@ export const FileContextMenu = Shade<{
             path={currentPath}
             file={entry}
             isOpened={isRelatedMoviesVisible}
+            onClose={() => setRelatedMoviesVisible(false)}
           />
         )}
       </>

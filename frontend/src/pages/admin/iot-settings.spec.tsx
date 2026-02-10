@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot } from '@furystack/shades'
+import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Config, IotConfig } from 'common'
@@ -62,7 +62,7 @@ describe('IotSettingsPage', () => {
     document.body.innerHTML = ''
   })
 
-  it('should render the IOT settings page with header', () => {
+  it('should render the IOT settings page with header', async () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -70,13 +70,14 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
     expect(page).toBeTruthy()
     expect(page?.textContent).toContain('IOT Device Availability')
   })
 
-  it('should display loading state', () => {
+  it('should display loading state', async () => {
     configObservable.setValue({ status: 'loading' })
 
     const rootElement = document.getElementById('root') as HTMLDivElement
@@ -86,12 +87,13 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
     expect(page?.textContent).toContain('Loading settings...')
   })
 
-  it('should render the form with ping interval and timeout inputs when loaded', () => {
+  it('should render the form with ping interval and timeout inputs when loaded', async () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -99,6 +101,8 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
 
@@ -119,7 +123,7 @@ describe('IotSettingsPage', () => {
     expect(pingTimeoutInput?.required).toBe(true)
   })
 
-  it('should render save button', () => {
+  it('should render save button', async () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -127,13 +131,15 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
     const saveButton = page?.querySelector('button[type="submit"]')
     expect(saveButton).toBeTruthy()
   })
 
-  it('should call ConfigService.getConfigAsObservable on render', () => {
+  it('should call ConfigService.getConfigAsObservable on render', async () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -141,11 +147,12 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
 
     expect(mockConfigService.getConfigAsObservable).toHaveBeenCalledWith('IOT_CONFIG')
   })
 
-  it('should render with custom values from config', () => {
+  it('should render with custom values from config', async () => {
     configObservable.setValue({
       status: 'loaded',
       value: createMockIotConfig(60000, 5000),
@@ -159,6 +166,8 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
     const pingIntervalInput = page?.querySelector('input[name="pingIntervalMs"]') as HTMLInputElement
@@ -168,7 +177,7 @@ describe('IotSettingsPage', () => {
     expect(pingTimeoutInput?.value).toBe('5000')
   })
 
-  it('should display validation constraints in help text', () => {
+  it('should display validation constraints in help text', async () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -176,6 +185,8 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
     const helpText = page?.textContent
@@ -194,6 +205,8 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
     const form = page?.querySelector('form') as HTMLFormElement
@@ -201,6 +214,7 @@ describe('IotSettingsPage', () => {
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
 
     await new Promise((resolve) => setTimeout(resolve, 50))
+    await flushUpdates()
 
     expect(mockNotyService.emit).toHaveBeenCalledWith('onNotyAdded', {
       title: 'Success',
@@ -219,6 +233,8 @@ describe('IotSettingsPage', () => {
       rootElement,
       jsxElement: <IotSettingsPage />,
     })
+    await flushUpdates()
+    await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
     const form = page?.querySelector('form') as HTMLFormElement
@@ -226,6 +242,7 @@ describe('IotSettingsPage', () => {
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
 
     await new Promise((resolve) => setTimeout(resolve, 50))
+    await flushUpdates()
 
     expect(mockNotyService.emit).toHaveBeenCalledWith('onNotyAdded', {
       title: 'Error',

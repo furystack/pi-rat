@@ -1,4 +1,4 @@
-import { createComponent, LocationService, RouteLink, Shade } from '@furystack/shades'
+import { createComponent, LocationService, NestedRouteLink, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
 import { match, type MatchOptions } from 'path-to-regexp'
 
@@ -40,7 +40,7 @@ export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
     const isActive = !!match(href, routingOptions)(currentPath)
 
     return (
-      <RouteLink
+      <NestedRouteLink
         href={href}
         style={{
           color: isActive ? cssVariableTheme.text.primary : cssVariableTheme.text.secondary,
@@ -50,7 +50,7 @@ export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
       >
         <span className="menu-icon">{icon}</span>
         <span className="menu-label">{label}</span>
-      </RouteLink>
+      </NestedRouteLink>
     )
   },
 })

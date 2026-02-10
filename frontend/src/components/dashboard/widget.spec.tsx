@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot } from '@furystack/shades'
+import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -30,6 +30,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="app-shortcut" appName="home" />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()
@@ -48,6 +49,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="entity-shortcut" entityName="movie" />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()
@@ -66,6 +68,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="html" content="<p>Hello World</p>" />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()
@@ -85,6 +88,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="markdown" content="# Heading" />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()
@@ -103,6 +107,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="group" title="Test Group" widgets={[]} />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()
@@ -121,6 +126,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="movie" imdbId="tt1234567" />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()
@@ -139,6 +145,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="series" imdbId="tt7654321" />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()
@@ -157,6 +164,7 @@ describe('Widget', () => {
         rootElement,
         jsxElement: <Widget type="continue-watching" />,
       })
+      await flushUpdates()
 
       const widget = document.querySelector('pi-rat-widget')
       expect(widget).toBeTruthy()

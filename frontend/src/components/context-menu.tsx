@@ -1,6 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { collapse, expand, Paper } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { Icon as IconModel } from 'common'
 import { Icon } from './Icon.js'
 
@@ -64,44 +63,28 @@ export const ContextMenu = Shade<ContextMenuProps>({
       backdropFilter: 'blur(20px)',
     },
   },
-  constructed: ({ useDisposable }) => {
-    const isOpen = useDisposable('isOpen', () => new ObservableValue(false))
-
-    const listener = (_ev: MouseEvent) => {
-      isOpen.setValue(false)
-    }
-
-    window.addEventListener('click', listener)
-    window.addEventListener('contextmenu', listener)
-
-    return () => {
-      window.removeEventListener('click', listener)
-      window.removeEventListener('contextmenu', listener)
-    }
-  },
-  render: ({ props, useDisposable, children, element }) => {
+  render: ({ props, useDisposable, children, useRef }) => {
     const { items } = props
+    const menuRef = useRef<HTMLElement>('menuItems')
 
-    const isOpen = useDisposable('isOpen', () => new ObservableValue(false))
-
-    isOpen.subscribe((value) => {
-      const menu = element.querySelector('.menuItems') as HTMLUListElement
-      try {
-        if (value) {
-          menu.getAnimations().forEach((a) => a.cancel())
-          menu.style.display = 'block'
-          void expand(menu).then(() => {
-            menu.style.opacity = '1'
-          })
-        } else {
+    useDisposable('windowListeners', () => {
+      const listener = () => {
+        const menu = menuRef.current
+        if (menu) {
           menu.getAnimations().forEach((a) => a.cancel())
           void collapse(menu).then(() => {
             menu.style.display = 'none'
             menu.style.opacity = '0'
           })
         }
-      } catch (error) {
-        /** in-progress animations will throw */
+      }
+      window.addEventListener('click', listener)
+      window.addEventListener('contextmenu', listener)
+      return {
+        [Symbol.dispose]: () => {
+          window.removeEventListener('click', listener)
+          window.removeEventListener('contextmenu', listener)
+        },
       }
     })
 
@@ -110,15 +93,20 @@ export const ContextMenu = Shade<ContextMenuProps>({
         oncontextmenu={(ev) => {
           ev.preventDefault()
           setTimeout(() => {
-            const menu = element.querySelector('.menuItems') as HTMLUListElement
-            menu.style.display = 'block'
-            menu.style.top = `${ev.clientY}px`
-            menu.style.left = `${ev.clientX}px`
-            isOpen.setValue(true)
+            const menu = menuRef.current
+            if (menu) {
+              menu.getAnimations().forEach((a) => a.cancel())
+              menu.style.display = 'block'
+              menu.style.top = `${ev.clientY}px`
+              menu.style.left = `${ev.clientX}px`
+              void expand(menu).then(() => {
+                menu.style.opacity = '1'
+              })
+            }
           })
         }}
       >
-        <Paper className="menuItems" elevation={3}>
+        <Paper className="menuItems" ref={menuRef} elevation={3}>
           {items.map((itemProps) => (
             <MenuItem {...itemProps} />
           ))}

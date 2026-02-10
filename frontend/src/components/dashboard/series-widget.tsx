@@ -1,5 +1,5 @@
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
-import { RouteLink, Shade, createComponent } from '@furystack/shades'
+import { NestedRouteLink, Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { SeriesService } from '../../services/series-service.js'
 
@@ -39,17 +39,19 @@ export const SeriesWidget = Shade<{
   size?: number
 }>({
   shadowDomName: 'pi-rat-series-widget',
-  constructed: ({ props, element }) => {
+  render: ({ props, injector, useObservable, useRef }) => {
+    const cardRef = useRef<HTMLElement>('card')
     setTimeout(() => {
-      void promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-        fill: 'forwards',
-        delay: (props.index || 0) * 160 + Math.random() * 100,
-        duration: 700,
-        easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-      })
+      const el = cardRef.current
+      if (el) {
+        void promisifyAnimation(el, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+          fill: 'forwards',
+          delay: (props.index || 0) * 160 + Math.random() * 100,
+          duration: 700,
+          easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+        })
+      }
     }, 1000)
-  },
-  render: ({ props, injector, useObservable }) => {
     const { imdbId, size = 256 } = props
 
     const seriesService = injector.getInstance(SeriesService)
@@ -59,7 +61,7 @@ export const SeriesWidget = Shade<{
 
     if (isLoadedCacheResult(series)) {
       return (
-        <RouteLink tabIndex={0} title={series.value.plot || series.value.title} href={url}>
+        <NestedRouteLink tabIndex={0} title={series.value.plot || series.value.title} href={url}>
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -117,7 +119,7 @@ export const SeriesWidget = Shade<{
               {series.value.title}
             </div>
           </div>
-        </RouteLink>
+        </NestedRouteLink>
       )
     } else if (isPendingCacheResult(series)) {
       return <Skeleton />

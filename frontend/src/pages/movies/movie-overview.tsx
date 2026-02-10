@@ -93,7 +93,8 @@ export const PlayButtons = Shade<{ imdbId: string }>({
 
 export const MovieOverview = Shade<{ imdbId: string }>({
   shadowDomName: 'shade-movie-overview',
-  render: ({ props, useObservable, injector, element }) => {
+  render: ({ props, useObservable, injector, useRef }) => {
+    const imgRef = useRef<HTMLImageElement>('posterImg')
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
     const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
     const movieService = injector.getInstance(MoviesService)
@@ -103,7 +104,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
     if (isLoadedCacheResult(movieResult)) {
       setTimeout(() => {
         void promisifyAnimation(
-          element.querySelector('img'),
+          imgRef.current,
           [
             { opacity: 0, transform: 'scale(0.85)' },
             { opacity: 1, transform: 'scale(1)' },
@@ -131,6 +132,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
           >
             <div style={{ padding: '2em' }}>
               <img
+                ref={imgRef}
                 src={movie.thumbnailImageUrl || ''}
                 alt={`thumbnail for ${movie.title}`}
                 style={{ boxShadow: '3px 3px 8px rgba(0,0,0,0.3)', borderRadius: '8px', opacity: '0' }}

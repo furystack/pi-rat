@@ -1,6 +1,6 @@
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
-import { LinkToRoute, Shade, createComponent } from '@furystack/shades'
+import { NestedRouteLink, Shade, compileRoute, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import type { DeviceAvailability as DeviceAvailabilityProps } from 'common'
 import { navigateToRoute } from '../../navigate-to-route.js'
@@ -45,16 +45,8 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
   shadowDomName: 'pi-rat-device-availability-widget',
   elementBase: HTMLDivElement,
   elementBaseName: 'div',
-  constructed: ({ props, element }) => {
-    element.style.transform = 'scale(0)'
-    void promisifyAnimation(element, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-      fill: 'forwards',
-      delay: (props.index || 0) * 160 + Math.random() * 100,
-      duration: 700,
-      easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-    })
-  },
-  render: ({ props, injector, useObservable }) => {
+  render: ({ props, injector, useObservable, useHostProps }) => {
+    useHostProps({ style: { transform: 'scale(0)' } })
     const { size = 256 } = props
 
     const iotDevices = injector.getInstance(IotDevicesService)
@@ -64,11 +56,10 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
 
     if (isLoadedCacheResult(device)) {
       return (
-        <LinkToRoute
+        <NestedRouteLink
           tabIndex={0}
           title={device.value.name}
-          route={iotDeviceRoute}
-          params={{ id: props.deviceName }}
+          href={compileRoute(iotDeviceRoute.url, { id: props.deviceName })}
           style={{
             textDecoration: 'none',
           }}
@@ -162,7 +153,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
               {device.value.name}
             </div>
           </div>
-        </LinkToRoute>
+        </NestedRouteLink>
       )
     } else if (isPendingCacheResult(device)) {
       return <Skeleton />

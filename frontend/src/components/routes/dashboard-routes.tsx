@@ -21,4 +21,7 @@ export const defaultDashboardRoute = {
   component: () => <DefaultDashboard />,
 }
 
-export const dashboardRoutes = [loadableDashboardRoute, defaultDashboardRoute] as const
+export const dashboardRoutes = {
+  [loadableDashboardRoute.url]: loadableDashboardRoute,
+  [defaultDashboardRoute.url]: defaultDashboardRoute,
+}

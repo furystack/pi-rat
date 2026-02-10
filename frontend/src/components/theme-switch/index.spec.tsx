@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot } from '@furystack/shades'
+import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -35,6 +35,7 @@ describe('ThemeSwitch', () => {
         rootElement,
         jsxElement: <ThemeSwitch />,
       })
+      await flushUpdates()
 
       const themeSwitch = rootElement.querySelector('theme-switch')
       expect(themeSwitch).toBeTruthy()
@@ -51,6 +52,7 @@ describe('ThemeSwitch', () => {
         rootElement,
         jsxElement: <ThemeSwitch />,
       })
+      await flushUpdates()
 
       const themeSwitch = rootElement.querySelector('theme-switch')
       expect(themeSwitch).toBeTruthy()
@@ -67,6 +69,7 @@ describe('ThemeSwitch', () => {
         rootElement,
         jsxElement: <ThemeSwitch />,
       })
+      await flushUpdates()
 
       const themeSwitch = rootElement.querySelector('theme-switch')
       expect(themeSwitch).toBeTruthy()
@@ -84,6 +87,7 @@ describe('ThemeSwitch', () => {
         rootElement,
         jsxElement: <ThemeSwitch />,
       })
+      await flushUpdates()
 
       const themeSwitch = rootElement.querySelector('theme-switch')
       expect(themeSwitch).toBeTruthy()
@@ -101,6 +105,7 @@ describe('ThemeSwitch', () => {
         rootElement,
         jsxElement: <ThemeSwitch />,
       })
+      await flushUpdates()
 
       const themeSwitch = rootElement.querySelector('theme-switch')
       expect(themeSwitch).toBeTruthy()
@@ -118,6 +123,7 @@ describe('ThemeSwitch', () => {
         rootElement,
         jsxElement: <ThemeSwitch />,
       })
+      await flushUpdates()
 
       expect(mockThemeProvider.subscribe).toHaveBeenCalledWith('themeChanged', expect.any(Function))
     })
@@ -133,6 +139,7 @@ describe('ThemeSwitch', () => {
         rootElement,
         jsxElement: <ThemeSwitch variant="outlined" />,
       })
+      await flushUpdates()
 
       const themeSwitch = rootElement.querySelector('theme-switch')
       expect(themeSwitch).toBeTruthy()

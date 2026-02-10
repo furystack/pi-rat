@@ -1,7 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
 import { Button, fadeIn, fadeOut, Input, Modal, NotyService, Wizard } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import { WizardStep } from '../../components/wizard-step.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { getErrorMessage } from '../../services/get-error-message.js'
@@ -67,21 +66,21 @@ export const AddDriveStep = Shade<WizardStepProps>({
 
 export const CreateDriveWizard = Shade<{ onDriveAdded?: () => void }>({
   shadowDomName: 'create-drive-wizard',
-  render: ({ useDisposable, props }) => {
-    const isOpened = useDisposable('isOpened', () => new ObservableValue(false))
+  render: ({ useState, props }) => {
+    const [isOpened, setIsOpened] = useState('isOpened', false)
     return (
       <>
         <Modal
           backdropStyle={{ zIndex: '1' }}
           isVisible={isOpened}
-          onClose={() => isOpened.setValue(false)}
+          onClose={() => setIsOpened(false)}
           showAnimation={fadeIn}
           hideAnimation={fadeOut}
         >
           <Wizard
             steps={[AddDriveStep]}
             onFinish={() => {
-              isOpened.setValue(false)
+              setIsOpened(false)
               props.onDriveAdded?.()
             }}
           ></Wizard>
@@ -90,7 +89,7 @@ export const CreateDriveWizard = Shade<{ onDriveAdded?: () => void }>({
           style={{ position: 'fixed', bottom: '1em', right: '1em', zIndex: '1' }}
           variant="outlined"
           color="success"
-          onclick={() => isOpened.setValue(true)}
+          onclick={() => setIsOpened(true)}
           title="Add Drive"
         >
           +

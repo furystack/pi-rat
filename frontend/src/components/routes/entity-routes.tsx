@@ -1,4 +1,4 @@
-import { createComponent, type Route } from '@furystack/shades'
+import { createComponent } from '@furystack/shades'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import { onLeave, onVisit } from './route-animations.js'
 
@@ -14,7 +14,7 @@ export const entityDrivesRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityUsersRoute = {
   url: '/entities/users',
@@ -28,7 +28,7 @@ export const entityUsersRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityDashboardsRoute = {
   url: '/entities/dashboards',
@@ -42,7 +42,7 @@ export const entityDashboardsRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityMoviesRoute = {
   url: '/entities/movies',
@@ -56,7 +56,7 @@ export const entityMoviesRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityMovieFilesRoute = {
   url: '/entities/movie-files',
@@ -70,7 +70,7 @@ export const entityMovieFilesRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityOmdbMovieMetadataRoute = {
   url: '/entities/omdb-movie-metadata',
@@ -84,7 +84,7 @@ export const entityOmdbMovieMetadataRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityOmdbSeriesMetadataRoute = {
   url: '/entities/omdb-series-metadata',
@@ -98,7 +98,7 @@ export const entityOmdbSeriesMetadataRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityConfigRoute = {
   url: '/entities/config',
@@ -112,7 +112,7 @@ export const entityConfigRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityDeviceRoute = {
   url: '/entities/iot-devices',
@@ -126,7 +126,7 @@ export const entityDeviceRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
 export const entityLoggingRoute = {
   url: '/entities/logging',
@@ -140,17 +140,17 @@ export const entityLoggingRoute = {
       }}
     />
   ),
-} satisfies Route
+}
 
-export const entityRoutes = [
-  entityDrivesRoute,
-  entityUsersRoute,
-  entityDashboardsRoute,
-  entityMoviesRoute,
-  entityMovieFilesRoute,
-  entityOmdbMovieMetadataRoute,
-  entityOmdbSeriesMetadataRoute,
-  entityConfigRoute,
-  entityDeviceRoute,
-  entityLoggingRoute,
-]
+export const entityRoutes = {
+  [entityDrivesRoute.url]: entityDrivesRoute,
+  [entityUsersRoute.url]: entityUsersRoute,
+  [entityDashboardsRoute.url]: entityDashboardsRoute,
+  [entityMoviesRoute.url]: entityMoviesRoute,
+  [entityMovieFilesRoute.url]: entityMovieFilesRoute,
+  [entityOmdbMovieMetadataRoute.url]: entityOmdbMovieMetadataRoute,
+  [entityOmdbSeriesMetadataRoute.url]: entityOmdbSeriesMetadataRoute,
+  [entityConfigRoute.url]: entityConfigRoute,
+  [entityDeviceRoute.url]: entityDeviceRoute,
+  [entityLoggingRoute.url]: entityLoggingRoute,
+}

@@ -1,4 +1,4 @@
-import { createComponent, type Route } from '@furystack/shades'
+import { createComponent } from '@furystack/shades'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import { onLeave, onVisit } from './route-animations.js'
 
@@ -16,13 +16,13 @@ export const LogEntriesTerminalRoute = {
       />
     )
   },
-} satisfies Route
+}
 
 export const logEntryRoute = {
   url: '/logging/log-entry/:id',
   onVisit,
   onLeave,
-  component: ({ match }) => {
+  component: ({ match }: { match: { params: { id: string } } }) => {
     return (
       <PiRatLazyLoad
         component={async () => {
@@ -32,6 +32,9 @@ export const logEntryRoute = {
       />
     )
   },
-} satisfies Route<{ id: string }>
+}
 
-export const loggingRoutes = [LogEntriesTerminalRoute, logEntryRoute] as const
+export const loggingRoutes = {
+  [LogEntriesTerminalRoute.url]: LogEntriesTerminalRoute,
+  [logEntryRoute.url]: logEntryRoute,
+}

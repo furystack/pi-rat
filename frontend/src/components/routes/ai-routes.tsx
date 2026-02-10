@@ -18,4 +18,6 @@ export const aiPageRoute = {
   },
 }
 
-export const aiRoutes = [aiPageRoute] as const
+export const aiRoutes = {
+  [aiPageRoute.url]: aiPageRoute,
+}

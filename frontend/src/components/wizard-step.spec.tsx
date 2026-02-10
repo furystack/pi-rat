@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot, ScreenService } from '@furystack/shades'
+import { ScreenService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { ObservableValue, usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -67,6 +67,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       const wizardStep = document.querySelector('wizard-step')
       expect(wizardStep).toBeTruthy()
@@ -90,6 +91,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       const wizardStep = document.querySelector('wizard-step')
       expect(wizardStep).toBeTruthy()
@@ -114,6 +116,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       vi.runAllTimers()
 
@@ -138,6 +141,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       vi.runAllTimers()
 
@@ -162,6 +166,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       vi.runAllTimers()
 
@@ -186,6 +191,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       vi.runAllTimers()
 
@@ -211,6 +217,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       vi.runAllTimers()
 
@@ -237,6 +244,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       const wizardStep = document.querySelector('wizard-step')
       const form = wizardStep?.querySelector('form')
@@ -262,6 +270,7 @@ describe('WizardStep', () => {
           </WizardStep>
         ),
       })
+      await flushUpdates()
 
       const wizardStep = document.querySelector('wizard-step')
       const form = wizardStep?.querySelector('form')

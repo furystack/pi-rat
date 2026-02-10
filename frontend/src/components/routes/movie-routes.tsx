@@ -50,10 +50,10 @@ export const seriesOverviewRoute = {
   },
 }
 
-export const movieRoutes = [
-  movieListRoute,
-  watchMovieRoute,
-  movieOverviewRoute,
-  seriesListRoute,
-  seriesOverviewRoute,
-] as const
+export const movieRoutes = {
+  [movieListRoute.url]: movieListRoute,
+  [watchMovieRoute.url]: watchMovieRoute,
+  [movieOverviewRoute.url]: movieOverviewRoute,
+  [seriesListRoute.url]: seriesListRoute,
+  [seriesOverviewRoute.url]: seriesOverviewRoute,
+}

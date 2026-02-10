@@ -25,22 +25,9 @@ export const Login = Shade({
       padding: '1em 0',
     },
   },
-  constructed: ({ element }) => {
-    element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
-  },
-  render: ({ injector, useObservable, element }) => {
+  render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService)
-    useObservable('isOperationInProgress', sessionService.isOperationInProgress, {
-      onChange: (isOperationInProgress) => {
-        const els = [...element.querySelectorAll('input').values(), ...element.querySelectorAll('button').values()]
-        els.forEach((el) => {
-          el.disabled = isOperationInProgress
-        })
-        if (!isOperationInProgress) {
-          element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
-        }
-      },
-    })
+    const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>
         <Form<LoginPayload>
@@ -51,13 +38,24 @@ export const Login = Shade({
           onSubmit={({ userName, password }) => void sessionService.login(userName, password)}
         >
           <h2>Login</h2>
-          <Input labelTitle="E-mail address" name="userName" required autofocus type="email" />
-          <Input labelTitle="Password" name="password" required minLength={4} type="password" />
+          <Input
+            labelTitle="E-mail address"
+            name="userName"
+            required
+            autofocus
+            type="email"
+            disabled={isOperationInProgress}
+          />
+          <Input labelTitle="Password" name="password" required minLength={4} type="password" disabled={isOperationInProgress} />
           <div className="button-row">
-            <Button variant="contained" color="primary" type="submit">
+            <Button variant="contained" color="primary" type="submit" disabled={isOperationInProgress}>
               Login
             </Button>
-            <Button variant="outlined" onclick={() => navigateToRoute(injector, registerRoute, {})}>
+            <Button
+              variant="outlined"
+              onclick={() => navigateToRoute(injector, registerRoute, {})}
+              disabled={isOperationInProgress}
+            >
               Create Account
             </Button>
           </div>

@@ -65,7 +65,7 @@ export const OmdbSettingsPage = Shade({
       paddingTop: '16px',
     },
   },
-  render: ({ injector, useObservable, useDisposable, element }) => {
+  render: ({ injector, useObservable, useDisposable, useState }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
 
@@ -73,15 +73,10 @@ export const OmdbSettingsPage = Shade({
 
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
+    const [isApiKeyVisible, setApiKeyVisible] = useState('apiKeyVisible', false)
 
     const toggleApiKeyVisibility = () => {
-      const input = element.querySelector<HTMLInputElement>('input[name="apiKey"]')
-      const button = element.querySelector<HTMLButtonElement>('[data-toggle-visibility]')
-      if (input && button) {
-        const isPassword = input.type === 'password'
-        input.type = isPassword ? 'text' : 'password'
-        button.textContent = isPassword ? '🙈 Hide' : '👁️ Show'
-      }
+      setApiKeyVisible(!isApiKeyVisible)
     }
 
     const handleSubmit = async (formData: Record<string, unknown>) => {
@@ -144,7 +139,7 @@ export const OmdbSettingsPage = Shade({
                 <Input
                   labelTitle="API Key"
                   name="apiKey"
-                  type="password"
+                  type={isApiKeyVisible ? 'text' : 'password'}
                   value={currentValues.apiKey}
                   placeholder="Enter your OMDB API key"
                   style={{ flex: '1' }}
@@ -154,9 +149,8 @@ export const OmdbSettingsPage = Shade({
                   variant="outlined"
                   onclick={toggleApiKeyVisibility}
                   style={{ marginBottom: '4px' }}
-                  data-toggle-visibility
                 >
-                  👁️ Show
+                  {isApiKeyVisible ? '🙈 Hide' : '👁️ Show'}
                 </Button>
               </div>
               <small className="api-key-hint">

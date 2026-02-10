@@ -20,8 +20,18 @@ const randomizeBlobVars = (el?: HTMLElement) =>
 
 export const Blob = Shade({
   shadowDomName: 'shade-bubbles-blob',
-  render: ({ element }) => {
-    randomizeBlobVars(element)
+  render: ({ useHostProps }) => {
+    const vars = {
+      '--x': `${randomInRange(-300, 300)}`,
+      '--y': `${randomInRange(-300, 300)}`,
+      '--scale': `${Math.random() + 0.5}`,
+      '--hue': `${randomInRange(64, 192)}`,
+      '--opacity': `${Math.random() * 0.1 + 0.05}`,
+      '--blur': `${randomInRange(1, 30)}px`,
+      '--blob-duration': `${randomInRange(0.2, 0.6)}s`,
+      '--blob-easing': `${Math.random() > 0.5 ? 'ease-out' : 'linear'}`,
+    }
+    useHostProps({ style: vars })
 
     return (
       <div
@@ -61,8 +71,20 @@ const randomizeBlobGroupVars = (el?: HTMLElement) =>
 
 const BlobGroup = Shade({
   shadowDomName: 'shade-bubbles-blob-group',
-  render: ({ children, element }) => {
-    randomizeBlobGroupVars(element)
+  render: ({ children, useHostProps }) => {
+    const vars = {
+      '--x': `${randomInRange(0, 100)}`,
+      '--y': `${randomInRange(0, 100)}`,
+      '--scale': `${randomInRange(0.5, 1)}`,
+      '--duration': `${randomInRange(0.1, 0.3)}s`,
+      '--origin-x': `${randomInRange(-100, 100)}`,
+      '--origin-y': `${randomInRange(-100, 100)}`,
+      '--direction': `${Math.random() > 0.5 ? 'normal' : 'reverse'}`,
+      '--timing': `${
+        Math.random() < 0.01 ? 'cubic-bezier(0.230, 1.000, 0.320, 1.000)' : Math.random() > 0.5 ? 'ease' : 'linear'
+      }`,
+    }
+    useHostProps({ style: vars })
     return (
       <div
         style={{
@@ -85,19 +107,23 @@ export const blob = <div></div>
 
 export const BubbleBackground = Shade({
   shadowDomName: 'bubble-background',
-  constructed: ({ element }) => {
-    const randomizeHandler = () => {
-      element.querySelectorAll('shade-bubbles-blob-group').forEach((el) => randomizeBlobGroupVars(el as HTMLElement))
-      //   randomizeBlobVars(element)
-      element.querySelectorAll('shade-bubbles-blob').forEach((el) => randomizeBlobVars(el as HTMLElement))
-      //   randomizeBlobGroupVars(element)
-    }
-    document.addEventListener('mouseup', randomizeHandler)
-    return () => document.removeEventListener('mouseup', randomizeHandler)
-  },
-  render: ({ children }) => {
+  render: ({ children, useDisposable, useRef }) => {
+    const containerRef = useRef<HTMLElement>('container')
+
+    useDisposable('mouseupListener', () => {
+      const randomizeHandler = () => {
+        const container = containerRef.current
+        if (!container) return
+        container.querySelectorAll('shade-bubbles-blob-group').forEach((el) => randomizeBlobGroupVars(el as HTMLElement))
+        container.querySelectorAll('shade-bubbles-blob').forEach((el) => randomizeBlobVars(el as HTMLElement))
+      }
+      document.addEventListener('mouseup', randomizeHandler)
+      return {
+        [Symbol.dispose]: () => document.removeEventListener('mouseup', randomizeHandler),
+      }
+    })
     return (
-      <>
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
         {new Array(8).fill(0).map(() => (
           <BlobGroup>
             {new Array(3).fill(0).map(() => (
@@ -106,7 +132,7 @@ export const BubbleBackground = Shade({
           </BlobGroup>
         ))}
         {children}
-      </>
+      </div>
     )
   },
 })

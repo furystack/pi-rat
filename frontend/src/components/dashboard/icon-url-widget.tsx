@@ -1,4 +1,4 @@
-import { RouteLink, Shade, createComponent } from '@furystack/shades'
+import { NestedRouteLink, Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 
 const focus = (el: HTMLElement) => {
@@ -88,9 +88,10 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
       textOverflow: 'ellipsis',
     },
   },
-  render: ({ props, element }) => {
+  render: ({ props, useRef }) => {
+    const cardRef = useRef<HTMLElement>('card')
     setTimeout(() => {
-      const el = element.querySelector('a div')
+      const el = cardRef.current
       if (el) {
         void promisifyAnimation(el, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
           fill: 'forwards',
@@ -102,8 +103,9 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
     })
 
     return (
-      <RouteLink title={props.description} href={props.url}>
+      <NestedRouteLink title={props.description} href={props.url}>
         <div
+          ref={cardRef}
           className="widget-card"
           onmouseenter={(ev) => focus(ev.target as HTMLElement)}
           onfocus={(ev) => focus(ev.target as HTMLElement)}
@@ -120,7 +122,7 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
           <div className="cover">{props.icon}</div>
           <div className="widget-name">{props.name}</div>
         </div>
-      </RouteLink>
+      </NestedRouteLink>
     )
   },
 })

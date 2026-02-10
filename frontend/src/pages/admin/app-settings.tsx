@@ -1,11 +1,10 @@
-import { createComponent, LocationService, Router, Shade } from '@furystack/shades'
+import { createComponent, LocationService, NestedRouter, Shade } from '@furystack/shades'
 import type { MatchResult } from 'path-to-regexp'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { SettingsMenuItem, SettingsMenuSection, SettingsSidebar } from '../../components/settings-sidebar/index.js'
 
-const settingsRoutes = [
-  {
-    url: '/app-settings/omdb',
+const settingsRoutes = {
+  '/app-settings/omdb': {
     component: () => (
       <PiRatLazyLoad
         component={async () => {
@@ -15,8 +14,7 @@ const settingsRoutes = [
       />
     ),
   },
-  {
-    url: '/app-settings/streaming',
+  '/app-settings/streaming': {
     component: () => (
       <PiRatLazyLoad
         component={async () => {
@@ -26,8 +24,7 @@ const settingsRoutes = [
       />
     ),
   },
-  {
-    url: '/app-settings/iot',
+  '/app-settings/iot': {
     component: () => (
       <PiRatLazyLoad
         component={async () => {
@@ -37,8 +34,7 @@ const settingsRoutes = [
       />
     ),
   },
-  {
-    url: '/app-settings/ai',
+  '/app-settings/ai': {
     component: () => (
       <PiRatLazyLoad
         component={async () => {
@@ -48,8 +44,7 @@ const settingsRoutes = [
       />
     ),
   },
-  {
-    url: '/app-settings/users/:username',
+  '/app-settings/users/:username': {
     component: ({ match }: { match: MatchResult<{ username: string }> }) => (
       <PiRatLazyLoad
         component={async () => {
@@ -59,8 +54,7 @@ const settingsRoutes = [
       />
     ),
   },
-  {
-    url: '/app-settings/users',
+  '/app-settings/users': {
     component: () => (
       <PiRatLazyLoad
         component={async () => {
@@ -70,8 +64,7 @@ const settingsRoutes = [
       />
     ),
   },
-  {
-    url: '/app-settings',
+  '/app-settings': {
     component: () => (
       <PiRatLazyLoad
         component={async () => {
@@ -81,7 +74,7 @@ const settingsRoutes = [
       />
     ),
   },
-]
+}
 
 export const AppSettingsPage = Shade({
   shadowDomName: 'app-settings-page',
@@ -136,7 +129,7 @@ export const AppSettingsPage = Shade({
         </SettingsSidebar>
 
         <div className="settings-content">
-          <Router routes={settingsRoutes} />
+          <NestedRouter routes={settingsRoutes} />
         </div>
       </div>
     )

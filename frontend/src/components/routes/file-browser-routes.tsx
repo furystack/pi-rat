@@ -32,4 +32,7 @@ export const fileBrowserOpenFileRoute = {
   ),
 }
 
-export const fileBrowserRoutes = [fileBrowserRoute, fileBrowserOpenFileRoute] as const
+export const fileBrowserRoutes = {
+  [fileBrowserRoute.url]: fileBrowserRoute,
+  [fileBrowserOpenFileRoute.url]: fileBrowserOpenFileRoute,
+}

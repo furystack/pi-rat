@@ -1,10 +1,13 @@
 import type { Injector } from '@furystack/inject'
-import type { Route } from '@furystack/shades'
-import { LocationService } from '@furystack/shades'
-import { compile } from 'path-to-regexp'
+import { LocationService, compileRoute } from '@furystack/shades'
 
-export const navigateToRoute = <T extends object>(injector: Injector, route: Route<T>, params: T, queryString = '') => {
-  const destinationPath = compile(route.url)(params)
+export const navigateToRoute = <T extends Record<string, string>>(
+  injector: Injector,
+  route: { url: string },
+  params: T,
+  queryString = '',
+) => {
+  const destinationPath = compileRoute(route.url, params)
   const fullPath = destinationPath + (queryString ? `?${queryString}` : '') || '/'
   window.history.pushState({}, '', fullPath)
   injector.getInstance(LocationService).updateState()

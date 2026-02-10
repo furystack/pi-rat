@@ -1,14 +1,14 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Modal, Paper, fadeIn, fadeOut } from '@furystack/shades-common-components'
-import type { ObservableValue } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { getFallbackMetadata } from 'common'
 import { FileIcon } from '../../pages/file-browser/file-icon.js'
-import { Separator } from '../Separator.js'
+import { Divider } from '@furystack/shades-common-components'
 import { RelatedMoviesModalContent } from './related-movies-modal-content.js'
 
-interface ManageMovieModalProps {
-  isOpened: ObservableValue<boolean>
+type ManageMovieModalProps = {
+  isOpened: boolean
+  onClose: () => void
   file: DirectoryEntry
   drive: string
   path: string
@@ -44,7 +44,7 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
     },
   },
   render: ({ props }) => {
-    const { isOpened, drive, file, path } = props
+    const { isOpened, onClose, drive, file, path } = props
 
     const fallbackMeta = getFallbackMetadata(`${path}/${file.name}`)
 
@@ -56,7 +56,7 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
           backdropFilter: 'blur(5px)',
           zIndex: '2',
         }}
-        onClose={() => isOpened.setValue(false)}
+        onClose={onClose}
         showAnimation={fadeIn}
         hideAnimation={fadeOut}
       >
@@ -70,10 +70,10 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
               <div className="file-path">{`${path === '/' ? '' : path}/${file.name}`}</div>
             </div>
 
-            <Separator />
+            <Divider />
             <RelatedMoviesModalContent drive={drive} path={path} file={file} />
             <div className="button-row">
-              <Button onclick={() => isOpened.setValue(false)}>Close</Button>
+              <Button onclick={onClose}>Close</Button>
             </div>
           </Paper>
         </div>

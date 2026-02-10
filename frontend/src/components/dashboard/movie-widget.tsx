@@ -1,6 +1,6 @@
 import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
-import { LazyLoad, RouteLink, Shade, createComponent } from '@furystack/shades'
+import { LazyLoad, NestedRouteLink, Shade, createComponent } from '@furystack/shades'
 import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
@@ -46,17 +46,19 @@ export const MovieWidget = Shade<{
   size?: number
 }>({
   shadowDomName: 'pi-rat-movie-widget',
-  constructed: ({ props, element }) => {
+  render: ({ props, injector, useObservable, useRef }) => {
+    const cardRef = useRef<HTMLElement>('card')
     setTimeout(() => {
-      void promisifyAnimation(element.querySelector('a div'), [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-        fill: 'forwards',
-        delay: (props.index || 0) * 160 + Math.random() * 100,
-        duration: 700,
-        easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-      })
+      const el = cardRef.current
+      if (el) {
+        void promisifyAnimation(el, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
+          fill: 'forwards',
+          delay: (props.index || 0) * 160 + Math.random() * 100,
+          duration: 700,
+          easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+        })
+      }
     }, 1000)
-  },
-  render: ({ props, injector, useObservable }) => {
     const { imdbId, size = 256 } = props
 
     const movieService = injector.getInstance(MoviesService)
@@ -74,7 +76,7 @@ export const MovieWidget = Shade<{
 
     if (isLoadedCacheResult(movie)) {
       return (
-        <RouteLink tabIndex={0} title={movie.value.plot || movie.value.title} href={url}>
+        <NestedRouteLink tabIndex={0} title={movie.value.plot || movie.value.title} href={url}>
           <div
             onfocus={(ev) => focus(ev.target as HTMLElement)}
             onblur={(ev) => blur(ev.target as HTMLElement)}
@@ -216,7 +218,7 @@ export const MovieWidget = Shade<{
               />
             </div>
           </div>
-        </RouteLink>
+        </NestedRouteLink>
       )
     } else if (isPendingCacheResult(movie)) {
       return <Skeleton />

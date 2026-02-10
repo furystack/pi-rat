@@ -1,12 +1,12 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Modal, Paper, fadeIn, fadeOut } from '@furystack/shades-common-components'
-import type { ObservableValue } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { FileIcon } from './file-icon.js'
 
 export const FileInfoModal = Shade<{
   entry: DirectoryEntry
-  isInfoVisible: ObservableValue<boolean>
+  isInfoVisible: boolean
+  onClose: () => void
   currentDriveLetter: string
   currentPath: string
 }>({
@@ -33,7 +33,7 @@ export const FileInfoModal = Shade<{
     },
   },
   render: ({ props }) => {
-    const { entry, isInfoVisible, currentDriveLetter, currentPath } = props
+    const { entry, isInfoVisible, onClose, currentDriveLetter, currentPath } = props
     return (
       <Modal
         isVisible={isInfoVisible}
@@ -42,7 +42,7 @@ export const FileInfoModal = Shade<{
           backdropFilter: 'blur(5px)',
           zIndex: '2',
         }}
-        onClose={() => isInfoVisible.setValue(false)}
+        onClose={onClose}
         showAnimation={fadeIn}
         hideAnimation={fadeOut}
       >
@@ -91,7 +91,7 @@ export const FileInfoModal = Shade<{
             </table>
 
             <div className="button-row">
-              <Button onclick={() => isInfoVisible.setValue(false)}>Close</Button>
+              <Button onclick={onClose}>Close</Button>
             </div>
           </Paper>
         </div>

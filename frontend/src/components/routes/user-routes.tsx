@@ -1,4 +1,4 @@
-import { createComponent, type Route } from '@furystack/shades'
+import { createComponent } from '@furystack/shades'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import { onLeave, onVisit } from './route-animations.js'
 
@@ -16,6 +16,8 @@ export const userSettingsRoute = {
       />
     )
   },
-} satisfies Route<unknown>
+}
 
-export const userRoutes = [userSettingsRoute] as const
+export const userRoutes = {
+  [userSettingsRoute.url]: userSettingsRoute,
+}

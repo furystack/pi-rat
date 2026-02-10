@@ -1,5 +1,5 @@
 import { Injector } from '@furystack/inject'
-import { createComponent, initializeShadeRoot, LocationService } from '@furystack/shades'
+import { LocationService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
@@ -26,6 +26,7 @@ describe('SettingsMenuItem', () => {
         rootElement,
         jsxElement: <SettingsMenuItem icon="🏠" label="Home" href="/home" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()
@@ -50,6 +51,7 @@ describe('SettingsMenuItem', () => {
         rootElement,
         jsxElement: <SettingsMenuItem icon="⚙️" label="Settings" href="/settings" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()
@@ -73,6 +75,7 @@ describe('SettingsMenuItem', () => {
         rootElement,
         jsxElement: <SettingsMenuItem icon="📁" label="Files" href="/files" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()
@@ -95,6 +98,7 @@ describe('SettingsMenuItem', () => {
         rootElement,
         jsxElement: <SettingsMenuItem icon="🎬" label="Movies" href="/movies" />,
       })
+      await flushUpdates()
 
       const menuItem = document.querySelector('settings-menu-item')
       expect(menuItem).toBeTruthy()

@@ -1,4 +1,4 @@
-import { createComponent, Router, Shade } from '@furystack/shades'
+import { createComponent, NestedRouter, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
 import { Init, Offline } from '../pages/index.js'
 import { SessionService } from '../services/session.js'
@@ -14,7 +14,7 @@ import { loggingRoutes } from './routes/logging-routes.js'
 import { movieRoutes } from './routes/movie-routes.js'
 import { userRoutes } from './routes/user-routes.js'
 
-export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
+export const Body = Shade({
   shadowDomName: 'shade-app-body',
   css: {
     color: cssVariableTheme.text.secondary,
@@ -29,23 +29,23 @@ export const Body = Shade<{ style?: Partial<CSSStyleDeclaration> }>({
     switch (sessionState) {
       case 'authenticated':
         return (
-          <Router
-            routes={[
+          <NestedRouter
+            routes={{
               ...movieRoutes,
               ...(hasAdminRole
-                ? [...adminRoutes, ...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes]
-                : []),
+                ? { ...adminRoutes, ...entityRoutes, ...fileBrowserRoutes, ...iotRoutes, ...loggingRoutes }
+                : {}),
               ...dashboardRoutes,
               ...chatRoutes,
               ...aiRoutes,
               ...userRoutes,
-            ]}
+            }}
           />
         )
       case 'offline':
         return <Offline />
       case 'unauthenticated':
-        return <Router routes={[...authRoutes]} />
+        return <NestedRouter routes={{ ...authRoutes }} />
       default:
         return <Init />
     }

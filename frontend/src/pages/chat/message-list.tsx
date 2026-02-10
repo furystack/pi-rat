@@ -42,7 +42,7 @@ const ChatLineAvatar = styledElement('div', {
 
 export const MessageList = Shade<{ chat: Chat }>({
   shadowDomName: 'shade-app-message-list',
-  style: {
+  css: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
@@ -50,13 +50,17 @@ export const MessageList = Shade<{ chat: Chat }>({
     overflowY: 'auto',
     width: '100%',
   },
-  render: ({ injector, props, useObservable, element }) => {
+  render: ({ injector, props, useObservable, useRef }) => {
+    const listRef = useRef<HTMLDivElement>('list')
     setTimeout(() => {
       requestAnimationFrame(() => {
-        element.scrollTo({
-          behavior: 'instant',
-          top: Math.max(element.scrollHeight, element.offsetHeight),
-        })
+        const el = listRef.current
+        if (el) {
+          el.scrollTo({
+            behavior: 'instant',
+            top: Math.max(el.scrollHeight, el.offsetHeight),
+          })
+        }
       })
     }, 1)
     const chatMessageService = injector.getInstance(ChatMessageService)

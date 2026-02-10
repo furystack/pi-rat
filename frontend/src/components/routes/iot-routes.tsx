@@ -21,4 +21,7 @@ export const iotDeviceRoute = {
   },
 }
 
-export const iotRoutes = [iotDeviceListRoute, iotDeviceRoute]
+export const iotRoutes = {
+  [iotDeviceListRoute.url]: iotDeviceListRoute,
+  [iotDeviceRoute.url]: iotDeviceRoute,
+}

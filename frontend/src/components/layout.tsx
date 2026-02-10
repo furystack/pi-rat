@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { cssVariableTheme, NotyList } from '@furystack/shades-common-components'
+import { cssVariableTheme, NotyList, PageLayout } from '@furystack/shades-common-components'
 import { InstallService } from '../services/install-service.js'
 import { Body } from './body.js'
 import { Header } from './header.js'
@@ -26,10 +26,14 @@ export const Layout = Shade({
             const result = await injector.getInstance(InstallService).getServiceStatus()
             if (result.state === 'installed') {
               return (
-                <>
-                  <Header title="🐀 PI-Rat" />
-                  <Body style={{ width: '100%', height: '100%', overflow: 'auto', position: 'fixed' }} id="body" />
-                </>
+                <PageLayout
+                  appBar={{
+                    variant: 'permanent',
+                    component: <Header title="🐀 PI-Rat" />,
+                  }}
+                >
+                  <Body />
+                </PageLayout>
               )
             } else if (result.state === 'needsInstall') {
               const { InstallerPage } = await import('../installer/index.js')
