@@ -17,10 +17,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@furystack/yarn-plugin-changelog": "^1.0.2",
+    "@furystack/yarn-plugin-changelog": "^1.0.3",
     "@playwright/test": "^1.58.2",
     "@types/jsdom": "^27.0.0",
-    "@types/node": "^25.2.2",
+    "@types/node": "^25.2.3",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
