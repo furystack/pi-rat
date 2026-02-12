@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@furystack/core": "^15.0.36",
+    "@furystack/entity-sync": "^0.1.0",
     "@furystack/rest": "^8.0.36",
     "ollama": "^0.6.3"
   }

@@ -701,6 +701,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@furystack/entity-sync-client@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@furystack/entity-sync-client@npm:0.1.0"
+  dependencies:
+    "@furystack/entity-sync": "npm:^0.1.0"
+    "@furystack/inject": "npm:^12.0.30"
+    "@furystack/utils": "npm:^8.1.10"
+  checksum: 10c0/b521a2f10344e28d4c7d08d29dd81a1ff74104ab97f847f2d70bb673016a1f6175c0c436973ebe511c3a301f949d2aa010b9125990f51b08651fb5076664ca66
+  languageName: node
+  linkType: hard
+
+"@furystack/entity-sync-service@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@furystack/entity-sync-service@npm:0.1.0"
+  dependencies:
+    "@furystack/core": "npm:^15.0.36"
+    "@furystack/entity-sync": "npm:^0.1.0"
+    "@furystack/inject": "npm:^12.0.30"
+    "@furystack/repository": "npm:^10.0.36"
+    "@furystack/websocket-api": "npm:^13.1.8"
+    ws: "npm:^8.19.0"
+  checksum: 10c0/622468b6d2763fa1c3cc882c0e23ce9e4739d522ba85691fade138101bc795e9bffd96540650f1c3c7424e26215f2c5c0485c35ee423c52599407093025b489c
+  languageName: node
+  linkType: hard
+
+"@furystack/entity-sync@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@furystack/entity-sync@npm:0.1.0"
+  dependencies:
+    "@furystack/core": "npm:^15.0.36"
+  checksum: 10c0/cc6a4b95c965fe7160789a08bdb7170879cd11183fe40bd923b8b99d68e0516bdf34a450304233a859b1a3334d3c450c5995bb3e9d5b844aeda55d2ffba3d296
+  languageName: node
+  linkType: hard
+
 "@furystack/inject@npm:^12.0.30":
   version: 12.0.30
   resolution: "@furystack/inject@npm:12.0.30"
@@ -3440,6 +3474,7 @@ __metadata:
   resolution: "common@workspace:common"
   dependencies:
     "@furystack/core": "npm:^15.0.36"
+    "@furystack/entity-sync": "npm:^0.1.0"
     "@furystack/rest": "npm:^8.0.36"
     "@types/node": "npm:^25.2.3"
     ollama: "npm:^0.6.3"
@@ -4483,6 +4518,8 @@ __metadata:
     "@codecov/vite-plugin": "npm:^1.9.1"
     "@furystack/cache": "npm:^6.0.0"
     "@furystack/core": "npm:^15.0.36"
+    "@furystack/entity-sync": "npm:^0.1.0"
+    "@furystack/entity-sync-client": "npm:^0.1.0"
     "@furystack/inject": "npm:^12.0.30"
     "@furystack/logging": "npm:^8.0.30"
     "@furystack/rest": "npm:^8.0.36"
@@ -7507,6 +7544,8 @@ __metadata:
   dependencies:
     "@furystack/cache": "npm:^6.0.0"
     "@furystack/core": "npm:^15.0.36"
+    "@furystack/entity-sync": "npm:^0.1.0"
+    "@furystack/entity-sync-service": "npm:^0.1.0"
     "@furystack/inject": "npm:^12.0.30"
     "@furystack/logging": "npm:^8.0.30"
     "@furystack/repository": "npm:^10.0.36"
