@@ -17,7 +17,6 @@ const createMockOllamaConfig = (host = 'http://localhost:11434'): Config => ({
 })
 
 type CacheState<T> =
-  | { status: 'uninitialized' }
   | { status: 'loading' }
   | { status: 'loaded'; value: T; updatedAt: Date }
   | { status: 'error'; error: unknown; updatedAt: Date }

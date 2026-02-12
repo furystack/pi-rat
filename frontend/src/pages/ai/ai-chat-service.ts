@@ -9,7 +9,7 @@ export class AiChatService {
   @Injected(AiApiClient)
   declare private aiApi: AiApiClient
 
-  private cache = new Cache({
+  public aiChatCache = new Cache({
     load: async (chatId: string) => {
       const { result } = await this.aiApi.call({
         method: 'GET',
@@ -22,14 +22,14 @@ export class AiChatService {
   })
 
   public async getAiChat(chatId: string) {
-    return this.cache.get(chatId)
+    return this.aiChatCache.get(chatId)
   }
 
   public getAiChatAsObservable(chatId: string) {
-    return this.cache.getObservable(chatId)
+    return this.aiChatCache.getObservable(chatId)
   }
 
-  private queryCache = new Cache({
+  public aiChatQueryCache = new Cache({
     load: async (findOptions: FindOptions<AiChat, Array<keyof AiChat>>) => {
       const results = await this.aiApi.call({
         method: 'GET',
@@ -38,7 +38,7 @@ export class AiChatService {
       })
 
       results.result.entries.forEach((chat) => {
-        this.cache.setExplicitValue({
+        this.aiChatCache.setExplicitValue({
           loadArgs: [chat.id],
           value: {
             status: 'loaded',
@@ -53,11 +53,11 @@ export class AiChatService {
   })
 
   public async getAiChats(request: FindOptions<AiChat, Array<keyof AiChat>>) {
-    return this.queryCache.get(request)
+    return this.aiChatQueryCache.get(request)
   }
 
   public getAiChatsAsObservable(request: FindOptions<AiChat, Array<keyof AiChat>>) {
-    return this.queryCache.getObservable(request)
+    return this.aiChatQueryCache.getObservable(request)
   }
 
   public async createChat(chat: AiChat) {
@@ -67,7 +67,7 @@ export class AiChatService {
       body: chat,
     })
 
-    this.queryCache.obsoleteRange(() => true)
+    this.aiChatQueryCache.obsoleteRange(() => true)
 
     return result
   }
@@ -79,7 +79,7 @@ export class AiChatService {
       url: { id: chatId },
     })
 
-    this.queryCache.obsoleteRange(() => true)
+    this.aiChatQueryCache.obsoleteRange(() => true)
 
     return result
   }

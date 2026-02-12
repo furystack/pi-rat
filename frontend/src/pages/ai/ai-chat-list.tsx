@@ -11,7 +11,7 @@ export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiCh
 
     const [chatList] = useObservable('chatList', aiChatService.getAiChatsAsObservable({}))
 
-    if (chatList.status === 'loading' || chatList.status === 'uninitialized') {
+    if (chatList.status === 'loading') {
       return <div>Loading...</div>
     }
     if (chatList.status === 'failed') {

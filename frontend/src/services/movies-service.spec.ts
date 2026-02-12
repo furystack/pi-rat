@@ -78,7 +78,7 @@ describe('MoviesService', () => {
         const observable = service.getMovieAsObservable('tt1234567')
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 

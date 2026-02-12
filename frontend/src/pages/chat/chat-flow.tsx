@@ -1,5 +1,7 @@
+import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Paper } from '@furystack/shades-common-components'
+import { CacheView, Paper } from '@furystack/shades-common-components'
+import type { Chat } from 'common'
 import { FullScreenLoader } from '../../components/fullscreen-loader.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { ChatService } from './chat-service.js'
@@ -8,16 +10,9 @@ import { InviteButton } from './invite-button.js'
 import { MessageInput } from './message-input.js'
 import { MessageList } from './message-list.js'
 
-export const ChatFlow = Shade({
-  shadowDomName: 'shade-app-chat-flow',
+const ChatFlowContent = Shade<{ data: CacheWithValue<Chat> }>({
+  shadowDomName: 'shade-app-chat-flow-content',
   css: {
-    display: 'flex',
-    '& .empty-state': {
-      flexGrow: '1',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
     '& .chat-container': {
       flexGrow: '1',
       display: 'flex',
@@ -37,7 +32,43 @@ export const ChatFlow = Shade({
       overflow: 'hidden',
     },
   },
-  render: ({ injector, useSearchState, useObservable }) => {
+  render: ({ props }) => {
+    const chat = props.data.value
+    return (
+      <Paper className="chat-container">
+        <h2>{chat.name}</h2>
+        <h5>{chat.description}</h5>
+        <div className="chat-actions">
+          <DeleteChatButton chat={chat} />
+          <InviteButton chat={chat} />
+        </div>
+        <div className="messages-container">
+          <MessageList
+            style={{
+              flexGrow: '1',
+              overflowY: 'auto',
+            }}
+            chat={chat}
+          />
+          <MessageInput chat={chat} />
+        </div>
+      </Paper>
+    )
+  },
+})
+
+export const ChatFlow = Shade({
+  shadowDomName: 'shade-app-chat-flow',
+  css: {
+    display: 'flex',
+    '& .empty-state': {
+      flexGrow: '1',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  },
+  render: ({ injector, useSearchState }) => {
     const chatService = injector.getInstance(ChatService)
     const [selectedChatId] = useSearchState('selectedChatId', '')
 
@@ -49,42 +80,14 @@ export const ChatFlow = Shade({
       )
     }
 
-    const [selectedChat] = useObservable(
-      `selectedChat-${selectedChatId}`,
-      chatService.getChatAsObservable(selectedChatId),
-    )
-
-    if (selectedChat.status === 'loading' || selectedChat.status === 'uninitialized') {
-      return <FullScreenLoader />
-    }
-
-    if (selectedChat.status === 'failed') {
-      return <GenericErrorPage error={selectedChat.error} />
-    }
-
-    if (selectedChat.status === 'obsolete') {
-      void chatService.getChat(selectedChatId)
-    }
-
     return (
-      <Paper className="chat-container">
-        <h2>{selectedChat.value.name}</h2>
-        <h5>{selectedChat.value.description}</h5>
-        <div className="chat-actions">
-          <DeleteChatButton chat={selectedChat.value} />
-          <InviteButton chat={selectedChat.value} />
-        </div>
-        <div className="messages-container">
-          <MessageList
-            style={{
-              flexGrow: '1',
-              overflowY: 'auto',
-            }}
-            chat={selectedChat.value}
-          />
-          <MessageInput chat={selectedChat.value} />
-        </div>
-      </Paper>
+      <CacheView
+        cache={chatService.chatCache}
+        args={[selectedChatId]}
+        content={ChatFlowContent}
+        loader={<FullScreenLoader />}
+        error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
+      />
     )
   },
 })

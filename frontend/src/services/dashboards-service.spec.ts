@@ -76,7 +76,7 @@ describe('DashboardService', () => {
         const observable = service.getDashboardAsObservable('dashboard-1')
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 

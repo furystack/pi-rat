@@ -117,9 +117,7 @@ export const UserListPage = Shade<UserListPageProps>({
         <h2 className="page-title">👥 Users</h2>
         <p className="page-description">Manage user accounts and their roles.</p>
 
-        {(usersState.status === 'loading' ||
-          usersState.status === 'uninitialized' ||
-          usersState.status === 'obsolete') && (
+        {(usersState.status === 'loading' || usersState.status === 'obsolete') && (
           <Paper elevation={1} style={{ padding: '24px' }}>
             <p className="loading-text">Loading users...</p>
           </Paper>

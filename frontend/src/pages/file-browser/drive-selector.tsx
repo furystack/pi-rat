@@ -17,7 +17,7 @@ export const DriveSelector = Shade<{
     const drivesService = injector.getInstance(DrivesService)
     const [availableDrives] = useObservable('availableDrives', drivesService.getVolumesAsObservable({}))
 
-    if (availableDrives.status === 'loading' || availableDrives.status === 'uninitialized') {
+    if (availableDrives.status === 'loading') {
       return null // TODO: Skeleton
     }
 

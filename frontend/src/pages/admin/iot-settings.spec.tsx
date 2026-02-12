@@ -18,7 +18,6 @@ const createMockIotConfig = (pingIntervalMs = 30000, pingTimeoutMs = 3000): Conf
 })
 
 type CacheState<T> =
-  | { status: 'uninitialized' }
   | { status: 'loading' }
   | { status: 'loaded'; value: T; updatedAt: Date }
   | { status: 'error'; error: unknown; updatedAt: Date }

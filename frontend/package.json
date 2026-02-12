@@ -24,7 +24,7 @@
     "@furystack/logging": "^8.0.30",
     "@furystack/rest-client-fetch": "^8.0.36",
     "@furystack/shades": "^12.0.1",
-    "@furystack/shades-common-components": "^12.0.1",
+    "@furystack/shades-common-components": "^12.1.0",
     "@furystack/shades-lottie": "^8.0.1",
     "@furystack/utils": "^8.1.10",
     "@types/node": "^25.2.3",
@@ -33,12 +33,12 @@
     "@xterm/addon-web-links": "^0.12.0",
     "@xterm/xterm": "^6.0.0",
     "common": "workspace:^",
-    "marked": "^17.0.1",
+    "marked": "^17.0.2",
     "media-chrome": "^4.17.2",
     "monaco-editor": "^0.55.1",
     "ollama": "^0.6.3",
     "path-to-regexp": "^8.3.0",
     "semaphore-async-await": "^1.5.1",
-    "video.js": "8.23.7"
+    "video.js": "8.23.8"
   }
 }

@@ -66,7 +66,7 @@ describe('InstallService', () => {
         const observable = service.getServiceStatusAsObservable()
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 

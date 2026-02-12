@@ -84,7 +84,7 @@ describe('LoggingService', () => {
         const observable = service.getLogEntryAsObservable('log-1')
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 
@@ -187,7 +187,7 @@ describe('LoggingService', () => {
         const observable = service.findLogEntryAsObservable(findOptions)
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
   })

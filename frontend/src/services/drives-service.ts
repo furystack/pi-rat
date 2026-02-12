@@ -11,7 +11,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
   @Injected(DrivesApiClient)
   declare private readonly drivesApiClient: DrivesApiClient
 
-  private volumesCache = new Cache({
+  public volumesCache = new Cache({
     load: async ({ findOptions }: { findOptions?: FindOptions<Drive, Array<keyof Drive>> }) => {
       const { result } = await this.drivesApiClient.call({
         method: 'GET',

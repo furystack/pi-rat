@@ -22,7 +22,7 @@ export class DashboardService {
     },
   })
 
-  private dashboardQueryCache = new Cache({
+  public dashboardQueryCache = new Cache({
     capacity: 100,
     load: async (findOptions: FindOptions<Dashboard, Array<keyof Dashboard>>) => {
       const { result } = await this.dashboardsApiClient.call({

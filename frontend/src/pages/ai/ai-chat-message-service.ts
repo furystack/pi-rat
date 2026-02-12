@@ -1,4 +1,4 @@
-import { Cache, CannotObsoleteUnloadedError } from '@furystack/cache'
+import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
 import type { AiChatMessage } from 'common'
@@ -37,15 +37,7 @@ export class AiChatMessageService {
       body: chat,
     })
 
-    try {
-      this.cache.obsoleteRange(() => true)
-    } catch (error) {
-      if (error instanceof CannotObsoleteUnloadedError) {
-        // The cache is not loaded yet, we can ignore this error
-        return result
-      }
-      throw error
-    }
+    this.cache.obsoleteRange(() => true)
 
     return result
   }
@@ -55,19 +47,11 @@ export class AiChatMessageService {
       if (message.type !== 'ai-chat-message-added') {
         return
       }
-      try {
-        this.cache.obsoleteRange((value) => {
-          return value.result.entries.some((entry) => {
-            return entry.aiChatId === message.aiChatMessage.aiChatId
-          })
+      this.cache.obsoleteRange((value) => {
+        return value.result.entries.some((entry) => {
+          return entry.aiChatId === message.aiChatMessage.aiChatId
         })
-      } catch (error) {
-        if (error instanceof CannotObsoleteUnloadedError) {
-          // The cache is not loaded yet, we can ignore this error
-          return
-        }
-        throw error
-      }
+      })
     })
   }
 }

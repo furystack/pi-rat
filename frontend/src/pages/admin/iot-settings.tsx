@@ -82,7 +82,7 @@ export const IotSettingsPage = Shade({
       }
     }
 
-    if (config.status === 'loading' || config.status === 'uninitialized') {
+    if (config.status === 'loading') {
       return (
         <div>
           <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>📡 IOT Device Availability</h2>
