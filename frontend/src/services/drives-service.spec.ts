@@ -9,7 +9,6 @@ import { WebsocketNotificationsService } from './websocket-events.js'
 const createMockDrive = (letter = 'A', physicalPath = '/mnt/drive-a'): Drive => ({
   letter,
   physicalPath,
-  owner: 'test-user',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 })
@@ -151,7 +150,7 @@ describe('DrivesService', () => {
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(DrivesService)
 
-        const body = { physicalPath: '/mnt/drive-b', owner: 'test-user' }
+        const body = { physicalPath: '/mnt/drive-b' }
         const result = await service.addVolume(body)
 
         expect(mockCall).toHaveBeenCalledWith({
@@ -177,7 +176,7 @@ describe('DrivesService', () => {
         const service = i.getInstance(DrivesService)
 
         await service.getVolumes({ findOptions: {} })
-        await service.addVolume({ physicalPath: '/mnt/drive-b', owner: 'test-user' })
+        await service.addVolume({ physicalPath: '/mnt/drive-b' })
         await service.getVolumes({ findOptions: {} })
 
         expect(mockCall).toHaveBeenCalledTimes(3)
@@ -193,7 +192,7 @@ describe('DrivesService', () => {
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(DrivesService)
 
-        const body = { physicalPath: '/mnt/drive-a-updated', owner: 'test-user' }
+        const body = { physicalPath: '/mnt/drive-a-updated' }
         await service.updateVolume('A', body)
 
         expect(mockCall).toHaveBeenCalledWith({
@@ -218,7 +217,7 @@ describe('DrivesService', () => {
         const service = i.getInstance(DrivesService)
 
         await service.getVolumes({ findOptions: {} })
-        await service.updateVolume('A', { physicalPath: '/updated', owner: 'test-user' })
+        await service.updateVolume('A', { physicalPath: '/updated' })
         await service.getVolumes({ findOptions: {} })
 
         expect(mockCall).toHaveBeenCalledTimes(3)
