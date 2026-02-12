@@ -1,6 +1,5 @@
 <!-- version-type: patch -->
-
-# pi-rat
+# common
 
 <!--
 FORMATTING GUIDE:
@@ -18,15 +17,8 @@ TIP: When multiple changelog drafts are merged, heading-based entries
 appear before simple list items within each section.
 -->
 
-## 📦 Build
-
-- Simplified `lint-staged` configuration: removed explicit `git add` steps, switched Prettier to `--ignore-unknown` for all file types
-
-## 🔧 Chores
-
-- Upgraded to Shades 12 with lazy-loaded route components and shadow DOM compatibility fixes
-
 ## ⬆️ Dependencies
 
-- Upgraded `@furystack/yarn-plugin-changelog` from ^1.0.2 to ^1.0.3
+- Upgraded `@furystack/core` from ^15.0.35 to ^15.0.36
+- Upgraded `@furystack/rest` from ^8.0.35 to ^8.0.36
 - Upgraded `@types/node` from ^25.2.2 to ^25.2.3
