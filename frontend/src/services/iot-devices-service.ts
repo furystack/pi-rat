@@ -13,7 +13,7 @@ export class IotDevicesService {
   @Injected(IotApiClient)
   declare private readonly iotApiClient: IotApiClient
 
-  private deviceCache = new Cache({
+  public deviceCache = new Cache({
     capacity: 100,
     load: async (id: string) => {
       const { result } = await this.iotApiClient.call({
@@ -67,7 +67,7 @@ export class IotDevicesService {
     },
   })
 
-  private devicePingHistoryCache = new Cache({
+  public devicePingHistoryCache = new Cache({
     capacity: 100,
     load: async (deviceName: string, query?: FindOptions<DevicePingHistory, Array<keyof DevicePingHistory>>) => {
       const { result } = await this.iotApiClient.call({

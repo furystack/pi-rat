@@ -43,12 +43,9 @@ const ChatLineAvatar = styledElement('div', {
 export const MessageList = Shade<{ chat: Chat }>({
   shadowDomName: 'shade-app-message-list',
   css: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: '8px',
-    overflowY: 'auto',
+    display: 'block',
     width: '100%',
+    height: '100%',
   },
   render: ({ injector, props, useObservable, useRef }) => {
     const listRef = useRef<HTMLDivElement>('list')
@@ -95,7 +92,18 @@ export const MessageList = Shade<{ chat: Chat }>({
     }
 
     return (
-      <>
+      <div
+        ref={listRef}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: '8px',
+          overflowY: 'auto',
+          width: '100%',
+          height: '100%',
+        }}
+      >
         {chatMessages.value.entries.map((message) => (
           <ChatLine>
             <ChatLineAvatar />
@@ -119,7 +127,7 @@ export const MessageList = Shade<{ chat: Chat }>({
             </div>
           </ChatLine>
         ))}
-      </>
+      </div>
     )
   },
 })

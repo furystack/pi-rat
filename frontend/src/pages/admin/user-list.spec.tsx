@@ -79,8 +79,8 @@ describe('UserListPage', () => {
       expect(page?.textContent).toContain('Loading users...')
     })
 
-    it('should display uninitialized state as loading', async () => {
-      usersObservable.setValue({ status: 'uninitialized' })
+    it('should display loading state as loading', async () => {
+      usersObservable.setValue({ status: 'loading' })
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 

@@ -76,7 +76,7 @@ describe('SeriesService', () => {
         const observable = service.getSeriesAsObservable('tt9876543')
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 
@@ -183,7 +183,7 @@ describe('SeriesService', () => {
         const observable = service.findSeriesAsObservable(findOptions)
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
   })

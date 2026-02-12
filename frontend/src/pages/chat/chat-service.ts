@@ -13,7 +13,7 @@ export class ChatService {
   @Injected(ChatApiClient)
   declare private readonly chatApiClient: ChatApiClient
 
-  private chatCache = new Cache({
+  public chatCache = new Cache({
     capacity: 100,
     load: async (id: string) => {
       const { result } = await this.chatApiClient.call({
@@ -26,7 +26,7 @@ export class ChatService {
     },
   })
 
-  private chatQueryCache = new Cache({
+  public chatQueryCache = new Cache({
     capacity: 100,
     load: async (findOptions: { filter?: FilterType<Chat> }) => {
       const { result } = await this.chatApiClient.call({

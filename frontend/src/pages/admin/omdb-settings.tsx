@@ -106,7 +106,7 @@ export const OmdbSettingsPage = Shade({
       }
     }
 
-    if (config.status === 'loading' || config.status === 'uninitialized') {
+    if (config.status === 'loading') {
       return (
         <div>
           <h2 className="page-title">🎬 OMDB Settings</h2>

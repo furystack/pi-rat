@@ -90,7 +90,7 @@ describe('ConfigService', () => {
         const observable = service.getConfigAsObservable('OMDB_CONFIG')
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 

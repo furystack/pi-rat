@@ -10,11 +10,9 @@ export const AiChatMessageList = Shade<{
 }>({
   shadowDomName: 'pi-rat-ai-chat-message-list',
   css: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: 'block',
     width: '100%',
     height: 'calc(100% - 124px)',
-    overflowY: 'auto',
   },
   render: ({ useObservable, injector, props, useDisposable, useRef }) => {
     const { selectedChatId } = props
@@ -77,7 +75,16 @@ export const AiChatMessageList = Shade<{
     scrollToBottom()
 
     return (
-      <>
+      <div
+        ref={containerRef}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          overflowY: 'auto',
+        }}
+      >
         {messages.value.result.entries.map((message) => {
           try {
             const fromJson = JSON.parse(message.content) as { content: string; thinking?: string }
@@ -103,7 +110,7 @@ export const AiChatMessageList = Shade<{
             )
           }
         })}
-      </>
+      </div>
     )
   },
 })

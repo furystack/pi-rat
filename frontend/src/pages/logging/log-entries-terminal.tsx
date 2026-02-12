@@ -13,10 +13,10 @@ import { LoggingService } from '../../services/logging-service.js'
 
 const useDisposableTerminal = (
   { useDisposable, injector }: Pick<RenderOptions<object>, 'useDisposable' | 'injector'>,
-  containerEl: HTMLElement | null,
+  containerRef: { current: HTMLElement | null },
 ) => {
   return useDisposable('terminal', () => {
-    if (!containerEl) {
+    if (!containerRef.current) {
       const dummyTerminal = new Terminal()
       return {
         terminal: dummyTerminal,
@@ -46,8 +46,13 @@ const useDisposableTerminal = (
     terminal.loadAddon(fitAddon)
     terminal.loadAddon(searchAddon)
     terminal.loadAddon(webLinksAddon)
-    terminal.open(containerEl)
-    fitAddon.fit()
+
+    queueMicrotask(() => {
+      const container = containerRef.current
+      if (!container) return
+      terminal.open(container)
+      fitAddon.fit()
+    })
 
     return {
       terminal,
@@ -117,7 +122,7 @@ export const LogEntriesTerminal = Shade({
   },
   render: (renderOptions) => {
     const containerRef = renderOptions.useRef<HTMLDivElement>('container')
-    const { terminal } = useDisposableTerminal(renderOptions, containerRef.current)
+    const { terminal } = useDisposableTerminal(renderOptions, containerRef)
     const [entries] = useLogEntries(renderOptions, terminal)
 
     fillTerminalWithLogEntries(terminal, entries)

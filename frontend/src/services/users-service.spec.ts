@@ -89,7 +89,7 @@ describe('UsersService', () => {
         const observable = service.getUserAsObservable('testuser@example.com')
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 
@@ -192,7 +192,7 @@ describe('UsersService', () => {
         const observable = service.findUsersAsObservable({ top: 10 })
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
 

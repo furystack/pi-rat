@@ -98,7 +98,7 @@ describe('IotDevicesService', () => {
         const observable = service.getDeviceAsObservable('test-device')
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
   })
@@ -359,7 +359,7 @@ describe('IotDevicesService', () => {
         const observable = service.observeLastPingForDevice(mockDevice)
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
   })
@@ -380,7 +380,7 @@ describe('IotDevicesService', () => {
         const observable = service.observeLastAwakeEntryForDevice(mockDevice)
 
         expect(observable).toBeDefined()
-        expect(observable.getValue().status).toBe('uninitialized')
+        expect(observable.getValue().status).toBe('loading')
       })
     })
   })

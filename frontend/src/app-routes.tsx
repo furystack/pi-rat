@@ -9,21 +9,11 @@ import {
 import { AppBarLink, type AppBarLinkProps } from '@furystack/shades-common-components'
 import { decode } from 'common'
 import type { MatchResult } from 'path-to-regexp'
-import { LoadableDashboard } from './components/dashboard/LoadableDashboard.js'
-import { DefaultDashboard } from './components/dashboard/default-dashboard.js'
 import { PiRatLazyLoad } from './components/pirat-lazy-load.js'
 import { navigateToRoute } from './navigate-to-route.js'
-import { DeviceList } from './pages/iot/device-list.js'
-import { Login } from './pages/login.js'
-import { MovieList } from './pages/movies/movie-list.js'
-import { MovieLoader } from './pages/movies/movie-loader.js'
-import { MovieOverview } from './pages/movies/movie-overview.js'
-import { SeriesList } from './pages/movies/series-list.js'
-import { SeriesOverview } from './pages/movies/series-overview.js'
-import { Register } from './pages/register.js'
 
 /**
- * Like ExtractRoutePaths from @furystack/shades but with NestedRoute<any> constraint
+ * Like ExtractRoutePaths from @furystack/shades but with NestedRoute<never> constraint
  * to support routes with specific match parameter types.
  */
 type ConcatPaths<Parent extends string, Child extends string> = Parent extends '/' ? Child : `${Parent}${Child}`
@@ -107,22 +97,53 @@ const settingsChildren = {
 
 export const appRoutes = {
   '/movies': {
-    component: () => <MovieList />,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { MovieList } = await import('./pages/movies/movie-list.js')
+          return <MovieList />
+        }}
+      />
+    ),
   },
   '/movies/:id/watch': {
-    component: ({ match }: { match: MatchResult<{ id: string }> }) => <MovieLoader movieFileId={match.params.id} />,
+    component: ({ match }: { match: MatchResult<{ id: string }> }) => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { MovieLoader } = await import('./pages/movies/movie-loader.js')
+          return <MovieLoader movieFileId={match.params.id} />
+        }}
+      />
+    ),
   },
   '/movies/:imdbId/overview': {
     component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => (
-      <MovieOverview imdbId={match.params.imdbId} />
+      <PiRatLazyLoad
+        component={async () => {
+          const { MovieOverview } = await import('./pages/movies/movie-overview.js')
+          return <MovieOverview imdbId={match.params.imdbId} />
+        }}
+      />
     ),
   },
   '/series': {
-    component: () => <SeriesList />,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { SeriesList } = await import('./pages/movies/series-list.js')
+          return <SeriesList />
+        }}
+      />
+    ),
   },
   '/series/:imdbId': {
     component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => (
-      <SeriesOverview imdbId={match.params.imdbId} />
+      <PiRatLazyLoad
+        component={async () => {
+          const { SeriesOverview } = await import('./pages/movies/series-overview.js')
+          return <SeriesOverview imdbId={match.params.imdbId} />
+        }}
+      />
     ),
   },
   '/app-settings': {
@@ -257,7 +278,14 @@ export const appRoutes = {
     ),
   },
   '/iot/devices': {
-    component: () => <DeviceList />,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { DeviceList } = await import('./pages/iot/device-list.js')
+          return <DeviceList />
+        }}
+      />
+    ),
   },
   '/iot/device/:id': {
     component: ({ match }: { match: MatchResult<{ id: string }> }) => (
@@ -315,20 +343,48 @@ export const appRoutes = {
     ),
   },
   '/dashboards/:id': {
-    component: ({ match }: { match: MatchResult<{ id: string }> }) => <LoadableDashboard id={match.params.id} />,
+    component: ({ match }: { match: MatchResult<{ id: string }> }) => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { LoadableDashboard } = await import('./components/dashboard/LoadableDashboard.js')
+          return <LoadableDashboard id={match.params.id} />
+        }}
+      />
+    ),
   },
   '/': {
     routingOptions: { end: false },
-    component: () => <DefaultDashboard />,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { DefaultDashboard } = await import('./components/dashboard/default-dashboard.js')
+          return <DefaultDashboard />
+        }}
+      />
+    ),
   },
 }
 
 export const authRoutes = {
   '/register': {
-    component: () => <Register />,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { Register } = await import('./pages/register.js')
+          return <Register />
+        }}
+      />
+    ),
   },
   '': {
-    component: () => <Login />,
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { Login } = await import('./pages/login.js')
+          return <Login />
+        }}
+      />
+    ),
   },
 }
 

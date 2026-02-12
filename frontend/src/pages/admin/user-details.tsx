@@ -295,9 +295,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           <h2>User Details</h2>
         </div>
 
-        {(userState.status === 'loading' ||
-          userState.status === 'uninitialized' ||
-          userState.status === 'obsolete') && (
+        {(userState.status === 'loading' || userState.status === 'obsolete') && (
           <Paper elevation={1} style={{ padding: '24px' }}>
             <p className="loading-text">Loading user...</p>
           </Paper>
