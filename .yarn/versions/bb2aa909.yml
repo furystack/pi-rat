@@ -1,3 +1,7 @@
 releases:
+  common: patch
   frontend: patch
   pi-rat: patch
+
+undecided:
+  - service
