@@ -1,15 +1,15 @@
-import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
+import { getDataSetFor } from '@furystack/repository'
 import { Movie, type OmdbMovieMetadata } from 'common'
 
 export const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
-  const movieStore = getStoreManager(injector).getStoreFor(Movie, 'imdbId')
-  const existingMovie = await movieStore.get(omdbMeta.imdbID)
+  const movieDataSet = getDataSetFor(injector, Movie, 'imdbId')
+  const existingMovie = await movieDataSet.get(injector, omdbMeta.imdbID)
 
   if (!existingMovie) {
     const {
       created: [newMovie],
-    } = await movieStore.add({
+    } = await movieDataSet.add(injector, {
       imdbId: omdbMeta.imdbID,
       title: omdbMeta.Title,
       year: parseInt(omdbMeta.Year, 10),

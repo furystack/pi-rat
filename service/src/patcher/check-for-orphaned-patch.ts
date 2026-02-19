@@ -2,10 +2,10 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import type { PatchRunStore } from './patch-run-store.js'
 
-export const checkForOrphanedPatch = async (injector: Injector, store: PatchRunStore) => {
+export const checkForOrphanedPatch = async (injector: Injector, dataSet: PatchRunStore) => {
   const logger = getLogger(injector).withScope('Orphaned Patch Checker')
 
-  const toBeOrphaned = await store.find({
+  const toBeOrphaned = await dataSet.find(injector, {
     filter: { status: { $eq: 'running' } },
   })
 
@@ -18,7 +18,7 @@ export const checkForOrphanedPatch = async (injector: Injector, store: PatchRunS
         .map((p) => ({ ...p, status: 'orphaned' as const }))
         .map(
           async (p) =>
-            await store.update(p.id, {
+            await dataSet.update(injector, p.id, {
               ...p,
               log: [
                 ...p.log,

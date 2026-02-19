@@ -1,8 +1,9 @@
-import { isAuthorized, StoreManager } from '@furystack/core'
+import { isAuthorized, useSystemIdentityContext } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { EventHub, PathHelper } from '@furystack/utils'
 import type { FSWatcher } from 'chokidar'
 import { watch } from 'chokidar'
@@ -78,15 +79,20 @@ export class FileWatcherService extends EventHub<{
 
   declare private injector: Injector
 
+  @Injected((injector) => getDataSetFor(injector, Drive, 'letter'))
+  declare private driveDataSet: DataSet<Drive, 'letter'>
+
+  @Injected((injector) => useSystemIdentityContext({ injector, username: 'file-watcher' }))
+  declare private systemInjector: Injector
+
   public async init() {
     await this.startWatchCurrentDirectories()
   }
 
   private async startWatchCurrentDirectories() {
-    const driveStore = this.injector.getInstance(StoreManager).getStoreFor(Drive, 'letter')
-    driveStore.subscribe('onEntityAdded', ({ entity }) => void this.addWatcher(entity))
-    driveStore.subscribe('onEntityRemoved', ({ key }) => void this.removeWatcher(key))
-    const allDrives = await driveStore.find({})
+    this.driveDataSet.subscribe('onEntityAdded', ({ entity }) => void this.addWatcher(entity))
+    this.driveDataSet.subscribe('onEntityRemoved', ({ key }) => void this.removeWatcher(key))
+    const allDrives = await this.driveDataSet.find(this.systemInjector, {})
     allDrives.forEach((drive) => void this.addWatcher(drive))
   }
 }

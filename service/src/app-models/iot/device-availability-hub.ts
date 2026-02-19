@@ -1,8 +1,8 @@
-import type { PhysicalStore, WithOptionalId } from '@furystack/core'
-import { StoreManager } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { useSystemIdentityContext } from '@furystack/core'
+import { Injectable, Injected, type Injector } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { EventHub, sleepAsync } from '@furystack/utils'
 import { Config, Device, DevicePingHistory, type IotConfig } from 'common'
 import ping from 'ping'
@@ -26,12 +26,15 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
   @Injected((injector) => getLogger(injector).withScope('DeviceAvailabilityHub'))
   declare private logger: ScopedLogger
 
-  @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Config, 'id'))
-  declare private configStore: PhysicalStore<Config, 'id', WithOptionalId<Config, 'id'>>
+  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
+  declare private configDataSet: DataSet<Config, 'id'>
+
+  @Injected((injector) => useSystemIdentityContext({ injector, username: 'device-availability' }))
+  declare private systemInjector: Injector
 
   private getCurrentConfig = async () => {
     try {
-      const loaded = (await this.configStore.get('IOT_CONFIG')) as IotConfig
+      const loaded = (await this.configDataSet.get(this.systemInjector, 'IOT_CONFIG')) as IotConfig
       return loaded || defaultIotConfig
     } catch (error) {
       await this.logger.warning({
@@ -57,7 +60,7 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
             })
 
             if (lastStatus !== newStatus) {
-              await this.devicePingHistoryStore.add({
+              await this.devicePingHistoryDataSet.add(this.systemInjector, {
                 name: device.name,
                 isAvailable: newStatus,
                 ping: parseFloat(avg) || undefined,
@@ -84,27 +87,23 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
     }
   }
 
-  @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Device, 'name'))
-  declare private deviceStore: PhysicalStore<Device, 'name', WithOptionalId<Device, 'name'>>
+  @Injected((injector) => getDataSetFor(injector, Device, 'name'))
+  declare private deviceDataSet: DataSet<Device, 'name'>
 
-  @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(DevicePingHistory, 'id'))
-  declare private devicePingHistoryStore: PhysicalStore<
-    DevicePingHistory,
-    'id',
-    WithOptionalId<DevicePingHistory, 'id'>
-  >
+  @Injected((injector) => getDataSetFor(injector, DevicePingHistory, 'id'))
+  declare private devicePingHistoryDataSet: DataSet<DevicePingHistory, 'id'>
 
   public async init() {
-    const currentDevices = await this.deviceStore.find({})
+    const currentDevices = await this.deviceDataSet.find(this.systemInjector, {})
     this.updateDevices(currentDevices)
 
-    this.deviceStore.subscribe('onEntityAdded', ({ entity }) => {
+    this.deviceDataSet.subscribe('onEntityAdded', ({ entity }) => {
       this.updateDevices([...this.devices, entity])
     })
-    this.deviceStore.subscribe('onEntityRemoved', ({ key }) => {
+    this.deviceDataSet.subscribe('onEntityRemoved', ({ key }) => {
       this.updateDevices(this.devices.filter((device) => device.name !== key))
     })
-    this.deviceStore.subscribe('onEntityUpdated', ({ id, change }) => {
+    this.deviceDataSet.subscribe('onEntityUpdated', ({ id, change }) => {
       this.updateDevices(this.devices.map((device) => (device.name === id ? { ...device, ...change } : device)))
     })
     await this.refreshConnections()

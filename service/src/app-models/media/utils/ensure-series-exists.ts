@@ -1,13 +1,13 @@
-import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
+import { getDataSetFor } from '@furystack/repository'
 import { Series, type OmdbSeriesMetadata } from 'common'
 
 export const ensureSeriesExists = async (omdbMeta: OmdbSeriesMetadata, injector: Injector) => {
-  const seriesStore = getStoreManager(injector).getStoreFor(Series, 'imdbId')
-  const existingSeries = await seriesStore.get(omdbMeta.imdbID)
+  const seriesDataSet = getDataSetFor(injector, Series, 'imdbId')
+  const existingSeries = await seriesDataSet.get(injector, omdbMeta.imdbID)
 
   if (!existingSeries) {
-    await seriesStore.add({
+    await seriesDataSet.add(injector, {
       imdbId: omdbMeta.imdbID,
       title: omdbMeta.Title,
       year: omdbMeta.Year,

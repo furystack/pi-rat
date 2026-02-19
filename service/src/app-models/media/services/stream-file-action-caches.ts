@@ -1,6 +1,7 @@
 import { Cache } from '@furystack/cache'
-import { getStoreManager } from '@furystack/core'
+import { useSystemIdentityContext } from '@furystack/core'
 import { Injectable, type Injector } from '@furystack/inject'
+import { getDataSetFor } from '@furystack/repository'
 import { Config, Drive, type MoviesConfig, type PiRatFile, type StreamQueryParams } from 'common'
 import { join } from 'path'
 import { FfprobeService } from '../../../ffprobe-service.js'
@@ -11,18 +12,27 @@ import { FfprobeService } from '../../../ffprobe-service.js'
 export class StreamFileActionCaches {
   declare public injector: Injector
 
+  private get systemInjector() {
+    if (!this._systemInjector) {
+      this._systemInjector = useSystemIdentityContext({ injector: this.injector, username: 'stream-cache' })
+    }
+    return this._systemInjector
+  }
+
+  private _systemInjector?: Injector
+
   public driveCache = new Cache({
     load: async (key: string) => {
-      const driveStore = getStoreManager(this.injector).getStoreFor(Drive, 'letter')
-      const drive = await driveStore.get(key)
+      const driveDataSet = getDataSetFor(this.injector, Drive, 'letter')
+      const drive = await driveDataSet.get(this.systemInjector, key)
       return drive
     },
   })
 
   public moviesConfigCache = new Cache({
     load: async (): Promise<MoviesConfig> => {
-      const moviesStore = getStoreManager(this.injector).getStoreFor(Config, 'id')
-      const moviesConfig = await moviesStore.get('MOVIES_CONFIG')
+      const configDataSet = getDataSetFor(this.injector, Config, 'id')
+      const moviesConfig = await configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')
 
       if (!moviesConfig) {
         return {
@@ -138,12 +148,11 @@ export class StreamFileActionCaches {
   })
 
   public init() {
-    getStoreManager(this.injector)
-      .getStoreFor(Config, 'id')
-      .subscribe('onEntityUpdated', ({ id }) => {
-        if (id === 'MOVIES_CONFIG') {
-          this.moviesConfigCache.setObsolete()
-        }
-      })
+    const configDataSet = getDataSetFor(this.injector, Config, 'id')
+    configDataSet.subscribe('onEntityUpdated', ({ id }) => {
+      if (id === 'MOVIES_CONFIG') {
+        this.moviesConfigCache.setObsolete()
+      }
+    })
   }
 }

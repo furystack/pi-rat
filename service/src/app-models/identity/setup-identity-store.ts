@@ -144,4 +144,6 @@ export const setupIdentity = async (injector: Injector) => {
     getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
     enableBasicAuth: false,
   })
+
+  await UserModel.sequelize?.sync()
 }

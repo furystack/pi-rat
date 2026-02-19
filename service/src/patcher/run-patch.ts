@@ -3,10 +3,10 @@ import { getLogger } from '@furystack/logging'
 import type { PatchRunStore } from './patch-run-store.js'
 import type { Patch } from './patch.js'
 
-export const runPatch = async (injector: Injector, patch: Patch, patchRunStore: PatchRunStore) => {
+export const runPatch = async (injector: Injector, patch: Patch, patchRunDataSet: PatchRunStore) => {
   const logger = getLogger(injector).withScope('Patch Runner')
 
-  const alreadyRun = await patchRunStore.find({
+  const alreadyRun = await patchRunDataSet.find(injector, {
     filter: { patchId: { $eq: patch.id } },
     top: 1,
   })
@@ -27,12 +27,14 @@ export const runPatch = async (injector: Injector, patch: Patch, patchRunStore: 
 
   await logger.verbose({ message: `📦  Running patch ${patch.id}...` })
 
-  const { created } = await patchRunStore.add({
+  const { created } = await patchRunDataSet.add(injector, {
     patchId: patch.id,
     name: patch.name,
     description: patch.description,
     status: 'running',
     log: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   })
 
   const newPatchRun = created[0]
@@ -41,14 +43,14 @@ export const runPatch = async (injector: Injector, patch: Patch, patchRunStore: 
     await patch.run(injector, (message) => {
       newPatchRun.log.push({ timestamp: new Date().toISOString(), message })
     })
-    await patchRunStore.update(newPatchRun.id, {
+    await patchRunDataSet.update(injector, newPatchRun.id, {
       status: 'success',
       log: newPatchRun.log,
     })
     await logger.verbose({ message: `📦  Patch ${patch.id} completed.` })
   } catch (error) {
     await logger.error({ message: `📦  Patch ${patch.id} failed.`, data: { error } })
-    await patchRunStore.update(newPatchRun.id, {
+    await patchRunDataSet.update(injector, newPatchRun.id, {
       status: 'failed',
       log: [
         ...newPatchRun.log,

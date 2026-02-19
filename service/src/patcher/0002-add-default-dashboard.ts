@@ -1,4 +1,4 @@
-import { StoreManager } from '@furystack/core'
+import { getDataSetFor } from '@furystack/repository'
 import { Dashboard } from 'common'
 import type { Patch } from './patch.js'
 
@@ -7,9 +7,9 @@ export const addDefaultDashboardPatcher: Patch = {
   description: 'Adds a default dashboard to the Dashboards DB',
   name: 'Add default dashboard',
   run: async (injector, addLogEntry) => {
-    const dashboardStore = injector.getInstance(StoreManager).getStoreFor(Dashboard, 'id')
+    const dashboardDataSet = getDataSetFor(injector, Dashboard, 'id')
 
-    await dashboardStore.add({
+    await dashboardDataSet.add(injector, {
       name: 'Default',
       description: 'Default',
       owner: 'system',

@@ -1,7 +1,8 @@
-import { getStoreManager, type PhysicalStore } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { useSystemIdentityContext } from '@furystack/core'
+import { Injectable, Injected, type Injector } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor, type DataSet } from '@furystack/repository'
 import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
 import { Config } from 'common'
 
@@ -12,11 +13,14 @@ export class OmdbClientService {
   @Injected((injector) => getLogger(injector).withScope('OMDB Client Service'))
   declare private logger: ScopedLogger
 
-  @Injected((injector) => getStoreManager(injector).getStoreFor(Config, 'id'))
-  declare private configStore: PhysicalStore<Config, 'id'>
+  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
+  declare private configDataSet: DataSet<Config, 'id'>
+
+  @Injected((injector) => useSystemIdentityContext({ injector, username: 'omdb-service' }))
+  declare private systemInjector: Injector
 
   public async init() {
-    const config = await this.configStore.get('OMDB_CONFIG')
+    const config = await this.configDataSet.get(this.systemInjector, 'OMDB_CONFIG')
     if (!config) {
       this.config = undefined
       await this.logger.information({
@@ -29,7 +33,7 @@ export class OmdbClientService {
     }
     this.config = config as OmdbConfig
 
-    this.configStore.subscribe('onEntityAdded', ({ entity }) => {
+    this.configDataSet.subscribe('onEntityAdded', ({ entity }) => {
       if (entity.id === 'OMDB_CONFIG') {
         this.config = entity as OmdbConfig
       }
@@ -37,7 +41,7 @@ export class OmdbClientService {
         message: `🎬   OMDB Service config added`,
       })
     })
-    this.configStore.subscribe('onEntityUpdated', ({ change }) => {
+    this.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
       if (change.id === 'OMDB_CONFIG') {
         this.config = {
           ...this.config,
@@ -50,7 +54,7 @@ export class OmdbClientService {
       }
     })
 
-    this.configStore.subscribe('onEntityRemoved', ({ key }) => {
+    this.configDataSet.subscribe('onEntityRemoved', ({ key }) => {
       if (key === 'OMDB_CONFIG') {
         this.config = undefined
         void this.logger.information({

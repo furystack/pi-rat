@@ -1,7 +1,7 @@
-import { StoreManager } from '@furystack/core'
+import { useSystemIdentityContext } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { getRepository } from '@furystack/repository'
+import { getDataSetFor, getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { PatchRun } from 'common'
 import { DataTypes, Model } from 'sequelize'
@@ -89,11 +89,12 @@ export const setupPatcher = async (injector: Injector) => {
     authorizeUpdate: alwaysDeny,
   })
 
-  const patchRunStore = injector.getInstance(StoreManager).getStoreFor(PatchRun, 'id')
+  const systemInjector = useSystemIdentityContext({ injector, username: 'patcher' })
+  const patchRunDataSet = getDataSetFor(injector, PatchRun, 'id')
 
-  await checkForOrphanedPatch(injector, patchRunStore)
+  await checkForOrphanedPatch(systemInjector, patchRunDataSet)
 
   for (const patchInstance of patchList) {
-    await runPatch(injector, patchInstance, patchRunStore)
+    await runPatch(systemInjector, patchInstance, patchRunDataSet)
   }
 }

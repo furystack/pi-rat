@@ -1,8 +1,4 @@
-import type { PhysicalStore } from '@furystack/core'
+import type { DataSet } from '@furystack/repository'
 import type { PatchRun } from 'common'
 
-export type PatchRunStore = PhysicalStore<
-  PatchRun,
-  'id',
-  Pick<PatchRun, 'name' | 'description' | 'patchId' | 'status' | 'log'>
->
+export type PatchRunStore = DataSet<PatchRun, 'id'>
