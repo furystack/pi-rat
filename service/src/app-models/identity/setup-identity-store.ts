@@ -123,7 +123,9 @@ export const setupIdentity = async (injector: Injector) => {
     },
   })
 
-  getRepository(injector).createDataSet(User, 'username', {
+  const repo = getRepository(injector)
+
+  repo.createDataSet(User, 'username', {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeRemove: withRole('admin'),
@@ -135,6 +137,13 @@ export const setupIdentity = async (injector: Injector) => {
       return { isAllowed: true }
     },
     authorizeUpdate: withRole('admin'),
+  })
+
+  repo.createDataSet(PasswordCredential, 'userName', {
+    authorizeAdd: withRole('admin'),
+    authorizeGet: withRole('admin'),
+    authorizeUpdate: withRole('admin'),
+    authorizeRemove: withRole('admin'),
   })
 
   usePasswordPolicy(injector)
