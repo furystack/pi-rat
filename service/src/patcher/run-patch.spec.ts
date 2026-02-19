@@ -100,11 +100,7 @@ describe('runPatch', () => {
         }),
       )
       expect(mockPatch.run).toHaveBeenCalled()
-      expect(mockStore.update).toHaveBeenCalledWith(
-        injector,
-        'run-1',
-        expect.objectContaining({ status: 'success' }),
-      )
+      expect(mockStore.update).toHaveBeenCalledWith(injector, 'run-1', expect.objectContaining({ status: 'success' }))
     })
   })
 
