@@ -30,7 +30,7 @@ describe('checkForOrphanedPatch', () => {
     await usingAsync(new Injector(), async (injector) => {
       await checkForOrphanedPatch(injector, mockStore as unknown as PatchRunStore)
 
-      expect(mockStore.find).toHaveBeenCalledWith({
+      expect(mockStore.find).toHaveBeenCalledWith(injector, {
         filter: { status: { $eq: 'running' } },
       })
       expect(mockStore.update).not.toHaveBeenCalled()
@@ -46,6 +46,7 @@ describe('checkForOrphanedPatch', () => {
       await checkForOrphanedPatch(injector, mockStore as unknown as PatchRunStore)
 
       expect(mockStore.update).toHaveBeenCalledWith(
+        injector,
         'patch-run-1',
         expect.objectContaining({
           status: 'orphaned',
@@ -76,8 +77,16 @@ describe('checkForOrphanedPatch', () => {
       await checkForOrphanedPatch(injector, mockStore as unknown as PatchRunStore)
 
       expect(mockStore.update).toHaveBeenCalledTimes(2)
-      expect(mockStore.update).toHaveBeenCalledWith('patch-run-1', expect.objectContaining({ status: 'orphaned' }))
-      expect(mockStore.update).toHaveBeenCalledWith('patch-run-2', expect.objectContaining({ status: 'orphaned' }))
+      expect(mockStore.update).toHaveBeenCalledWith(
+        injector,
+        'patch-run-1',
+        expect.objectContaining({ status: 'orphaned' }),
+      )
+      expect(mockStore.update).toHaveBeenCalledWith(
+        injector,
+        'patch-run-2',
+        expect.objectContaining({ status: 'orphaned' }),
+      )
     })
   })
 
@@ -96,6 +105,7 @@ describe('checkForOrphanedPatch', () => {
       await checkForOrphanedPatch(injector, mockStore as unknown as PatchRunStore)
 
       expect(mockStore.update).toHaveBeenCalledWith(
+        injector,
         'patch-run-1',
         expect.objectContaining({
           log: expect.arrayContaining([

@@ -1,6 +1,6 @@
 import { Cache } from '@furystack/cache'
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, type Injector } from '@furystack/inject'
+import { Injected, Injectable, type Injector } from '@furystack/inject'
 import { getDataSetFor } from '@furystack/repository'
 import { Config, Drive, type MoviesConfig, type PiRatFile, type StreamQueryParams } from 'common'
 import { join } from 'path'
@@ -12,14 +12,8 @@ import { FfprobeService } from '../../../ffprobe-service.js'
 export class StreamFileActionCaches {
   declare public injector: Injector
 
-  private get systemInjector() {
-    if (!this._systemInjector) {
-      this._systemInjector = useSystemIdentityContext({ injector: this.injector, username: 'stream-cache' })
-    }
-    return this._systemInjector
-  }
-
-  private _systemInjector?: Injector
+  @Injected((injector) => useSystemIdentityContext({ injector, username: 'stream-cache' }))
+  declare private systemInjector: Injector
 
   public driveCache = new Cache({
     load: async (key: string) => {

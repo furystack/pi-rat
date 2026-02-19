@@ -7,28 +7,26 @@ import { FfprobeService } from '../../../ffprobe-service.js'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { linkMovie } from './link-movie.js'
 
-// Mock getStoreManager
 const mockMovieFileStoreFind = vi.fn()
 const mockMovieFileStoreAdd = vi.fn()
 const mockOmdbStoreFind = vi.fn()
 
-vi.mock('@furystack/core', () => ({
-  getStoreManager: () => ({
-    getStoreFor: (model: { name: string }) => {
-      if (model.name === 'MovieFile') {
-        return {
-          find: (...args: unknown[]) => mockMovieFileStoreFind(...args) as unknown,
-          add: (...args: unknown[]) => mockMovieFileStoreAdd(...args) as unknown,
-        }
+vi.mock('@furystack/repository', () => ({
+  getDataSetFor: (_injector: unknown, model: { name?: string } | ((...args: unknown[]) => unknown)) => {
+    const name = typeof model === 'function' ? model.name : ''
+    if (name === 'MovieFile') {
+      return {
+        find: (...args: unknown[]) => mockMovieFileStoreFind(...args) as unknown,
+        add: (...args: unknown[]) => mockMovieFileStoreAdd(...args) as unknown,
       }
-      if (model.name === 'OmdbMovieMetadata') {
-        return {
-          find: (...args: unknown[]) => mockOmdbStoreFind(...args) as unknown,
-        }
+    }
+    if (name === 'OmdbMovieMetadata') {
+      return {
+        find: (...args: unknown[]) => mockOmdbStoreFind(...args) as unknown,
       }
-      return {}
-    },
-  }),
+    }
+    return {}
+  },
 }))
 
 // Mock getLogger

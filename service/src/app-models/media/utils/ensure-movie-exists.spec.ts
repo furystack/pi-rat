@@ -4,16 +4,13 @@ import { describe, expect, it, vi } from 'vitest'
 import type { OmdbMovieMetadata } from 'common'
 import { ensureMovieExists } from './ensure-movie-exists.js'
 
-// Mock getStoreManager
 const mockMovieStoreGet = vi.fn()
 const mockMovieStoreAdd = vi.fn()
 
-vi.mock('@furystack/core', () => ({
-  getStoreManager: () => ({
-    getStoreFor: () => ({
-      get: (...args: unknown[]) => mockMovieStoreGet(...args) as unknown,
-      add: (...args: unknown[]) => mockMovieStoreAdd(...args) as unknown,
-    }),
+vi.mock('@furystack/repository', () => ({
+  getDataSetFor: () => ({
+    get: (...args: unknown[]) => mockMovieStoreGet(...args) as unknown,
+    add: (...args: unknown[]) => mockMovieStoreAdd(...args) as unknown,
   }),
 }))
 
@@ -56,7 +53,7 @@ describe('ensureMovieExists', () => {
     await usingAsync(new Injector(), async (injector) => {
       const result = await ensureMovieExists(createOmdbMeta(), injector)
 
-      expect(mockMovieStoreGet).toHaveBeenCalledWith('tt1234567')
+      expect(mockMovieStoreGet).toHaveBeenCalledWith(injector, 'tt1234567')
       expect(mockMovieStoreAdd).not.toHaveBeenCalled()
       expect(result).toBe(existingMovie)
     })
@@ -74,8 +71,9 @@ describe('ensureMovieExists', () => {
     await usingAsync(new Injector(), async (injector) => {
       const result = await ensureMovieExists(createOmdbMeta(), injector)
 
-      expect(mockMovieStoreGet).toHaveBeenCalledWith('tt1234567')
+      expect(mockMovieStoreGet).toHaveBeenCalledWith(injector, 'tt1234567')
       expect(mockMovieStoreAdd).toHaveBeenCalledWith(
+        injector,
         expect.objectContaining({
           imdbId: 'tt1234567',
           title: 'Test Movie',
@@ -111,6 +109,7 @@ describe('ensureMovieExists', () => {
       await ensureMovieExists(omdbMeta, injector)
 
       expect(mockMovieStoreAdd).toHaveBeenCalledWith(
+        injector,
         expect.objectContaining({
           imdbId: 'tt9999999',
           season: 1,
@@ -132,6 +131,7 @@ describe('ensureMovieExists', () => {
       await ensureMovieExists(omdbMeta, injector)
 
       expect(mockMovieStoreAdd).toHaveBeenCalledWith(
+        injector,
         expect.objectContaining({
           duration: undefined,
         }),

@@ -1,15 +1,12 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { Injector } from '@furystack/inject'
-import { StoreManager } from '@furystack/core'
 import { RequestError } from '@furystack/rest'
 import { HttpUserContext } from '@furystack/rest-service'
-import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
+import { PasswordAuthenticator } from '@furystack/security'
 import { usingAsync } from '@furystack/utils'
 import { describe, expect, it, vi } from 'vitest'
-import { User } from 'common'
 import { RegisterAction } from './register-action.js'
 
-// Mock getLogger
 vi.mock('@furystack/logging', () => ({
   getLogger: () => ({
     withScope: () => ({
@@ -20,27 +17,32 @@ vi.mock('@furystack/logging', () => ({
   }),
 }))
 
+const mockUserDataSet = {
+  get: vi.fn(),
+  add: vi.fn(),
+  remove: vi.fn(),
+}
+
+const mockCredentialDataSet = {
+  add: vi.fn(),
+}
+
+vi.mock('@furystack/core', () => ({
+  useSystemIdentityContext: ({ injector }: { injector: unknown }) => injector,
+}))
+
+vi.mock('@furystack/repository', () => ({
+  getDataSetFor: (_injector: unknown, model: { name?: string } | ((...args: unknown[]) => unknown)) => {
+    const name = typeof model === 'function' ? model.name : ''
+    if (name === 'User') return mockUserDataSet
+    if (name === 'PasswordCredential') return mockCredentialDataSet
+    throw new Error(`Unknown model: ${name}`)
+  },
+}))
+
 describe('RegisterAction', () => {
   const createTestInjector = () => {
     const injector = new Injector()
-
-    const mockUserStore = {
-      get: vi.fn(),
-      add: vi.fn(),
-      remove: vi.fn(),
-    }
-
-    const mockCredentialStore = {
-      add: vi.fn(),
-    }
-
-    const mockStoreManager = {
-      getStoreFor: vi.fn((model: { name: string }) => {
-        if (model === User || model.name === 'User') return mockUserStore
-        if (model === PasswordCredential || model.name === 'PasswordCredential') return mockCredentialStore
-        throw new Error(`Unknown model: ${model.name}`)
-      }),
-    }
 
     const mockHasher = {
       createCredential: vi.fn().mockResolvedValue({
@@ -59,19 +61,18 @@ describe('RegisterAction', () => {
       cookieLogin: vi.fn().mockResolvedValue(undefined),
     }
 
-    injector.setExplicitInstance(mockStoreManager as unknown as StoreManager, StoreManager)
     injector.setExplicitInstance(mockAuthenticator as unknown as PasswordAuthenticator, PasswordAuthenticator)
     injector.setExplicitInstance(mockUserContext as unknown as HttpUserContext, HttpUserContext)
 
-    return { injector, mockUserStore, mockCredentialStore, mockHasher, mockUserContext }
+    return { injector, mockHasher, mockUserContext }
   }
 
   it('should register a new user successfully', async () => {
-    const { injector, mockUserStore, mockCredentialStore, mockUserContext } = createTestInjector()
+    const { injector, mockUserContext } = createTestInjector()
 
-    mockUserStore.get.mockResolvedValue(null) // User doesn't exist
-    mockUserStore.add.mockResolvedValue(undefined)
-    mockCredentialStore.add.mockResolvedValue(undefined)
+    mockUserDataSet.get.mockResolvedValue(null)
+    mockUserDataSet.add.mockResolvedValue(undefined)
+    mockCredentialDataSet.add.mockResolvedValue(undefined)
 
     await usingAsync(injector, async (i) => {
       const result = await RegisterAction({
@@ -81,14 +82,15 @@ describe('RegisterAction', () => {
         request: {} as IncomingMessage,
       })
 
-      expect(mockUserStore.get).toHaveBeenCalledWith('newuser')
-      expect(mockUserStore.add).toHaveBeenCalledWith(
+      expect(mockUserDataSet.get).toHaveBeenCalledWith(i, 'newuser')
+      expect(mockUserDataSet.add).toHaveBeenCalledWith(
+        i,
         expect.objectContaining({
           username: 'newuser',
           roles: [],
         }),
       )
-      expect(mockCredentialStore.add).toHaveBeenCalled()
+      expect(mockCredentialDataSet.add).toHaveBeenCalled()
       expect(mockUserContext.authenticateUser).toHaveBeenCalledWith('newuser', 'password123')
       expect(mockUserContext.cookieLogin).toHaveBeenCalled()
       expect(result.chunk).toEqual({ username: 'newuser', roles: [] })
@@ -96,9 +98,9 @@ describe('RegisterAction', () => {
   })
 
   it('should throw 409 when user already exists', async () => {
-    const { injector, mockUserStore } = createTestInjector()
+    const { injector } = createTestInjector()
 
-    mockUserStore.get.mockResolvedValue({ username: 'existinguser', roles: [] })
+    mockUserDataSet.get.mockResolvedValue({ username: 'existinguser', roles: [] })
 
     await usingAsync(injector, async (i) => {
       try {
@@ -118,9 +120,9 @@ describe('RegisterAction', () => {
   })
 
   it('should throw 400 when credential creation fails', async () => {
-    const { injector, mockUserStore, mockHasher } = createTestInjector()
+    const { injector, mockHasher } = createTestInjector()
 
-    mockUserStore.get.mockResolvedValue(null)
+    mockUserDataSet.get.mockResolvedValue(null)
     mockHasher.createCredential.mockRejectedValue(new Error('Invalid password'))
 
     await usingAsync(injector, async (i) => {
@@ -141,12 +143,12 @@ describe('RegisterAction', () => {
   })
 
   it('should cleanup user when registration fails after user creation', async () => {
-    const { injector, mockUserStore, mockCredentialStore } = createTestInjector()
+    const { injector } = createTestInjector()
 
-    mockUserStore.get.mockResolvedValue(null)
-    mockUserStore.add.mockResolvedValue(undefined)
-    mockCredentialStore.add.mockRejectedValue(new Error('Credential store error'))
-    mockUserStore.remove.mockResolvedValue(undefined)
+    mockUserDataSet.get.mockResolvedValue(null)
+    mockUserDataSet.add.mockResolvedValue(undefined)
+    mockCredentialDataSet.add.mockRejectedValue(new Error('Credential store error'))
+    mockUserDataSet.remove.mockResolvedValue(undefined)
 
     await usingAsync(injector, async (i) => {
       try {
@@ -159,19 +161,18 @@ describe('RegisterAction', () => {
         expect.fail('Expected RequestError to be thrown')
       } catch (error) {
         expect(error).toBeInstanceOf(RequestError)
-        // Verify cleanup was attempted
-        expect(mockUserStore.remove).toHaveBeenCalledWith('newuser')
+        expect(mockUserDataSet.remove).toHaveBeenCalledWith(i, 'newuser')
       }
     })
   })
 
   it('should not fail if cleanup fails', async () => {
-    const { injector, mockUserStore, mockCredentialStore } = createTestInjector()
+    const { injector } = createTestInjector()
 
-    mockUserStore.get.mockResolvedValue(null)
-    mockUserStore.add.mockResolvedValue(undefined)
-    mockCredentialStore.add.mockRejectedValue(new Error('Credential store error'))
-    mockUserStore.remove.mockRejectedValue(new Error('Cleanup failed'))
+    mockUserDataSet.get.mockResolvedValue(null)
+    mockUserDataSet.add.mockResolvedValue(undefined)
+    mockCredentialDataSet.add.mockRejectedValue(new Error('Credential store error'))
+    mockUserDataSet.remove.mockRejectedValue(new Error('Cleanup failed'))
 
     await usingAsync(injector, async (i) => {
       try {
@@ -185,8 +186,7 @@ describe('RegisterAction', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(RequestError)
         expect((error as RequestError).responseCode).toBe(400)
-        // Cleanup was attempted even though it failed
-        expect(mockUserStore.remove).toHaveBeenCalledWith('newuser')
+        expect(mockUserDataSet.remove).toHaveBeenCalledWith(i, 'newuser')
       }
     })
   })
