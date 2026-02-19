@@ -1,4 +1,4 @@
-import { getCurrentUser, getStoreManager } from '@furystack/core'
+import { getCurrentUser, getStoreManager, useSystemIdentityContext } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
@@ -316,10 +316,9 @@ export const setupChatStore = async (injector: Injector) => {
   })
 
   const chatDataSet = repo.getDataSetFor(Chat, 'id')
-  const chatPhysicalStore = getStoreManager(injector).getStoreFor(Chat, 'id')
-
   const chatMessageDataSet = repo.getDataSetFor(ChatMessage, 'id')
-  const chatMessagePhysicalStore = getStoreManager(injector).getStoreFor(ChatMessage, 'id')
+
+  const systemInjector = useSystemIdentityContext({ injector, username: 'chat-events' })
 
   const wsService = injector.getInstance(WebsocketService)
 
@@ -344,7 +343,7 @@ export const setupChatStore = async (injector: Injector) => {
   })
 
   chatDataSet.subscribe('onEntityUpdated', async ({ id, change }) => {
-    const entity = await chatPhysicalStore.get(id)
+    const entity = await chatDataSet.get(systemInjector, id)
     void wsService.announce({ type: 'chat-updated', id, change }, async ({ injector: i }) => {
       const user = await getCurrentUser(i)
       if (!user || !entity) {
@@ -355,7 +354,7 @@ export const setupChatStore = async (injector: Injector) => {
   })
 
   chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
-    const chat = await chatPhysicalStore.get(entity.chatId)
+    const chat = await chatDataSet.get(systemInjector, entity.chatId)
     if (chat) {
       void wsService.announce({ type: 'chat-message-added', chatMessage: entity, chat }, async ({ injector: i }) => {
         const user = await getCurrentUser(i)
@@ -368,11 +367,11 @@ export const setupChatStore = async (injector: Injector) => {
   })
 
   chatMessageDataSet.subscribe('onEntityUpdated', async ({ id, change }) => {
-    const reloadedChatMessage = await chatMessagePhysicalStore.get(id)
+    const reloadedChatMessage = await chatMessageDataSet.get(systemInjector, id)
     if (!reloadedChatMessage) {
       return
     }
-    const chat = await chatPhysicalStore.get(reloadedChatMessage.chatId)
+    const chat = await chatDataSet.get(systemInjector, reloadedChatMessage.chatId)
     if (!chat) {
       return
     }

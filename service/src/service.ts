@@ -1,11 +1,8 @@
-import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
-import type { SequelizeStore } from '@furystack/sequelize-store'
 import { EventHub } from '@furystack/utils'
-import { User } from 'common'
 import { AiAppModel } from './ai/ai-app-model.js'
 import { ChatAppModel } from './app-models/chat/chat-app-model.js'
 import { ConfigAppModel } from './app-models/config/config-app-model.js'
@@ -48,14 +45,6 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
     await wsService.announce({
       type: 'service-started',
     })
-
-    const userStore = getStoreManager(injector).getStoreFor(User, 'username') as unknown as SequelizeStore<
-      User,
-      any,
-      'username',
-      User
-    >
-    await userStore.sequelizeModel.sequelize?.sync()
 
     await setupFrontendBundle(injector)
 

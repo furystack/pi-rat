@@ -1,6 +1,6 @@
-import { getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import {
   getFallbackMetadata,
@@ -43,9 +43,9 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   const { title, year, season, episode } = getFallbackMetadata(path)
 
-  const movieFileStore = getStoreManager(injector).getStoreFor(MovieFile, 'id')
+  const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
 
-  const storedMovieFile = await movieFileStore.find({
+  const storedMovieFile = await movieFileDataSet.find(injector, {
     filter: {
       driveLetter: { $eq: driveLetter },
       path: { $eq: path },
@@ -62,8 +62,8 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 
-  const omdbStore = getStoreManager(injector).getStoreFor(OmdbMovieMetadata, 'imdbID')
-  const storedResult = await omdbStore.find({
+  const omdbDataSet = getDataSetFor(injector, OmdbMovieMetadata, 'imdbID')
+  const storedResult = await omdbDataSet.find(injector, {
     filter: {
       Title: { $eq: title },
       ...(year ? { Year: { $eq: year.toString() } } : {}),
@@ -83,7 +83,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
     const {
       created: [newMovieFile],
-    } = await movieFileStore.add({
+    } = await movieFileDataSet.add(injector, {
       driveLetter,
       path,
       imdbId: storedResult[0].imdbID,
@@ -128,7 +128,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   const {
     created: [newMovieFile],
-  } = await movieFileStore.add({
+  } = await movieFileDataSet.add(injector, {
     driveLetter,
     path,
     imdbId: added.imdbID,

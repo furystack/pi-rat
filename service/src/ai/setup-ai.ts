@@ -1,6 +1,7 @@
-import { getCurrentUser, getStoreManager, IdentityContext } from '@furystack/core'
+import { getCurrentUser, IdentityContext, useSystemIdentityContext } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { usingAsync } from '@furystack/utils'
 import { AiChat, AiChatMessage, Config, User } from 'common'
 import { ImpersonatedIdentityContext } from '../utils/impersonated-identity-context.js'
@@ -12,30 +13,30 @@ export const setupAi = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('AI Setup')
   const clientService = injector.getInstance(OllamaClientService)
 
-  const storeManager = getStoreManager(injector)
+  const configDataSet = getDataSetFor(injector, Config, 'id')
 
-  const configStore = storeManager.getStoreFor(Config, 'id')
-
-  configStore.subscribe('onEntityAdded', async ({ entity }) => {
+  configDataSet.subscribe('onEntityAdded', async ({ entity }) => {
     if (entity.id === 'OLLAMA_CONFIG') {
       await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
-      await clientService.init(injector)
+      await clientService.init()
     }
   })
 
-  configStore.subscribe('onEntityUpdated', async ({ id }) => {
+  configDataSet.subscribe('onEntityUpdated', async ({ id }) => {
     if (id === 'OLLAMA_CONFIG') {
       await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
-      await clientService.init(injector)
+      await clientService.init()
     }
   })
 
   await setupAiStore(injector)
 
-  const chatMessageStore = storeManager.getStoreFor(AiChatMessage, 'id')
-  const chatStore = storeManager.getStoreFor(AiChat, 'id')
+  const systemInjector = useSystemIdentityContext({ injector, username: 'ai-setup' })
+  const chatMessageDataSet = getDataSetFor(injector, AiChatMessage, 'id')
+  const chatDataSet = getDataSetFor(injector, AiChat, 'id')
+  const userDataSet = getDataSetFor(injector, User, 'username')
 
-  chatMessageStore.subscribe('onEntityAdded', async ({ entity }) => {
+  chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
     const ws = injector.getInstance(WebsocketService)
     await ws.announce(
       {
@@ -49,19 +50,19 @@ export const setupAi = async (injector: Injector) => {
     )
   })
 
-  chatMessageStore.subscribe('onEntityAdded', async ({ entity }) => {
-    const chat = await chatStore.get(entity.aiChatId)
+  chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
+    const chat = await chatDataSet.get(systemInjector, entity.aiChatId)
     if (!chat) {
       await logger.error({ message: `❌  Chat with ID ${entity.aiChatId} not found for message ${entity.id}` })
       return
     }
-    const chatHistory = await chatMessageStore.find({
+    const chatHistory = await chatMessageDataSet.find(systemInjector, {
       filter: { aiChatId: { $eq: chat.id } },
       order: { createdAt: 'DESC' },
       top: 20,
     })
 
-    const currentUser = await getStoreManager(injector).getStoreFor(User, 'username').get(entity.owner)
+    const currentUser = await userDataSet.get(systemInjector, entity.owner)
 
     await usingAsync(injector.createChild({}), async (handlerInjector) => {
       handlerInjector.setExplicitInstance(new ImpersonatedIdentityContext(currentUser), IdentityContext)

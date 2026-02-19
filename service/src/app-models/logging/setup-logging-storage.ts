@@ -80,6 +80,6 @@ export const setupLoggingStorage = async (injector: Injector) => {
     authorizeGet: withRole('admin'),
     authorizeUpdate: alwaysDeny,
     authorizeRemove: alwaysDeny,
-    authorizeAdd: alwaysDeny,
+    authorizeAdd: withRole('admin'),
   })
 }

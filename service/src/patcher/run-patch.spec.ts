@@ -92,6 +92,7 @@ describe('runPatch', () => {
       await runPatch(injector, mockPatch, mockStore as unknown as PatchRunStore)
 
       expect(mockStore.add).toHaveBeenCalledWith(
+        injector,
         expect.objectContaining({
           patchId: 'test-patch-1',
           name: 'Test Patch',
@@ -99,7 +100,7 @@ describe('runPatch', () => {
         }),
       )
       expect(mockPatch.run).toHaveBeenCalled()
-      expect(mockStore.update).toHaveBeenCalledWith('run-1', expect.objectContaining({ status: 'success' }))
+      expect(mockStore.update).toHaveBeenCalledWith(injector, 'run-1', expect.objectContaining({ status: 'success' }))
     })
   })
 
@@ -120,6 +121,7 @@ describe('runPatch', () => {
       )
 
       expect(mockStore.update).toHaveBeenCalledWith(
+        injector,
         'run-1',
         expect.objectContaining({
           status: 'failed',

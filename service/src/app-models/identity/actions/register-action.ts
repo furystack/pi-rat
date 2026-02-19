@@ -1,5 +1,6 @@
-import { StoreManager } from '@furystack/core'
+import { useSystemIdentityContext } from '@furystack/core'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { HttpUserContext, JsonResult, type RequestAction } from '@furystack/rest-service'
 import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
@@ -11,12 +12,12 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
   const postBody = await getBody()
   const { username, password } = postBody as { username: string; password: string }
 
-  const storeManager = injector.getInstance(StoreManager)
+  const systemInjector = useSystemIdentityContext({ injector, username: 'registration' })
+  const userDataSet = getDataSetFor(injector, User, 'username')
   const authenticator = injector.getInstance(PasswordAuthenticator)
 
   // Check if user already exists
-  const userStore = storeManager.getStoreFor(User, 'username')
-  const existingUser = await userStore.get(username)
+  const existingUser = await userDataSet.get(systemInjector, username)
   if (existingUser) {
     await logger.warning({ message: `Registration attempt for existing user: ${username}` })
     throw new RequestError('User already exists', 409)
@@ -34,11 +35,12 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
       updatedAt: new Date().toISOString(),
     }
 
-    await userStore.add(newUser)
+    await userDataSet.add(systemInjector, newUser)
     await logger.information({ message: `User created: ${username}` })
 
     // Now add the credential to the store
-    await storeManager.getStoreFor(PasswordCredential, 'userName').add(credential)
+    const credentialDataSet = getDataSetFor(injector, PasswordCredential, 'userName')
+    await credentialDataSet.add(systemInjector, credential)
     await logger.information({ message: `Registration completed for: ${username}` })
 
     const userContext = injector.getInstance(HttpUserContext)
@@ -54,7 +56,7 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
 
     // Clean up any partial state - try to remove user if it was created
     try {
-      await userStore.remove(username)
+      await userDataSet.remove(systemInjector, username)
       await logger.information({ message: `Cleaned up user ${username} after registration failure` })
     } catch (cleanupError) {
       // Ignore cleanup errors - user might not have been created yet

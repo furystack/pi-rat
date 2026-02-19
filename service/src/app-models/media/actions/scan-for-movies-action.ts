@@ -1,5 +1,6 @@
-import { getStoreManager } from '@furystack/core'
+import { useSystemIdentityContext } from '@furystack/core'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
 import { Drive, MovieFile, type ScanForMoviesEndpoint } from 'common'
@@ -11,18 +12,18 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
   const { root, autoExtractSubtitles } = await getBody()
 
   const logger = getLogger(injector).withScope('ScanForMoviesAction')
+  const systemInjector = useSystemIdentityContext({ injector, username: 'scan-movies' })
 
   const maintainer = injector.getInstance(MovieMaintainerService)
-  const storeManager = getStoreManager(injector)
-  const driveStore = storeManager.getStoreFor(Drive, 'letter')
-  const drive = await driveStore.get(root.driveLetter)
+  const driveDataSet = getDataSetFor(injector, Drive, 'letter')
+  const drive = await driveDataSet.get(systemInjector, root.driveLetter)
 
   if (!drive) {
     throw new RequestError(`Drive ${root.driveLetter} not found`, 400)
   }
 
-  const movieFilesStore = storeManager.getStoreFor(MovieFile, 'id')
-  const alreadyAddedMovieFiles = await movieFilesStore.find({})
+  const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
+  const alreadyAddedMovieFiles = await movieFileDataSet.find(systemInjector, {})
 
   await logger.verbose({
     message: `Scanning for movie files in ${root.path} on drive ${drive.letter}`,
@@ -40,13 +41,13 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
   for (const file of toBeAdded) {
     try {
       const addedMovieFile = await linkMovie({
-        injector,
+        injector: systemInjector,
         file,
       })
 
       if (autoExtractSubtitles) {
         await extractSubtitles({
-          injector,
+          injector: systemInjector,
           file,
         })
       }

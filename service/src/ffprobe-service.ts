@@ -1,6 +1,7 @@
 import { Cache } from '@furystack/cache'
-import { PhysicalStore, StoreManager } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { useSystemIdentityContext } from '@furystack/core'
+import { Injectable, Injected, type Injector } from '@furystack/inject'
+import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { Drive, PiRatFile, type FfprobeData } from 'common'
 import { FileWatcherService } from './app-models/drives/file-watcher-service.js'
 import { execAsync } from './utils/exec-async.js'
@@ -19,13 +20,16 @@ export type FfprobeResult = FfprobeData
 
 @Injectable({ lifetime: 'singleton' })
 export class FfprobeService {
-  @Injected((injector) => injector.getInstance(StoreManager).getStoreFor(Drive, 'letter'))
-  declare private readonly physicalPathStore: PhysicalStore<Drive, 'letter'>
+  @Injected((injector) => getDataSetFor(injector, Drive, 'letter'))
+  declare private readonly driveDataSet: DataSet<Drive, 'letter'>
+
+  @Injected((injector) => useSystemIdentityContext({ injector, username: 'ffprobe-service' }))
+  declare private readonly systemInjector: Injector
 
   private readonly piRatFileCache = new Cache({
     capacity: 100,
     load: async (file: PiRatFile) => {
-      const drive = await this.physicalPathStore.get(file.driveLetter)
+      const drive = await this.driveDataSet.get(this.systemInjector, file.driveLetter)
       if (!drive) {
         throw new Error(`Drive ${file.driveLetter} not found`)
       }

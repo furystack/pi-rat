@@ -1,4 +1,5 @@
-import { getCurrentUser, StoreManager } from '@furystack/core'
+import { getCurrentUser, useSystemIdentityContext } from '@furystack/core'
+import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
 import { Chat, ChatInvitation, type AcceptInvitationAction as AcceptInvitationActionType } from 'common'
@@ -8,27 +9,27 @@ export const AcceptInvitationAction: RequestAction<AcceptInvitationActionType> =
 
   const { id } = getUrlParams()
 
-  const storeManager = injector.getInstance(StoreManager)
-  const chatInvitationStore = storeManager.getStoreFor(ChatInvitation, 'id')
+  const systemInjector = useSystemIdentityContext({ injector, username: 'chat-actions' })
+  const chatInvitationDataSet = getDataSetFor(injector, ChatInvitation, 'id')
 
-  const chatInvitation = await chatInvitationStore.get(id)
+  const chatInvitation = await chatInvitationDataSet.get(systemInjector, id)
 
   if (!chatInvitation || chatInvitation.userId !== user.username) {
     throw new RequestError('Chat invitation not found or you are not the recipient', 404)
   }
 
-  const chatStore = storeManager.getStoreFor(Chat, 'id')
-  const chat = await chatStore.get(chatInvitation.chatId)
+  const chatDataSet = getDataSetFor(injector, Chat, 'id')
+  const chat = await chatDataSet.get(systemInjector, chatInvitation.chatId)
 
   if (!chat) {
     throw new RequestError('Chat not found', 404)
   }
 
-  await chatStore.update(chat.id, {
+  await chatDataSet.update(systemInjector, chat.id, {
     participants: Array.from(new Set([...chat.participants, user.username])),
   })
 
-  await chatInvitationStore.update(id, {
+  await chatInvitationDataSet.update(systemInjector, id, {
     status: 'accepted',
   })
 

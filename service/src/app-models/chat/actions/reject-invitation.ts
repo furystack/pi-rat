@@ -1,4 +1,5 @@
-import { getCurrentUser, StoreManager } from '@furystack/core'
+import { getCurrentUser, useSystemIdentityContext } from '@furystack/core'
+import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
 import { ChatInvitation, type RejectInvitationAction as RejectInvitationActionType } from 'common'
@@ -8,10 +9,10 @@ export const RejectInvitationAction: RequestAction<RejectInvitationActionType> =
 
   const { id } = getUrlParams()
 
-  const storeManager = injector.getInstance(StoreManager)
-  const chatInvitationStore = storeManager.getStoreFor(ChatInvitation, 'id')
+  const systemInjector = useSystemIdentityContext({ injector, username: 'chat-actions' })
+  const chatInvitationDataSet = getDataSetFor(injector, ChatInvitation, 'id')
 
-  const chatInvitation = await chatInvitationStore.get(id)
+  const chatInvitation = await chatInvitationDataSet.get(systemInjector, id)
 
   if (!chatInvitation || chatInvitation.userId !== user.username) {
     throw new RequestError('Chat invitation not found or you are not the recipient', 404)
@@ -21,7 +22,7 @@ export const RejectInvitationAction: RequestAction<RejectInvitationActionType> =
     throw new RequestError('Chat invitation is not pending. Only pending invitations can be rejected', 400)
   }
 
-  await chatInvitationStore.update(id, {
+  await chatInvitationDataSet.update(systemInjector, id, {
     status: 'rejected',
   })
 

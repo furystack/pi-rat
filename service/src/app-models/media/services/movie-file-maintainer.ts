@@ -1,7 +1,8 @@
-import { getStoreManager, StoreManager, type PhysicalStore } from '@furystack/core'
+import { useSystemIdentityContext } from '@furystack/core'
 import { Injectable, Injected, type Injector } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { PathHelper } from '@furystack/utils'
 import type { MoviesConfig, PiRatFile } from 'common'
 import { Config, Drive, getFallbackMetadata, isMovieFile, isSampleFile, MovieFile } from 'common'
@@ -18,15 +19,22 @@ export class MovieMaintainerService {
   @Injected((i) => getLogger(i).withScope('MovieFileMaintainer'))
   declare private logger: ScopedLogger
 
-  @Injected((injector) => getStoreManager(injector).getStoreFor(Config, 'id'))
-  declare private configStore: PhysicalStore<Config, 'id'>
+  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
+  declare private configDataSet: DataSet<Config, 'id'>
+
+  @Injected((injector) => getDataSetFor(injector, MovieFile, 'id'))
+  declare private movieFileDataSet: DataSet<MovieFile, 'id'>
+
+  @Injected((injector) => getDataSetFor(injector, Drive, 'letter'))
+  declare private driveDataSet: DataSet<Drive, 'letter'>
+
+  @Injected((injector) => useSystemIdentityContext({ injector, username: 'movie-maintainer' }))
+  declare private systemInjector: Injector
 
   declare private injector: Injector
   private onUnlink = async (file: PiRatFile) => {
     try {
-      const store = this.injector.getInstance(StoreManager).getStoreFor(MovieFile, 'id')
-
-      const existingMovies = await store.find({
+      const existingMovies = await this.movieFileDataSet.find(this.systemInjector, {
         filter: {
           path: { $eq: file.path },
           driveLetter: { $eq: file.driveLetter },
@@ -38,7 +46,7 @@ export class MovieMaintainerService {
           message: `🎬  A movie file has been removed, cleaning up '${file.path}' from DB...`,
           data: file,
         })
-        await store.remove(existingMovies[0].id)
+        await this.movieFileDataSet.remove(this.systemInjector, existingMovies[0].id)
       }
     } catch (error) {
       await this.logger.error({
@@ -50,10 +58,9 @@ export class MovieMaintainerService {
 
   private onUnlinkDir = async (file: PiRatFile) => {
     try {
-      const store = this.injector.getInstance(StoreManager).getStoreFor(MovieFile, 'id')
       const normalizedPath = PathHelper.normalize(file.path)
 
-      const existingMovies = await store.find({
+      const existingMovies = await this.movieFileDataSet.find(this.systemInjector, {
         filter: {
           path: { $like: `${normalizedPath}%` },
           driveLetter: { $eq: file.driveLetter },
@@ -70,7 +77,7 @@ export class MovieMaintainerService {
             })),
           },
         })
-        await store.remove(existingMovies[0].id)
+        await this.movieFileDataSet.remove(this.systemInjector, existingMovies[0].id)
       }
     } catch (error) {
       await this.logger.error({
@@ -107,7 +114,7 @@ export class MovieMaintainerService {
   private onAdd = async (file: PiRatFile) => {
     try {
       if (this.shouldTryLinkMovie(file)) {
-        await linkMovie({ injector: this.injector, file })
+        await linkMovie({ injector: this.systemInjector, file })
         if (this.shouldAutoExtractSubtitles()) {
           await this.logger.verbose({
             message: `🎬  Auto extracting subtitles for movie file '${file.path}'...`,
@@ -115,7 +122,7 @@ export class MovieMaintainerService {
           })
           try {
             await extractSubtitles({
-              injector: this.injector,
+              injector: this.systemInjector,
               file,
             })
           } catch (error) {
@@ -187,7 +194,7 @@ export class MovieMaintainerService {
   }
 
   public async init() {
-    this.config = (await this.configStore.get('MOVIES_CONFIG')) as MoviesConfig | undefined
+    this.config = (await this.configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
     this.addSubsciption = this.fileWatcherService.subscribe('add', (file) => void this.onAdd(file))
     this.unlinkDirSubscription = this.fileWatcherService.subscribe('unlinkDir', (dir) => void this.onUnlinkDir(dir))
     this.unlinkSubscription = this.fileWatcherService.subscribe('unlink', (file) => void this.onUnlink(file))
@@ -198,11 +205,10 @@ export class MovieMaintainerService {
       message: '🎬  Starting full sync of movie files...',
     })
 
-    const drivesStore = this.injector.getInstance(StoreManager).getStoreFor(Drive, 'letter')
-
-    const movieFilesStore = this.injector.getInstance(StoreManager).getStoreFor(MovieFile, 'id')
-
-    const [drives, alreadyAddedMovieFiles] = await Promise.all([drivesStore.find({}), movieFilesStore.find({})])
+    const [drives, alreadyAddedMovieFiles] = await Promise.all([
+      this.driveDataSet.find(this.systemInjector, {}),
+      this.movieFileDataSet.find(this.systemInjector, {}),
+    ])
 
     await this.logger.verbose({
       message: `🎬  Starting checking files on ${drives.length} drives...`,
@@ -239,21 +245,21 @@ export class MovieMaintainerService {
 }
 
 export const useMovieFileMaintainer = (injector: Injector) => {
-  const configStore = injector.getInstance(StoreManager).getStoreFor(Config, 'id')
+  const configDataSet = getDataSetFor(injector, Config, 'id')
 
-  configStore.subscribe('onEntityAdded', (config) => {
-    if (config.entity.id === 'MOVIES_CONFIG') {
+  configDataSet.subscribe('onEntityAdded', ({ entity }) => {
+    if (entity.id === 'MOVIES_CONFIG') {
       void injector.getInstance(MovieMaintainerService).init()
     }
   })
 
-  configStore.subscribe('onEntityUpdated', ({ id }) => {
+  configDataSet.subscribe('onEntityUpdated', ({ id }) => {
     if (id === 'MOVIES_CONFIG') {
       void injector.getInstance(MovieMaintainerService).init()
     }
   })
 
-  configStore.subscribe('onEntityRemoved', ({ key }) => {
+  configDataSet.subscribe('onEntityRemoved', ({ key }) => {
     if (key === 'MOVIES_CONFIG') {
       injector.getInstance(MovieMaintainerService)[Symbol.dispose]()
     }

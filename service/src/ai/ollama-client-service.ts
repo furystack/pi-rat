@@ -1,6 +1,7 @@
-import { getCurrentUser, getStoreManager, type PhysicalStore } from '@furystack/core'
+import { getCurrentUser, useSystemIdentityContext } from '@furystack/core'
 import { Injectable, Injected, type Injector } from '@furystack/inject'
 import { getLogger, type ScopedLogger } from '@furystack/logging'
+import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { AiChatMessage, Config, type AiChat, type OllamaConfig } from 'common'
 import type { Message } from 'ollama'
 import { Ollama, type ChatRequest } from 'ollama'
@@ -40,8 +41,14 @@ export class OllamaClientService {
   @Injected((injector) => getLogger(injector).withScope('Ollama Client Service'))
   declare private logger: ScopedLogger
 
-  @Injected((injector) => getStoreManager(injector).getStoreFor(AiChatMessage, 'id'))
-  declare private chatMessageStore: PhysicalStore<AiChatMessage, 'id'>
+  @Injected((injector) => getDataSetFor(injector, AiChatMessage, 'id'))
+  declare private chatMessageDataSet: DataSet<AiChatMessage, 'id'>
+
+  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
+  declare private configDataSet: DataSet<Config, 'id'>
+
+  @Injected((injector) => useSystemIdentityContext({ injector, username: 'ollama-service' }))
+  declare private systemInjector: Injector
 
   declare ollama: Ollama
 
@@ -56,10 +63,8 @@ export class OllamaClientService {
     )
   }
 
-  private getOllamaConfig = async (injector: Injector): Promise<OllamaConfig | undefined> => {
-    const storeManager = getStoreManager(injector)
-    const configStore = storeManager.getStoreFor(Config, 'id')
-    const [ollamaConfig] = await configStore.find({
+  private getOllamaConfig = async (): Promise<OllamaConfig | undefined> => {
+    const [ollamaConfig] = await this.configDataSet.find(this.systemInjector, {
       top: 1,
       filter: {
         id: { $eq: 'OLLAMA_CONFIG' },
@@ -73,8 +78,8 @@ export class OllamaClientService {
     return this.isValidOllamaConfig(ollamaConfig) ? ollamaConfig : undefined
   }
 
-  public async init(injector: Injector) {
-    const config = await this.getOllamaConfig(injector)
+  public async init() {
+    const config = await this.getOllamaConfig()
     if (!config) {
       this.config = undefined
       await this.logger.information({
@@ -239,7 +244,7 @@ export class OllamaClientService {
             })
           : result
 
-      await this.chatMessageStore.add({
+      await this.chatMessageDataSet.add(this.systemInjector, {
         aiChatId: chat.id,
         role: 'assistant',
         content: resultWithToolResponses.message.content,
