@@ -83,10 +83,10 @@ export const setupPatcher = async (injector: Injector) => {
   })
 
   getRepository(injector).createDataSet(PatchRun, 'id', {
-    authorizeAdd: alwaysDeny,
+    authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeRemove: alwaysDeny,
-    authorizeUpdate: alwaysDeny,
+    authorizeUpdate: withRole('admin'),
   })
 
   const systemInjector = useSystemIdentityContext({ injector, username: 'patcher' })
