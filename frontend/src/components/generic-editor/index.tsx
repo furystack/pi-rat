@@ -119,52 +119,57 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       )
     }
 
+    const extendedHeaderComponents = { actions: () => null, ...headerComponents }
+    const extendedRowComponents = {
+      selection: (entry: EntityFromProps<typeof props>) => (
+        <SelectionCell entry={entry} service={service as CollectionService<EntityFromProps<typeof props>>} />
+      ),
+      actions: (entry: EntityFromProps<typeof props>) => (
+        <div style={{ width: '156px' }}>
+          <Button
+            onclick={() => {
+              setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] })
+              refresh()
+            }}
+          >
+            ✏️
+          </Button>
+          <Button
+            onclick={() => {
+              service
+                .removeEntries(entry[service.extendedOptions.keyProperty])
+                .then(() => {
+                  noty.emit('onNotyAdded', {
+                    type: 'success',
+                    title: 'Entity deleted',
+                    body: '🗑️ The selected entity deleted successfully',
+                  })
+                  refresh()
+                })
+                .catch((error) => {
+                  noty.emit('onNotyAdded', {
+                    type: 'error',
+                    title: '❗ Failed to delete entity',
+                    body: (error as Error).toString(),
+                  })
+                })
+            }}
+          >
+            ❌
+          </Button>
+        </div>
+      ),
+      ...rowComponents,
+    }
+
     return (
       <>
         <DataGrid
           collectionService={service}
           findOptions={service.findOptions}
-          columns={['selection' as any, ...columns, 'actions' as any]}
-          headerComponents={{ actions: () => null, ...headerComponents }}
-          rowComponents={{
-            selection: (entry) => <SelectionCell entry={entry} service={service as CollectionService<any>} />,
-            actions: (entry) => (
-              <div style={{ width: '156px' }}>
-                <Button
-                  onclick={() => {
-                    setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] })
-                    refresh()
-                  }}
-                >
-                  ✏️
-                </Button>
-                <Button
-                  onclick={() => {
-                    service
-                      .removeEntries(entry[service.extendedOptions.keyProperty])
-                      .then(() => {
-                        noty.emit('onNotyAdded', {
-                          type: 'success',
-                          title: 'Entity deleted',
-                          body: '🗑️ The selected entity deleted successfully',
-                        })
-                        refresh()
-                      })
-                      .catch((error) => {
-                        noty.emit('onNotyAdded', {
-                          type: 'error',
-                          title: '❗ Failed to delete entity',
-                          body: (error as Error).toString(),
-                        })
-                      })
-                  }}
-                >
-                  ❌
-                </Button>
-              </div>
-            ),
-            ...rowComponents,
-          }}
+          columns={['selection', ...columns, 'actions'] as unknown as typeof columns}
+          headerComponents={extendedHeaderComponents as unknown as typeof headerComponents}
+          rowComponents={extendedRowComponents as unknown as typeof rowComponents}
           styles={{
             ...styles,
             header: { width: '128px', ...styles?.header },
