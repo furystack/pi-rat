@@ -46,7 +46,7 @@ export class MovieMaintainerService {
           message: `🎬  A movie file has been removed, cleaning up '${file.path}' from DB...`,
           data: file,
         })
-        await this.movieFileDataSet.remove(this.systemInjector, existingMovies[0].id)
+        await this.movieFileDataSet.remove(this.systemInjector, ...existingMovies.map((m) => m.id))
       }
     } catch (error) {
       await this.logger.error({
@@ -77,7 +77,7 @@ export class MovieMaintainerService {
             })),
           },
         })
-        await this.movieFileDataSet.remove(this.systemInjector, existingMovies[0].id)
+        await this.movieFileDataSet.remove(this.systemInjector, ...existingMovies.map((m) => m.id))
       }
     } catch (error) {
       await this.logger.error({

@@ -26,7 +26,6 @@ export const IotDevicesPage = Shade({
           keyProperty: 'name',
           readonlyProperties: [],
           deleteEntities: async (...entities) => {
-            // TODO: Bulk?
             await Promise.all(entities.map((entity) => iotService.deleteDevice(entity)))
           },
           getEntity: async (id) => {

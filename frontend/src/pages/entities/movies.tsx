@@ -29,8 +29,8 @@ export const MoviesPage = Shade({
             const result = await moviesService.findMovie(findOptions)
             return result
           },
-          deleteEntities: async (id) => {
-            await moviesService.deleteMovie(id)
+          deleteEntities: async (...ids) => {
+            await Promise.all(ids.map((id) => moviesService.deleteMovie(id)))
           },
           getEntity: async (id) => {
             const result = await moviesService.getMovie(id)

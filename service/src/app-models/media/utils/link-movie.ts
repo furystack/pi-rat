@@ -13,7 +13,6 @@ import {
 } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
-import { announceNewMovie } from './announce-new-movie.js'
 import { ensureMovieExists } from './ensure-movie-exists.js'
 import { ensureOmdbMovieExists } from './ensure-omdb-movie-exists.js'
 import { ensureOmdbSeriesExists } from './ensure-omdb-series-exists.js'
@@ -90,17 +89,6 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       ffprobe: ffprobeResult,
     })
 
-    await announceNewMovie({
-      injector,
-      file: {
-        driveLetter,
-        path,
-      },
-
-      movie,
-      movieFile: newMovieFile,
-    })
-
     await logger.debug({
       message: `File ${fileName} linked succesfully.`,
       data: { file, movieFile: newMovieFile, movie },
@@ -135,12 +123,5 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     ffprobe: ffprobeResult,
   })
 
-  await announceNewMovie({
-    injector,
-    file: { driveLetter, path },
-    movie,
-    movieFile: newMovieFile,
-  })
-
-  return { status: 'linked' } as const
+  return { status: 'linked', movieFile: newMovieFile, movie } as const
 }

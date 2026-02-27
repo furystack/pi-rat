@@ -33,8 +33,8 @@ export const ConfigPage = Shade({
             })
             return result
           },
-          deleteEntities: async (id) => {
-            await api.call({ method: 'DELETE', action: `/config/:id`, url: { id } })
+          deleteEntities: async (...ids) => {
+            await Promise.all(ids.map((id) => api.call({ method: 'DELETE', action: `/config/:id`, url: { id } })))
           },
           getEntity: async (id) => {
             const result = await api.call({ method: 'GET', action: `/config/:id`, url: { id }, query: {} })

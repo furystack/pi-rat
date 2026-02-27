@@ -33,8 +33,8 @@ export const UsersPage = Shade({
             })
             return result.result
           },
-          deleteEntities: async (id) => {
-            await api.call({ method: 'DELETE', action: `/users/:id`, url: { id } })
+          deleteEntities: async (...ids) => {
+            await Promise.all(ids.map((id) => api.call({ method: 'DELETE', action: `/users/:id`, url: { id } })))
           },
           getEntity: async (id) => {
             const result = await api.call({ method: 'GET', action: `/users/:id`, url: { id }, query: {} })
