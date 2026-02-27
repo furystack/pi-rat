@@ -29,7 +29,7 @@
     "@furystack/shades-common-components": "^13.0.1",
     "@furystack/shades-lottie": "^8.0.7",
     "@furystack/utils": "^8.1.10",
-    "@types/node": "^25.3.1",
+    "@types/node": "^25.3.2",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-search": "^0.16.0",
     "@xterm/addon-web-links": "^0.12.0",

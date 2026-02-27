@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { getRepository } from '@furystack/repository'
+import { getDataSetFor, getRepository } from '@furystack/repository'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
 import { PasswordCredential, PasswordResetToken, usePasswordPolicy } from '@furystack/security'
 import { useSequelize } from '@furystack/sequelize-store'
@@ -187,6 +187,7 @@ export const setupIdentity = async (injector: Injector) => {
 
   useHttpAuthentication(injector, {
     enableBasicAuth: false,
+    getUserDataSet: (i) => getDataSetFor(i, User, 'username'),
   })
 
   await UserModel.sequelize?.sync()
