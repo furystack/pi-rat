@@ -1,10 +1,11 @@
 import type { Injector } from '@furystack/inject'
+import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 
 import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
 
 import { getCurrentUser, isAuthorized } from '@furystack/core'
-import type { AuthorizationResult } from '@furystack/repository'
+import type { AuthorizationResult, DataSet } from '@furystack/repository'
 import { getDataSetFor, getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { DataTypes, Model } from 'sequelize'
@@ -123,6 +124,39 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
   declare Response: string
   declare createdAt: string
   declare updatedAt: string
+}
+
+export const announceMovieFileAdded = async ({
+  entity,
+  injector,
+  movieDataSet,
+  logger,
+}: {
+  entity: MovieFile
+  injector: Injector
+  movieDataSet: DataSet<Movie, 'imdbId'>
+  logger: ScopedLogger
+}) => {
+  if (!entity.imdbId) return
+  try {
+    const movie = await movieDataSet.get(injector, entity.imdbId)
+    if (movie) {
+      await injector.getInstance(WebsocketService).announce(
+        {
+          type: 'add-movie',
+          file: { driveLetter: entity.driveLetter, path: entity.path },
+          movie,
+          movieFile: entity,
+        },
+        async ({ injector: i }) => isAuthorized(i, 'admin'),
+      )
+    }
+  } catch (error) {
+    await logger.error({
+      message: `Failed to announce new movie file '${entity.path}'`,
+      data: { error },
+    })
+  }
 }
 
 export const setupMedia = async (injector: Injector) => {
@@ -666,28 +700,7 @@ export const setupMedia = async (injector: Injector) => {
   const movieDataSet = getDataSetFor(injector, Movie, 'imdbId')
 
   movieFileDataSet.subscribe('onEntityAdded', ({ entity }) => {
-    if (!entity.imdbId) return
-    void (async () => {
-      try {
-        const movie = await movieDataSet.get(injector, entity.imdbId as string)
-        if (movie) {
-          await injector.getInstance(WebsocketService).announce(
-            {
-              type: 'add-movie',
-              file: { driveLetter: entity.driveLetter, path: entity.path },
-              movie,
-              movieFile: entity,
-            },
-            async ({ injector: i }) => isAuthorized(i, 'admin'),
-          )
-        }
-      } catch (error) {
-        await logger.error({
-          message: `Failed to announce new movie file '${entity.path}'`,
-          data: { error },
-        })
-      }
-    })()
+    void announceMovieFileAdded({ entity, injector, movieDataSet, logger })
   })
 
   useMovieFileMaintainer(injector)

@@ -62,6 +62,6 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
 
   return JsonResult({
     status: true,
-    added: added.filter((file) => file.status === 'linked').map((file) => file.movieFile!),
+    added: added.filter((file) => file.status === 'linked').map((file) => file.movieFile),
   })
 }
