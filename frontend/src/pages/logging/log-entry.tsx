@@ -1,6 +1,9 @@
+import { useEntitySync } from '@furystack/entity-sync-client'
 import { createComponent, Shade } from '@furystack/shades'
+import { Skeleton } from '@furystack/shades-common-components'
+import { LogEntry as LogEntryModel } from 'common'
+import { GenericErrorPage } from '../../components/generic-error.js'
 import { MonacoEditor } from '../../components/monaco-editor.js'
-import { LoggingService } from '../../services/logging-service.js'
 
 export const LogEntry = Shade<{ id: string }>({
   shadowDomName: 'shade-app-log-entry-page',
@@ -13,10 +16,18 @@ export const LogEntry = Shade<{ id: string }>({
       height: 'calc(100% - 60px)',
     },
   },
-  render: ({ props, injector, useObservable }) => {
-    const { id } = props
-    const loggingService = injector.getInstance(LoggingService)
-    const [logEntry] = useObservable('logEntry', loggingService.getLogEntryAsObservable(id))
+  render: (options) => {
+    const { id } = options.props
+    const logEntryState = useEntitySync(options, LogEntryModel, id)
+
+    if (logEntryState.status === 'connecting') {
+      return <Skeleton />
+    }
+
+    if (logEntryState.status === 'error') {
+      return <GenericErrorPage error={logEntryState.error} />
+    }
+
     return (
       <div className="log-entry-container">
         <MonacoEditor
@@ -24,7 +35,7 @@ export const LogEntry = Shade<{ id: string }>({
             language: 'json',
             readOnly: true,
           }}
-          value={JSON.stringify(logEntry.value, null, 2)}
+          value={JSON.stringify(logEntryState.data, null, 2)}
         />
       </div>
     )

@@ -1,9 +1,9 @@
+import { useCollectionSync } from '@furystack/entity-sync-client'
 import { createComponent, Shade } from '@furystack/shades'
 import { Paper } from '@furystack/shades-common-components'
+import { AiChatMessage } from 'common'
 import { marked } from 'marked'
 import { ErrorDisplay } from '../../components/error-display.js'
-import { WebsocketNotificationsService } from '../../services/websocket-events.js'
-import { AiChatMessageService } from './ai-chat-message-service.js'
 
 export const AiChatMessageList = Shade<{
   selectedChatId: string
@@ -14,33 +14,16 @@ export const AiChatMessageList = Shade<{
     width: '100%',
     height: 'calc(100% - 124px)',
   },
-  render: ({ useObservable, injector, props, useDisposable, useRef }) => {
+  render: (options) => {
+    const { props, useRef } = options
     const { selectedChatId } = props
-    const aiChatService = injector.getInstance(AiChatMessageService)
     const containerRef = useRef<HTMLDivElement>('container')
 
-    const [messages] = useObservable(
-      'messages',
-      aiChatService.getChatMessagesAsObservable({
-        filter: {
-          aiChatId: { $eq: selectedChatId },
-        },
-      }),
-    )
-
-    const wsService = injector.getInstance(WebsocketNotificationsService)
-
-    useDisposable('webSocketSubscription', () =>
-      wsService.subscribe('onMessage', async (message) => {
-        if (message.type !== 'ai-chat-message-added') {
-          return
-        }
-        if (message.aiChatMessage.aiChatId !== selectedChatId) {
-          return
-        }
-        scrollToBottom('smooth')
-      }),
-    )
+    const messagesState = useCollectionSync(options, AiChatMessage, {
+      filter: {
+        aiChatId: { $eq: selectedChatId },
+      },
+    })
 
     const scrollToBottom = (behavior: ScrollBehavior = 'instant') => {
       setTimeout(() => {
@@ -56,20 +39,12 @@ export const AiChatMessageList = Shade<{
       }, 1)
     }
 
-    if (!messages?.value) {
+    if (messagesState.status === 'connecting') {
       return <div>Loading messages...</div>
     }
 
-    if (messages.status === 'failed') {
-      return <ErrorDisplay error={messages.error} />
-    }
-
-    if (messages.status === 'obsolete') {
-      void aiChatService.getChatMessages({
-        filter: {
-          aiChatId: { $eq: selectedChatId },
-        },
-      })
+    if (messagesState.status === 'error') {
+      return <ErrorDisplay error={messagesState.error} />
     }
 
     scrollToBottom()
@@ -85,7 +60,7 @@ export const AiChatMessageList = Shade<{
           overflowY: 'auto',
         }}
       >
-        {messages.value.result.entries.map((message) => {
+        {messagesState.data.entries.map((message) => {
           try {
             const fromJson = JSON.parse(message.content) as { content: string; thinking?: string }
             const { content, thinking } = fromJson

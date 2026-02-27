@@ -11,14 +11,6 @@ export const LoggingPage = Shade({
   render: ({ useDisposable, injector }) => {
     const loggingService = injector.getInstance(LoggingService)
 
-    // Initialize the logging service to listen for WebSocket messages
-    useDisposable('logging-service-websocket', () => {
-      loggingService.init()
-      return {
-        [Symbol.dispose]: () => loggingService.dispose(),
-      }
-    })
-
     const modelProvider = injector.getInstance(MonacoModelProvider)
 
     const modelUri = modelProvider.getModelUriForEntityType({
@@ -34,7 +26,6 @@ export const LoggingPage = Shade({
           keyProperty: 'id',
           readonlyProperties: [],
           deleteEntities: async () => {
-            // TODO: Bulk?
             throw new Error('Delete not supported for logging entries')
           },
           getEntity: async (id) => {

@@ -1,11 +1,10 @@
-import { getCurrentUser, IdentityContext, useSystemIdentityContext } from '@furystack/core'
+import { IdentityContext, useSystemIdentityContext } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { usingAsync } from '@furystack/utils'
 import { AiChat, AiChatMessage, Config, User } from 'common'
 import { ImpersonatedIdentityContext } from '../utils/impersonated-identity-context.js'
-import { WebsocketService } from '../websocket-service.js'
 import { OllamaClientService } from './ollama-client-service.js'
 import { setupAiStore } from './setup-ai-store.js'
 
@@ -35,20 +34,6 @@ export const setupAi = async (injector: Injector) => {
   const chatMessageDataSet = getDataSetFor(injector, AiChatMessage, 'id')
   const chatDataSet = getDataSetFor(injector, AiChat, 'id')
   const userDataSet = getDataSetFor(injector, User, 'username')
-
-  chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
-    const ws = injector.getInstance(WebsocketService)
-    await ws.announce(
-      {
-        type: 'ai-chat-message-added',
-        aiChatMessage: entity,
-      },
-      async ({ injector: i }) => {
-        const user = await getCurrentUser(i)
-        return user.username === entity.owner
-      },
-    )
-  })
 
   chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
     const chat = await chatDataSet.get(systemInjector, entity.aiChatId)

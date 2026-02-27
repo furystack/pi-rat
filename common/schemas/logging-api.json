@@ -2,224 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$ref": "#/definitions/LoggingApi",
   "definitions": {
-    "LoggingApi": {
-      "type": "object",
-      "properties": {
-        "GET": {
-          "type": "object",
-          "properties": {
-            "/logs": {
-              "$ref": "#/definitions/GetCollectionEndpoint%3CLogEntry%3E"
-            },
-            "/logs/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CLogEntry%2C%22id%22%3E"
-            }
-          },
-          "required": ["/logs", "/logs/:id"],
-          "additionalProperties": false
-        },
-        "POST": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PATCH": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PUT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "DELETE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "HEAD": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "CONNECT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "TRACE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "OPTIONS": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        }
-      },
-      "required": ["GET"],
-      "additionalProperties": false
-    },
-    "GetCollectionEndpoint<LogEntry>": {
-      "type": "object",
-      "properties": {
-        "query": {
-          "type": "object",
-          "properties": {
-            "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CLogEntry%2C(%22id%22%7C%22scope%22%7C%22message%22%7C%22data%22%7C%22level%22%7C%22createdAt%22)%5B%5D%3E"
-            }
-          },
-          "additionalProperties": false
-        },
-        "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CLogEntry%3E"
-        }
-      },
-      "required": ["query", "result"],
-      "additionalProperties": false,
-      "description": "Rest endpoint model for getting / querying collections"
-    },
-    "FindOptions<LogEntry,(\"id\"|\"scope\"|\"message\"|\"data\"|\"level\"|\"createdAt\")[]>": {
-      "type": "object",
-      "properties": {
-        "top": {
-          "type": "number",
-          "description": "Limits the hits"
-        },
-        "skip": {
-          "type": "number",
-          "description": "Skips the first N hit"
-        },
-        "order": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "scope": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "message": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "data": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "level": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "createdAt": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            }
-          },
-          "additionalProperties": false,
-          "description": "Sets up an order by a field and a direction"
-        },
-        "select": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["id", "scope", "message", "data", "level", "createdAt"]
-          },
-          "description": "The result set will be limited to these fields"
-        },
-        "filter": {
-          "$ref": "#/definitions/FilterType%3CLogEntry%3E",
-          "description": "The fields should match this filter"
-        }
-      },
-      "additionalProperties": false,
-      "description": "Type for default filtering model"
-    },
     "FilterType<LogEntry>": {
       "type": "object",
       "additionalProperties": false,
@@ -596,10 +378,83 @@
         }
       }
     },
-    "LogLevel": {
-      "type": "string",
-      "enum": ["verbose", "debug", "information", "warning", "error", "fatal"],
-      "description": "The verbosity level of a log entry"
+    "FindOptions<LogEntry,(\"id\"|\"scope\"|\"message\"|\"data\"|\"level\"|\"createdAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "scope": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "message": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "data": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "level": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["id", "scope", "message", "data", "level", "createdAt"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CLogEntry%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "GetCollectionEndpoint<LogEntry>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CLogEntry%2C(%22id%22%7C%22scope%22%7C%22message%22%7C%22data%22%7C%22level%22%7C%22createdAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CLogEntry%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
     },
     "GetCollectionResult<LogEntry>": {
       "type": "object",
@@ -619,37 +474,6 @@
       "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
-    },
-    "LogEntry": {
-      "type": "object",
-      "properties": {
-        "scope": {
-          "type": "string",
-          "description": "The scope of the log entry"
-        },
-        "message": {
-          "type": "string",
-          "description": "A short message describing the log entry"
-        },
-        "data": {
-          "description": "Additional structured data"
-        },
-        "level": {
-          "$ref": "#/definitions/LogLevel",
-          "description": "The log level"
-        },
-        "id": {
-          "type": "string",
-          "description": "The unique identifier of the log entry"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The creation timestamp"
-        }
-      },
-      "required": ["createdAt", "id", "level", "message", "scope"],
-      "additionalProperties": false,
-      "description": "A log entry model"
     },
     "GetEntityEndpoint<LogEntry,\"id\">": {
       "type": "object",
@@ -686,6 +510,182 @@
       "required": ["query", "url", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
+    },
+    "LogEntry": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "description": "The scope of the log entry"
+        },
+        "message": {
+          "type": "string",
+          "description": "A short message describing the log entry"
+        },
+        "data": {
+          "description": "Additional structured data"
+        },
+        "level": {
+          "$ref": "#/definitions/LogLevel",
+          "description": "The log level"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the log entry"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The creation timestamp"
+        }
+      },
+      "required": ["createdAt", "id", "level", "message", "scope"],
+      "additionalProperties": false,
+      "description": "A log entry model"
+    },
+    "LoggingApi": {
+      "type": "object",
+      "properties": {
+        "GET": {
+          "type": "object",
+          "properties": {
+            "/logs": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CLogEntry%3E"
+            },
+            "/logs/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CLogEntry%2C%22id%22%3E"
+            }
+          },
+          "required": ["/logs", "/logs/:id"],
+          "additionalProperties": false
+        },
+        "POST": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "PATCH": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "PUT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "DELETE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["GET"],
+      "additionalProperties": false
+    },
+    "LogLevel": {
+      "type": "string",
+      "enum": ["verbose", "debug", "information", "warning", "error", "fatal"],
+      "description": "The verbosity level of a log entry"
     }
   }
 }

@@ -1,18 +1,24 @@
-import type { CacheWithValue } from '@furystack/cache'
+import { useEntitySync } from '@furystack/entity-sync-client'
 import { createComponent, Shade } from '@furystack/shades'
-import { CacheView, Paper } from '@furystack/shades-common-components'
-import type { Chat } from 'common'
+import { Paper } from '@furystack/shades-common-components'
+import { Chat } from 'common'
 import { FullScreenLoader } from '../../components/fullscreen-loader.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
-import { ChatService } from './chat-service.js'
 import { DeleteChatButton } from './delete-chat-button.js'
 import { InviteButton } from './invite-button.js'
 import { MessageInput } from './message-input.js'
 import { MessageList } from './message-list.js'
 
-const ChatFlowContent = Shade<{ data: CacheWithValue<Chat> }>({
-  shadowDomName: 'shade-app-chat-flow-content',
+export const ChatFlow = Shade({
+  shadowDomName: 'shade-app-chat-flow',
   css: {
+    display: 'flex',
+    '& .empty-state': {
+      flexGrow: '1',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     '& .chat-container': {
       flexGrow: '1',
       display: 'flex',
@@ -32,8 +38,34 @@ const ChatFlowContent = Shade<{ data: CacheWithValue<Chat> }>({
       overflow: 'hidden',
     },
   },
-  render: ({ props }) => {
-    const chat = props.data.value
+  render: (options) => {
+    const { useSearchState } = options
+    const [selectedChatId] = useSearchState('selectedChatId', '')
+
+    if (!selectedChatId) {
+      return (
+        <Paper className="empty-state">
+          <h2>Select a chat to start</h2>
+        </Paper>
+      )
+    }
+
+    const chatState = useEntitySync(options, Chat, selectedChatId)
+
+    if (chatState.status === 'connecting') {
+      return <FullScreenLoader />
+    }
+
+    if (chatState.status === 'error') {
+      return <GenericErrorPage error={chatState.error} />
+    }
+
+    if (!chatState.data) {
+      return <FullScreenLoader />
+    }
+
+    const chat = chatState.data
+
     return (
       <Paper className="chat-container">
         <h2>{chat.name}</h2>
@@ -53,41 +85,6 @@ const ChatFlowContent = Shade<{ data: CacheWithValue<Chat> }>({
           <MessageInput chat={chat} />
         </div>
       </Paper>
-    )
-  },
-})
-
-export const ChatFlow = Shade({
-  shadowDomName: 'shade-app-chat-flow',
-  css: {
-    display: 'flex',
-    '& .empty-state': {
-      flexGrow: '1',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  },
-  render: ({ injector, useSearchState }) => {
-    const chatService = injector.getInstance(ChatService)
-    const [selectedChatId] = useSearchState('selectedChatId', '')
-
-    if (!selectedChatId) {
-      return (
-        <Paper className="empty-state">
-          <h2>Select a chat to start</h2>
-        </Paper>
-      )
-    }
-
-    return (
-      <CacheView
-        cache={chatService.chatCache}
-        args={[selectedChatId]}
-        content={ChatFlowContent}
-        loader={<FullScreenLoader />}
-        error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
-      />
     )
   },
 })

@@ -1,7 +1,64 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "GetDirectoryEntries": {
+    "ChapterData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "start": {
+          "type": "number"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "end": {
+          "type": "number"
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "time_base": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": ["title"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
+      "additionalProperties": false
+    },
+    "DeleteEndpoint<Drive,\"letter\">": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The drive letter, should be unique"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for deleting entities"
+    },
+    "DeleteFileEndpoint": {
       "type": "object",
       "properties": {
         "url": {
@@ -18,30 +75,19 @@
           "additionalProperties": false
         },
         "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CDirectoryEntry%3E"
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": ["success"],
+          "additionalProperties": false
         }
       },
       "required": ["url", "result"],
       "additionalProperties": false
-    },
-    "GetCollectionResult<DirectoryEntry>": {
-      "type": "object",
-      "properties": {
-        "count": {
-          "type": "number",
-          "description": "The Total count of entities"
-        },
-        "entries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DirectoryEntry"
-          },
-          "description": "List of the selected entities"
-        }
-      },
-      "required": ["count", "entries"],
-      "additionalProperties": false,
-      "description": "Response Model for GetCollection"
     },
     "DirectoryEntry": {
       "type": "object",
@@ -83,75 +129,6 @@
       ],
       "additionalProperties": false
     },
-    "UploadEndpoint": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean",
-              "const": true
-            },
-            "entries": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/DirectoryEntry"
-              }
-            }
-          },
-          "required": ["success", "entries"],
-          "additionalProperties": false
-        },
-        "url": {
-          "type": "object",
-          "properties": {
-            "letter": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": ["letter", "path"],
-          "additionalProperties": false
-        },
-        "body": {}
-      },
-      "required": ["result", "url", "body"],
-      "additionalProperties": false
-    },
-    "DeleteFileEndpoint": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "object",
-          "properties": {
-            "letter": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": ["letter", "path"],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean",
-              "const": true
-            }
-          },
-          "required": ["success"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["url", "result"],
-      "additionalProperties": false
-    },
     "DownloadEndpoint": {
       "type": "object",
       "properties": {
@@ -171,37 +148,6 @@
         "result": {}
       },
       "required": ["url", "result"],
-      "additionalProperties": false
-    },
-    "PostDriveEndpoint": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/Omit%3CWithOptionalId%3CDrive%2C%22letter%22%3E%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
-        },
-        "result": {
-          "$ref": "#/definitions/Drive"
-        }
-      },
-      "required": ["body", "result"],
-      "additionalProperties": false
-    },
-    "Omit<WithOptionalId<Drive,\"letter\">,(\"createdAt\"|\"updatedAt\")>": {
-      "$ref": "#/definitions/Pick%3CWithOptionalId%3CDrive%2C%22letter%22%3E%2CExclude%3C(%22physicalPath%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22letter%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
-    },
-    "Pick<WithOptionalId<Drive,\"letter\">,Exclude<(\"physicalPath\"|\"createdAt\"|\"updatedAt\"|\"letter\"),(\"createdAt\"|\"updatedAt\")>>": {
-      "type": "object",
-      "properties": {
-        "physicalPath": {
-          "type": "string",
-          "description": "The physical path that will be mounted to the drive letter"
-        },
-        "letter": {
-          "type": "string",
-          "description": "The drive letter, should be unique"
-        }
-      },
-      "required": ["physicalPath"],
       "additionalProperties": false
     },
     "Drive": {
@@ -229,42 +175,167 @@
       "required": ["physicalPath", "letter", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
-    "PatchDriveEndpoint": {
+    "DrivesApi": {
       "type": "object",
       "properties": {
-        "body": {
-          "$ref": "#/definitions/Partial%3COmit%3CDrive%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
-        },
-        "url": {
+        "GET": {
           "type": "object",
           "properties": {
-            "id": {
-              "type": "string",
-              "description": "The drive letter, should be unique"
+            "/volumes": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CDrive%3E"
+            },
+            "/volumes/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CDrive%2C%22letter%22%3E"
+            },
+            "/files/:letter/:path": {
+              "$ref": "#/definitions/GetDirectoryEntries"
+            },
+            "/files/:letter/:path/download": {
+              "$ref": "#/definitions/DownloadEndpoint"
+            },
+            "/files/:letter/:path/ffprobe": {
+              "$ref": "#/definitions/FfprobeEndpoint"
             }
           },
-          "required": ["id"],
+          "required": [
+            "/volumes",
+            "/volumes/:id",
+            "/files/:letter/:path",
+            "/files/:letter/:path/download",
+            "/files/:letter/:path/ffprobe"
+          ],
           "additionalProperties": false
         },
-        "result": {
-          "type": "object"
+        "POST": {
+          "type": "object",
+          "properties": {
+            "/volumes": {
+              "$ref": "#/definitions/PostDriveEndpoint"
+            },
+            "/volumes/:letter/:path/upload": {
+              "$ref": "#/definitions/UploadEndpoint"
+            }
+          },
+          "required": ["/volumes", "/volumes/:letter/:path/upload"],
+          "additionalProperties": false
+        },
+        "PATCH": {
+          "type": "object",
+          "properties": {
+            "/volumes/:id": {
+              "$ref": "#/definitions/PatchEndpoint%3CDrive%2C%22letter%22%3E"
+            }
+          },
+          "required": ["/volumes/:id"],
+          "additionalProperties": false
+        },
+        "PUT": {
+          "type": "object",
+          "properties": {
+            "/files/:letter/:path": {
+              "$ref": "#/definitions/SaveTextFileEndpoint"
+            }
+          },
+          "required": ["/files/:letter/:path"],
+          "additionalProperties": false
+        },
+        "DELETE": {
+          "type": "object",
+          "properties": {
+            "/volumes/:id": {
+              "$ref": "#/definitions/DeleteEndpoint%3CDrive%2C%22letter%22%3E"
+            },
+            "/files/:letter/:path": {
+              "$ref": "#/definitions/DeleteFileEndpoint"
+            }
+          },
+          "required": ["/volumes/:id", "/files/:letter/:path"],
+          "additionalProperties": false
+        },
+        "HEAD": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "CONNECT": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "TRACE": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
+        },
+        "OPTIONS": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "result": {},
+              "url": {},
+              "query": {},
+              "body": {},
+              "headers": {}
+            },
+            "required": ["result"],
+            "additionalProperties": false
+          }
         }
       },
-      "required": ["body", "url", "result"],
+      "required": ["GET", "POST", "PUT", "PATCH", "DELETE"],
       "additionalProperties": false
     },
-    "Partial<Omit<Drive,(\"createdAt\"|\"updatedAt\")>>": {
+    "FfprobeData": {
       "type": "object",
       "properties": {
-        "physicalPath": {
-          "type": "string",
-          "description": "The physical path that will be mounted to the drive letter"
+        "streams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FfprobeStream"
+          }
         },
-        "letter": {
-          "type": "string",
-          "description": "The drive letter, should be unique"
+        "format": {
+          "$ref": "#/definitions/FfprobeFormat"
+        },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChapterData"
+          }
         }
       },
+      "required": ["streams", "format", "chapters"],
       "additionalProperties": false
     },
     "FfprobeEndpoint": {
@@ -290,27 +361,41 @@
       "required": ["url", "result"],
       "additionalProperties": false
     },
-    "FfprobeData": {
+    "FfprobeFormat": {
       "type": "object",
       "properties": {
-        "streams": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/FfprobeStream"
-          }
+        "filename": {
+          "type": "string"
         },
-        "format": {
-          "$ref": "#/definitions/FfprobeFormat"
+        "nb_streams": {
+          "type": "number"
         },
-        "chapters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ChapterData"
-          }
-        }
-      },
-      "required": ["streams", "format", "chapters"],
-      "additionalProperties": false
+        "nb_programs": {
+          "type": "number"
+        },
+        "format_name": {
+          "type": "string"
+        },
+        "format_long_name": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "number"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        },
+        "bit_rate": {
+          "type": "number"
+        },
+        "probe_score": {
+          "type": "number"
+        },
+        "tags": {}
+      }
     },
     "FfprobeStream": {
       "type": "object",
@@ -496,470 +581,6 @@
           "type": "number"
         }
       }
-    },
-    "FfprobeFormat": {
-      "type": "object",
-      "properties": {
-        "filename": {
-          "type": "string"
-        },
-        "nb_streams": {
-          "type": "number"
-        },
-        "nb_programs": {
-          "type": "number"
-        },
-        "format_name": {
-          "type": "string"
-        },
-        "format_long_name": {
-          "type": "string"
-        },
-        "start_time": {
-          "type": "number"
-        },
-        "duration": {
-          "type": "number"
-        },
-        "size": {
-          "type": "number"
-        },
-        "bit_rate": {
-          "type": "number"
-        },
-        "probe_score": {
-          "type": "number"
-        },
-        "tags": {}
-      }
-    },
-    "ChapterData": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "number"
-        },
-        "start": {
-          "type": "number"
-        },
-        "start_time": {
-          "type": "string"
-        },
-        "end": {
-          "type": "number"
-        },
-        "end_time": {
-          "type": "string"
-        },
-        "time_base": {
-          "type": "string"
-        },
-        "tags": {
-          "type": "object",
-          "properties": {
-            "title": {
-              "type": "string"
-            }
-          },
-          "required": ["title"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
-      "additionalProperties": false
-    },
-    "SaveTextFileEndpoint": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "object",
-          "properties": {
-            "letter": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": ["letter", "path"],
-          "additionalProperties": false
-        },
-        "body": {
-          "type": "object",
-          "properties": {
-            "text": {
-              "type": "string"
-            }
-          },
-          "required": ["text"],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean",
-              "const": true
-            }
-          },
-          "required": ["success"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["url", "body", "result"],
-      "additionalProperties": false
-    },
-    "DrivesApi": {
-      "type": "object",
-      "properties": {
-        "GET": {
-          "type": "object",
-          "properties": {
-            "/volumes": {
-              "$ref": "#/definitions/GetCollectionEndpoint%3CDrive%3E"
-            },
-            "/volumes/:id": {
-              "$ref": "#/definitions/GetEntityEndpoint%3CDrive%2C%22letter%22%3E"
-            },
-            "/files/:letter/:path": {
-              "$ref": "#/definitions/GetDirectoryEntries"
-            },
-            "/files/:letter/:path/download": {
-              "$ref": "#/definitions/DownloadEndpoint"
-            },
-            "/files/:letter/:path/ffprobe": {
-              "$ref": "#/definitions/FfprobeEndpoint"
-            }
-          },
-          "required": [
-            "/volumes",
-            "/volumes/:id",
-            "/files/:letter/:path",
-            "/files/:letter/:path/download",
-            "/files/:letter/:path/ffprobe"
-          ],
-          "additionalProperties": false
-        },
-        "POST": {
-          "type": "object",
-          "properties": {
-            "/volumes": {
-              "$ref": "#/definitions/PostDriveEndpoint"
-            },
-            "/volumes/:letter/:path/upload": {
-              "$ref": "#/definitions/UploadEndpoint"
-            }
-          },
-          "required": ["/volumes", "/volumes/:letter/:path/upload"],
-          "additionalProperties": false
-        },
-        "PATCH": {
-          "type": "object",
-          "properties": {
-            "/volumes/:id": {
-              "$ref": "#/definitions/PatchEndpoint%3CDrive%2C%22letter%22%3E"
-            }
-          },
-          "required": ["/volumes/:id"],
-          "additionalProperties": false
-        },
-        "PUT": {
-          "type": "object",
-          "properties": {
-            "/files/:letter/:path": {
-              "$ref": "#/definitions/SaveTextFileEndpoint"
-            }
-          },
-          "required": ["/files/:letter/:path"],
-          "additionalProperties": false
-        },
-        "DELETE": {
-          "type": "object",
-          "properties": {
-            "/volumes/:id": {
-              "$ref": "#/definitions/DeleteEndpoint%3CDrive%2C%22letter%22%3E"
-            },
-            "/files/:letter/:path": {
-              "$ref": "#/definitions/DeleteFileEndpoint"
-            }
-          },
-          "required": ["/volumes/:id", "/files/:letter/:path"],
-          "additionalProperties": false
-        },
-        "HEAD": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "CONNECT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "TRACE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "OPTIONS": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        }
-      },
-      "required": ["GET", "POST", "PUT", "PATCH", "DELETE"],
-      "additionalProperties": false
-    },
-    "RestApi": {
-      "type": "object",
-      "properties": {
-        "GET": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "POST": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PATCH": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PUT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "DELETE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "HEAD": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "CONNECT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "TRACE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "OPTIONS": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "GetCollectionEndpoint<Drive>": {
-      "type": "object",
-      "properties": {
-        "query": {
-          "type": "object",
-          "properties": {
-            "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CDrive%2C(%22physicalPath%22%7C%22letter%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
-            }
-          },
-          "additionalProperties": false
-        },
-        "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CDrive%3E"
-        }
-      },
-      "required": ["query", "result"],
-      "additionalProperties": false,
-      "description": "Rest endpoint model for getting / querying collections"
-    },
-    "FindOptions<Drive,(\"physicalPath\"|\"letter\"|\"createdAt\"|\"updatedAt\")[]>": {
-      "type": "object",
-      "properties": {
-        "top": {
-          "type": "number",
-          "description": "Limits the hits"
-        },
-        "skip": {
-          "type": "number",
-          "description": "Skips the first N hit"
-        },
-        "order": {
-          "type": "object",
-          "properties": {
-            "physicalPath": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "letter": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "createdAt": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "updatedAt": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            }
-          },
-          "additionalProperties": false,
-          "description": "Sets up an order by a field and a direction"
-        },
-        "select": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["physicalPath", "letter", "createdAt", "updatedAt"]
-          },
-          "description": "The result set will be limited to these fields"
-        },
-        "filter": {
-          "$ref": "#/definitions/FilterType%3CDrive%3E",
-          "description": "The fields should match this filter"
-        }
-      },
-      "additionalProperties": false,
-      "description": "Type for default filtering model"
     },
     "FilterType<Drive>": {
       "type": "object",
@@ -1247,6 +868,95 @@
         }
       }
     },
+    "FindOptions<Drive,(\"physicalPath\"|\"letter\"|\"createdAt\"|\"updatedAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "physicalPath": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "letter": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["physicalPath", "letter", "createdAt", "updatedAt"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CDrive%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "GetCollectionEndpoint<Drive>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CDrive%2C(%22physicalPath%22%7C%22letter%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CDrive%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "GetCollectionResult<DirectoryEntry>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DirectoryEntry"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
     "GetCollectionResult<Drive>": {
       "type": "object",
       "properties": {
@@ -1265,6 +975,29 @@
       "required": ["count", "entries"],
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
+    },
+    "GetDirectoryEntries": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CDirectoryEntry%3E"
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false
     },
     "GetEntityEndpoint<Drive,\"letter\">": {
       "type": "object",
@@ -1302,30 +1035,8 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
-    "PatchEndpoint<Drive,\"letter\">": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/Partial%3CDrive%3E"
-        },
-        "url": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The drive letter, should be unique"
-            }
-          },
-          "required": ["id"],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object"
-        }
-      },
-      "required": ["body", "url", "result"],
-      "additionalProperties": false,
-      "description": "Endpoint model for updating entities"
+    "Omit<WithOptionalId<Drive,\"letter\">,(\"createdAt\"|\"updatedAt\")>": {
+      "$ref": "#/definitions/Pick%3CWithOptionalId%3CDrive%2C%22letter%22%3E%2CExclude%3C(%22physicalPath%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22letter%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
     },
     "Partial<Drive>": {
       "type": "object",
@@ -1351,9 +1062,26 @@
       },
       "additionalProperties": false
     },
-    "DeleteEndpoint<Drive,\"letter\">": {
+    "Partial<Omit<Drive,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
+        "physicalPath": {
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "letter": {
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PatchDriveEndpoint": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3COmit%3CDrive%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+        },
         "url": {
           "type": "object",
           "properties": {
@@ -1369,9 +1097,140 @@
           "type": "object"
         }
       },
-      "required": ["url", "result"],
+      "required": ["body", "url", "result"],
+      "additionalProperties": false
+    },
+    "PatchEndpoint<Drive,\"letter\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CDrive%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The drive letter, should be unique"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["body", "url", "result"],
       "additionalProperties": false,
-      "description": "Endpoint model for deleting entities"
+      "description": "Endpoint model for updating entities"
+    },
+    "Pick<WithOptionalId<Drive,\"letter\">,Exclude<(\"physicalPath\"|\"createdAt\"|\"updatedAt\"|\"letter\"),(\"createdAt\"|\"updatedAt\")>>": {
+      "type": "object",
+      "properties": {
+        "physicalPath": {
+          "type": "string",
+          "description": "The physical path that will be mounted to the drive letter"
+        },
+        "letter": {
+          "type": "string",
+          "description": "The drive letter, should be unique"
+        }
+      },
+      "required": ["physicalPath"],
+      "additionalProperties": false
+    },
+    "PostDriveEndpoint": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Omit%3CWithOptionalId%3CDrive%2C%22letter%22%3E%2C(%22createdAt%22%7C%22updatedAt%22)%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/Drive"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false
+    },
+    "SaveTextFileEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": ["text"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": ["success"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["url", "body", "result"],
+      "additionalProperties": false
+    },
+    "UploadEndpoint": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "const": true
+            },
+            "entries": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DirectoryEntry"
+              }
+            }
+          },
+          "required": ["success", "entries"],
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "body": {}
+      },
+      "required": ["result", "url", "body"],
+      "additionalProperties": false
     }
   }
 }
