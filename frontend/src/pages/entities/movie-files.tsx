@@ -26,7 +26,9 @@ export const MovieFilesPage = Shade({
           keyProperty: 'id',
           readonlyProperties: [],
           getEntities: async (findOptions) => await movieFilesService.findMovieFile(findOptions),
-          deleteEntities: async (id) => await movieFilesService.deleteMovieFile(id),
+          deleteEntities: async (...ids) => {
+            await Promise.all(ids.map((id) => movieFilesService.deleteMovieFile(id)))
+          },
           getEntity: async (id) => await movieFilesService.getMovieFile(id),
           patchEntity: async (id, entity) => {
             await movieFilesService.updateMovieFile(id, entity)

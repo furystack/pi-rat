@@ -30,8 +30,8 @@ export const DashboardsPage = Shade({
             const result = await dashboardsService.findDashboard(findOptions)
             return result
           },
-          deleteEntities: async (id) => {
-            await dashboardsService.deleteDashboard(id)
+          deleteEntities: async (...ids) => {
+            await Promise.all(ids.map((id) => dashboardsService.deleteDashboard(id)))
           },
           getEntity: async (id) => {
             const result = dashboardsService.getDashboard(id)

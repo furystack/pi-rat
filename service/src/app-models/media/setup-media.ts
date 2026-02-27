@@ -5,7 +5,7 @@ import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchH
 
 import { getCurrentUser, isAuthorized } from '@furystack/core'
 import type { AuthorizationResult } from '@furystack/repository'
-import { getRepository } from '@furystack/repository'
+import { getDataSetFor, getRepository } from '@furystack/repository'
 import { useSequelize } from '@furystack/sequelize-store'
 import { DataTypes, Model } from 'sequelize'
 
@@ -13,6 +13,7 @@ import { authorizedOnly } from '../../authorization/authorized-only.js'
 import { withRole } from '../../authorization/with-role.js'
 import type { FfprobeResult } from '../../ffprobe-service.js'
 import { getDefaultDbSettings } from '../../get-default-db-options.js'
+import { WebsocketService } from '../../websocket-service.js'
 import { OmdbClientService } from './metadata-services/omdb-client-service.js'
 import { useMovieFileMaintainer } from './services/movie-file-maintainer.js'
 
@@ -660,6 +661,27 @@ export const setupMedia = async (injector: Injector) => {
   })
 
   injector.getInstance(OmdbClientService)
+
+  const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
+  const movieDataSet = getDataSetFor(injector, Movie, 'imdbId')
+
+  movieFileDataSet.subscribe('onEntityAdded', ({ entity }) => {
+    if (!entity.imdbId) return
+    void (async () => {
+      const movie = await movieDataSet.get(injector, entity.imdbId as string)
+      if (movie) {
+        await injector.getInstance(WebsocketService).announce(
+          {
+            type: 'add-movie',
+            file: { driveLetter: entity.driveLetter, path: entity.path },
+            movie,
+            movieFile: entity,
+          },
+          async ({ injector: i }) => isAuthorized(i, 'admin'),
+        )
+      }
+    })()
+  })
 
   useMovieFileMaintainer(injector)
 }

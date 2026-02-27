@@ -38,11 +38,6 @@ vi.mock('@furystack/logging', () => ({
   }),
 }))
 
-// Mock helper functions
-vi.mock('./announce-new-movie.js', () => ({
-  announceNewMovie: vi.fn().mockResolvedValue(undefined),
-}))
-
 vi.mock('./ensure-movie-exists.js', () => ({
   ensureMovieExists: vi.fn().mockResolvedValue({ imdbId: 'tt1234567', title: 'Test Movie' }),
 }))

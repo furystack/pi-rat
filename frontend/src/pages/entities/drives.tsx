@@ -29,8 +29,8 @@ export const DrivesPage = Shade({
             const result = await drivesService.getVolumes({ findOptions })
             return result
           },
-          deleteEntities: async (id) => {
-            await drivesService.removeVolume(id)
+          deleteEntities: async (...ids) => {
+            await Promise.all(ids.map((id) => drivesService.removeVolume(id)))
           },
           getEntity: async (id) => {
             const result = await drivesService.getVolume(id)
