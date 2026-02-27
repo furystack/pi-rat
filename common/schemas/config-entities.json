@@ -1,6 +1,189 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "Config": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "OMDB_CONFIG",
+              "description": "Configuration entry for the OMDB API"
+            },
+            {
+              "type": "string",
+              "const": "GITHUB_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "IOT_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "MOVIES_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "OLLAMA_CONFIG"
+            }
+          ],
+          "description": "Configuration entry for the OMDB API"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string",
+                  "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+                },
+                "trySearchMovieFromTitle": {
+                  "type": "boolean",
+                  "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+                },
+                "autoDownloadMetadata": {
+                  "type": "boolean",
+                  "description": "If a new imdb id is added, download the metadata automatically"
+                }
+              },
+              "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "clientId": {
+                  "type": "string"
+                },
+                "clientSecret": {
+                  "type": "string"
+                }
+              },
+              "required": ["clientId", "clientSecret"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "pingIntervalMs": {
+                  "type": "number",
+                  "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+                },
+                "pingTimeoutMs": {
+                  "type": "number",
+                  "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+                }
+              },
+              "required": ["pingIntervalMs", "pingTimeoutMs"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "autoExtractSubtitles": {
+                  "type": "boolean",
+                  "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
+                },
+                "fullSyncOnStartup": {
+                  "type": "boolean",
+                  "description": "If true, all movies on all drives will be synced on startup or config change."
+                },
+                "preset": {
+                  "type": "string",
+                  "enum": [
+                    "ultrafast",
+                    "superfast",
+                    "veryfast",
+                    "faster",
+                    "fast",
+                    "medium",
+                    "slow",
+                    "slower",
+                    "veryslow"
+                  ],
+                  "description": "The default preset for transcoding movies."
+                },
+                "threads": {
+                  "type": "number",
+                  "description": "The number of threads to use for transcoding."
+                },
+                "watchFiles": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "all"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "drive": {
+                            "type": "string",
+                            "description": "The drive to watch"
+                          },
+                          "path": {
+                            "type": "string",
+                            "description": "An optional path filter. If not set, all files in the drive will be watched."
+                          }
+                        },
+                        "required": ["drive"],
+                        "additionalProperties": false
+                      }
+                    }
+                  ],
+                  "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                }
+              },
+              "required": ["watchFiles"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+                }
+              },
+              "required": ["host"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "value", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "ConfigType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/OmdbConfig"
+        },
+        {
+          "$ref": "#/definitions/GithubConfig"
+        },
+        {
+          "$ref": "#/definitions/IotConfig"
+        },
+        {
+          "$ref": "#/definitions/MoviesConfig"
+        },
+        {
+          "$ref": "#/definitions/OllamaConfig"
+        }
+      ]
+    },
     "GithubConfig": {
       "type": "object",
       "properties": {
@@ -164,189 +347,6 @@
         }
       },
       "required": ["id", "value"],
-      "additionalProperties": false
-    },
-    "ConfigType": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/OmdbConfig"
-        },
-        {
-          "$ref": "#/definitions/GithubConfig"
-        },
-        {
-          "$ref": "#/definitions/IotConfig"
-        },
-        {
-          "$ref": "#/definitions/MoviesConfig"
-        },
-        {
-          "$ref": "#/definitions/OllamaConfig"
-        }
-      ]
-    },
-    "Config": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "anyOf": [
-            {
-              "type": "string",
-              "const": "OMDB_CONFIG",
-              "description": "Configuration entry for the OMDB API"
-            },
-            {
-              "type": "string",
-              "const": "GITHUB_CONFIG"
-            },
-            {
-              "type": "string",
-              "const": "IOT_CONFIG"
-            },
-            {
-              "type": "string",
-              "const": "MOVIES_CONFIG"
-            },
-            {
-              "type": "string",
-              "const": "OLLAMA_CONFIG"
-            }
-          ],
-          "description": "Configuration entry for the OMDB API"
-        },
-        "value": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "apiKey": {
-                  "type": "string",
-                  "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
-                },
-                "trySearchMovieFromTitle": {
-                  "type": "boolean",
-                  "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
-                },
-                "autoDownloadMetadata": {
-                  "type": "boolean",
-                  "description": "If a new imdb id is added, download the metadata automatically"
-                }
-              },
-              "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "clientId": {
-                  "type": "string"
-                },
-                "clientSecret": {
-                  "type": "string"
-                }
-              },
-              "required": ["clientId", "clientSecret"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "pingIntervalMs": {
-                  "type": "number",
-                  "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
-                },
-                "pingTimeoutMs": {
-                  "type": "number",
-                  "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
-                }
-              },
-              "required": ["pingIntervalMs", "pingTimeoutMs"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "autoExtractSubtitles": {
-                  "type": "boolean",
-                  "description": "If true, the subtitles from the movie file will be extracted automatically on discovery"
-                },
-                "fullSyncOnStartup": {
-                  "type": "boolean",
-                  "description": "If true, all movies on all drives will be synced on startup or config change."
-                },
-                "preset": {
-                  "type": "string",
-                  "enum": [
-                    "ultrafast",
-                    "superfast",
-                    "veryfast",
-                    "faster",
-                    "fast",
-                    "medium",
-                    "slow",
-                    "slower",
-                    "veryslow"
-                  ],
-                  "description": "The default preset for transcoding movies."
-                },
-                "threads": {
-                  "type": "number",
-                  "description": "The number of threads to use for transcoding."
-                },
-                "watchFiles": {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "const": "all"
-                    },
-                    {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "drive": {
-                            "type": "string",
-                            "description": "The drive to watch"
-                          },
-                          "path": {
-                            "type": "string",
-                            "description": "An optional path filter. If not set, all files in the drive will be watched."
-                          }
-                        },
-                        "required": ["drive"],
-                        "additionalProperties": false
-                      }
-                    }
-                  ],
-                  "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
-                }
-              },
-              "required": ["watchFiles"],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "host": {
-                  "type": "string",
-                  "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
-                }
-              },
-              "required": ["host"],
-              "additionalProperties": false
-            }
-          ]
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "required": ["id", "value", "createdAt", "updatedAt"],
       "additionalProperties": false
     }
   }

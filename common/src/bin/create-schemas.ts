@@ -131,6 +131,13 @@ export const exec = async (): Promise<void> => {
           skipTypeCheck: true,
           expose: 'all',
         }).createSchema(schemaValue.type)
+
+        if (schema.definitions) {
+          schema.definitions = Object.fromEntries(
+            Object.entries(schema.definitions).sort(([a], [b]) => a.localeCompare(b)),
+          )
+        }
+
         await promises.writeFile(outputFile, JSON.stringify(schema, null, 2))
         console.log(`Schema generated succesfully.`)
       } catch (error) {

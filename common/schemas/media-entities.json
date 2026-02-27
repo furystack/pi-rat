@@ -1,45 +1,97 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "FfprobeStreamDisposition": {
+    "ChapterData": {
       "type": "object",
       "properties": {
-        "default": {
+        "id": {
           "type": "number"
         },
-        "dub": {
+        "start": {
           "type": "number"
         },
-        "original": {
+        "start_time": {
+          "type": "string"
+        },
+        "end": {
           "type": "number"
         },
-        "comment": {
-          "type": "number"
+        "end_time": {
+          "type": "string"
         },
-        "lyrics": {
-          "type": "number"
+        "time_base": {
+          "type": "string"
         },
-        "karaoke": {
-          "type": "number"
-        },
-        "forced": {
-          "type": "number"
-        },
-        "hearing_impaired": {
-          "type": "number"
-        },
-        "visual_impaired": {
-          "type": "number"
-        },
-        "clean_effects": {
-          "type": "number"
-        },
-        "attached_pic": {
-          "type": "number"
-        },
-        "timed_thumbnails": {
-          "type": "number"
+        "tags": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": ["title"],
+          "additionalProperties": false
         }
+      },
+      "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
+      "additionalProperties": false
+    },
+    "FfprobeData": {
+      "type": "object",
+      "properties": {
+        "streams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FfprobeStream"
+          }
+        },
+        "format": {
+          "$ref": "#/definitions/FfprobeFormat"
+        },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ChapterData"
+          }
+        }
+      },
+      "required": ["streams", "format", "chapters"],
+      "additionalProperties": false
+    },
+    "FfprobeFormat": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "nb_streams": {
+          "type": "number"
+        },
+        "nb_programs": {
+          "type": "number"
+        },
+        "format_name": {
+          "type": "string"
+        },
+        "format_long_name": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "number"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        },
+        "bit_rate": {
+          "type": "number"
+        },
+        "probe_score": {
+          "type": "number"
+        },
+        "tags": {}
       }
     },
     "FfprobeStream": {
@@ -186,168 +238,60 @@
       },
       "required": ["index"]
     },
-    "FfprobeFormat": {
+    "FfprobeStreamDisposition": {
       "type": "object",
       "properties": {
-        "filename": {
-          "type": "string"
-        },
-        "nb_streams": {
+        "default": {
           "type": "number"
         },
-        "nb_programs": {
+        "dub": {
           "type": "number"
         },
-        "format_name": {
-          "type": "string"
-        },
-        "format_long_name": {
-          "type": "string"
-        },
-        "start_time": {
+        "original": {
           "type": "number"
         },
-        "duration": {
+        "comment": {
           "type": "number"
         },
-        "size": {
+        "lyrics": {
           "type": "number"
         },
-        "bit_rate": {
+        "karaoke": {
           "type": "number"
         },
-        "probe_score": {
+        "forced": {
           "type": "number"
         },
-        "tags": {}
+        "hearing_impaired": {
+          "type": "number"
+        },
+        "visual_impaired": {
+          "type": "number"
+        },
+        "clean_effects": {
+          "type": "number"
+        },
+        "attached_pic": {
+          "type": "number"
+        },
+        "timed_thumbnails": {
+          "type": "number"
+        }
       }
     },
-    "ChapterData": {
+    "isValidOmdbMetadata": {
+      "$comment": "(metadata: any) => metadata is OmdbMovieMetadata",
       "type": "object",
       "properties": {
-        "id": {
-          "type": "number"
-        },
-        "start": {
-          "type": "number"
-        },
-        "start_time": {
-          "type": "string"
-        },
-        "end": {
-          "type": "number"
-        },
-        "end_time": {
-          "type": "string"
-        },
-        "time_base": {
-          "type": "string"
-        },
-        "tags": {
+        "namedArgs": {
           "type": "object",
           "properties": {
-            "title": {
-              "type": "string"
-            }
+            "metadata": {}
           },
-          "required": ["title"],
+          "required": ["metadata"],
           "additionalProperties": false
         }
-      },
-      "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
-      "additionalProperties": false
-    },
-    "FfprobeData": {
-      "type": "object",
-      "properties": {
-        "streams": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/FfprobeStream"
-          }
-        },
-        "format": {
-          "$ref": "#/definitions/FfprobeFormat"
-        },
-        "chapters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ChapterData"
-          }
-        }
-      },
-      "required": ["streams", "format", "chapters"],
-      "additionalProperties": false
-    },
-    "MovieFile": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "imdbId": {
-          "type": "string"
-        },
-        "driveLetter": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "ffprobe": {
-          "$ref": "#/definitions/FfprobeData"
-        },
-        "relatedFiles": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": ["subtitle", "audio", "trailer", "info", "other"]
-              },
-              "path": {
-                "type": "string"
-              }
-            },
-            "required": ["type", "path"],
-            "additionalProperties": false
-          }
-        }
-      },
-      "required": ["id", "driveLetter", "path", "ffprobe"],
-      "additionalProperties": false
-    },
-    "WatchHistoryEntry": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "userName": {
-          "type": "string"
-        },
-        "driveLetter": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "watchedSeconds": {
-          "type": "number"
-        },
-        "completed": {
-          "type": "boolean"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
-      "additionalProperties": false
+      }
     },
     "Movie": {
       "type": "object",
@@ -397,6 +341,45 @@
         }
       },
       "required": ["imdbId", "title", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "MovieFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "driveLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "ffprobe": {
+          "$ref": "#/definitions/FfprobeData"
+        },
+        "relatedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["subtitle", "audio", "trailer", "info", "other"]
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": ["type", "path"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["id", "driveLetter", "path", "ffprobe"],
       "additionalProperties": false
     },
     "OmdbMovieMetadata": {
@@ -534,20 +517,6 @@
         "updatedAt"
       ],
       "additionalProperties": false
-    },
-    "isValidOmdbMetadata": {
-      "$comment": "(metadata: any) => metadata is OmdbMovieMetadata",
-      "type": "object",
-      "properties": {
-        "namedArgs": {
-          "type": "object",
-          "properties": {
-            "metadata": {}
-          },
-          "required": ["metadata"],
-          "additionalProperties": false
-        }
-      }
     },
     "OmdbSeriesMetadata": {
       "type": "object",
@@ -692,6 +661,37 @@
         }
       },
       "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "WatchHistoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "driveLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "watchedSeconds": {
+          "type": "number"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
       "additionalProperties": false
     }
   }

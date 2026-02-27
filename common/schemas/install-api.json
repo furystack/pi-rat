@@ -1,35 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "ServiceStatusResponse": {
-      "type": "object",
-      "properties": {
-        "state": {
-          "$ref": "#/definitions/ServiceStatus"
-        },
-        "services": {
-          "type": "object",
-          "properties": {
-            "omdb": {
-              "type": "boolean",
-              "description": "OMDB API Installation Status for metadata fetching"
-            },
-            "github": {
-              "type": "boolean",
-              "description": "Github API Installation Status for external authentication"
-            }
-          },
-          "required": ["omdb", "github"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["state", "services"],
-      "additionalProperties": false
-    },
-    "ServiceStatus": {
-      "type": "string",
-      "enum": ["installed", "needsInstall"]
-    },
     "GetServiceStatusAction": {
       "type": "object",
       "properties": {
@@ -200,6 +171,35 @@
         }
       },
       "required": ["GET", "POST"],
+      "additionalProperties": false
+    },
+    "ServiceStatus": {
+      "type": "string",
+      "enum": ["installed", "needsInstall"]
+    },
+    "ServiceStatusResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/ServiceStatus"
+        },
+        "services": {
+          "type": "object",
+          "properties": {
+            "omdb": {
+              "type": "boolean",
+              "description": "OMDB API Installation Status for metadata fetching"
+            },
+            "github": {
+              "type": "boolean",
+              "description": "Github API Installation Status for external authentication"
+            }
+          },
+          "required": ["omdb", "github"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["state", "services"],
       "additionalProperties": false
     }
   }

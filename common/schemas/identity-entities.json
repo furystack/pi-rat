@@ -1,6 +1,66 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "def-function": {
+      "$comment": "() =>undefined"
+    },
+    "getAllRoleDefinitions": {
+      "$comment": "() => RoleDefinition[]"
+    },
+    "getRoleDefinition": {
+      "$comment": "(name: Roles[number]) => RoleDefinition",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": ["admin", "media-manager", "viewer", "iot-manager"]
+            }
+          },
+          "required": ["name"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "RoleDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["admin", "media-manager", "viewer", "iot-manager"],
+          "description": "Role name (matches values in Roles type)"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable name for display in UI"
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of what this role allows"
+        }
+      },
+      "required": ["description", "displayName", "name"],
+      "description": "Full role definition including the name"
+    },
+    "RoleMetadata": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable name for display in UI"
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of what this role allows"
+        }
+      },
+      "required": ["displayName", "description"],
+      "additionalProperties": false,
+      "description": "Metadata for a role (displayName, description)"
+    },
     "Roles": {
       "type": "array",
       "items": {
@@ -26,66 +86,6 @@
       },
       "required": ["username", "roles", "createdAt", "updatedAt"],
       "additionalProperties": false
-    },
-    "RoleMetadata": {
-      "type": "object",
-      "properties": {
-        "displayName": {
-          "type": "string",
-          "description": "Human-readable name for display in UI"
-        },
-        "description": {
-          "type": "string",
-          "description": "Brief description of what this role allows"
-        }
-      },
-      "required": ["displayName", "description"],
-      "additionalProperties": false,
-      "description": "Metadata for a role (displayName, description)"
-    },
-    "RoleDefinition": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["admin", "media-manager", "viewer", "iot-manager"],
-          "description": "Role name (matches values in Roles type)"
-        },
-        "displayName": {
-          "type": "string",
-          "description": "Human-readable name for display in UI"
-        },
-        "description": {
-          "type": "string",
-          "description": "Brief description of what this role allows"
-        }
-      },
-      "required": ["description", "displayName", "name"],
-      "description": "Full role definition including the name"
-    },
-    "getRoleDefinition": {
-      "$comment": "(name: Roles[number]) => RoleDefinition",
-      "type": "object",
-      "properties": {
-        "namedArgs": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string",
-              "enum": ["admin", "media-manager", "viewer", "iot-manager"]
-            }
-          },
-          "required": ["name"],
-          "additionalProperties": false
-        }
-      }
-    },
-    "getAllRoleDefinitions": {
-      "$comment": "() => RoleDefinition[]"
-    },
-    "def-function": {
-      "$comment": "() =>undefined"
     }
   }
 }

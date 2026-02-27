@@ -16,6 +16,20 @@
       "required": ["type", "appName"],
       "additionalProperties": false
     },
+    "Base64Icon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "base64"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
     "ContinueWatchingWidgetGroup": {
       "type": "object",
       "properties": {
@@ -31,6 +45,57 @@
         }
       },
       "required": ["type"],
+      "additionalProperties": false
+    },
+    "Dashboard": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "widgets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Widget"
+          }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "name", "description", "owner", "widgets", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "DeviceAvailability": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "device-availability"
+        },
+        "deviceName": {
+          "type": "string"
+        },
+        "enableWakeUp": {
+          "type": "boolean"
+        },
+        "icon": {
+          "$ref": "#/definitions/Icon"
+        }
+      },
+      "required": ["type", "deviceName"],
       "additionalProperties": false
     },
     "EntityShortcutWidget": {
@@ -59,6 +124,20 @@
       "required": ["type", "entityName"],
       "additionalProperties": false
     },
+    "FontIcon": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "font"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": ["type", "value"],
+      "additionalProperties": false
+    },
     "HtmlWidget": {
       "type": "object",
       "properties": {
@@ -71,26 +150,6 @@
         }
       },
       "required": ["type", "content"],
-      "additionalProperties": false
-    },
-    "DeviceAvailability": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "const": "device-availability"
-        },
-        "deviceName": {
-          "type": "string"
-        },
-        "enableWakeUp": {
-          "type": "boolean"
-        },
-        "icon": {
-          "$ref": "#/definitions/Icon"
-        }
-      },
-      "required": ["type", "deviceName"],
       "additionalProperties": false
     },
     "Icon": {
@@ -108,34 +167,6 @@
           "$ref": "#/definitions/UrlIcon"
         }
       ]
-    },
-    "FontIcon": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "const": "font"
-        },
-        "value": {
-          "type": "string"
-        }
-      },
-      "required": ["type", "value"],
-      "additionalProperties": false
-    },
-    "Base64Icon": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "const": "base64"
-        },
-        "value": {
-          "type": "string"
-        }
-      },
-      "required": ["type", "value"],
-      "additionalProperties": false
     },
     "LottieIcon": {
       "type": "object",
@@ -195,20 +226,6 @@
       "required": ["type", "value"],
       "additionalProperties": false
     },
-    "UrlIcon": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "const": "url"
-        },
-        "value": {
-          "type": "string"
-        }
-      },
-      "required": ["type", "value"],
-      "additionalProperties": false
-    },
     "MarkdownWidget": {
       "type": "object",
       "properties": {
@@ -263,24 +280,18 @@
       "required": ["type", "imdbId"],
       "additionalProperties": false
     },
-    "WidgetGroup": {
+    "UrlIcon": {
       "type": "object",
       "properties": {
         "type": {
           "type": "string",
-          "const": "group"
+          "const": "url"
         },
-        "title": {
+        "value": {
           "type": "string"
-        },
-        "widgets": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Widget"
-          }
         }
       },
-      "required": ["type", "title", "widgets"],
+      "required": ["type", "value"],
       "additionalProperties": false
     },
     "Widget": {
@@ -314,19 +325,14 @@
         }
       ]
     },
-    "Dashboard": {
+    "WidgetGroup": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "type": {
+          "type": "string",
+          "const": "group"
         },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "owner": {
+        "title": {
           "type": "string"
         },
         "widgets": {
@@ -334,15 +340,9 @@
           "items": {
             "$ref": "#/definitions/Widget"
           }
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
         }
       },
-      "required": ["id", "name", "description", "owner", "widgets", "createdAt", "updatedAt"],
+      "required": ["type", "title", "widgets"],
       "additionalProperties": false
     }
   }

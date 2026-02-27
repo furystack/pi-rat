@@ -1,6 +1,41 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "Chat": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the chat"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description in markdown format"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the chat was created"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the chat"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of participants in the chat"
+        }
+      },
+      "required": ["id", "name", "createdAt", "owner", "participants"],
+      "additionalProperties": false
+    },
     "ChatInvitation": {
       "type": "object",
       "properties": {
@@ -42,25 +77,6 @@
       "required": ["id", "chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"],
       "additionalProperties": false
     },
-    "ChatMessageAttachment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier of the attachment"
-        },
-        "fileName": {
-          "type": "string",
-          "description": "The type of the file"
-        },
-        "type": {
-          "type": "string",
-          "description": "The type that hints how the attachment can be displayed"
-        }
-      },
-      "required": ["id", "fileName", "type"],
-      "additionalProperties": false
-    },
     "ChatMessage": {
       "type": "object",
       "properties": {
@@ -96,39 +112,23 @@
       "required": ["id", "content", "createdAt", "owner", "chatId", "attachments"],
       "additionalProperties": false
     },
-    "Chat": {
+    "ChatMessageAttachment": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique identifier"
+          "description": "The unique identifier of the attachment"
         },
-        "name": {
+        "fileName": {
           "type": "string",
-          "description": "The name of the chat"
+          "description": "The type of the file"
         },
-        "description": {
+        "type": {
           "type": "string",
-          "description": "The description in markdown format"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The date the chat was created"
-        },
-        "owner": {
-          "type": "string",
-          "description": "The owner of the chat"
-        },
-        "participants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "A list of participants in the chat"
+          "description": "The type that hints how the attachment can be displayed"
         }
       },
-      "required": ["id", "name", "createdAt", "owner", "participants"],
+      "required": ["id", "fileName", "type"],
       "additionalProperties": false
     }
   }

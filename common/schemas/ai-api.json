@@ -1,536 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "OllamaApiMessage": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "images": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "role": {
-          "type": "string"
-        },
-        "content": {
-          "type": "string"
-        },
-        "thinking": {
-          "type": "string"
-        },
-        "tool_calls": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ToolCall"
-          }
-        },
-        "tool_name": {
-          "type": "string"
-        }
-      },
-      "required": ["content", "role"]
-    },
-    "ToolCall": {
-      "type": "object",
-      "properties": {
-        "function": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "arguments": {
-              "type": "object"
-            }
-          },
-          "required": ["name", "arguments"],
-          "additionalProperties": false
-        }
-      },
-      "required": ["function"],
-      "additionalProperties": false
-    },
-    "ChatRequest": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "messages": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/OllamaApiMessage"
-          }
-        },
-        "model": {
-          "type": "string"
-        },
-        "stream": {
-          "type": "boolean"
-        },
-        "format": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "keep_alive": {
-          "type": ["string", "number"]
-        },
-        "tools": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Tool"
-          }
-        },
-        "think": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "string",
-              "const": "high"
-            },
-            {
-              "type": "string",
-              "const": "medium"
-            },
-            {
-              "type": "string",
-              "const": "low"
-            }
-          ]
-        },
-        "logprobs": {
-          "type": "boolean"
-        },
-        "top_logprobs": {
-          "type": "number"
-        },
-        "options": {
-          "$ref": "#/definitions/Partial%3COptions%3E"
-        }
-      },
-      "required": ["messages", "model"]
-    },
-    "Tool": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string"
-        },
-        "function": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string"
-                },
-                "$defs": {},
-                "items": {},
-                "required": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "properties": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            }
-                          }
-                        ]
-                      },
-                      "items": {},
-                      "description": {
-                        "type": "string"
-                      },
-                      "enum": {
-                        "type": "array",
-                        "items": {}
-                      }
-                    },
-                    "additionalProperties": false
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "required": ["type", "function"],
-      "additionalProperties": false
-    },
-    "Partial<Options>": {
-      "type": "object",
-      "properties": {
-        "numa": {
-          "type": "boolean"
-        },
-        "num_ctx": {
-          "type": "number"
-        },
-        "num_batch": {
-          "type": "number"
-        },
-        "num_gpu": {
-          "type": "number"
-        },
-        "main_gpu": {
-          "type": "number"
-        },
-        "low_vram": {
-          "type": "boolean"
-        },
-        "f16_kv": {
-          "type": "boolean"
-        },
-        "logits_all": {
-          "type": "boolean"
-        },
-        "vocab_only": {
-          "type": "boolean"
-        },
-        "use_mmap": {
-          "type": "boolean"
-        },
-        "use_mlock": {
-          "type": "boolean"
-        },
-        "embedding_only": {
-          "type": "boolean"
-        },
-        "num_thread": {
-          "type": "number"
-        },
-        "num_keep": {
-          "type": "number"
-        },
-        "seed": {
-          "type": "number"
-        },
-        "num_predict": {
-          "type": "number"
-        },
-        "top_k": {
-          "type": "number"
-        },
-        "top_p": {
-          "type": "number"
-        },
-        "tfs_z": {
-          "type": "number"
-        },
-        "typical_p": {
-          "type": "number"
-        },
-        "repeat_last_n": {
-          "type": "number"
-        },
-        "temperature": {
-          "type": "number"
-        },
-        "repeat_penalty": {
-          "type": "number"
-        },
-        "presence_penalty": {
-          "type": "number"
-        },
-        "frequency_penalty": {
-          "type": "number"
-        },
-        "mirostat": {
-          "type": "number"
-        },
-        "mirostat_tau": {
-          "type": "number"
-        },
-        "mirostat_eta": {
-          "type": "number"
-        },
-        "penalize_newline": {
-          "type": "boolean"
-        },
-        "stop": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "ChatResponse": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "message": {
-          "$ref": "#/definitions/OllamaApiMessage"
-        },
-        "model": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "done": {
-          "type": "boolean"
-        },
-        "done_reason": {
-          "type": "string"
-        },
-        "total_duration": {
-          "type": "number"
-        },
-        "load_duration": {
-          "type": "number"
-        },
-        "prompt_eval_count": {
-          "type": "number"
-        },
-        "prompt_eval_duration": {
-          "type": "number"
-        },
-        "eval_count": {
-          "type": "number"
-        },
-        "eval_duration": {
-          "type": "number"
-        },
-        "logprobs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Logprob"
-          }
-        }
-      },
-      "required": [
-        "created_at",
-        "done",
-        "done_reason",
-        "eval_count",
-        "eval_duration",
-        "load_duration",
-        "message",
-        "model",
-        "prompt_eval_count",
-        "prompt_eval_duration",
-        "total_duration"
-      ]
-    },
-    "Logprob": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        },
-        "logprob": {
-          "type": "number"
-        },
-        "top_logprobs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TokenLogprob"
-          }
-        }
-      },
-      "additionalProperties": false,
-      "required": ["logprob", "token"]
-    },
-    "TokenLogprob": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        },
-        "logprob": {
-          "type": "number"
-        }
-      },
-      "required": ["token", "logprob"],
-      "additionalProperties": false
-    },
-    "GetModelsAction": {
-      "type": "object",
-      "properties": {
-        "result": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ModelResponse"
-          }
-        }
-      },
-      "required": ["result"],
-      "additionalProperties": false
-    },
-    "ModelResponse": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "modified_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "model": {
-          "type": "string"
-        },
-        "size": {
-          "type": "number"
-        },
-        "digest": {
-          "type": "string"
-        },
-        "details": {
-          "$ref": "#/definitions/ModelDetails"
-        },
-        "expires_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "size_vram": {
-          "type": "number"
-        }
-      },
-      "required": ["name", "modified_at", "model", "size", "digest", "details", "expires_at", "size_vram"],
-      "additionalProperties": false
-    },
-    "ModelDetails": {
-      "type": "object",
-      "properties": {
-        "parent_model": {
-          "type": "string"
-        },
-        "format": {
-          "type": "string"
-        },
-        "family": {
-          "type": "string"
-        },
-        "families": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "parameter_size": {
-          "type": "string"
-        },
-        "quantization_level": {
-          "type": "string"
-        }
-      },
-      "required": ["parent_model", "format", "family", "families", "parameter_size", "quantization_level"],
-      "additionalProperties": false
-    },
-    "ChatAction": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "stream": {
-              "type": "boolean",
-              "const": false
-            },
-            "messages": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/OllamaApiMessage"
-              }
-            },
-            "model": {
-              "type": "string"
-            },
-            "format": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object"
-                }
-              ]
-            },
-            "keep_alive": {
-              "type": ["string", "number"]
-            },
-            "tools": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Tool"
-              }
-            },
-            "think": {
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "string",
-                  "const": "high"
-                },
-                {
-                  "type": "string",
-                  "const": "medium"
-                },
-                {
-                  "type": "string",
-                  "const": "low"
-                }
-              ]
-            },
-            "logprobs": {
-              "type": "boolean"
-            },
-            "top_logprobs": {
-              "type": "number"
-            },
-            "options": {
-              "$ref": "#/definitions/Partial%3COptions%3E"
-            }
-          },
-          "required": ["messages", "model"]
-        },
-        "result": {
-          "$ref": "#/definitions/ChatResponse"
-        }
-      },
-      "required": ["body", "result"],
-      "additionalProperties": false
-    },
     "AiApi": {
       "type": "object",
       "properties": {
@@ -671,91 +141,309 @@
       "required": ["GET", "POST", "PATCH", "DELETE"],
       "additionalProperties": false
     },
-    "GetCollectionEndpoint<AiChat>": {
+    "AiChat": {
       "type": "object",
       "properties": {
-        "query": {
-          "type": "object",
-          "properties": {
-            "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CAiChat%2C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22model%22%7C%22status%22%7C%22visibility%22)%5B%5D%3E"
-            }
-          },
-          "additionalProperties": false
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the AI chat."
         },
-        "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CAiChat%3E"
+        "name": {
+          "type": "string",
+          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the AI chat was created."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner username of the AI chat."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "archived"],
+          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["private", "public"],
+          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
         }
       },
-      "required": ["query", "result"],
-      "additionalProperties": false,
-      "description": "Rest endpoint model for getting / querying collections"
+      "required": ["id", "name", "createdAt", "owner", "model", "status", "visibility"],
+      "additionalProperties": false
     },
-    "FindOptions<AiChat,(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"model\"|\"status\"|\"visibility\")[]>": {
+    "AiChatMessage": {
       "type": "object",
       "properties": {
-        "top": {
-          "type": "number",
-          "description": "Limits the hits"
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the AI chat message"
         },
-        "skip": {
-          "type": "number",
-          "description": "Skips the first N hit"
+        "content": {
+          "type": "string",
+          "description": "The content of the AI chat message"
         },
-        "order": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the AI chat message was created"
+        },
+        "aiChatId": {
+          "type": "string",
+          "description": "The id of the AI chat this message belongs to This is used to associate the message with a specific AI chat."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["user", "assistant"],
+          "description": "The role of the message sender, either 'user' or 'assistant' This indicates whether the message was sent by the user or generated by the AI assistant."
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["public", "private"],
+          "description": "Defines if the AI Chat is public or private Denormalized field due performance reasons."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the AI chat message This is used to identify the user who created the message. Denormalized field due performance reasons."
+        }
+      },
+      "required": ["id", "content", "createdAt", "aiChatId", "role", "visibility", "owner"],
+      "additionalProperties": false
+    },
+    "ChatAction": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "stream": {
+              "type": "boolean",
+              "const": false
+            },
+            "messages": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OllamaApiMessage"
+              }
+            },
+            "model": {
+              "type": "string"
+            },
+            "format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "keep_alive": {
+              "type": ["string", "number"]
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Tool"
+              }
+            },
+            "think": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "const": "high"
+                },
+                {
+                  "type": "string",
+                  "const": "medium"
+                },
+                {
+                  "type": "string",
+                  "const": "low"
+                }
+              ]
+            },
+            "logprobs": {
+              "type": "boolean"
+            },
+            "top_logprobs": {
+              "type": "number"
+            },
+            "options": {
+              "$ref": "#/definitions/Partial%3COptions%3E"
+            }
+          },
+          "required": ["messages", "model"]
+        },
+        "result": {
+          "$ref": "#/definitions/ChatResponse"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false
+    },
+    "ChatRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OllamaApiMessage"
+          }
+        },
+        "model": {
+          "type": "string"
+        },
+        "stream": {
+          "type": "boolean"
+        },
+        "format": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "keep_alive": {
+          "type": ["string", "number"]
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tool"
+          }
+        },
+        "think": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "high"
+            },
+            {
+              "type": "string",
+              "const": "medium"
+            },
+            {
+              "type": "string",
+              "const": "low"
+            }
+          ]
+        },
+        "logprobs": {
+          "type": "boolean"
+        },
+        "top_logprobs": {
+          "type": "number"
+        },
+        "options": {
+          "$ref": "#/definitions/Partial%3COptions%3E"
+        }
+      },
+      "required": ["messages", "model"]
+    },
+    "ChatResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/OllamaApiMessage"
+        },
+        "model": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "done": {
+          "type": "boolean"
+        },
+        "done_reason": {
+          "type": "string"
+        },
+        "total_duration": {
+          "type": "number"
+        },
+        "load_duration": {
+          "type": "number"
+        },
+        "prompt_eval_count": {
+          "type": "number"
+        },
+        "prompt_eval_duration": {
+          "type": "number"
+        },
+        "eval_count": {
+          "type": "number"
+        },
+        "eval_duration": {
+          "type": "number"
+        },
+        "logprobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Logprob"
+          }
+        }
+      },
+      "required": [
+        "created_at",
+        "done",
+        "done_reason",
+        "eval_count",
+        "eval_duration",
+        "load_duration",
+        "message",
+        "model",
+        "prompt_eval_count",
+        "prompt_eval_duration",
+        "total_duration"
+      ]
+    },
+    "DeleteEndpoint<AiChat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "url": {
           "type": "object",
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "name": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "description": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "createdAt": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "owner": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "model": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "status": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "visibility": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
+              "description": "The unique identifier for the AI chat."
             }
           },
-          "additionalProperties": false,
-          "description": "Sets up an order by a field and a direction"
+          "required": ["id"],
+          "additionalProperties": false
         },
-        "select": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["id", "name", "description", "createdAt", "owner", "model", "status", "visibility"]
-          },
-          "description": "The result set will be limited to these fields"
-        },
-        "filter": {
-          "$ref": "#/definitions/FilterType%3CAiChat%3E",
-          "description": "The fields should match this filter"
+        "result": {
+          "type": "object"
         }
       },
+      "required": ["url", "result"],
       "additionalProperties": false,
-      "description": "Type for default filtering model"
+      "description": "Endpoint model for deleting entities"
     },
     "FilterType<AiChat>": {
       "type": "object",
@@ -1275,185 +963,6 @@
         }
       }
     },
-    "GetCollectionResult<AiChat>": {
-      "type": "object",
-      "properties": {
-        "count": {
-          "type": "number",
-          "description": "The Total count of entities"
-        },
-        "entries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AiChat"
-          },
-          "description": "List of the selected entities"
-        }
-      },
-      "required": ["count", "entries"],
-      "additionalProperties": false,
-      "description": "Response Model for GetCollection"
-    },
-    "AiChat": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier for the AI chat."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
-        },
-        "description": {
-          "type": "string",
-          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The date the AI chat was created."
-        },
-        "owner": {
-          "type": "string",
-          "description": "The owner username of the AI chat."
-        },
-        "model": {
-          "type": "string",
-          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
-        },
-        "status": {
-          "type": "string",
-          "enum": ["active", "archived"],
-          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
-        },
-        "visibility": {
-          "type": "string",
-          "enum": ["private", "public"],
-          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
-        }
-      },
-      "required": ["id", "name", "createdAt", "owner", "model", "status", "visibility"],
-      "additionalProperties": false
-    },
-    "GetEntityEndpoint<AiChat,\"id\">": {
-      "type": "object",
-      "properties": {
-        "query": {
-          "type": "object",
-          "properties": {
-            "select": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": ["id", "name", "description", "createdAt", "owner", "model", "status", "visibility"]
-              },
-              "description": "The list of fields to select"
-            }
-          },
-          "additionalProperties": false
-        },
-        "url": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The entity's unique identifier"
-            }
-          },
-          "required": ["id"],
-          "additionalProperties": false
-        },
-        "result": {
-          "$ref": "#/definitions/AiChat"
-        }
-      },
-      "required": ["query", "url", "result"],
-      "additionalProperties": false,
-      "description": "Endpoint model for getting a single entity"
-    },
-    "GetCollectionEndpoint<AiChatMessage>": {
-      "type": "object",
-      "properties": {
-        "query": {
-          "type": "object",
-          "properties": {
-            "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CAiChatMessage%2C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22aiChatId%22%7C%22role%22%7C%22visibility%22%7C%22owner%22)%5B%5D%3E"
-            }
-          },
-          "additionalProperties": false
-        },
-        "result": {
-          "$ref": "#/definitions/GetCollectionResult%3CAiChatMessage%3E"
-        }
-      },
-      "required": ["query", "result"],
-      "additionalProperties": false,
-      "description": "Rest endpoint model for getting / querying collections"
-    },
-    "FindOptions<AiChatMessage,(\"id\"|\"content\"|\"createdAt\"|\"aiChatId\"|\"role\"|\"visibility\"|\"owner\")[]>": {
-      "type": "object",
-      "properties": {
-        "top": {
-          "type": "number",
-          "description": "Limits the hits"
-        },
-        "skip": {
-          "type": "number",
-          "description": "Skips the first N hit"
-        },
-        "order": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "content": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "createdAt": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "aiChatId": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "role": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "visibility": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "owner": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            }
-          },
-          "additionalProperties": false,
-          "description": "Sets up an order by a field and a direction"
-        },
-        "select": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["id", "content", "createdAt", "aiChatId", "role", "visibility", "owner"]
-          },
-          "description": "The result set will be limited to these fields"
-        },
-        "filter": {
-          "$ref": "#/definitions/FilterType%3CAiChatMessage%3E",
-          "description": "The fields should match this filter"
-        }
-      },
-      "additionalProperties": false,
-      "description": "Type for default filtering model"
-    },
     "FilterType<AiChatMessage>": {
       "type": "object",
       "additionalProperties": false,
@@ -1920,6 +1429,193 @@
         }
       }
     },
+    "FindOptions<AiChat,(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"model\"|\"status\"|\"visibility\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "name": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "description": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "owner": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "model": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "status": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "visibility": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["id", "name", "description", "createdAt", "owner", "model", "status", "visibility"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CAiChat%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FindOptions<AiChatMessage,(\"id\"|\"content\"|\"createdAt\"|\"aiChatId\"|\"role\"|\"visibility\"|\"owner\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "content": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "aiChatId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "role": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "visibility": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "owner": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["id", "content", "createdAt", "aiChatId", "role", "visibility", "owner"]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CAiChatMessage%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "GetCollectionEndpoint<AiChat>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CAiChat%2C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22model%22%7C%22status%22%7C%22visibility%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CAiChat%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "GetCollectionEndpoint<AiChatMessage>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CAiChatMessage%2C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22aiChatId%22%7C%22role%22%7C%22visibility%22%7C%22owner%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CAiChatMessage%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "GetCollectionResult<AiChat>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AiChat"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
     "GetCollectionResult<AiChatMessage>": {
       "type": "object",
       "properties": {
@@ -1939,43 +1635,41 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
-    "AiChatMessage": {
+    "GetEntityEndpoint<AiChat,\"id\">": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier for the AI chat message"
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["id", "name", "description", "createdAt", "owner", "model", "status", "visibility"]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
         },
-        "content": {
-          "type": "string",
-          "description": "The content of the AI chat message"
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
         },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the AI chat message was created"
-        },
-        "aiChatId": {
-          "type": "string",
-          "description": "The id of the AI chat this message belongs to This is used to associate the message with a specific AI chat."
-        },
-        "role": {
-          "type": "string",
-          "enum": ["user", "assistant"],
-          "description": "The role of the message sender, either 'user' or 'assistant' This indicates whether the message was sent by the user or generated by the AI assistant."
-        },
-        "visibility": {
-          "type": "string",
-          "enum": ["public", "private"],
-          "description": "Defines if the AI Chat is public or private Denormalized field due performance reasons."
-        },
-        "owner": {
-          "type": "string",
-          "description": "The owner of the AI chat message This is used to identify the user who created the message. Denormalized field due performance reasons."
+        "result": {
+          "$ref": "#/definitions/AiChat"
         }
       },
-      "required": ["id", "content", "createdAt", "aiChatId", "role", "visibility", "owner"],
-      "additionalProperties": false
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
     },
     "GetEntityEndpoint<AiChatMessage,\"id\">": {
       "type": "object",
@@ -2013,6 +1707,294 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
+    "GetModelsAction": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelResponse"
+          }
+        }
+      },
+      "required": ["result"],
+      "additionalProperties": false
+    },
+    "Logprob": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "logprob": {
+          "type": "number"
+        },
+        "top_logprobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TokenLogprob"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["logprob", "token"]
+    },
+    "ModelDetails": {
+      "type": "object",
+      "properties": {
+        "parent_model": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "families": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parameter_size": {
+          "type": "string"
+        },
+        "quantization_level": {
+          "type": "string"
+        }
+      },
+      "required": ["parent_model", "format", "family", "families", "parameter_size", "quantization_level"],
+      "additionalProperties": false
+    },
+    "ModelResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "modified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "model": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        },
+        "digest": {
+          "type": "string"
+        },
+        "details": {
+          "$ref": "#/definitions/ModelDetails"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size_vram": {
+          "type": "number"
+        }
+      },
+      "required": ["name", "modified_at", "model", "size", "digest", "details", "expires_at", "size_vram"],
+      "additionalProperties": false
+    },
+    "OllamaApiMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "role": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "thinking": {
+          "type": "string"
+        },
+        "tool_calls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ToolCall"
+          }
+        },
+        "tool_name": {
+          "type": "string"
+        }
+      },
+      "required": ["content", "role"]
+    },
+    "Partial<AiChat>": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the AI chat."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the AI chat was created."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner username of the AI chat."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "archived"],
+          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["private", "public"],
+          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
+        }
+      },
+      "additionalProperties": false
+    },
+    "Partial<Options>": {
+      "type": "object",
+      "properties": {
+        "numa": {
+          "type": "boolean"
+        },
+        "num_ctx": {
+          "type": "number"
+        },
+        "num_batch": {
+          "type": "number"
+        },
+        "num_gpu": {
+          "type": "number"
+        },
+        "main_gpu": {
+          "type": "number"
+        },
+        "low_vram": {
+          "type": "boolean"
+        },
+        "f16_kv": {
+          "type": "boolean"
+        },
+        "logits_all": {
+          "type": "boolean"
+        },
+        "vocab_only": {
+          "type": "boolean"
+        },
+        "use_mmap": {
+          "type": "boolean"
+        },
+        "use_mlock": {
+          "type": "boolean"
+        },
+        "embedding_only": {
+          "type": "boolean"
+        },
+        "num_thread": {
+          "type": "number"
+        },
+        "num_keep": {
+          "type": "number"
+        },
+        "seed": {
+          "type": "number"
+        },
+        "num_predict": {
+          "type": "number"
+        },
+        "top_k": {
+          "type": "number"
+        },
+        "top_p": {
+          "type": "number"
+        },
+        "tfs_z": {
+          "type": "number"
+        },
+        "typical_p": {
+          "type": "number"
+        },
+        "repeat_last_n": {
+          "type": "number"
+        },
+        "temperature": {
+          "type": "number"
+        },
+        "repeat_penalty": {
+          "type": "number"
+        },
+        "presence_penalty": {
+          "type": "number"
+        },
+        "frequency_penalty": {
+          "type": "number"
+        },
+        "mirostat": {
+          "type": "number"
+        },
+        "mirostat_tau": {
+          "type": "number"
+        },
+        "mirostat_eta": {
+          "type": "number"
+        },
+        "penalize_newline": {
+          "type": "boolean"
+        },
+        "stop": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "PatchEndpoint<AiChat,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/Partial%3CAiChat%3E"
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The unique identifier for the AI chat."
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object"
+        }
+      },
+      "required": ["body", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for updating entities"
+    },
     "PostEndpoint<AiChat,\"id\">": {
       "type": "object",
       "properties": {
@@ -2026,6 +2008,125 @@
       "required": ["body", "result"],
       "additionalProperties": false,
       "description": "Endpoint model for creating new entities"
+    },
+    "PostEndpoint<AiChatMessage,\"id\">": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/definitions/WithOptionalId%3CAiChatMessage%2C%22id%22%3E"
+        },
+        "result": {
+          "$ref": "#/definitions/AiChatMessage"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for creating new entities"
+    },
+    "TokenLogprob": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "logprob": {
+          "type": "number"
+        }
+      },
+      "required": ["token", "logprob"],
+      "additionalProperties": false
+    },
+    "Tool": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "function": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "$defs": {},
+                "items": {},
+                "required": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "properties": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        ]
+                      },
+                      "items": {},
+                      "description": {
+                        "type": "string"
+                      },
+                      "enum": {
+                        "type": "array",
+                        "items": {}
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["type", "function"],
+      "additionalProperties": false
+    },
+    "ToolCall": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "arguments": {
+              "type": "object"
+            }
+          },
+          "required": ["name", "arguments"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["function"],
+      "additionalProperties": false
     },
     "WithOptionalId<AiChat,\"id\">": {
       "type": "object",
@@ -2068,20 +2169,6 @@
       },
       "required": ["createdAt", "model", "name", "owner", "status", "visibility"]
     },
-    "PostEndpoint<AiChatMessage,\"id\">": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/WithOptionalId%3CAiChatMessage%2C%22id%22%3E"
-        },
-        "result": {
-          "$ref": "#/definitions/AiChatMessage"
-        }
-      },
-      "required": ["body", "result"],
-      "additionalProperties": false,
-      "description": "Endpoint model for creating new entities"
-    },
     "WithOptionalId<AiChatMessage,\"id\">": {
       "type": "object",
       "additionalProperties": false,
@@ -2118,93 +2205,6 @@
         }
       },
       "required": ["aiChatId", "content", "createdAt", "owner", "role", "visibility"]
-    },
-    "PatchEndpoint<AiChat,\"id\">": {
-      "type": "object",
-      "properties": {
-        "body": {
-          "$ref": "#/definitions/Partial%3CAiChat%3E"
-        },
-        "url": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier for the AI chat."
-            }
-          },
-          "required": ["id"],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object"
-        }
-      },
-      "required": ["body", "url", "result"],
-      "additionalProperties": false,
-      "description": "Endpoint model for updating entities"
-    },
-    "Partial<AiChat>": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier for the AI chat."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
-        },
-        "description": {
-          "type": "string",
-          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The date the AI chat was created."
-        },
-        "owner": {
-          "type": "string",
-          "description": "The owner username of the AI chat."
-        },
-        "model": {
-          "type": "string",
-          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
-        },
-        "status": {
-          "type": "string",
-          "enum": ["active", "archived"],
-          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
-        },
-        "visibility": {
-          "type": "string",
-          "enum": ["private", "public"],
-          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
-        }
-      },
-      "additionalProperties": false
-    },
-    "DeleteEndpoint<AiChat,\"id\">": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "description": "The unique identifier for the AI chat."
-            }
-          },
-          "required": ["id"],
-          "additionalProperties": false
-        },
-        "result": {
-          "type": "object"
-        }
-      },
-      "required": ["url", "result"],
-      "additionalProperties": false,
-      "description": "Endpoint model for deleting entities"
     }
   }
 }
