@@ -69,7 +69,7 @@ type FileWatcherEvents = {
 let mockFileWatcher: EventHub<FileWatcherEvents>
 
 vi.mock('../../drives/file-watcher-service.js', async () => {
-  const { InjectableOptionsSymbol } = (await vi.importActual('@furystack/inject'))
+  const { InjectableOptionsSymbol } = await vi.importActual('@furystack/inject')
 
   class MockFileWatcherService {}
   Object.assign(MockFileWatcherService, {
