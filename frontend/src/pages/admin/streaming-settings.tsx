@@ -1,7 +1,9 @@
+import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, NotyService, Paper } from '@furystack/shades-common-components'
+import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import type { MoviesConfig } from 'common'
+import type { Config, MoviesConfig } from 'common'
+import { GenericErrorPage } from '../../components/generic-error.js'
 import { ConfigService } from '../../services/config-service.js'
 
 type StreamingFormData = MoviesConfig['value']
@@ -18,83 +20,11 @@ const PRESET_OPTIONS = [
   { value: 'veryslow', label: 'Very Slow (Best Quality)' },
 ] as const
 
-export const StreamingSettingsPage = Shade({
-  shadowDomName: 'streaming-settings-page',
-  css: {
-    '& .page-title': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .page-description': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .loading-text': {
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .section-title': {
-      marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
-      fontSize: '16px',
-    },
-    '& .form-field': {
-      marginBottom: '24px',
-    },
-    '& .checkbox-label': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      cursor: 'pointer',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .checkbox-label input': {
-      width: '18px',
-      height: '18px',
-      cursor: 'pointer',
-    },
-    '& .checkbox-title': {
-      fontWeight: '500',
-    },
-    '& .checkbox-description': {
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .section-divider': {
-      borderTop: '1px solid var(--theme-background-default)',
-      margin: '24px 0',
-      paddingTop: '24px',
-    },
-    '& .select-label': {
-      display: 'block',
-      marginBottom: '8px',
-      fontWeight: '500',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .select-input': {
-      width: '100%',
-      maxWidth: '300px',
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '4px',
-      border: '1px solid var(--theme-background-paper)',
-      backgroundColor: 'var(--theme-background-default)',
-      color: 'var(--theme-text-primary)',
-      cursor: 'pointer',
-    },
-    '& .field-hint': {
-      color: 'var(--theme-text-secondary)',
-      display: 'block',
-      marginTop: '4px',
-    },
-    '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
-      paddingTop: '16px',
-    },
-  },
-  render: ({ injector, useObservable, useDisposable }) => {
+const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
+  shadowDomName: 'streaming-settings-content',
+  render: ({ props, injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
-
-    const [config] = useObservable('moviesConfig', configService.getConfigAsObservable('MOVIES_CONFIG'))
 
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
@@ -128,31 +58,18 @@ export const StreamingSettingsPage = Shade({
       }
     }
 
-    if (config.status === 'loading') {
-      return (
-        <div>
-          <h2 className="page-title">📺 Streaming Settings</h2>
-          <Paper elevation={1} style={{ padding: '24px' }}>
-            <p className="loading-text">Loading settings...</p>
-          </Paper>
-        </div>
-      )
-    }
-
-    const currentValues: StreamingFormData =
-      config.status === 'loaded' && config.value
-        ? (config.value.value as StreamingFormData)
-        : {
-            autoExtractSubtitles: false,
-            fullSyncOnStartup: false,
-            preset: 'medium',
-            threads: 4,
-            watchFiles: 'all',
-          }
+    const currentValues: StreamingFormData = props.data.value
+      ? (props.data.value.value as StreamingFormData)
+      : {
+          autoExtractSubtitles: false,
+          fullSyncOnStartup: false,
+          preset: 'medium',
+          threads: 4,
+          watchFiles: 'all',
+        }
 
     return (
-      <div>
-        <h2 className="page-title">📺 Streaming Settings</h2>
+      <>
         <p className="page-description">Configure media transcoding and file watching settings.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
@@ -247,6 +164,93 @@ export const StreamingSettingsPage = Shade({
             </div>
           </Form>
         </Paper>
+      </>
+    )
+  },
+})
+
+export const StreamingSettingsPage = Shade({
+  shadowDomName: 'streaming-settings-page',
+  css: {
+    '& .page-title': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .section-title': {
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+      fontSize: '16px',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .checkbox-label': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      cursor: 'pointer',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .checkbox-label input': {
+      width: '18px',
+      height: '18px',
+      cursor: 'pointer',
+    },
+    '& .checkbox-title': {
+      fontWeight: '500',
+    },
+    '& .checkbox-description': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .section-divider': {
+      borderTop: '1px solid var(--theme-background-default)',
+      margin: '24px 0',
+      paddingTop: '24px',
+    },
+    '& .select-label': {
+      display: 'block',
+      marginBottom: '8px',
+      fontWeight: '500',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .select-input': {
+      width: '100%',
+      maxWidth: '300px',
+      padding: '8px 12px',
+      fontSize: '14px',
+      borderRadius: '4px',
+      border: '1px solid var(--theme-background-paper)',
+      backgroundColor: 'var(--theme-background-default)',
+      color: 'var(--theme-text-primary)',
+      cursor: 'pointer',
+    },
+    '& .field-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
+  render: ({ injector }) => {
+    const configService = injector.getInstance(ConfigService)
+
+    return (
+      <div>
+        <h2 className="page-title">📺 Streaming Settings</h2>
+        <CacheView
+          cache={configService.configCache}
+          args={['MOVIES_CONFIG']}
+          content={StreamingSettingsContent}
+          loader={<Skeleton />}
+          error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
+        />
       </div>
     )
   },

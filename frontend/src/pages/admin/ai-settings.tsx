@@ -1,7 +1,9 @@
+import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, NotyService, Paper } from '@furystack/shades-common-components'
+import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import type { OllamaConfig } from 'common'
+import type { Config, OllamaConfig } from 'common'
+import { GenericErrorPage } from '../../components/generic-error.js'
 import { ConfigService } from '../../services/config-service.js'
 
 type OllamaFormData = OllamaConfig['value']
@@ -16,45 +18,11 @@ const isValidUrl = (urlString: string): boolean => {
   }
 }
 
-export const AiSettingsPage = Shade({
-  shadowDomName: 'ai-settings-page',
-  css: {
-    '& .page-title': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .page-description': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .loading-text': {
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .form-field': {
-      marginBottom: '24px',
-    },
-    '& .field-hint': {
-      color: 'var(--theme-text-secondary)',
-      display: 'block',
-      marginTop: '4px',
-    },
-    '& .validation-error': {
-      color: 'var(--theme-error-main)',
-      backgroundColor: 'var(--theme-error-light)',
-      padding: '12px',
-      borderRadius: '4px',
-      marginBottom: '16px',
-    },
-    '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
-      paddingTop: '16px',
-    },
-  },
-  render: ({ injector, useObservable, useDisposable }) => {
+const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
+  shadowDomName: 'ai-settings-content',
+  render: ({ props, injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
-
-    const [config] = useObservable('ollamaConfig', configService.getConfigAsObservable('OLLAMA_CONFIG'))
 
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
@@ -103,27 +71,10 @@ export const AiSettingsPage = Shade({
       }
     }
 
-    if (config.status === 'loading') {
-      return (
-        <div>
-          <h2 className="page-title">🤖 Ollama Integration</h2>
-          <Paper elevation={1} style={{ padding: '24px' }}>
-            <p className="loading-text">Loading settings...</p>
-          </Paper>
-        </div>
-      )
-    }
-
-    const currentValues: OllamaFormData =
-      config.status === 'loaded' && config.value
-        ? (config.value.value as OllamaFormData)
-        : {
-            host: '',
-          }
+    const currentValues: OllamaFormData = props.data.value ? (props.data.value.value as OllamaFormData) : { host: '' }
 
     return (
-      <div>
-        <h2 className="page-title">🤖 Ollama Integration</h2>
+      <>
         <p className="page-description">Configure the connection to your Ollama server for AI-powered features.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
@@ -162,6 +113,55 @@ export const AiSettingsPage = Shade({
             </div>
           </Form>
         </Paper>
+      </>
+    )
+  },
+})
+
+export const AiSettingsPage = Shade({
+  shadowDomName: 'ai-settings-page',
+  css: {
+    '& .page-title': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .field-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .validation-error': {
+      color: 'var(--theme-error-main)',
+      backgroundColor: 'var(--theme-error-light)',
+      padding: '12px',
+      borderRadius: '4px',
+      marginBottom: '16px',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
+  render: ({ injector }) => {
+    const configService = injector.getInstance(ConfigService)
+
+    return (
+      <div>
+        <h2 className="page-title">🤖 Ollama Integration</h2>
+        <CacheView
+          cache={configService.configCache}
+          args={['OLLAMA_CONFIG']}
+          content={AiSettingsContent}
+          loader={<Skeleton />}
+          error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
+        />
       </div>
     )
   },

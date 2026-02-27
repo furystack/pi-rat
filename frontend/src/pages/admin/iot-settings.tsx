@@ -1,7 +1,9 @@
+import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, NotyService, Paper } from '@furystack/shades-common-components'
+import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import type { IotConfig } from 'common'
+import type { Config, IotConfig } from 'common'
+import { GenericErrorPage } from '../../components/generic-error.js'
 import { ConfigService } from '../../services/config-service.js'
 
 type IotFormData = IotConfig['value']
@@ -13,13 +15,11 @@ const MAX_PING_TIMEOUT_MS = 60000
 const DEFAULT_PING_INTERVAL_MS = 30000
 const DEFAULT_PING_TIMEOUT_MS = 3000
 
-export const IotSettingsPage = Shade({
-  shadowDomName: 'iot-settings-page',
-  render: ({ injector, useObservable, useDisposable }) => {
+const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
+  shadowDomName: 'iot-settings-content',
+  render: ({ props, injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
-
-    const [config] = useObservable('iotConfig', configService.getConfigAsObservable('IOT_CONFIG'))
 
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
@@ -82,28 +82,15 @@ export const IotSettingsPage = Shade({
       }
     }
 
-    if (config.status === 'loading') {
-      return (
-        <div>
-          <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>📡 IOT Device Availability</h2>
-          <Paper elevation={1} style={{ padding: '24px' }}>
-            <p style={{ color: 'var(--theme-text-secondary)' }}>Loading settings...</p>
-          </Paper>
-        </div>
-      )
-    }
-
-    const currentValues: IotFormData =
-      config.status === 'loaded' && config.value
-        ? (config.value.value as IotFormData)
-        : {
-            pingIntervalMs: DEFAULT_PING_INTERVAL_MS,
-            pingTimeoutMs: DEFAULT_PING_TIMEOUT_MS,
-          }
+    const currentValues: IotFormData = props.data.value
+      ? (props.data.value.value as IotFormData)
+      : {
+          pingIntervalMs: DEFAULT_PING_INTERVAL_MS,
+          pingTimeoutMs: DEFAULT_PING_TIMEOUT_MS,
+        }
 
     return (
-      <div>
-        <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>📡 IOT Device Availability</h2>
+      <>
         <p style={{ marginBottom: '24px', color: 'var(--theme-text-secondary)' }}>
           Configure how frequently IOT devices are pinged to check their availability.
         </p>
@@ -175,6 +162,26 @@ export const IotSettingsPage = Shade({
             </div>
           </Form>
         </Paper>
+      </>
+    )
+  },
+})
+
+export const IotSettingsPage = Shade({
+  shadowDomName: 'iot-settings-page',
+  render: ({ injector }) => {
+    const configService = injector.getInstance(ConfigService)
+
+    return (
+      <div>
+        <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>📡 IOT Device Availability</h2>
+        <CacheView
+          cache={configService.configCache}
+          args={['IOT_CONFIG']}
+          content={IotSettingsContent}
+          loader={<Skeleton />}
+          error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
+        />
       </div>
     )
   },

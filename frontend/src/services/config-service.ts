@@ -9,7 +9,7 @@ export class ConfigService {
   @Injected(ConfigApiClient)
   declare private readonly configApiClient: ConfigApiClient
 
-  private configCache = new Cache({
+  public configCache = new Cache({
     capacity: 50,
     load: async (id: ConfigType['id']) => {
       const { result } = await this.configApiClient.call({
