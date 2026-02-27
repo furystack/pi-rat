@@ -23,7 +23,7 @@ export const MoviePicker = Shade({
           element: <div>{entry.title}</div>,
           score: 1,
         })}
-        onSelectSuggestion={(entry) => {
+        onSelectSuggestion={(entry: Movie) => {
           console.log(entry)
         }}
       />

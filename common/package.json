@@ -25,14 +25,14 @@
     "create-schemas": "node ./dist/bin/create-schemas.js"
   },
   "devDependencies": {
-    "@types/node": "^25.3.0",
+    "@types/node": "^25.3.2",
     "ts-json-schema-generator": "^2.5.0",
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@furystack/core": "^15.1.0",
-    "@furystack/entity-sync": "^0.1.1",
-    "@furystack/rest": "^8.0.37",
+    "@furystack/core": "^15.2.2",
+    "@furystack/entity-sync": "^1.0.3",
+    "@furystack/rest": "^8.0.40",
     "ollama": "^0.6.3"
   }
 }

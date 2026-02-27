@@ -82,6 +82,8 @@ export const CreateAiChatButton = Shade({
               }}
               validate={(formData): formData is Pick<AiChat, 'name' | 'description' | 'model'> => {
                 return (
+                  typeof formData === 'object' &&
+                  formData !== null &&
                   'name' in formData &&
                   typeof (formData as AiChat).name === 'string' &&
                   (formData as AiChat).name.trim() !== '' &&

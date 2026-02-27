@@ -72,6 +72,8 @@ export const InviteButton = Shade<{ chat: Chat }>({
               }}
               validate={(formData): formData is { userName: string; message: string } => {
                 return (
+                  typeof formData === 'object' &&
+                  formData !== null &&
                   'userName' in formData &&
                   typeof (formData as { userName: unknown }).userName === 'string' &&
                   (formData as { userName: string }).userName.trim().length > 0 &&

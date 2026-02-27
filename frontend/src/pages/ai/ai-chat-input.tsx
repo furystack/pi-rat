@@ -46,6 +46,8 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
         }}
         validate={(formData): formData is { message: string } => {
           return (
+            typeof formData === 'object' &&
+            formData !== null &&
             'message' in formData &&
             typeof (formData as { message?: unknown }).message === 'string' &&
             (formData as { message: string }).message.trim() !== ''

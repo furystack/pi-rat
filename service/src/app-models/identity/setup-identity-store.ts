@@ -1,9 +1,9 @@
 import { getCurrentUser } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { getRepository } from '@furystack/repository'
+import { getDataSetFor, getRepository } from '@furystack/repository'
 import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
-import { PasswordCredential, usePasswordPolicy } from '@furystack/security'
+import { PasswordCredential, PasswordResetToken, usePasswordPolicy } from '@furystack/security'
 import { useSequelize } from '@furystack/sequelize-store'
 import { User, type Roles } from 'common'
 import { DataTypes, Model } from 'sequelize'
@@ -25,6 +25,12 @@ class PasswordCredentialModel extends Model<PasswordCredential, PasswordCredenti
   declare passwordHash: string
   declare salt: string
   declare creationDate: string
+}
+
+class PasswordResetTokenModel extends Model<PasswordResetToken, PasswordResetToken> implements PasswordResetToken {
+  declare userName: string
+  declare token: string
+  declare createdAt: string
 }
 
 class SessionModel extends Model<DefaultSession, DefaultSession> implements DefaultSession {
@@ -101,6 +107,33 @@ export const setupIdentity = async (injector: Injector) => {
 
   useSequelize({
     injector,
+    model: PasswordResetToken,
+    sequelizeModel: PasswordResetTokenModel,
+    primaryKey: 'token',
+    options,
+    initModel: async (sequelize) => {
+      PasswordResetTokenModel.init(
+        {
+          token: {
+            type: DataTypes.STRING,
+            primaryKey: true,
+          },
+          userName: {
+            type: DataTypes.STRING,
+          },
+          createdAt: {
+            type: DataTypes.STRING,
+          },
+        },
+        {
+          sequelize,
+        },
+      )
+    },
+  })
+
+  useSequelize({
+    injector,
     model: DefaultSession,
     sequelizeModel: SessionModel,
     primaryKey: 'sessionId',
@@ -146,12 +179,15 @@ export const setupIdentity = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
+  repo.createDataSet(PasswordResetToken, 'token')
+
+  repo.createDataSet(DefaultSession, 'sessionId')
+
   usePasswordPolicy(injector)
 
   useHttpAuthentication(injector, {
-    getUserStore: (sm) => sm.getStoreFor(User, 'username'),
-    getSessionStore: (sm) => sm.getStoreFor(DefaultSession, 'sessionId'),
     enableBasicAuth: false,
+    getUserDataSet: (i) => getDataSetFor(i, User, 'username'),
   })
 
   await UserModel.sequelize?.sync()
