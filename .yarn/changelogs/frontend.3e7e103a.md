@@ -1,4 +1,5 @@
 <!-- version-type: patch -->
+
 # frontend
 
 <!--
@@ -18,15 +19,19 @@ appear before simple list items within each section.
 -->
 
 ## ✨ Features
+
 <!-- PLACEHOLDER: Describe your shiny new features (feat:) -->
 
 ## 🐛 Bug Fixes
+
 <!-- PLACEHOLDER: Describe the nasty little bugs that has been eradicated (fix:) -->
 
 ## 📚 Documentation
+
 <!-- PLACEHOLDER: Describe documentation changes (docs:) -->
 
 ## ⚡ Performance
+
 <!-- PLACEHOLDER: Describe performance improvements (perf:) -->
 
 ## ♻️ Refactoring
@@ -34,16 +39,21 @@ appear before simple list items within each section.
 - Updated `deleteEntities` in entity pages (`config`, `dashboards`, `drives`, `movie-files`, `movies`, `users`) to accept variadic IDs and delete in parallel with `Promise.all`
 
 ## 🧪 Tests
+
 <!-- PLACEHOLDER: Describe test changes (test:) -->
 
 ## 📦 Build
+
 <!-- PLACEHOLDER: Describe build system changes (build:) -->
 
 ## 👷 CI
+
 <!-- PLACEHOLDER: Describe CI configuration changes (ci:) -->
 
 ## ⬆️ Dependencies
+
 <!-- PLACEHOLDER: Describe dependency updates (deps:) -->
 
 ## 🔧 Chores
+
 <!-- PLACEHOLDER: Describe other changes (chore:) -->

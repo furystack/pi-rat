@@ -668,17 +668,24 @@ export const setupMedia = async (injector: Injector) => {
   movieFileDataSet.subscribe('onEntityAdded', ({ entity }) => {
     if (!entity.imdbId) return
     void (async () => {
-      const movie = await movieDataSet.get(injector, entity.imdbId as string)
-      if (movie) {
-        await injector.getInstance(WebsocketService).announce(
-          {
-            type: 'add-movie',
-            file: { driveLetter: entity.driveLetter, path: entity.path },
-            movie,
-            movieFile: entity,
-          },
-          async ({ injector: i }) => isAuthorized(i, 'admin'),
-        )
+      try {
+        const movie = await movieDataSet.get(injector, entity.imdbId as string)
+        if (movie) {
+          await injector.getInstance(WebsocketService).announce(
+            {
+              type: 'add-movie',
+              file: { driveLetter: entity.driveLetter, path: entity.path },
+              movie,
+              movieFile: entity,
+            },
+            async ({ injector: i }) => isAuthorized(i, 'admin'),
+          )
+        }
+      } catch (error) {
+        await logger.error({
+          message: `Failed to announce new movie file '${entity.path}'`,
+          data: { error },
+        })
       }
     })()
   })

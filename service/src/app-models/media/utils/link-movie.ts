@@ -111,15 +111,17 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   const added = await ensureOmdbMovieExists(result, injector)
 
-  await ensureMovieExists(added, injector)
+  const movie = await ensureMovieExists(added, injector)
   await ensureOmdbSeriesExists(added, injector)
 
-  await movieFileDataSet.add(injector, {
+  const {
+    created: [newMovieFile],
+  } = await movieFileDataSet.add(injector, {
     driveLetter,
     path,
     imdbId: added.imdbID,
     ffprobe: ffprobeResult,
   })
 
-  return { status: 'linked' } as const
+  return { status: 'linked', movieFile: newMovieFile, movie } as const
 }
