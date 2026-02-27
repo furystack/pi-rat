@@ -38,11 +38,6 @@
     "vite": "^7.3.1",
     "vitest": "^4.0.18"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix"
@@ -52,6 +47,7 @@
     ]
   },
   "scripts": {
+    "prepare": "husky",
     "build": "tsc -b common service frontend && yarn workspace frontend build",
     "create-schemas": "yarn workspace common create-schemas",
     "test:e2e:install": "yarn playwright test --grep @install --project chromium",
