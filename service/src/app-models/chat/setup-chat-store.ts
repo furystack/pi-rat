@@ -1,4 +1,4 @@
-import { getCurrentUser, getStoreManager, useSystemIdentityContext } from '@furystack/core'
+import { getCurrentUser, getStoreManager } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
@@ -6,7 +6,6 @@ import { SequelizeStore, useSequelize } from '@furystack/sequelize-store'
 import { Chat, ChatInvitation, ChatMessage } from 'common'
 import { DATE, JSON, Model, STRING } from 'sequelize'
 import { getDefaultDbSettings } from '../../get-default-db-options.js'
-import { WebsocketService } from '../../websocket-service.js'
 
 class ChatModel extends Model<Chat, Chat> implements Chat {
   declare id: string
@@ -313,86 +312,6 @@ export const setupChatStore = async (injector: Injector) => {
 
       return { isAllowed: true }
     },
-  })
-
-  const chatDataSet = repo.getDataSetFor(Chat, 'id')
-  const chatMessageDataSet = repo.getDataSetFor(ChatMessage, 'id')
-
-  const systemInjector = useSystemIdentityContext({ injector, username: 'chat-events' })
-
-  const wsService = injector.getInstance(WebsocketService)
-
-  chatDataSet.subscribe('onEntityAdded', ({ entity }) => {
-    void wsService.announce({ type: 'chat-added', chat: entity }, async ({ injector: i }) => {
-      const user = await getCurrentUser(i)
-      if (!user) {
-        return false
-      }
-      return entity.owner === user.username || entity.participants.includes(user.username)
-    })
-  })
-
-  chatDataSet.subscribe('onEntityRemoved', ({ key }) => {
-    void wsService.announce({ type: 'chat-removed', chatId: key }, async ({ injector: i }) => {
-      const user = await getCurrentUser(i)
-      if (!user) {
-        return false
-      }
-      return true
-    })
-  })
-
-  chatDataSet.subscribe('onEntityUpdated', async ({ id, change }) => {
-    const entity = await chatDataSet.get(systemInjector, id)
-    void wsService.announce({ type: 'chat-updated', id, change }, async ({ injector: i }) => {
-      const user = await getCurrentUser(i)
-      if (!user || !entity) {
-        return false
-      }
-      return entity.owner === user.username || entity.participants.includes(user.username)
-    })
-  })
-
-  chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
-    const chat = await chatDataSet.get(systemInjector, entity.chatId)
-    if (chat) {
-      void wsService.announce({ type: 'chat-message-added', chatMessage: entity, chat }, async ({ injector: i }) => {
-        const user = await getCurrentUser(i)
-        if (!user || !chat) {
-          return false
-        }
-        return chat.owner === user.username || chat.participants.includes(user.username)
-      })
-    }
-  })
-
-  chatMessageDataSet.subscribe('onEntityUpdated', async ({ id, change }) => {
-    const reloadedChatMessage = await chatMessageDataSet.get(systemInjector, id)
-    if (!reloadedChatMessage) {
-      return
-    }
-    const chat = await chatDataSet.get(systemInjector, reloadedChatMessage.chatId)
-    if (!chat) {
-      return
-    }
-
-    void wsService.announce({ type: 'chat-message-updated', id, change, chat }, async ({ injector: i }) => {
-      const currentUser = await getCurrentUser(i)
-      if (!currentUser) {
-        return false
-      }
-      return chat.owner === currentUser.username || chat.participants.includes(currentUser.username)
-    })
-  })
-
-  chatMessageDataSet.subscribe('onEntityRemoved', async ({ key }) => {
-    await wsService.announce({ type: 'chat-message-removed', chatMessageId: key }, async ({ injector: i }) => {
-      const user = await getCurrentUser(i)
-      if (!user) {
-        return false
-      }
-      return true
-    })
   })
 
   repo.createDataSet(ChatInvitation, 'id', {

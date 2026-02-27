@@ -32,34 +32,6 @@
       },
       "required": ["content", "role"]
     },
-    "Omit<Message,\"images\">": {
-      "$ref": "#/definitions/Pick%3CMessage%2CExclude%3C(%22role%22%7C%22content%22%7C%22thinking%22%7C%22images%22%7C%22tool_calls%22%7C%22tool_name%22)%2C%22images%22%3E%3E"
-    },
-    "Pick<Message,Exclude<(\"role\"|\"content\"|\"thinking\"|\"images\"|\"tool_calls\"|\"tool_name\"),\"images\">>": {
-      "type": "object",
-      "properties": {
-        "role": {
-          "type": "string"
-        },
-        "content": {
-          "type": "string"
-        },
-        "thinking": {
-          "type": "string"
-        },
-        "tool_calls": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ToolCall"
-          }
-        },
-        "tool_name": {
-          "type": "string"
-        }
-      },
-      "required": ["role", "content"],
-      "additionalProperties": false
-    },
     "ToolCall": {
       "type": "object",
       "properties": {
@@ -145,69 +117,6 @@
         }
       },
       "required": ["messages", "model"]
-    },
-    "Omit<ChatRequest,\"messages\">": {
-      "$ref": "#/definitions/Pick%3CChatRequest%2CExclude%3C(%22model%22%7C%22messages%22%7C%22stream%22%7C%22format%22%7C%22keep_alive%22%7C%22tools%22%7C%22think%22%7C%22logprobs%22%7C%22top_logprobs%22%7C%22options%22)%2C%22messages%22%3E%3E"
-    },
-    "Pick<ChatRequest,Exclude<(\"model\"|\"messages\"|\"stream\"|\"format\"|\"keep_alive\"|\"tools\"|\"think\"|\"logprobs\"|\"top_logprobs\"|\"options\"),\"messages\">>": {
-      "type": "object",
-      "properties": {
-        "model": {
-          "type": "string"
-        },
-        "stream": {
-          "type": "boolean"
-        },
-        "format": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "keep_alive": {
-          "type": ["string", "number"]
-        },
-        "tools": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Tool"
-          }
-        },
-        "think": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "string",
-              "const": "high"
-            },
-            {
-              "type": "string",
-              "const": "medium"
-            },
-            {
-              "type": "string",
-              "const": "low"
-            }
-          ]
-        },
-        "logprobs": {
-          "type": "boolean"
-        },
-        "top_logprobs": {
-          "type": "number"
-        },
-        "options": {
-          "$ref": "#/definitions/Partial%3COptions%3E"
-        }
-      },
-      "required": ["model"],
-      "additionalProperties": false
     },
     "Tool": {
       "type": "object",
@@ -438,64 +347,6 @@
         "prompt_eval_duration",
         "total_duration"
       ]
-    },
-    "Omit<ChatResponse,\"message\">": {
-      "$ref": "#/definitions/Pick%3CChatResponse%2CExclude%3C(%22model%22%7C%22created_at%22%7C%22message%22%7C%22done%22%7C%22done_reason%22%7C%22total_duration%22%7C%22load_duration%22%7C%22prompt_eval_count%22%7C%22prompt_eval_duration%22%7C%22eval_count%22%7C%22eval_duration%22%7C%22logprobs%22)%2C%22message%22%3E%3E"
-    },
-    "Pick<ChatResponse,Exclude<(\"model\"|\"created_at\"|\"message\"|\"done\"|\"done_reason\"|\"total_duration\"|\"load_duration\"|\"prompt_eval_count\"|\"prompt_eval_duration\"|\"eval_count\"|\"eval_duration\"|\"logprobs\"),\"message\">>": {
-      "type": "object",
-      "properties": {
-        "model": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "done": {
-          "type": "boolean"
-        },
-        "done_reason": {
-          "type": "string"
-        },
-        "total_duration": {
-          "type": "number"
-        },
-        "load_duration": {
-          "type": "number"
-        },
-        "prompt_eval_count": {
-          "type": "number"
-        },
-        "prompt_eval_duration": {
-          "type": "number"
-        },
-        "eval_count": {
-          "type": "number"
-        },
-        "eval_duration": {
-          "type": "number"
-        },
-        "logprobs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Logprob"
-          }
-        }
-      },
-      "required": [
-        "model",
-        "created_at",
-        "done",
-        "done_reason",
-        "total_duration",
-        "load_duration",
-        "prompt_eval_count",
-        "prompt_eval_duration",
-        "eval_count",
-        "eval_duration"
-      ],
-      "additionalProperties": false
     },
     "Logprob": {
       "type": "object",
@@ -818,147 +669,6 @@
         }
       },
       "required": ["GET", "POST", "PATCH", "DELETE"],
-      "additionalProperties": false
-    },
-    "RestApi": {
-      "type": "object",
-      "properties": {
-        "GET": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "POST": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PATCH": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PUT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "DELETE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "HEAD": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "CONNECT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "TRACE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "OPTIONS": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        }
-      },
       "additionalProperties": false
     },
     "GetCollectionEndpoint<AiChat>": {
@@ -2358,46 +2068,6 @@
       },
       "required": ["createdAt", "model", "name", "owner", "status", "visibility"]
     },
-    "Omit<AiChat,\"id\">": {
-      "$ref": "#/definitions/Pick%3CAiChat%2CExclude%3C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22model%22%7C%22status%22%7C%22visibility%22)%2C%22id%22%3E%3E"
-    },
-    "Pick<AiChat,Exclude<(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"model\"|\"status\"|\"visibility\"),\"id\">>": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the AI chat. It can be used as a context information for the AI model and is also displayed in the UI."
-        },
-        "description": {
-          "type": "string",
-          "description": "The description of the AI chat in markdown format. This can be used to provide additional context or instructions for the AI model, and is also displayed in the UI."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The date the AI chat was created."
-        },
-        "owner": {
-          "type": "string",
-          "description": "The owner username of the AI chat."
-        },
-        "model": {
-          "type": "string",
-          "description": "The model used by the AI chat, such as 'gpt-3.5-turbo' or 'gpt-4' This is the model that will be used to generate responses in the chat."
-        },
-        "status": {
-          "type": "string",
-          "enum": ["active", "archived"],
-          "description": "The status of the AI chat, indicating whether it is active or archived Archived chats can no longer be used for new messages, but can still be viewed and referenced."
-        },
-        "visibility": {
-          "type": "string",
-          "enum": ["private", "public"],
-          "description": "Defines if the chat can be viewed by its owner only or if it's public to anyone who knows the ID."
-        }
-      },
-      "required": ["name", "createdAt", "owner", "model", "status", "visibility"],
-      "additionalProperties": false
-    },
     "PostEndpoint<AiChatMessage,\"id\">": {
       "type": "object",
       "properties": {
@@ -2448,42 +2118,6 @@
         }
       },
       "required": ["aiChatId", "content", "createdAt", "owner", "role", "visibility"]
-    },
-    "Omit<AiChatMessage,\"id\">": {
-      "$ref": "#/definitions/Pick%3CAiChatMessage%2CExclude%3C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22aiChatId%22%7C%22role%22%7C%22visibility%22%7C%22owner%22)%2C%22id%22%3E%3E"
-    },
-    "Pick<AiChatMessage,Exclude<(\"id\"|\"content\"|\"createdAt\"|\"aiChatId\"|\"role\"|\"visibility\"|\"owner\"),\"id\">>": {
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string",
-          "description": "The content of the AI chat message"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The timestamp when the AI chat message was created"
-        },
-        "aiChatId": {
-          "type": "string",
-          "description": "The id of the AI chat this message belongs to This is used to associate the message with a specific AI chat."
-        },
-        "role": {
-          "type": "string",
-          "enum": ["user", "assistant"],
-          "description": "The role of the message sender, either 'user' or 'assistant' This indicates whether the message was sent by the user or generated by the AI assistant."
-        },
-        "visibility": {
-          "type": "string",
-          "enum": ["public", "private"],
-          "description": "Defines if the AI Chat is public or private Denormalized field due performance reasons."
-        },
-        "owner": {
-          "type": "string",
-          "description": "The owner of the AI chat message This is used to identify the user who created the message. Denormalized field due performance reasons."
-        }
-      },
-      "required": ["content", "createdAt", "aiChatId", "role", "visibility", "owner"],
-      "additionalProperties": false
     },
     "PatchEndpoint<AiChat,\"id\">": {
       "type": "object",

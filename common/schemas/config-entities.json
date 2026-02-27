@@ -1,53 +1,50 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "OmdbConfig": {
+    "GithubConfig": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "const": "OMDB_CONFIG",
-          "description": "Configuration entry for the OMDB API"
+          "const": "GITHUB_CONFIG"
         },
         "value": {
           "type": "object",
           "properties": {
-            "apiKey": {
-              "type": "string",
-              "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
+            "clientId": {
+              "type": "string"
             },
-            "trySearchMovieFromTitle": {
-              "type": "boolean",
-              "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
-            },
-            "autoDownloadMetadata": {
-              "type": "boolean",
-              "description": "If a new imdb id is added, download the metadata automatically"
+            "clientSecret": {
+              "type": "string"
             }
           },
-          "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+          "required": ["clientId", "clientSecret"],
           "additionalProperties": false
         }
       },
       "required": ["id", "value"],
       "additionalProperties": false
     },
-    "OllamaConfig": {
+    "IotConfig": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "const": "OLLAMA_CONFIG"
+          "const": "IOT_CONFIG"
         },
         "value": {
           "type": "object",
           "properties": {
-            "host": {
-              "type": "string",
-              "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
+            "pingIntervalMs": {
+              "type": "number",
+              "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
+            },
+            "pingTimeoutMs": {
+              "type": "number",
+              "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
             }
           },
-          "required": ["host"],
+          "required": ["pingIntervalMs", "pingTimeoutMs"],
           "additionalProperties": false
         }
       },
@@ -116,50 +113,53 @@
       "required": ["id", "value"],
       "additionalProperties": false
     },
-    "IotConfig": {
+    "OllamaConfig": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "const": "IOT_CONFIG"
+          "const": "OLLAMA_CONFIG"
         },
         "value": {
           "type": "object",
           "properties": {
-            "pingIntervalMs": {
-              "type": "number",
-              "description": "The interval in milliseconds at which to ping all IOT devices to check their availability. Defaults to 120000 (2 minutes)."
-            },
-            "pingTimeoutMs": {
-              "type": "number",
-              "description": "The timeout in milliseconds for each ping request. Defaults to 3000 (3 second)."
+            "host": {
+              "type": "string",
+              "description": "The Ollama host URL, including the protocol (http or https). E.g.: http://localhost:11434"
             }
           },
-          "required": ["pingIntervalMs", "pingTimeoutMs"],
+          "required": ["host"],
           "additionalProperties": false
         }
       },
       "required": ["id", "value"],
       "additionalProperties": false
     },
-    "GithubConfig": {
+    "OmdbConfig": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "const": "GITHUB_CONFIG"
+          "const": "OMDB_CONFIG",
+          "description": "Configuration entry for the OMDB API"
         },
         "value": {
           "type": "object",
           "properties": {
-            "clientId": {
-              "type": "string"
+            "apiKey": {
+              "type": "string",
+              "description": "The API key for the OMDB API, can be requested at https://www.omdbapi.com/"
             },
-            "clientSecret": {
-              "type": "string"
+            "trySearchMovieFromTitle": {
+              "type": "boolean",
+              "description": "If a movie / series entry is added, try to search for the movie from data extracted from the file name (e.g.: title, year, season, episode, etc...)"
+            },
+            "autoDownloadMetadata": {
+              "type": "boolean",
+              "description": "If a new imdb id is added, download the metadata automatically"
             }
           },
-          "required": ["clientId", "clientSecret"],
+          "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
           "additionalProperties": false
         }
       },

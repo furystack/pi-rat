@@ -1,9 +1,10 @@
+import { useCollectionSync } from '@furystack/entity-sync-client'
 import { createComponent, Shade, styledElement } from '@furystack/shades'
 import { Skeleton } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
+import { ChatMessage } from 'common'
 import { marked } from 'marked'
 import { GenericErrorPage } from '../../components/generic-error.js'
-import { ChatMessageService } from './chat-messages-service.js'
 import { DeleteChatMessage } from './delete-chat-message.js'
 
 const ChatLine = styledElement('div', {
@@ -47,7 +48,8 @@ export const MessageList = Shade<{ chat: Chat }>({
     width: '100%',
     height: '100%',
   },
-  render: ({ injector, props, useObservable, useRef }) => {
+  render: (options) => {
+    const { props, useRef } = options
     const listRef = useRef<HTMLDivElement>('list')
     setTimeout(() => {
       requestAnimationFrame(() => {
@@ -60,16 +62,15 @@ export const MessageList = Shade<{ chat: Chat }>({
         }
       })
     }, 1)
-    const chatMessageService = injector.getInstance(ChatMessageService)
 
     const { chat } = props
 
-    const [chatMessages] = useObservable(
-      `chatMessages-${chat.id}`,
-      chatMessageService.getChatMessagesAsObservable({ filter: { chatId: { $eq: chat.id } } }),
-    )
+    const chatMessages = useCollectionSync(options, ChatMessage, {
+      filter: { chatId: { $eq: chat.id } },
+      order: { createdAt: 'ASC' },
+    })
 
-    if (!chatMessages.value) {
+    if (chatMessages.status === 'connecting') {
       return (
         <>
           <Skeleton />
@@ -79,15 +80,11 @@ export const MessageList = Shade<{ chat: Chat }>({
       )
     }
 
-    if (chatMessages.status === 'failed') {
+    if (chatMessages.status === 'error') {
       return <GenericErrorPage error={chatMessages.error} />
     }
 
-    if (chatMessages.status === 'obsolete') {
-      void chatMessageService.getChatMessages({ filter: { chatId: { $eq: chat.id } } })
-    }
-
-    if (chatMessages.value.entries.length === 0) {
+    if (chatMessages.data.entries.length === 0) {
       return <div style={{ padding: '16px' }}>No messages yet. Start the conversation!</div>
     }
 
@@ -104,7 +101,7 @@ export const MessageList = Shade<{ chat: Chat }>({
           height: '100%',
         }}
       >
-        {chatMessages.value.entries.map((message) => (
+        {chatMessages.data.entries.map((message) => (
           <ChatLine>
             <ChatLineAvatar />
             <div style={{ width: '100%' }}>

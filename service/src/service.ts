@@ -2,7 +2,10 @@ import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
+import { SyncSubscribeAction, SyncUnsubscribeAction, useEntitySync } from '@furystack/entity-sync-service'
+import { useWebsockets } from '@furystack/websocket-api'
 import { EventHub } from '@furystack/utils'
+import { AiChatMessage, Chat, ChatMessage, LogEntry } from 'common'
 import { AiAppModel } from './ai/ai-app-model.js'
 import { ChatAppModel } from './app-models/chat/chat-app-model.js'
 import { ConfigAppModel } from './app-models/config/config-app-model.js'
@@ -14,6 +17,7 @@ import { IotAppModel } from './app-models/iot/iot-app-model.js'
 import { LoggingAppModel } from './app-models/logging/logging-app-model.js'
 import { MediaAppModel } from './app-models/media/media-app-model.js'
 import { AppModelManager } from './AppModelManager.js'
+import { getPort } from './get-port.js'
 import { setupPatcher } from './patcher/setup-patcher.js'
 import { setupFrontendBundle } from './setup-frontend-bundle.js'
 import { WebsocketService } from './websocket-service.js'
@@ -40,6 +44,22 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       injector.getInstance(ChatAppModel),
       injector.getInstance(AiAppModel),
     )
+
+    useEntitySync(injector, {
+      models: [
+        { model: Chat, primaryKey: 'id' },
+        { model: ChatMessage, primaryKey: 'id', debounceMs: 100 },
+        { model: LogEntry, primaryKey: 'id', debounceMs: 200 },
+        { model: AiChatMessage, primaryKey: 'id' },
+      ],
+    })
+
+    const syncInjector = injector.createChild({ owner: 'entity-sync' })
+    await useWebsockets(syncInjector, {
+      port: getPort(),
+      path: '/api/sync',
+      actions: [SyncSubscribeAction, SyncUnsubscribeAction],
+    })
 
     const wsService = injector.getInstance(WebsocketService)
     await wsService.announce({

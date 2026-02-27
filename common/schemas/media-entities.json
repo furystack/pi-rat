@@ -1,382 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "Series": {
-      "type": "object",
-      "properties": {
-        "imdbId": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "year": {
-          "type": "string"
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
-      "additionalProperties": false
-    },
-    "OmdbSeriesMetadata": {
-      "type": "object",
-      "properties": {
-        "Title": {
-          "type": "string"
-        },
-        "Year": {
-          "type": "string"
-        },
-        "Rated": {
-          "type": "string"
-        },
-        "Released": {
-          "type": "string"
-        },
-        "Runtime": {
-          "type": "string"
-        },
-        "Genre": {
-          "type": "string"
-        },
-        "Director": {
-          "type": "string"
-        },
-        "Writer": {
-          "type": "string"
-        },
-        "Actors": {
-          "type": "string"
-        },
-        "Plot": {
-          "type": "string"
-        },
-        "Language": {
-          "type": "string"
-        },
-        "Country": {
-          "type": "string"
-        },
-        "Awards": {
-          "type": "string"
-        },
-        "Poster": {
-          "type": "string"
-        },
-        "Ratings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "Source": {
-                "type": "string"
-              },
-              "Value": {
-                "type": "string"
-              }
-            },
-            "required": ["Source", "Value"],
-            "additionalProperties": false
-          }
-        },
-        "Metascore": {
-          "type": "string"
-        },
-        "imdbRating": {
-          "type": "string"
-        },
-        "imdbVotes": {
-          "type": "string"
-        },
-        "imdbID": {
-          "type": "string"
-        },
-        "Type": {
-          "type": "string"
-        },
-        "totalSeasons": {
-          "type": "string"
-        },
-        "Response": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Title",
-        "Year",
-        "Rated",
-        "Released",
-        "Runtime",
-        "Genre",
-        "Director",
-        "Writer",
-        "Actors",
-        "Plot",
-        "Language",
-        "Country",
-        "Awards",
-        "Poster",
-        "Ratings",
-        "Metascore",
-        "imdbRating",
-        "imdbVotes",
-        "imdbID",
-        "Type",
-        "totalSeasons",
-        "Response",
-        "createdAt",
-        "updatedAt"
-      ],
-      "additionalProperties": false
-    },
-    "OmdbMovieMetadata": {
-      "type": "object",
-      "properties": {
-        "Title": {
-          "type": "string"
-        },
-        "Year": {
-          "type": "string"
-        },
-        "Rated": {
-          "type": "string"
-        },
-        "Released": {
-          "type": "string"
-        },
-        "Runtime": {
-          "type": "string"
-        },
-        "Genre": {
-          "type": "string"
-        },
-        "Director": {
-          "type": "string"
-        },
-        "Writer": {
-          "type": "string"
-        },
-        "Actors": {
-          "type": "string"
-        },
-        "Plot": {
-          "type": "string"
-        },
-        "Language": {
-          "type": "string"
-        },
-        "Country": {
-          "type": "string"
-        },
-        "Awards": {
-          "type": "string"
-        },
-        "Poster": {
-          "type": "string"
-        },
-        "Ratings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "Source": {
-                "type": "string"
-              },
-              "Value": {
-                "type": "string"
-              }
-            },
-            "required": ["Source", "Value"],
-            "additionalProperties": false
-          }
-        },
-        "Metascore": {
-          "type": "string"
-        },
-        "imdbRating": {
-          "type": "string"
-        },
-        "imdbVotes": {
-          "type": "string"
-        },
-        "imdbID": {
-          "type": "string"
-        },
-        "Type": {
-          "type": "string",
-          "enum": ["movie", "episode"]
-        },
-        "DVD": {
-          "type": "string"
-        },
-        "BoxOffice": {
-          "type": "string"
-        },
-        "Production": {
-          "type": "string"
-        },
-        "Website": {
-          "type": "string"
-        },
-        "Response": {
-          "type": "string",
-          "const": "True"
-        },
-        "seriesID": {
-          "type": "string"
-        },
-        "Season": {
-          "type": "string"
-        },
-        "Episode": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Title",
-        "Year",
-        "Rated",
-        "Released",
-        "Runtime",
-        "Genre",
-        "Director",
-        "Writer",
-        "Actors",
-        "Plot",
-        "Language",
-        "Country",
-        "Awards",
-        "Poster",
-        "Ratings",
-        "Metascore",
-        "imdbRating",
-        "imdbVotes",
-        "imdbID",
-        "Type",
-        "Response",
-        "createdAt",
-        "updatedAt"
-      ],
-      "additionalProperties": false
-    },
-    "isValidOmdbMetadata": {
-      "$comment": "(metadata: any) => metadata is OmdbMovieMetadata",
-      "type": "object",
-      "properties": {
-        "namedArgs": {
-          "type": "object",
-          "properties": {
-            "metadata": {}
-          },
-          "required": ["metadata"],
-          "additionalProperties": false
-        }
-      }
-    },
-    "Movie": {
-      "type": "object",
-      "properties": {
-        "imdbId": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "year": {
-          "type": "number"
-        },
-        "duration": {
-          "type": "number"
-        },
-        "genre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": ["movie", "episode"]
-        },
-        "seriesId": {
-          "type": "string"
-        },
-        "season": {
-          "type": "number"
-        },
-        "episode": {
-          "type": "number"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": ["imdbId", "title", "createdAt", "updatedAt"],
-      "additionalProperties": false
-    },
-    "WatchHistoryEntry": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "userName": {
-          "type": "string"
-        },
-        "driveLetter": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "watchedSeconds": {
-          "type": "number"
-        },
-        "completed": {
-          "type": "boolean"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      },
-      "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
-      "additionalProperties": false
-    },
     "FfprobeStreamDisposition": {
       "type": "object",
       "properties": {
@@ -692,6 +316,382 @@
         }
       },
       "required": ["id", "driveLetter", "path", "ffprobe"],
+      "additionalProperties": false
+    },
+    "WatchHistoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "driveLetter": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "watchedSeconds": {
+          "type": "number"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "userName", "driveLetter", "path", "watchedSeconds", "completed", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "Movie": {
+      "type": "object",
+      "properties": {
+        "imdbId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "year": {
+          "type": "number"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "genre": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "thumbnailImageUrl": {
+          "type": "string"
+        },
+        "plot": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["movie", "episode"]
+        },
+        "seriesId": {
+          "type": "string"
+        },
+        "season": {
+          "type": "number"
+        },
+        "episode": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["imdbId", "title", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "OmdbMovieMetadata": {
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Year": {
+          "type": "string"
+        },
+        "Rated": {
+          "type": "string"
+        },
+        "Released": {
+          "type": "string"
+        },
+        "Runtime": {
+          "type": "string"
+        },
+        "Genre": {
+          "type": "string"
+        },
+        "Director": {
+          "type": "string"
+        },
+        "Writer": {
+          "type": "string"
+        },
+        "Actors": {
+          "type": "string"
+        },
+        "Plot": {
+          "type": "string"
+        },
+        "Language": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Awards": {
+          "type": "string"
+        },
+        "Poster": {
+          "type": "string"
+        },
+        "Ratings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Source": {
+                "type": "string"
+              },
+              "Value": {
+                "type": "string"
+              }
+            },
+            "required": ["Source", "Value"],
+            "additionalProperties": false
+          }
+        },
+        "Metascore": {
+          "type": "string"
+        },
+        "imdbRating": {
+          "type": "string"
+        },
+        "imdbVotes": {
+          "type": "string"
+        },
+        "imdbID": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string",
+          "enum": ["movie", "episode"]
+        },
+        "DVD": {
+          "type": "string"
+        },
+        "BoxOffice": {
+          "type": "string"
+        },
+        "Production": {
+          "type": "string"
+        },
+        "Website": {
+          "type": "string"
+        },
+        "Response": {
+          "type": "string",
+          "const": "True"
+        },
+        "seriesID": {
+          "type": "string"
+        },
+        "Season": {
+          "type": "string"
+        },
+        "Episode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Title",
+        "Year",
+        "Rated",
+        "Released",
+        "Runtime",
+        "Genre",
+        "Director",
+        "Writer",
+        "Actors",
+        "Plot",
+        "Language",
+        "Country",
+        "Awards",
+        "Poster",
+        "Ratings",
+        "Metascore",
+        "imdbRating",
+        "imdbVotes",
+        "imdbID",
+        "Type",
+        "Response",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "isValidOmdbMetadata": {
+      "$comment": "(metadata: any) => metadata is OmdbMovieMetadata",
+      "type": "object",
+      "properties": {
+        "namedArgs": {
+          "type": "object",
+          "properties": {
+            "metadata": {}
+          },
+          "required": ["metadata"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "OmdbSeriesMetadata": {
+      "type": "object",
+      "properties": {
+        "Title": {
+          "type": "string"
+        },
+        "Year": {
+          "type": "string"
+        },
+        "Rated": {
+          "type": "string"
+        },
+        "Released": {
+          "type": "string"
+        },
+        "Runtime": {
+          "type": "string"
+        },
+        "Genre": {
+          "type": "string"
+        },
+        "Director": {
+          "type": "string"
+        },
+        "Writer": {
+          "type": "string"
+        },
+        "Actors": {
+          "type": "string"
+        },
+        "Plot": {
+          "type": "string"
+        },
+        "Language": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Awards": {
+          "type": "string"
+        },
+        "Poster": {
+          "type": "string"
+        },
+        "Ratings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Source": {
+                "type": "string"
+              },
+              "Value": {
+                "type": "string"
+              }
+            },
+            "required": ["Source", "Value"],
+            "additionalProperties": false
+          }
+        },
+        "Metascore": {
+          "type": "string"
+        },
+        "imdbRating": {
+          "type": "string"
+        },
+        "imdbVotes": {
+          "type": "string"
+        },
+        "imdbID": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "totalSeasons": {
+          "type": "string"
+        },
+        "Response": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Title",
+        "Year",
+        "Rated",
+        "Released",
+        "Runtime",
+        "Genre",
+        "Director",
+        "Writer",
+        "Actors",
+        "Plot",
+        "Language",
+        "Country",
+        "Awards",
+        "Poster",
+        "Ratings",
+        "Metascore",
+        "imdbRating",
+        "imdbVotes",
+        "imdbID",
+        "Type",
+        "totalSeasons",
+        "Response",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "Series": {
+      "type": "object",
+      "properties": {
+        "imdbId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "year": {
+          "type": "string"
+        },
+        "thumbnailImageUrl": {
+          "type": "string"
+        },
+        "plot": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
       "additionalProperties": false
     }
   }

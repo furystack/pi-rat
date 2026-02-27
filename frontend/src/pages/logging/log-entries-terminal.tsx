@@ -1,15 +1,14 @@
-import type { CacheResult } from '@furystack/cache'
-import type { GetCollectionResult } from '@furystack/rest'
+import type { SyncState } from '@furystack/entity-sync'
+import { useCollectionSync } from '@furystack/entity-sync-client'
 import { Shade, createComponent, type RenderOptions } from '@furystack/shades'
 import { FitAddon } from '@xterm/addon-fit'
 import { SearchAddon } from '@xterm/addon-search'
 import { WebLinksAddon } from '@xterm/addon-web-links'
 import { Terminal } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
-import type { LogEntry } from 'common'
+import { LogEntry } from 'common'
 import { compile, match, type MatchResult } from 'path-to-regexp'
 import { navigateToRoute } from '../../navigate-to-route.js'
-import { LoggingService } from '../../services/logging-service.js'
 
 const useDisposableTerminal = (
   { useDisposable, injector }: Pick<RenderOptions<object>, 'useDisposable' | 'injector'>,
@@ -64,13 +63,28 @@ const useDisposableTerminal = (
   })
 }
 
-const fillTerminalWithLogEntries = (terminal: Terminal, logEntries: CacheResult<GetCollectionResult<LogEntry>>) => {
+const fillTerminalWithLogEntries = (
+  terminal: Terminal,
+  logState: SyncState<{ entries: LogEntry[]; count: number }>,
+) => {
   terminal.clear()
   terminal.write('\r\n\r\n\r\n\r\n***** LOG ENTRIES *****\r\n')
 
-  const maxScopeLength = Math.max(...(logEntries.value?.entries.map((logEntry) => logEntry.scope.length) ?? [0]))
+  if (logState.status === 'connecting') {
+    terminal.write('Loading log entries...\r\n')
+    return
+  }
 
-  logEntries.value?.entries.forEach((logEntry) => {
+  if (logState.status === 'error') {
+    terminal.write(`Error: ${logState.error}\r\n`)
+    return
+  }
+
+  const { entries } = logState.data
+
+  const maxScopeLength = Math.max(...entries.map((logEntry) => logEntry.scope.length).concat([0]))
+
+  entries.forEach((logEntry) => {
     const timestamp = new Date(logEntry.createdAt).toISOString()
     const coloredLevelSymbol =
       logEntry.level === 'error'
@@ -94,23 +108,6 @@ const fillTerminalWithLogEntries = (terminal: Terminal, logEntries: CacheResult<
   })
 }
 
-const useLogEntries = (
-  { injector, useObservable }: Pick<RenderOptions<object>, 'injector' | 'useObservable'>,
-  terminal: Terminal,
-) => {
-  return useObservable(
-    'logEntries',
-    injector.getInstance(LoggingService).findLogEntryAsObservable({
-      order: { createdAt: 'DESC' },
-    }),
-    {
-      onChange: (logEntries) => {
-        fillTerminalWithLogEntries(terminal, logEntries)
-      },
-    },
-  )
-}
-
 export const LogEntriesTerminal = Shade({
   shadowDomName: 'shade-app-log-entries-terminal-page',
   css: {
@@ -123,9 +120,12 @@ export const LogEntriesTerminal = Shade({
   render: (renderOptions) => {
     const containerRef = renderOptions.useRef<HTMLDivElement>('container')
     const { terminal } = useDisposableTerminal(renderOptions, containerRef)
-    const [entries] = useLogEntries(renderOptions, terminal)
 
-    fillTerminalWithLogEntries(terminal, entries)
+    const logState = useCollectionSync(renderOptions, LogEntry, {
+      order: { createdAt: 'DESC' },
+    })
+
+    fillTerminalWithLogEntries(terminal, logState)
 
     return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
   },

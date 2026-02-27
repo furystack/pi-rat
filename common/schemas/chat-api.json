@@ -277,147 +277,6 @@
       "required": ["GET", "POST", "PATCH", "DELETE"],
       "additionalProperties": false
     },
-    "RestApi": {
-      "type": "object",
-      "properties": {
-        "GET": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "POST": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PATCH": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "PUT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "DELETE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "HEAD": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "CONNECT": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "TRACE": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        },
-        "OPTIONS": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "result": {},
-              "url": {},
-              "query": {},
-              "body": {},
-              "headers": {}
-            },
-            "required": ["result"],
-            "additionalProperties": false
-          }
-        }
-      },
-      "additionalProperties": false
-    },
     "GetCollectionEndpoint<Chat>": {
       "type": "object",
       "properties": {
@@ -2232,39 +2091,6 @@
       },
       "required": ["createdAt", "name", "owner", "participants"]
     },
-    "Omit<Chat,\"id\">": {
-      "$ref": "#/definitions/Pick%3CChat%2CExclude%3C(%22id%22%7C%22name%22%7C%22description%22%7C%22createdAt%22%7C%22owner%22%7C%22participants%22)%2C%22id%22%3E%3E"
-    },
-    "Pick<Chat,Exclude<(\"id\"|\"name\"|\"description\"|\"createdAt\"|\"owner\"|\"participants\"),\"id\">>": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the chat"
-        },
-        "description": {
-          "type": "string",
-          "description": "The description in markdown format"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The date the chat was created"
-        },
-        "owner": {
-          "type": "string",
-          "description": "The owner of the chat"
-        },
-        "participants": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "A list of participants in the chat"
-        }
-      },
-      "required": ["name", "createdAt", "owner", "participants"],
-      "additionalProperties": false
-    },
     "PostEndpoint<ChatMessage,\"id\">": {
       "type": "object",
       "properties": {
@@ -2312,39 +2138,6 @@
         }
       },
       "required": ["attachments", "chatId", "content", "createdAt", "owner"]
-    },
-    "Omit<ChatMessage,\"id\">": {
-      "$ref": "#/definitions/Pick%3CChatMessage%2CExclude%3C(%22id%22%7C%22content%22%7C%22createdAt%22%7C%22owner%22%7C%22chatId%22%7C%22attachments%22)%2C%22id%22%3E%3E"
-    },
-    "Pick<ChatMessage,Exclude<(\"id\"|\"content\"|\"createdAt\"|\"owner\"|\"chatId\"|\"attachments\"),\"id\">>": {
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string",
-          "description": "The content of the message"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The date the message was created"
-        },
-        "owner": {
-          "type": "string",
-          "description": "The unique identifier of the user who sent the message"
-        },
-        "chatId": {
-          "type": "string",
-          "description": "The unique identifier of the chat to which this message belongs"
-        },
-        "attachments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ChatMessageAttachment"
-          },
-          "description": "The attachments of the message"
-        }
-      },
-      "required": ["content", "createdAt", "owner", "chatId", "attachments"],
-      "additionalProperties": false
     },
     "PostEndpoint<ChatInvitation,\"id\">": {
       "type": "object",
@@ -2399,45 +2192,6 @@
         }
       },
       "required": ["chatId", "chatName", "createdAt", "createdBy", "message", "status", "userId"]
-    },
-    "Omit<ChatInvitation,\"id\">": {
-      "$ref": "#/definitions/Pick%3CChatInvitation%2CExclude%3C(%22id%22%7C%22chatId%22%7C%22chatName%22%7C%22message%22%7C%22userId%22%7C%22status%22%7C%22createdAt%22%7C%22createdBy%22)%2C%22id%22%3E%3E"
-    },
-    "Pick<ChatInvitation,Exclude<(\"id\"|\"chatId\"|\"chatName\"|\"message\"|\"userId\"|\"status\"|\"createdAt\"|\"createdBy\"),\"id\">>": {
-      "type": "object",
-      "properties": {
-        "chatId": {
-          "type": "string",
-          "description": "The foreign key to the chat entity to which this invitation belongs. This is used to associate the invitation with the correct chat. It is a foreign key to the Chat model."
-        },
-        "chatName": {
-          "type": "string",
-          "description": "The name of the chat to which the user is invited. This is used to display the chat name in the user interface."
-        },
-        "message": {
-          "type": "string",
-          "description": "The message that is sent with the chat invitation. This is used to provide context or information about the invitation. It can include details about the chat or a personal message to the user."
-        },
-        "userId": {
-          "type": "string",
-          "description": "The unique identifier of the user who is invited to the chat. This is used to identify the user in the system. It is a foreign key to the User model."
-        },
-        "status": {
-          "type": "string",
-          "enum": ["pending", "accepted", "rejected", "revoked", "expired"],
-          "description": "The status of the chat invitation. This is used to track whether the invitation is pending, accepted, or rejected."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "The timestamp when the invitation was created. This is used to track when the invitation was sent."
-        },
-        "createdBy": {
-          "type": "string",
-          "description": "Unique identifier of the user who created the invitation. This is used to track who sent the invitation. It is a foreign key to the User model."
-        }
-      },
-      "required": ["chatId", "chatName", "message", "userId", "status", "createdAt", "createdBy"],
-      "additionalProperties": false
     },
     "PatchEndpoint<Chat,\"id\">": {
       "type": "object",
