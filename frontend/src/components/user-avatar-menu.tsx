@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Avatar, Button, Icon, icons, Paper } from '@furystack/shades-common-components'
+import { Avatar, Button, cssVariableTheme, Icon, icons, Paper } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -22,19 +22,19 @@ export const UserAvatarMenu = Shade({
     },
     '& .menu-username': {
       padding: '8px 12px',
-      fontSize: '12px',
-      color: 'var(--theme-text-secondary)',
-      borderBottom: '1px solid var(--theme-border-default)',
+      fontSize: cssVariableTheme.typography.fontSize.xs,
+      color: cssVariableTheme.text.secondary,
+      borderBottom: `1px solid ${cssVariableTheme.action.subtleBorder}`,
       marginBottom: '4px',
     },
     '& .menu-button': {
       width: '100%',
       justifyContent: 'flex-start',
       padding: '8px 12px',
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
       background: 'transparent',
       border: 'none',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& .menu-overlay': {
       position: 'fixed',
@@ -45,7 +45,7 @@ export const UserAvatarMenu = Shade({
       zIndex: '999',
     },
     '& .avatar-fallback': {
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
     },
   },
   render: ({ injector, useObservable, useState }) => {

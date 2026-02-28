@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Loader } from '@furystack/shades-common-components'
+import { Loader, Typography } from '@furystack/shades-common-components'
 
 export const Init = Shade({
   shadowDomName: 'shade-init',
@@ -23,7 +23,7 @@ export const Init = Shade({
           height: '128px',
         }}
       />
-      <h2>Initializing app...</h2>
+      <Typography variant="h2">Initializing app...</Typography>
     </div>
   ),
 })

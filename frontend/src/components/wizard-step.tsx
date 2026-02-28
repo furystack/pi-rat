@@ -1,6 +1,6 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
-import { Button, Form, showParallax } from '@furystack/shades-common-components'
+import { Button, Form, showParallax, Typography } from '@furystack/shades-common-components'
 
 const defaultValidate = (formData: unknown): formData is Record<string, string> =>
   typeof formData === 'object' &&
@@ -48,9 +48,9 @@ export const WizardStep = Shade<
 
     useDisposable('parallaxAnimation', () => {
       const id = setTimeout(() => {
-        void showParallax(h1Ref.current)
-        void showParallax(contentRef.current, { delay: 200, duration: 600 })
-        void showParallax(actionsRef.current, { delay: 400, duration: 2000 })
+        if (h1Ref.current) void showParallax(h1Ref.current)
+        if (contentRef.current) void showParallax(contentRef.current, { delay: 200, duration: 600 })
+        if (actionsRef.current) void showParallax(actionsRef.current, { delay: 400, duration: 2000 })
       }, 1)
       return { [Symbol.dispose]: () => clearTimeout(id) }
     })
@@ -73,7 +73,9 @@ export const WizardStep = Shade<
           }
         }}
       >
-        <h1 ref={h1Ref}>{props.title}</h1>
+        <Typography variant="h1" ref={h1Ref}>
+          {props.title}
+        </Typography>
         <div ref={contentRef} className="content">
           {children}
         </div>

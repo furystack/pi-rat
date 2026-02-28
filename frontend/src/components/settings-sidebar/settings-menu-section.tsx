@@ -11,7 +11,7 @@ export const SettingsMenuSection = Shade<SettingsMenuSectionProps>({
     display: 'block',
     marginBottom: '16px',
     '& .section-title': {
-      fontSize: '12px',
+      fontSize: cssVariableTheme.typography.fontSize.xs,
       fontWeight: '600',
       textTransform: 'uppercase',
       letterSpacing: '0.5px',

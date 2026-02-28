@@ -1,6 +1,6 @@
 import { useCollectionSync } from '@furystack/entity-sync-client'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Paper, Skeleton } from '@furystack/shades-common-components'
+import { Button, Paper, Skeleton, Typography } from '@furystack/shades-common-components'
 import { Chat } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
 
@@ -31,7 +31,7 @@ export const ChatList = Shade({
 
     return (
       <Paper style={{ width: '100%', height: 'calc(100% - 28px)' }}>
-        <h2>Chat List</h2>
+        <Typography variant="h2">Chat List</Typography>
         <div
           style={{
             display: 'flex',

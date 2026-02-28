@@ -1,6 +1,6 @@
 import { hasCacheValue } from '@furystack/cache'
 import { Shade, createComponent } from '@furystack/shades'
-import { Icon, icons, Loader } from '@furystack/shades-common-components'
+import { cssVariableTheme, Icon, icons, Loader } from '@furystack/shades-common-components'
 import type { Device } from 'common'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 
@@ -67,7 +67,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
             style={{
               cursor: 'pointer',
               opacity: lastPingState.status === 'obsolete' ? '0.5' : '1',
-              color: 'var(--theme-success-main, #4caf50)',
+              color: cssVariableTheme.palette.success.main,
             }}
           >
             <Icon icon={icons.circleDot} />
@@ -87,7 +87,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
             }}
             style={{
               cursor: 'pointer',
-              color: 'var(--theme-error-main, #f44336)',
+              color: cssVariableTheme.palette.error.main,
             }}
           >
             <Icon icon={icons.circleDot} />

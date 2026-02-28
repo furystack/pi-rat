@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import { Button, NotyService, Paper, Skeleton, Typography } from '@furystack/shades-common-components'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { SessionService } from '../../services/session.js'
@@ -68,7 +68,7 @@ export const ChatInvitationList = Shade({
       <>
         {received.length ? (
           <Paper style={{ width: '100%' }}>
-            <h2>Invitations</h2>
+            <Typography variant="h2">Invitations</Typography>
 
             <ul style={{ padding: '0', margin: '0' }}>
               {received.map((invitation) => (
@@ -82,7 +82,7 @@ export const ChatInvitationList = Shade({
                 >
                   {invitation.userId === currentUser?.username ? (
                     <div>
-                      <p>{invitation.chatName}</p>
+                      <Typography variant="body1">{invitation.chatName}</Typography>
                       <Button
                         onclick={async () => {
                           await chatInvitationService
@@ -138,7 +138,7 @@ export const ChatInvitationList = Shade({
         ) : null}
         {sent.length ? (
           <Paper style={{ width: '100%' }}>
-            <h2>Sent Invitations</h2>
+            <Typography variant="h2">Sent Invitations</Typography>
 
             <ul style={{ padding: '0', margin: '0' }}>
               {sent.map((invitation) => (
@@ -150,7 +150,7 @@ export const ChatInvitationList = Shade({
                     justifyContent: 'space-between',
                   }}
                 >
-                  <p>{invitation.chatName}</p>
+                  <Typography variant="body1">{invitation.chatName}</Typography>
                   <Button
                     onclick={async () => {
                       await chatInvitationService

@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, Modal, Paper } from '@furystack/shades-common-components'
+import { Button, cssVariableTheme, Form, Input, Modal, Paper, Typography } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
 import { ChatService } from './chat-service.js'
 
@@ -43,12 +43,12 @@ export const AddChatButton = Shade({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            background: 'rgba(128,128,128, 0.3)',
-            backdropFilter: 'blur(5px)',
+            background: cssVariableTheme.action.backdrop,
+            backdropFilter: `blur(${cssVariableTheme.effects.blurMd})`,
           }}
         >
           <Paper onclick={(ev) => ev.stopPropagation()}>
-            <h2>Add New Chat</h2>
+            <Typography variant="h2">Add New Chat</Typography>
             <Form<AddChatPayload>
               validate={isAddChatPayload}
               onSubmit={(chatData) => {

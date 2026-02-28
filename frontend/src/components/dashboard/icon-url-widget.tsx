@@ -1,5 +1,5 @@
 import { NestedRouteLink, Shade, createComponent } from '@furystack/shades'
-import { promisifyAnimation } from '@furystack/shades-common-components'
+import { cssVariableTheme, promisifyAnimation } from '@furystack/shades-common-components'
 import type { AppPaths } from '../../app-routes.js'
 import { WIDGET_ANIMATION, widgetCoverBlur, widgetCoverFocus, widgetEntrance } from './widget-animations.js'
 
@@ -49,16 +49,16 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
     '& .widget-card': {
       width: '256px',
       height: '256px',
-      margin: '8px',
-      borderRadius: '8px',
+      margin: cssVariableTheme.spacing.sm,
+      borderRadius: cssVariableTheme.shape.borderRadius.md,
       transform: 'scale(0)',
       overflow: 'hidden',
       placeContent: 'center',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-evenly',
-      boxShadow: '1px 3px 6px rgba(0,0,0,0.3)',
-      background: 'rgba(128,128,128,0.15)',
+      boxShadow: cssVariableTheme.shadows.md,
+      background: cssVariableTheme.action.hoverBackground,
       opacity: '.7',
     },
     '& .cover': {
@@ -69,7 +69,7 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
       width: '100%',
       placeContent: 'center',
       textAlign: 'center',
-      filter: 'drop-shadow(2px 4px 9px rgba(0,0,0,0.5))',
+      filter: `drop-shadow(${cssVariableTheme.shadows.lg})`,
     },
     '& .widget-name': {
       maxWidth: '100%',

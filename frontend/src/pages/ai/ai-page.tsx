@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Paper } from '@furystack/shades-common-components'
+import { Paper, Typography } from '@furystack/shades-common-components'
 import { AiChatList } from './ai-chat-list.js'
 import { AiChat } from './ai-chat.js'
 import { CreateAiChatButton } from './create-ai-chat-button.js'
@@ -46,7 +46,7 @@ export const AiPage = Shade({
       <div className="ai-container">
         <Paper style={{ display: 'flex', flexDirection: 'row', width: 'calc(100% - 48px)', flexGrow: '0' }}>
           <div className="ai-header">
-            <h1>AI Chats</h1>
+            <Typography variant="h1">AI Chats</Typography>
             <CreateAiChatButton />
           </div>
         </Paper>

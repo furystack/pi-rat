@@ -1,5 +1,13 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, NotyService, Paper } from '@furystack/shades-common-components'
+import {
+  Button,
+  cssVariableTheme,
+  Form,
+  Input,
+  NotyService,
+  Paper,
+  Typography,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import { SessionService } from '../../services/session.js'
 
@@ -29,19 +37,19 @@ const SecuritySection = Shade({
     marginTop: '24px',
     '& h3': {
       marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& h4': {
       marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& .error-message': {
-      color: 'var(--theme-error-main)',
-      fontSize: '14px',
+      color: cssVariableTheme.palette.error.main,
+      fontSize: cssVariableTheme.typography.fontSize.sm,
       marginBottom: '16px',
       padding: '8px',
-      backgroundColor: 'var(--theme-error-light)',
-      borderRadius: '4px',
+      backgroundColor: cssVariableTheme.palette.error.light,
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
     },
   },
   render: ({ injector, useDisposable }) => {
@@ -76,10 +84,10 @@ const SecuritySection = Shade({
 
     return (
       <>
-        <h3>🔒 Security</h3>
+        <Typography variant="h3">🔒 Security</Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <h4>Change Password</h4>
+          <Typography variant="h4">Change Password</Typography>
 
           <Form<PasswordResetPayload>
             validate={isPasswordResetPayload}
@@ -137,24 +145,24 @@ const ProfileSection = Shade({
   css: {
     '& h3': {
       marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& .field-group': {
       marginBottom: '16px',
     },
     '& .field-label': {
       display: 'block',
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
       fontWeight: 'bold',
       marginBottom: '4px',
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .field-value': {
       padding: '8px 12px',
-      backgroundColor: 'var(--theme-background-paper)',
-      border: '1px solid var(--theme-border-default)',
-      borderRadius: '4px',
-      color: 'var(--theme-text-primary)',
+      backgroundColor: cssVariableTheme.background.paper,
+      border: `1px solid ${cssVariableTheme.action.subtleBorder}`,
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
+      color: cssVariableTheme.text.primary,
     },
   },
   render: ({ injector, useObservable }) => {
@@ -165,7 +173,7 @@ const ProfileSection = Shade({
 
     return (
       <>
-        <h3>👤 Profile</h3>
+        <Typography variant="h3">👤 Profile</Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <div className="field-group">
@@ -191,15 +199,15 @@ export const UserSettingsPage = Shade({
     margin: '0 auto',
     '& h1': {
       marginBottom: '32px',
-      color: 'var(--theme-text-primary)',
-      borderBottom: '2px solid var(--theme-primary-main)',
+      color: cssVariableTheme.text.primary,
+      borderBottom: `2px solid ${cssVariableTheme.palette.primary.main}`,
       paddingBottom: '8px',
     },
   },
   render: () => {
     return (
       <>
-        <h1>User Settings</h1>
+        <Typography variant="h1">User Settings</Typography>
 
         <ProfileSection />
         <SecuritySection />

@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
+import { Button, Form, Input, Paper, Typography } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -42,7 +42,7 @@ export const Login = Shade({
           className="login-form"
           onSubmit={({ userName, password }) => void sessionService.login(userName, password)}
         >
-          <h2>Login</h2>
+          <Typography variant="h2">Login</Typography>
           <Input
             labelTitle="E-mail address"
             name="userName"

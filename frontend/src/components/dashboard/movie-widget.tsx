@@ -2,7 +2,7 @@ import type { CacheWithValue } from '@furystack/cache'
 import { isLoadedCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
 import { LazyLoad, Shade, createComponent } from '@furystack/shades'
-import { CacheView, Skeleton } from '@furystack/shades-common-components'
+import { CacheView, cssVariableTheme, Skeleton } from '@furystack/shades-common-components'
 import type { Movie } from 'common'
 import { AppLink } from '../../app-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
@@ -84,7 +84,7 @@ const MovieWidgetContent = Shade<{
             src={movie.thumbnailImageUrl as string}
             alt={movie.title}
             className="cover"
-            style={{ backgroundColor: '#666' }}
+            style={{ backgroundColor: cssVariableTheme.background.default }}
           />
           <div className="title-bar">
             {movie.title}
@@ -115,7 +115,7 @@ const MovieWidgetContent = Shade<{
                       left: '0',
                       height: '2px',
                       width: `${percent}%`,
-                      background: 'rgba(96,96,255,0.5)',
+                      background: cssVariableTheme.palette.primary.main,
                     }}
                   />
                 )

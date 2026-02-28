@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { promisifyAnimation } from '@furystack/shades-common-components'
+import { cssVariableTheme, promisifyAnimation } from '@furystack/shades-common-components'
 
 import { WIDGET_ANIMATION, widgetCoverBlur, widgetCoverFocus, widgetEntrance } from './widget-animations.js'
 
@@ -35,13 +35,13 @@ export const WidgetCard = Shade<WidgetCardProps>({
       alignItems: 'center',
       flexDirection: 'column',
       filter: 'saturate(0.3)brightness(0.6)',
-      background: 'rgba(128,128,128,0.1)',
+      background: cssVariableTheme.action.hoverBackground,
       transform: 'scale(0)',
-      borderRadius: '4px',
-      margin: '8px',
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
+      margin: cssVariableTheme.spacing.sm,
       overflow: 'hidden',
-      color: 'white',
-      boxShadow: 'rgba(0, 0, 0, 0.3) 1px 3px 6px',
+      color: cssVariableTheme.text.primary,
+      boxShadow: cssVariableTheme.shadows.md,
     },
     '& .cover': {
       display: 'inline-block',
@@ -70,7 +70,7 @@ export const WidgetCard = Shade<WidgetCardProps>({
       bottom: '0',
       whiteSpace: 'nowrap',
       padding: '1em',
-      background: 'rgba(0,0,0,0.7)',
+      background: cssVariableTheme.action.backdrop,
     },
   },
   render: ({ props, children, useRef, useDisposable }) => {

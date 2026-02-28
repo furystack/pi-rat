@@ -1,5 +1,6 @@
 import type { Injector } from '@furystack/inject'
 import { createComponent, Shade } from '@furystack/shades'
+import { cssVariableTheme } from '@furystack/shades-common-components'
 import type { CommandPaletteSuggestionResult } from '@furystack/shades-common-components'
 
 export interface SuggestionOptions {
@@ -33,11 +34,11 @@ const SuggestionItem = Shade<SuggestionItemProps>({
       height: '100%',
     },
     '& .suggestion-name': {
-      color: '#bbb',
+      color: cssVariableTheme.text.primary,
       fontWeight: 'bolder',
     },
     '& .suggestion-description': {
-      color: '#777',
+      color: cssVariableTheme.text.secondary,
     },
   },
   render: ({ props }) => {

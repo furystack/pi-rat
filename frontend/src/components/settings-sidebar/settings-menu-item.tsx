@@ -27,11 +27,11 @@ export const SettingsMenuItem = Shade<SettingsMenuItemProps>({
       backgroundColor: cssVariableTheme.background.paper,
     },
     '& .menu-icon': {
-      fontSize: '16px',
+      fontSize: cssVariableTheme.typography.fontSize.lg,
       lineHeight: '1',
     },
     '& .menu-label': {
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
     },
   },
   render: ({ props, injector, useObservable }) => {

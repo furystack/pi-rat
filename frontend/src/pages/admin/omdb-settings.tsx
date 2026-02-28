@@ -3,6 +3,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import {
   Button,
   CacheView,
+  cssVariableTheme,
   Form,
   Icon,
   icons,
@@ -13,6 +14,7 @@ import {
   Paper,
   Skeleton,
   Switch,
+  Typography,
 } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Config, OmdbConfig } from 'common'
@@ -38,7 +40,7 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   css: {
     '& .page-description': {
       marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .form-field': {
       marginBottom: '24px',
@@ -49,18 +51,18 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
       gap: '8px',
     },
     '& .api-key-hint': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       display: 'block',
       marginTop: '4px',
     },
     '& .api-key-hint a': {
-      color: 'var(--theme-primary-main)',
+      color: cssVariableTheme.palette.primary.main,
     },
     '& .switch-description': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
+      borderTop: `1px solid ${cssVariableTheme.background.default}`,
       paddingTop: '16px',
     },
   },
@@ -109,7 +111,9 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
     return (
       <>
-        <p className="page-description">Configure the OMDB API integration for fetching movie and series metadata.</p>
+        <Typography variant="body1" className="page-description">
+          Configure the OMDB API integration for fetching movie and series metadata.
+        </Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<OmdbRawFormData> validate={isOmdbRawFormData} onSubmit={(data) => void handleSubmit(data)}>

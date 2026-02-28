@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Paper } from '@furystack/shades-common-components'
+import { cssVariableTheme, Paper, Typography } from '@furystack/shades-common-components'
 
 export const AdminSettingsPage = Shade({
   shadowDomName: 'admin-settings-page',
@@ -12,21 +12,21 @@ export const AdminSettingsPage = Shade({
           margin: '0 auto',
         }}
       >
-        <h1
+        <Typography
+          variant="h1"
           style={{
             marginBottom: '32px',
-            color: 'var(--theme-text-primary)',
-            borderBottom: '2px solid var(--theme-primary-main)',
+            borderBottom: `2px solid ${cssVariableTheme.palette.primary.main}`,
             paddingBottom: '8px',
           }}
         >
           Application Administration
-        </h1>
+        </Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <p style={{ color: 'var(--theme-text-secondary)' }}>
+          <Typography variant="body1" color="textSecondary">
             Application administration settings will be available here.
-          </p>
+          </Typography>
         </Paper>
       </div>
     )

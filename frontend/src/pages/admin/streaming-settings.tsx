@@ -3,7 +3,9 @@ import { createComponent, Shade } from '@furystack/shades'
 import {
   Button,
   CacheView,
+  cssVariableTheme,
   Form,
+  Typography,
   Input,
   NotyService,
   PageContainer,
@@ -52,31 +54,31 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   css: {
     '& .page-description': {
       marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .section-title': {
       marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
-      fontSize: '16px',
+      color: cssVariableTheme.text.primary,
+      fontSize: cssVariableTheme.typography.fontSize.lg,
     },
     '& .form-field': {
       marginBottom: '24px',
     },
     '& .switch-description': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .section-divider': {
-      borderTop: '1px solid var(--theme-background-default)',
+      borderTop: `1px solid ${cssVariableTheme.background.default}`,
       margin: '24px 0',
       paddingTop: '24px',
     },
     '& .field-hint': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       display: 'block',
       marginTop: '4px',
     },
     '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
+      borderTop: `1px solid ${cssVariableTheme.background.default}`,
       paddingTop: '16px',
     },
   },
@@ -128,11 +130,15 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
     return (
       <>
-        <p className="page-description">Configure media transcoding and file watching settings.</p>
+        <Typography variant="body1" className="page-description">
+          Configure media transcoding and file watching settings.
+        </Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<StreamingRawFormData> validate={isStreamingRawFormData} onSubmit={(data) => void handleSubmit(data)}>
-            <h3 className="section-title">File Discovery</h3>
+            <Typography variant="h3" className="section-title">
+              File Discovery
+            </Typography>
 
             <div className="form-field">
               <Switch
@@ -182,7 +188,9 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
             </div>
 
             <div className="section-divider">
-              <h3 className="section-title">Transcoding</h3>
+              <Typography variant="h3" className="section-title">
+                Transcoding
+              </Typography>
 
               <div className="form-field">
                 <Select

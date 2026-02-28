@@ -1,4 +1,5 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
+import { Typography } from '@furystack/shades-common-components'
 import { WidgetGroup } from '../../components/dashboard/widget-group.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
@@ -48,9 +49,11 @@ export const SeriesOverview = Shade<SeriesListProps>({
                 overflowY: isDesktop ? 'auto' : undefined,
               }}
             >
-              <h1>{series.title}</h1>
-              <p style={{ fontSize: '0.8em' }}>{series.year?.toString()} &nbsp;</p>
-              <p style={{ textAlign: 'justify' }}>{series.plot}</p>
+              <Typography variant="h1">{series.title}</Typography>
+              <Typography variant="caption">{series.year?.toString()} &nbsp;</Typography>
+              <Typography variant="body1" align="justify">
+                {series.plot}
+              </Typography>
               <div style={{ width: '100%', overflow: 'hidden' }}>
                 {seasons.map((s) => (
                   <WidgetGroup

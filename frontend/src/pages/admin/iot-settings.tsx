@@ -1,6 +1,16 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import {
+  Button,
+  CacheView,
+  cssVariableTheme,
+  Form,
+  Input,
+  NotyService,
+  Paper,
+  Skeleton,
+  Typography,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Config, IotConfig } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
@@ -98,9 +108,9 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
     return (
       <>
-        <p style={{ marginBottom: '24px', color: 'var(--theme-text-secondary)' }}>
+        <Typography variant="body1" color="textSecondary" style={{ marginBottom: '24px' }}>
           Configure how frequently IOT devices are pinged to check their availability.
-        </p>
+        </Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<IotRawFormData>
@@ -127,7 +137,7 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
                 required
                 style={{ maxWidth: '250px' }}
               />
-              <small style={{ color: 'var(--theme-text-secondary)', display: 'block', marginTop: '4px' }}>
+              <small style={{ color: cssVariableTheme.text.secondary, display: 'block', marginTop: '4px' }}>
                 How often to ping all IOT devices ({MIN_PING_INTERVAL_MS}ms - {MAX_PING_INTERVAL_MS}ms). Default:{' '}
                 {DEFAULT_PING_INTERVAL_MS}ms ({DEFAULT_PING_INTERVAL_MS / 1000} seconds).
               </small>
@@ -145,7 +155,7 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
                 required
                 style={{ maxWidth: '250px' }}
               />
-              <small style={{ color: 'var(--theme-text-secondary)', display: 'block', marginTop: '4px' }}>
+              <small style={{ color: cssVariableTheme.text.secondary, display: 'block', marginTop: '4px' }}>
                 Timeout for each ping request ({MIN_PING_TIMEOUT_MS}ms - {MAX_PING_TIMEOUT_MS}ms, must be less than
                 interval). Default: {DEFAULT_PING_TIMEOUT_MS}ms ({DEFAULT_PING_TIMEOUT_MS / 1000} seconds).
               </small>
@@ -154,8 +164,8 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
             {validationError && (
               <div
                 style={{
-                  color: 'var(--theme-error-main)',
-                  backgroundColor: 'var(--theme-error-light)',
+                  color: cssVariableTheme.palette.error.main,
+                  backgroundColor: cssVariableTheme.palette.error.light,
                   padding: '12px',
                   borderRadius: '4px',
                   marginBottom: '16px',
@@ -166,7 +176,7 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
               </div>
             )}
 
-            <div style={{ borderTop: '1px solid var(--theme-background-default)', paddingTop: '16px' }}>
+            <div style={{ borderTop: `1px solid ${cssVariableTheme.background.default}`, paddingTop: '16px' }}>
               <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
                 {isLoading ? 'Saving...' : 'Save Settings'}
               </Button>
@@ -185,7 +195,9 @@ export const IotSettingsPage = Shade({
 
     return (
       <div>
-        <h2 style={{ marginBottom: '24px', color: 'var(--theme-text-primary)' }}>📡 IOT Device Availability</h2>
+        <Typography variant="h2" style={{ marginBottom: '24px' }}>
+          📡 IOT Device Availability
+        </Typography>
         <CacheView
           cache={configService.configCache}
           args={['IOT_CONFIG']}

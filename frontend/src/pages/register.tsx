@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
+import { Button, Form, Input, Paper, Typography } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -51,7 +51,7 @@ export const Register = Shade({
             void sessionService.register(userName, password)
           }}
         >
-          <h2>Create Account</h2>
+          <Typography variant="h2">Create Account</Typography>
           <Input
             labelTitle="E-mail address"
             name="userName"

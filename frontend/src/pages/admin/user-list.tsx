@@ -1,7 +1,15 @@
 import type { CacheWithValue } from '@furystack/cache'
 import type { GetCollectionResult } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, PageContainer, PageHeader, Paper, Skeleton } from '@furystack/shades-common-components'
+import {
+  Button,
+  CacheView,
+  cssVariableTheme,
+  PageContainer,
+  PageHeader,
+  Paper,
+  Skeleton,
+} from '@furystack/shades-common-components'
 import type { User } from 'common'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { RoleTag } from '../../components/role-tag/index.js'
@@ -14,34 +22,34 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
     '& .users-table': {
       width: '100%',
       borderCollapse: 'collapse',
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
     },
     '& thead tr': {
-      backgroundColor: 'var(--theme-background-default)',
-      borderBottom: '1px solid var(--theme-border-default)',
+      backgroundColor: cssVariableTheme.background.default,
+      borderBottom: `1px solid ${cssVariableTheme.action.subtleBorder}`,
     },
     '& th': {
       padding: '12px 16px',
       textAlign: 'left',
       fontWeight: '600',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& th.actions-col': {
       textAlign: 'right',
     },
     '& tbody tr': {
-      borderBottom: '1px solid var(--theme-border-default)',
+      borderBottom: `1px solid ${cssVariableTheme.action.subtleBorder}`,
       cursor: 'pointer',
       transition: 'background-color 0.15s ease',
     },
     '& tbody tr:hover': {
-      backgroundColor: 'var(--theme-background-default)',
+      backgroundColor: cssVariableTheme.background.default,
     },
     '& td': {
       padding: '12px 16px',
     },
     '& .username-cell': {
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
       fontWeight: '500',
     },
     '& .roles-cell': {
@@ -50,11 +58,11 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
       flexWrap: 'wrap',
     },
     '& .no-roles': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       fontStyle: 'italic',
     },
     '& .created-cell': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .actions-cell': {
       textAlign: 'right',
@@ -62,7 +70,7 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
     '& .empty-row td': {
       padding: '24px 16px',
       textAlign: 'center',
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
   },
   render: ({ props, injector }) => {

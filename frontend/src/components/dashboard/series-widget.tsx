@@ -1,6 +1,6 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { Shade, createComponent } from '@furystack/shades'
-import { CacheView, Skeleton } from '@furystack/shades-common-components'
+import { CacheView, cssVariableTheme, Skeleton } from '@furystack/shades-common-components'
 import type { Series } from 'common'
 import { AppLink } from '../../app-routes.js'
 import { SeriesService } from '../../services/series-service.js'
@@ -24,7 +24,7 @@ const SeriesWidgetContent = Shade<{
             src={series.thumbnailImageUrl as string}
             alt={series.title}
             className="cover"
-            style={{ backgroundColor: '#666' }}
+            style={{ backgroundColor: cssVariableTheme.background.default }}
           />
           <div className="title-bar">{series.title}</div>
         </WidgetCard>

@@ -1,5 +1,14 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, Modal, NotyService, Paper } from '@furystack/shades-common-components'
+import {
+  Button,
+  cssVariableTheme,
+  Form,
+  Input,
+  Modal,
+  NotyService,
+  Paper,
+  Typography,
+} from '@furystack/shades-common-components'
 import type { AiChat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { SessionService } from '../../services/session.js'
@@ -52,12 +61,12 @@ export const CreateAiChatButton = Shade({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            background: 'rgba(128,128,128, 0.3)',
-            backdropFilter: 'blur(5px)',
+            background: cssVariableTheme.action.backdrop,
+            backdropFilter: `blur(${cssVariableTheme.effects.blurMd})`,
           }}
         >
           <Paper onclick={(ev) => ev.stopPropagation()}>
-            <h2>Create New AI Chat</h2>
+            <Typography variant="h2">Create New AI Chat</Typography>
             <Form<CreateAiChatPayload>
               onSubmit={(chat) => {
                 aiChatService

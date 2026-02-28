@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button } from '@furystack/shades-common-components'
+import { Button, Typography } from '@furystack/shades-common-components'
 import { WebsocketNotificationsService } from '../../services/websocket-events.js'
 import { AddChatButton } from './add-chat-button.js'
 import { ChatFlow } from './chat-flow.js'
@@ -60,7 +60,7 @@ export const ChatPage = Shade({
     return (
       <>
         <div className="chat-header">
-          <h1>Chat Page</h1>
+          <Typography variant="h1">Chat Page</Typography>
           <div>
             <Button
               onclick={async () => {

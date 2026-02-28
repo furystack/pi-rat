@@ -1,7 +1,7 @@
 import type { CacheWithValue } from '@furystack/cache'
 import type { GetCollectionResult } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, Paper, Skeleton } from '@furystack/shades-common-components'
+import { Button, CacheView, Paper, Skeleton, Typography } from '@furystack/shades-common-components'
 import type { AiChat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { AiChatService } from './ai-chat-service.js'
@@ -15,7 +15,7 @@ const AiChatListContent = Shade<{
   render: ({ props }) => {
     return (
       <Paper style={{ padding: '16px', height: 'calc(100% - 48px)' }}>
-        <h3>Chats</h3>
+        <Typography variant="h3">Chats</Typography>
         <div
           style={{
             display: 'flex',

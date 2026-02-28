@@ -1,6 +1,15 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, NotyService, Paper, Select, Skeleton } from '@furystack/shades-common-components'
+import {
+  Button,
+  CacheView,
+  cssVariableTheme,
+  NotyService,
+  Paper,
+  Select,
+  Skeleton,
+  Typography,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Roles, User } from 'common'
 import { getAllRoleDefinitions } from 'common'
@@ -20,7 +29,7 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     '& .section-title': {
       marginTop: '0',
       marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& .info-grid': {
       display: 'grid',
@@ -29,11 +38,11 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       alignItems: 'center',
     },
     '& .info-label': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       fontWeight: '500',
     },
     '& .info-value': {
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& .roles-container': {
       marginBottom: '16px',
@@ -45,15 +54,15 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       minHeight: '32px',
     },
     '& .no-roles': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       fontStyle: 'italic',
     },
     '& .add-role-container': {
       marginBottom: '16px',
     },
     '& .validation-error': {
-      color: 'var(--theme-error-main)',
-      backgroundColor: 'rgba(244, 67, 54, 0.1)',
+      color: cssVariableTheme.palette.error.main,
+      backgroundColor: cssVariableTheme.palette.error.light,
       padding: '12px',
       borderRadius: '4px',
       marginBottom: '16px',
@@ -62,7 +71,7 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     '& .button-row': {
       display: 'flex',
       gap: '12px',
-      borderTop: '1px solid var(--theme-border-default)',
+      borderTop: `1px solid ${cssVariableTheme.action.subtleBorder}`,
       paddingTop: '16px',
     },
   },
@@ -197,7 +206,9 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     return (
       <>
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <h3 className="section-title">User Information</h3>
+          <Typography variant="h3" className="section-title">
+            User Information
+          </Typography>
 
           <div className="info-grid">
             <span className="info-label">Username:</span>
@@ -212,7 +223,9 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
         </Paper>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <h3 className="section-title">Roles</h3>
+          <Typography variant="h3" className="section-title">
+            Roles
+          </Typography>
 
           <div className="roles-container">
             <div className="roles-list">
@@ -294,7 +307,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     },
     '& .page-header h2': {
       margin: '0',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
   },
   render: ({ props, injector }) => {
@@ -310,7 +323,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           <Button variant="outlined" onclick={navigateBack}>
             ← Back
           </Button>
-          <h2>User Details</h2>
+          <Typography variant="h2">User Details</Typography>
         </div>
         <CacheView
           cache={usersService.userCache}
