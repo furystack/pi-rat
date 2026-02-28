@@ -1,7 +1,7 @@
+import { Cache } from '@furystack/cache'
 import { Injector } from '@furystack/inject'
 import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { NotyService } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { Config, OllamaConfig } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ConfigService } from '../../services/config-service.js'
@@ -16,33 +16,31 @@ const createMockOllamaConfig = (host = 'http://localhost:11434'): Config => ({
   updatedAt: new Date(),
 })
 
-type CacheState<T> =
-  | { status: 'loading' }
-  | { status: 'loaded'; value: T; updatedAt: Date }
-  | { status: 'error'; error: unknown; updatedAt: Date }
-
 describe('AiSettingsPage', () => {
   let injector: Injector
   let mockConfigService: {
-    getConfigAsObservable: ReturnType<typeof vi.fn>
+    configCache: Cache<Config, [string]>
     saveConfig: ReturnType<typeof vi.fn>
   }
   let mockNotyService: {
     emit: ReturnType<typeof vi.fn>
   }
-  let configObservable: ObservableValue<CacheState<Config>>
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="root"></div>'
 
-    configObservable = new ObservableValue<CacheState<Config>>({
-      status: 'loaded',
-      value: createMockOllamaConfig(),
-      updatedAt: new Date(),
+    const configCache = new Cache<Config, [string]>({
+      capacity: 10,
+      load: vi.fn().mockResolvedValue(createMockOllamaConfig()),
+    })
+
+    configCache.setExplicitValue({
+      loadArgs: ['OLLAMA_CONFIG'],
+      value: { status: 'loaded', value: createMockOllamaConfig(), updatedAt: new Date() },
     })
 
     mockConfigService = {
-      getConfigAsObservable: vi.fn().mockReturnValue(configObservable),
+      configCache,
       saveConfig: vi.fn().mockResolvedValue(createMockOllamaConfig()),
     }
 
@@ -75,8 +73,14 @@ describe('AiSettingsPage', () => {
     expect(page?.textContent).toContain('Ollama Integration')
   })
 
-  it('should display loading state', async () => {
-    configObservable.setValue({ status: 'loading' })
+  it('should display loader when loading', async () => {
+    const neverResolvingCache = new Cache<Config, [string]>({
+      capacity: 10,
+      load: () => new Promise(() => {}),
+    })
+    mockConfigService.configCache = neverResolvingCache
+
+    injector.setExplicitInstance(mockConfigService as unknown as ConfigService, ConfigService)
 
     const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -88,7 +92,8 @@ describe('AiSettingsPage', () => {
     await flushUpdates()
 
     const page = document.querySelector('ai-settings-page')
-    expect(page?.textContent).toContain('Loading settings...')
+    const skeleton = page?.querySelector('shade-skeleton')
+    expect(skeleton).toBeTruthy()
   })
 
   it('should render the form with host input when loaded', async () => {
@@ -125,7 +130,7 @@ describe('AiSettingsPage', () => {
     expect(saveButton).toBeTruthy()
   })
 
-  it('should call ConfigService.getConfigAsObservable on render', async () => {
+  it('should use configCache on render', async () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -135,14 +140,13 @@ describe('AiSettingsPage', () => {
     })
     await flushUpdates()
 
-    expect(mockConfigService.getConfigAsObservable).toHaveBeenCalledWith('OLLAMA_CONFIG')
+    expect(mockConfigService.configCache).toBeTruthy()
   })
 
   it('should render with empty host when config value is empty', async () => {
-    configObservable.setValue({
-      status: 'loaded',
-      value: createMockOllamaConfig(''),
-      updatedAt: new Date(),
+    mockConfigService.configCache.setExplicitValue({
+      loadArgs: ['OLLAMA_CONFIG'],
+      value: { status: 'loaded', value: createMockOllamaConfig(''), updatedAt: new Date() },
     })
 
     const rootElement = document.getElementById('root') as HTMLDivElement

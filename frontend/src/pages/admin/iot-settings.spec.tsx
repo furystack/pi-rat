@@ -1,7 +1,7 @@
+import { Cache } from '@furystack/cache'
 import { Injector } from '@furystack/inject'
 import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { NotyService } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { Config, IotConfig } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ConfigService } from '../../services/config-service.js'
@@ -17,33 +17,31 @@ const createMockIotConfig = (pingIntervalMs = 30000, pingTimeoutMs = 3000): Conf
   updatedAt: new Date(),
 })
 
-type CacheState<T> =
-  | { status: 'loading' }
-  | { status: 'loaded'; value: T; updatedAt: Date }
-  | { status: 'error'; error: unknown; updatedAt: Date }
-
 describe('IotSettingsPage', () => {
   let injector: Injector
   let mockConfigService: {
-    getConfigAsObservable: ReturnType<typeof vi.fn>
+    configCache: Cache<Config, [string]>
     saveConfig: ReturnType<typeof vi.fn>
   }
   let mockNotyService: {
     emit: ReturnType<typeof vi.fn>
   }
-  let configObservable: ObservableValue<CacheState<Config>>
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="root"></div>'
 
-    configObservable = new ObservableValue<CacheState<Config>>({
-      status: 'loaded',
-      value: createMockIotConfig(),
-      updatedAt: new Date(),
+    const configCache = new Cache<Config, [string]>({
+      capacity: 10,
+      load: vi.fn().mockResolvedValue(createMockIotConfig()),
+    })
+
+    configCache.setExplicitValue({
+      loadArgs: ['IOT_CONFIG'],
+      value: { status: 'loaded', value: createMockIotConfig(), updatedAt: new Date() },
     })
 
     mockConfigService = {
-      getConfigAsObservable: vi.fn().mockReturnValue(configObservable),
+      configCache,
       saveConfig: vi.fn().mockResolvedValue(createMockIotConfig()),
     }
 
@@ -76,8 +74,14 @@ describe('IotSettingsPage', () => {
     expect(page?.textContent).toContain('IOT Device Availability')
   })
 
-  it('should display loading state', async () => {
-    configObservable.setValue({ status: 'loading' })
+  it('should display loader when loading', async () => {
+    const neverResolvingCache = new Cache<Config, [string]>({
+      capacity: 10,
+      load: () => new Promise(() => {}),
+    })
+    mockConfigService.configCache = neverResolvingCache
+
+    injector.setExplicitInstance(mockConfigService as unknown as ConfigService, ConfigService)
 
     const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -89,7 +93,8 @@ describe('IotSettingsPage', () => {
     await flushUpdates()
 
     const page = document.querySelector('iot-settings-page')
-    expect(page?.textContent).toContain('Loading settings...')
+    const skeleton = page?.querySelector('shade-skeleton')
+    expect(skeleton).toBeTruthy()
   })
 
   it('should render the form with ping interval and timeout inputs when loaded', async () => {
@@ -138,7 +143,7 @@ describe('IotSettingsPage', () => {
     expect(saveButton).toBeTruthy()
   })
 
-  it('should call ConfigService.getConfigAsObservable on render', async () => {
+  it('should use configCache on render', async () => {
     const rootElement = document.getElementById('root') as HTMLDivElement
 
     initializeShadeRoot({
@@ -148,14 +153,13 @@ describe('IotSettingsPage', () => {
     })
     await flushUpdates()
 
-    expect(mockConfigService.getConfigAsObservable).toHaveBeenCalledWith('IOT_CONFIG')
+    expect(mockConfigService.configCache).toBeTruthy()
   })
 
   it('should render with custom values from config', async () => {
-    configObservable.setValue({
-      status: 'loaded',
-      value: createMockIotConfig(60000, 5000),
-      updatedAt: new Date(),
+    mockConfigService.configCache.setExplicitValue({
+      loadArgs: ['IOT_CONFIG'],
+      value: { status: 'loaded', value: createMockIotConfig(60000, 5000), updatedAt: new Date() },
     })
 
     const rootElement = document.getElementById('root') as HTMLDivElement

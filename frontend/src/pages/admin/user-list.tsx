@@ -1,34 +1,16 @@
+import type { CacheWithValue } from '@furystack/cache'
+import type { GetCollectionResult } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Paper } from '@furystack/shades-common-components'
+import { Button, CacheView, Paper, Skeleton } from '@furystack/shades-common-components'
+import type { User } from 'common'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { RoleTag } from '../../components/role-tag/index.js'
+import { GenericErrorPage } from '../../components/generic-error.js'
 import { UsersService } from '../../services/users-service.js'
 
-type UserListPageProps = Record<string, never>
-
-export const UserListPage = Shade<UserListPageProps>({
-  shadowDomName: 'user-list-page',
+const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> }>({
+  shadowDomName: 'user-list-content',
   css: {
-    '& .page-container': {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '24px',
-      height: '100%',
-    },
-    '& .page-title': {
-      marginBottom: '8px',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .page-description': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .loading-text': {
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .error-text': {
-      color: 'var(--theme-error-main)',
-    },
     '& .users-table': {
       width: '100%',
       borderCollapse: 'collapse',
@@ -83,10 +65,8 @@ export const UserListPage = Shade<UserListPageProps>({
       color: 'var(--theme-text-secondary)',
     },
   },
-  render: ({ injector, useObservable }) => {
-    const usersService = injector.getInstance(UsersService)
-
-    const [usersState] = useObservable('users', usersService.findUsersAsObservable({}))
+  render: ({ props, injector }) => {
+    const usersState = props.data
 
     const navigateToUser = (username: string) => {
       navigateToRoute(injector, '/app-settings/users/:username', { username })
@@ -102,83 +82,90 @@ export const UserListPage = Shade<UserListPageProps>({
       })
     }
 
-    const handleRetry = () => {
-      usersService.userQueryCache.flushAll()
-      void usersService.findUsers({})
-    }
+    return (
+      <Paper elevation={1} style={{ padding: '0', overflow: 'hidden' }}>
+        <table className="users-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Roles</th>
+              <th>Created</th>
+              <th className="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usersState.value.entries.map((user) => (
+              <tr onclick={() => navigateToUser(user.username)}>
+                <td className="username-cell">{user.username}</td>
+                <td>
+                  <div className="roles-cell">
+                    {user.roles.length > 0 ? (
+                      user.roles.map((roleName) => <RoleTag roleName={roleName} variant="default" />)
+                    ) : (
+                      <span className="no-roles">No roles</span>
+                    )}
+                  </div>
+                </td>
+                <td className="created-cell">{formatDate(user.createdAt)}</td>
+                <td className="actions-cell">
+                  <Button
+                    variant="outlined"
+                    onclick={(e) => {
+                      e.stopPropagation()
+                      navigateToUser(user.username)
+                    }}
+                  >
+                    Edit
+                  </Button>
+                </td>
+              </tr>
+            ))}
+            {usersState.value.entries.length === 0 && (
+              <tr className="empty-row">
+                <td colSpan={4}>No users found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </Paper>
+    )
+  },
+})
 
-    const getErrorMessage = (error: unknown): string => {
-      if (error instanceof Error) return error.message
-      return 'Failed to load users'
-    }
+type UserListPageProps = Record<string, never>
+
+export const UserListPage = Shade<UserListPageProps>({
+  shadowDomName: 'user-list-page',
+  css: {
+    '& .page-container': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '24px',
+      height: '100%',
+    },
+    '& .page-title': {
+      marginBottom: '8px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+  },
+  render: ({ injector }) => {
+    const usersService = injector.getInstance(UsersService)
 
     return (
       <div className="page-container">
         <h2 className="page-title">👥 Users</h2>
         <p className="page-description">Manage user accounts and their roles.</p>
-
-        {(usersState.status === 'loading' || usersState.status === 'obsolete') && (
-          <Paper elevation={1} style={{ padding: '24px' }}>
-            <p className="loading-text">Loading users...</p>
-          </Paper>
-        )}
-
-        {usersState.status === 'failed' && (
-          <Paper elevation={1} style={{ padding: '24px' }}>
-            <p className="error-text">Error: {getErrorMessage(usersState.error)}</p>
-            <Button variant="outlined" onclick={handleRetry} style={{ marginTop: '12px' }}>
-              Retry
-            </Button>
-          </Paper>
-        )}
-
-        {usersState.status === 'loaded' && (
-          <Paper elevation={1} style={{ padding: '0', overflow: 'hidden' }}>
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Roles</th>
-                  <th>Created</th>
-                  <th className="actions-col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {usersState.value.entries.map((user) => (
-                  <tr onclick={() => navigateToUser(user.username)}>
-                    <td className="username-cell">{user.username}</td>
-                    <td>
-                      <div className="roles-cell">
-                        {user.roles.length > 0 ? (
-                          user.roles.map((roleName) => <RoleTag roleName={roleName} variant="default" />)
-                        ) : (
-                          <span className="no-roles">No roles</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="created-cell">{formatDate(user.createdAt)}</td>
-                    <td className="actions-cell">
-                      <Button
-                        variant="outlined"
-                        onclick={(e) => {
-                          e.stopPropagation()
-                          navigateToUser(user.username)
-                        }}
-                      >
-                        Edit
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-                {usersState.value.entries.length === 0 && (
-                  <tr className="empty-row">
-                    <td colSpan={4}>No users found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </Paper>
-        )}
+        <CacheView
+          cache={usersService.userQueryCache}
+          args={[{}]}
+          content={UserListContent}
+          loader={<Skeleton />}
+          error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
+        />
       </div>
     )
   },

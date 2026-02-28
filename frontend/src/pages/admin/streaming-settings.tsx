@@ -1,7 +1,9 @@
+import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, NotyService, Paper } from '@furystack/shades-common-components'
+import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import type { MoviesConfig } from 'common'
+import type { Config, MoviesConfig } from 'common'
+import { GenericErrorPage } from '../../components/generic-error.js'
 import { ConfigService } from '../../services/config-service.js'
 
 type StreamingFormData = MoviesConfig['value']
@@ -18,18 +20,11 @@ const PRESET_OPTIONS = [
   { value: 'veryslow', label: 'Very Slow (Best Quality)' },
 ] as const
 
-export const StreamingSettingsPage = Shade({
-  shadowDomName: 'streaming-settings-page',
+const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
+  shadowDomName: 'streaming-settings-content',
   css: {
-    '& .page-title': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-primary)',
-    },
     '& .page-description': {
       marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .loading-text': {
       color: 'var(--theme-text-secondary)',
     },
     '& .section-title': {
@@ -90,11 +85,9 @@ export const StreamingSettingsPage = Shade({
       paddingTop: '16px',
     },
   },
-  render: ({ injector, useObservable, useDisposable }) => {
+  render: ({ props, injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
-
-    const [config] = useObservable('moviesConfig', configService.getConfigAsObservable('MOVIES_CONFIG'))
 
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
@@ -128,31 +121,18 @@ export const StreamingSettingsPage = Shade({
       }
     }
 
-    if (config.status === 'loading') {
-      return (
-        <div>
-          <h2 className="page-title">📺 Streaming Settings</h2>
-          <Paper elevation={1} style={{ padding: '24px' }}>
-            <p className="loading-text">Loading settings...</p>
-          </Paper>
-        </div>
-      )
-    }
-
-    const currentValues: StreamingFormData =
-      config.status === 'loaded' && config.value
-        ? (config.value.value as StreamingFormData)
-        : {
-            autoExtractSubtitles: false,
-            fullSyncOnStartup: false,
-            preset: 'medium',
-            threads: 4,
-            watchFiles: 'all',
-          }
+    const currentValues: StreamingFormData = props.data.value.value
+      ? (props.data.value.value as StreamingFormData)
+      : {
+          autoExtractSubtitles: false,
+          fullSyncOnStartup: false,
+          preset: 'medium',
+          threads: 4,
+          watchFiles: 'all',
+        }
 
     return (
-      <div>
-        <h2 className="page-title">📺 Streaming Settings</h2>
+      <>
         <p className="page-description">Configure media transcoding and file watching settings.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
@@ -247,6 +227,32 @@ export const StreamingSettingsPage = Shade({
             </div>
           </Form>
         </Paper>
+      </>
+    )
+  },
+})
+
+export const StreamingSettingsPage = Shade({
+  shadowDomName: 'streaming-settings-page',
+  css: {
+    '& .page-title': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-primary)',
+    },
+  },
+  render: ({ injector }) => {
+    const configService = injector.getInstance(ConfigService)
+
+    return (
+      <div>
+        <h2 className="page-title">📺 Streaming Settings</h2>
+        <CacheView
+          cache={configService.configCache}
+          args={['MOVIES_CONFIG']}
+          content={StreamingSettingsContent}
+          loader={<Skeleton />}
+          error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
+        />
       </div>
     )
   },
