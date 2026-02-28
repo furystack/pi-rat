@@ -93,7 +93,7 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
       }
     }
 
-    const currentValues: OmdbFormData = props.data.value
+    const currentValues: OmdbFormData = props.data.value.value
       ? (props.data.value.value as OmdbFormData)
       : { apiKey: '', trySearchMovieFromTitle: true, autoDownloadMetadata: true }
 

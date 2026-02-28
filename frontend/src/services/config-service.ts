@@ -1,6 +1,7 @@
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
+import { ResponseError } from '@furystack/rest-client-fetch'
 import type { Config, ConfigType } from 'common'
 import { ConfigApiClient } from './api-clients/config-api-client.js'
 
@@ -12,13 +13,20 @@ export class ConfigService {
   public configCache = new Cache({
     capacity: 50,
     load: async (id: ConfigType['id']) => {
-      const { result } = await this.configApiClient.call({
-        method: 'GET',
-        action: '/config/:id',
-        url: { id },
-        query: {},
-      })
-      return result
+      try {
+        const { result } = await this.configApiClient.call({
+          method: 'GET',
+          action: '/config/:id',
+          url: { id },
+          query: {},
+        })
+        return result
+      } catch (error) {
+        if (error instanceof ResponseError && error.response.status === 404) {
+          return { id, value: null } as unknown as Config
+        }
+        throw error
+      }
     },
   })
 

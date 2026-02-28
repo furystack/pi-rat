@@ -121,7 +121,7 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
       }
     }
 
-    const currentValues: StreamingFormData = props.data.value
+    const currentValues: StreamingFormData = props.data.value.value
       ? (props.data.value.value as StreamingFormData)
       : {
           autoExtractSubtitles: false,

@@ -96,7 +96,9 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
       }
     }
 
-    const currentValues: OllamaFormData = props.data.value ? (props.data.value.value as OllamaFormData) : { host: '' }
+    const currentValues: OllamaFormData = props.data.value.value
+      ? (props.data.value.value as OllamaFormData)
+      : { host: '' }
 
     return (
       <>

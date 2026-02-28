@@ -82,7 +82,7 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
       }
     }
 
-    const currentValues: IotFormData = props.data.value
+    const currentValues: IotFormData = props.data.value.value
       ? (props.data.value.value as IotFormData)
       : {
           pingIntervalMs: DEFAULT_PING_INTERVAL_MS,
