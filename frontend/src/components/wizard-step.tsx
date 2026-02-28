@@ -1,9 +1,16 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import type { WizardStepProps } from '@furystack/shades-common-components'
-import { Button, showParallax } from '@furystack/shades-common-components'
+import { Button, Form, showParallax } from '@furystack/shades-common-components'
+
+const defaultValidate = (formData: unknown): formData is Record<string, string> =>
+  typeof formData === 'object' && formData !== null
 
 export const WizardStep = Shade<
-  { title: string; onSubmit?: (ev: SubmitEvent) => void | Promise<void> } & WizardStepProps
+  {
+    title: string
+    validate?: (formData: unknown) => formData is Record<string, string>
+    onSubmit?: (formData: Record<string, string>) => void | Promise<void>
+  } & WizardStepProps
 >({
   shadowDomName: 'wizard-step',
   css: {
@@ -63,12 +70,12 @@ export const WizardStep = Shade<
     }
 
     return (
-      <form
+      <Form<Record<string, string>>
         ref={formRef}
-        onsubmit={async (ev) => {
-          ev.preventDefault()
+        validate={props.validate ?? defaultValidate}
+        onSubmit={async (data) => {
           if (props.onSubmit) {
-            await props.onSubmit(ev)
+            await props.onSubmit(data)
           } else {
             props.onNext?.()
           }
@@ -91,7 +98,7 @@ export const WizardStep = Shade<
             {props.currentPage < props.maxPages - 1 ? 'Next' : 'Finish'}
           </Button>
         </div>
-      </form>
+      </Form>
     )
   },
 })

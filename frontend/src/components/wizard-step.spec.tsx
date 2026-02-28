@@ -250,6 +250,7 @@ describe('WizardStep', () => {
       const form = wizardStep?.querySelector('form')
 
       form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await flushUpdates()
       expect(onNext).toHaveBeenCalledTimes(1)
     })
   })
@@ -265,7 +266,14 @@ describe('WizardStep', () => {
         injector,
         rootElement,
         jsxElement: (
-          <WizardStep title="Submit Test" currentPage={0} maxPages={3} onSubmit={onSubmit} onNext={onNext}>
+          <WizardStep
+            title="Submit Test"
+            currentPage={0}
+            maxPages={3}
+            validate={(data): data is Record<string, string> => typeof data === 'object' && data !== null}
+            onSubmit={onSubmit}
+            onNext={onNext}
+          >
             Content
           </WizardStep>
         ),
@@ -276,6 +284,7 @@ describe('WizardStep', () => {
       const form = wizardStep?.querySelector('form')
 
       form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      await flushUpdates()
       expect(onSubmit).toHaveBeenCalledTimes(1)
       expect(onNext).not.toHaveBeenCalled()
     })

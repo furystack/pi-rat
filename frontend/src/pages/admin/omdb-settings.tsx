@@ -8,6 +8,18 @@ import { ConfigService } from '../../services/config-service.js'
 
 type OmdbFormData = OmdbConfig['value']
 
+export type OmdbRawFormData = {
+  apiKey: string
+  trySearchMovieFromTitle?: string
+  autoDownloadMetadata?: string
+}
+
+export const isOmdbRawFormData = (data: unknown): data is OmdbRawFormData => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return typeof d.apiKey === 'string'
+}
+
 const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'omdb-settings-content',
   css: {
@@ -66,9 +78,9 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
       setApiKeyVisible(!isApiKeyVisible)
     }
 
-    const handleSubmit = async (formData: Record<string, unknown>) => {
+    const handleSubmit = async (formData: OmdbRawFormData) => {
       const data: OmdbFormData = {
-        apiKey: formData.apiKey as string,
+        apiKey: formData.apiKey,
         trySearchMovieFromTitle: formData.trySearchMovieFromTitle === 'on',
         autoDownloadMetadata: formData.autoDownloadMetadata === 'on',
       }
@@ -102,12 +114,7 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
         <p className="page-description">Configure the OMDB API integration for fetching movie and series metadata.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <Form<Record<string, unknown>>
-            validate={(data): data is Record<string, unknown> => {
-              return typeof (data as Record<string, unknown>).apiKey === 'string'
-            }}
-            onSubmit={(data) => void handleSubmit(data)}
-          >
+          <Form<OmdbRawFormData> validate={isOmdbRawFormData} onSubmit={(data) => void handleSubmit(data)}>
             <div className="form-field">
               <div className="api-key-row">
                 <Input

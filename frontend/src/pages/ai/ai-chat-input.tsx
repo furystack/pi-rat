@@ -4,6 +4,16 @@ import { SessionService } from '../../services/session.js'
 import { AiChatMessageService } from './ai-chat-message-service.js'
 import { AiChatService } from './ai-chat-service.js'
 
+export type AiMessagePayload = {
+  message: string
+}
+
+export const isAiMessagePayload = (data: unknown): data is AiMessagePayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return typeof d.message === 'string' && d.message.trim() !== ''
+}
+
 export const AiChatInput = Shade<{ selectedChatId: string }>({
   shadowDomName: 'pi-rat-ai-chat-input',
   style: {
@@ -27,7 +37,7 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
     )
 
     return (
-      <Form<{ message: string }>
+      <Form<AiMessagePayload>
         ref={formRef}
         onSubmit={({ message }) => {
           void aiChatMessageService
@@ -44,15 +54,7 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
               formRef.current?.reset()
             })
         }}
-        validate={(formData): formData is { message: string } => {
-          return (
-            typeof formData === 'object' &&
-            formData !== null &&
-            'message' in formData &&
-            typeof (formData as { message?: unknown }).message === 'string' &&
-            (formData as { message: string }).message.trim() !== ''
-          )
-        }}
+        validate={isAiMessagePayload}
         style={{ display: 'flex', flexDirection: 'row', width: '100%' }}
       >
         <Input

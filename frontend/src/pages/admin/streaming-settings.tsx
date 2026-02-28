@@ -8,6 +8,21 @@ import { ConfigService } from '../../services/config-service.js'
 
 type StreamingFormData = MoviesConfig['value']
 
+export type StreamingRawFormData = {
+  autoExtractSubtitles?: string
+  fullSyncOnStartup?: string
+  preset: string
+  threads: string
+  watchFiles?: string
+}
+
+export const isStreamingRawFormData = (data: unknown): data is StreamingRawFormData => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  const threads = Number(d.threads)
+  return typeof d.threads === 'string' && !isNaN(threads) && threads >= 1 && threads <= 64
+}
+
 const PRESET_OPTIONS = [
   { value: 'ultrafast', label: 'Ultra Fast' },
   { value: 'superfast', label: 'Super Fast' },
@@ -92,7 +107,7 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
 
-    const handleSubmit = async (formData: Record<string, unknown>) => {
+    const handleSubmit = async (formData: StreamingRawFormData) => {
       const data: StreamingFormData = {
         autoExtractSubtitles: formData.autoExtractSubtitles === 'on',
         fullSyncOnStartup: formData.fullSyncOnStartup === 'on',
@@ -136,14 +151,7 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
         <p className="page-description">Configure media transcoding and file watching settings.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <Form<Record<string, unknown>>
-            validate={(data): data is Record<string, unknown> => {
-              const formData = data as Record<string, unknown>
-              const threads = Number(formData.threads)
-              return !isNaN(threads) && threads >= 1 && threads <= 64
-            }}
-            onSubmit={(data) => void handleSubmit(data)}
-          >
+          <Form<StreamingRawFormData> validate={isStreamingRawFormData} onSubmit={(data) => void handleSubmit(data)}>
             <h3 className="section-title">File Discovery</h3>
 
             <div className="form-field">
