@@ -5,8 +5,12 @@ import {
   CacheView,
   cssVariableTheme,
   Form,
+  Icon,
+  icons,
   Input,
   NotyService,
+  PageContainer,
+  PageHeader,
   Paper,
   Skeleton,
   Typography,
@@ -194,10 +198,8 @@ export const IotSettingsPage = Shade({
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <div>
-        <Typography variant="h2" style={{ marginBottom: '24px' }}>
-          📡 IOT Device Availability
-        </Typography>
+      <PageContainer gap="24px">
+        <PageHeader icon={<Icon icon={icons.plug} />} title="IOT Device Availability" />
         <CacheView
           cache={configService.configCache}
           args={['IOT_CONFIG']}
@@ -205,7 +207,7 @@ export const IotSettingsPage = Shade({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

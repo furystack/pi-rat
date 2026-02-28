@@ -5,7 +5,8 @@ import {
   CacheView,
   cssVariableTheme,
   Form,
-  Typography,
+  Icon,
+  icons,
   Input,
   NotyService,
   PageContainer,
@@ -14,6 +15,7 @@ import {
   Select,
   Skeleton,
   Switch,
+  Typography,
 } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Config, MoviesConfig } from 'common'
@@ -240,7 +242,7 @@ export const StreamingSettingsPage = Shade({
 
     return (
       <PageContainer gap="24px">
-        <PageHeader title="📺 Streaming Settings" />
+        <PageHeader icon={<Icon icon={icons.play} />} title="Streaming Settings" />
         <CacheView
           cache={configService.configCache}
           args={['MOVIES_CONFIG']}

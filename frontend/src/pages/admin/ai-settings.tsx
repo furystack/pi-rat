@@ -5,8 +5,12 @@ import {
   CacheView,
   cssVariableTheme,
   Form,
+  Icon,
+  icons,
   Input,
   NotyService,
+  PageContainer,
+  PageHeader,
   Paper,
   Skeleton,
   Typography,
@@ -158,20 +162,12 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
 export const AiSettingsPage = Shade({
   shadowDomName: 'ai-settings-page',
-  css: {
-    '& .page-title': {
-      marginBottom: '24px',
-      color: cssVariableTheme.text.primary,
-    },
-  },
   render: ({ injector }) => {
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <div>
-        <Typography variant="h2" className="page-title">
-          🤖 Ollama Integration
-        </Typography>
+      <PageContainer gap="24px">
+        <PageHeader icon={<Icon icon={icons.wand} />} title="Ollama Integration" />
         <CacheView
           cache={configService.configCache}
           args={['OLLAMA_CONFIG']}
@@ -179,7 +175,7 @@ export const AiSettingsPage = Shade({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

@@ -5,6 +5,8 @@ import {
   Button,
   CacheView,
   cssVariableTheme,
+  Icon,
+  icons,
   PageContainer,
   PageHeader,
   Paper,
@@ -149,7 +151,11 @@ export const UserListPage = Shade<UserListPageProps>({
 
     return (
       <PageContainer gap="24px">
-        <PageHeader title="👥 Users" description="Manage user accounts and their roles." />
+        <PageHeader
+          icon={<Icon icon={icons.users} />}
+          title="Users"
+          description="Manage user accounts and their roles."
+        />
         <CacheView
           cache={usersService.userQueryCache}
           args={[{}]}

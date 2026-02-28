@@ -3,8 +3,13 @@ import { createComponent, Shade } from '@furystack/shades'
 import {
   Button,
   CacheView,
+  Chip,
   cssVariableTheme,
+  Icon,
+  icons,
   NotyService,
+  PageContainer,
+  PageHeader,
   Paper,
   Select,
   Skeleton,
@@ -12,9 +17,7 @@ import {
 } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Roles, User } from 'common'
-import { getAllRoleDefinitions } from 'common'
-import { navigateToRoute } from '../../navigate-to-route.js'
-import { RoleTag } from '../../components/role-tag/index.js'
+import { getAllRoleDefinitions, getRoleDefinition } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { UsersService } from '../../services/users-service.js'
 
@@ -232,13 +235,20 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
               {rolesToDisplay.length > 0 ? (
                 rolesToDisplay.map((roleName) => {
                   const variant = getRoleVariant(roleName)
+                  const role = getRoleDefinition(roleName)
+                  const chipColor = variant === 'added' ? 'success' : variant === 'removed' ? 'error' : undefined
+                  const onDelete = variant === 'removed' ? () => restoreRole(roleName) : () => removeRole(roleName)
+
                   return (
-                    <RoleTag
-                      roleName={roleName}
-                      variant={variant}
-                      onRemove={variant !== 'removed' ? () => removeRole(roleName) : undefined}
-                      onRestore={variant === 'removed' ? () => restoreRole(roleName) : undefined}
-                    />
+                    <Chip
+                      variant="outlined"
+                      color={chipColor}
+                      onDelete={onDelete}
+                      title={role.description}
+                      style={variant === 'removed' ? { textDecoration: 'line-through' } : undefined}
+                    >
+                      {role.displayName}
+                    </Chip>
                   )
                 })
               ) : (
@@ -293,38 +303,12 @@ type UserDetailsPageProps = {
 
 export const UserDetailsPage = Shade<UserDetailsPageProps>({
   shadowDomName: 'user-details-page',
-  css: {
-    '& .page-container': {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '24px',
-      height: '100%',
-    },
-    '& .page-header': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '16px',
-    },
-    '& .page-header h2': {
-      margin: '0',
-      color: cssVariableTheme.text.primary,
-    },
-  },
   render: ({ props, injector }) => {
     const usersService = injector.getInstance(UsersService)
 
-    const navigateBack = () => {
-      navigateToRoute(injector, '/app-settings/users')
-    }
-
     return (
-      <div className="page-container">
-        <div className="page-header">
-          <Button variant="outlined" onclick={navigateBack}>
-            ← Back
-          </Button>
-          <Typography variant="h2">User Details</Typography>
-        </div>
+      <PageContainer gap="24px">
+        <PageHeader icon={<Icon icon={icons.user} />} title="User Details" />
         <CacheView
           cache={usersService.userCache}
           args={[props.username]}
@@ -332,7 +316,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

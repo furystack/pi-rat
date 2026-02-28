@@ -201,7 +201,7 @@ export const OmdbSettingsPage = Shade({
 
     return (
       <PageContainer gap="24px">
-        <PageHeader title="🎬 OMDB Settings" />
+        <PageHeader icon={<Icon icon={icons.film} />} title="OMDB Settings" />
         <CacheView
           cache={configService.configCache}
           args={['OMDB_CONFIG']}

@@ -1,6 +1,6 @@
 import { Cache } from '@furystack/cache'
 import { Injector } from '@furystack/inject'
-import { LocationService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
+import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { NotyService } from '@furystack/shades-common-components'
 import type { User } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -9,11 +9,11 @@ import { createMockUser } from '../../test-utils/user-test-helpers.js'
 import { UserDetailsPage } from './user-details.js'
 
 /**
- * Helper to get action buttons (excluding buttons inside role-tags and shade-select)
+ * Helper to get action buttons (excluding buttons inside chips and shade-select)
  */
 const getActionButtons = (page: Element | null | undefined) => {
   const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
-  return allButtons.filter((btn) => !btn.closest('role-tag') && !btn.closest('shade-select'))
+  return allButtons.filter((btn) => !btn.closest('shade-chip') && !btn.closest('shade-select'))
 }
 
 /**
@@ -208,7 +208,7 @@ describe('UserDetailsPage', () => {
       expect(page?.textContent).toContain('Roles')
     })
 
-    it('should render role tags for user roles', async () => {
+    it('should render role chips for user roles', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -219,12 +219,12 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const roleTags = page?.querySelectorAll('role-tag')
+      const chips = page?.querySelectorAll('shade-chip')
 
-      expect(roleTags?.length).toBe(1)
+      expect(chips?.length).toBe(1)
     })
 
-    it('should render multiple role tags for user with multiple roles', async () => {
+    it('should render multiple role chips for user with multiple roles', async () => {
       seedUserCache('testuser@example.com', ['admin', 'viewer', 'media-manager'])
 
       const rootElement = document.getElementById('root') as HTMLDivElement
@@ -237,9 +237,9 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const roleTags = page?.querySelectorAll('role-tag')
+      const chips = page?.querySelectorAll('shade-chip')
 
-      expect(roleTags?.length).toBe(3)
+      expect(chips?.length).toBe(3)
     })
 
     it('should display "No roles assigned" for user without roles', async () => {
@@ -336,9 +336,10 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      // Back button, Save Changes button, and Cancel button
-      const buttons = page?.querySelectorAll('button')
-      expect(buttons?.length).toBeGreaterThanOrEqual(3)
+      const actionButtons = getActionButtons(page)
+      expect(actionButtons.length).toBe(2)
+      expect(actionButtons[0]?.textContent).toContain('Save Changes')
+      expect(actionButtons[1]?.textContent).toContain('Cancel')
     })
 
     it('should have Save Changes and Cancel buttons disabled when no changes', async () => {
@@ -357,29 +358,6 @@ describe('UserDetailsPage', () => {
     })
   })
 
-  describe('navigation', () => {
-    it('should navigate back to user list when Back button is clicked', async () => {
-      const rootElement = document.getElementById('root') as HTMLDivElement
-      const locationService = injector.getInstance(LocationService)
-      const updateStateSpy = vi.spyOn(locationService, 'updateState')
-
-      initializeShadeRoot({
-        injector,
-        rootElement,
-        jsxElement: <UserDetailsPage username="testuser@example.com" />,
-      })
-      await flushUpdates()
-
-      const page = document.querySelector('user-details-page')
-      const backButton = page?.querySelector('button') as HTMLButtonElement
-
-      backButton.click()
-
-      expect(window.location.pathname).toBe('/app-settings/users')
-      expect(updateStateSpy).toHaveBeenCalled()
-    })
-  })
-
   describe('role editing', () => {
     it('should add role when selected from dropdown', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
@@ -395,8 +373,8 @@ describe('UserDetailsPage', () => {
 
       await selectRoleFromDropdown(page, 'viewer')
 
-      const roleTags = page?.querySelectorAll('role-tag')
-      expect(roleTags?.length).toBe(2)
+      const chips = page?.querySelectorAll('shade-chip')
+      expect(chips?.length).toBe(2)
 
       const actionButtons = getActionButtons(page)
       const disabledActionButtons = actionButtons.filter((btn) => btn.disabled)
@@ -418,9 +396,9 @@ describe('UserDetailsPage', () => {
 
       const page = document.querySelector('user-details-page')
 
-      const roleTag = page?.querySelector('role-tag')
-      const removeButton = roleTag?.querySelector('button')
-      removeButton?.click()
+      const chip = page?.querySelector('shade-chip')
+      const deleteButton = chip?.querySelector('.chip-delete') as HTMLElement
+      deleteButton?.click()
 
       await new Promise((resolve) => setTimeout(resolve, 10))
       await flushUpdates()
@@ -452,8 +430,8 @@ describe('UserDetailsPage', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      const roleTags = page?.querySelectorAll('role-tag')
-      expect(roleTags?.length).toBe(1)
+      const chips = page?.querySelectorAll('shade-chip')
+      expect(chips?.length).toBe(1)
 
       const disabledActionButtons = getActionButtons(page).filter((btn) => btn.disabled)
       expect(disabledActionButtons.length).toBe(2)
@@ -478,7 +456,7 @@ describe('UserDetailsPage', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
 
       const actionButtons = getActionButtons(page)
-      const saveButton = actionButtons[1]
+      const saveButton = actionButtons[0]
       saveButton.click()
 
       await new Promise((resolve) => setTimeout(resolve, 50))
@@ -506,7 +484,7 @@ describe('UserDetailsPage', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
 
       const actionButtons = getActionButtons(page)
-      const saveButton = actionButtons[1]
+      const saveButton = actionButtons[0]
       saveButton.click()
 
       await new Promise((resolve) => setTimeout(resolve, 50))
@@ -537,7 +515,7 @@ describe('UserDetailsPage', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
 
       const actionButtons = getActionButtons(page)
-      const saveButton = actionButtons[1]
+      const saveButton = actionButtons[0]
       saveButton.click()
 
       await new Promise((resolve) => setTimeout(resolve, 50))
@@ -575,16 +553,16 @@ describe('UserDetailsPage', () => {
       await new Promise((resolve) => setTimeout(resolve, 10))
 
       const actionButtonsBefore = getActionButtons(page)
+      expect(actionButtonsBefore[0]?.disabled).toBe(false)
       expect(actionButtonsBefore[1]?.disabled).toBe(false)
-      expect(actionButtonsBefore[2]?.disabled).toBe(false)
 
-      actionButtonsBefore[1]?.click()
+      actionButtonsBefore[0]?.click()
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
       const actionButtonsAfter = getActionButtons(page)
+      expect(actionButtonsAfter[0]?.disabled).toBe(true)
       expect(actionButtonsAfter[1]?.disabled).toBe(true)
-      expect(actionButtonsAfter[2]?.disabled).toBe(true)
     })
   })
 
@@ -604,16 +582,16 @@ describe('UserDetailsPage', () => {
 
       const page = document.querySelector('user-details-page')
 
-      const roleTag = page?.querySelector('role-tag')
-      const removeButton = roleTag?.querySelector('button')
-      removeButton?.click()
+      const chip = page?.querySelector('shade-chip')
+      const deleteButton = chip?.querySelector('.chip-delete') as HTMLElement
+      deleteButton?.click()
 
       await new Promise((resolve) => setTimeout(resolve, 10))
       await flushUpdates()
       await flushUpdates()
 
       const actionButtons = getActionButtons(page)
-      const saveButton = actionButtons[1]
+      const saveButton = actionButtons[0]
       saveButton.click()
 
       await new Promise((resolve) => setTimeout(resolve, 10))
