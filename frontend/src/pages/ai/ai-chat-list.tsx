@@ -1,27 +1,18 @@
+import type { CacheWithValue } from '@furystack/cache'
+import type { GetCollectionResult } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Paper } from '@furystack/shades-common-components'
+import { Button, CacheView, Paper, Skeleton } from '@furystack/shades-common-components'
 import type { AiChat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { AiChatService } from './ai-chat-service.js'
 
-export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiChat) => void }>({
-  shadowDomName: 'pi-rat-ai-chat-list',
-  render: ({ injector, useObservable, props }) => {
-    const aiChatService = injector.getInstance(AiChatService)
-
-    const [chatList] = useObservable('chatList', aiChatService.getAiChatsAsObservable({}))
-
-    if (chatList.status === 'loading') {
-      return <div>Loading...</div>
-    }
-    if (chatList.status === 'failed') {
-      return <ErrorDisplay error={chatList.error} />
-    }
-
-    if (chatList.status === 'obsolete') {
-      void aiChatService.getAiChats({})
-    }
-
+const AiChatListContent = Shade<{
+  data: CacheWithValue<GetCollectionResult<AiChat>>
+  selectedChatId?: string
+  onSelect: (chat: AiChat) => void
+}>({
+  shadowDomName: 'pi-rat-ai-chat-list-content',
+  render: ({ props }) => {
     return (
       <Paper style={{ padding: '16px', height: 'calc(100% - 48px)' }}>
         <h3>Chats</h3>
@@ -34,7 +25,7 @@ export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiCh
             padding: '8px',
           }}
         >
-          {chatList.value.entries.map((chat) => (
+          {props.data.value.entries.map((chat) => (
             <Button
               variant={props.selectedChatId === chat.id ? 'contained' : undefined}
               onclick={() => {
@@ -46,6 +37,24 @@ export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiCh
           ))}
         </div>
       </Paper>
+    )
+  },
+})
+
+export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiChat) => void }>({
+  shadowDomName: 'pi-rat-ai-chat-list',
+  render: ({ injector, props }) => {
+    const aiChatService = injector.getInstance(AiChatService)
+
+    return (
+      <CacheView
+        cache={aiChatService.aiChatQueryCache}
+        args={[{}]}
+        content={AiChatListContent}
+        contentProps={{ selectedChatId: props.selectedChatId, onSelect: props.onSelect }}
+        loader={<Skeleton />}
+        error={(err) => <ErrorDisplay error={err} />}
+      />
     )
   },
 })

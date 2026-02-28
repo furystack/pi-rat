@@ -1,6 +1,7 @@
-import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import type { CacheWithValue } from '@furystack/cache'
 import { Shade, createComponent } from '@furystack/shades'
-import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
+import { CacheView, Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
+import type { Series } from 'common'
 import { AppLink } from '../../app-routes.js'
 import { SeriesService } from '../../services/series-service.js'
 
@@ -34,13 +35,18 @@ const blur = (el: HTMLElement) => {
   )
 }
 
-export const SeriesWidget = Shade<{
-  imdbId: string
+const SeriesWidgetContent = Shade<{
+  data: CacheWithValue<Series>
   index?: number
   size?: number
 }>({
-  shadowDomName: 'pi-rat-series-widget',
-  render: ({ props, injector, useObservable, useRef }) => {
+  shadowDomName: 'pi-rat-series-widget-content',
+  render: ({ props, useRef }) => {
+    const { size = 256 } = props
+    const series = props.data.value
+    const { imdbId } = series
+    const url = `/series/${imdbId}`
+
     const cardRef = useRef<HTMLElement>('card')
     setTimeout(() => {
       const el = cardRef.current
@@ -53,86 +59,88 @@ export const SeriesWidget = Shade<{
         })
       }
     }, 1000)
-    const { imdbId, size = 256 } = props
 
-    const seriesService = injector.getInstance(SeriesService)
-    const [series] = useObservable('movie', seriesService.getSeriesAsObservable(imdbId))
-
-    const url = `/series/${imdbId}`
-
-    if (isLoadedCacheResult(series)) {
-      return (
-        <AppLink
-          tabIndex={0}
-          title={series.value.plot || series.value.title}
-          href="/series/:imdbId"
-          params={{ imdbId }}
+    return (
+      <AppLink tabIndex={0} title={series.plot || series.title} href="/series/:imdbId" params={{ imdbId }}>
+        <div
+          onfocus={(ev) => focus(ev.target as HTMLElement)}
+          onblur={(ev) => blur(ev.target as HTMLElement)}
+          onmouseenter={(ev) => focus(ev.target as HTMLElement)}
+          onmouseleave={(ev) => blur(ev.target as HTMLElement)}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            width: `${size}px`,
+            height: `${size}px`,
+            filter: 'saturate(0.3)brightness(0.6)',
+            background: 'rgba(128,128,128,0.1)',
+            transform: 'scale(0)',
+            borderRadius: '4px',
+            margin: '8px',
+            overflow: 'hidden',
+            color: 'white',
+          }}
+          onclick={(ev) => {
+            if (url.startsWith('http') && new URL(url).href !== window.location.href) {
+              ev.preventDefault()
+              ev.stopImmediatePropagation()
+              window.location.replace(url)
+            }
+          }}
         >
-          <div
-            onfocus={(ev) => focus(ev.target as HTMLElement)}
-            onblur={(ev) => blur(ev.target as HTMLElement)}
-            onmouseenter={(ev) => focus(ev.target as HTMLElement)}
-            onmouseleave={(ev) => blur(ev.target as HTMLElement)}
+          <img
+            src={series.thumbnailImageUrl as string}
+            alt={series.title}
+            className="cover"
             style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'column',
-              width: `${size}px`,
-              height: `${size}px`,
-              filter: 'saturate(0.3)brightness(0.6)',
-              background: 'rgba(128,128,128,0.1)',
-              transform: 'scale(0)',
-              borderRadius: '4px',
-              margin: '8px',
-              overflow: 'hidden',
-              color: 'white',
+              display: 'inline-block',
+              backgroundColor: '#666',
+              objectFit: 'cover',
+              width: '100%',
+              height: '100%',
+              transform: 'scale(1)',
             }}
-            onclick={(ev) => {
-              if (url.startsWith('http') && new URL(url).href !== window.location.href) {
-                ev.preventDefault()
-                ev.stopImmediatePropagation()
-                window.location.replace(url)
-              }
+          />
+          <div
+            style={{
+              width: 'calc(100% - 2em)',
+              overflow: 'hidden',
+              textAlign: 'center',
+              textOverflow: 'ellipsis',
+              position: 'absolute',
+              bottom: '0',
+              whiteSpace: 'nowrap',
+              padding: '1em',
+              background: 'rgba(0,0,0,0.7)',
             }}
           >
-            <img
-              src={series.value.thumbnailImageUrl as string}
-              alt={series.value.title}
-              className="cover"
-              style={{
-                display: 'inline-block',
-                backgroundColor: '#666',
-                objectFit: 'cover',
-                width: '100%',
-                height: '100%',
-                transform: 'scale(1)',
-              }}
-            />
-            <div
-              style={{
-                width: 'calc(100% - 2em)',
-                overflow: 'hidden',
-                textAlign: 'center',
-                textOverflow: 'ellipsis',
-                position: 'absolute',
-                bottom: '0',
-                whiteSpace: 'nowrap',
-                padding: '1em',
-                background: 'rgba(0,0,0,0.7)',
-              }}
-            >
-              {series.value.title}
-            </div>
+            {series.title}
           </div>
-        </AppLink>
-      )
-    } else if (isPendingCacheResult(series)) {
-      return <Skeleton />
-    } else if (isFailedCacheResult(series)) {
-      return <>:(</>
-    }
+        </div>
+      </AppLink>
+    )
+  },
+})
 
-    return null
+export const SeriesWidget = Shade<{
+  imdbId: string
+  index?: number
+  size?: number
+}>({
+  shadowDomName: 'pi-rat-series-widget',
+  render: ({ props, injector }) => {
+    const seriesService = injector.getInstance(SeriesService)
+
+    return (
+      <CacheView
+        cache={seriesService.seriesCache}
+        args={[props.imdbId]}
+        content={SeriesWidgetContent}
+        contentProps={{ index: props.index, size: props.size }}
+        loader={<Skeleton />}
+      />
+    )
   },
 })

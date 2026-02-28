@@ -1,8 +1,8 @@
-import { isFailedCacheResult, isLoadedCacheResult, isPendingCacheResult } from '@furystack/cache'
+import type { CacheWithValue } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
-import { Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
-import type { DeviceAvailability as DeviceAvailabilityProps } from 'common'
+import { CacheView, Skeleton, promisifyAnimation } from '@furystack/shades-common-components'
+import type { Device, DeviceAvailability as DeviceAvailabilityProps, Icon as IconType } from 'common'
 import { AppLink } from '../../app-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
@@ -40,131 +40,144 @@ const blur = (el: HTMLElement) => {
   )
 }
 
+const DeviceAvailabilityContent = Shade<{
+  data: CacheWithValue<Device>
+  size: number
+  icon?: IconType
+}>({
+  shadowDomName: 'pi-rat-device-availability-content',
+  render: ({ props, injector, useObservable }) => {
+    const { size } = props
+    const device = props.data.value
+
+    const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
+
+    return (
+      <AppLink
+        tabIndex={0}
+        title={device.name}
+        href="/iot/device/:id"
+        params={{ id: device.name }}
+        style={{
+          textDecoration: 'none',
+        }}
+      >
+        <div
+          onfocus={(ev) => focus(ev.target as HTMLElement)}
+          onblur={(ev) => blur(ev.target as HTMLElement)}
+          onmouseenter={(ev) => focus(ev.target as HTMLElement)}
+          onmouseleave={(ev) => blur(ev.target as HTMLElement)}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            width: `${size}px`,
+            height: `${size}px`,
+            filter: 'saturate(0.3)brightness(0.6)',
+            background: 'rgba(128,128,128,0.1)',
+            borderRadius: '4px',
+            margin: '8px',
+            overflow: 'hidden',
+            color: 'white',
+            boxShadow: 'rgba(0, 0, 0, 0.3) 1px 3px 6px',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              zIndex: '1',
+              fontSize: '1.3em',
+              width: 'calc(100% - 2em)',
+              display: 'flex',
+              margin: '1em',
+              justifyContent: 'space-between',
+            }}
+          >
+            <DeviceAvailabilityPanel {...device} />
+
+            {currentUser?.roles.includes('admin') ? (
+              <div style={{ display: 'flex' }}>
+                <div
+                  style={{ width: '16px', height: '16px', marginLeft: '1em' }}
+                  onclick={(ev) => {
+                    ev.preventDefault()
+                    ev.stopImmediatePropagation()
+                    navigateToRoute(
+                      injector,
+                      '/entities/iot-devices',
+                      {},
+                      {
+                        queryString: serializeToQueryString({
+                          gedst: { mode: 'edit', currentId: device.name },
+                        }),
+                      },
+                    )
+                  }}
+                  title="Edit device details"
+                >
+                  ✏️
+                </div>
+              </div>
+            ) : null}
+          </div>
+          <div
+            className="cover"
+            style={{
+              display: 'inline-block',
+              objectFit: 'cover',
+              width: '100%',
+              height: '100%',
+              transform: 'scale(1)',
+              verticalAlign: 'middle',
+              textAlign: 'center',
+              lineHeight: `${size * 0.8}px`,
+              fontSize: `${size / 2}px`,
+            }}
+          >
+            {props.icon ? <Icon {...props.icon} /> : null}
+          </div>
+          <div
+            style={{
+              width: 'calc(100% - 2em)',
+              overflow: 'hidden',
+              textAlign: 'center',
+              textOverflow: 'ellipsis',
+              position: 'absolute',
+              bottom: '0',
+              whiteSpace: 'nowrap',
+              padding: '1em',
+              background: 'rgba(0,0,0,0.7)',
+            }}
+          >
+            {device.name}
+          </div>
+        </div>
+      </AppLink>
+    )
+  },
+})
+
 export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: number; size?: number }>({
   shadowDomName: 'pi-rat-device-availability-widget',
   elementBase: HTMLDivElement,
   elementBaseName: 'div',
-  render: ({ props, injector, useObservable, useHostProps }) => {
+  render: ({ props, injector, useHostProps }) => {
     useHostProps({ style: { transform: 'scale(0)' } })
     const { size = 256 } = props
 
     const iotDevices = injector.getInstance(IotDevicesService)
 
-    const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
-    const [device] = useObservable('movie', iotDevices.getDeviceAsObservable(props.deviceName))
-
-    if (isLoadedCacheResult(device)) {
-      return (
-        <AppLink
-          tabIndex={0}
-          title={device.value.name}
-          href="/iot/device/:id"
-          params={{ id: props.deviceName }}
-          style={{
-            textDecoration: 'none',
-          }}
-        >
-          <div
-            onfocus={(ev) => focus(ev.target as HTMLElement)}
-            onblur={(ev) => blur(ev.target as HTMLElement)}
-            onmouseenter={(ev) => focus(ev.target as HTMLElement)}
-            onmouseleave={(ev) => blur(ev.target as HTMLElement)}
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'column',
-              width: `${size}px`,
-              height: `${size}px`,
-              filter: 'saturate(0.3)brightness(0.6)',
-              background: 'rgba(128,128,128,0.1)',
-              borderRadius: '4px',
-              margin: '8px',
-              overflow: 'hidden',
-              color: 'white',
-              boxShadow: 'rgba(0, 0, 0, 0.3) 1px 3px 6px',
-            }}
-          >
-            <div
-              style={{
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                zIndex: '1',
-                fontSize: '1.3em',
-                width: 'calc(100% - 2em)',
-                display: 'flex',
-                margin: '1em',
-                justifyContent: 'space-between',
-              }}
-            >
-              <DeviceAvailabilityPanel {...device.value} />
-
-              {currentUser?.roles.includes('admin') ? (
-                <div style={{ display: 'flex' }}>
-                  <div
-                    style={{ width: '16px', height: '16px', marginLeft: '1em' }}
-                    onclick={(ev) => {
-                      ev.preventDefault()
-                      ev.stopImmediatePropagation()
-                      navigateToRoute(
-                        injector,
-                        '/entities/iot-devices',
-                        {},
-                        {
-                          queryString: serializeToQueryString({
-                            gedst: { mode: 'edit', currentId: device.value.name },
-                          }),
-                        },
-                      )
-                    }}
-                    title="Edit device details"
-                  >
-                    ✏️
-                  </div>
-                </div>
-              ) : null}
-            </div>
-            <div
-              className="cover"
-              style={{
-                display: 'inline-block',
-                objectFit: 'cover',
-                width: '100%',
-                height: '100%',
-                transform: 'scale(1)',
-                verticalAlign: 'middle',
-                textAlign: 'center',
-                lineHeight: `${size * 0.8}px`,
-                fontSize: `${size / 2}px`,
-              }}
-            >
-              {props.icon ? <Icon {...props.icon} /> : null}
-            </div>
-            <div
-              style={{
-                width: 'calc(100% - 2em)',
-                overflow: 'hidden',
-                textAlign: 'center',
-                textOverflow: 'ellipsis',
-                position: 'absolute',
-                bottom: '0',
-                whiteSpace: 'nowrap',
-                padding: '1em',
-                background: 'rgba(0,0,0,0.7)',
-              }}
-            >
-              {device.value.name}
-            </div>
-          </div>
-        </AppLink>
-      )
-    } else if (isPendingCacheResult(device)) {
-      return <Skeleton />
-    } else if (isFailedCacheResult(device)) {
-      return <>{`:(`}</>
-    }
-
-    return <>{JSON.stringify(device)}</>
+    return (
+      <CacheView
+        cache={iotDevices.deviceCache}
+        args={[props.deviceName]}
+        content={DeviceAvailabilityContent}
+        contentProps={{ size, icon: props.icon }}
+        loader={<Skeleton />}
+      />
+    )
   },
 })

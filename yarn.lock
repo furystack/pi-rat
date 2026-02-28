@@ -835,9 +835,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^13.0.1":
-  version: 13.0.1
-  resolution: "@furystack/shades-common-components@npm:13.0.1"
+"@furystack/shades-common-components@npm:^13.1.0":
+  version: 13.1.0
+  resolution: "@furystack/shades-common-components@npm:13.1.0"
   dependencies:
     "@furystack/cache": "npm:^6.0.0"
     "@furystack/core": "npm:^15.2.2"
@@ -845,7 +845,7 @@ __metadata:
     "@furystack/shades": "npm:^12.2.4"
     "@furystack/utils": "npm:^8.1.10"
     path-to-regexp: "npm:^8.3.0"
-  checksum: 10c0/82591863555353daaec2a3a151393a65e9d377b1ddb2b10cddb06828d8eb5e0b7948c7ec3f7d191ae931a264a10edd20b53c785b84b6e51055e50669ed79f842
+  checksum: 10c0/d04ec670e45e5e3ffff4db8c06ea52fd35726d4f36b89885a8bfa845e50c5de43d1d6a9f6738d42f3bf234395c5f7702558b8217af725bc1aa3a906f985b077d
   languageName: node
   linkType: hard
 
@@ -4227,14 +4227,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-playwright@npm:^2.7.1":
-  version: 2.7.1
-  resolution: "eslint-plugin-playwright@npm:2.7.1"
+"eslint-plugin-playwright@npm:^2.8.0":
+  version: 2.8.0
+  resolution: "eslint-plugin-playwright@npm:2.8.0"
   dependencies:
     globals: "npm:^17.3.0"
   peerDependencies:
     eslint: ">=8.40.0"
-  checksum: 10c0/efd45122b4d4e77608862f0f25a95200a0e367abbe6d53bdce38c59009c4b90edcf12b6f1c2b50e86b0addea56c68ad0c7767768b0a2a73d7f09a814b827df72
+  checksum: 10c0/64767f7a963fd78be5ab4dfb261a9b658e9b9835badf47825a70d1608fcfa420a53ca8a9ce874f830cf2bc10823e232b11ad9dc5b2ea5124193f805fa06bfc6b
   languageName: node
   linkType: hard
 
@@ -4602,7 +4602,7 @@ __metadata:
     "@furystack/rest": "npm:^8.0.40"
     "@furystack/rest-client-fetch": "npm:^8.0.40"
     "@furystack/shades": "npm:^12.2.4"
-    "@furystack/shades-common-components": "npm:^13.0.1"
+    "@furystack/shades-common-components": "npm:^13.1.0"
     "@furystack/shades-lottie": "npm:^8.0.7"
     "@furystack/utils": "npm:^8.1.10"
     "@types/marked": "npm:^6.0.0"
@@ -6930,7 +6930,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-import: "npm:2.32.0"
     eslint-plugin-jsdoc: "npm:^62.7.1"
-    eslint-plugin-playwright: "npm:^2.7.1"
+    eslint-plugin-playwright: "npm:^2.8.0"
     eslint-plugin-prettier: "npm:^5.5.5"
     husky: "npm:^9.1.7"
     jsdom: "npm:^28.1.0"

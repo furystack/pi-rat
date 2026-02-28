@@ -26,7 +26,7 @@
     "@furystack/logging": "^8.0.30",
     "@furystack/rest-client-fetch": "^8.0.40",
     "@furystack/shades": "^12.2.4",
-    "@furystack/shades-common-components": "^13.0.1",
+    "@furystack/shades-common-components": "^13.1.0",
     "@furystack/shades-lottie": "^8.0.7",
     "@furystack/utils": "^8.1.10",
     "@types/node": "^25.3.2",
