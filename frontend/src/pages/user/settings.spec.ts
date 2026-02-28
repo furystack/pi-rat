@@ -7,8 +7,8 @@ describe('isPasswordResetPayload', () => {
       expect(
         isPasswordResetPayload({
           currentPassword: 'old',
-          newPassword: 'new',
-          confirmPassword: 'confirm',
+          newPassword: 'newPass',
+          confirmPassword: 'newPass',
         }),
       ).toBe(true)
     })
@@ -17,8 +17,8 @@ describe('isPasswordResetPayload', () => {
       expect(
         isPasswordResetPayload({
           currentPassword: 'old',
-          newPassword: 'new',
-          confirmPassword: 'confirm',
+          newPassword: 'newPass',
+          confirmPassword: 'newPass',
           extra: 'field',
         }),
       ).toBe(true)
@@ -88,6 +88,18 @@ describe('isPasswordResetPayload', () => {
           currentPassword: 'old',
           newPassword: 'new',
           confirmPassword: '',
+        }),
+      ).toBe(false)
+    })
+  })
+
+  describe('password mismatch', () => {
+    it('returns false when newPassword and confirmPassword do not match', () => {
+      expect(
+        isPasswordResetPayload({
+          currentPassword: 'old',
+          newPassword: 'new',
+          confirmPassword: 'different',
         }),
       ).toBe(false)
     })

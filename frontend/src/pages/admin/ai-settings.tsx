@@ -105,9 +105,9 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
           <Form<OllamaRawFormData>
             validate={(data): data is OllamaRawFormData => {
               const isValid = isOllamaRawFormData(data)
-              if (!isValid) {
-                validationErrorObservable.setValue('Please enter a valid URL (e.g., http://localhost:11434)')
-              }
+              validationErrorObservable.setValue(
+                isValid ? null : 'Please enter a valid URL (e.g., http://localhost:11434)',
+              )
               return isValid
             }}
             onSubmit={(data) => void handleSubmit(data)}

@@ -18,7 +18,8 @@ export const isPasswordResetPayload = (data: unknown): data is PasswordResetPayl
     typeof d.newPassword === 'string' &&
     d.newPassword.length > 0 &&
     typeof d.confirmPassword === 'string' &&
-    d.confirmPassword.length > 0
+    d.confirmPassword.length > 0 &&
+    d.newPassword === d.confirmPassword
   )
 }
 
@@ -51,11 +52,6 @@ const SecuritySection = Shade({
     const error = useDisposable('error', () => new ObservableValue<string>(''))
 
     const handlePasswordReset = async (data: PasswordResetPayload) => {
-      if (data.newPassword !== data.confirmPassword) {
-        error.setValue('New passwords do not match')
-        return
-      }
-
       isLoading.setValue(true)
       error.setValue('')
 

@@ -37,7 +37,7 @@ export const AddDriveStep = Shade<WizardStepProps>({
             })
             injector.getInstance(NotyService).emit('onNotyAdded', {
               type: 'success',
-              body: `Drive '${data.letter}' has been created succesfully`,
+              body: `Drive '${data.letter}' has been created successfully`,
               title: 'Drive created',
             })
           } catch (error) {

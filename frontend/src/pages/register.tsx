@@ -47,11 +47,7 @@ export const Register = Shade({
         <Form<RegisterPayload>
           validate={isRegisterPayload}
           className="register-form"
-          onSubmit={({ userName, password, confirmPassword }) => {
-            if (password !== confirmPassword) {
-              sessionService.loginError.setValue('Passwords do not match')
-              return
-            }
+          onSubmit={({ userName, password }) => {
             void sessionService.register(userName, password)
           }}
         >

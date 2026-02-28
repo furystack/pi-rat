@@ -3,7 +3,9 @@ import type { WizardStepProps } from '@furystack/shades-common-components'
 import { Button, Form, showParallax } from '@furystack/shades-common-components'
 
 const defaultValidate = (formData: unknown): formData is Record<string, string> =>
-  typeof formData === 'object' && formData !== null
+  typeof formData === 'object' &&
+  formData !== null &&
+  Object.values(formData as Record<string, unknown>).every((v) => typeof v === 'string')
 
 export const WizardStep = Shade<
   {

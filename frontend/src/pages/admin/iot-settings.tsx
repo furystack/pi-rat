@@ -106,9 +106,11 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
           <Form<IotRawFormData>
             validate={(data): data is IotRawFormData => {
               const isValid = isIotRawFormData(data)
-              if (!isValid && typeof data === 'object' && data !== null) {
-                validationErrorObservable.setValue(validateIotForm(data as Record<string, unknown>))
-              }
+              validationErrorObservable.setValue(
+                isValid || typeof data !== 'object' || data === null
+                  ? null
+                  : validateIotForm(data as Record<string, unknown>),
+              )
               return isValid
             }}
             onSubmit={(data) => void handleSubmit(data)}
