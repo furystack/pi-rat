@@ -1,6 +1,7 @@
 import { NestedRouteLink, Shade, createComponent } from '@furystack/shades'
 import { promisifyAnimation } from '@furystack/shades-common-components'
 import type { AppPaths } from '../../app-routes.js'
+import { WIDGET_ANIMATION, widgetCoverBlur, widgetCoverFocus, widgetEntrance } from './widget-animations.js'
 
 const focus = (el: HTMLElement) => {
   void promisifyAnimation(
@@ -12,18 +13,10 @@ const focus = (el: HTMLElement) => {
     {
       duration: 1000,
       fill: 'forwards',
-      easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
+      easing: WIDGET_ANIMATION.focusCard.easing,
     },
   )
-  void promisifyAnimation(
-    el.querySelector('.cover') as HTMLImageElement,
-    [{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
-    {
-      fill: 'forwards',
-      easing: 'cubic-bezier(0.310, 0.805, 0.605, 1.145)',
-      duration: 850,
-    },
-  )
+  widgetCoverFocus(el)
 }
 
 const blur = (el: HTMLElement) => {
@@ -36,14 +29,10 @@ const blur = (el: HTMLElement) => {
     {
       duration: 1200,
       fill: 'forwards',
-      easing: 'cubic-bezier(0.230, 1.000, 0.320, 1.000)',
+      easing: WIDGET_ANIMATION.focusCard.easing,
     },
   )
-  void promisifyAnimation(
-    el.querySelector('.cover') as HTMLImageElement,
-    [{ transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
-    { fill: 'forwards', duration: 150 },
-  )
+  widgetCoverBlur(el)
 }
 
 type IconUrlWidgetProps = {
@@ -89,18 +78,17 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
       textOverflow: 'ellipsis',
     },
   },
-  render: ({ props, useRef }) => {
+  render: ({ props, useRef, useDisposable }) => {
     const cardRef = useRef<HTMLElement>('card')
-    setTimeout(() => {
-      const el = cardRef.current
-      if (el) {
-        void promisifyAnimation(el, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], {
-          fill: 'forwards',
-          delay: (props.index || 0) * 160 + Math.random() * 100,
-          duration: 700,
-          easing: 'cubic-bezier(0.190, 1.000, 0.220, 1.000)',
-        })
-      }
+
+    useDisposable('entryAnimation', () => {
+      const id = setTimeout(() => {
+        const el = cardRef.current
+        if (el) {
+          widgetEntrance(el, props.index || 0)
+        }
+      })
+      return { [Symbol.dispose]: () => clearTimeout(id) }
     })
 
     const href: string = props.url

@@ -12,6 +12,7 @@ type GenericMonacoEditorProps<T, TKey extends keyof T, TReadonlyProperties exten
   modelUri?: Uri
 }
 
+ 
 type EntityFromProps<Props> = Props extends GenericMonacoEditorProps<infer T, any, any> ? T : never
 
 export const GenericMonacoEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T>(

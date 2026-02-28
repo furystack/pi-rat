@@ -7,6 +7,7 @@ import { environmentOptions } from '../../environment-options.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { getErrorMessage } from '../../services/get-error-message.js'
 import { SessionService } from '../../services/session.js'
+import { triggerDownload } from '../../trigger-download.js'
 import { BreadCrumbs } from './breadcrumbs.js'
 import { DirectoryEntryIcon } from './directory-entry-icon.js'
 import { FileContextMenu } from './file-context-menu.js'
@@ -65,13 +66,7 @@ export const FileList = Shade<{
             const url = `${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(
               letter,
             )}/${encodeURIComponent(PathHelper.joinPaths(path, focused.name))}/download`
-            const a = document.createElement('a')
-            a.href = url
-            a.target = '_blank'
-            a.download = focused.name
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
+            triggerDownload(url, focused.name)
           }
         }
 

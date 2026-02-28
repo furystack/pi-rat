@@ -41,40 +41,30 @@ export const WizardStep = Shade<
       opacity: '0',
     },
   },
-  render: ({ props, children, useObservable, injector, useRef }) => {
+  render: ({ props, children, useObservable, useDisposable, injector, useRef }) => {
     const h1Ref = useRef<HTMLHeadingElement>('h1')
     const contentRef = useRef<HTMLDivElement>('content')
     const actionsRef = useRef<HTMLDivElement>('actions')
-    const formRef = useRef<HTMLFormElement>('form')
 
-    setTimeout(() => {
-      void showParallax(h1Ref.current)
-      void showParallax(contentRef.current, { delay: 200, duration: 600 })
-      void showParallax(actionsRef.current, { delay: 400, duration: 2000 })
-    }, 1)
-
-    const [isLargeScreen] = useObservable('screenSize', injector.getInstance(ScreenService).screenSize.atLeast.md, {
-      onChange: (isLarge) => {
-        const form = formRef.current
-        if (form) {
-          form.style.padding = '16px'
-          form.style.width = isLarge ? '800px' : `${window.innerWidth - 16}px`
-          form.style.height = isLarge ? '500px' : `${window.innerHeight - 192}px`
-        }
-      },
+    useDisposable('parallaxAnimation', () => {
+      const id = setTimeout(() => {
+        void showParallax(h1Ref.current)
+        void showParallax(contentRef.current, { delay: 200, duration: 600 })
+        void showParallax(actionsRef.current, { delay: 400, duration: 2000 })
+      }, 1)
+      return { [Symbol.dispose]: () => clearTimeout(id) }
     })
 
-    const form = formRef.current
-    if (form) {
-      form.style.padding = '16px'
-      form.style.width = isLargeScreen ? '800px' : `${window.innerWidth - 16}px`
-      form.style.height = isLargeScreen ? '500px' : `${window.innerHeight - 192}px`
-    }
+    const [isLargeScreen] = useObservable('screenSize', injector.getInstance(ScreenService).screenSize.atLeast.md)
 
     return (
       <Form<Record<string, string>>
-        ref={formRef}
         validate={props.validate ?? defaultValidate}
+        style={{
+          padding: '16px',
+          width: isLargeScreen ? '800px' : '100%',
+          height: isLargeScreen ? '500px' : 'calc(100vh - 192px)',
+        }}
         onSubmit={async (data) => {
           if (props.onSubmit) {
             await props.onSubmit(data)

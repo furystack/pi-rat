@@ -20,7 +20,7 @@ type GenericEditorServiceOptions<
   postEntity: (entity: Omit<T, TRedonlyProperties>) => Promise<T>
   deleteEntities: (...entities: Array<T[TKey]>) => Promise<void>
   schemaUri?: Uri
-  schema?: any
+  schema?: unknown
 }
 
 export class GenericEditorService<T, TKey extends keyof T, TOmittedProperties extends keyof T>
