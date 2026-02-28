@@ -60,9 +60,9 @@ export class ConfigService {
     id: TId,
     value: Extract<ConfigType, { id: TId }>['value'],
   ): Promise<Config> {
-    const existingConfig = await this.configCache.get(id)
+    const existingConfig = await this.configCache.get(id).catch(() => null)
 
-    if (existingConfig.value != null) {
+    if (existingConfig?.value != null) {
       await this.configApiClient.call({
         method: 'PATCH',
         action: '/config/:id',
