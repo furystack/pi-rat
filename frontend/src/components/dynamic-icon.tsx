@@ -3,13 +3,13 @@ import { createComponent } from '@furystack/shades'
 import '@furystack/shades-lottie'
 import type { Icon as IconModel } from 'common'
 
-type IconProps = IconModel & {
+type DynamicIconProps = IconModel & {
   title?: string
   onclick?: (ev: MouseEvent) => void
   style?: Partial<CSSStyleDeclaration>
 }
 
-export const Icon: (props: IconProps, children: ChildrenList) => JSX.Element = (props, children) => {
+export const DynamicIcon: (props: DynamicIconProps, children: ChildrenList) => JSX.Element = (props, children) => {
   const { type, value, ...restProps } = props
 
   if (type === 'font') {

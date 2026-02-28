@@ -7,7 +7,7 @@ import { AppLink } from '../../app-routes.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 import { SessionService } from '../../services/session.js'
-import { Icon } from '../Icon.js'
+import { DynamicIcon } from '../dynamic-icon.js'
 import { DeviceAvailabilityPanel } from '../iot-devices/device-availability-panel.js'
 import { WidgetCard } from './widget-card.js'
 
@@ -69,7 +69,7 @@ const DeviceAvailabilityContent = Shade<{
               fontSize: `${size / 2}px`,
             }}
           >
-            {props.icon ? <Icon {...props.icon} /> : null}
+            {props.icon ? <DynamicIcon {...props.icon} /> : null}
           </div>
           <div className="title-bar">{device.name}</div>
         </WidgetCard>

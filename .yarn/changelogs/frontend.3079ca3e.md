@@ -22,9 +22,13 @@ appear before simple list items within each section.
 
 ### Replaced emoji and Material Icons with `Icon` component
 
-Migrated all inline emoji characters (🎥, 📂, 🔧, etc.) and `<i className="material-icons">` usage to the `Icon` component from `@furystack/shades-common-components`. This provides theme-aware, consistent iconography across the UI.
+Migrated inline emoji characters and `<i className="material-icons">` usage to the `Icon` component from `@furystack/shades-common-components` in many areas. This provides theme-aware, consistent iconography across the UI. Dashboard widget shortcuts retain emojis for now (pending colored SVG/Lottie icons).
 
-Affected areas: header navigation, dashboard widgets, command palette, file browser, generic editor, error pages, user avatar menu, theme switch, settings sidebar, IoT device panels, and movie player controls.
+Affected areas: header navigation, command palette, file browser, generic editor, error pages, user avatar menu, theme switch, settings sidebar, IoT device panels, and movie player controls.
+
+### Renamed local `Icon` component to `DynamicIcon`
+
+Renamed `frontend/src/components/Icon.tsx` to `dynamic-icon.tsx` and the export from `Icon` to `DynamicIcon` to avoid confusion with the shared `Icon` from `@furystack/shades-common-components`. The `DynamicIcon` renders multi-format icons (font, url, base64, lottie) from the `common` `Icon` model.
 
 ### Replaced native HTML form elements with shared components
 

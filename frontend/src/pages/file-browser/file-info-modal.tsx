@@ -1,7 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Dialog, Icon, icons } from '@furystack/shades-common-components'
 import type { DirectoryEntry } from 'common'
-import { FileIcon } from './file-icon.js'
 
 export const FileInfoModal = Shade<{
   entry: DirectoryEntry
@@ -25,11 +24,6 @@ export const FileInfoModal = Shade<{
         onClose={onClose}
         actions={<Button onclick={onClose}>Close</Button>}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-          <FileIcon entry={entry} />
-          <span>{entry.name}</span>
-        </div>
-
         <table>
           <tbody>
             <tr>

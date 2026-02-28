@@ -55,7 +55,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'Movie File entities',
     description: 'List, edit and create movie file entities',
-    icon: <Icon icon={icons.film} size="small" />,
+    icon: <Icon icon={icons.file} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/movie-files')

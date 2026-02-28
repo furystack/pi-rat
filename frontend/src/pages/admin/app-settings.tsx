@@ -38,13 +38,25 @@ export const AppSettingsPage = Shade<AppSettingsPageProps>({
               label="OMDB Settings"
               href="/app-settings/omdb"
             />
-            <SettingsMenuItem icon="📺" label="Streaming Settings" href="/app-settings/streaming" />
+            <SettingsMenuItem
+              icon={<Icon icon={icons.play} size="small" />}
+              label="Streaming Settings"
+              href="/app-settings/streaming"
+            />
           </SettingsMenuSection>
           <SettingsMenuSection title="IOT">
-            <SettingsMenuItem icon="📡" label="Device Availability" href="/app-settings/iot" />
+            <SettingsMenuItem
+              icon={<Icon icon={icons.plug} size="small" />}
+              label="Device Availability"
+              href="/app-settings/iot"
+            />
           </SettingsMenuSection>
           <SettingsMenuSection title="AI">
-            <SettingsMenuItem icon="🤖" label="Ollama Settings" href="/app-settings/ai" />
+            <SettingsMenuItem
+              icon={<Icon icon={icons.wand} size="small" />}
+              label="Ollama Settings"
+              href="/app-settings/ai"
+            />
           </SettingsMenuSection>
           <SettingsMenuSection title="Identity">
             <SettingsMenuItem

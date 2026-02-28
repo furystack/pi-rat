@@ -1,6 +1,23 @@
 import { Shade, createComponent, styledShade } from '@furystack/shades'
+import type { IconDefinition } from '@furystack/shades-common-components'
 import { Button, Icon, icons, Input } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
+
+const maximizeIcon: IconDefinition = {
+  name: 'Maximize',
+  description: 'Expand to full screen',
+  keywords: ['fullscreen', 'maximize', 'expand'],
+  category: 'Actions',
+  paths: [{ d: 'M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3' }],
+}
+
+const minimizeIcon: IconDefinition = {
+  name: 'Minimize',
+  description: 'Exit full screen',
+  keywords: ['fullscreen', 'minimize', 'shrink'],
+  category: 'Actions',
+  paths: [{ d: 'M4 14h6v6m10-10h-6V4m0 6l7-7M3 21l7-7' }],
+}
 
 type ControlAreaProps = {
   isPlaying: ObservableValue<boolean>
@@ -98,7 +115,7 @@ export const ControlArea = Shade<ControlAreaProps>({
           </ControlButton>
         )}
         <ControlButton title="Toggle full screen" onclick={() => setFullScreen(!isFullScreen)}>
-          {isFullScreen ? <Icon icon={icons.minus} /> : <Icon icon={icons.appWindow} />}
+          {isFullScreen ? <Icon icon={minimizeIcon} /> : <Icon icon={maximizeIcon} />}
         </ControlButton>
         <SoundControl isMuted={props.isMuted} volume={props.volume} />
       </div>
