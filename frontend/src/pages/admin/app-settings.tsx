@@ -40,48 +40,30 @@ const menuItems: Array<MenuEntry & { href?: AppPaths }> = [
   },
 ]
 
-const settingsRoutes = menuItems.flatMap((entry) => ('children' in entry ? entry.children.map((c) => c.key) : []))
+const settingsRoutes = menuItems.flatMap((entry) =>
+  'children' in entry ? entry.children.flatMap((c) => (c.key ? [c.key] : [])) : [],
+)
 
 const getSelectedKey = (currentPath: string) =>
   settingsRoutes.find((route) => !!match(route)(currentPath)) ?? settingsRoutes[0]
 
 export const AppSettingsPage = Shade<AppSettingsPageProps>({
   shadowDomName: 'app-settings-page',
-  css: {
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    width: '100%',
-    height: '100%',
-    overflow: 'hidden',
-    '& .settings-layout': {
-      display: 'flex',
-      height: '100%',
-      width: '100%',
-      overflow: 'hidden',
-      marginTop: '48px',
-    },
-    '& .settings-content': {
-      flex: '1',
-      overflow: 'auto',
-      padding: '24px 48px',
-    },
-  },
   render: ({ props, injector, useObservable }) => {
     const [currentPath] = useObservable('locationChange', injector.getInstance(LocationService).onLocationPathChanged)
     const selectedKey = getSelectedKey(currentPath)
 
     const handleSelect = (key: string) => {
-      navigateToRoute(injector, key as AppPaths)
+      navigateToRoute(injector, key as AppPaths, {})
     }
 
     return (
-      <div className="settings-layout">
+      <>
         <Drawer position="left" variant="permanent">
           <Menu items={menuItems} selectedKey={selectedKey} onSelect={handleSelect} />
         </Drawer>
-        <div className="settings-content">{props.outlet}</div>
-      </div>
+        {props.outlet}
+      </>
     )
   },
 })
