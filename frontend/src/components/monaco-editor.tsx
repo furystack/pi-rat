@@ -1,5 +1,5 @@
-import { Shade, createComponent } from '@furystack/shades'
-import type { editor as editorTypes } from 'monaco-editor/esm/vs/editor/editor.api.js'
+import { createComponent, Shade } from '@furystack/shades'
+import type { editor as editorTypes, Uri } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import 'monaco-editor/esm/vs/editor/editor.main.js'
 
@@ -18,6 +18,8 @@ export interface MonacoEditorProps {
   value?: string
   onchange?: (value: string) => void
   style?: Partial<CSSStyleDeclaration>
+  onValueChange?: (value: string) => void
+  modelUri?: Uri
 }
 export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
@@ -60,6 +62,11 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
           const updatedName = registerShadesTheme(themeProvider)
           editor.setTheme(updatedName)
         })
+
+        if (props.modelUri) {
+          const model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
+          editorInstance.setModel(model)
+        }
       })
 
       return {
