@@ -28,7 +28,7 @@ export const RoleTag = Shade<RoleTagProps>({
       alignItems: 'center',
       gap: '6px',
       padding: '4px 12px',
-      borderRadius: cssVariableTheme.shape.borderRadius.full,
+      borderRadius: cssVariableTheme.shape.borderRadius.md,
       fontSize: cssVariableTheme.typography.fontSize.sm,
       fontWeight: '500',
       transition: 'all 0.2s ease',
