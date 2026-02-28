@@ -1,6 +1,18 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import {
+  Button,
+  CacheView,
+  Form,
+  Input,
+  NotyService,
+  PageContainer,
+  PageHeader,
+  Paper,
+  Select,
+  Skeleton,
+  Switch,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Config, MoviesConfig } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
@@ -50,45 +62,13 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     '& .form-field': {
       marginBottom: '24px',
     },
-    '& .checkbox-label': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      cursor: 'pointer',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .checkbox-label input': {
-      width: '18px',
-      height: '18px',
-      cursor: 'pointer',
-    },
-    '& .checkbox-title': {
-      fontWeight: '500',
-    },
-    '& .checkbox-description': {
+    '& .switch-description': {
       color: 'var(--theme-text-secondary)',
     },
     '& .section-divider': {
       borderTop: '1px solid var(--theme-background-default)',
       margin: '24px 0',
       paddingTop: '24px',
-    },
-    '& .select-label': {
-      display: 'block',
-      marginBottom: '8px',
-      fontWeight: '500',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .select-input': {
-      width: '100%',
-      maxWidth: '300px',
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '4px',
-      border: '1px solid var(--theme-background-paper)',
-      backgroundColor: 'var(--theme-background-default)',
-      color: 'var(--theme-text-primary)',
-      cursor: 'pointer',
     },
     '& .field-hint': {
       color: 'var(--theme-text-secondary)',
@@ -155,58 +135,63 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
             <h3 className="section-title">File Discovery</h3>
 
             <div className="form-field">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="autoExtractSubtitles"
-                  checked={currentValues.autoExtractSubtitles ?? false}
-                />
-                <div>
-                  <div className="checkbox-title">Auto-extract subtitles</div>
-                  <small className="checkbox-description">
-                    Automatically extract embedded subtitles when new media files are discovered
-                  </small>
-                </div>
-              </label>
+              <Switch
+                name="autoExtractSubtitles"
+                checked={currentValues.autoExtractSubtitles ?? false}
+                labelTitle={
+                  <div>
+                    <div>Auto-extract subtitles</div>
+                    <small className="switch-description">
+                      Automatically extract embedded subtitles when new media files are discovered
+                    </small>
+                  </div>
+                }
+              />
             </div>
 
             <div className="form-field">
-              <label className="checkbox-label">
-                <input type="checkbox" name="fullSyncOnStartup" checked={currentValues.fullSyncOnStartup ?? false} />
-                <div>
-                  <div className="checkbox-title">Full sync on startup</div>
-                  <small className="checkbox-description">
-                    Scan all configured drives for media files when the service starts
-                  </small>
-                </div>
-              </label>
+              <Switch
+                name="fullSyncOnStartup"
+                checked={currentValues.fullSyncOnStartup ?? false}
+                labelTitle={
+                  <div>
+                    <div>Full sync on startup</div>
+                    <small className="switch-description">
+                      Scan all configured drives for media files when the service starts
+                    </small>
+                  </div>
+                }
+              />
             </div>
 
             <div className="form-field">
-              <label className="checkbox-label">
-                <input type="checkbox" name="watchFiles" checked={currentValues.watchFiles === 'all'} value="all" />
-                <div>
-                  <div className="checkbox-title">Watch all files</div>
-                  <small className="checkbox-description">
-                    Monitor all drives for new media files (uncheck for custom drive configuration via advanced
-                    settings)
-                  </small>
-                </div>
-              </label>
+              <Switch
+                name="watchFiles"
+                checked={currentValues.watchFiles === 'all'}
+                value="all"
+                labelTitle={
+                  <div>
+                    <div>Watch all files</div>
+                    <small className="switch-description">
+                      Monitor all drives for new media files (uncheck for custom drive configuration via advanced
+                      settings)
+                    </small>
+                  </div>
+                }
+              />
             </div>
 
             <div className="section-divider">
               <h3 className="section-title">Transcoding</h3>
 
               <div className="form-field">
-                <label className="select-label">Preset</label>
-                <select name="preset" className="select-input">
-                  {PRESET_OPTIONS.map((option) => (
-                    <option value={option.value} selected={currentValues.preset === option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  name="preset"
+                  labelTitle="Preset"
+                  options={PRESET_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+                  value={currentValues.preset}
+                  style={{ maxWidth: '300px' }}
+                />
                 <small className="field-hint">
                   Faster presets = lower quality, slower presets = better quality at the cost of encoding time
                 </small>
@@ -242,18 +227,12 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
 export const StreamingSettingsPage = Shade({
   shadowDomName: 'streaming-settings-page',
-  css: {
-    '& .page-title': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-primary)',
-    },
-  },
   render: ({ injector }) => {
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <div>
-        <h2 className="page-title">📺 Streaming Settings</h2>
+      <PageContainer gap="24px">
+        <PageHeader title="📺 Streaming Settings" />
         <CacheView
           cache={configService.configCache}
           args={['MOVIES_CONFIG']}
@@ -261,7 +240,7 @@ export const StreamingSettingsPage = Shade({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

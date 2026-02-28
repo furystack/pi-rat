@@ -1,7 +1,7 @@
 import type { CacheWithValue } from '@furystack/cache'
 import type { GetCollectionResult } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, Paper, Skeleton } from '@furystack/shades-common-components'
+import { Button, CacheView, PageContainer, PageHeader, Paper, Skeleton } from '@furystack/shades-common-components'
 import type { User } from 'common'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { RoleTag } from '../../components/role-tag/index.js'
@@ -136,29 +136,12 @@ type UserListPageProps = Record<string, never>
 
 export const UserListPage = Shade<UserListPageProps>({
   shadowDomName: 'user-list-page',
-  css: {
-    '& .page-container': {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '24px',
-      height: '100%',
-    },
-    '& .page-title': {
-      marginBottom: '8px',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .page-description': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-  },
   render: ({ injector }) => {
     const usersService = injector.getInstance(UsersService)
 
     return (
-      <div className="page-container">
-        <h2 className="page-title">👥 Users</h2>
-        <p className="page-description">Manage user accounts and their roles.</p>
+      <PageContainer gap="24px">
+        <PageHeader title="👥 Users" description="Manage user accounts and their roles." />
         <CacheView
           cache={usersService.userQueryCache}
           args={[{}]}
@@ -166,7 +149,7 @@ export const UserListPage = Shade<UserListPageProps>({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

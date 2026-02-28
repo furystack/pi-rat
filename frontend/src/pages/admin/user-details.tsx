@@ -1,6 +1,6 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import { Button, CacheView, NotyService, Paper, Select, Skeleton } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Roles, User } from 'common'
 import { getAllRoleDefinitions } from 'common'
@@ -50,23 +50,6 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     },
     '& .add-role-container': {
       marginBottom: '16px',
-    },
-    '& .add-role-label': {
-      display: 'block',
-      marginBottom: '8px',
-      color: 'var(--theme-text-secondary)',
-      fontWeight: '500',
-      fontSize: '14px',
-    },
-    '& .add-role-select': {
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '4px',
-      border: '1px solid var(--theme-border-default)',
-      backgroundColor: 'var(--theme-background-paper)',
-      color: 'var(--theme-text-primary)',
-      cursor: 'pointer',
-      minWidth: '200px',
     },
     '& .validation-error': {
       color: 'var(--theme-error-main)',
@@ -253,23 +236,20 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
 
           {availableRolesToAdd.length > 0 && (
             <div className="add-role-container">
-              <label className="add-role-label">Add Role:</label>
-              <select
-                className="add-role-select"
+              <Select
+                labelTitle="Add Role"
+                placeholder="Select a role to add..."
+                options={availableRolesToAdd.map((role) => ({ value: role.name, label: role.displayName }))}
                 value={selectedRole}
-                onchange={(e) => {
-                  const roleName = (e.target as HTMLSelectElement).value as Roles[number]
+                onValueChange={(value) => {
+                  const roleName = value as Roles[number]
                   if (roleName) {
                     addRole(roleName)
                     setSelectedRole('')
                   }
                 }}
-              >
-                <option value="">Select a role to add...</option>
-                {availableRolesToAdd.map((role) => (
-                  <option value={role.name}>{role.displayName}</option>
-                ))}
-              </select>
+                style={{ minWidth: '200px' }}
+              />
             </div>
           )}
 

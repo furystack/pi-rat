@@ -1,4 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
+import { Icon, icons } from '@furystack/shades-common-components'
 import { SettingsMenuItem, SettingsMenuSection, SettingsSidebar } from '../../components/settings-sidebar/index.js'
 
 type AppSettingsPageProps = {
@@ -32,7 +33,11 @@ export const AppSettingsPage = Shade<AppSettingsPageProps>({
       <div className="settings-layout">
         <SettingsSidebar>
           <SettingsMenuSection title="Media">
-            <SettingsMenuItem icon="🎬" label="OMDB Settings" href="/app-settings/omdb" />
+            <SettingsMenuItem
+              icon={<Icon icon={icons.film} size="small" />}
+              label="OMDB Settings"
+              href="/app-settings/omdb"
+            />
             <SettingsMenuItem icon="📺" label="Streaming Settings" href="/app-settings/streaming" />
           </SettingsMenuSection>
           <SettingsMenuSection title="IOT">
@@ -42,7 +47,11 @@ export const AppSettingsPage = Shade<AppSettingsPageProps>({
             <SettingsMenuItem icon="🤖" label="Ollama Settings" href="/app-settings/ai" />
           </SettingsMenuSection>
           <SettingsMenuSection title="Identity">
-            <SettingsMenuItem icon="👥" label="Users" href="/app-settings/users" />
+            <SettingsMenuItem
+              icon={<Icon icon={icons.users} size="small" />}
+              label="Users"
+              href="/app-settings/users"
+            />
           </SettingsMenuSection>
         </SettingsSidebar>
 

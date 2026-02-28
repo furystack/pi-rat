@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { AppBar, Button } from '@furystack/shades-common-components'
+import { AppBar, Button, Icon, icons } from '@furystack/shades-common-components'
 import { AppBarAppLink } from '../app-routes.js'
 import { environmentOptions } from '../environment-options.js'
 import { SessionService } from '../services/session.js'
@@ -29,7 +29,7 @@ const AdminLinks = Shade({
 
     return isAdmin ? (
       <AppBarAppLink href="/file-browser" title="Drives">
-        📂 Files
+        <Icon icon={icons.folderOpen} size="small" /> Files
       </AppBarAppLink>
     ) : null
   },
@@ -62,7 +62,7 @@ export const Header = Shade<HeaderProps>({
             {currentUser?.roles?.includes('admin') ? <AdminLinks /> : null}
 
             <AppBarAppLink title="Movies" href="/movies">
-              🎥 Movies
+              <Icon icon={icons.film} size="small" /> Movies
             </AppBarAppLink>
 
             <AppBarAppLink title="Series" href="/series">

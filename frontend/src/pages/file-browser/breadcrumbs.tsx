@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { cssVariableTheme } from '@furystack/shades-common-components'
+import { Breadcrumb } from '@furystack/shades-common-components'
 
 export const BreadCrumbs = Shade<{
   currentDrive: string
@@ -7,20 +7,6 @@ export const BreadCrumbs = Shade<{
   onChangePath: (newPath: string) => void
 }>({
   shadowDomName: 'drives-breadcrumbs',
-  css: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0.5em',
-    letterSpacing: '0.1em',
-    '& a': {
-      color: cssVariableTheme.text.secondary,
-      textDecoration: 'none',
-      transition: 'color 0.2s ease-in-out',
-    },
-    '& a:hover': {
-      color: cssVariableTheme.text.primary,
-    },
-  },
   render: ({ props }) => {
     const { currentDrive: drive, currentPath: path, onChangePath: setPath } = props
 
@@ -32,14 +18,28 @@ export const BreadCrumbs = Shade<{
     }))
 
     return (
-      <>
-        {drive}:/
-        {segmentsWithRelativePaths.map((s) => (
-          <a title={`${drive}:/${s.path}`} href="#" onclick={() => setPath(s.path)}>
-            {s.name}/
-          </a>
-        ))}
-      </>
+      <Breadcrumb
+        separator="/"
+        homeItem={{
+          path: '/',
+          label: `${drive}:`,
+          render: () => (
+            <span style={{ cursor: 'pointer' }} onclick={() => setPath('/')}>
+              {drive}:
+            </span>
+          ),
+        }}
+        items={segmentsWithRelativePaths.map((s) => ({
+          path: `/${s.path}`,
+          label: s.name,
+          render: (item) => (
+            <span title={`${drive}:/${s.path}`} style={{ cursor: 'pointer' }} onclick={() => setPath(s.path)}>
+              {item.label}
+            </span>
+          ),
+        }))}
+        lastItemClickable={false}
+      />
     )
   },
 })

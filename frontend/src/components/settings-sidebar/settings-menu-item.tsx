@@ -4,7 +4,7 @@ import { match, type MatchOptions } from 'path-to-regexp'
 import type { AppPaths } from '../../app-routes.js'
 
 type SettingsMenuItemProps = {
-  icon: string
+  icon: JSX.Element | string
   label: string
   href: AppPaths
   routingOptions?: MatchOptions

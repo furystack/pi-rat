@@ -1,5 +1,5 @@
 import { Shade, createComponent, styledShade } from '@furystack/shades'
-import { Button, Input } from '@furystack/shades-common-components'
+import { Button, Icon, icons, Input } from '@furystack/shades-common-components'
 import type { ObservableValue } from '@furystack/utils'
 
 type ControlAreaProps = {
@@ -90,19 +90,15 @@ export const ControlArea = Shade<ControlAreaProps>({
         />
         {isPlaying ? (
           <ControlButton title="Pause" onclick={() => setIsPlaying(false)}>
-            <i className="material-icons">pause</i>
+            <Icon icon={icons.pause} />
           </ControlButton>
         ) : (
           <ControlButton title="Play" onclick={() => setIsPlaying(true)}>
-            <i className="material-icons">play_arrow</i>
+            <Icon icon={icons.play} />
           </ControlButton>
         )}
         <ControlButton title="Toggle full screen" onclick={() => setFullScreen(!isFullScreen)}>
-          {isFullScreen ? (
-            <i className="material-icons">fullscreen_exit</i>
-          ) : (
-            <i className="material-icons">fullscreen</i>
-          )}
+          {isFullScreen ? <Icon icon={icons.minus} /> : <Icon icon={icons.appWindow} />}
         </ControlButton>
         <SoundControl isMuted={props.isMuted} volume={props.volume} />
       </div>

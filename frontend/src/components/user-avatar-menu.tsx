@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Avatar, Button, Paper } from '@furystack/shades-common-components'
+import { Avatar, Button, Icon, icons, Paper } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -88,16 +88,16 @@ export const UserAvatarMenu = Shade({
 
               {isAdmin && (
                 <Button className="menu-button" onclick={handleAppSettingsClick}>
-                  🔧 Application Settings
+                  <Icon icon={icons.wrench} size="small" /> Application Settings
                 </Button>
               )}
 
               <Button className="menu-button" onclick={handleSettingsClick}>
-                👤 User Settings
+                <Icon icon={icons.user} size="small" /> User Settings
               </Button>
 
               <Button className="menu-button" onclick={handleLogoutClick}>
-                🚪 Log Out
+                <Icon icon={icons.logOut} size="small" /> Log Out
               </Button>
             </div>
           </Paper>
