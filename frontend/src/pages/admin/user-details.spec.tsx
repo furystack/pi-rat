@@ -1,11 +1,11 @@
+import { Cache } from '@furystack/cache'
 import { Injector } from '@furystack/inject'
 import { LocationService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { NotyService } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import type { User } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UsersService } from '../../services/users-service.js'
-import { type CacheState, createMockUser } from '../../test-utils/user-test-helpers.js'
+import { createMockUser } from '../../test-utils/user-test-helpers.js'
 import { UserDetailsPage } from './user-details.js'
 
 /**
@@ -13,32 +13,41 @@ import { UserDetailsPage } from './user-details.js'
  */
 const getActionButtons = (page: Element | null | undefined) => {
   const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
-  // Filter out buttons that are inside role-tag elements
   return allButtons.filter((btn) => !btn.closest('role-tag'))
 }
 
 describe('UserDetailsPage', () => {
   let injector: Injector
   let mockUsersService: {
-    getUserAsObservable: ReturnType<typeof vi.fn>
+    userCache: Cache<User, [string]>
     updateUser: ReturnType<typeof vi.fn>
   }
   let mockNotyService: {
     emit: ReturnType<typeof vi.fn>
   }
-  let userObservable: ObservableValue<CacheState<User>>
+
+  const seedUserCache = (username: string, roles: User['roles']) => {
+    mockUsersService.userCache.setExplicitValue({
+      loadArgs: [username],
+      value: { status: 'loaded', value: createMockUser(username, roles), updatedAt: new Date() },
+    })
+  }
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="root"></div>'
 
-    userObservable = new ObservableValue<CacheState<User>>({
-      status: 'loaded',
-      value: createMockUser('testuser@example.com', ['admin']),
-      updatedAt: new Date(),
+    const userCache = new Cache<User, [string]>({
+      capacity: 10,
+      load: vi.fn().mockResolvedValue(createMockUser('testuser@example.com', ['admin'])),
+    })
+
+    userCache.setExplicitValue({
+      loadArgs: ['testuser@example.com'],
+      value: { status: 'loaded', value: createMockUser('testuser@example.com', ['admin']), updatedAt: new Date() },
     })
 
     mockUsersService = {
-      getUserAsObservable: vi.fn().mockReturnValue(userObservable),
+      userCache,
       updateUser: vi.fn().mockResolvedValue(createMockUser('testuser@example.com', ['admin', 'viewer'])),
     }
 
@@ -72,8 +81,14 @@ describe('UserDetailsPage', () => {
       expect(page?.textContent).toContain('User Details')
     })
 
-    it('should display loading state', async () => {
-      userObservable.setValue({ status: 'loading' })
+    it('should display loader when loading', async () => {
+      const neverResolvingCache = new Cache<User, [string]>({
+        capacity: 10,
+        load: () => new Promise(() => {}),
+      })
+      mockUsersService.userCache = neverResolvingCache
+
+      injector.setExplicitInstance(mockUsersService as unknown as UsersService, UsersService)
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -85,14 +100,14 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      expect(page?.textContent).toContain('Loading user...')
+      const skeleton = page?.querySelector('shade-skeleton')
+      expect(skeleton).toBeTruthy()
     })
 
-    it('should display error state with go back button', async () => {
-      userObservable.setValue({
-        status: 'failed',
-        error: new Error('User not found'),
-        updatedAt: new Date(),
+    it('should display error state', async () => {
+      mockUsersService.userCache.setExplicitValue({
+        loadArgs: ['nonexistent@example.com'],
+        value: { status: 'failed', error: new Error('User not found'), updatedAt: new Date() },
       })
 
       const rootElement = document.getElementById('root') as HTMLDivElement
@@ -103,33 +118,10 @@ describe('UserDetailsPage', () => {
         jsxElement: <UserDetailsPage username="nonexistent@example.com" />,
       })
       await flushUpdates()
-
-      const page = document.querySelector('user-details-page')
-      expect(page?.textContent).toContain('Error: User not found')
-      // Go Back button exists - Button component renders as button element
-      const buttons = page?.querySelectorAll('button')
-      // Should have Back button and Go Back button
-      expect(buttons?.length).toBeGreaterThanOrEqual(1)
-    })
-
-    it('should display fallback error message for non-Error objects', async () => {
-      userObservable.setValue({
-        status: 'failed',
-        error: 'string error',
-        updatedAt: new Date(),
-      })
-
-      const rootElement = document.getElementById('root') as HTMLDivElement
-
-      initializeShadeRoot({
-        injector,
-        rootElement,
-        jsxElement: <UserDetailsPage username="testuser@example.com" />,
-      })
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      expect(page?.textContent).toContain('Failed to load user')
+      expect(page?.textContent).toContain('User not found')
     })
   })
 
@@ -210,11 +202,7 @@ describe('UserDetailsPage', () => {
     })
 
     it('should render multiple role tags for user with multiple roles', async () => {
-      userObservable.setValue({
-        status: 'loaded',
-        value: createMockUser('testuser@example.com', ['admin', 'viewer', 'media-manager']),
-        updatedAt: new Date(),
-      })
+      seedUserCache('testuser@example.com', ['admin', 'viewer', 'media-manager'])
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -232,11 +220,7 @@ describe('UserDetailsPage', () => {
     })
 
     it('should display "No roles assigned" for user without roles', async () => {
-      userObservable.setValue({
-        status: 'loaded',
-        value: createMockUser('testuser@example.com', []),
-        updatedAt: new Date(),
-      })
+      seedUserCache('testuser@example.com', [])
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -271,11 +255,7 @@ describe('UserDetailsPage', () => {
     })
 
     it('should show available roles that user does not have', async () => {
-      userObservable.setValue({
-        status: 'loaded',
-        value: createMockUser('testuser@example.com', ['admin']),
-        updatedAt: new Date(),
-      })
+      seedUserCache('testuser@example.com', ['admin'])
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -300,11 +280,7 @@ describe('UserDetailsPage', () => {
     })
 
     it('should not show dropdown when user has all roles', async () => {
-      userObservable.setValue({
-        status: 'loaded',
-        value: createMockUser('testuser@example.com', ['admin', 'viewer', 'media-manager', 'iot-manager']),
-        updatedAt: new Date(),
-      })
+      seedUserCache('testuser@example.com', ['admin', 'viewer', 'media-manager', 'iot-manager'])
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -349,9 +325,7 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      // Button component sets disabled attribute on the button element
       const disabledButtons = page?.querySelectorAll('button[disabled]')
-      // Save and Cancel buttons should be disabled (Back is always enabled)
       expect(disabledButtons?.length).toBe(2)
     })
   })
@@ -370,7 +344,6 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      // Back button is the first button element in the page
       const backButton = page?.querySelector('button') as HTMLButtonElement
 
       backButton.click()
@@ -394,26 +367,19 @@ describe('UserDetailsPage', () => {
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
 
-      // Simulate selecting a role
       select.value = 'viewer'
       select.dispatchEvent(new Event('change', { bubbles: true }))
       await flushUpdates()
 
-      // Should now have 2 role tags (admin + viewer)
       const roleTags = page?.querySelectorAll('role-tag')
       expect(roleTags?.length).toBe(2)
 
-      // No disabled buttons anymore (Save and Cancel are enabled)
       const disabledButtons = page?.querySelectorAll('button[disabled]')
       expect(disabledButtons?.length).toBe(0)
     })
 
     it('should remove role when remove button is clicked', async () => {
-      userObservable.setValue({
-        status: 'loaded',
-        value: createMockUser('testuser@example.com', ['admin', 'viewer']),
-        updatedAt: new Date(),
-      })
+      seedUserCache('testuser@example.com', ['admin', 'viewer'])
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -427,17 +393,14 @@ describe('UserDetailsPage', () => {
 
       const page = document.querySelector('user-details-page')
 
-      // Find and click the remove button on a role tag
       const roleTag = page?.querySelector('role-tag')
       const removeButton = roleTag?.querySelector('button')
       removeButton?.click()
 
-      // Wait for re-render
       await new Promise((resolve) => setTimeout(resolve, 10))
       await flushUpdates()
       await flushUpdates()
 
-      // No disabled buttons (Save and Cancel are enabled)
       const disabledButtons = page?.querySelectorAll('button[disabled]')
       expect(disabledButtons?.length).toBe(0)
     })
@@ -455,28 +418,21 @@ describe('UserDetailsPage', () => {
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
 
-      // Add a role
       select.value = 'viewer'
       select.dispatchEvent(new Event('change', { bubbles: true }))
 
-      // Wait for state update
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      // Get action buttons (excluding role-tag buttons): Back (0), Save (1), Cancel (2)
       const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
       const actionButtons = allButtons.filter((btn) => !btn.closest('role-tag'))
-      // Cancel is the last action button
       const cancelButton = actionButtons[actionButtons.length - 1]
       cancelButton.click()
 
-      // Wait for re-render
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      // Should be back to original state (1 role tag)
       const roleTags = page?.querySelectorAll('role-tag')
       expect(roleTags?.length).toBe(1)
 
-      // Save and Cancel buttons should be disabled again
       const disabledButtons = page?.querySelectorAll('button[disabled]')
       expect(disabledButtons?.length).toBe(2)
     })
@@ -496,19 +452,15 @@ describe('UserDetailsPage', () => {
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
 
-      // Add a role
       select.value = 'viewer'
       select.dispatchEvent(new Event('change', { bubbles: true }))
 
-      // Wait for state update
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      // Get action buttons (excluding role-tag buttons): Back (0), Save (1), Cancel (2)
       const actionButtons = getActionButtons(page)
       const saveButton = actionButtons[1]
       saveButton.click()
 
-      // Wait for async save
       await new Promise((resolve) => setTimeout(resolve, 50))
 
       expect(mockUsersService.updateUser).toHaveBeenCalledWith('testuser@example.com', {
@@ -530,13 +482,11 @@ describe('UserDetailsPage', () => {
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
 
-      // Add a role
       select.value = 'viewer'
       select.dispatchEvent(new Event('change', { bubbles: true }))
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      // Click Save
       const actionButtons = getActionButtons(page)
       const saveButton = actionButtons[1]
       saveButton.click()
@@ -565,13 +515,11 @@ describe('UserDetailsPage', () => {
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
 
-      // Add a role
       select.value = 'viewer'
       select.dispatchEvent(new Event('change', { bubbles: true }))
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      // Click Save
       const actionButtons = getActionButtons(page)
       const saveButton = actionButtons[1]
       saveButton.click()
@@ -586,7 +534,6 @@ describe('UserDetailsPage', () => {
     })
 
     it('should disable buttons while saving', async () => {
-      // Make updateUser slow - need to delay to check the saving state
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       mockUsersService.updateUser.mockImplementation(() => {
         return new Promise<User>((resolve) => {
@@ -608,37 +555,28 @@ describe('UserDetailsPage', () => {
       const page = document.querySelector('user-details-page')
       const select = page?.querySelector('select') as HTMLSelectElement
 
-      // Add a role
       select.value = 'viewer'
       select.dispatchEvent(new Event('change', { bubbles: true }))
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      // Verify buttons are enabled before save
       const actionButtonsBefore = getActionButtons(page)
-      expect(actionButtonsBefore[1]?.disabled).toBe(false) // Save
-      expect(actionButtonsBefore[2]?.disabled).toBe(false) // Cancel
+      expect(actionButtonsBefore[1]?.disabled).toBe(false)
+      expect(actionButtonsBefore[2]?.disabled).toBe(false)
 
-      // Click Save
       actionButtonsBefore[1]?.click()
 
-      // Wait a bit for state to update
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      // Both Save and Cancel should be disabled while saving
       const actionButtonsAfter = getActionButtons(page)
-      expect(actionButtonsAfter[1]?.disabled).toBe(true) // Save
-      expect(actionButtonsAfter[2]?.disabled).toBe(true) // Cancel
+      expect(actionButtonsAfter[1]?.disabled).toBe(true)
+      expect(actionButtonsAfter[2]?.disabled).toBe(true)
     })
   })
 
   describe('validation', () => {
     it('should show validation error when trying to save with no roles', async () => {
-      userObservable.setValue({
-        status: 'loaded',
-        value: createMockUser('testuser@example.com', ['viewer']),
-        updatedAt: new Date(),
-      })
+      seedUserCache('testuser@example.com', ['viewer'])
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -652,7 +590,6 @@ describe('UserDetailsPage', () => {
 
       const page = document.querySelector('user-details-page')
 
-      // Remove the only role
       const roleTag = page?.querySelector('role-tag')
       const removeButton = roleTag?.querySelector('button')
       removeButton?.click()
@@ -661,7 +598,6 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
       await flushUpdates()
 
-      // Click Save (index 1 of action buttons, excluding role-tag buttons)
       const actionButtons = getActionButtons(page)
       const saveButton = actionButtons[1]
       saveButton.click()
@@ -672,21 +608,6 @@ describe('UserDetailsPage', () => {
 
       expect(page?.textContent).toContain('User must have at least one role')
       expect(mockUsersService.updateUser).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('service integration', () => {
-    it('should call getUserAsObservable with username on render', async () => {
-      const rootElement = document.getElementById('root') as HTMLDivElement
-
-      initializeShadeRoot({
-        injector,
-        rootElement,
-        jsxElement: <UserDetailsPage username="testuser@example.com" />,
-      })
-      await flushUpdates()
-
-      expect(mockUsersService.getUserAsObservable).toHaveBeenCalledWith('testuser@example.com')
     })
   })
 })

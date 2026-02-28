@@ -22,6 +22,69 @@ const PRESET_OPTIONS = [
 
 const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'streaming-settings-content',
+  css: {
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .section-title': {
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+      fontSize: '16px',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .checkbox-label': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      cursor: 'pointer',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .checkbox-label input': {
+      width: '18px',
+      height: '18px',
+      cursor: 'pointer',
+    },
+    '& .checkbox-title': {
+      fontWeight: '500',
+    },
+    '& .checkbox-description': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .section-divider': {
+      borderTop: '1px solid var(--theme-background-default)',
+      margin: '24px 0',
+      paddingTop: '24px',
+    },
+    '& .select-label': {
+      display: 'block',
+      marginBottom: '8px',
+      fontWeight: '500',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .select-input': {
+      width: '100%',
+      maxWidth: '300px',
+      padding: '8px 12px',
+      fontSize: '14px',
+      borderRadius: '4px',
+      border: '1px solid var(--theme-background-paper)',
+      backgroundColor: 'var(--theme-background-default)',
+      color: 'var(--theme-text-primary)',
+      cursor: 'pointer',
+    },
+    '& .field-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ props, injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
@@ -175,67 +238,6 @@ export const StreamingSettingsPage = Shade({
     '& .page-title': {
       marginBottom: '24px',
       color: 'var(--theme-text-primary)',
-    },
-    '& .page-description': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .section-title': {
-      marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
-      fontSize: '16px',
-    },
-    '& .form-field': {
-      marginBottom: '24px',
-    },
-    '& .checkbox-label': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      cursor: 'pointer',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .checkbox-label input': {
-      width: '18px',
-      height: '18px',
-      cursor: 'pointer',
-    },
-    '& .checkbox-title': {
-      fontWeight: '500',
-    },
-    '& .checkbox-description': {
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .section-divider': {
-      borderTop: '1px solid var(--theme-background-default)',
-      margin: '24px 0',
-      paddingTop: '24px',
-    },
-    '& .select-label': {
-      display: 'block',
-      marginBottom: '8px',
-      fontWeight: '500',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .select-input': {
-      width: '100%',
-      maxWidth: '300px',
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '4px',
-      border: '1px solid var(--theme-background-paper)',
-      backgroundColor: 'var(--theme-background-default)',
-      color: 'var(--theme-text-primary)',
-      cursor: 'pointer',
-    },
-    '& .field-hint': {
-      color: 'var(--theme-text-secondary)',
-      display: 'block',
-      marginTop: '4px',
-    },
-    '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
-      paddingTop: '16px',
     },
   },
   render: ({ injector }) => {

@@ -93,6 +93,7 @@ export const RelatedMoviesModalContent = Shade<{
         content={RelatedMoviesContent}
         contentProps={{ drive, path, file }}
         loader={<Skeleton />}
+        error={() => <>:(</>}
       />
     )
   },

@@ -233,6 +233,7 @@ export const MovieWidget = Shade<{
         content={MovieWidgetContent}
         contentProps={{ index: props.index, size: props.size }}
         loader={<Skeleton />}
+        error={() => <>:(</>}
       />
     )
   },

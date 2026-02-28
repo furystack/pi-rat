@@ -16,6 +16,73 @@ type RoleChange = {
 
 const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
   shadowDomName: 'user-details-content',
+  css: {
+    '& .section-title': {
+      marginTop: '0',
+      marginBottom: '16px',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .info-grid': {
+      display: 'grid',
+      gridTemplateColumns: '150px 1fr',
+      gap: '12px',
+      alignItems: 'center',
+    },
+    '& .info-label': {
+      color: 'var(--theme-text-secondary)',
+      fontWeight: '500',
+    },
+    '& .info-value': {
+      color: 'var(--theme-text-primary)',
+    },
+    '& .roles-container': {
+      marginBottom: '16px',
+    },
+    '& .roles-list': {
+      display: 'flex',
+      gap: '8px',
+      flexWrap: 'wrap',
+      minHeight: '32px',
+    },
+    '& .no-roles': {
+      color: 'var(--theme-text-secondary)',
+      fontStyle: 'italic',
+    },
+    '& .add-role-container': {
+      marginBottom: '16px',
+    },
+    '& .add-role-label': {
+      display: 'block',
+      marginBottom: '8px',
+      color: 'var(--theme-text-secondary)',
+      fontWeight: '500',
+      fontSize: '14px',
+    },
+    '& .add-role-select': {
+      padding: '8px 12px',
+      fontSize: '14px',
+      borderRadius: '4px',
+      border: '1px solid var(--theme-border-default)',
+      backgroundColor: 'var(--theme-background-paper)',
+      color: 'var(--theme-text-primary)',
+      cursor: 'pointer',
+      minWidth: '200px',
+    },
+    '& .validation-error': {
+      color: 'var(--theme-error-main)',
+      backgroundColor: 'rgba(244, 67, 54, 0.1)',
+      padding: '12px',
+      borderRadius: '4px',
+      marginBottom: '16px',
+      fontSize: '14px',
+    },
+    '& .button-row': {
+      display: 'flex',
+      gap: '12px',
+      borderTop: '1px solid var(--theme-border-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ props, injector, useObservable, useDisposable }) => {
     const usersService = injector.getInstance(UsersService)
     const notyService = injector.getInstance(NotyService)
@@ -268,71 +335,6 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     '& .page-header h2': {
       margin: '0',
       color: 'var(--theme-text-primary)',
-    },
-    '& .section-title': {
-      marginTop: '0',
-      marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .info-grid': {
-      display: 'grid',
-      gridTemplateColumns: '150px 1fr',
-      gap: '12px',
-      alignItems: 'center',
-    },
-    '& .info-label': {
-      color: 'var(--theme-text-secondary)',
-      fontWeight: '500',
-    },
-    '& .info-value': {
-      color: 'var(--theme-text-primary)',
-    },
-    '& .roles-container': {
-      marginBottom: '16px',
-    },
-    '& .roles-list': {
-      display: 'flex',
-      gap: '8px',
-      flexWrap: 'wrap',
-      minHeight: '32px',
-    },
-    '& .no-roles': {
-      color: 'var(--theme-text-secondary)',
-      fontStyle: 'italic',
-    },
-    '& .add-role-container': {
-      marginBottom: '16px',
-    },
-    '& .add-role-label': {
-      display: 'block',
-      marginBottom: '8px',
-      color: 'var(--theme-text-secondary)',
-      fontWeight: '500',
-      fontSize: '14px',
-    },
-    '& .add-role-select': {
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '4px',
-      border: '1px solid var(--theme-border-default)',
-      backgroundColor: 'var(--theme-background-paper)',
-      color: 'var(--theme-text-primary)',
-      cursor: 'pointer',
-      minWidth: '200px',
-    },
-    '& .validation-error': {
-      color: 'var(--theme-error-main)',
-      backgroundColor: 'rgba(244, 67, 54, 0.1)',
-      padding: '12px',
-      borderRadius: '4px',
-      marginBottom: '16px',
-      fontSize: '14px',
-    },
-    '& .button-row': {
-      display: 'flex',
-      gap: '12px',
-      borderTop: '1px solid var(--theme-border-default)',
-      paddingTop: '16px',
     },
   },
   render: ({ props, injector }) => {

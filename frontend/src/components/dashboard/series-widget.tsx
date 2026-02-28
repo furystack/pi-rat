@@ -140,6 +140,7 @@ export const SeriesWidget = Shade<{
         content={SeriesWidgetContent}
         contentProps={{ index: props.index, size: props.size }}
         loader={<Skeleton />}
+        error={() => <>:(</>}
       />
     )
   },

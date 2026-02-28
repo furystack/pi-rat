@@ -177,6 +177,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
         content={DeviceAvailabilityContent}
         contentProps={{ size, icon: props.icon }}
         loader={<Skeleton />}
+        error={() => <>:(</>}
       />
     )
   },

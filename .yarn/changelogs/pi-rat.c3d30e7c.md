@@ -21,3 +21,4 @@ appear before simple list items within each section.
 ## ⬆️ Dependencies
 
 - Bumped `@furystack/shades-common-components` from `^13.0.1` to `^13.1.0`
+- Bumped `eslint-plugin-playwright` from `^2.7.1` to `^2.8.0`

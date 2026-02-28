@@ -10,6 +10,61 @@ import { UsersService } from '../../services/users-service.js'
 
 const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> }>({
   shadowDomName: 'user-list-content',
+  css: {
+    '& .users-table': {
+      width: '100%',
+      borderCollapse: 'collapse',
+      fontSize: '14px',
+    },
+    '& thead tr': {
+      backgroundColor: 'var(--theme-background-default)',
+      borderBottom: '1px solid var(--theme-border-default)',
+    },
+    '& th': {
+      padding: '12px 16px',
+      textAlign: 'left',
+      fontWeight: '600',
+      color: 'var(--theme-text-primary)',
+    },
+    '& th.actions-col': {
+      textAlign: 'right',
+    },
+    '& tbody tr': {
+      borderBottom: '1px solid var(--theme-border-default)',
+      cursor: 'pointer',
+      transition: 'background-color 0.15s ease',
+    },
+    '& tbody tr:hover': {
+      backgroundColor: 'var(--theme-background-default)',
+    },
+    '& td': {
+      padding: '12px 16px',
+    },
+    '& .username-cell': {
+      color: 'var(--theme-text-primary)',
+      fontWeight: '500',
+    },
+    '& .roles-cell': {
+      display: 'flex',
+      gap: '8px',
+      flexWrap: 'wrap',
+    },
+    '& .no-roles': {
+      color: 'var(--theme-text-secondary)',
+      fontStyle: 'italic',
+    },
+    '& .created-cell': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .actions-cell': {
+      textAlign: 'right',
+    },
+    '& .empty-row td': {
+      padding: '24px 16px',
+      textAlign: 'center',
+      color: 'var(--theme-text-secondary)',
+    },
+  },
   render: ({ props, injector }) => {
     const usersState = props.data
 
@@ -94,59 +149,6 @@ export const UserListPage = Shade<UserListPageProps>({
     },
     '& .page-description': {
       marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .users-table': {
-      width: '100%',
-      borderCollapse: 'collapse',
-      fontSize: '14px',
-    },
-    '& thead tr': {
-      backgroundColor: 'var(--theme-background-default)',
-      borderBottom: '1px solid var(--theme-border-default)',
-    },
-    '& th': {
-      padding: '12px 16px',
-      textAlign: 'left',
-      fontWeight: '600',
-      color: 'var(--theme-text-primary)',
-    },
-    '& th.actions-col': {
-      textAlign: 'right',
-    },
-    '& tbody tr': {
-      borderBottom: '1px solid var(--theme-border-default)',
-      cursor: 'pointer',
-      transition: 'background-color 0.15s ease',
-    },
-    '& tbody tr:hover': {
-      backgroundColor: 'var(--theme-background-default)',
-    },
-    '& td': {
-      padding: '12px 16px',
-    },
-    '& .username-cell': {
-      color: 'var(--theme-text-primary)',
-      fontWeight: '500',
-    },
-    '& .roles-cell': {
-      display: 'flex',
-      gap: '8px',
-      flexWrap: 'wrap',
-    },
-    '& .no-roles': {
-      color: 'var(--theme-text-secondary)',
-      fontStyle: 'italic',
-    },
-    '& .created-cell': {
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .actions-cell': {
-      textAlign: 'right',
-    },
-    '& .empty-row td': {
-      padding: '24px 16px',
-      textAlign: 'center',
       color: 'var(--theme-text-secondary)',
     },
   },

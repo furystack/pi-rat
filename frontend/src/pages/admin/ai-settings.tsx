@@ -20,6 +20,31 @@ const isValidUrl = (urlString: string): boolean => {
 
 const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'ai-settings-content',
+  css: {
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .field-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .validation-error': {
+      color: 'var(--theme-error-main)',
+      backgroundColor: 'var(--theme-error-light)',
+      padding: '12px',
+      borderRadius: '4px',
+      marginBottom: '16px',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ props, injector, useObservable, useDisposable }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
@@ -124,29 +149,6 @@ export const AiSettingsPage = Shade({
     '& .page-title': {
       marginBottom: '24px',
       color: 'var(--theme-text-primary)',
-    },
-    '& .page-description': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .form-field': {
-      marginBottom: '24px',
-    },
-    '& .field-hint': {
-      color: 'var(--theme-text-secondary)',
-      display: 'block',
-      marginTop: '4px',
-    },
-    '& .validation-error': {
-      color: 'var(--theme-error-main)',
-      backgroundColor: 'var(--theme-error-light)',
-      padding: '12px',
-      borderRadius: '4px',
-      marginBottom: '16px',
-    },
-    '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
-      paddingTop: '16px',
     },
   },
   render: ({ injector }) => {

@@ -10,6 +10,50 @@ type OmdbFormData = OmdbConfig['value']
 
 const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'omdb-settings-content',
+  css: {
+    '& .page-description': {
+      marginBottom: '24px',
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .form-field': {
+      marginBottom: '24px',
+    },
+    '& .api-key-row': {
+      display: 'flex',
+      alignItems: 'flex-end',
+      gap: '8px',
+    },
+    '& .api-key-hint': {
+      color: 'var(--theme-text-secondary)',
+      display: 'block',
+      marginTop: '4px',
+    },
+    '& .api-key-hint a': {
+      color: 'var(--theme-primary-main)',
+    },
+    '& .checkbox-label': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      cursor: 'pointer',
+      color: 'var(--theme-text-primary)',
+    },
+    '& .checkbox-label input': {
+      width: '18px',
+      height: '18px',
+      cursor: 'pointer',
+    },
+    '& .checkbox-title': {
+      fontWeight: '500',
+    },
+    '& .checkbox-description': {
+      color: 'var(--theme-text-secondary)',
+    },
+    '& .form-footer': {
+      borderTop: '1px solid var(--theme-background-default)',
+      paddingTop: '16px',
+    },
+  },
   render: ({ props, injector, useObservable, useDisposable, useState }) => {
     const configService = injector.getInstance(ConfigService)
     const notyService = injector.getInstance(NotyService)
@@ -139,48 +183,6 @@ export const OmdbSettingsPage = Shade({
     '& .page-title': {
       marginBottom: '24px',
       color: 'var(--theme-text-primary)',
-    },
-    '& .page-description': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .form-field': {
-      marginBottom: '24px',
-    },
-    '& .api-key-row': {
-      display: 'flex',
-      alignItems: 'flex-end',
-      gap: '8px',
-    },
-    '& .api-key-hint': {
-      color: 'var(--theme-text-secondary)',
-      display: 'block',
-      marginTop: '4px',
-    },
-    '& .api-key-hint a': {
-      color: 'var(--theme-primary-main)',
-    },
-    '& .checkbox-label': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      cursor: 'pointer',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .checkbox-label input': {
-      width: '18px',
-      height: '18px',
-      cursor: 'pointer',
-    },
-    '& .checkbox-title': {
-      fontWeight: '500',
-    },
-    '& .checkbox-description': {
-      color: 'var(--theme-text-secondary)',
-    },
-    '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
-      paddingTop: '16px',
     },
   },
   render: ({ injector }) => {

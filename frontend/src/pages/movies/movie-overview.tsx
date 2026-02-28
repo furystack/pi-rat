@@ -179,6 +179,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
         args={[props.imdbId]}
         content={MovieOverviewContent}
         loader={<Skeleton />}
+        error={() => <>:(</>}
       />
     )
   },
