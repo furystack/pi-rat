@@ -31,9 +31,8 @@ type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends key
   modelUri?: Uri
 }
 
- 
 type EntityFromProps<Props> = Props extends { service: GenericEditorService<infer T, any, any> } ? T : never
- 
+
 type EntityKeyFromProps<Props> = Props extends { service: GenericEditorService<any, infer TKey, any> } ? TKey : never
 
 export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string>(

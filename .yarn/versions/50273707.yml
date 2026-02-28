@@ -1,0 +1,3 @@
+releases:
+  frontend: patch
+  pi-rat: patch
