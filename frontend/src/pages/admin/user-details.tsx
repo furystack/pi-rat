@@ -83,29 +83,24 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       paddingTop: '16px',
     },
   },
-  render: ({ props, injector, useObservable, useDisposable }) => {
+  render: ({ props, injector, useState, useObservable, useDisposable }) => {
     const usersService = injector.getInstance(UsersService)
     const notyService = injector.getInstance(NotyService)
     const user = props.data.value
 
-    const roleChangeObservable = useDisposable('roleChange', () => new ObservableValue<RoleChange | null>(null))
+    const roleChangeObservable = useDisposable(
+      'roleChange',
+      () =>
+        new ObservableValue<RoleChange>({
+          originalRoles: [...user.roles],
+          currentRoles: [...user.roles],
+        }),
+    )
     const [roleChange] = useObservable('roleChangeValue', roleChangeObservable)
 
-    const isSavingObservable = useDisposable('isSaving', () => new ObservableValue(false))
-    const [isSaving] = useObservable('isSavingValue', isSavingObservable)
-
-    const validationErrorObservable = useDisposable('validationError', () => new ObservableValue<string | null>(null))
-    const [validationError] = useObservable('validationErrorValue', validationErrorObservable)
-
-    const isRoleStateInitialized = useDisposable('isRoleStateInitialized', () => new ObservableValue(false))
-
-    if (!isRoleStateInitialized.getValue()) {
-      isRoleStateInitialized.setValue(true)
-      roleChangeObservable.setValue({
-        originalRoles: [...user.roles],
-        currentRoles: [...user.roles],
-      })
-    }
+    const [isSaving, setIsSaving] = useState('isSaving', false)
+    const [validationError, setValidationError] = useState<string | null>('validationError', null)
+    const [selectedRole, setSelectedRole] = useState('selectedRole', '')
 
     const formatDate = (dateString: string) => {
       return new Date(dateString).toLocaleDateString(undefined, {
@@ -117,42 +112,36 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       })
     }
 
+    const { currentRoles, originalRoles } = roleChange
+
     const addRole = (roleName: Roles[number]) => {
-      const current = roleChange?.currentRoles ?? user.roles
-      const original = roleChange?.originalRoles ?? user.roles
-      if (current.includes(roleName)) return
+      if (currentRoles.includes(roleName)) return
       roleChangeObservable.setValue({
-        originalRoles: [...original],
-        currentRoles: [...current, roleName],
+        originalRoles: [...originalRoles],
+        currentRoles: [...currentRoles, roleName],
       })
-      validationErrorObservable.setValue(null)
+      setValidationError(null)
     }
 
     const removeRole = (roleName: Roles[number]) => {
-      const current = roleChange?.currentRoles ?? user.roles
-      const original = roleChange?.originalRoles ?? user.roles
       roleChangeObservable.setValue({
-        originalRoles: [...original],
-        currentRoles: current.filter((r) => r !== roleName),
+        originalRoles: [...originalRoles],
+        currentRoles: currentRoles.filter((r) => r !== roleName),
       })
     }
 
     const restoreRole = (roleName: Roles[number]) => {
-      const current = roleChange?.currentRoles ?? user.roles
-      const original = roleChange?.originalRoles ?? user.roles
-      if (current.includes(roleName)) return
+      if (currentRoles.includes(roleName)) return
       roleChangeObservable.setValue({
-        originalRoles: [...original],
-        currentRoles: [...current, roleName],
+        originalRoles: [...originalRoles],
+        currentRoles: [...currentRoles, roleName],
       })
-      validationErrorObservable.setValue(null)
+      setValidationError(null)
     }
 
     const getRoleVariant = (roleName: Roles[number]): 'default' | 'added' | 'removed' => {
-      const original = roleChange?.originalRoles ?? user.roles
-      const current = roleChange?.currentRoles ?? user.roles
-      const isInOriginal = original.includes(roleName)
-      const isInCurrent = current.includes(roleName)
+      const isInOriginal = originalRoles.includes(roleName)
+      const isInCurrent = currentRoles.includes(roleName)
 
       if (isInOriginal && isInCurrent) return 'default'
       if (!isInOriginal && isInCurrent) return 'added'
@@ -161,29 +150,25 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     }
 
     const hasChanges = () => {
-      const original = roleChange?.originalRoles ?? user.roles
-      const current = roleChange?.currentRoles ?? user.roles
-      const originalSorted = [...original].sort()
-      const currentSorted = [...current].sort()
+      const originalSorted = [...originalRoles].sort()
+      const currentSorted = [...currentRoles].sort()
       if (originalSorted.length !== currentSorted.length) return true
       return originalSorted.some((role, idx) => role !== currentSorted[idx])
     }
 
     const handleSave = async () => {
-      const current = roleChange?.currentRoles ?? user.roles
-
-      if (current.length === 0) {
-        validationErrorObservable.setValue('User must have at least one role')
+      if (currentRoles.length === 0) {
+        setValidationError('User must have at least one role')
         return
       }
 
-      isSavingObservable.setValue(true)
-      validationErrorObservable.setValue(null)
+      setIsSaving(true)
+      setValidationError(null)
 
       try {
         await usersService.updateUser(user.username, {
           username: user.username,
-          roles: current,
+          roles: currentRoles,
         })
 
         notyService.emit('onNotyAdded', {
@@ -194,8 +179,8 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
 
         if (!roleChangeObservable.isDisposed) {
           roleChangeObservable.setValue({
-            originalRoles: [...current],
-            currentRoles: [...current],
+            originalRoles: [...currentRoles],
+            currentRoles: [...currentRoles],
           })
         }
       } catch (error) {
@@ -206,26 +191,21 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
           type: 'error',
         })
       } finally {
-        if (!isSavingObservable.isDisposed) {
-          isSavingObservable.setValue(false)
+        if (!roleChangeObservable.isDisposed) {
+          setIsSaving(false)
         }
       }
     }
 
     const handleCancel = () => {
-      if (roleChange) {
-        roleChangeObservable.setValue({
-          ...roleChange,
-          currentRoles: [...roleChange.originalRoles],
-        })
-        validationErrorObservable.setValue(null)
-      }
+      roleChangeObservable.setValue({
+        ...roleChange,
+        currentRoles: [...roleChange.originalRoles],
+      })
+      setValidationError(null)
     }
 
     const allRoles = getAllRoleDefinitions()
-
-    const currentRoles = roleChange?.currentRoles ?? user.roles
-    const originalRoles = roleChange?.originalRoles ?? user.roles
 
     const availableRolesToAdd = allRoles.filter((role) => !currentRoles.includes(role.name))
 
@@ -276,12 +256,12 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
               <label className="add-role-label">Add Role:</label>
               <select
                 className="add-role-select"
+                value={selectedRole}
                 onchange={(e) => {
-                  const select = e.target as HTMLSelectElement
-                  const roleName = select.value as Roles[number]
+                  const roleName = (e.target as HTMLSelectElement).value as Roles[number]
                   if (roleName) {
                     addRole(roleName)
-                    select.value = ''
+                    setSelectedRole('')
                   }
                 }}
               >

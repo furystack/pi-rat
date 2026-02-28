@@ -7,11 +7,11 @@ import { ErrorReporter } from '../services/error-reporter.js'
 import { Error404 } from './error-404.js'
 import { ErrorDisplay } from './error-display.js'
 
-export interface GenericErrorProps {
+export type GenericErrorProps = {
   mainTitle?: string
   subtitle?: string
   description?: JSX.Element
-  error?: any
+  error?: unknown
   retry?: () => Promise<void>
 }
 
