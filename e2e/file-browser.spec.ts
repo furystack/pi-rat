@@ -23,7 +23,7 @@ const createDrive = async (page: Page, tempPath: string, tempDriveLetter: string
   const submitButton = page.getByRole('button', { name: 'Finish' })
   await submitButton.click()
 
-  await assertAndDismissNoty(page, `Drive '${tempDriveLetter}' has been created succesfully`)
+  await assertAndDismissNoty(page, `Drive '${tempDriveLetter}' has been created successfully`)
 }
 
 const selectDrive = async (page: Page, driveLetter: string) => {
