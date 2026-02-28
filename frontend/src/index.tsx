@@ -1,7 +1,7 @@
 /** ToDo: Main entry point */
 
 import { IdentityContext } from '@furystack/core'
-import { EntitySyncService, createInMemoryCacheStore } from '@furystack/entity-sync-client'
+import { createInMemoryCacheStore, EntitySyncService } from '@furystack/entity-sync-client'
 import { Injector } from '@furystack/inject'
 import { getLogger, useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
@@ -10,6 +10,7 @@ import { AiChatMessage, Chat, ChatMessage, LogEntry } from 'common'
 import { Layout } from './components/layout.js'
 import { environmentOptions } from './environment-options.js'
 import { SessionService } from './services/session.js'
+import { registerThemeSwitchCheat } from './theme-switch-cheat.js'
 import { darkTheme } from './themes/dark.js'
 
 const shadeInjector = new Injector()
@@ -50,3 +51,5 @@ initializeShadeRoot({
   rootElement,
   jsxElement: <Layout />,
 })
+
+registerThemeSwitchCheat(shadeInjector)
