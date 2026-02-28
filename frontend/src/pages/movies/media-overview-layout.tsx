@@ -4,6 +4,7 @@ import { promisifyAnimation } from '@furystack/shades-common-components'
 type MediaOverviewLayoutProps = {
   thumbnailUrl: string
   title: string
+  detailsContainerStyle?: Partial<CSSStyleDeclaration>
 }
 
 export const MediaOverviewLayout = Shade<MediaOverviewLayoutProps>({
@@ -64,7 +65,10 @@ export const MediaOverviewLayout = Shade<MediaOverviewLayoutProps>({
           <div className="poster-container">
             <img ref={imgRef} className="poster-image" src={props.thumbnailUrl} alt={`thumbnail for ${props.title}`} />
           </div>
-          <div className="details-container" style={{ minWidth: isDesktop ? '550px' : undefined }}>
+          <div
+            className="details-container"
+            style={{ minWidth: isDesktop ? '550px' : undefined, ...props.detailsContainerStyle }}
+          >
             {children}
           </div>
         </div>

@@ -41,6 +41,7 @@ export const WidgetCard = Shade<WidgetCardProps>({
       margin: '8px',
       overflow: 'hidden',
       color: 'white',
+      boxShadow: 'rgba(0, 0, 0, 0.3) 1px 3px 6px',
     },
     '& .cover': {
       display: 'inline-block',

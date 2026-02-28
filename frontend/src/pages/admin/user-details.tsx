@@ -191,7 +191,9 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
           type: 'error',
         })
       } finally {
-        setIsSaving(false)
+        if (!roleChangeObservable.isDisposed) {
+          setIsSaving(false)
+        }
       }
     }
 

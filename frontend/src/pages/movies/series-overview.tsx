@@ -1,4 +1,4 @@
-import { createComponent, Shade } from '@furystack/shades'
+import { createComponent, ScreenService, Shade } from '@furystack/shades'
 import { WidgetGroup } from '../../components/dashboard/widget-group.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
@@ -13,7 +13,8 @@ export type SeriesListProps = {
 
 export const SeriesOverview = Shade<SeriesListProps>({
   shadowDomName: 'series-overview-page',
-  render: ({ props, injector }) => {
+  render: ({ props, injector, useObservable }) => {
+    const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
     const seriesService = injector.getInstance(SeriesService)
     const moviesService = injector.getInstance(MoviesService)
     const movieFileService = injector.getInstance(MovieFilesService)
@@ -38,7 +39,15 @@ export const SeriesOverview = Shade<SeriesListProps>({
           ).sort() as number[]
 
           return (
-            <MediaOverviewLayout thumbnailUrl={series.thumbnailImageUrl || ''} title={series.title}>
+            <MediaOverviewLayout
+              thumbnailUrl={series.thumbnailImageUrl || ''}
+              title={series.title}
+              detailsContainerStyle={{
+                maxHeight: isDesktop ? 'calc(100% - 128px)' : undefined,
+                overflow: 'hidden',
+                overflowY: isDesktop ? 'auto' : undefined,
+              }}
+            >
               <h1>{series.title}</h1>
               <p style={{ fontSize: '0.8em' }}>{series.year?.toString()} &nbsp;</p>
               <p style={{ textAlign: 'justify' }}>{series.plot}</p>
