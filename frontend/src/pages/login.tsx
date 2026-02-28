@@ -3,9 +3,17 @@ import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
-type LoginPayload = {
+export type LoginPayload = {
   userName: string
   password: string
+}
+
+export const isLoginPayload = (data: unknown): data is LoginPayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.userName === 'string' && d.userName.length > 0 && typeof d.password === 'string' && d.password.length > 0
+  )
 }
 
 export const Login = Shade({
@@ -30,9 +38,7 @@ export const Login = Shade({
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>
         <Form<LoginPayload>
-          validate={(plainData): plainData is LoginPayload => {
-            return !!(plainData as LoginPayload)?.userName?.length && !!(plainData as LoginPayload)?.password?.length
-          }}
+          validate={isLoginPayload}
           className="login-form"
           onSubmit={({ userName, password }) => void sessionService.login(userName, password)}
         >

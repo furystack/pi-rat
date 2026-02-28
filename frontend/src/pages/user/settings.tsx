@@ -3,10 +3,24 @@ import { Button, Form, Input, NotyService, Paper } from '@furystack/shades-commo
 import { ObservableValue } from '@furystack/utils'
 import { SessionService } from '../../services/session.js'
 
-type PasswordResetPayload = {
+export type PasswordResetPayload = {
   currentPassword: string
   newPassword: string
   confirmPassword: string
+}
+
+export const isPasswordResetPayload = (data: unknown): data is PasswordResetPayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.currentPassword === 'string' &&
+    d.currentPassword.length > 0 &&
+    typeof d.newPassword === 'string' &&
+    d.newPassword.length > 0 &&
+    typeof d.confirmPassword === 'string' &&
+    d.confirmPassword.length > 0 &&
+    d.newPassword === d.confirmPassword
+  )
 }
 
 const SecuritySection = Shade({
@@ -38,11 +52,6 @@ const SecuritySection = Shade({
     const error = useDisposable('error', () => new ObservableValue<string>(''))
 
     const handlePasswordReset = async (data: PasswordResetPayload) => {
-      if (data.newPassword !== data.confirmPassword) {
-        error.setValue('New passwords do not match')
-        return
-      }
-
       isLoading.setValue(true)
       error.setValue('')
 
@@ -73,13 +82,7 @@ const SecuritySection = Shade({
           <h4>Change Password</h4>
 
           <Form<PasswordResetPayload>
-            validate={(data): data is PasswordResetPayload => {
-              return !!(
-                (data as PasswordResetPayload)?.currentPassword?.length &&
-                (data as PasswordResetPayload)?.newPassword?.length &&
-                (data as PasswordResetPayload)?.confirmPassword?.length
-              )
-            }}
+            validate={isPasswordResetPayload}
             onSubmit={(data) => {
               void handlePasswordReset(data)
             }}

@@ -5,6 +5,22 @@ import { WizardStep } from '../../components/wizard-step.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { getErrorMessage } from '../../services/get-error-message.js'
 
+export type AddDrivePayload = {
+  letter: string
+  physicalPath: string
+}
+
+export const isAddDrivePayload = (data: unknown): data is AddDrivePayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.letter === 'string' &&
+    d.letter.length > 0 &&
+    typeof d.physicalPath === 'string' &&
+    d.physicalPath.length > 0
+  )
+}
+
 export const AddDriveStep = Shade<WizardStepProps>({
   shadowDomName: 'add-drive-step',
   render: ({ props, injector }) => {
@@ -12,21 +28,16 @@ export const AddDriveStep = Shade<WizardStepProps>({
       <WizardStep
         title="Add Drive"
         {...props}
-        onSubmit={async (ev) => {
-          ev.preventDefault()
-          ev.stopPropagation()
-          const form = ev.target as HTMLFormElement
-          const formData = new FormData(form)
-
-          const values = Object.fromEntries(formData.entries()) as { letter: string; physicalPath: string }
+        validate={isAddDrivePayload}
+        onSubmit={async (data) => {
           try {
             await injector.getInstance(DrivesService).addVolume({
-              letter: values.letter.toString(),
-              physicalPath: values.physicalPath.toString(),
+              letter: data.letter,
+              physicalPath: data.physicalPath,
             })
             injector.getInstance(NotyService).emit('onNotyAdded', {
               type: 'success',
-              body: `Drive '${values.letter.toString()}' has been created succesfully`,
+              body: `Drive '${data.letter}' has been created successfully`,
               title: 'Drive created',
             })
           } catch (error) {

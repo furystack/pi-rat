@@ -4,6 +4,26 @@ import { Input } from '@furystack/shades-common-components'
 import { WizardStep } from '../components/wizard-step.js'
 import { InstallApiClient } from '../services/api-clients/install-api-client.js'
 
+export type CreateAdminPayload = {
+  userName: string
+  password: string
+  confirmPassword: string
+}
+
+export const isCreateAdminPayload = (data: unknown): data is CreateAdminPayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.userName === 'string' &&
+    d.userName.length > 0 &&
+    typeof d.password === 'string' &&
+    d.password.length > 0 &&
+    typeof d.confirmPassword === 'string' &&
+    d.confirmPassword.length > 0 &&
+    d.password === d.confirmPassword
+  )
+}
+
 export const CreateAdminStep = Shade<WizardStepProps>({
   shadowDomName: 'create-admin-step',
   render: ({ props, injector }) => {
@@ -11,19 +31,14 @@ export const CreateAdminStep = Shade<WizardStepProps>({
       <WizardStep
         title="Create the Super Admin user"
         {...props}
-        onSubmit={async (ev) => {
-          ev.preventDefault()
-          const form = ev.target as HTMLFormElement
-          const formData = new FormData(form)
-
-          const values = Object.fromEntries(formData.entries()) as { userName: string; password: string }
-
+        validate={isCreateAdminPayload}
+        onSubmit={async (data) => {
           await injector.getInstance(InstallApiClient).call({
             method: 'POST',
             action: '/install',
             body: {
-              username: values.userName.toString(),
-              password: values.password.toString(),
+              username: data.userName,
+              password: data.password,
             },
           })
 
@@ -65,7 +80,6 @@ export const CreateAdminStep = Shade<WizardStepProps>({
           required
           autocomplete="off"
         />
-        <input type="submit" style={{ display: 'none' }} />
       </WizardStep>
     )
   },

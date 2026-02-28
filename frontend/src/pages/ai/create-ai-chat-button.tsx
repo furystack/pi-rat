@@ -6,6 +6,20 @@ import { SessionService } from '../../services/session.js'
 import { AiChatService } from './ai-chat-service.js'
 import { AiModelSelector } from './ai-model-selector.js'
 
+export type CreateAiChatPayload = Pick<AiChat, 'name' | 'description' | 'model'>
+
+export const isCreateAiChatPayload = (data: unknown): data is CreateAiChatPayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.name === 'string' &&
+    d.name.trim() !== '' &&
+    (typeof d.description === 'string' || d.description === undefined) &&
+    typeof d.model === 'string' &&
+    d.model.trim() !== ''
+  )
+}
+
 export const CreateAiChatButton = Shade({
   shadowDomName: 'pi-rat-create-ai-chat-button',
   render: ({ injector, useState }) => {
@@ -44,7 +58,7 @@ export const CreateAiChatButton = Shade({
         >
           <Paper onclick={(ev) => ev.stopPropagation()}>
             <h2>Create New AI Chat</h2>
-            <Form<Pick<AiChat, 'name' | 'description' | 'model'>>
+            <Form<CreateAiChatPayload>
               onSubmit={(chat) => {
                 aiChatService
                   .createChat({
@@ -80,21 +94,7 @@ export const CreateAiChatButton = Shade({
                     })
                   })
               }}
-              validate={(formData): formData is Pick<AiChat, 'name' | 'description' | 'model'> => {
-                return (
-                  typeof formData === 'object' &&
-                  formData !== null &&
-                  'name' in formData &&
-                  typeof (formData as AiChat).name === 'string' &&
-                  (formData as AiChat).name.trim() !== '' &&
-                  'description' in formData &&
-                  (typeof (formData as AiChat).description === 'string' ||
-                    (formData as AiChat).description === undefined) &&
-                  'model' in formData &&
-                  typeof (formData as AiChat).model === 'string' &&
-                  (formData as AiChat).model.trim() !== ''
-                )
-              }}
+              validate={isCreateAiChatPayload}
             >
               Select model:
               <AiModelSelector />

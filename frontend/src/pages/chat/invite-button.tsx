@@ -5,6 +5,22 @@ import { ErrorDisplay } from '../../components/error-display.js'
 import { SessionService } from '../../services/session.js'
 import { ChatInvitationService } from './chat-intivation-service.js'
 
+export type InvitePayload = {
+  userName: string
+  message: string
+}
+
+export const isInvitePayload = (data: unknown): data is InvitePayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.userName === 'string' &&
+    d.userName.trim().length > 0 &&
+    typeof d.message === 'string' &&
+    d.message.trim().length <= 500
+  )
+}
+
 export const InviteButton = Shade<{ chat: Chat }>({
   shadowDomName: 'shade-app-invite-button',
   render: ({ useState, props, injector }) => {
@@ -36,7 +52,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
           isVisible={isModalOpen}
         >
           <Paper onclick={(ev) => ev.stopPropagation()}>
-            <Form<{ userName: string; message: string }>
+            <Form<InvitePayload>
               style={{
                 zIndex: '9000',
                 display: 'flex',
@@ -70,18 +86,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
                     })
                   })
               }}
-              validate={(formData): formData is { userName: string; message: string } => {
-                return (
-                  typeof formData === 'object' &&
-                  formData !== null &&
-                  'userName' in formData &&
-                  typeof (formData as { userName: unknown }).userName === 'string' &&
-                  (formData as { userName: string }).userName.trim().length > 0 &&
-                  'message' in formData &&
-                  typeof (formData as { message: unknown }).message === 'string' &&
-                  (formData as { message: string }).message.trim().length <= 500
-                )
-              }}
+              validate={isInvitePayload}
             >
               <h2>Invite</h2>
               <div>

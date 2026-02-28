@@ -1,8 +1,22 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, Form, Input, Modal, Paper } from '@furystack/shades-common-components'
-import type { Chat } from 'common'
 import { SessionService } from '../../services/session.js'
 import { ChatService } from './chat-service.js'
+
+export type AddChatPayload = {
+  name: string
+  description?: string
+}
+
+export const isAddChatPayload = (data: unknown): data is AddChatPayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.name === 'string' &&
+    d.name.length > 0 &&
+    (d.description === undefined || typeof d.description === 'string')
+  )
+}
 
 export const AddChatButton = Shade({
   shadowDomName: 'shade-app-chat-add-chat-button',
@@ -35,11 +49,12 @@ export const AddChatButton = Shade({
         >
           <Paper onclick={(ev) => ev.stopPropagation()}>
             <h2>Add New Chat</h2>
-            <Form<Chat>
-              onSubmit={(chat: Chat) => {
+            <Form<AddChatPayload>
+              validate={isAddChatPayload}
+              onSubmit={(chatData) => {
                 chats
                   .addChat({
-                    ...chat,
+                    ...chatData,
                     id: crypto.randomUUID(),
                     participants: [],
                     createdAt: new Date(),
@@ -51,9 +66,6 @@ export const AddChatButton = Shade({
                   .catch((error) => {
                     console.error('Error adding chat:', error)
                   })
-              }}
-              validate={(_formData): _formData is Chat => {
-                return true
               }}
             >
               <Input name="name" labelTitle="Chat Name" placeholder="Enter chat name" required />

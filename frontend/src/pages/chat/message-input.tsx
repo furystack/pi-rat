@@ -4,6 +4,16 @@ import type { Chat } from 'common'
 import { SessionService } from '../../services/session.js'
 import { ChatMessageService } from './chat-messages-service.js'
 
+export type ChatMessagePayload = {
+  content: string
+}
+
+export const isChatMessagePayload = (data: unknown): data is ChatMessagePayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return typeof d.content === 'string' && d.content.trim().length > 0
+}
+
 export const MessageInput = Shade<{ chat: Chat }>({
   shadowDomName: 'shade-app-message-input',
   render: ({ injector, props, useRef }) => {
@@ -13,7 +23,7 @@ export const MessageInput = Shade<{ chat: Chat }>({
     const formRef = useRef<HTMLFormElement>('form')
 
     return (
-      <Form<{ content: string }>
+      <Form<ChatMessagePayload>
         ref={formRef}
         onSubmit={(formData) => {
           void chatService.addChatMessage({
@@ -26,15 +36,7 @@ export const MessageInput = Shade<{ chat: Chat }>({
           })
           formRef.current?.reset()
         }}
-        validate={(formData: unknown): formData is { content: string } => {
-          return (
-            typeof formData === 'object' &&
-            formData !== null &&
-            'content' in formData &&
-            typeof (formData as { content: unknown }).content === 'string' &&
-            (formData as { content: string }).content.trim().length > 0
-          )
-        }}
+        validate={isChatMessagePayload}
         style={{
           display: 'flex',
           flexDirection: 'row',

@@ -3,10 +3,24 @@ import { Button, Form, Input, Paper } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
-type RegisterPayload = {
+export type RegisterPayload = {
   userName: string
   password: string
   confirmPassword: string
+}
+
+export const isRegisterPayload = (data: unknown): data is RegisterPayload => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  return (
+    typeof d.userName === 'string' &&
+    d.userName.length > 0 &&
+    typeof d.password === 'string' &&
+    d.password.length > 0 &&
+    typeof d.confirmPassword === 'string' &&
+    d.confirmPassword.length > 0 &&
+    d.password === d.confirmPassword
+  )
 }
 
 export const Register = Shade({
@@ -31,21 +45,9 @@ export const Register = Shade({
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>
         <Form<RegisterPayload>
-          validate={(plainData): plainData is RegisterPayload => {
-            const data = plainData as RegisterPayload
-            return !!(
-              data?.userName?.length &&
-              data?.password?.length &&
-              data?.confirmPassword?.length &&
-              data.password === data.confirmPassword
-            )
-          }}
+          validate={isRegisterPayload}
           className="register-form"
-          onSubmit={({ userName, password, confirmPassword }) => {
-            if (password !== confirmPassword) {
-              sessionService.loginError.setValue('Passwords do not match')
-              return
-            }
+          onSubmit={({ userName, password }) => {
             void sessionService.register(userName, password)
           }}
         >

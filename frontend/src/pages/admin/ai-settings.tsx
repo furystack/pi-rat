@@ -8,7 +8,11 @@ import { ConfigService } from '../../services/config-service.js'
 
 type OllamaFormData = OllamaConfig['value']
 
-const isValidUrl = (urlString: string): boolean => {
+export type OllamaRawFormData = {
+  host: string
+}
+
+export const isValidUrl = (urlString: string): boolean => {
   if (urlString === '') return true
   try {
     const url = new URL(urlString)
@@ -16,6 +20,13 @@ const isValidUrl = (urlString: string): boolean => {
   } catch {
     return false
   }
+}
+
+export const isOllamaRawFormData = (data: unknown): data is OllamaRawFormData => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  if (typeof d.host !== 'string') return false
+  return isValidUrl(d.host)
 }
 
 const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
@@ -55,25 +66,11 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     const validationErrorObservable = useDisposable('validationError', () => new ObservableValue<string | null>(null))
     const [validationError] = useObservable('validationErrorValue', validationErrorObservable)
 
-    const validateForm = (formData: Record<string, unknown>): string | null => {
-      const host = (formData.host as string) ?? ''
-
-      if (host !== '' && !isValidUrl(host)) {
-        return 'Please enter a valid URL (e.g., http://localhost:11434)'
-      }
-      return null
-    }
-
-    const handleSubmit = async (formData: Record<string, unknown>) => {
-      const error = validateForm(formData)
-      if (error) {
-        validationErrorObservable.setValue(error)
-        return
-      }
+    const handleSubmit = async (formData: OllamaRawFormData) => {
       validationErrorObservable.setValue(null)
 
       const data: OllamaFormData = {
-        host: (formData.host as string) ?? '',
+        host: formData.host,
       }
 
       isLoadingObservable.setValue(true)
@@ -105,11 +102,13 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
         <p className="page-description">Configure the connection to your Ollama server for AI-powered features.</p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <Form<Record<string, unknown>>
-            validate={(data): data is Record<string, unknown> => {
-              const error = validateForm(data as Record<string, unknown>)
-              validationErrorObservable.setValue(error)
-              return error === null
+          <Form<OllamaRawFormData>
+            validate={(data): data is OllamaRawFormData => {
+              const isValid = isOllamaRawFormData(data)
+              validationErrorObservable.setValue(
+                isValid ? null : 'Please enter a valid URL (e.g., http://localhost:11434)',
+              )
+              return isValid
             }}
             onSubmit={(data) => void handleSubmit(data)}
           >

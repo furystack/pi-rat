@@ -8,12 +8,46 @@ import { ConfigService } from '../../services/config-service.js'
 
 type IotFormData = IotConfig['value']
 
-const MIN_PING_INTERVAL_MS = 1000
-const MAX_PING_INTERVAL_MS = 3600000
-const MIN_PING_TIMEOUT_MS = 100
-const MAX_PING_TIMEOUT_MS = 60000
+export const MIN_PING_INTERVAL_MS = 1000
+export const MAX_PING_INTERVAL_MS = 3600000
+export const MIN_PING_TIMEOUT_MS = 100
+export const MAX_PING_TIMEOUT_MS = 60000
 const DEFAULT_PING_INTERVAL_MS = 30000
 const DEFAULT_PING_TIMEOUT_MS = 3000
+
+export type IotRawFormData = {
+  pingIntervalMs: string
+  pingTimeoutMs: string
+}
+
+export const validateIotForm = (data: Record<string, unknown>): string | null => {
+  const pingIntervalMs = Number(data.pingIntervalMs)
+  const pingTimeoutMs = Number(data.pingTimeoutMs)
+
+  if (isNaN(pingIntervalMs) || pingIntervalMs < MIN_PING_INTERVAL_MS) {
+    return `Ping interval must be at least ${MIN_PING_INTERVAL_MS}ms`
+  }
+  if (pingIntervalMs > MAX_PING_INTERVAL_MS) {
+    return `Ping interval must be at most ${MAX_PING_INTERVAL_MS}ms (1 hour)`
+  }
+  if (isNaN(pingTimeoutMs) || pingTimeoutMs < MIN_PING_TIMEOUT_MS) {
+    return `Ping timeout must be at least ${MIN_PING_TIMEOUT_MS}ms`
+  }
+  if (pingTimeoutMs > MAX_PING_TIMEOUT_MS) {
+    return `Ping timeout must be at most ${MAX_PING_TIMEOUT_MS}ms (1 minute)`
+  }
+  if (pingTimeoutMs >= pingIntervalMs) {
+    return 'Ping timeout must be less than ping interval'
+  }
+  return null
+}
+
+export const isIotRawFormData = (data: unknown): data is IotRawFormData => {
+  if (typeof data !== 'object' || data === null) return false
+  const d = data as Record<string, unknown>
+  if (typeof d.pingIntervalMs !== 'string' || typeof d.pingTimeoutMs !== 'string') return false
+  return validateIotForm(d) === null
+}
 
 const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'iot-settings-content',
@@ -27,34 +61,7 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     const validationErrorObservable = useDisposable('validationError', () => new ObservableValue<string | null>(null))
     const [validationError] = useObservable('validationErrorValue', validationErrorObservable)
 
-    const validateForm = (formData: Record<string, unknown>): string | null => {
-      const pingIntervalMs = Number(formData.pingIntervalMs)
-      const pingTimeoutMs = Number(formData.pingTimeoutMs)
-
-      if (isNaN(pingIntervalMs) || pingIntervalMs < MIN_PING_INTERVAL_MS) {
-        return `Ping interval must be at least ${MIN_PING_INTERVAL_MS}ms`
-      }
-      if (pingIntervalMs > MAX_PING_INTERVAL_MS) {
-        return `Ping interval must be at most ${MAX_PING_INTERVAL_MS}ms (1 hour)`
-      }
-      if (isNaN(pingTimeoutMs) || pingTimeoutMs < MIN_PING_TIMEOUT_MS) {
-        return `Ping timeout must be at least ${MIN_PING_TIMEOUT_MS}ms`
-      }
-      if (pingTimeoutMs > MAX_PING_TIMEOUT_MS) {
-        return `Ping timeout must be at most ${MAX_PING_TIMEOUT_MS}ms (1 minute)`
-      }
-      if (pingTimeoutMs >= pingIntervalMs) {
-        return 'Ping timeout must be less than ping interval'
-      }
-      return null
-    }
-
-    const handleSubmit = async (formData: Record<string, unknown>) => {
-      const error = validateForm(formData)
-      if (error) {
-        validationErrorObservable.setValue(error)
-        return
-      }
+    const handleSubmit = async (formData: IotRawFormData) => {
       validationErrorObservable.setValue(null)
 
       const data: IotFormData = {
@@ -96,11 +103,15 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
         </p>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <Form<Record<string, unknown>>
-            validate={(data): data is Record<string, unknown> => {
-              const error = validateForm(data as Record<string, unknown>)
-              validationErrorObservable.setValue(error)
-              return error === null
+          <Form<IotRawFormData>
+            validate={(data): data is IotRawFormData => {
+              const isValid = isIotRawFormData(data)
+              validationErrorObservable.setValue(
+                isValid || typeof data !== 'object' || data === null
+                  ? null
+                  : validateIotForm(data as Record<string, unknown>),
+              )
+              return isValid
             }}
             onSubmit={(data) => void handleSubmit(data)}
           >
