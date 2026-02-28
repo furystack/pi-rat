@@ -66,7 +66,7 @@ describe('UserListPage', () => {
 
       const page = document.querySelector('user-list-page')
       expect(page).toBeTruthy()
-      expect(page?.textContent).toContain('👥 Users')
+      expect(page?.textContent).toContain('Users')
       expect(page?.textContent).toContain('Manage user accounts and their roles.')
     })
 

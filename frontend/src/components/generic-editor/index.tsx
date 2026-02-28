@@ -136,6 +136,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
             <Icon icon={icons.edit} size="small" />
           </Button>
           <Button
+            title="Delete"
             onclick={() => {
               service
                 .removeEntries(entry[service.extendedOptions.keyProperty])

@@ -84,7 +84,7 @@ test.describe('File Browser', () => {
     await page.locator('icon-url-widget', { hasText: 'Drives' }).click()
 
     const driveLine = page.locator('shades-data-grid-row', { hasText: tempDriveLetter })
-    await driveLine.locator('button').nth(1).click()
+    await driveLine.locator('button[title="Delete"]').click()
 
     await assertAndDismissNoty(page, `🗑️ The selected entity deleted successfully`)
 
