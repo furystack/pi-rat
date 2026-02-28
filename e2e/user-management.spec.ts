@@ -15,25 +15,28 @@ const getTestUserName = (projectName: string, testId: string) => `role-tester-${
  */
 const addRoleToUser = async (page: Page): Promise<string | null> => {
   const detailsPage = page.locator('user-details-page')
-  const roleSelect = detailsPage.locator('select')
+  const roleSelect = detailsPage.locator('shade-select')
 
   const selectCount = await roleSelect.count()
   if (selectCount === 0) {
     return null
   }
 
-  const optionsCount = await roleSelect.locator('option').count()
-  if (optionsCount <= 1) {
+  // Open the dropdown
+  await roleSelect.locator('[role="combobox"]').click()
+
+  const options = roleSelect.locator('[role="option"]')
+  const optionsCount = await options.count()
+  if (optionsCount === 0) {
     return null
   }
 
-  const options = roleSelect.locator('option')
-  const roleValue = await options.nth(1).getAttribute('value')
+  const roleValue = await options.first().getAttribute('data-value')
   if (!roleValue) {
     return null
   }
 
-  await roleSelect.selectOption(roleValue)
+  await options.first().click()
   return roleValue
 }
 

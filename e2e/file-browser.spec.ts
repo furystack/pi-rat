@@ -4,7 +4,7 @@ import { join } from 'path'
 import { assertAndDismissNoty, login, uploadFile } from './helpers.js'
 
 const gotoFileBrowser = async (page: Page) => {
-  await page.locator('shade-app-bar-link', { hasText: '📂 Files' }).click()
+  await page.locator('shade-app-bar-link', { hasText: 'Files' }).click()
 }
 
 const createDrive = async (page: Page, tempPath: string, tempDriveLetter: string) => {
@@ -27,8 +27,9 @@ const createDrive = async (page: Page, tempPath: string, tempDriveLetter: string
 }
 
 const selectDrive = async (page: Page, driveLetter: string) => {
-  const selector = page.locator('drive-selector select').nth(0)
-  await selector.selectOption(driveLetter)
+  const selector = page.locator('drive-selector shade-select').nth(0)
+  await selector.locator('[role="combobox"]').click()
+  await selector.locator('[role="option"]', { hasText: driveLetter }).click()
 }
 
 const openFile = async (page: Page, fileName: string) => {
@@ -83,7 +84,7 @@ test.describe('File Browser', () => {
     await page.locator('icon-url-widget', { hasText: 'Drives' }).click()
 
     const driveLine = page.locator('shades-data-grid-row', { hasText: tempDriveLetter })
-    await driveLine.locator('button', { hasText: '❌' }).click()
+    await driveLine.locator('button').nth(1).click()
 
     await assertAndDismissNoty(page, `🗑️ The selected entity deleted successfully`)
 

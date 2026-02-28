@@ -9,11 +9,34 @@ import { createMockUser } from '../../test-utils/user-test-helpers.js'
 import { UserDetailsPage } from './user-details.js'
 
 /**
- * Helper to get action buttons (excluding buttons inside role-tags)
+ * Helper to get action buttons (excluding buttons inside role-tags and shade-select)
  */
 const getActionButtons = (page: Element | null | undefined) => {
   const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
-  return allButtons.filter((btn) => !btn.closest('role-tag'))
+  return allButtons.filter((btn) => !btn.closest('role-tag') && !btn.closest('shade-select'))
+}
+
+/**
+ * Helper to select a role from the Select dropdown by clicking the combobox trigger
+ * then clicking the matching option item by its display label.
+ */
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Application Admin',
+  viewer: 'Viewer',
+  'media-manager': 'Media Manager',
+  'iot-manager': 'IoT Manager',
+}
+
+const selectRoleFromDropdown = async (page: Element | null | undefined, roleName: string) => {
+  const select = page?.querySelector('shade-select')
+  const trigger = select?.querySelector('[role="combobox"]') as HTMLElement
+  trigger?.click()
+  await flushUpdates()
+  const label = ROLE_LABELS[roleName] ?? roleName
+  const options = Array.from(select?.querySelectorAll('[role="option"]') ?? [])
+  const option = options.find((opt) => opt.textContent?.includes(label)) as HTMLElement
+  option?.click()
+  await flushUpdates()
 }
 
 describe('UserDetailsPage', () => {
@@ -248,9 +271,9 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      expect(page?.textContent).toContain('Add Role:')
+      expect(page?.textContent).toContain('Add Role')
 
-      const select = page?.querySelector('select')
+      const select = page?.querySelector('shade-select')
       expect(select).toBeTruthy()
     })
 
@@ -267,16 +290,20 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select')
-      const options = select?.querySelectorAll('option')
+      const select = page?.querySelector('shade-select')
+      expect(select).toBeTruthy()
 
-      // Should have placeholder + 3 available roles (viewer, media-manager, iot-manager)
-      expect(options?.length).toBe(4)
-      expect(select?.textContent).toContain('Select a role to add...')
-      expect(select?.textContent).toContain('Viewer')
-      expect(select?.textContent).toContain('Media Manager')
-      expect(select?.textContent).toContain('IoT Manager')
-      expect(select?.textContent).not.toContain('Application Admin')
+      // Open the dropdown by clicking the combobox trigger
+      const trigger = select?.querySelector('[role="combobox"]') as HTMLElement
+      trigger?.click()
+      await flushUpdates()
+
+      // Check that the available roles are rendered (not admin since user already has it)
+      const selectText = select?.textContent ?? ''
+      expect(selectText).toContain('Viewer')
+      expect(selectText).toContain('Media Manager')
+      expect(selectText).toContain('IoT Manager')
+      expect(selectText).not.toContain('Application Admin')
     })
 
     it('should not show dropdown when user has all roles', async () => {
@@ -292,7 +319,7 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select')
+      const select = page?.querySelector('shade-select')
       expect(select).toBeFalsy()
     })
   })
@@ -365,17 +392,15 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select') as HTMLSelectElement
 
-      select.value = 'viewer'
-      select.dispatchEvent(new Event('change', { bubbles: true }))
-      await flushUpdates()
+      await selectRoleFromDropdown(page, 'viewer')
 
       const roleTags = page?.querySelectorAll('role-tag')
       expect(roleTags?.length).toBe(2)
 
-      const disabledButtons = page?.querySelectorAll('button[disabled]')
-      expect(disabledButtons?.length).toBe(0)
+      const actionButtons = getActionButtons(page)
+      const disabledActionButtons = actionButtons.filter((btn) => btn.disabled)
+      expect(disabledActionButtons.length).toBe(0)
     })
 
     it('should remove role when remove button is clicked', async () => {
@@ -416,15 +441,12 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select') as HTMLSelectElement
 
-      select.value = 'viewer'
-      select.dispatchEvent(new Event('change', { bubbles: true }))
+      await selectRoleFromDropdown(page, 'viewer')
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      const allButtons = Array.from(page?.querySelectorAll('button') ?? [])
-      const actionButtons = allButtons.filter((btn) => !btn.closest('role-tag'))
+      const actionButtons = getActionButtons(page)
       const cancelButton = actionButtons[actionButtons.length - 1]
       cancelButton.click()
 
@@ -433,8 +455,8 @@ describe('UserDetailsPage', () => {
       const roleTags = page?.querySelectorAll('role-tag')
       expect(roleTags?.length).toBe(1)
 
-      const disabledButtons = page?.querySelectorAll('button[disabled]')
-      expect(disabledButtons?.length).toBe(2)
+      const disabledActionButtons = getActionButtons(page).filter((btn) => btn.disabled)
+      expect(disabledActionButtons.length).toBe(2)
     })
   })
 
@@ -450,10 +472,8 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select') as HTMLSelectElement
 
-      select.value = 'viewer'
-      select.dispatchEvent(new Event('change', { bubbles: true }))
+      await selectRoleFromDropdown(page, 'viewer')
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -480,10 +500,8 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select') as HTMLSelectElement
 
-      select.value = 'viewer'
-      select.dispatchEvent(new Event('change', { bubbles: true }))
+      await selectRoleFromDropdown(page, 'viewer')
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -513,10 +531,8 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select') as HTMLSelectElement
 
-      select.value = 'viewer'
-      select.dispatchEvent(new Event('change', { bubbles: true }))
+      await selectRoleFromDropdown(page, 'viewer')
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -553,10 +569,8 @@ describe('UserDetailsPage', () => {
       await flushUpdates()
 
       const page = document.querySelector('user-details-page')
-      const select = page?.querySelector('select') as HTMLSelectElement
 
-      select.value = 'viewer'
-      select.dispatchEvent(new Event('change', { bubbles: true }))
+      await selectRoleFromDropdown(page, 'viewer')
 
       await new Promise((resolve) => setTimeout(resolve, 10))
 
