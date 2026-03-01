@@ -134,6 +134,46 @@ describe('HlsSegmentAction', () => {
     })
   })
 
+  it('should reject segment index exceeding upper bound', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      const { SegmentCache } = await import('../services/segment-cache.js')
+      injector.getInstance(SegmentCache)
+
+      try {
+        await HlsSegmentAction({
+          injector,
+          getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '100001' }),
+          getQuery: () => ({ mode: 'transcode', from: 0, to: 10 }),
+          response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Should have thrown')
+      } catch (error) {
+        expect((error as Error).message).toContain('Invalid segment index')
+      }
+    })
+  })
+
+  it('should reject time range exceeding 24 hours', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      const { SegmentCache } = await import('../services/segment-cache.js')
+      injector.getInstance(SegmentCache)
+
+      try {
+        await HlsSegmentAction({
+          injector,
+          getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '0' }),
+          getQuery: () => ({ mode: 'transcode', from: 0, to: 86_401 }),
+          response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Should have thrown')
+      } catch (error) {
+        expect((error as Error).message).toContain('Invalid time range')
+      }
+    })
+  })
+
   it('should reject invalid resolution', async () => {
     await usingAsync(new Injector(), async (injector) => {
       const { SegmentCache } = await import('../services/segment-cache.js')

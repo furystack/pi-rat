@@ -14,18 +14,15 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
   getQuery,
 }) => {
   const logger = getLogger(injector).withScope('StreamAction')
-  const mimeType = mime.getType('mp4')
-  const mimeHeader = mimeType ? { 'Content-Type': mimeType } : {}
-  const head = {
-    ...mimeHeader,
-  }
-  response.writeHead(200, head)
-
   const { letter, path } = getUrlParams()
 
   if (path.includes('..') || path.includes('\0')) {
     throw new RequestError('Invalid path', 400)
   }
+
+  const mimeType = mime.getType('mp4')
+  const mimeHeader = mimeType ? { 'Content-Type': mimeType } : {}
+  response.writeHead(200, { ...mimeHeader })
 
   const cache = injector.getInstance(StreamFileActionCaches)
 

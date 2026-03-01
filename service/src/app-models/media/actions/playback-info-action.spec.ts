@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { Injector } from '@furystack/inject'
+import { RequestError } from '@furystack/rest'
 import { usingAsync } from '@furystack/utils'
 import type { FfprobeData } from 'common'
 import { describe, expect, it, vi } from 'vitest'
@@ -96,6 +97,47 @@ describe('PlaybackInfoAction', () => {
       const body = result.chunk as { mode: string; streamUrl: string }
       expect(body.mode).toBe('remux')
       expect(body.streamUrl).toContain('/master.m3u8')
+    })
+  })
+
+  it('should reject path traversal in file path', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      try {
+        await PlaybackInfoAction({
+          injector,
+          getBody: async () => ({
+            file: { driveLetter: 'A', path: '../../etc/passwd' },
+            codecSupport: { video: ['h264'], audio: ['aac'], containers: ['mp4'] },
+          }),
+          response: {} as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Expected RequestError to be thrown')
+      } catch (error) {
+        expect(error).toBeInstanceOf(RequestError)
+        expect((error as RequestError).responseCode).toBe(400)
+        expect((error as RequestError).message).toBe('Invalid file path')
+      }
+    })
+  })
+
+  it('should reject null bytes in file path', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      try {
+        await PlaybackInfoAction({
+          injector,
+          getBody: async () => ({
+            file: { driveLetter: 'A', path: 'test\0.mp4' },
+            codecSupport: { video: ['h264'], audio: ['aac'], containers: ['mp4'] },
+          }),
+          response: {} as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Expected RequestError to be thrown')
+      } catch (error) {
+        expect(error).toBeInstanceOf(RequestError)
+        expect((error as RequestError).responseCode).toBe(400)
+      }
     })
   })
 

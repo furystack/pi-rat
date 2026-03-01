@@ -26,13 +26,13 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
   }
 
   const segmentIndex = parseInt(index, 10)
-  if (isNaN(segmentIndex) || segmentIndex < 0) {
+  if (isNaN(segmentIndex) || segmentIndex < 0 || segmentIndex > 100_000) {
     throw new RequestError('Invalid segment index', 400)
   }
 
   const from = query.from ?? 0
   const to = query.to ?? from + 10
-  if (from < 0 || to <= from) {
+  if (from < 0 || to <= from || to > 86_400) {
     throw new RequestError('Invalid time range', 400)
   }
 

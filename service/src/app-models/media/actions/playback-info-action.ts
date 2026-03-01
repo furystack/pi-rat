@@ -1,4 +1,5 @@
 import { getLogger } from '@furystack/logging'
+import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import { getDataSetFor } from '@furystack/repository'
@@ -11,6 +12,10 @@ export const PlaybackInfoAction: RequestAction<PlaybackInfoRequest> = async ({ i
   const logger = getLogger(injector).withScope('PlaybackInfoAction')
   const body = await getBody()
   const { file, codecSupport, selectedAudioTrackIndex, selectedSubtitleTrackIndex } = body
+
+  if (file.path.includes('..') || file.path.includes('\0')) {
+    throw new RequestError('Invalid file path', 400)
+  }
 
   await logger.verbose({ message: 'Playback info requested', data: { file, selectedAudioTrackIndex } })
 
