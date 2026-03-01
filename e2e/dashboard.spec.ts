@@ -21,7 +21,7 @@ const setMonacoValue = async (page: Page, value: any) => {
 }
 
 const trySaveDashboard = async (page: Page) => {
-  await page.getByRole('button', { name: 'Save' }).click({ force: true })
+  await page.getByRole('button', { name: 'Save' }).dispatchEvent('click')
 }
 
 test.describe('Dashboard', () => {
