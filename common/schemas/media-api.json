@@ -6463,6 +6463,9 @@
             },
             "audioTrack": {
               "type": "number"
+            },
+            "resolution": {
+              "type": "string"
             }
           },
           "additionalProperties": false
@@ -6491,6 +6494,9 @@
         "query": {
           "type": "object",
           "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
             "videoCodecs": {
               "type": "string"
             },

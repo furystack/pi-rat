@@ -18,7 +18,13 @@ const TEXT_SUBTITLE_CODECS: Record<string, SubtitleTrackInfo['format']> = {
   mov_text: 'srt',
 }
 
-const CONTAINER_COMPATIBLE_WITH_BROWSER = ['mp4', 'mov', 'webm']
+/**
+ * Formats that browsers can natively play. Checked against the primary (first)
+ * ffprobe format alias only — e.g. "matroska,webm" has primary "matroska"
+ * which is NOT browser-native, while "mov,mp4,m4a,3gp,3g2,mj2" has primary
+ * "mov" which IS browser-native.
+ */
+const BROWSER_NATIVE_PRIMARY_FORMATS = new Set(['mp4', 'mov', 'webm', 'm4v', 'mp3', 'ogg'])
 
 /**
  * Resolves the optimal playback mode for a given file based on the client's codec support.
@@ -60,10 +66,11 @@ export const resolvePlaybackMode = ({
   const videoSupported = codecSupport.video.includes(videoStream.codec_name)
   const audioSupported = selectedAudio?.codec_name ? codecSupport.audio.includes(selectedAudio.codec_name) : true
 
-  const containerFormat = ffprobe.format.format_name?.split(',')[0] ?? ''
+  const formatAliases = ffprobe.format.format_name?.split(',').map((s) => s.trim()) ?? []
+  const primaryFormat = formatAliases[0] ?? ''
   const containerSupported =
-    codecSupport.containers.includes(containerFormat) ||
-    CONTAINER_COMPATIBLE_WITH_BROWSER.some((c) => containerFormat.includes(c))
+    formatAliases.some((alias) => codecSupport.containers.includes(alias)) ||
+    BROWSER_NATIVE_PRIMARY_FORMATS.has(primaryFormat)
 
   if (videoSupported && audioSupported && containerSupported) {
     return { mode: 'direct-play', warnings }

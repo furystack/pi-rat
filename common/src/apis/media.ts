@@ -96,7 +96,7 @@ export type PlaybackInfoResponse = {
 
 export type HlsMasterEndpoint = {
   url: { letter: string; path: string }
-  query: { videoCodecs?: string; audioCodecs?: string; containers?: string }
+  query: { mode?: PlaybackMode; videoCodecs?: string; audioCodecs?: string; containers?: string }
   result: unknown
 }
 
@@ -114,7 +114,7 @@ export type HlsSegmentEndpoint = {
 
 export type HlsInitEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; audioTrack?: number }
+  query: { mode?: PlaybackMode; audioTrack?: number; resolution?: string }
   result: unknown
 }
 

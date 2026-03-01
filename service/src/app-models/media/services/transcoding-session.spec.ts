@@ -398,6 +398,86 @@ describe('TranscodingSessionService', () => {
     })
   })
 
+  describe('disk usage and cache eviction', () => {
+    const testDir = join(tmpdir(), 'pirat-test-diskusage')
+
+    beforeEach(() => {
+      if (!existsSync(testDir)) mkdirSync(testDir, { recursive: true })
+    })
+
+    afterEach(() => {
+      if (existsSync(testDir)) rmSync(testDir, { recursive: true, force: true })
+    })
+
+    it('should calculate session disk usage', () => {
+      const sessionDir = join(testDir, 'session1')
+      mkdirSync(sessionDir, { recursive: true })
+      writeFileSync(join(sessionDir, 'segment0.m4s'), Buffer.alloc(1000))
+      writeFileSync(join(sessionDir, 'segment1.m4s'), Buffer.alloc(2000))
+      writeFileSync(join(sessionDir, 'init.mp4'), Buffer.alloc(500))
+
+      const service = new TranscodingSessionService()
+      try {
+        const mockSession = { sessionDir } as Parameters<typeof service.getSessionDiskUsage>[0]
+        const usage = service.getSessionDiskUsage(mockSession)
+        expect(usage).toBe(3500)
+      } finally {
+        service.dispose()
+      }
+    })
+
+    it('should return 0 for non-existent session directory', () => {
+      const service = new TranscodingSessionService()
+      try {
+        const mockSession = { sessionDir: join(testDir, 'nonexistent') } as Parameters<
+          typeof service.getSessionDiskUsage
+        >[0]
+        const usage = service.getSessionDiskUsage(mockSession)
+        expect(usage).toBe(0)
+      } finally {
+        service.dispose()
+      }
+    })
+
+    it('should calculate total disk usage across sessions', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          const s1 = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test1.mkv',
+            mode: 'transcode',
+          })
+          const s2 = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test2.mkv',
+            mode: 'transcode',
+          })
+
+          writeFileSync(join(s1.sessionDir, 'segment0.m4s'), Buffer.alloc(100))
+          writeFileSync(join(s2.sessionDir, 'segment0.m4s'), Buffer.alloc(200))
+
+          const total = service.getTotalDiskUsage()
+          expect(total).toBe(300)
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+  })
+
   describe('buildHlsFfmpegArgs via getOrCreateSession', () => {
     it('should use -c:v copy and -c:a copy for remux mode', async () => {
       const mockProcess = createMockProcess()

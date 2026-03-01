@@ -28,7 +28,7 @@ export const HlsInitAction: RequestAction<HlsInitEndpoint> = async ({ injector, 
   const sessionService = injector.getInstance(TranscodingSessionService)
 
   // The session should already exist (created when stream.m3u8 was requested)
-  let session = sessionService.getSession(letter, path, mode, query.audioTrack ?? 0)
+  let session = sessionService.getSession(letter, path, mode, query.audioTrack ?? 0, query.resolution)
   if (!session) {
     // Create one if it doesn't exist (init might be requested before stream.m3u8)
     session = await sessionService.getOrCreateSession({
@@ -36,6 +36,7 @@ export const HlsInitAction: RequestAction<HlsInitEndpoint> = async ({ injector, 
       path,
       mode,
       audioTrackId: query.audioTrack ?? 0,
+      resolution: query.resolution,
     })
   }
 

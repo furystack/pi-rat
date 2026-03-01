@@ -195,8 +195,9 @@ export class MoviePlayerService implements AsyncDisposable {
   }
 
   private async startHlsPlayback(videoElement: HTMLVideoElement) {
+    const mode = this.playbackMode.getValue()
     const hlsUrl = this.toServiceUrl(
-      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8`,
+      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encodeURIComponent(mode)}`,
     )
 
     const HlsModule = await loadHls()

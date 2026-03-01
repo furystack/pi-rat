@@ -6,7 +6,7 @@ import type { PlaybackMode } from 'common'
 import { Config, Drive, type MoviesConfig } from 'common'
 import { spawn, type ChildProcess } from 'child_process'
 import { createHash } from 'crypto'
-import { existsSync, mkdirSync, rmSync, statSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'fs'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { tmpdir } from 'os'
@@ -35,6 +35,8 @@ const SESSION_IDLE_TIMEOUT_MS = 5 * 60 * 1000
 const SEGMENT_DURATION = 6
 const WAIT_POLL_INTERVAL_MS = 100
 const WAIT_TIMEOUT_MS = 60_000
+const DEFAULT_MAX_CACHE_SIZE_MB = 5000
+const BYTES_PER_MB = 1024 * 1024
 
 @Injectable({ lifetime: 'singleton' })
 export class TranscodingSessionService {
@@ -49,6 +51,7 @@ export class TranscodingSessionService {
   private sessions = new Map<SessionKey, TranscodingSessionEntry>()
   private pendingSessions = new Map<SessionKey, Promise<TranscodingSessionEntry>>()
   private cleanupInterval: ReturnType<typeof setInterval>
+  private maxCacheSizeBytes: number | null = null
 
   constructor() {
     this.cleanupInterval = setInterval(() => this.cleanupIdleSessions(), SESSION_IDLE_TIMEOUT_MS / 2)
@@ -94,6 +97,10 @@ export class TranscodingSessionService {
       const dir = config?.value?.hlsSegmentPath || join(tmpdir(), 'pirat-hls-sessions')
       if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
       this.baseDirCache = dir
+
+      const mb = config?.value?.hlsMaxCacheSizeMb ?? DEFAULT_MAX_CACHE_SIZE_MB
+      this.maxCacheSizeBytes = mb * BYTES_PER_MB
+
       return dir
     } catch {
       return this.getBaseDir()
@@ -213,6 +220,7 @@ export class TranscodingSessionService {
     })
 
     this.sessions.set(key, session)
+    void this.evictByDiskUsage()
     return session
   }
 
@@ -415,6 +423,77 @@ export class TranscodingSessionService {
     }
   }
 
+  /**
+   * Returns the total bytes used by a session's directory on disk.
+   */
+  public getSessionDiskUsage(session: TranscodingSessionEntry): number {
+    try {
+      if (!existsSync(session.sessionDir)) return 0
+      return readdirSync(session.sessionDir).reduce((total, file) => {
+        try {
+          return total + statSync(join(session.sessionDir, file)).size
+        } catch {
+          return total
+        }
+      }, 0)
+    } catch {
+      return 0
+    }
+  }
+
+  /**
+   * Returns the total bytes used across all active session directories.
+   */
+  public getTotalDiskUsage(): number {
+    let total = 0
+    for (const session of this.sessions.values()) {
+      total += this.getSessionDiskUsage(session)
+    }
+    return total
+  }
+
+  private async loadMaxCacheSize(): Promise<number> {
+    if (this.maxCacheSizeBytes !== null) return this.maxCacheSizeBytes
+    try {
+      const configDataSet = getDataSetFor(this.injector, Config, 'id')
+      const config = (await configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
+      const mb = config?.value?.hlsMaxCacheSizeMb ?? DEFAULT_MAX_CACHE_SIZE_MB
+      this.maxCacheSizeBytes = mb * BYTES_PER_MB
+    } catch {
+      this.maxCacheSizeBytes = DEFAULT_MAX_CACHE_SIZE_MB * BYTES_PER_MB
+    }
+    return this.maxCacheSizeBytes
+  }
+
+  /**
+   * Evicts the least-recently-accessed completed/error sessions until total disk
+   * usage is under the configured hlsMaxCacheSizeMb limit.
+   */
+  private async evictByDiskUsage(): Promise<void> {
+    const maxBytes = await this.loadMaxCacheSize()
+    let totalUsage = this.getTotalDiskUsage()
+    if (totalUsage <= maxBytes) return
+
+    // Sort sessions by lastAccessedAt ascending (oldest first), prefer completed/error over active
+    const candidates = [...this.sessions.entries()].sort(([, a], [, b]) => {
+      const aActive = a.state === 'starting' || a.state === 'running'
+      const bActive = b.state === 'starting' || b.state === 'running'
+      if (aActive !== bActive) return aActive ? 1 : -1
+      return a.lastAccessedAt - b.lastAccessedAt
+    })
+
+    for (const [key, session] of candidates) {
+      if (totalUsage <= maxBytes) break
+      const usage = this.getSessionDiskUsage(session)
+      void this.logger.verbose({
+        message: `Evicting session for cache limit: ${key} (${Math.round(usage / BYTES_PER_MB)}MB)`,
+      })
+      this.destroySession(session)
+      this.sessions.delete(key)
+      totalUsage -= usage
+    }
+  }
+
   private cleanupIdleSessions() {
     const now = Date.now()
     const keysToRemove: SessionKey[] = []
@@ -431,6 +510,8 @@ export class TranscodingSessionService {
         this.sessions.delete(key)
       }
     }
+
+    void this.evictByDiskUsage()
   }
 
   private destroySession(session: TranscodingSessionEntry) {
