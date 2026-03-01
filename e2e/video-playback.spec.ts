@@ -78,7 +78,23 @@ const navigateToMovieAndPlay = async (page: Page) => {
   const video = page.locator('video').first()
   await expect(video).toBeVisible({ timeout: 15_000 })
 
+  // Wait for video to actually start playing (HLS transcoding takes time)
+  await expect(async () => {
+    const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
+    expect(currentTime).toBeGreaterThan(0)
+  }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
+
   return video
+}
+
+const openSettingsSubmenu = async (page: Page, menuItemText: string) => {
+  const settingsButton = page.locator('media-settings-menu-button').first()
+  await expect(settingsButton).toBeVisible({ timeout: 5_000 })
+  await settingsButton.click()
+
+  const menuItem = page.locator('media-settings-menu-item').filter({ hasText: menuItemText })
+  await expect(menuItem).toBeVisible({ timeout: 5_000 })
+  await menuItem.click()
 }
 
 test.describe('Video Playback @media', () => {
@@ -189,12 +205,7 @@ test.describe('Video Playback @media', () => {
   })
 
   test('Playback smoke: video loads and currentTime advances', async ({ page }) => {
-    const video = await navigateToMovieAndPlay(page)
-
-    await expect(async () => {
-      const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
-      expect(currentTime).toBeGreaterThan(0)
-    }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
+    await navigateToMovieAndPlay(page)
 
     const errorDialog = page.locator('[role="alertdialog"], .error-dialog, shade-noty[data-type="error"]')
     await expect(errorDialog).toHaveCount(0)
@@ -202,57 +213,49 @@ test.describe('Video Playback @media', () => {
 
   test('Subtitle switching: tracks are listed and selectable', async ({ page }) => {
     await navigateToMovieAndPlay(page)
+    await openSettingsSubmenu(page, 'Captions')
 
-    const captionsButton = page.locator('button', { hasText: /caption|subtitle/i }).first()
-    const hasCaptions = await captionsButton.isVisible({ timeout: 5_000 }).catch(() => false)
-    test.skip(!hasCaptions, 'No captions menu available — media-chrome may render differently')
-
-    await captionsButton.click()
-
-    const trackOptions = page.locator('[role="menuitem"], [role="option"], li').filter({ hasText: /.+/ })
-    const optionCount = await trackOptions.count()
+    const captionOptions = page.locator('media-captions-menu media-chrome-menu-item')
+    await expect(captionOptions.first()).toBeVisible({ timeout: 5_000 })
+    const optionCount = await captionOptions.count()
     expect(optionCount).toBeGreaterThan(0)
 
-    await trackOptions.first().click()
+    await captionOptions.first().click()
   })
 
   test('Audio switching: multiple tracks shown, switching resumes playback', async ({ page }) => {
     const video = await navigateToMovieAndPlay(page)
+    await openSettingsSubmenu(page, 'Audio')
 
-    const audioButton = page.locator('button', { hasText: /audio/i }).first()
-    const hasAudio = await audioButton.isVisible({ timeout: 5_000 }).catch(() => false)
-    test.skip(!hasAudio, 'No audio menu available — media-chrome may render differently')
-
-    await audioButton.click()
-
-    const audioOptions = page.locator('[role="menuitem"], [role="option"], li').filter({ hasText: /.+/ })
+    const audioOptions = page.locator('media-audio-track-menu media-chrome-menu-item')
+    await expect(audioOptions.first()).toBeVisible({ timeout: 5_000 })
     const audioCount = await audioOptions.count()
     expect(audioCount).toBeGreaterThanOrEqual(2)
 
     await audioOptions.nth(1).click()
 
-    await page.waitForTimeout(3_000)
-    const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
-    expect(currentTime).toBeGreaterThan(0)
+    // After switching audio tracks the player reloads — wait for playback to resume
+    await expect(async () => {
+      const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
+      expect(currentTime).toBeGreaterThan(0)
+    }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
   })
 
-  test('Quality switching (HLS): changing quality continues playback', async ({ page }) => {
+  test('Quality switching (HLS): quality options are listed and selectable', async ({ page }) => {
     const video = await navigateToMovieAndPlay(page)
+    await openSettingsSubmenu(page, 'Quality')
 
-    const qualityButton = page.locator('button', { hasText: /quality|resolution/i }).first()
-    const hasQuality = await qualityButton.isVisible({ timeout: 5_000 }).catch(() => false)
-    test.skip(!hasQuality, 'No quality menu available — HLS not active or media-chrome renders differently')
-
-    await qualityButton.click()
-
-    const qualityOptions = page.locator('[role="menuitem"], [role="option"], li').filter({ hasText: /.+/ })
+    const qualityOptions = page.locator('media-rendition-menu media-chrome-menu-item')
+    await expect(qualityOptions.first()).toBeVisible({ timeout: 5_000 })
     const qualityCount = await qualityOptions.count()
     expect(qualityCount).toBeGreaterThanOrEqual(2)
 
     await qualityOptions.last().click()
 
-    await page.waitForTimeout(3_000)
-    const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
-    expect(currentTime).toBeGreaterThan(0)
+    // Verify playback continues after quality switch
+    await expect(async () => {
+      const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
+      expect(currentTime).toBeGreaterThan(0)
+    }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
   })
 })
