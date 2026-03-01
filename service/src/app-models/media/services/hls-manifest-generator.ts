@@ -80,7 +80,7 @@ export const generateMasterPlaylist = ({
     }
   }
 
-  return `${lines.join('\n')  }\n`
+  return `${lines.join('\n')}\n`
 }
 
 export const generateMediaPlaylist = ({
@@ -119,7 +119,7 @@ export const generateMediaPlaylist = ({
   }
 
   lines.push('#EXT-X-ENDLIST')
-  return `${lines.join('\n')  }\n`
+  return `${lines.join('\n')}\n`
 }
 
 export const generateSubtitlePlaylist = ({
@@ -139,7 +139,7 @@ export const generateSubtitlePlaylist = ({
     subtitleUrl,
     '#EXT-X-ENDLIST',
   ]
-  return `${lines.join('\n')  }\n`
+  return `${lines.join('\n')}\n`
 }
 
 const getCodecString = (ffprobe: FfprobeData): string => {
