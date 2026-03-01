@@ -1,4 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
+import type Hls from 'hls.js'
 import { environmentOptions } from '../../environment-options.js'
 
 /**
@@ -11,7 +12,9 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
     const videoRef = useRef<HTMLVideoElement>('video')
     const logRef = useRef<HTMLPreElement>('log')
 
-    const hlsUrl = `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(props.driveLetter)}/${encodeURIComponent(props.path)}/master.m3u8`
+    const hlsUrl = `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(props.driveLetter)}/${encodeURIComponent(props.path)}/master.m3u8?mode=transcode`
+
+    let hlsInstance: Hls | null = null
 
     useDisposable('hls-setup', () => {
       const frameId = requestAnimationFrame(() => {
@@ -40,6 +43,7 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
               xhr.withCredentials = true
             },
           })
+          hlsInstance = hls
 
           hls.on(HlsModule.Events.MANIFEST_PARSED, (_e, data) => {
             append(`Manifest parsed: ${data.levels.length} levels`)
@@ -78,7 +82,15 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
           hls.attachMedia(video)
         })
       })
-      return { [Symbol.dispose]: () => cancelAnimationFrame(frameId) }
+      return {
+        [Symbol.dispose]: () => {
+          cancelAnimationFrame(frameId)
+          if (hlsInstance) {
+            hlsInstance.destroy()
+            hlsInstance = null
+          }
+        },
+      }
     })
 
     return (

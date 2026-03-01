@@ -478,6 +478,294 @@ describe('TranscodingSessionService', () => {
     })
   })
 
+  describe('ffmpeg process state transitions', () => {
+    it('should transition to running when stderr contains "Opening"', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          const session = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+          })
+
+          expect(session.state).toBe('starting')
+
+          const stderrHandler = mockProcess._stderrHandlers.data?.[0]
+          stderrHandler?.(Buffer.from('Opening output file for writing'))
+
+          expect(session.state).toBe('running')
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+
+    it('should not transition from running back to running on subsequent stderr', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          const session = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+          })
+
+          const stderrHandler = mockProcess._stderrHandlers.data?.[0]
+          stderrHandler?.(Buffer.from('Opening output file'))
+          expect(session.state).toBe('running')
+
+          stderrHandler?.(Buffer.from('frame=100 fps=25'))
+          expect(session.state).toBe('running')
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+
+    it('should transition to completed when ffmpeg exits with code 0', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          const session = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+          })
+
+          const closeHandler = mockProcess._processHandlers.close?.[0]
+          closeHandler?.(0)
+
+          expect(session.state).toBe('completed')
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+
+    it('should transition to error when ffmpeg exits with non-zero code', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          const session = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+          })
+
+          const closeHandler = mockProcess._processHandlers.close?.[0]
+          closeHandler?.(1)
+
+          expect(session.state).toBe('error')
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+
+    it('should transition to error when ffmpeg emits error event', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          const session = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+          })
+
+          const errorHandler = mockProcess._processHandlers.error?.[0]
+          errorHandler?.(new Error('spawn ENOENT'))
+
+          expect(session.state).toBe('error')
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+  })
+
+  describe('readPlaylist', () => {
+    const testDir = join(tmpdir(), 'pirat-test-readplaylist')
+
+    beforeEach(() => {
+      if (!existsSync(testDir)) mkdirSync(testDir, { recursive: true })
+    })
+
+    afterEach(() => {
+      if (existsSync(testDir)) rmSync(testDir, { recursive: true, force: true })
+    })
+
+    it('should return playlist content when file exists', async () => {
+      vi.useRealTimers()
+      const playlistContent = '#EXTM3U\n#EXT-X-VERSION:7\nsegment0.m4s\n'
+      writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
+
+      const service = new TranscodingSessionService()
+      try {
+        const mockSession = {
+          sessionDir: testDir,
+          state: 'running' as const,
+        } as Parameters<typeof service.readPlaylist>[0]
+
+        const result = await service.readPlaylist(mockSession)
+        expect(result).toBe(playlistContent)
+      } finally {
+        service.dispose()
+      }
+    })
+
+    it('should return null when session errors before playlist is created', async () => {
+      vi.useRealTimers()
+      const service = new TranscodingSessionService()
+      try {
+        const mockSession = {
+          sessionDir: testDir,
+          state: 'error' as const,
+        } as Parameters<typeof service.readPlaylist>[0]
+
+        const result = await service.readPlaylist(mockSession)
+        expect(result).toBeNull()
+      } finally {
+        service.dispose()
+      }
+    })
+  })
+
+  it('should handle removeSession on non-existent session gracefully', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      const service = injector.getInstance(TranscodingSessionService)
+      try {
+        service.removeSession('Z', 'nonexistent.mkv', 'transcode')
+        expect(service.getActiveSessionCount()).toBe(0)
+      } finally {
+        service.dispose()
+      }
+    })
+  })
+
+  it('should handle destroySession when process is already killed', async () => {
+    const mockProcess = createMockProcess()
+    mockProcess.killed = true
+    mockSpawn.mockReturnValue(mockProcess)
+
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        FfprobeService,
+      )
+      injector.setExplicitInstance(
+        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        HwAccelDetector,
+      )
+
+      const service = injector.getInstance(TranscodingSessionService)
+      await service.getOrCreateSession({
+        driveLetter: 'A',
+        path: 'test.mkv',
+        mode: 'transcode',
+      })
+
+      service.dispose()
+
+      expect(mockProcess.kill).not.toHaveBeenCalled()
+      expect(service.getActiveSessionCount()).toBe(0)
+    })
+  })
+
+  it('should update lastAccessedAt when getSession is called', async () => {
+    const mockProcess = createMockProcess()
+    mockSpawn.mockReturnValue(mockProcess)
+
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        FfprobeService,
+      )
+      injector.setExplicitInstance(
+        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        HwAccelDetector,
+      )
+
+      const service = injector.getInstance(TranscodingSessionService)
+      try {
+        const session = await service.getOrCreateSession({
+          driveLetter: 'A',
+          path: 'test.mkv',
+          mode: 'transcode',
+        })
+
+        const initialAccessedAt = session.lastAccessedAt
+
+        await new Promise((resolve) => setTimeout(resolve, 10))
+
+        service.getSession('A', 'test.mkv', 'transcode', 0)
+        expect(session.lastAccessedAt).toBeGreaterThan(initialAccessedAt)
+      } finally {
+        service.dispose()
+      }
+    })
+  })
+
   describe('buildHlsFfmpegArgs via getOrCreateSession', () => {
     it('should use -c:v copy and -c:a copy for remux mode', async () => {
       const mockProcess = createMockProcess()
