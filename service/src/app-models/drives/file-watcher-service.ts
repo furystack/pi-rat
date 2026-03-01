@@ -73,7 +73,7 @@ export class FileWatcherService extends EventHub<{
       delete this.watchers[letter]
       await this.logger.information({ message: `🔍  Stopping File Watcher on volume '${letter}'...` })
     } else {
-      throw new Error(`Watcher for drive '${letter}' does not exist`)
+      await this.logger.warning({ message: `Attempted to remove watcher for drive '${letter}', but no watcher exists` })
     }
   }
 
