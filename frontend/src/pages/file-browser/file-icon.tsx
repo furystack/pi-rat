@@ -1,4 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { Icon, icons } from '@furystack/shades-common-components'
 import type { DirectoryEntry } from 'common'
 
 const movieExtensions = ['mkv', 'mov', 'mp4', 'avi']
@@ -15,22 +16,22 @@ export const FileIcon = Shade<{ entry: DirectoryEntry }>({
 
     if (extension) {
       if (movieExtensions.includes(extension)) {
-        return <>🎬</>
+        return <Icon icon={icons.film} size="small" />
       }
 
       if (musicExtensions.includes(extension)) {
-        return <>🎵</>
+        return <Icon icon={icons.music} size="small" />
       }
 
       if (imageExtensions.includes(extension)) {
-        return <>🖼️</>
+        return <Icon icon={icons.image} size="small" />
       }
 
       if (textDocumentExtensions.includes(extension)) {
-        return <>📄</>
+        return <Icon icon={icons.fileText} size="small" />
       }
     }
 
-    return <>❓</>
+    return <Icon icon={icons.file} size="small" />
   },
 })

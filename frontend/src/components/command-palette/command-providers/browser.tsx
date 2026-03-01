@@ -1,4 +1,6 @@
+import { createComponent } from '@furystack/shades'
 import type { CommandProvider } from '@furystack/shades-common-components'
+import { Icon, icons } from '@furystack/shades-common-components'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 
@@ -7,7 +9,7 @@ export const BrowserCommands: SuggestionOptions[] = [
     name: 'Refresh window',
     description: 'Restarts the whole app by reloading the current window.',
     score: 1,
-    icon: '🔃',
+    icon: <Icon icon={icons.refresh} size="small" />,
     onSelected: () => window.location.reload(),
   },
 ]

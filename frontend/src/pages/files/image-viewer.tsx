@@ -1,4 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
+import { Typography } from '@furystack/shades-common-components'
 import { environmentOptions } from '../../environment-options.js'
 
 export const ImageViewer = Shade<{ letter: string; path: string }>({
@@ -18,9 +19,9 @@ export const ImageViewer = Shade<{ letter: string; path: string }>({
           flexDirection: 'column',
         }}
       >
-        <h1 style={{ paddingLeft: '2em' }}>
+        <Typography variant="h1" style={{ paddingLeft: '2em' }}>
           {letter}:{path}
-        </h1>
+        </Typography>
         <img
           style={{
             maxWidth: '100%',

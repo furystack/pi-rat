@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Loader } from '@furystack/shades-common-components'
+import { Loader, Typography } from '@furystack/shades-common-components'
 
 export const FullScreenLoader = Shade<{ message?: string }>({
   shadowDomName: 'pirat-fullscreen-loader',
@@ -35,7 +35,7 @@ export const FullScreenLoader = Shade<{ message?: string }>({
               height: '128px',
             }}
           />
-          <h2>{message}</h2>
+          <Typography variant="h2">{message}</Typography>
         </div>
       </>
     )

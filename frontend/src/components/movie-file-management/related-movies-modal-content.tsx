@@ -1,7 +1,7 @@
 import type { CacheWithValue } from '@furystack/cache'
 import type { GetCollectionResult } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
-import { Button, CacheView, Skeleton } from '@furystack/shades-common-components'
+import { Button, CacheView, Skeleton, Typography } from '@furystack/shades-common-components'
 import { getFullPath, type DirectoryEntry, type MovieFile } from 'common'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
 import { InstallService } from '../../services/install-service.js'
@@ -29,7 +29,7 @@ const RelatedMoviesContent = Shade<{
     if (linkedFiles.value.count === 0) {
       return (
         <>
-          <p>
+          <Typography variant="body1">
             No related movie is linked to this file
             <>
               {serviceStatus.status === 'loaded' && serviceStatus.value.services.omdb ? (
@@ -53,7 +53,7 @@ const RelatedMoviesContent = Shade<{
                 <Button disabled>OMDB not available</Button>
               )}
             </>
-          </p>
+          </Typography>
         </>
       )
     }

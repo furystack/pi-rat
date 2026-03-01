@@ -1,5 +1,18 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, NotyService, Paper } from '@furystack/shades-common-components'
+import {
+  Button,
+  Chip,
+  cssVariableTheme,
+  Form,
+  Icon,
+  icons,
+  Input,
+  NotyService,
+  PageContainer,
+  PageHeader,
+  Paper,
+  Typography,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import { SessionService } from '../../services/session.js'
 
@@ -26,22 +39,13 @@ export const isPasswordResetPayload = (data: unknown): data is PasswordResetPayl
 const SecuritySection = Shade({
   shadowDomName: 'user-settings-security',
   css: {
-    marginTop: '24px',
-    '& h3': {
-      marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
-    },
-    '& h4': {
-      marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
-    },
     '& .error-message': {
-      color: 'var(--theme-error-main)',
-      fontSize: '14px',
+      color: cssVariableTheme.palette.error.main,
+      fontSize: cssVariableTheme.typography.fontSize.sm,
       marginBottom: '16px',
       padding: '8px',
-      backgroundColor: 'var(--theme-error-light)',
-      borderRadius: '4px',
+      backgroundColor: cssVariableTheme.palette.error.light,
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
     },
   },
   render: ({ injector, useDisposable }) => {
@@ -75,59 +79,63 @@ const SecuritySection = Shade({
     }
 
     return (
-      <>
-        <h3>🔒 Security</h3>
+      <Paper elevation={1} style={{ padding: '24px' }}>
+        <Typography variant="h4" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 16px 0' }}>
+          <Icon icon={icons.lock} size="small" /> Security
+        </Typography>
 
-        <Paper elevation={1} style={{ padding: '24px' }}>
-          <h4>Change Password</h4>
+        <Form<PasswordResetPayload>
+          validate={isPasswordResetPayload}
+          onSubmit={(data) => {
+            void handlePasswordReset(data)
+          }}
+          style={{ maxWidth: '400px' }}
+          data-password-reset-form
+        >
+          <Input
+            labelTitle="Current Password"
+            name="currentPassword"
+            type="password"
+            variant="outlined"
+            placeholder="Enter your current password"
+            required
+            minLength={4}
+            style={{ marginBottom: '16px' }}
+          />
 
-          <Form<PasswordResetPayload>
-            validate={isPasswordResetPayload}
-            onSubmit={(data) => {
-              void handlePasswordReset(data)
-            }}
-            style={{ maxWidth: '400px' }}
-            data-password-reset-form
+          <Input
+            labelTitle="New Password"
+            name="newPassword"
+            type="password"
+            variant="outlined"
+            placeholder="Enter a new password"
+            required
+            style={{ marginBottom: '16px' }}
+          />
+
+          <Input
+            labelTitle="Confirm New Password"
+            name="confirmPassword"
+            type="password"
+            variant="outlined"
+            placeholder="Re-enter the new password"
+            required
+            style={{ marginBottom: '16px' }}
+          />
+
+          {error.getValue() && <div className="error-message">{error.getValue()}</div>}
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={isLoading.getValue()}
+            style={{ marginTop: '8px' }}
           >
-            <Input
-              labelTitle="Current Password"
-              name="currentPassword"
-              type="password"
-              required
-              minLength={4}
-              style={{ marginBottom: '16px' }}
-            />
-
-            <Input
-              labelTitle="New Password"
-              name="newPassword"
-              type="password"
-              required
-              style={{ marginBottom: '16px' }}
-            />
-
-            <Input
-              labelTitle="Confirm New Password"
-              name="confirmPassword"
-              type="password"
-              required
-              style={{ marginBottom: '16px' }}
-            />
-
-            {error.getValue() && <div className="error-message">{error.getValue()}</div>}
-
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={isLoading.getValue()}
-              style={{ marginTop: '8px' }}
-            >
-              {isLoading.getValue() ? 'Updating...' : 'Update Password'}
-            </Button>
-          </Form>
-        </Paper>
-      </>
+            {isLoading.getValue() ? 'Updating...' : 'Update Password'}
+          </Button>
+        </Form>
+      </Paper>
     )
   },
 })
@@ -135,26 +143,30 @@ const SecuritySection = Shade({
 const ProfileSection = Shade({
   shadowDomName: 'user-settings-profile',
   css: {
-    '& h3': {
-      marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
-    },
     '& .field-group': {
       marginBottom: '16px',
     },
+    '& .field-group:last-child': {
+      marginBottom: '0',
+    },
     '& .field-label': {
       display: 'block',
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
       fontWeight: 'bold',
       marginBottom: '4px',
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .field-value': {
       padding: '8px 12px',
-      backgroundColor: 'var(--theme-background-paper)',
-      border: '1px solid var(--theme-border-default)',
-      borderRadius: '4px',
-      color: 'var(--theme-text-primary)',
+      backgroundColor: cssVariableTheme.background.default,
+      border: `1px solid ${cssVariableTheme.action.subtleBorder}`,
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
+      color: cssVariableTheme.text.primary,
+    },
+    '& .roles-list': {
+      display: 'flex',
+      gap: '8px',
+      flexWrap: 'wrap',
     },
   },
   render: ({ injector, useObservable }) => {
@@ -164,46 +176,46 @@ const ProfileSection = Shade({
     if (!currentUser) return null
 
     return (
-      <>
-        <h3>👤 Profile</h3>
+      <Paper elevation={1} style={{ padding: '24px' }}>
+        <Typography variant="h4" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 16px 0' }}>
+          <Icon icon={icons.user} size="small" /> Profile
+        </Typography>
 
-        <Paper elevation={1} style={{ padding: '24px' }}>
-          <div className="field-group">
-            <label className="field-label">Username</label>
-            <div className="field-value">{currentUser.username}</div>
-          </div>
+        <div className="field-group">
+          <label className="field-label">Username</label>
+          <div className="field-value">{currentUser.username}</div>
+        </div>
 
-          <div className="field-group">
-            <label className="field-label">Roles</label>
-            <div className="field-value">{currentUser.roles?.join(', ') || 'No roles assigned'}</div>
+        <div className="field-group">
+          <label className="field-label">Roles</label>
+          <div className="roles-list">
+            {currentUser.roles?.length ? (
+              currentUser.roles.map((role) => (
+                <Chip variant="outlined" size="small">
+                  {role}
+                </Chip>
+              ))
+            ) : (
+              <Typography variant="body2" color="textSecondary">
+                No roles assigned
+              </Typography>
+            )}
           </div>
-        </Paper>
-      </>
+        </div>
+      </Paper>
     )
   },
 })
 
 export const UserSettingsPage = Shade({
   shadowDomName: 'user-settings-page',
-  css: {
-    padding: '48px',
-    maxWidth: '800px',
-    margin: '0 auto',
-    '& h1': {
-      marginBottom: '32px',
-      color: 'var(--theme-text-primary)',
-      borderBottom: '2px solid var(--theme-primary-main)',
-      paddingBottom: '8px',
-    },
-  },
   render: () => {
     return (
-      <>
-        <h1>User Settings</h1>
-
+      <PageContainer gap="24px">
+        <PageHeader icon={<Icon icon={icons.settings} />} title="User Settings" />
         <ProfileSection />
         <SecuritySection />
-      </>
+      </PageContainer>
     )
   },
 })

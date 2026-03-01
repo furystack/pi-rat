@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, ThemeProviderService } from '@furystack/shades-common-components'
+import { Button, Form, TextArea } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
 import { SessionService } from '../../services/session.js'
 import { ChatMessageService } from './chat-messages-service.js'
@@ -19,7 +19,6 @@ export const MessageInput = Shade<{ chat: Chat }>({
   render: ({ injector, props, useRef }) => {
     const chatService = injector.getInstance(ChatMessageService)
     const session = injector.getInstance(SessionService)
-    const theme = injector.getInstance(ThemeProviderService)
     const formRef = useRef<HTMLFormElement>('form')
 
     return (
@@ -42,15 +41,7 @@ export const MessageInput = Shade<{ chat: Chat }>({
           flexDirection: 'row',
         }}
       >
-        <textarea
-          style={{
-            flexGrow: '1',
-            backgroundColor: theme.theme.background.paper,
-            color: theme.theme.text.primary,
-            outline: 'none',
-          }}
-          name="content"
-        />
+        <TextArea name="content" variant="contained" style={{ flexGrow: '1' }} />
         <Button type="submit">Send</Button>
       </Form>
     )

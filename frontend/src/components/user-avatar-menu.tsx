@@ -1,110 +1,82 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Avatar, Button, Paper } from '@furystack/shades-common-components'
+import type { MenuEntry } from '@furystack/shades-common-components'
+import { Avatar, cssVariableTheme, Dropdown, Icon, icons } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
 export const UserAvatarMenu = Shade({
   shadowDomName: 'user-avatar-menu',
   css: {
-    position: 'relative',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: '8px',
-    '& .dropdown-menu': {
-      position: 'absolute',
-      top: '40px',
-      right: '0',
-      zIndex: '1000',
-    },
-    '& .menu-content': {
-      padding: '8px',
-    },
-    '& .menu-username': {
-      padding: '8px 12px',
-      fontSize: '12px',
-      color: 'var(--theme-text-secondary)',
-      borderBottom: '1px solid var(--theme-border-default)',
-      marginBottom: '4px',
-    },
-    '& .menu-button': {
-      width: '100%',
-      justifyContent: 'flex-start',
-      padding: '8px 12px',
-      fontSize: '14px',
-      background: 'transparent',
-      border: 'none',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .menu-overlay': {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100vw',
-      height: '100vh',
-      zIndex: '999',
-    },
     '& .avatar-fallback': {
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
     },
   },
-  render: ({ injector, useObservable, useState }) => {
+  render: ({ injector, useObservable }) => {
     const session = injector.getInstance(SessionService)
     const [currentUser] = useObservable('currentUser', session.currentUser)
-    const [isMenuOpen, setIsMenuOpen] = useState('isMenuOpen', false)
 
     if (!currentUser) return null
 
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
-    const handleAppSettingsClick = () => {
-      navigateToRoute(injector, '/app-settings')
-      setIsMenuOpen(false)
-    }
+    const menuItems: MenuEntry[] = [
+      {
+        type: 'group',
+        key: 'user-group',
+        label: currentUser.username ?? '',
+        children: [
+          ...(isAdmin
+            ? [
+                {
+                  key: 'app-settings',
+                  label: 'Application Settings',
+                  icon: (<Icon icon={icons.wrench} size="small" />) as JSX.Element,
+                },
+              ]
+            : []),
+          {
+            key: 'user-settings',
+            label: 'User Settings',
+            icon: (<Icon icon={icons.user} size="small" />) as JSX.Element,
+          },
+          { type: 'divider' as const },
+          {
+            key: 'logout',
+            label: 'Log Out',
+            icon: (<Icon icon={icons.logOut} size="small" />) as JSX.Element,
+          },
+        ],
+      },
+    ]
 
-    const handleSettingsClick = () => {
-      navigateToRoute(injector, '/user/settings')
-      setIsMenuOpen(false)
-    }
-
-    const handleLogoutClick = () => {
-      void session.logout()
-      setIsMenuOpen(false)
+    const handleSelect = (key: string) => {
+      switch (key) {
+        case 'app-settings':
+          navigateToRoute(injector, '/app-settings')
+          break
+        case 'user-settings':
+          navigateToRoute(injector, '/user/settings')
+          break
+        case 'logout':
+          void session.logout()
+          break
+        default:
+          break
+      }
     }
 
     return (
-      <>
+      <Dropdown items={menuItems} placement="bottomRight" onSelect={handleSelect}>
         <Avatar
           style={{ height: '32px', width: '32px', cursor: 'pointer' }}
           avatarUrl=""
           fallback={<span className="avatar-fallback">{currentUser.username?.charAt(0)?.toUpperCase()}</span>}
-          onclick={() => setIsMenuOpen(!isMenuOpen)}
         />
-
-        {isMenuOpen && (
-          <Paper className="dropdown-menu" onclick={(e) => e.stopPropagation()}>
-            <div className="menu-content">
-              <div className="menu-username">{currentUser.username}</div>
-
-              {isAdmin && (
-                <Button className="menu-button" onclick={handleAppSettingsClick}>
-                  🔧 Application Settings
-                </Button>
-              )}
-
-              <Button className="menu-button" onclick={handleSettingsClick}>
-                👤 User Settings
-              </Button>
-
-              <Button className="menu-button" onclick={handleLogoutClick}>
-                🚪 Log Out
-              </Button>
-            </div>
-          </Paper>
-        )}
-
-        {isMenuOpen && <div className="menu-overlay" onclick={() => setIsMenuOpen(false)} />}
-      </>
+      </Dropdown>
     )
   },
 })

@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { ContextMenu, ContextMenuManager, NotyService } from '@furystack/shades-common-components'
+import { ContextMenu, ContextMenuManager, Icon, icons, NotyService } from '@furystack/shades-common-components'
 import type { ContextMenuItem } from '@furystack/shades-common-components'
 import type { DirectoryEntry } from 'common'
 import { getFallbackMetadata, getFullPath, isMovieFile, isSampleFile } from 'common'
@@ -29,7 +29,7 @@ export const FileContextMenu = Shade<{
     const getItems = (): Array<ContextMenuItem<() => void>> => [
       {
         type: 'item',
-        icon: <span>📂</span>,
+        icon: <Icon icon={icons.folderOpen} size="small" />,
         label: 'Open',
         data: () => open(),
       },
@@ -37,7 +37,7 @@ export const FileContextMenu = Shade<{
         ? [
             {
               type: 'item' as const,
-              icon: <span>🎥</span>,
+              icon: <Icon icon={icons.film} size="small" />,
               label: `Related movie: ${movieMetadata.title} ${
                 movieMetadata.type === 'episode' ? `S${movieMetadata.season}E${movieMetadata.episode}` : ''
               }`,
@@ -45,7 +45,7 @@ export const FileContextMenu = Shade<{
             },
             {
               type: 'item' as const,
-              icon: <span>💬</span>,
+              icon: <Icon icon={icons.messageCircle} size="small" />,
               label: 'Extract Subtitles',
               data: () => {
                 const notyService = injector.getInstance(NotyService)
@@ -81,7 +81,7 @@ export const FileContextMenu = Shade<{
         ? [
             {
               type: 'item' as const,
-              icon: <span>🎬</span>,
+              icon: <Icon icon={icons.film} size="small" />,
               label: 'Scan for movies',
               data: () => {
                 const notyService = injector.getInstance(NotyService)
@@ -118,7 +118,7 @@ export const FileContextMenu = Shade<{
         : []),
       {
         type: 'item',
-        icon: <span>ℹ️</span>,
+        icon: <Icon icon={icons.info} size="small" />,
         label: 'Show file info',
         data: () => setInfoVisible(true),
       },

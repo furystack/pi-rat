@@ -1,5 +1,14 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, Form, Input, Modal, NotyService, Paper } from '@furystack/shades-common-components'
+import {
+  Button,
+  cssVariableTheme,
+  Form,
+  Input,
+  Modal,
+  NotyService,
+  Paper,
+  Typography,
+} from '@furystack/shades-common-components'
 import type { Chat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { SessionService } from '../../services/session.js'
@@ -45,8 +54,8 @@ export const InviteButton = Shade<{ chat: Chat }>({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            background: 'rgba(128,128,128, 0.3)',
-            backdropFilter: 'blur(5px)',
+            background: cssVariableTheme.action.backdrop,
+            backdropFilter: `blur(${cssVariableTheme.effects.blurMd})`,
           }}
           onClose={() => setIsModalOpen(false)}
           isVisible={isModalOpen}
@@ -88,7 +97,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
               }}
               validate={isInvitePayload}
             >
-              <h2>Invite</h2>
+              <Typography variant="h2">Invite</Typography>
               <div>
                 <Input name="userName" labelTitle="Username" placeholder="Enter username to invite" required />
                 <Input

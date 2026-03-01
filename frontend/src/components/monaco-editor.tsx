@@ -1,62 +1,76 @@
-import { Shade, createComponent } from '@furystack/shades'
-import type { Uri } from 'monaco-editor'
+import { createComponent, Shade } from '@furystack/shades'
+import type { editor as editorTypes, Uri } from 'monaco-editor/esm/vs/editor/editor.api.js'
 import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
-import 'monaco-editor/esm/vs/editor/editor.main'
+import 'monaco-editor/esm/vs/editor/editor.main.js'
 
-import { ThemeProviderService, getCssVariable } from '@furystack/shades-common-components'
-import { darkTheme } from '../themes/dark.js'
-import './worker-config'
+import { ThemeProviderService } from '@furystack/shades-common-components'
+import { createMonacoTheme } from './create-monaco-theme.js'
+import './worker-config.js'
 
-export type MonacoEditorProps = {
+const registerShadesTheme = (themeProvider: ThemeProviderService) => {
+  const monacoTheme = createMonacoTheme(themeProvider.getAssignedTheme())
+  editor.defineTheme(monacoTheme.name, monacoTheme.data)
+  return monacoTheme.name
+}
+
+export interface MonacoEditorProps {
   options: editor.IStandaloneEditorConstructionOptions
   value?: string
+  onchange?: (value: string) => void
+  style?: Partial<CSSStyleDeclaration>
   onValueChange?: (value: string) => void
   modelUri?: Uri
 }
-
 export const MonacoEditor = Shade<MonacoEditorProps>({
   shadowDomName: 'monaco-editor',
   css: {
     display: 'block',
-    height: 'calc(100% - 96px)',
+    height: '100%',
     width: '100%',
     position: 'relative',
   },
-  render: ({ props, injector, useState, useDisposable, useRef }) => {
-    const containerRef = useRef<HTMLDivElement>('container')
-    const themeProvider = injector.getInstance(ThemeProviderService)
+  render: ({ props, useDisposable, injector, useHostProps, useRef }) => {
+    const containerRef = useRef<HTMLDivElement>('editorContainer')
 
-    const [theme] = useState<'vs-light' | 'vs-dark'>(
-      'theme',
-      getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'vs-dark' : 'vs-light',
-    )
+    if (props.style) {
+      useHostProps({ style: props.style as Record<string, string> })
+    }
 
-    useDisposable('monacoEditor', () => {
-      let editorInstance: editor.IStandaloneCodeEditor | null = null
-      let model: editor.ITextModel | null = null
+    useDisposable('editor-init', () => {
+      let editorInstance: editorTypes.IStandaloneCodeEditor | undefined
+      let themeSub: Disposable | undefined
 
       queueMicrotask(() => {
-        const container = containerRef.current
-        if (!container) return
+        if (!containerRef.current) return
+        const themeProvider = injector.getInstance(ThemeProviderService)
 
-        editorInstance = editor.create(container, { ...props.options, theme })
+        const themeName = registerShadesTheme(themeProvider)
+
+        editorInstance = editor.create(containerRef.current, {
+          theme: themeName,
+          ...props.options,
+        })
         editorInstance.setValue(props.value || '')
+        editorInstance.onDidChangeModelContent(() => {
+          const value = editorInstance!.getValue()
+          props.onchange?.(value)
+          props.onValueChange?.(value)
+        })
 
-        if (props.onValueChange) {
-          editorInstance.onKeyUp(() => {
-            props.onValueChange?.(editorInstance!.getValue())
-          })
-        }
+        themeSub = themeProvider.subscribe('themeChanged', () => {
+          const updatedName = registerShadesTheme(themeProvider)
+          editor.setTheme(updatedName)
+        })
 
         if (props.modelUri) {
-          model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
+          const model = editor.createModel(editorInstance.getValue(), 'json', props.modelUri)
           editorInstance.setModel(model)
         }
       })
 
       return {
         [Symbol.dispose]: () => {
-          model?.dispose()
+          themeSub?.[Symbol.dispose]()
           editorInstance?.dispose()
         },
       }

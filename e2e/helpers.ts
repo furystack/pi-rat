@@ -44,8 +44,8 @@ export const logout = async (page: Page) => {
   await expect(userAvatar).toBeVisible()
   await userAvatar.click()
 
-  // Wait for dropdown menu and click logout - use getByRole for better accessibility
-  const logoutButton = page.getByRole('button', { name: /log out/i })
+  // Wait for dropdown menu and click logout
+  const logoutButton = page.getByRole('menuitem', { name: /log out/i })
   await expect(logoutButton).toBeVisible()
   await logoutButton.click()
 
@@ -60,7 +60,7 @@ export const navigateToUserSettings = async (page: Page) => {
   await userAvatar.click()
 
   // Click on User Settings option
-  const settingsButton = page.getByRole('button', { name: /user settings/i })
+  const settingsButton = page.getByRole('menuitem', { name: /user settings/i })
   await settingsButton.click()
 
   // Verify we're on the settings page
@@ -75,7 +75,7 @@ export const navigateToAppSettings = async (page: Page) => {
   await userAvatar.click()
 
   // Click on Application Settings option (only visible to admin users)
-  const appSettingsButton = page.getByRole('button', { name: /application settings/i })
+  const appSettingsButton = page.getByRole('menuitem', { name: /application settings/i })
   await expect(appSettingsButton).toBeVisible()
   await appSettingsButton.click()
 

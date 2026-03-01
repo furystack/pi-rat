@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Paper } from '@furystack/shades-common-components'
+import { Paper, Typography } from '@furystack/shades-common-components'
 import { environmentOptions } from '../../environment-options.js'
 
 export const UnknownType = Shade<{ letter: string; path: string }>({
@@ -9,11 +9,11 @@ export const UnknownType = Shade<{ letter: string; path: string }>({
     return (
       <div style={{ padding: '96px' }}>
         <Paper style={{ display: 'block' }}>
-          <h1>Unknown File Type</h1>
-          <p>There is no viewer for this file type</p>
-          <p>Drive: {letter}</p>
-          <p>Path: {path}</p>
-          <p>
+          <Typography variant="h1">Unknown File Type</Typography>
+          <Typography variant="body1">There is no viewer for this file type</Typography>
+          <Typography variant="body1">Drive: {letter}</Typography>
+          <Typography variant="body1">Path: {path}</Typography>
+          <Typography variant="body1">
             You can download the file{' '}
             <a
               href={`${environmentOptions.serviceUrl}/drives/files/${encodeURIComponent(letter)}/${encodeURIComponent(
@@ -23,7 +23,7 @@ export const UnknownType = Shade<{ letter: string; path: string }>({
               here
             </a>
             .
-          </p>
+          </Typography>
         </Paper>
       </div>
     )

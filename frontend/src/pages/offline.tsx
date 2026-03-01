@@ -1,4 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { Typography } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
 
 export const Offline = Shade({
@@ -20,15 +21,15 @@ export const Offline = Shade({
     return (
       <>
         <div id="offline">
-          <h1>WhoOoOops... 😱</h1>
-          <h3>The service seems to be offline 😓</h3>
-          <p>
+          <Typography variant="h1">WhoOoOops... 😱</Typography>
+          <Typography variant="h3">The service seems to be offline 😓</Typography>
+          <Typography variant="body1">
             There was a trouble connecting to the backend service at{' '}
             <a href={environmentOptions.serviceUrl} target="_blank">
               {environmentOptions.serviceUrl}
             </a>
             . It seems to be the service is unaccessible at the moment. You can check the following things:
-          </p>
+          </Typography>
           <ul>
             <li>
               The URL above is correct. You can set in in your 'SERVICE_URL' environment variable before building the

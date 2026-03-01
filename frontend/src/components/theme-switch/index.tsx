@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import type { ButtonProps } from '@furystack/shades-common-components'
-import { getCssVariable } from '@furystack/shades-common-components'
+import { getCssVariable, Icon, icons } from '@furystack/shades-common-components'
 import { Button, ThemeProviderService } from '@furystack/shades-common-components'
 import { darkTheme } from '../../themes/dark.js'
 import { lightTheme } from '../../themes/light.js'
@@ -29,7 +29,7 @@ export const ThemeSwitch = Shade<Omit<ButtonProps, 'onclick'>>({
           themeProvider.setAssignedTheme(theme === 'dark' ? lightTheme : darkTheme)
         }}
       >
-        {theme === 'dark' ? '☀️' : '🌜'}
+        {theme === 'dark' ? <Icon icon={icons.sun} size="small" /> : <Icon icon={icons.moon} size="small" />}
       </Button>
     )
   },

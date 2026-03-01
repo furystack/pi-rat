@@ -1,5 +1,5 @@
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
-import { promisifyAnimation } from '@furystack/shades-common-components'
+import { cssVariableTheme, promisifyAnimation } from '@furystack/shades-common-components'
 
 type MediaOverviewLayoutProps = {
   thumbnailUrl: string
@@ -27,8 +27,8 @@ export const MediaOverviewLayout = Shade<MediaOverviewLayoutProps>({
       padding: '2em',
     },
     '& .poster-image': {
-      boxShadow: '3px 3px 8px rgba(0,0,0,0.3)',
-      borderRadius: '8px',
+      boxShadow: cssVariableTheme.shadows.md,
+      borderRadius: cssVariableTheme.shape.borderRadius.md,
       opacity: '0',
     },
     '& .details-container': {

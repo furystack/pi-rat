@@ -1,6 +1,6 @@
 import { useEntitySync } from '@furystack/entity-sync-client'
 import { createComponent, Shade } from '@furystack/shades'
-import { Paper } from '@furystack/shades-common-components'
+import { Paper, Typography } from '@furystack/shades-common-components'
 import { Chat } from 'common'
 import { FullScreenLoader } from '../../components/fullscreen-loader.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
@@ -45,7 +45,7 @@ export const ChatFlow = Shade({
     if (!selectedChatId) {
       return (
         <Paper className="empty-state">
-          <h2>Select a chat to start</h2>
+          <Typography variant="h2">Select a chat to start</Typography>
         </Paper>
       )
     }
@@ -68,8 +68,8 @@ export const ChatFlow = Shade({
 
     return (
       <Paper className="chat-container">
-        <h2>{chat.name}</h2>
-        <h5>{chat.description}</h5>
+        <Typography variant="h2">{chat.name}</Typography>
+        <Typography variant="h5">{chat.description}</Typography>
         <div className="chat-actions">
           <DeleteChatButton chat={chat} />
           <InviteButton chat={chat} />

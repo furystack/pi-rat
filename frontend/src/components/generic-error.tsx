@@ -1,6 +1,6 @@
 import { ResponseError } from '@furystack/rest-client-fetch'
 import { createComponent, ScreenService, Shade } from '@furystack/shades'
-import { Button, ThemeProviderService } from '@furystack/shades-common-components'
+import { Button, Icon, icons, ThemeProviderService, Typography } from '@furystack/shades-common-components'
 import deadSmiley from '../animations/error-dead-smiley.json' with { type: 'json' }
 import redCross from '../animations/error-red-cross.json' with { type: 'json' }
 import { ErrorReporter } from '../services/error-reporter.js'
@@ -78,8 +78,8 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
               src={Math.random() > 0.5 ? JSON.stringify(redCross) : JSON.stringify(deadSmiley)}
             ></lottie-player>
             <div className="error-message">
-              <h1> {props.mainTitle || 'WhoOoOops... 😱'}</h1>
-              <h3> {props.subtitle || 'Something terrible happened 😓'}</h3>
+              <Typography variant="h1">{props.mainTitle || 'WhoOoOops... 😱'}</Typography>
+              <Typography variant="h3">{props.subtitle || 'Something terrible happened 😓'}</Typography>
 
               {props.description || <ErrorDisplay error={props.error} />}
             </div>
@@ -87,12 +87,18 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
         </div>
         <div className="error-actions">
           <a href="/">
-            <Button>🏡 Go Home</Button>
+            <Button>
+              <Icon icon={icons.home} size="small" /> Go Home
+            </Button>
           </a>
-          {props.retry ? <Button onclick={() => props.retry?.()}>🔄️ Retry</Button> : null}
+          {props.retry ? (
+            <Button onclick={() => props.retry?.()}>
+              <Icon icon={icons.refresh} size="small" /> Retry
+            </Button>
+          ) : null}
           {props.error ? (
             <Button onclick={() => injector.getInstance(ErrorReporter).sendErrorReport(props.error as Error)}>
-              📩 Report error
+              <Icon icon={icons.send} size="small" /> Report error
             </Button>
           ) : null}
         </div>

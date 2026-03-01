@@ -1,6 +1,20 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import {
+  Button,
+  CacheView,
+  cssVariableTheme,
+  Form,
+  Icon,
+  icons,
+  Input,
+  NotyService,
+  PageContainer,
+  PageHeader,
+  Paper,
+  Skeleton,
+  Typography,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Config, OllamaConfig } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
@@ -34,25 +48,25 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   css: {
     '& .page-description': {
       marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .form-field': {
       marginBottom: '24px',
     },
     '& .field-hint': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       display: 'block',
       marginTop: '4px',
     },
     '& .validation-error': {
-      color: 'var(--theme-error-main)',
-      backgroundColor: 'var(--theme-error-light)',
+      color: cssVariableTheme.palette.error.main,
+      backgroundColor: cssVariableTheme.palette.error.light,
       padding: '12px',
       borderRadius: '4px',
       marginBottom: '16px',
     },
     '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
+      borderTop: `1px solid ${cssVariableTheme.background.default}`,
       paddingTop: '16px',
     },
   },
@@ -99,7 +113,9 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
     return (
       <>
-        <p className="page-description">Configure the connection to your Ollama server for AI-powered features.</p>
+        <Typography variant="body1" className="page-description">
+          Configure the connection to your Ollama server for AI-powered features.
+        </Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<OllamaRawFormData>
@@ -146,18 +162,12 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
 export const AiSettingsPage = Shade({
   shadowDomName: 'ai-settings-page',
-  css: {
-    '& .page-title': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-primary)',
-    },
-  },
   render: ({ injector }) => {
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <div>
-        <h2 className="page-title">🤖 Ollama Integration</h2>
+      <PageContainer gap="24px">
+        <PageHeader icon={<Icon icon={icons.wand} />} title="Ollama Integration" />
         <CacheView
           cache={configService.configCache}
           args={['OLLAMA_CONFIG']}
@@ -165,7 +175,7 @@ export const AiSettingsPage = Shade({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

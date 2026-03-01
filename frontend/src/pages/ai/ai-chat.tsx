@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, NotyService, Paper } from '@furystack/shades-common-components'
+import { Button, NotyService, Paper, Typography } from '@furystack/shades-common-components'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { AiChatInput } from './ai-chat-input.js'
 import { AiChatMessageList } from './ai-chat-message-list.js'
@@ -22,7 +22,7 @@ export const AiChat = Shade<{ selectedChatId: string }>({
 
     return (
       <Paper style={{ padding: '16px', flexGrow: '1' }}>
-        <h3>
+        <Typography variant="h3">
           {chat.value?.name}
           <Button
             title="Delete Chat"
@@ -53,7 +53,7 @@ export const AiChat = Shade<{ selectedChatId: string }>({
           >
             🗑️
           </Button>
-        </h3>
+        </Typography>
         <AiChatMessageList selectedChatId={selectedChatId} />
         <AiChatInput selectedChatId={selectedChatId} />
       </Paper>

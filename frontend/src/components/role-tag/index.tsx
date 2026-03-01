@@ -1,4 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
+import { cssVariableTheme } from '@furystack/shades-common-components'
 import type { Roles } from 'common'
 import { getRoleDefinition } from 'common'
 
@@ -27,27 +28,27 @@ export const RoleTag = Shade<RoleTagProps>({
       alignItems: 'center',
       gap: '6px',
       padding: '4px 12px',
-      borderRadius: '16px',
-      fontSize: '13px',
+      borderRadius: cssVariableTheme.shape.borderRadius.md,
+      fontSize: cssVariableTheme.typography.fontSize.sm,
       fontWeight: '500',
       transition: 'all 0.2s ease',
     }
 
     const variantStyles: Record<RoleTagProps['variant'], Partial<CSSStyleDeclaration>> = {
       default: {
-        backgroundColor: 'var(--theme-background-paper)',
-        border: '1px solid var(--theme-border-default)',
-        color: 'var(--theme-text-primary)',
+        backgroundColor: cssVariableTheme.background.paper,
+        border: `1px solid ${cssVariableTheme.action.subtleBorder}`,
+        color: cssVariableTheme.text.primary,
       },
       added: {
-        backgroundColor: 'rgba(76, 175, 80, 0.15)',
-        border: '1px solid var(--theme-success-main, #4caf50)',
-        color: 'var(--theme-success-dark, #2e7d32)',
+        backgroundColor: cssVariableTheme.palette.success.light,
+        border: `1px solid ${cssVariableTheme.palette.success.main}`,
+        color: cssVariableTheme.palette.success.dark,
       },
       removed: {
-        backgroundColor: 'rgba(244, 67, 54, 0.15)',
-        border: '1px solid var(--theme-error-main, #f44336)',
-        color: 'var(--theme-error-dark, #c62828)',
+        backgroundColor: cssVariableTheme.palette.error.light,
+        border: `1px solid ${cssVariableTheme.palette.error.main}`,
+        color: cssVariableTheme.palette.error.dark,
         textDecoration: 'line-through',
       },
     }
@@ -59,7 +60,7 @@ export const RoleTag = Shade<RoleTagProps>({
       padding: '0',
       margin: '0',
       marginLeft: '4px',
-      fontSize: '14px',
+      fontSize: cssVariableTheme.typography.fontSize.sm,
       lineHeight: '1',
     }
 
@@ -78,7 +79,7 @@ export const RoleTag = Shade<RoleTagProps>({
             title="Restore role"
             style={{
               ...buttonBaseStyle,
-              color: 'var(--theme-error-dark, #c62828)',
+              color: cssVariableTheme.palette.error.dark,
             }}
           >
             ↩
@@ -94,7 +95,8 @@ export const RoleTag = Shade<RoleTagProps>({
             title="Remove role"
             style={{
               ...buttonBaseStyle,
-              color: props.variant === 'added' ? 'var(--theme-success-dark, #2e7d32)' : 'var(--theme-text-secondary)',
+              color:
+                props.variant === 'added' ? cssVariableTheme.palette.success.dark : cssVariableTheme.text.secondary,
             }}
           >
             ×

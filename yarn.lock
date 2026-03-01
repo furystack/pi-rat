@@ -835,9 +835,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^13.1.0":
-  version: 13.1.0
-  resolution: "@furystack/shades-common-components@npm:13.1.0"
+"@furystack/shades-common-components@npm:^13.2.0":
+  version: 13.2.0
+  resolution: "@furystack/shades-common-components@npm:13.2.0"
   dependencies:
     "@furystack/cache": "npm:^6.0.0"
     "@furystack/core": "npm:^15.2.2"
@@ -845,7 +845,7 @@ __metadata:
     "@furystack/shades": "npm:^12.2.4"
     "@furystack/utils": "npm:^8.1.10"
     path-to-regexp: "npm:^8.3.0"
-  checksum: 10c0/d04ec670e45e5e3ffff4db8c06ea52fd35726d4f36b89885a8bfa845e50c5de43d1d6a9f6738d42f3bf234395c5f7702558b8217af725bc1aa3a906f985b077d
+  checksum: 10c0/bd97c93ebdfae48c668bba54101d3b73baee95161ab37be16fc870f6f0fbd120bccaa4ffdaf3592817f07ba54871ef1d39ee1d73b942ba9b18a4ed43c37d6fd4
   languageName: node
   linkType: hard
 
@@ -1730,12 +1730,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.3.2":
-  version: 25.3.2
-  resolution: "@types/node@npm:25.3.2"
+"@types/node@npm:^25.3.3":
+  version: 25.3.3
+  resolution: "@types/node@npm:25.3.3"
   dependencies:
     undici-types: "npm:~7.18.0"
-  checksum: 10c0/946c8758668762d3c3b475281b420e580d0ce828c6847534a822b92be791e23e5879b53001ea928e5352dec8908082d854b8076b7bcfc69549e23ad54b1f98ab
+  checksum: 10c0/63e1d3816a9f4a706ab5d588d18cb98aa824b97748ff585537d327528e9438f58f69f45c7762e7cd3a1ab32c1619f551aabe8075d13172f9273cf10f6d83ab91
   languageName: node
   linkType: hard
 
@@ -3521,7 +3521,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^14.0.2":
+"commander@npm:^14.0.2, commander@npm:^14.0.3":
   version: 14.0.3
   resolution: "commander@npm:14.0.3"
   checksum: 10c0/755652564bbf56ff2ff083313912b326450d3f8d8c85f4b71416539c9a05c3c67dbd206821ca72635bf6b160e2afdefcb458e86b317827d5cb333b69ce7f1a24
@@ -3542,7 +3542,7 @@ __metadata:
     "@furystack/core": "npm:^15.2.2"
     "@furystack/entity-sync": "npm:^1.0.3"
     "@furystack/rest": "npm:^8.0.40"
-    "@types/node": "npm:^25.3.2"
+    "@types/node": "npm:^25.3.3"
     ollama: "npm:^0.6.3"
     ts-json-schema-generator: "npm:^2.5.0"
     vitest: "npm:^4.0.18"
@@ -4602,11 +4602,11 @@ __metadata:
     "@furystack/rest": "npm:^8.0.40"
     "@furystack/rest-client-fetch": "npm:^8.0.40"
     "@furystack/shades": "npm:^12.2.4"
-    "@furystack/shades-common-components": "npm:^13.1.0"
+    "@furystack/shades-common-components": "npm:^13.2.0"
     "@furystack/shades-lottie": "npm:^8.0.7"
     "@furystack/utils": "npm:^8.1.10"
     "@types/marked": "npm:^6.0.0"
-    "@types/node": "npm:^25.3.2"
+    "@types/node": "npm:^25.3.3"
     "@xterm/addon-fit": "npm:^0.11.0"
     "@xterm/addon-search": "npm:^0.16.0"
     "@xterm/addon-web-links": "npm:^0.12.0"
@@ -5793,20 +5793,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^16.2.7":
-  version: 16.2.7
-  resolution: "lint-staged@npm:16.2.7"
+"lint-staged@npm:^16.3.0":
+  version: 16.3.0
+  resolution: "lint-staged@npm:16.3.0"
   dependencies:
-    commander: "npm:^14.0.2"
+    commander: "npm:^14.0.3"
     listr2: "npm:^9.0.5"
     micromatch: "npm:^4.0.8"
     nano-spawn: "npm:^2.0.0"
-    pidtree: "npm:^0.6.0"
     string-argv: "npm:^0.3.2"
-    yaml: "npm:^2.8.1"
+    tinyexec: "npm:^1.0.2"
+    yaml: "npm:^2.8.2"
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10c0/9a677c21a8112d823ae5bc565ba2c9e7b803786f2a021c46827a55fe44ed59def96edb24fc99c06a2545cdbbf366022ad82addcb3bf60c712f3b98ef92069717
+  checksum: 10c0/095306a1debc135b2989dd7402aecad03b864c4636546621a39c0d435b45a24beeb93db2a026648ef014ae7946f24900a9f7618ca72a97a071931a329f11a284
   languageName: node
   linkType: hard
 
@@ -6924,7 +6924,7 @@ __metadata:
     "@furystack/yarn-plugin-changelog": "npm:^1.0.5"
     "@playwright/test": "npm:^1.58.2"
     "@types/jsdom": "npm:^28.0.0"
-    "@types/node": "npm:^25.3.2"
+    "@types/node": "npm:^25.3.3"
     "@vitest/coverage-v8": "npm:^4.0.18"
     eslint: "npm:^10.0.2"
     eslint-config-prettier: "npm:^10.1.8"
@@ -6934,7 +6934,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.5.5"
     husky: "npm:^9.1.7"
     jsdom: "npm:^28.1.0"
-    lint-staged: "npm:^16.2.7"
+    lint-staged: "npm:^16.3.0"
     prettier: "npm:^3.8.1"
     rimraf: "npm:^6.1.3"
     typescript: "npm:^5.9.3"
@@ -6962,15 +6962,6 @@ __metadata:
   version: 4.0.3
   resolution: "picomatch@npm:4.0.3"
   checksum: 10c0/9582c951e95eebee5434f59e426cddd228a7b97a0161a375aed4be244bd3fe8e3a31b846808ea14ef2c8a2527a6eeab7b3946a67d5979e81694654f939473ae2
-  languageName: node
-  linkType: hard
-
-"pidtree@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "pidtree@npm:0.6.0"
-  bin:
-    pidtree: bin/pidtree.js
-  checksum: 10c0/0829ec4e9209e230f74ebf4265f5ccc9ebfb488334b525cb13f86ff801dca44b362c41252cd43ae4d7653a10a5c6ab3be39d2c79064d6895e0d78dc50a5ed6e9
   languageName: node
   linkType: hard
 
@@ -7673,7 +7664,7 @@ __metadata:
     "@furystack/websocket-api": "npm:^13.1.14"
     "@types/ffprobe": "npm:^1.1.8"
     "@types/formidable": "npm:^3.4.7"
-    "@types/node": "npm:^25.3.2"
+    "@types/node": "npm:^25.3.3"
     "@types/ping": "npm:^0.4.4"
     chokidar: "npm:^5.0.0"
     common: "workspace:^"
@@ -9178,7 +9169,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.8.1":
+"yaml@npm:^2.8.2":
   version: 2.8.2
   resolution: "yaml@npm:2.8.2"
   bin:

@@ -2,7 +2,7 @@ import type { CacheWithValue } from '@furystack/cache'
 import { isLoadedCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, Skeleton } from '@furystack/shades-common-components'
+import { Button, CacheView, Skeleton, Typography } from '@furystack/shades-common-components'
 import type { Movie } from 'common'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
@@ -100,11 +100,13 @@ const MovieOverviewContent = Shade<{ data: CacheWithValue<Movie> }>({
 
     return (
       <MediaOverviewLayout thumbnailUrl={movie.thumbnailImageUrl || ''} title={movie.title}>
-        <h1>{movie.title}</h1>
-        <p style={{ fontSize: '0.8em' }}>
+        <Typography variant="h1">{movie.title}</Typography>
+        <Typography variant="caption">
           {movie.year?.toString()} &nbsp; {movie.genre}
-        </p>
-        <p style={{ textAlign: 'justify' }}>{movie.plot}</p>
+        </Typography>
+        <Typography variant="body1" align="justify">
+          {movie.plot}
+        </Typography>
         <div>
           <PlayButtons imdbId={movie.imdbId} />
           {currentUser?.roles.includes('movie-admin') ? (

@@ -72,8 +72,7 @@ describe('WizardStep', () => {
       const wizardStep = document.querySelector('wizard-step')
       expect(wizardStep).toBeTruthy()
 
-      const title = wizardStep?.querySelector('h1')
-      expect(title?.textContent).toBe('Test Step')
+      expect(wizardStep?.textContent).toContain('Test Step')
     })
   })
 

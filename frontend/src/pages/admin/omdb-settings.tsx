@@ -1,6 +1,21 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, Form, Input, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import {
+  Button,
+  CacheView,
+  cssVariableTheme,
+  Form,
+  Icon,
+  icons,
+  Input,
+  NotyService,
+  PageContainer,
+  PageHeader,
+  Paper,
+  Skeleton,
+  Switch,
+  Typography,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Config, OmdbConfig } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
@@ -25,7 +40,7 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   css: {
     '& .page-description': {
       marginBottom: '24px',
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .form-field': {
       marginBottom: '24px',
@@ -36,33 +51,18 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
       gap: '8px',
     },
     '& .api-key-hint': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       display: 'block',
       marginTop: '4px',
     },
     '& .api-key-hint a': {
-      color: 'var(--theme-primary-main)',
+      color: cssVariableTheme.palette.primary.main,
     },
-    '& .checkbox-label': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      cursor: 'pointer',
-      color: 'var(--theme-text-primary)',
-    },
-    '& .checkbox-label input': {
-      width: '18px',
-      height: '18px',
-      cursor: 'pointer',
-    },
-    '& .checkbox-title': {
-      fontWeight: '500',
-    },
-    '& .checkbox-description': {
-      color: 'var(--theme-text-secondary)',
+    '& .switch-description': {
+      color: cssVariableTheme.text.secondary,
     },
     '& .form-footer': {
-      borderTop: '1px solid var(--theme-background-default)',
+      borderTop: `1px solid ${cssVariableTheme.background.default}`,
       paddingTop: '16px',
     },
   },
@@ -111,7 +111,9 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
     return (
       <>
-        <p className="page-description">Configure the OMDB API integration for fetching movie and series metadata.</p>
+        <Typography variant="body1" className="page-description">
+          Configure the OMDB API integration for fetching movie and series metadata.
+        </Typography>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Form<OmdbRawFormData> validate={isOmdbRawFormData} onSubmit={(data) => void handleSubmit(data)}>
@@ -131,7 +133,15 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
                   onclick={toggleApiKeyVisibility}
                   style={{ marginBottom: '4px' }}
                 >
-                  {isApiKeyVisible ? '🙈 Hide' : '👁️ Show'}
+                  {isApiKeyVisible ? (
+                    <>
+                      <Icon icon={icons.eyeOff} size="small" /> Hide
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon={icons.eye} size="small" /> Show
+                    </>
+                  )}
                 </Button>
               </div>
               <small className="api-key-hint">
@@ -143,27 +153,33 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
             </div>
 
             <div className="form-field">
-              <label className="checkbox-label">
-                <input type="checkbox" name="trySearchMovieFromTitle" checked={currentValues.trySearchMovieFromTitle} />
-                <div>
-                  <div className="checkbox-title">Auto-search from filename</div>
-                  <small className="checkbox-description">
-                    When a movie or series is added, automatically search for metadata based on the filename
-                  </small>
-                </div>
-              </label>
+              <Switch
+                name="trySearchMovieFromTitle"
+                checked={currentValues.trySearchMovieFromTitle}
+                labelTitle={
+                  <div>
+                    <div>Auto-search from filename</div>
+                    <small className="switch-description">
+                      When a movie or series is added, automatically search for metadata based on the filename
+                    </small>
+                  </div>
+                }
+              />
             </div>
 
             <div className="form-field">
-              <label className="checkbox-label">
-                <input type="checkbox" name="autoDownloadMetadata" checked={currentValues.autoDownloadMetadata} />
-                <div>
-                  <div className="checkbox-title">Auto-download metadata</div>
-                  <small className="checkbox-description">
-                    Automatically download metadata when a new IMDB ID is added
-                  </small>
-                </div>
-              </label>
+              <Switch
+                name="autoDownloadMetadata"
+                checked={currentValues.autoDownloadMetadata}
+                labelTitle={
+                  <div>
+                    <div>Auto-download metadata</div>
+                    <small className="switch-description">
+                      Automatically download metadata when a new IMDB ID is added
+                    </small>
+                  </div>
+                }
+              />
             </div>
 
             <div className="form-footer">
@@ -180,24 +196,12 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
 export const OmdbSettingsPage = Shade({
   shadowDomName: 'omdb-settings-page',
-  css: {
-    '& .page-container': {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '24px',
-      height: '100%',
-    },
-    '& .page-title': {
-      marginBottom: '24px',
-      color: 'var(--theme-text-primary)',
-    },
-  },
   render: ({ injector }) => {
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <div className="page-container">
-        <h2 className="page-title">🎬 OMDB Settings</h2>
+      <PageContainer gap="24px">
+        <PageHeader icon={<Icon icon={icons.film} />} title="OMDB Settings" />
         <CacheView
           cache={configService.configCache}
           args={['OMDB_CONFIG']}
@@ -205,7 +209,7 @@ export const OmdbSettingsPage = Shade({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

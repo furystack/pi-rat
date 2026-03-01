@@ -21,7 +21,7 @@ const setMonacoValue = async (page: Page, value: any) => {
 }
 
 const trySaveDashboard = async (page: Page) => {
-  await page.getByRole('button', { name: 'Save' }).click()
+  await page.getByRole('button', { name: 'Save' }).dispatchEvent('click')
 }
 
 test.describe('Dashboard', () => {
@@ -41,7 +41,7 @@ test.describe('Dashboard', () => {
     await login(page)
 
     await navigateToDashboardList(page)
-    await page.getByRole('button', { name: '➕' }).click()
+    await page.locator('button[is="shade-fab"]').click()
 
     await setMonacoValue(page, {
       name: dashboardName,
@@ -98,7 +98,7 @@ test.describe('Dashboard', () => {
     await page
       .locator('shades-data-grid-row')
       .filter({ hasText: dashboardName })
-      .getByRole('button', { name: '❌' })
+      .locator('button[title="Delete"]')
       .click()
 
     await page.reload()

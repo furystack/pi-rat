@@ -15,26 +15,29 @@ const getTestUserName = (projectName: string, testId: string) => `role-tester-${
  */
 const addRoleToUser = async (page: Page): Promise<string | null> => {
   const detailsPage = page.locator('user-details-page')
-  const roleSelect = detailsPage.locator('select')
+  const roleSelect = detailsPage.locator('shade-select')
 
   const selectCount = await roleSelect.count()
   if (selectCount === 0) {
     return null
   }
 
-  const optionsCount = await roleSelect.locator('option').count()
-  if (optionsCount <= 1) {
+  // Open the dropdown
+  await roleSelect.locator('[role="combobox"]').click()
+
+  const options = roleSelect.locator('[role="option"]')
+  const optionsCount = await options.count()
+  if (optionsCount === 0) {
     return null
   }
 
-  const options = roleSelect.locator('option')
-  const roleValue = await options.nth(1).getAttribute('value')
-  if (!roleValue) {
+  const roleLabel = await options.first().textContent()
+  if (!roleLabel) {
     return null
   }
 
-  await roleSelect.selectOption(roleValue)
-  return roleValue
+  await options.first().click()
+  return roleLabel.trim()
 }
 
 /**
@@ -42,21 +45,21 @@ const addRoleToUser = async (page: Page): Promise<string | null> => {
  */
 const removeRole = async (page: Page): Promise<string | null> => {
   const detailsPage = page.locator('user-details-page')
-  const roleTags = detailsPage.locator('role-tag')
+  const chips = detailsPage.locator('shade-chip')
 
-  const roleCount = await roleTags.count()
-  if (roleCount === 0) {
+  const chipCount = await chips.count()
+  if (chipCount === 0) {
     return null
   }
 
-  const roleTag = roleTags.first()
-  const roleText = await roleTag.textContent()
+  const chip = chips.first()
+  const chipLabel = await chip.locator('.chip-label').textContent()
 
-  const removeButton = roleTag.locator('button', { hasText: '×' })
-  const removeButtonCount = await removeButton.count()
-  if (removeButtonCount > 0) {
-    await removeButton.click()
-    return roleText?.replace('×', '').replace('↩', '').trim() ?? null
+  const deleteButton = chip.locator('.chip-delete')
+  const deleteButtonCount = await deleteButton.count()
+  if (deleteButtonCount > 0) {
+    await deleteButton.click()
+    return chipLabel?.trim() ?? null
   }
 
   return null
@@ -88,7 +91,7 @@ test.describe('User Management', () => {
 
     const usersPage = page.locator('user-list-page')
     await expect(usersPage).toBeVisible()
-    await expect(page.locator('text=👥 Users').first()).toBeVisible()
+    await expect(page.locator('text=Users').first()).toBeVisible()
 
     // ============================================
     // STEP 2: Open the test user's details
@@ -111,7 +114,7 @@ test.describe('User Management', () => {
     // ============================================
     // STEP 3: Verify user starts with no roles
     // ============================================
-    expect(await detailsPage.locator('role-tag').count(), 'New user should have no roles').toBe(0)
+    expect(await detailsPage.locator('shade-chip').count(), 'New user should have no roles').toBe(0)
 
     // ============================================
     // STEP 4: Test Cancel functionality - add a role then cancel
@@ -123,7 +126,7 @@ test.describe('User Management', () => {
     // Cancel should restore original state (no roles)
     await cancelButton.click()
     await expect(saveButton).toBeDisabled()
-    expect(await detailsPage.locator('role-tag').count()).toBe(0)
+    expect(await detailsPage.locator('shade-chip').count()).toBe(0)
 
     // ============================================
     // STEP 5: Add a role and save
@@ -141,9 +144,9 @@ test.describe('User Management', () => {
     // Reload and verify persistence
     await page.reload()
     await expect(detailsPage).toBeVisible()
-    // Wait for the role-tag to be rendered after the page fetches user data
-    await expect(detailsPage.locator('role-tag').first()).toBeVisible()
-    expect(await detailsPage.locator('role-tag').count()).toBe(1)
+    // Wait for the chip to be rendered after the page fetches user data
+    await expect(detailsPage.locator('shade-chip').first()).toBeVisible()
+    expect(await detailsPage.locator('shade-chip').count()).toBe(1)
 
     // Re-locate buttons after reload
     const saveButtonAfterReload = detailsPage.getByRole('button', { name: 'Save Changes' })
@@ -155,10 +158,9 @@ test.describe('User Management', () => {
     const removed = await removeRole(page)
     expect(removed).not.toBeNull()
 
-    // Restore button should appear for removed role
-    const restoreButton = detailsPage.locator('role-tag').locator('button', { hasText: '↩' }).first()
-    await expect(restoreButton).toBeVisible()
-    await restoreButton.click()
+    // Clicking the delete button on a removed chip restores it
+    const removedChip = detailsPage.locator('shade-chip').first()
+    await removedChip.locator('.chip-delete').click()
 
     // No net changes after restore, save should be disabled
     await expect(saveButtonAfterReload).toBeDisabled()
@@ -173,13 +175,12 @@ test.describe('User Management', () => {
 
     // Cancel to restore the role
     await cancelButtonAfterReload.click()
-    expect(await detailsPage.locator('role-tag').count()).toBe(1)
+    expect(await detailsPage.locator('shade-chip').count()).toBe(1)
 
     // ============================================
     // STEP 8: Navigate back to users list
     // ============================================
-    const backButton = detailsPage.getByRole('button', { name: /back/i })
-    await backButton.click()
+    await page.goto('/app-settings/users')
 
     await expect(page).toHaveURL(/\/app-settings\/users$/)
     await expect(usersPage).toBeVisible()

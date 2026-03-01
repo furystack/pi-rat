@@ -1,4 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { Typography } from '@furystack/shades-common-components'
 import type { WidgetGroup as WidgetGroupData } from 'common'
 import { Widget } from './widget.js'
 
@@ -26,7 +27,7 @@ export const WidgetGroup = Shade<WidgetGroupData>({
   render: ({ props }) => {
     return (
       <div className="widget-group-container">
-        <h3>{props.title}</h3>
+        <Typography variant="h3">{props.title}</Typography>
         <div className="widget-list">
           {props.widgets.map((w) => (
             <div className="widget-item">

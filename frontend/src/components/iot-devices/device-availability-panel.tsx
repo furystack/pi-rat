@@ -1,9 +1,8 @@
 import { hasCacheValue } from '@furystack/cache'
 import { Shade, createComponent } from '@furystack/shades'
-import { Loader } from '@furystack/shades-common-components'
+import { cssVariableTheme, Icon, icons, Loader } from '@furystack/shades-common-components'
 import type { Device } from 'common'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
-import { Icon } from '../Icon.js'
 
 export const DeviceAvailabilityPanel = Shade<Device>({
   shadowDomName: 'device-availability-panel',
@@ -32,7 +31,7 @@ export const DeviceAvailabilityPanel = Shade<Device>({
     const [lastPingState] = useObservable('pingState', iotService.findPingHistoryAsObservable(...pingArgs))
 
     if (lastPingState.status === 'failed') {
-      return <Icon type="font" value="⚠️" title="Failed to load ping state" />
+      return <Icon icon={icons.warning} color="warning" title="Failed to load ping state" />
     }
 
     if (!hasCacheValue(lastPingState)) {
@@ -44,40 +43,39 @@ export const DeviceAvailabilityPanel = Shade<Device>({
 
       if (!lastPing) {
         return (
-          <Icon
+          <span
             onclick={(ev) => {
               ev.stopPropagation()
               ev.preventDefault()
               void iotService.pingDevice(props)
             }}
-            type="font"
-            value="❓"
             title="No ping found, status unknown. Will refresh soon"
             style={{
               cursor: 'pointer',
               opacity: lastPingState.status === 'obsolete' ? '0.5' : '1',
             }}
-          />
+          >
+            <Icon icon={icons.info} />
+          </span>
         )
       }
 
       if (lastPing.isAvailable) {
         return (
-          <Icon
-            type="font"
-            value="🟢"
+          <span
             title="Device is available"
             style={{
               cursor: 'pointer',
               opacity: lastPingState.status === 'obsolete' ? '0.5' : '1',
+              color: cssVariableTheme.palette.success.main,
             }}
-          />
+          >
+            <Icon icon={icons.circleDot} />
+          </span>
         )
       } else {
         return (
-          <Icon
-            type="font"
-            value="🔴"
+          <span
             title="Device is not available. Click here to wake it up"
             onclick={(ev) => {
               ev.preventDefault()
@@ -87,7 +85,13 @@ export const DeviceAvailabilityPanel = Shade<Device>({
                 .then(() => iotService.pingDevice(props))
                 .then(() => iotService.findPingHistory(...pingArgs))
             }}
-          />
+            style={{
+              cursor: 'pointer',
+              color: cssVariableTheme.palette.error.main,
+            }}
+          >
+            <Icon icon={icons.circleDot} />
+          </span>
         )
       }
     }

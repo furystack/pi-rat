@@ -1,11 +1,23 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
-import { Button, CacheView, NotyService, Paper, Skeleton } from '@furystack/shades-common-components'
+import {
+  Button,
+  CacheView,
+  Chip,
+  cssVariableTheme,
+  Icon,
+  icons,
+  NotyService,
+  PageContainer,
+  PageHeader,
+  Paper,
+  Select,
+  Skeleton,
+  Typography,
+} from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import type { Roles, User } from 'common'
-import { getAllRoleDefinitions } from 'common'
-import { navigateToRoute } from '../../navigate-to-route.js'
-import { RoleTag } from '../../components/role-tag/index.js'
+import { getAllRoleDefinitions, getRoleDefinition } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { UsersService } from '../../services/users-service.js'
 
@@ -20,7 +32,7 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     '& .section-title': {
       marginTop: '0',
       marginBottom: '16px',
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& .info-grid': {
       display: 'grid',
@@ -29,11 +41,11 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       alignItems: 'center',
     },
     '& .info-label': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       fontWeight: '500',
     },
     '& .info-value': {
-      color: 'var(--theme-text-primary)',
+      color: cssVariableTheme.text.primary,
     },
     '& .roles-container': {
       marginBottom: '16px',
@@ -45,32 +57,15 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       minHeight: '32px',
     },
     '& .no-roles': {
-      color: 'var(--theme-text-secondary)',
+      color: cssVariableTheme.text.secondary,
       fontStyle: 'italic',
     },
     '& .add-role-container': {
       marginBottom: '16px',
     },
-    '& .add-role-label': {
-      display: 'block',
-      marginBottom: '8px',
-      color: 'var(--theme-text-secondary)',
-      fontWeight: '500',
-      fontSize: '14px',
-    },
-    '& .add-role-select': {
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '4px',
-      border: '1px solid var(--theme-border-default)',
-      backgroundColor: 'var(--theme-background-paper)',
-      color: 'var(--theme-text-primary)',
-      cursor: 'pointer',
-      minWidth: '200px',
-    },
     '& .validation-error': {
-      color: 'var(--theme-error-main)',
-      backgroundColor: 'rgba(244, 67, 54, 0.1)',
+      color: cssVariableTheme.palette.error.main,
+      backgroundColor: cssVariableTheme.palette.error.light,
       padding: '12px',
       borderRadius: '4px',
       marginBottom: '16px',
@@ -79,7 +74,7 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     '& .button-row': {
       display: 'flex',
       gap: '12px',
-      borderTop: '1px solid var(--theme-border-default)',
+      borderTop: `1px solid ${cssVariableTheme.action.subtleBorder}`,
       paddingTop: '16px',
     },
   },
@@ -214,7 +209,9 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     return (
       <>
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <h3 className="section-title">User Information</h3>
+          <Typography variant="h3" className="section-title">
+            User Information
+          </Typography>
 
           <div className="info-grid">
             <span className="info-label">Username:</span>
@@ -229,20 +226,29 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
         </Paper>
 
         <Paper elevation={1} style={{ padding: '24px' }}>
-          <h3 className="section-title">Roles</h3>
+          <Typography variant="h3" className="section-title">
+            Roles
+          </Typography>
 
           <div className="roles-container">
             <div className="roles-list">
               {rolesToDisplay.length > 0 ? (
                 rolesToDisplay.map((roleName) => {
                   const variant = getRoleVariant(roleName)
+                  const role = getRoleDefinition(roleName)
+                  const chipColor = variant === 'added' ? 'success' : variant === 'removed' ? 'error' : undefined
+                  const onDelete = variant === 'removed' ? () => restoreRole(roleName) : () => removeRole(roleName)
+
                   return (
-                    <RoleTag
-                      roleName={roleName}
-                      variant={variant}
-                      onRemove={variant !== 'removed' ? () => removeRole(roleName) : undefined}
-                      onRestore={variant === 'removed' ? () => restoreRole(roleName) : undefined}
-                    />
+                    <Chip
+                      variant="outlined"
+                      color={chipColor}
+                      onDelete={onDelete}
+                      title={role.description}
+                      style={variant === 'removed' ? { textDecoration: 'line-through' } : undefined}
+                    >
+                      {role.displayName}
+                    </Chip>
                   )
                 })
               ) : (
@@ -253,23 +259,20 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
 
           {availableRolesToAdd.length > 0 && (
             <div className="add-role-container">
-              <label className="add-role-label">Add Role:</label>
-              <select
-                className="add-role-select"
+              <Select
+                labelTitle="Add Role"
+                placeholder="Select a role to add..."
+                options={availableRolesToAdd.map((role) => ({ value: role.name, label: role.displayName }))}
                 value={selectedRole}
-                onchange={(e) => {
-                  const roleName = (e.target as HTMLSelectElement).value as Roles[number]
+                onValueChange={(value) => {
+                  const roleName = value as Roles[number]
                   if (roleName) {
                     addRole(roleName)
                     setSelectedRole('')
                   }
                 }}
-              >
-                <option value="">Select a role to add...</option>
-                {availableRolesToAdd.map((role) => (
-                  <option value={role.name}>{role.displayName}</option>
-                ))}
-              </select>
+                style={{ minWidth: '200px' }}
+              />
             </div>
           )}
 
@@ -300,38 +303,12 @@ type UserDetailsPageProps = {
 
 export const UserDetailsPage = Shade<UserDetailsPageProps>({
   shadowDomName: 'user-details-page',
-  css: {
-    '& .page-container': {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '24px',
-      height: '100%',
-    },
-    '& .page-header': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '16px',
-    },
-    '& .page-header h2': {
-      margin: '0',
-      color: 'var(--theme-text-primary)',
-    },
-  },
   render: ({ props, injector }) => {
     const usersService = injector.getInstance(UsersService)
 
-    const navigateBack = () => {
-      navigateToRoute(injector, '/app-settings/users')
-    }
-
     return (
-      <div className="page-container">
-        <div className="page-header">
-          <Button variant="outlined" onclick={navigateBack}>
-            ← Back
-          </Button>
-          <h2>User Details</h2>
-        </div>
+      <PageContainer gap="24px">
+        <PageHeader icon={<Icon icon={icons.user} />} title="User Details" />
         <CacheView
           cache={usersService.userCache}
           args={[props.username]}
@@ -339,7 +316,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
           loader={<Skeleton />}
           error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
         />
-      </div>
+      </PageContainer>
     )
   },
 })

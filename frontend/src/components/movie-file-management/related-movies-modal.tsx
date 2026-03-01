@@ -1,5 +1,13 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button, Modal, Paper, fadeIn, fadeOut } from '@furystack/shades-common-components'
+import {
+  Button,
+  cssVariableTheme,
+  Modal,
+  Paper,
+  Typography,
+  fadeIn,
+  fadeOut,
+} from '@furystack/shades-common-components'
 import type { DirectoryEntry } from 'common'
 import { getFallbackMetadata } from 'common'
 import { FileIcon } from '../../pages/file-browser/file-icon.js'
@@ -36,7 +44,7 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
     '& .file-path': {
       padding: '0.5em 0.5em 0 0.7em',
       fontSize: '0.85em',
-      color: 'rgba(128,128,128,0.8)',
+      color: cssVariableTheme.text.secondary,
     },
     '& .button-row': {
       display: 'flex',
@@ -52,8 +60,8 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
       <Modal
         isVisible={isOpened}
         backdropStyle={{
-          background: 'rgba(128,128,128, 0.3)',
-          backdropFilter: 'blur(5px)',
+          background: cssVariableTheme.action.backdrop,
+          backdropFilter: `blur(${cssVariableTheme.effects.blurMd})`,
           zIndex: '2',
         }}
         onClose={onClose}
@@ -63,10 +71,10 @@ export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
         <div className="modal-center" onclick={(ev) => ev.stopPropagation()} ondblclick={(ev) => ev.stopPropagation()}>
           <Paper className="modal-content">
             <div>
-              <h3 className="modal-title">
+              <Typography variant="h3" className="modal-title">
                 <FileIcon entry={file} /> &nbsp;{fallbackMeta.title}
                 {fallbackMeta.year && ` (${fallbackMeta.year})`}
-              </h3>
+              </Typography>
               <div className="file-path">{`${path === '/' ? '' : path}/${file.name}`}</div>
             </div>
 

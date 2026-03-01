@@ -52,7 +52,7 @@ export const GenericMonacoEditor: <T, TKey extends keyof T, TReadonlyProperties 
           style={{
             position: 'fixed',
             bottom: '1em',
-            right: '1em',
+            right: '5em',
             display: 'flex',
             justifyContent: 'flex-end',
           }}

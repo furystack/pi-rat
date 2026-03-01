@@ -1,7 +1,7 @@
 import type { CacheWithValue } from '@furystack/cache'
 import type { GetCollectionResult } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
-import { CacheView, Skeleton } from '@furystack/shades-common-components'
+import { CacheView, Select, Skeleton } from '@furystack/shades-common-components'
 import type { Drive } from 'common'
 import { DrivesService } from '../../services/drives-service.js'
 import { ErrorDisplay } from '../../components/error-display.js'
@@ -20,10 +20,10 @@ const DriveSelectorContent = Shade<{
     } as DriveLocation)
 
     return (
-      <select
-        onchange={(ev) => {
-          const { value } = ev.target as HTMLOptionElement
-
+      <Select
+        options={props.data.value.entries.map((r) => ({ value: r.letter, label: r.letter }))}
+        value={currentDrive.letter}
+        onValueChange={(value) => {
           if (currentDrive.letter !== value && props.data.value.entries.find((e) => e.letter === value)) {
             setCurrentDrive({
               letter: value,
@@ -31,13 +31,7 @@ const DriveSelectorContent = Shade<{
             })
           }
         }}
-      >
-        {props.data.value.entries.map((r) => (
-          <option value={r.letter} selected={currentDrive.letter === r.letter}>
-            {r.letter}
-          </option>
-        ))}
-      </select>
+      />
     )
   },
 })

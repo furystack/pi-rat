@@ -1,5 +1,7 @@
 import { getCurrentUser } from '@furystack/core'
+import { createComponent } from '@furystack/shades'
 import type { CommandProvider } from '@furystack/shades-common-components'
+import { Icon, icons } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../../../navigate-to-route.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
@@ -8,7 +10,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'Config entities',
     description: 'List, edit and create config entities',
-    icon: '⚙️',
+    icon: <Icon icon={icons.settings} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/config')
@@ -17,7 +19,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'Dashboard entities',
     description: 'List, edit and create dashboard entities',
-    icon: '📔',
+    icon: <Icon icon={icons.layers} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/dashboards')
@@ -35,7 +37,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'User entities',
     description: 'List, edit and create user entities',
-    icon: '👤',
+    icon: <Icon icon={icons.user} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/users')
@@ -44,7 +46,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'Movie entities',
     description: 'List, edit and create movie entities',
-    icon: '🎥',
+    icon: <Icon icon={icons.film} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/movies')
@@ -53,7 +55,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'Movie File entities',
     description: 'List, edit and create movie file entities',
-    icon: '🎞️',
+    icon: <Icon icon={icons.file} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/movie-files')
@@ -62,7 +64,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'OMDB Movie Metadata entities',
     description: 'List, edit and create OMDB Movie Metadata entities',
-    icon: '🌐',
+    icon: <Icon icon={icons.globe} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/omdb-movie-metadata')
@@ -71,7 +73,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'OMDB Series metadata entities',
     description: 'List, edit and create OMDB Series metadata entities',
-    icon: '🌐',
+    icon: <Icon icon={icons.globe} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/omdb-series-metadata')
@@ -89,7 +91,7 @@ const EntitySuggestions: SuggestionOptions[] = [
   {
     name: 'Log entries',
     description: 'View the log entries',
-    icon: '📝',
+    icon: <Icon icon={icons.fileText} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
       navigateToRoute(injector, '/entities/logging')

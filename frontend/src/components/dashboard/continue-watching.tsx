@@ -1,4 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
+import { Typography } from '@furystack/shades-common-components'
 import type { ContinueWatchingWidgetGroup as ContinueWatchingWidgetGroupProps } from 'common'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
@@ -73,7 +74,7 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
           return (
             <div className="continue-watching-container">
               <div className="continue-watching-content">
-                <h3>Continue watching</h3>
+                <Typography variant="h3">Continue watching</Typography>
                 <div className="continue-watching-list">
                   {watchEntries.entries.map((entry, index) => (
                     <div className="continue-watching-item">

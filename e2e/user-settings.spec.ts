@@ -13,15 +13,15 @@ test.describe('User Settings', () => {
     // ============================================
     // STEP 2: Verify page structure and heading
     // ============================================
-    const settingsHeading = page.locator('h1', { hasText: 'User Settings' })
+    const settingsHeading = page.locator('h4', { hasText: 'User Settings' })
     await expect(settingsHeading).toBeVisible()
 
     // Verify Profile section is visible
-    const profileSection = page.locator('h3', { hasText: 'Profile' })
+    const profileSection = page.locator('h4', { hasText: 'Profile' })
     await expect(profileSection).toBeVisible()
 
     // Verify Security section is visible
-    const securitySection = page.locator('h3', { hasText: 'Security' })
+    const securitySection = page.locator('h4', { hasText: 'Security' })
     await expect(securitySection).toBeVisible()
 
     // ============================================

@@ -1,7 +1,7 @@
 import type { ChildrenList } from '@furystack/shades'
 import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
-import { Button, DataGrid, Fab, NotyService, SelectionCell } from '@furystack/shades-common-components'
+import { Button, DataGrid, Fab, Icon, icons, NotyService, SelectionCell } from '@furystack/shades-common-components'
 import type { Uri } from 'monaco-editor'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import type { GenericEditorService } from './generic-editor-service.js'
@@ -133,9 +133,10 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
               refresh()
             }}
           >
-            ✏️
+            <Icon icon={icons.edit} size="small" />
           </Button>
           <Button
+            title="Delete"
             onclick={() => {
               service
                 .removeEntries(entry[service.extendedOptions.keyProperty])
@@ -156,7 +157,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 })
             }}
           >
-            ❌
+            <Icon icon={icons.trash} size="small" />
           </Button>
         </div>
       ),
@@ -183,7 +184,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
             setEditorState({ mode: 'create' })
           }}
         >
-          ➕
+          <Icon icon={icons.plus} />
         </Fab>
       </>
     )

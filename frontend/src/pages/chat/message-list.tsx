@@ -1,6 +1,6 @@
 import { useCollectionSync } from '@furystack/entity-sync-client'
 import { createComponent, Shade, styledElement } from '@furystack/shades'
-import { Skeleton } from '@furystack/shades-common-components'
+import { cssVariableTheme, Skeleton } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
 import { ChatMessage } from 'common'
 import { marked } from 'marked'
@@ -8,7 +8,7 @@ import { GenericErrorPage } from '../../components/generic-error.js'
 import { DeleteChatMessage } from './delete-chat-message.js'
 
 const ChatLine = styledElement('div', {
-  fontSize: '12px',
+  fontSize: cssVariableTheme.typography.fontSize.xs,
   display: 'flex',
   flexDirection: 'row',
   gap: '4px',
@@ -30,13 +30,13 @@ const ChatLineAvatar = styledElement('div', {
   width: '32px',
   height: '32px',
   borderRadius: '50%',
-  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  backgroundColor: cssVariableTheme.action.hoverBackground,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: '16px',
+  fontSize: cssVariableTheme.typography.fontSize.lg,
   fontWeight: 'bold',
-  color: 'rgba(0, 0, 0, 0.7)',
+  color: cssVariableTheme.text.secondary,
   marginRight: '8px',
   flexShrink: '0',
 })
