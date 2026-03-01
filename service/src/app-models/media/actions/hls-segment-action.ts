@@ -99,8 +99,6 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
     chunks.push(chunk)
   })
 
-  ffmpegProcess.stdout.pipe(response)
-
   ffmpegProcess.stderr.on('data', (data: Buffer) => {
     void logger.verbose({ message: `ffmpeg stderr: ${data.toString()}` })
   })
@@ -114,9 +112,24 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
     void logger.verbose({ message: `ffmpeg process exited with code ${code}` })
     if (code === 0 && chunks.length > 0) {
       const fullBuffer = Buffer.concat(chunks)
-      void segmentCache.put(letter, path, segmentIndex, mode, fullBuffer, resolution)
+
+      // Strip ftyp+moov boxes — HLS media segments should only contain moof+mdat.
+      // The init segment (ftyp+moov) is served separately via #EXT-X-MAP.
+      let mediaStart = 0
+      while (mediaStart + 8 <= fullBuffer.length) {
+        const boxSize = fullBuffer.readUInt32BE(mediaStart)
+        const boxType = fullBuffer.toString('ascii', mediaStart + 4, mediaStart + 8)
+        if (boxType === 'moof' || boxType === 'mdat' || boxType === 'styp') break
+        if (boxSize < 8) break
+        mediaStart += boxSize
+      }
+
+      const mediaData = mediaStart > 0 ? fullBuffer.subarray(mediaStart) : fullBuffer
+      void segmentCache.put(letter, path, segmentIndex, mode, mediaData, resolution)
+      response.end(mediaData)
+    } else {
+      response.end()
     }
-    response.end()
   })
 
   return BypassResult()

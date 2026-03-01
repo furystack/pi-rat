@@ -18,6 +18,7 @@ import { getPort } from '../../get-port.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
 import { GetSubtitleFileAction } from './actions/get-subtitle-file-action.js'
 import { GetSubtitlesAction } from './actions/get-subtitles-action.js'
+import { HlsInitAction } from './actions/hls-init-action.js'
 import { HlsMasterAction } from './actions/hls-master-action.js'
 import { HlsSegmentAction } from './actions/hls-segment-action.js'
 import { HlsStreamAction } from './actions/hls-stream-action.js'
@@ -89,6 +90,9 @@ export const setupMediaRestApi = async (injector: Injector) => {
         ),
         '/files/:letter/:path/stream.m3u8': Authorize()(
           Validate({ schema: mediaApiSchema, schemaName: 'HlsStreamEndpoint' })(HlsStreamAction),
+        ),
+        '/files/:letter/:path/init.mp4': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsInitEndpoint' })(HlsInitAction),
         ),
         '/files/:letter/:path/segment/:index': Authorize()(
           Validate({ schema: mediaApiSchema, schemaName: 'HlsSegmentEndpoint' })(HlsSegmentAction),

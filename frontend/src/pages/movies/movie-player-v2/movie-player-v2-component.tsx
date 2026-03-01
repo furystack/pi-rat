@@ -205,7 +205,6 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               const { currentTime } = ev.currentTarget as HTMLVideoElement
               mediaService.progress.setValue(currentTime || 0)
             }}
-            currentTime={watchProgress?.watchedSeconds || 0}
           >
             {...subtitleElements}
             {getChaptersTrack(props.ffprobe)}

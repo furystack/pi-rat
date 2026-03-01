@@ -47,7 +47,7 @@ describe('generateMasterPlaylist', () => {
     expect(playlist).toContain('#EXT-X-STREAM-INF:')
   })
 
-  it('should include audio renditions for multiple audio tracks', () => {
+  it('should not include HLS audio renditions (audio switching is app-level)', () => {
     const playlist = generateMasterPlaylist({
       ffprobe: createFfprobe(),
       file: { driveLetter: 'A', path: 'movies/test.mkv' },
@@ -57,13 +57,8 @@ describe('generateMasterPlaylist', () => {
       subtitleTracks: [],
     })
 
-    expect(playlist).toContain('TYPE=AUDIO')
-    expect(playlist).toContain('NAME="English"')
-    expect(playlist).toContain('NAME="French"')
-    expect(playlist).toContain('LANGUAGE="eng"')
-    expect(playlist).toContain('LANGUAGE="fra"')
-    expect(playlist).toContain('stream.m3u8?')
-    expect(playlist).not.toContain('/audio/')
+    expect(playlist).not.toContain('TYPE=AUDIO')
+    expect(playlist).not.toContain('AUDIO="audio"')
   })
 
   it('should include subtitle entries but exclude burn-in tracks', () => {

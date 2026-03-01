@@ -21,7 +21,6 @@ export const generateMasterPlaylist = ({
   file,
   mode,
   baseUrl,
-  audioTracks,
   subtitleTracks,
 }: {
   ffprobe: FfprobeData
@@ -44,14 +43,10 @@ export const generateMasterPlaylist = ({
     )
   }
 
-  for (let i = 0; i < audioTracks.length; i++) {
-    const track = audioTracks[i]
-    const isDefault = track.isDefault || i === 0 ? 'YES' : 'NO'
-    const audioQuery = serializeToQueryString({ mode, audioTrack: track.index })
-    lines.push(
-      `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="${track.label}",LANGUAGE="${track.language}",DEFAULT=${isDefault},AUTOSELECT=${isDefault},URI="${streamBase}/stream.m3u8?${audioQuery}"`,
-    )
-  }
+  // Audio renditions are NOT emitted as separate HLS alternate renditions because
+  // segments contain both video+audio (not audio-only). Audio switching is handled
+  // at the application level via MoviePlayerService.switchAudioTrack() which reloads
+  // the entire stream with a different audioTrack parameter.
 
   const videoStream = ffprobe.streams.find((s) => s.codec_type === 'video')
   const sourceHeight = videoStream?.height || 1080
@@ -60,9 +55,8 @@ export const generateMasterPlaylist = ({
 
   if (mode === 'remux' || mode === 'direct-play' || mode === 'direct-stream') {
     const subtitleGroup = subtitleTracks.filter((t) => !t.requiresBurnIn).length > 0 ? ',SUBTITLES="subs"' : ''
-    const audioGroup = audioTracks.length > 1 ? ',AUDIO="audio"' : ''
     lines.push(
-      `#EXT-X-STREAM-INF:BANDWIDTH=${sourceBitrate},RESOLUTION=${sourceWidth}x${sourceHeight},CODECS="${getCodecString(ffprobe)}"${audioGroup}${subtitleGroup}`,
+      `#EXT-X-STREAM-INF:BANDWIDTH=${sourceBitrate},RESOLUTION=${sourceWidth}x${sourceHeight},CODECS="${getCodecString(ffprobe)}"${subtitleGroup}`,
       `${streamBase}/stream.m3u8?${serializeToQueryString({ mode })}`,
     )
   } else {
@@ -72,11 +66,10 @@ export const generateMasterPlaylist = ({
     }
 
     const subtitleGroup = subtitleTracks.filter((t) => !t.requiresBurnIn).length > 0 ? ',SUBTITLES="subs"' : ''
-    const audioGroup = audioTracks.length > 1 ? ',AUDIO="audio"' : ''
 
     for (const variant of applicableVariants) {
       lines.push(
-        `#EXT-X-STREAM-INF:BANDWIDTH=${variant.bandwidth},RESOLUTION=${variant.resolution},CODECS="avc1.42E01E,mp4a.40.2"${audioGroup}${subtitleGroup}`,
+        `#EXT-X-STREAM-INF:BANDWIDTH=${variant.bandwidth},RESOLUTION=${variant.resolution},CODECS="avc1.42E01E,mp4a.40.2"${subtitleGroup}`,
         `${streamBase}/stream.m3u8?${serializeToQueryString({ mode: 'transcode' as PlaybackMode, resolution: `${variant.height}p` })}`,
       )
     }
@@ -101,12 +94,19 @@ export const generateMediaPlaylist = ({
   audioTrack?: number
 }): string => {
   const segmentCount = Math.ceil(duration / segmentDuration)
+
+  const initQuery = serializeToQueryString({
+    mode,
+    ...(audioTrack !== undefined ? { audioTrack } : {}),
+  })
+
   const lines: string[] = [
     '#EXTM3U',
     '#EXT-X-VERSION:7',
     `#EXT-X-TARGETDURATION:${segmentDuration}`,
     '#EXT-X-MEDIA-SEQUENCE:0',
     '#EXT-X-PLAYLIST-TYPE:VOD',
+    `#EXT-X-MAP:URI="${baseUrl}/init.mp4?${initQuery}"`,
   ]
 
   for (let i = 0; i < segmentCount; i++) {

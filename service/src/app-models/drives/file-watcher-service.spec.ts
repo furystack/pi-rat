@@ -63,10 +63,12 @@ describe('FileWatcherService', () => {
     await usingAsync(new Injector(), async (injector) => {
       const service = injector.getInstance(FileWatcherService)
 
-      const {addWatcher} = (service as unknown as { addWatcher: (drive: { letter: string; physicalPath: string }) => Promise<void> })
+      const { addWatcher } = service as unknown as {
+        addWatcher: (drive: { letter: string; physicalPath: string }) => Promise<void>
+      }
       await addWatcher.call(service, { letter: 'T', physicalPath: '/tmp/test' })
 
-      const {removeWatcher} = (service as unknown as { removeWatcher: (letter: string) => Promise<void> })
+      const { removeWatcher } = service as unknown as { removeWatcher: (letter: string) => Promise<void> }
       await removeWatcher.call(service, 'T')
 
       expect(mockLogger.information).toHaveBeenCalledWith(
@@ -81,7 +83,9 @@ describe('FileWatcherService', () => {
     await usingAsync(new Injector(), async (injector) => {
       const service = injector.getInstance(FileWatcherService)
 
-      const {addWatcher} = (service as unknown as { addWatcher: (drive: { letter: string; physicalPath: string }) => Promise<void> })
+      const { addWatcher } = service as unknown as {
+        addWatcher: (drive: { letter: string; physicalPath: string }) => Promise<void>
+      }
       await addWatcher.call(service, { letter: 'X', physicalPath: '/tmp/test' })
 
       await expect(addWatcher.call(service, { letter: 'X', physicalPath: '/tmp/test' })).rejects.toThrow(

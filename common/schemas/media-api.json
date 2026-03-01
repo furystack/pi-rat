@@ -6439,6 +6439,39 @@
       "required": ["url", "result"],
       "additionalProperties": false
     },
+    "HlsInitEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "audioTrack": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
     "HlsMasterEndpoint": {
       "type": "object",
       "properties": {
@@ -6634,6 +6667,9 @@
             "/files/:letter/:path/stream.m3u8": {
               "$ref": "#/definitions/HlsStreamEndpoint"
             },
+            "/files/:letter/:path/init.mp4": {
+              "$ref": "#/definitions/HlsInitEndpoint"
+            },
             "/files/:letter/:path/segment/:index": {
               "$ref": "#/definitions/HlsSegmentEndpoint"
             }
@@ -6656,6 +6692,7 @@
             "/files/:letter/:path/stream",
             "/files/:letter/:path/master.m3u8",
             "/files/:letter/:path/stream.m3u8",
+            "/files/:letter/:path/init.mp4",
             "/files/:letter/:path/segment/:index"
           ],
           "additionalProperties": false

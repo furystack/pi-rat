@@ -182,6 +182,12 @@ export type HlsSegmentEndpoint = {
   result: unknown
 }
 
+export type HlsInitEndpoint = {
+  url: { letter: string; path: string }
+  query: { mode?: PlaybackMode; audioTrack?: number }
+  result: unknown
+}
+
 export type GetSubtitlesEndpoint = {
   url: { movieId: string }
   result: string[]
@@ -211,6 +217,7 @@ export interface MediaApi extends RestApi {
     '/files/:letter/:path/stream': StreamFileEndpoint
     '/files/:letter/:path/master.m3u8': HlsMasterEndpoint
     '/files/:letter/:path/stream.m3u8': HlsStreamEndpoint
+    '/files/:letter/:path/init.mp4': HlsInitEndpoint
     '/files/:letter/:path/segment/:index': HlsSegmentEndpoint
   }
   POST: {
