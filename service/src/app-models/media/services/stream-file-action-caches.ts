@@ -55,7 +55,7 @@ export class StreamFileActionCaches {
       queryParams: StreamQueryParams
       file: PiRatFile
     }) => {
-      const { audio, video, from, to } = queryParams
+      const { audio, video, from, to, mode } = queryParams
 
       const [drive, config, ffprobe] = await Promise.all([
         this.driveCache.get(file.driveLetter),
@@ -72,7 +72,11 @@ export class StreamFileActionCaches {
       const audioStreams = ffprobe.streams.filter((stream) => stream.codec_type === 'audio')
       const audioStream = audioStreams.find((track) => track.index === audio?.trackId) || audioStreams[0]
 
-      // Build ffmpeg args
+      const isRemux = mode === 'remux'
+      const isDirectStream = mode === 'direct-stream'
+      const copyVideo = isRemux || isDirectStream
+      const copyAudio = isRemux
+
       const ffmpegArgs: string[] = []
 
       if (typeof from === 'number') {
@@ -91,51 +95,67 @@ export class StreamFileActionCaches {
       )
       ffmpegArgs.push('-map', `0:a:${audioStreamIndex}`)
 
-      if (audio?.audioCodec) {
+      if (copyAudio) {
+        ffmpegArgs.push('-c:a', 'copy')
+      } else if (audio?.audioCodec) {
         ffmpegArgs.push('-c:a', audio.audioCodec)
+        if (audio?.bitrate) {
+          ffmpegArgs.push('-b:a', `${audio.bitrate}k`)
+        }
       } else {
         ffmpegArgs.push('-c:a', 'aac')
         ffmpegArgs.push('-b:a', '128k')
       }
-      if (audio?.bitrate) {
-        ffmpegArgs.push('-b:a', String(audio.bitrate))
-      }
-      if (audio?.mixdown) {
+      if (!copyAudio && audio?.mixdown) {
         ffmpegArgs.push('-ac', '2')
       }
 
       const videoStreamIndex = 0
       ffmpegArgs.push('-map', `0:v:${videoStreamIndex}`)
-      if (video?.codec) {
-        ffmpegArgs.push('-c:v', video.codec)
-      } else {
-        ffmpegArgs.push('-c:v', 'libx264')
-      }
-      ffmpegArgs.push('-preset', config?.value?.preset ?? 'ultrafast')
 
-      if (video?.resolution) {
-        switch (video.resolution) {
-          case '4k':
-            ffmpegArgs.push('-s', '3840x2160')
-            break
-          case '1080p':
-            ffmpegArgs.push('-s', '1920x1080')
-            break
-          case '720p':
-            ffmpegArgs.push('-s', '1280x720')
-            break
-          case '480p':
-            ffmpegArgs.push('-s', '854x480')
-            break
-          case '360p':
-            ffmpegArgs.push('-s', '640x360')
-            break
-          default:
-            break
+      if (copyVideo) {
+        ffmpegArgs.push('-c:v', 'copy')
+      } else {
+        const videoCodec = video?.codec ?? 'libx264'
+        ffmpegArgs.push('-c:v', videoCodec)
+
+        const supportsPreset = videoCodec === 'libx264' || videoCodec === 'libx265'
+        if (supportsPreset) {
+          ffmpegArgs.push('-preset', config?.value?.preset ?? 'ultrafast')
+        }
+
+        if (videoCodec === 'libvpx-vp9') {
+          ffmpegArgs.push('-row-mt', '1', '-cpu-used', '4')
+        }
+
+        if (videoCodec === 'libaom-av1') {
+          ffmpegArgs.push('-cpu-used', '8', '-row-mt', '1')
+        }
+
+        if (video?.resolution) {
+          switch (video.resolution) {
+            case '4k':
+              ffmpegArgs.push('-s', '3840x2160')
+              break
+            case '1080p':
+              ffmpegArgs.push('-s', '1920x1080')
+              break
+            case '720p':
+              ffmpegArgs.push('-s', '1280x720')
+              break
+            case '480p':
+              ffmpegArgs.push('-s', '854x480')
+              break
+            case '360p':
+              ffmpegArgs.push('-s', '640x360')
+              break
+            default:
+              break
+          }
         }
       }
 
-      ffmpegArgs.push('pipe:1') // Output to stdout
+      ffmpegArgs.push('pipe:1')
 
       return ffmpegArgs
     },

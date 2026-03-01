@@ -1,0 +1,223 @@
+import { Injector } from '@furystack/inject'
+import { usingAsync } from '@furystack/utils'
+import type { FfprobeData, MoviesConfig, StreamQueryParams } from 'common'
+import { describe, expect, it, vi } from 'vitest'
+import { FfprobeService } from '../../../ffprobe-service.js'
+import { StreamFileActionCaches } from './stream-file-action-caches.js'
+
+vi.mock('@furystack/core', () => ({
+  useSystemIdentityContext: ({ injector }: { injector: unknown }) => injector,
+}))
+
+vi.mock('@furystack/repository', () => ({
+  getDataSetFor: () => ({
+    get: vi.fn().mockResolvedValue(undefined),
+    subscribe: vi.fn().mockReturnValue({ [Symbol.dispose]: vi.fn() }),
+  }),
+}))
+
+vi.mock('@furystack/logging', () => ({
+  getLogger: () => ({
+    withScope: () => ({
+      verbose: vi.fn().mockResolvedValue(undefined),
+      error: vi.fn().mockResolvedValue(undefined),
+      information: vi.fn().mockResolvedValue(undefined),
+    }),
+  }),
+}))
+
+const mockFfprobe: FfprobeData = {
+  streams: [
+    { index: 0, codec_type: 'video', codec_name: 'h264', width: 1920, height: 1080, tags: {} },
+    {
+      index: 1,
+      codec_type: 'audio',
+      codec_name: 'aac',
+      channels: 2,
+      tags: { language: 'eng' },
+      disposition: { default: 1 },
+    },
+    {
+      index: 2,
+      codec_type: 'audio',
+      codec_name: 'dts',
+      channels: 6,
+      tags: { language: 'fra' },
+    },
+  ],
+  format: { format_name: 'matroska', duration: 7200 },
+  chapters: [],
+}
+
+const mockDrive = { letter: 'A', physicalPath: '/mnt/media' }
+
+const buildArgs = async (queryParams: StreamQueryParams) => {
+  return await usingAsync(new Injector(), async (injector) => {
+    injector.setExplicitInstance(
+      { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      FfprobeService,
+    )
+
+    const caches = injector.getInstance(StreamFileActionCaches)
+    caches.driveCache = { get: vi.fn().mockResolvedValue(mockDrive) } as never
+    caches.moviesConfigCache = {
+      get: vi.fn().mockResolvedValue({
+        id: 'MOVIES_CONFIG',
+        value: { preset: 'ultrafast', watchFiles: 'all' },
+      } satisfies MoviesConfig),
+    } as never
+
+    return await caches.ffMpegArgsCache.get({
+      injector,
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      queryParams,
+    })
+  })
+}
+
+describe('ffMpegArgsCache', () => {
+  describe('remux mode (-c copy)', () => {
+    it('should use -c:v copy and -c:a copy in remux mode', async () => {
+      const args = await buildArgs({
+        mode: 'remux',
+        from: 0,
+        to: 10,
+        audio: { trackId: 1 },
+      })
+
+      expect(args).toContain('-c:v')
+      expect(args[args.indexOf('-c:v') + 1]).toBe('copy')
+      expect(args).toContain('-c:a')
+      expect(args[args.indexOf('-c:a') + 1]).toBe('copy')
+      expect(args).not.toContain('libx264')
+      expect(args).not.toContain('-preset')
+    })
+  })
+
+  describe('direct-stream mode (copy video, transcode audio)', () => {
+    it('should use -c:v copy and -c:a aac', async () => {
+      const args = await buildArgs({
+        mode: 'direct-stream',
+        from: 0,
+        to: 10,
+        audio: { trackId: 2, audioCodec: 'aac', bitrate: 96 },
+      })
+
+      expect(args[args.indexOf('-c:v') + 1]).toBe('copy')
+      expect(args[args.indexOf('-c:a') + 1]).toBe('aac')
+      expect(args).not.toContain('-preset')
+    })
+  })
+
+  describe('transcode mode (full re-encode)', () => {
+    it('should use -c:v libx264 and -c:a aac with preset', async () => {
+      const args = await buildArgs({
+        mode: 'transcode',
+        from: 0,
+        to: 10,
+        audio: { trackId: 1, audioCodec: 'aac' },
+        video: { codec: 'libx264' },
+      })
+
+      expect(args[args.indexOf('-c:v') + 1]).toBe('libx264')
+      expect(args[args.indexOf('-c:a') + 1]).toBe('aac')
+      expect(args).toContain('-preset')
+      expect(args[args.indexOf('-preset') + 1]).toBe('ultrafast')
+    })
+  })
+
+  describe('legacy mode (no mode specified)', () => {
+    it('should default to transcode behavior', async () => {
+      const args = await buildArgs({
+        from: 0,
+        to: 10,
+        audio: { trackId: 1 },
+      })
+
+      expect(args[args.indexOf('-c:v') + 1]).toBe('libx264')
+      expect(args).toContain('-preset')
+    })
+  })
+
+  describe('audio track selection', () => {
+    it('should map the correct audio stream index', async () => {
+      const args = await buildArgs({
+        mode: 'remux',
+        from: 0,
+        to: 10,
+        audio: { trackId: 2 },
+      })
+
+      expect(args).toContain('-map')
+      const audioMapIndex = args.findIndex((a, i) => a === '-map' && args[i + 1]?.startsWith('0:a:'))
+      expect(args[audioMapIndex + 1]).toBe('0:a:1')
+    })
+  })
+
+  describe('resolution scaling', () => {
+    it('should add resolution flags in transcode mode', async () => {
+      const args = await buildArgs({
+        mode: 'transcode',
+        from: 0,
+        to: 10,
+        audio: { trackId: 1 },
+        video: { codec: 'libx264', resolution: '720p' },
+      })
+
+      expect(args).toContain('-s')
+      expect(args[args.indexOf('-s') + 1]).toBe('1280x720')
+    })
+
+    it('should NOT add resolution flags in remux mode', async () => {
+      const args = await buildArgs({
+        mode: 'remux',
+        from: 0,
+        to: 10,
+        audio: { trackId: 1 },
+        video: { resolution: '720p' },
+      })
+
+      expect(args).not.toContain('-s')
+    })
+  })
+
+  describe('time range', () => {
+    it('should add -ss and -t flags', async () => {
+      const args = await buildArgs({
+        mode: 'remux',
+        from: 30,
+        to: 40,
+      })
+
+      expect(args).toContain('-ss')
+      expect(args[args.indexOf('-ss') + 1]).toBe('30')
+      expect(args).toContain('-t')
+      expect(args[args.indexOf('-t') + 1]).toBe('10')
+    })
+  })
+
+  describe('audio mixdown', () => {
+    it('should add -ac 2 in transcode mode with mixdown', async () => {
+      const args = await buildArgs({
+        mode: 'transcode',
+        from: 0,
+        to: 10,
+        audio: { trackId: 1, mixdown: true },
+      })
+
+      expect(args).toContain('-ac')
+      expect(args[args.indexOf('-ac') + 1]).toBe('2')
+    })
+
+    it('should NOT add -ac in remux mode even with mixdown', async () => {
+      const args = await buildArgs({
+        mode: 'remux',
+        from: 0,
+        to: 10,
+        audio: { trackId: 1, mixdown: true },
+      })
+
+      expect(args).not.toContain('-ac')
+    })
+  })
+})

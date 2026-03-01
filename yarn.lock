@@ -4612,6 +4612,7 @@ __metadata:
     "@xterm/addon-web-links": "npm:^0.12.0"
     "@xterm/xterm": "npm:^6.0.0"
     common: "workspace:^"
+    hls.js: "npm:^1.6.15"
     marked: "npm:^17.0.3"
     media-chrome: "npm:^4.18.0"
     monaco-editor: "npm:^0.55.1"
@@ -5041,6 +5042,13 @@ __metadata:
   dependencies:
     function-bind: "npm:^1.1.2"
   checksum: 10c0/3769d434703b8ac66b209a4cca0737519925bbdb61dd887f93a16372b14694c63ff4e797686d87c90f08168e81082248b9b028bad60d4da9e0d1148766f56eb9
+  languageName: node
+  linkType: hard
+
+"hls.js@npm:^1.6.15":
+  version: 1.6.15
+  resolution: "hls.js@npm:1.6.15"
+  checksum: 10c0/a3558909506b9d93420b395b1d9508df364f911ebc19b315f98bd4c1b94973ed996a95fe8662756a3fca96b762af741d13df81987bc68322f473acacbecbc6d9
   languageName: node
   linkType: hard
 

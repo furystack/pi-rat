@@ -30,13 +30,21 @@ export type StreamingRawFormData = {
   preset: string
   threads: string
   watchFiles?: string
+  hlsSegmentPath?: string
+  hlsMaxCacheSizeMb?: string
+  hwAccelMethod?: string
 }
 
 export const isStreamingRawFormData = (data: unknown): data is StreamingRawFormData => {
   if (typeof data !== 'object' || data === null) return false
   const d = data as Record<string, unknown>
   const threads = Number(d.threads)
-  return typeof d.threads === 'string' && !isNaN(threads) && threads >= 1 && threads <= 64
+  if (typeof d.threads !== 'string' || isNaN(threads) || threads < 1 || threads > 64) return false
+  if (d.hlsMaxCacheSizeMb !== undefined && d.hlsMaxCacheSizeMb !== '') {
+    const cacheSize = Number(d.hlsMaxCacheSizeMb)
+    if (isNaN(cacheSize) || cacheSize < 0) return false
+  }
+  return true
 }
 
 const PRESET_OPTIONS = [
@@ -98,6 +106,9 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
         preset: formData.preset as StreamingFormData['preset'],
         threads: Number(formData.threads),
         watchFiles: formData.watchFiles === 'all' ? 'all' : [],
+        hlsSegmentPath: formData.hlsSegmentPath || undefined,
+        hlsMaxCacheSizeMb: formData.hlsMaxCacheSizeMb ? Number(formData.hlsMaxCacheSizeMb) : undefined,
+        hwAccelMethod: (formData.hwAccelMethod as StreamingFormData['hwAccelMethod']) || undefined,
       }
 
       isLoadingObservable.setValue(true)
@@ -220,6 +231,60 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
                   style={{ maxWidth: '150px' }}
                 />
                 <small className="field-hint">Number of CPU threads for transcoding (1-64).</small>
+              </div>
+
+              <div className="form-field">
+                <Select
+                  name="hwAccelMethod"
+                  labelTitle="Hardware Acceleration"
+                  options={[
+                    { value: 'none', label: 'None (Software Only)' },
+                    { value: 'vaapi', label: 'VAAPI (Intel/AMD)' },
+                    { value: 'nvenc', label: 'NVENC (NVIDIA)' },
+                    { value: 'qsv', label: 'Quick Sync (Intel)' },
+                    { value: 'videotoolbox', label: 'VideoToolbox (macOS)' },
+                  ]}
+                  value={currentValues.hwAccelMethod ?? 'none'}
+                  style={{ maxWidth: '300px' }}
+                />
+                <small className="field-hint">
+                  Select a hardware acceleration method for faster transcoding. Requires compatible GPU and drivers.
+                </small>
+              </div>
+            </div>
+
+            <div className="section-divider">
+              <Typography variant="h3" className="section-title">
+                HLS Streaming
+              </Typography>
+
+              <div className="form-field">
+                <Input
+                  labelTitle="Segment Storage Path"
+                  name="hlsSegmentPath"
+                  type="text"
+                  value={currentValues.hlsSegmentPath ?? ''}
+                  placeholder="Leave empty for system temp directory"
+                  style={{ maxWidth: '400px' }}
+                />
+                <small className="field-hint">
+                  Directory for storing HLS segments during streaming. Defaults to system temp directory if empty.
+                </small>
+              </div>
+
+              <div className="form-field">
+                <Input
+                  labelTitle="Max Cache Size (MB)"
+                  name="hlsMaxCacheSizeMb"
+                  type="number"
+                  value={currentValues.hlsMaxCacheSizeMb?.toString() ?? ''}
+                  placeholder="5000"
+                  min="0"
+                  style={{ maxWidth: '150px' }}
+                />
+                <small className="field-hint">
+                  Maximum disk space for cached HLS segments in megabytes. Defaults to 5000 MB (5 GB).
+                </small>
               </div>
             </div>
 

@@ -135,6 +135,19 @@
                     }
                   ],
                   "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                },
+                "hlsSegmentPath": {
+                  "type": "string",
+                  "description": "Directory path for storing HLS segments. Defaults to system temp directory."
+                },
+                "hlsMaxCacheSizeMb": {
+                  "type": "number",
+                  "description": "Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB)."
+                },
+                "hwAccelMethod": {
+                  "type": "string",
+                  "enum": ["vaapi", "nvenc", "qsv", "videotoolbox", "none"],
+                  "description": "Preferred hardware acceleration method for transcoding."
                 }
               },
               "required": ["watchFiles"],
@@ -708,6 +721,19 @@
                             }
                           ],
                           "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                        },
+                        "hlsSegmentPath": {
+                          "type": "string",
+                          "description": "Directory path for storing HLS segments. Defaults to system temp directory."
+                        },
+                        "hlsMaxCacheSizeMb": {
+                          "type": "number",
+                          "description": "Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB)."
+                        },
+                        "hwAccelMethod": {
+                          "type": "string",
+                          "enum": ["vaapi", "nvenc", "qsv", "videotoolbox", "none"],
+                          "description": "Preferred hardware acceleration method for transcoding."
                         }
                       },
                       "required": ["watchFiles"],
@@ -831,6 +857,19 @@
                             }
                           ],
                           "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                        },
+                        "hlsSegmentPath": {
+                          "type": "string",
+                          "description": "Directory path for storing HLS segments. Defaults to system temp directory."
+                        },
+                        "hlsMaxCacheSizeMb": {
+                          "type": "number",
+                          "description": "Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB)."
+                        },
+                        "hwAccelMethod": {
+                          "type": "string",
+                          "enum": ["vaapi", "nvenc", "qsv", "videotoolbox", "none"],
+                          "description": "Preferred hardware acceleration method for transcoding."
                         }
                       },
                       "required": ["watchFiles"],
@@ -962,6 +1001,19 @@
                               }
                             ],
                             "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                          },
+                          "hlsSegmentPath": {
+                            "type": "string",
+                            "description": "Directory path for storing HLS segments. Defaults to system temp directory."
+                          },
+                          "hlsMaxCacheSizeMb": {
+                            "type": "number",
+                            "description": "Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB)."
+                          },
+                          "hwAccelMethod": {
+                            "type": "string",
+                            "enum": ["vaapi", "nvenc", "qsv", "videotoolbox", "none"],
+                            "description": "Preferred hardware acceleration method for transcoding."
                           }
                         },
                         "required": ["watchFiles"],
@@ -1088,6 +1140,19 @@
                               }
                             ],
                             "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                          },
+                          "hlsSegmentPath": {
+                            "type": "string",
+                            "description": "Directory path for storing HLS segments. Defaults to system temp directory."
+                          },
+                          "hlsMaxCacheSizeMb": {
+                            "type": "number",
+                            "description": "Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB)."
+                          },
+                          "hwAccelMethod": {
+                            "type": "string",
+                            "enum": ["vaapi", "nvenc", "qsv", "videotoolbox", "none"],
+                            "description": "Preferred hardware acceleration method for transcoding."
                           }
                         },
                         "required": ["watchFiles"],
@@ -1539,6 +1604,19 @@
                     }
                   ],
                   "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                },
+                "hlsSegmentPath": {
+                  "type": "string",
+                  "description": "Directory path for storing HLS segments. Defaults to system temp directory."
+                },
+                "hlsMaxCacheSizeMb": {
+                  "type": "number",
+                  "description": "Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB)."
+                },
+                "hwAccelMethod": {
+                  "type": "string",
+                  "enum": ["vaapi", "nvenc", "qsv", "videotoolbox", "none"],
+                  "description": "Preferred hardware acceleration method for transcoding."
                 }
               },
               "required": ["watchFiles"],
@@ -1695,6 +1773,19 @@
                     }
                   ],
                   "description": "'all' or a list of directories to watch for new movies and all subtitles will be extracted automatically."
+                },
+                "hlsSegmentPath": {
+                  "type": "string",
+                  "description": "Directory path for storing HLS segments. Defaults to system temp directory."
+                },
+                "hlsMaxCacheSizeMb": {
+                  "type": "number",
+                  "description": "Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB)."
+                },
+                "hwAccelMethod": {
+                  "type": "string",
+                  "enum": ["vaapi", "nvenc", "qsv", "videotoolbox", "none"],
+                  "description": "Preferred hardware acceleration method for transcoding."
                 }
               },
               "required": ["watchFiles"],

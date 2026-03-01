@@ -48,7 +48,58 @@ export type ScanForMoviesEndpoint = {
   }
 }
 
+export type PlaybackMode = 'direct-play' | 'remux' | 'direct-stream' | 'transcode'
+
+export type CodecSupportMap = {
+  video: string[]
+  audio: string[]
+  containers: string[]
+}
+
+export type SubtitleTrackInfo = {
+  index: number
+  label: string
+  language: string
+  format: 'srt' | 'ass' | 'webvtt' | 'pgs' | 'vobsub' | 'other'
+  source: 'embedded' | 'external'
+  requiresBurnIn: boolean
+  url?: string
+}
+
+export type AudioTrackInfo = {
+  index: number
+  label: string
+  language: string
+  codecName: string
+  channels: number
+  isDefault: boolean
+}
+
+export type PlaybackInfoRequest = {
+  body: {
+    file: PiRatFile
+    codecSupport: CodecSupportMap
+    selectedAudioTrackIndex?: number
+    selectedSubtitleTrackIndex?: number
+  }
+  result: PlaybackInfoResponse
+}
+
+export type PlaybackInfoResponse = {
+  mode: PlaybackMode
+  streamUrl: string
+  audioTracks: AudioTrackInfo[]
+  subtitleTracks: SubtitleTrackInfo[]
+  warnings: string[]
+  duration: number
+}
+
 export type StreamQueryParams = {
+  /**
+   * The playback mode determined by the server via /playback-info
+   */
+  mode?: PlaybackMode
+
   /**
    * Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc...
    */
@@ -80,7 +131,7 @@ export type StreamQueryParams = {
     /**
      * The codec for video encoding. If not provided, the original encoding will be used
      */
-    codec?: 'libx264'
+    codec?: 'libx264' | 'libx265' | 'libvpx-vp9' | 'libaom-av1'
 
     /**
      * The output resolution for the video stream. If not provided, the original resolution will be used
@@ -133,6 +184,20 @@ export interface MediaApi extends RestApi {
     '/movie-files': GetCollectionEndpoint<MovieFile>
     '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
     '/files/:letter/:path/stream': StreamFileEndpoint
+    '/files/:letter/:path/master.m3u8': {
+      url: { letter: string; path: string }
+      result: unknown
+    }
+    '/files/:letter/:path/stream.m3u8': {
+      url: { letter: string; path: string }
+      query: { mode?: PlaybackMode; resolution?: string }
+      result: unknown
+    }
+    '/files/:letter/:path/segment/:index': {
+      url: { letter: string; path: string; index: string }
+      query: { mode?: PlaybackMode; from?: number; to?: number; resolution?: string }
+      result: unknown
+    }
   }
   POST: {
     '/movies': PostEndpoint<Movie, 'imdbId', Omit<Movie, 'createdAt' | 'updatedAt'>>
@@ -141,6 +206,7 @@ export interface MediaApi extends RestApi {
     '/extract-subtitles': ExtractSubtitles
     '/save-watch-progress': SaveWatchProgress
     '/scan-for-movies': ScanForMoviesEndpoint
+    '/playback-info': PlaybackInfoRequest
   }
   PATCH: {
     '/movies/:id': PatchEndpoint<Omit<Movie, 'createdAt' | 'updatedAt'>, 'imdbId'>
