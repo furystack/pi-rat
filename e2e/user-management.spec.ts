@@ -180,7 +180,7 @@ test.describe('User Management', () => {
     // ============================================
     // STEP 8: Navigate back to users list
     // ============================================
-    await page.goBack()
+    await page.goto('/app-settings/users')
 
     await expect(page).toHaveURL(/\/app-settings\/users$/)
     await expect(usersPage).toBeVisible()
