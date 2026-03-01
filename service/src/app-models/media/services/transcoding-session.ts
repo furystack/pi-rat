@@ -47,6 +47,7 @@ export class TranscodingSessionService {
   declare private systemInjector: Injector
 
   private sessions = new Map<SessionKey, TranscodingSessionEntry>()
+  private pendingSessions = new Map<SessionKey, Promise<TranscodingSessionEntry>>()
   private cleanupInterval: ReturnType<typeof setInterval>
 
   constructor() {
@@ -134,6 +135,27 @@ export class TranscodingSessionService {
       return existing
     }
 
+    const pending = this.pendingSessions.get(key)
+    if (pending) return pending
+
+    const createPromise = this.createSession(key, driveLetter, path, mode, audioTrackId, resolution)
+    this.pendingSessions.set(key, createPromise)
+
+    try {
+      return await createPromise
+    } finally {
+      this.pendingSessions.delete(key)
+    }
+  }
+
+  private async createSession(
+    key: SessionKey,
+    driveLetter: string,
+    path: string,
+    mode: PlaybackMode,
+    audioTrackId: number,
+    resolution?: string,
+  ): Promise<TranscodingSessionEntry> {
     await this.getBaseDirFromConfig()
     const sessionDir = this.getSessionDir(key)
     if (!existsSync(sessionDir)) {
@@ -395,8 +417,15 @@ export class TranscodingSessionService {
 
   private cleanupIdleSessions() {
     const now = Date.now()
+    const keysToRemove: SessionKey[] = []
     for (const [key, session] of this.sessions) {
       if (now - session.lastAccessedAt > SESSION_IDLE_TIMEOUT_MS) {
+        keysToRemove.push(key)
+      }
+    }
+    for (const key of keysToRemove) {
+      const session = this.sessions.get(key)
+      if (session) {
         void this.logger.verbose({ message: `Cleaning up idle session: ${key}` })
         this.destroySession(session)
         this.sessions.delete(key)

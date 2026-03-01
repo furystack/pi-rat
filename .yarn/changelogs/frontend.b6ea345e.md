@@ -22,6 +22,10 @@
 - Add `getSubtitleTracksFromPlaybackInfo()` helper for building subtitle track elements from server response
 - Filter out bitmap subtitles that require burn-in
 
+### Add PlainHlsPlayer debug page
+
+- Add minimal HLS player route at `/plain-hls/:letter/:path` for debugging HLS streams without media-chrome overhead
+
 ## 🧪 Tests
 
 - Add unit tests for `MoviePlayerService` (initialization, playback info fetching, audio switching, disposal)

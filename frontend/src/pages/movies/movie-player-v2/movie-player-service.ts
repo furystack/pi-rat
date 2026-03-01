@@ -80,6 +80,8 @@ export class MoviePlayerService implements AsyncDisposable {
   public progress: ObservableValue<number>
 
   public async [Symbol.asyncDispose]() {
+    await this.teardownHlsSession()
+
     this.progress[Symbol.dispose]()
     this.resolution[Symbol.dispose]()
     this.playbackInfo[Symbol.dispose]()
@@ -88,6 +90,29 @@ export class MoviePlayerService implements AsyncDisposable {
     if (this.hls) {
       this.hls.destroy()
       this.hls = null
+    }
+  }
+
+  private async teardownHlsSession() {
+    const mode = this.playbackMode.getValue()
+    if (mode === 'direct-play') return
+
+    try {
+      await this.api.call({
+        method: 'DELETE',
+        action: '/files/:letter/:path/hls-session',
+        url: {
+          letter: this.file.driveLetter,
+          path: this.file.path,
+        },
+        query: {
+          mode,
+          audioTrack: this.audioTrackId.getValue(),
+          resolution: this.resolution.getValue(),
+        },
+      })
+    } catch (error) {
+      void this.logger.warning({ message: 'Failed to tear down HLS session', data: { error } })
     }
   }
 

@@ -21,6 +21,7 @@ import { GetSubtitlesAction } from './actions/get-subtitles-action.js'
 import { HlsInitAction } from './actions/hls-init-action.js'
 import { HlsMasterAction } from './actions/hls-master-action.js'
 import { HlsSegmentAction } from './actions/hls-segment-action.js'
+import { HlsSessionTeardownAction } from './actions/hls-session-teardown-action.js'
 import { HlsStreamAction } from './actions/hls-stream-action.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
 import { PlaybackInfoAction } from './actions/playback-info-action.js'
@@ -148,6 +149,9 @@ export const setupMediaRestApi = async (injector: Injector) => {
           schema: mediaApiSchema,
           schemaName: 'DeleteEndpoint<WatchHistoryEntry,"id">',
         })(createDeleteEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
+        '/files/:letter/:path/hls-session': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsSessionTeardownEndpoint' })(HlsSessionTeardownAction),
+        ),
       },
     },
   })

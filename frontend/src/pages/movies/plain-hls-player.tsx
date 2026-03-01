@@ -14,8 +14,7 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
     const hlsUrl = `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(props.driveLetter)}/${encodeURIComponent(props.path)}/master.m3u8`
 
     useDisposable('hls-setup', () => {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      const frameId = requestAnimationFrame(async () => {
+      const frameId = requestAnimationFrame(() => {
         const video = videoRef.current
         const log = logRef.current
         if (!video || !log) return
@@ -28,56 +27,56 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
 
         append(`HLS URL: ${hlsUrl}`)
 
-        const HlsModule = (await import('hls.js')).default
-
-        if (!HlsModule.isSupported()) {
-          append('hls.js not supported, trying native')
-          video.src = hlsUrl
-          return
-        }
-
-        const hls = new HlsModule({
-          debug: false,
-          xhrSetup: (xhr) => {
-            xhr.withCredentials = true
-          },
-        })
-
-        hls.on(HlsModule.Events.MANIFEST_PARSED, (_e, data) => {
-          append(`Manifest parsed: ${data.levels.length} levels`)
-          video.play().catch((err) => append(`Autoplay blocked: ${err}`))
-        })
-
-        hls.on(HlsModule.Events.LEVEL_LOADED, (_e, data) => {
-          append(
-            `Level ${data.level} loaded: ${data.details.totalduration?.toFixed(1)}s, ${data.details.fragments.length} frags`,
-          )
-        })
-
-        hls.on(HlsModule.Events.FRAG_LOADED, (_e, data) => {
-          const f = data.frag
-          append(`Frag ${f.sn} [${f.type}] start=${f.start.toFixed(1)} dur=${f.duration.toFixed(1)} level=${f.level}`)
-        })
-
-        hls.on(HlsModule.Events.FRAG_BUFFERED, (_e, data) => {
-          const f = data.frag
-          const {startPTS} = (f as unknown as Record<string, number>)
-          const {endPTS} = (f as unknown as Record<string, number>)
-          if (startPTS !== undefined) {
-            append(`  -> buffered ${f.sn} [${f.type}] PTS=${startPTS.toFixed(2)}-${endPTS?.toFixed(2)}`)
+        void import('hls.js').then(({ default: HlsModule }) => {
+          if (!HlsModule.isSupported()) {
+            append('hls.js not supported, trying native')
+            video.src = hlsUrl
+            return
           }
-        })
 
-        hls.on(HlsModule.Events.ERROR, (_e, data) => {
-          append(`ERROR: ${data.type} / ${data.details}${data.fatal ? ' [FATAL]' : ''}`)
-          if (data.fatal && data.type === HlsModule.ErrorTypes.MEDIA_ERROR) {
-            append('Attempting recovery...')
-            hls.recoverMediaError()
-          }
-        })
+          const hls = new HlsModule({
+            debug: false,
+            xhrSetup: (xhr) => {
+              xhr.withCredentials = true
+            },
+          })
 
-        hls.loadSource(hlsUrl)
-        hls.attachMedia(video)
+          hls.on(HlsModule.Events.MANIFEST_PARSED, (_e, data) => {
+            append(`Manifest parsed: ${data.levels.length} levels`)
+            video.play().catch((err: unknown) => append(`Autoplay blocked: ${String(err)}`))
+          })
+
+          hls.on(HlsModule.Events.LEVEL_LOADED, (_e, data) => {
+            append(
+              `Level ${data.level} loaded: ${data.details.totalduration?.toFixed(1)}s, ${data.details.fragments.length} frags`,
+            )
+          })
+
+          hls.on(HlsModule.Events.FRAG_LOADED, (_e, data) => {
+            const f = data.frag
+            append(`Frag ${f.sn} [${f.type}] start=${f.start.toFixed(1)} dur=${f.duration.toFixed(1)} level=${f.level}`)
+          })
+
+          hls.on(HlsModule.Events.FRAG_BUFFERED, (_e, data) => {
+            const { startPTS, endPTS } = data.frag
+            if (startPTS !== undefined && startPTS !== null) {
+              append(
+                `  -> buffered ${data.frag.sn} [${data.frag.type}] PTS=${startPTS.toFixed(2)}-${endPTS?.toFixed(2)}`,
+              )
+            }
+          })
+
+          hls.on(HlsModule.Events.ERROR, (_e, data) => {
+            append(`ERROR: ${data.type} / ${data.details}${data.fatal ? ' [FATAL]' : ''}`)
+            if (data.fatal && data.type === HlsModule.ErrorTypes.MEDIA_ERROR) {
+              append('Attempting recovery...')
+              hls.recoverMediaError()
+            }
+          })
+
+          hls.loadSource(hlsUrl)
+          hls.attachMedia(video)
+        })
       })
       return { [Symbol.dispose]: () => cancelAnimationFrame(frameId) }
     })

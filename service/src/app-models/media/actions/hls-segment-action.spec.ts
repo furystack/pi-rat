@@ -3,47 +3,51 @@ import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
 import { describe, expect, it, vi } from 'vitest'
 import { HlsSegmentAction } from './hls-segment-action.js'
-
-const mockLogger = {
-  verbose: vi.fn().mockResolvedValue(undefined),
-  error: vi.fn().mockResolvedValue(undefined),
-  information: vi.fn().mockResolvedValue(undefined),
-}
+import { TranscodingSessionService } from '../services/transcoding-session.js'
 
 vi.mock('@furystack/logging', () => ({
   getLogger: () => ({
-    withScope: () => mockLogger,
+    withScope: () => ({
+      verbose: vi.fn().mockResolvedValue(undefined),
+      error: vi.fn().mockResolvedValue(undefined),
+    }),
   }),
 }))
 
-vi.mock('@furystack/core', () => ({
-  useSystemIdentityContext: ({ injector }: { injector: unknown }) => injector,
+vi.mock('fs', () => ({
+  createReadStream: () => ({ pipe: vi.fn() }),
 }))
 
-vi.mock('@furystack/repository', () => ({
-  getDataSetFor: () => ({
-    get: vi.fn().mockResolvedValue(undefined),
-    subscribe: vi.fn().mockReturnValue({ [Symbol.dispose]: vi.fn() }),
-  }),
+vi.mock('fs/promises', () => ({
+  stat: vi.fn().mockResolvedValue({ size: 1024 }),
 }))
 
-const mockSpawn = vi.fn()
-
-vi.mock('child_process', () => ({
-  spawn: (...args: unknown[]) => mockSpawn(...args) as unknown,
-}))
+const mockSession = {
+  key: 'A:test.mkv:transcode:0:',
+  sessionDir: '/tmp/pirat-hls-sessions/abc123',
+  state: 'running' as const,
+  mode: 'transcode' as const,
+  driveLetter: 'A',
+  path: 'test.mkv',
+  audioTrackId: 0,
+  createdAt: Date.now(),
+  lastAccessedAt: Date.now(),
+  ffmpegProcess: { killed: false, kill: vi.fn() },
+}
 
 describe('HlsSegmentAction', () => {
   it('should reject invalid segment index', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
+      injector.setExplicitInstance(
+        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       try {
         await HlsSegmentAction({
           injector,
           getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: 'abc' }),
-          getQuery: () => ({ mode: 'transcode', from: 0, to: 10 }),
+          getQuery: () => ({}),
           response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
@@ -56,14 +60,16 @@ describe('HlsSegmentAction', () => {
 
   it('should reject path traversal attempts', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
+      injector.setExplicitInstance(
+        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       try {
         await HlsSegmentAction({
           injector,
           getUrlParams: () => ({ letter: 'A', path: '../etc/passwd', index: '0' }),
-          getQuery: () => ({ mode: 'transcode', from: 0, to: 10 }),
+          getQuery: () => ({}),
           response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
@@ -76,14 +82,16 @@ describe('HlsSegmentAction', () => {
 
   it('should reject negative segment index', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
+      injector.setExplicitInstance(
+        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       try {
         await HlsSegmentAction({
           injector,
           getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '-5' }),
-          getQuery: () => ({ mode: 'transcode', from: 0, to: 10 }),
+          getQuery: () => ({}),
           response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
@@ -94,36 +102,40 @@ describe('HlsSegmentAction', () => {
     })
   })
 
-  it('should reject invalid time range', async () => {
+  it('should reject segment index exceeding upper bound', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
+      injector.setExplicitInstance(
+        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       try {
         await HlsSegmentAction({
           injector,
-          getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '0' }),
-          getQuery: () => ({ mode: 'transcode', from: -5, to: 10 }),
+          getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '100001' }),
+          getQuery: () => ({}),
           response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
         expect.fail('Should have thrown')
       } catch (error) {
-        expect((error as Error).message).toContain('Invalid time range')
+        expect((error as Error).message).toContain('Invalid segment index')
       }
     })
   })
 
   it('should reject invalid playback mode', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
+      injector.setExplicitInstance(
+        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       try {
         await HlsSegmentAction({
           injector,
           getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '0' }),
-          getQuery: () => ({ mode: 'invalid' as never, from: 0, to: 10 }),
+          getQuery: () => ({ mode: 'invalid' as never }),
           response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
@@ -134,265 +146,105 @@ describe('HlsSegmentAction', () => {
     })
   })
 
-  it('should reject segment index exceeding upper bound', async () => {
+  it('should return 404 when no active session exists', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
-
-      try {
-        await HlsSegmentAction({
-          injector,
-          getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '100001' }),
-          getQuery: () => ({ mode: 'transcode', from: 0, to: 10 }),
-          response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
-          request: {} as IncomingMessage,
-        })
-        expect.fail('Should have thrown')
-      } catch (error) {
-        expect((error as Error).message).toContain('Invalid segment index')
-      }
-    })
-  })
-
-  it('should reject time range exceeding 24 hours', async () => {
-    await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
+      injector.setExplicitInstance(
+        {
+          getSession: vi.fn().mockReturnValue(undefined),
+          waitForSegment: vi.fn(),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       try {
         await HlsSegmentAction({
           injector,
           getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '0' }),
-          getQuery: () => ({ mode: 'transcode', from: 0, to: 86_401 }),
+          getQuery: () => ({ mode: 'transcode' }),
           response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
         expect.fail('Should have thrown')
       } catch (error) {
-        expect((error as Error).message).toContain('Invalid time range')
+        expect((error as Error).message).toContain('No active transcoding session')
       }
     })
   })
 
-  it('should reject invalid resolution', async () => {
+  it('should return 504 when segment is not available', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      injector.getInstance(SegmentCache)
+      injector.setExplicitInstance(
+        {
+          getSession: vi.fn().mockReturnValue(mockSession),
+          waitForSegment: vi.fn().mockResolvedValue(false),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       try {
         await HlsSegmentAction({
           injector,
-          getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '0' }),
-          getQuery: () => ({ mode: 'transcode', from: 0, to: 10, resolution: '999p' }),
+          getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '5' }),
+          getQuery: () => ({ mode: 'transcode' }),
           response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
         expect.fail('Should have thrown')
       } catch (error) {
-        expect((error as Error).message).toContain('Invalid resolution')
+        expect((error as Error).message).toContain('Segment not available')
       }
     })
   })
 
-  it('should serve cached segment without spawning ffmpeg', async () => {
-    const mockCachedStream = { pipe: vi.fn() }
+  it('should serve segment when session and segment are available', async () => {
     const writeHead = vi.fn()
 
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      const cache = injector.getInstance(SegmentCache)
-      cache.get = vi.fn().mockResolvedValue(mockCachedStream) as never
+      injector.setExplicitInstance(
+        {
+          getSession: vi.fn().mockReturnValue(mockSession),
+          waitForSegment: vi.fn().mockResolvedValue(true),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       await HlsSegmentAction({
         injector,
-        getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '0' }),
-        getQuery: () => ({ mode: 'remux', from: 0, to: 10 }),
+        getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '3' }),
+        getQuery: () => ({ mode: 'transcode' }),
         response: { writeHead, on: vi.fn() } as unknown as ServerResponse,
         request: {} as IncomingMessage,
       })
 
-      expect(writeHead).toHaveBeenCalledWith(200, expect.objectContaining({ 'Cache-Control': 'public, max-age=3600' }))
-      expect(mockCachedStream.pipe).toHaveBeenCalled()
-      expect(mockSpawn).not.toHaveBeenCalled()
-    })
-  })
-
-  it('should spawn ffmpeg when no cached segment exists', async () => {
-    const mockStdout = { on: vi.fn(), pipe: vi.fn() }
-    const mockStderr = { on: vi.fn() }
-    const mockProcess = {
-      stdout: mockStdout,
-      stderr: mockStderr,
-      on: vi.fn(),
-    }
-    mockSpawn.mockReturnValue(mockProcess)
-
-    await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      const cache = injector.getInstance(SegmentCache)
-      cache.get = vi.fn().mockResolvedValue(null) as never
-      cache.put = vi.fn().mockResolvedValue(undefined) as never
-
-      const { StreamFileActionCaches } = await import('../services/stream-file-action-caches.js')
-      const caches = injector.getInstance(StreamFileActionCaches)
-      caches.ffMpegArgsCache = {
-        get: vi.fn().mockResolvedValue(['-i', 'test.mkv', 'pipe:1']),
-      } as never
-      caches.driveCache = { get: vi.fn().mockResolvedValue({ letter: 'A', physicalPath: '/mnt' }) } as never
-      caches.moviesConfigCache = {
-        get: vi.fn().mockResolvedValue({ id: 'MOVIES_CONFIG', value: { preset: 'ultrafast', watchFiles: 'all' } }),
-      } as never
-
-      await HlsSegmentAction({
-        injector,
-        getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '3' }),
-        getQuery: () => ({ mode: 'transcode', from: 30, to: 40 }),
-        response: { writeHead: vi.fn(), on: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
-        request: {} as IncomingMessage,
-      })
-
-      expect(mockSpawn).toHaveBeenCalledWith('ffmpeg', expect.arrayContaining(['-i']), expect.anything())
-      expect(mockStdout.pipe).toHaveBeenCalled()
-    })
-  })
-
-  it('should log stderr output', async () => {
-    const mockStdout = { on: vi.fn(), pipe: vi.fn() }
-    const mockStderr = { on: vi.fn() }
-    const mockProcess = {
-      stdout: mockStdout,
-      stderr: mockStderr,
-      on: vi.fn(),
-    }
-    mockSpawn.mockReturnValue(mockProcess)
-
-    await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      const cache = injector.getInstance(SegmentCache)
-      cache.get = vi.fn().mockResolvedValue(null) as never
-
-      const { StreamFileActionCaches } = await import('../services/stream-file-action-caches.js')
-      const caches = injector.getInstance(StreamFileActionCaches)
-      caches.ffMpegArgsCache = {
-        get: vi.fn().mockResolvedValue(['-i', 'test.mkv', 'pipe:1']),
-      } as never
-      caches.driveCache = { get: vi.fn().mockResolvedValue({ letter: 'A', physicalPath: '/mnt' }) } as never
-      caches.moviesConfigCache = {
-        get: vi.fn().mockResolvedValue({ id: 'MOVIES_CONFIG', value: { preset: 'ultrafast', watchFiles: 'all' } }),
-      } as never
-
-      await HlsSegmentAction({
-        injector,
-        getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '3' }),
-        getQuery: () => ({ mode: 'transcode', from: 30, to: 40 }),
-        response: { writeHead: vi.fn(), on: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
-        request: {} as IncomingMessage,
-      })
-
-      // Simulate stderr data
-      const stderrCallback = mockStderr.on.mock.calls.find((c) => c[0] === 'data')?.[1] as
-        | ((data: Buffer) => void)
-        | undefined
-      stderrCallback?.(Buffer.from('some error log'))
-
-      expect(mockLogger.verbose).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'ffmpeg stderr: some error log' }),
+      expect(writeHead).toHaveBeenCalledWith(
+        200,
+        expect.objectContaining({
+          'Cache-Control': 'public, max-age=3600',
+          'Content-Length': 1024,
+        }),
       )
     })
   })
 
-  it('should handle process error', async () => {
-    const mockStdout = { on: vi.fn(), pipe: vi.fn() }
-    const mockStderr = { on: vi.fn() }
-    const mockProcess = {
-      stdout: mockStdout,
-      stderr: mockStderr,
-      on: vi.fn(),
-    }
-    mockSpawn.mockReturnValue(mockProcess)
+  it('should pass audioTrack and resolution to session lookup', async () => {
+    const getSession = vi.fn().mockReturnValue(mockSession)
+    const waitForSegment = vi.fn().mockResolvedValue(true)
 
     await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      const cache = injector.getInstance(SegmentCache)
-      cache.get = vi.fn().mockResolvedValue(null) as never
-
-      const { StreamFileActionCaches } = await import('../services/stream-file-action-caches.js')
-      const caches = injector.getInstance(StreamFileActionCaches)
-      caches.ffMpegArgsCache = {
-        get: vi.fn().mockResolvedValue(['-i', 'test.mkv', 'pipe:1']),
-      } as never
-      caches.driveCache = { get: vi.fn().mockResolvedValue({ letter: 'A', physicalPath: '/mnt' }) } as never
-      caches.moviesConfigCache = {
-        get: vi.fn().mockResolvedValue({ id: 'MOVIES_CONFIG', value: { preset: 'ultrafast', watchFiles: 'all' } }),
-      } as never
-
-      await HlsSegmentAction({
-        injector,
-        getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '3' }),
-        getQuery: () => ({ mode: 'transcode', from: 30, to: 40 }),
-        response: { writeHead: vi.fn(), on: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
-        request: {} as IncomingMessage,
-      })
-
-      // Simulate error
-      const errorCallback = mockProcess.on.mock.calls.find((c) => c[0] === 'error')?.[1] as
-        | ((err: Error) => void)
-        | undefined
-      errorCallback?.(new Error('spawn failed'))
-
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'ffmpeg process error: spawn failed' }),
+      injector.setExplicitInstance(
+        { getSession, waitForSegment } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
       )
-    })
-  })
-
-  it('should cache segment on successful exit', async () => {
-    const mockStdout = { on: vi.fn(), pipe: vi.fn() }
-    const mockStderr = { on: vi.fn() }
-    const mockProcess = {
-      stdout: mockStdout,
-      stderr: mockStderr,
-      on: vi.fn(),
-    }
-    mockSpawn.mockReturnValue(mockProcess)
-
-    await usingAsync(new Injector(), async (injector) => {
-      const { SegmentCache } = await import('../services/segment-cache.js')
-      const cache = injector.getInstance(SegmentCache)
-      cache.get = vi.fn().mockResolvedValue(null) as never
-      cache.put = vi.fn().mockResolvedValue(undefined) as never
-
-      const { StreamFileActionCaches } = await import('../services/stream-file-action-caches.js')
-      const caches = injector.getInstance(StreamFileActionCaches)
-      caches.ffMpegArgsCache = {
-        get: vi.fn().mockResolvedValue(['-i', 'test.mkv', 'pipe:1']),
-      } as never
-      caches.driveCache = { get: vi.fn().mockResolvedValue({ letter: 'A', physicalPath: '/mnt' }) } as never
-      caches.moviesConfigCache = {
-        get: vi.fn().mockResolvedValue({ id: 'MOVIES_CONFIG', value: { preset: 'ultrafast', watchFiles: 'all' } }),
-      } as never
 
       await HlsSegmentAction({
         injector,
-        getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '3' }),
-        getQuery: () => ({ mode: 'transcode', from: 30, to: 40 }),
-        response: { writeHead: vi.fn(), on: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
+        getUrlParams: () => ({ letter: 'A', path: 'test.mkv', index: '0' }),
+        getQuery: () => ({ mode: 'transcode', audioTrack: 2, resolution: '720p' }),
+        response: { writeHead: vi.fn(), on: vi.fn() } as unknown as ServerResponse,
         request: {} as IncomingMessage,
       })
 
-      // Simulate data
-      const dataCallback = mockStdout.on.mock.calls.find((c) => c[0] === 'data')?.[1] as
-        | ((data: Buffer) => void)
-        | undefined
-      dataCallback?.(Buffer.from('segment data'))
-
-      // Simulate close(0)
-      const closeCallback = mockProcess.on.mock.calls.find((c) => c[0] === 'close')?.[1] as
-        | ((code: number) => void)
-        | undefined
-      closeCallback?.(0)
-
-      expect(cache.put).toHaveBeenCalledWith('A', 'test.mkv', 3, 'transcode', expect.any(Buffer), undefined)
+      expect(getSession).toHaveBeenCalledWith('A', 'test.mkv', 'transcode', 2, '720p')
     })
   })
 })

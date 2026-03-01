@@ -24,7 +24,7 @@
 ### Add transcoding infrastructure
 
 - Add `TranscodingSessionService` for managing FFmpeg processes with idle timeout cleanup
-- Add `SegmentCache` with SHA-256 keying, disk persistence, and LRU eviction
+- Add `HlsInitAction` for serving fMP4 initialization segments
 - Add `HwAccelDetector` with cached probe of `ffmpeg -hwaccels` and `-encoders`
 - Add expanded output codec support: H.265, VP9, AV1
 

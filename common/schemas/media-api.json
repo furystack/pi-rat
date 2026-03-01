@@ -6547,6 +6547,51 @@
       "required": ["url", "query", "result"],
       "additionalProperties": false
     },
+    "HlsSessionTeardownEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "audioTrack": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          },
+          "required": ["success"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
     "HlsStreamEndpoint": {
       "type": "object",
       "properties": {
@@ -6766,9 +6811,17 @@
             },
             "/my-watch-progresses/:id": {
               "$ref": "#/definitions/DeleteEndpoint%3CWatchHistoryEntry%2C%22id%22%3E"
+            },
+            "/files/:letter/:path/hls-session": {
+              "$ref": "#/definitions/HlsSessionTeardownEndpoint"
             }
           },
-          "required": ["/movies/:id", "/movie-files/:id", "/my-watch-progresses/:id"],
+          "required": [
+            "/movies/:id",
+            "/movie-files/:id",
+            "/my-watch-progresses/:id",
+            "/files/:letter/:path/hls-session"
+          ],
           "additionalProperties": false
         },
         "HEAD": {

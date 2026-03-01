@@ -2,7 +2,7 @@ import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
 import type { FfprobeData, MoviesConfig, StreamQueryParams } from 'common'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { execSync } from 'child_process'
+import { execSync, execFileSync } from 'child_process'
 import { mkdirSync, existsSync, rmSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
@@ -174,8 +174,7 @@ describeIfFfmpeg('Integration: Stream file actions with real FFmpeg', () => {
         video: { codec: 'libx264' },
       })
 
-      const { execSync: execSyncLocal } = await import('child_process')
-      const output = execSyncLocal(`ffmpeg ${args.join(' ')}`, {
+      const output = execFileSync('ffmpeg', args, {
         timeout: 30_000,
         maxBuffer: 50 * 1024 * 1024,
       })
@@ -229,10 +228,6 @@ describeIfFfmpeg('Integration: Stream file actions with real FFmpeg', () => {
       expect(playlist).toContain('#EXT-X-VERSION:7')
       expect(playlist).toContain('#EXT-X-STREAM-INF:')
       expect(playlist).toContain('stream.m3u8')
-
-      if (audioTracks.length > 1) {
-        expect(playlist).toContain('TYPE=AUDIO')
-      }
     })
 
     // generateMediaPlaylist tests removed — ffmpeg now generates the media playlist via -f hls

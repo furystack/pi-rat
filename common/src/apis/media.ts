@@ -188,6 +188,12 @@ export type HlsInitEndpoint = {
   result: unknown
 }
 
+export type HlsSessionTeardownEndpoint = {
+  url: { letter: string; path: string }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
+  result: { success: boolean }
+}
+
 export type GetSubtitlesEndpoint = {
   url: { movieId: string }
   result: string[]
@@ -237,5 +243,6 @@ export interface MediaApi extends RestApi {
     '/movies/:id': DeleteEndpoint<Movie, 'imdbId'>
     '/movie-files/:id': DeleteEndpoint<MovieFile, 'id'>
     '/my-watch-progresses/:id': DeleteEndpoint<WatchHistoryEntry, 'id'>
+    '/files/:letter/:path/hls-session': HlsSessionTeardownEndpoint
   }
 }

@@ -22,7 +22,7 @@ export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
     throw new RequestError('Invalid path', 400)
   }
 
-  const mode: PlaybackMode = query.mode || 'transcode'
+  const mode: PlaybackMode = query.mode ?? 'transcode'
   if (!VALID_MODES.includes(mode)) {
     throw new RequestError('Invalid playback mode', 400)
   }

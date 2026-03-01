@@ -2,36 +2,75 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
 import { serializeToQueryString } from '@furystack/rest'
-import type { FfprobeData } from 'common'
 import { describe, expect, it, vi } from 'vitest'
-import { FfprobeService } from '../../../ffprobe-service.js'
 import { HlsStreamAction } from './hls-stream-action.js'
+import { TranscodingSessionService } from '../services/transcoding-session.js'
 
 vi.mock('@furystack/logging', () => ({
   getLogger: () => ({
     withScope: () => ({
       verbose: vi.fn().mockResolvedValue(undefined),
       error: vi.fn().mockResolvedValue(undefined),
-      information: vi.fn().mockResolvedValue(undefined),
     }),
   }),
 }))
 
-const mockFfprobe: FfprobeData = {
-  streams: [
-    { index: 0, codec_type: 'video', codec_name: 'h264', width: 1920, height: 1080, tags: {} },
-    { index: 1, codec_type: 'audio', codec_name: 'aac', channels: 2, tags: {}, disposition: { default: 1 } },
-  ],
-  format: { format_name: 'matroska', duration: 60 },
-  chapters: [],
+const MOCK_PLAYLIST = [
+  '#EXTM3U',
+  '#EXT-X-VERSION:7',
+  '#EXT-X-PLAYLIST-TYPE:VOD',
+  '#EXT-X-TARGETDURATION:6',
+  '#EXT-X-MAP:URI="init.mp4"',
+  '#EXTINF:6.000,',
+  'segment0.m4s',
+  '#EXTINF:6.000,',
+  'segment1.m4s',
+  '#EXTINF:4.000,',
+  'segment2.m4s',
+  '#EXT-X-ENDLIST',
+].join('\n')
+
+const mockSession = {
+  key: 'A:test.mkv:transcode:0:',
+  sessionDir: '/tmp/pirat-hls-sessions/abc123',
+  state: 'running' as const,
+  mode: 'transcode' as const,
+  driveLetter: 'A',
+  path: 'test.mkv',
+  audioTrackId: 0,
+  createdAt: Date.now(),
+  lastAccessedAt: Date.now(),
+  ffmpegProcess: { killed: false, kill: vi.fn() },
 }
 
 describe('HlsStreamAction', () => {
+  it('should reject path traversal attempts', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getOrCreateSession: vi.fn(), readPlaylist: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
+
+      try {
+        await HlsStreamAction({
+          injector,
+          getUrlParams: () => ({ letter: 'A', path: '../etc/passwd' }),
+          getQuery: () => ({}),
+          response: { writeHead: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Should have thrown')
+      } catch (error) {
+        expect((error as Error).message).toContain('Invalid path')
+      }
+    })
+  })
+
   it('should reject invalid playback mode', async () => {
     await usingAsync(new Injector(), async (injector) => {
       injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
-        FfprobeService,
+        { getOrCreateSession: vi.fn(), readPlaylist: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
       )
 
       try {
@@ -49,24 +88,27 @@ describe('HlsStreamAction', () => {
     })
   })
 
-  it('should reject invalid resolution', async () => {
+  it('should return 500 when playlist is not available', async () => {
     await usingAsync(new Injector(), async (injector) => {
       injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
-        FfprobeService,
+        {
+          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+          readPlaylist: vi.fn().mockResolvedValue(null),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
       )
 
       try {
         await HlsStreamAction({
           injector,
           getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
-          getQuery: () => ({ mode: 'transcode', resolution: '999p' }),
+          getQuery: () => ({ mode: 'transcode' }),
           response: { writeHead: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
           request: {} as IncomingMessage,
         })
         expect.fail('Should have thrown')
       } catch (error) {
-        expect((error as Error).message).toContain('Invalid resolution')
+        expect((error as Error).message).toContain('Failed to generate HLS playlist')
       }
     })
   })
@@ -82,8 +124,11 @@ describe('HlsStreamAction', () => {
 
     await usingAsync(new Injector(), async (injector) => {
       injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
-        FfprobeService,
+        {
+          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -104,7 +149,7 @@ describe('HlsStreamAction', () => {
     })
   })
 
-  it('should include correct number of segments', async () => {
+  it('should rewrite segment URLs with query params', async () => {
     let writtenBody = ''
     const response = {
       writeHead: vi.fn(),
@@ -115,8 +160,11 @@ describe('HlsStreamAction', () => {
 
     await usingAsync(new Injector(), async (injector) => {
       injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
-        FfprobeService,
+        {
+          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -127,8 +175,9 @@ describe('HlsStreamAction', () => {
         request: {} as IncomingMessage,
       })
 
-      const segmentCount = (writtenBody.match(/#EXTINF:/g) || []).length
-      expect(segmentCount).toBe(6)
+      expect(writtenBody).toContain('/api/media/files/A/test.mkv/segment/0.m4s')
+      expect(writtenBody).toContain('/api/media/files/A/test.mkv/segment/1.m4s')
+      expect(writtenBody).toContain('/api/media/files/A/test.mkv/init.mp4')
       expect(writtenBody).toContain(serializeToQueryString({ mode: 'transcode' as const }))
       expect(writtenBody).toContain(serializeToQueryString({ resolution: '720p' }))
     })
@@ -145,8 +194,11 @@ describe('HlsStreamAction', () => {
 
     await usingAsync(new Injector(), async (injector) => {
       injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
-        FfprobeService,
+        {
+          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -158,6 +210,36 @@ describe('HlsStreamAction', () => {
       })
 
       expect(writtenBody).toContain(serializeToQueryString({ mode: 'transcode' as const }))
+    })
+  })
+
+  it('should pass audioTrack and resolution to session creation', async () => {
+    const getOrCreateSession = vi.fn().mockResolvedValue(mockSession)
+
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        {
+          getOrCreateSession,
+          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
+
+      await HlsStreamAction({
+        injector,
+        getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
+        getQuery: () => ({ mode: 'transcode', audioTrack: 2, resolution: '1080p' }),
+        response: { writeHead: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
+        request: {} as IncomingMessage,
+      })
+
+      expect(getOrCreateSession).toHaveBeenCalledWith({
+        driveLetter: 'A',
+        path: 'test.mkv',
+        mode: 'transcode',
+        audioTrackId: 2,
+        resolution: '1080p',
+      })
     })
   })
 })
