@@ -193,7 +193,7 @@ describe('ffMpegArgsCache', () => {
   })
 
   describe('time range', () => {
-    it('should add -ss and -t flags', async () => {
+    it('should add -ss before -i and normalize timestamps', async () => {
       const args = await buildArgs({
         mode: 'remux',
         from: 30,
@@ -204,6 +204,13 @@ describe('ffMpegArgsCache', () => {
       expect(args[args.indexOf('-ss') + 1]).toBe('30')
       expect(args).toContain('-t')
       expect(args[args.indexOf('-t') + 1]).toBe('10')
+
+      const iIdx = args.indexOf('-i')
+      const ssIdx = args.indexOf('-ss')
+      expect(ssIdx).toBeLessThan(iIdx)
+
+      expect(args).toContain('-avoid_negative_ts')
+      expect(args[args.indexOf('-avoid_negative_ts') + 1]).toBe('make_zero')
     })
   })
 

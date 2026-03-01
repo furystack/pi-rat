@@ -213,6 +213,7 @@ describe('buildAudioTrackList', () => {
     const tracks = buildAudioTrackList(ffprobe)
     expect(tracks).toHaveLength(1)
     expect(tracks[0].language).toBe('und')
+    expect(tracks[0].label).toBe('Audio Track 1')
   })
 })
 

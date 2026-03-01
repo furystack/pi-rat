@@ -10,8 +10,8 @@ import type {
   SubtitleTrackInfo,
 } from 'common'
 import type Hls from 'hls.js'
-import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { environmentOptions } from '../../../environment-options.js'
+import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 
 export const videoCodecs = {
   h264: 'avc1.42E01E',
@@ -217,8 +217,31 @@ export class MoviePlayerService implements AsyncDisposable {
       }
     })
 
-    this.hls.on(HlsModule.Events.MANIFEST_PARSED, () => {
+    const { hls } = this
+
+    hls.on(HlsModule.Events.MANIFEST_PARSED, () => {
       void this.logger.verbose({ message: 'HLS manifest parsed' })
+
+      const resolutionHeightMap: Record<string, number> = {
+        '4k': 2160,
+        '1080p': 1080,
+        '720p': 720,
+        '480p': 480,
+        '360p': 360,
+      }
+
+      const sub = this.resolution.subscribe((value) => {
+        if (!value) {
+          hls.currentLevel = -1
+          return
+        }
+        const targetHeight = resolutionHeightMap[value]
+        if (!targetHeight) return
+        const levelIndex = hls.levels.findIndex((l) => l.height === targetHeight)
+        hls.currentLevel = levelIndex >= 0 ? levelIndex : -1
+      })
+
+      hls.on(HlsModule.Events.DESTROYING, () => sub[Symbol.dispose]())
     })
 
     this.hls.loadSource(hlsUrl)

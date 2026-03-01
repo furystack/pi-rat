@@ -84,11 +84,20 @@ export class StreamFileActionCaches {
         ffmpegArgs.push('-ss', String(from))
       }
 
-      ffmpegArgs.push('-i', fullPath, '-f', 'mp4', '-movflags', 'empty_moov+frag_keyframe+faststart+default_base_moof')
+      ffmpegArgs.push('-i', fullPath)
 
       if (typeof to === 'number' && typeof from === 'number') {
         ffmpegArgs.push('-t', String(Math.max(to - from, 1)))
       }
+
+      ffmpegArgs.push(
+        '-avoid_negative_ts',
+        'make_zero',
+        '-f',
+        'mp4',
+        '-movflags',
+        'empty_moov+frag_keyframe+faststart+default_base_moof',
+      )
 
       const threads = config?.value?.threads
       if (threads && threads > 0) {

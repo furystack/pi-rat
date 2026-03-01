@@ -87,7 +87,7 @@ export const buildAudioTrackList = (ffprobe: FfprobeData): AudioTrackInfo[] => {
       const tags = stream.tags as Record<string, string> | undefined
       const language = tags?.language ?? 'und'
       const title = tags?.title ?? ''
-      const label = title || language || `Audio Track ${idx + 1}`
+      const label = title || (language !== 'und' ? language : '') || `Audio Track ${idx + 1}`
 
       return {
         index: stream.index,
