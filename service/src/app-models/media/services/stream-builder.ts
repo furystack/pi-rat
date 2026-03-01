@@ -104,6 +104,7 @@ export const buildSubtitleTrackList = (
   ffprobe: FfprobeData,
   file: PiRatFile,
   relatedFiles?: Array<{ type: string; path: string }>,
+  movieId?: string,
 ): SubtitleTrackInfo[] => {
   const tracks: SubtitleTrackInfo[] = []
 
@@ -120,6 +121,15 @@ export const buildSubtitleTrackList = (
         : 'pgs'
       : (TEXT_SUBTITLE_CODECS[codecName] ?? 'other')
 
+    const subtitleFileName = `${file.path
+      .split('/')
+      .pop()
+      ?.replace(/\.[^.]+$/, '')}-subtitle-${stream.index}.vtt`
+    const embeddedUrl =
+      !isBitmap && movieId
+        ? `/api/media/movies/${encodeURIComponent(movieId)}/subtitles/${encodeURIComponent(subtitleFileName)}`
+        : undefined
+
     tracks.push({
       index: stream.index,
       label: title || language || `Subtitle ${stream.index}`,
@@ -127,6 +137,7 @@ export const buildSubtitleTrackList = (
       format,
       source: 'embedded',
       requiresBurnIn: isBitmap,
+      url: embeddedUrl,
     })
   }
 
@@ -159,6 +170,7 @@ export const buildPlaybackInfoResponse = ({
   selectedSubtitleTrackIndex,
   relatedFiles,
   streamBaseUrl,
+  movieId,
 }: {
   ffprobe: FfprobeData
   file: PiRatFile
@@ -167,6 +179,7 @@ export const buildPlaybackInfoResponse = ({
   selectedSubtitleTrackIndex?: number
   relatedFiles?: Array<{ type: string; path: string }>
   streamBaseUrl: string
+  movieId?: string
 }): PlaybackInfoResponse => {
   const { mode, warnings } = resolvePlaybackMode({
     ffprobe,
@@ -175,16 +188,19 @@ export const buildPlaybackInfoResponse = ({
     selectedSubtitleTrackIndex,
   })
 
+  const encodedLetter = encodeURIComponent(file.driveLetter)
+  const encodedPath = encodeURIComponent(file.path)
+
   const streamUrl =
     mode === 'direct-play'
-      ? `/api/drives/files/${encodeURIComponent(file.driveLetter)}/${encodeURIComponent(file.path)}/download`
-      : `${streamBaseUrl}/files/${encodeURIComponent(file.driveLetter)}/${encodeURIComponent(file.path)}/stream`
+      ? `/api/drives/files/${encodedLetter}/${encodedPath}/download`
+      : `${streamBaseUrl}/files/${encodedLetter}/${encodedPath}/master.m3u8`
 
   return {
     mode,
     streamUrl,
     audioTracks: buildAudioTrackList(ffprobe),
-    subtitleTracks: buildSubtitleTrackList(ffprobe, file, relatedFiles),
+    subtitleTracks: buildSubtitleTrackList(ffprobe, file, relatedFiles, movieId),
     warnings,
     duration: ffprobe.format.duration ?? 0,
   }

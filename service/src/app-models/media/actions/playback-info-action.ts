@@ -31,6 +31,7 @@ export const PlaybackInfoAction: RequestAction<PlaybackInfoRequest> = async ({ i
     selectedSubtitleTrackIndex,
     relatedFiles: movieFile?.relatedFiles,
     streamBaseUrl: '/api/media',
+    movieId: movieFile?.imdbId,
   })
 
   await logger.verbose({

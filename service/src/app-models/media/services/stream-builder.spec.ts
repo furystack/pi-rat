@@ -237,6 +237,36 @@ describe('buildSubtitleTrackList', () => {
     expect(tracks[1].requiresBurnIn).toBe(false)
   })
 
+  it('should generate URLs for embedded text subtitles when movieId is provided', () => {
+    const ffprobe = createFfprobe({
+      streams: [
+        { index: 0, codec_type: 'video', codec_name: 'h264', tags: {} },
+        { index: 2, codec_type: 'subtitle', codec_name: 'subrip', tags: { language: 'eng' } },
+      ],
+    })
+
+    const file = { driveLetter: 'A', path: 'movies/test.mkv' }
+    const tracks = buildSubtitleTrackList(ffprobe, file, undefined, 'tt1234567')
+
+    expect(tracks[0].url).toContain('/api/media/movies/tt1234567/subtitles/')
+    expect(tracks[0].url).toContain('test-subtitle-2.vtt')
+  })
+
+  it('should not generate URLs for bitmap subtitles even with movieId', () => {
+    const ffprobe = createFfprobe({
+      streams: [
+        { index: 0, codec_type: 'video', codec_name: 'h264', tags: {} },
+        { index: 2, codec_type: 'subtitle', codec_name: 'hdmv_pgs_subtitle', tags: { language: 'eng' } },
+      ],
+    })
+
+    const file = { driveLetter: 'A', path: 'movies/test.mkv' }
+    const tracks = buildSubtitleTrackList(ffprobe, file, undefined, 'tt1234567')
+
+    expect(tracks[0].url).toBeUndefined()
+    expect(tracks[0].requiresBurnIn).toBe(true)
+  })
+
   it('should classify bitmap subtitles as requiring burn-in', () => {
     const ffprobe = createFfprobe({
       streams: [
@@ -296,7 +326,7 @@ describe('buildPlaybackInfoResponse', () => {
     expect(response.warnings).toHaveLength(0)
   })
 
-  it('should return stream URL for non-direct modes', () => {
+  it('should return HLS master URL for non-direct modes', () => {
     const ffprobe = createFfprobe()
     const file = { driveLetter: 'A', path: 'movies/test.mkv' }
 
@@ -315,6 +345,6 @@ describe('buildPlaybackInfoResponse', () => {
 
     expect(response.mode).toBe('remux')
     expect(response.streamUrl).toContain('/api/media/files/')
-    expect(response.streamUrl).toContain('/stream')
+    expect(response.streamUrl).toContain('/master.m3u8')
   })
 })

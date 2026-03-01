@@ -5,6 +5,7 @@ import { getDataSetFor } from '@furystack/repository'
 import { Config, Drive, type MoviesConfig, type PiRatFile, type StreamQueryParams } from 'common'
 import { join } from 'path'
 import { FfprobeService } from '../../../ffprobe-service.js'
+import { HwAccelDetector } from './hw-accel-detector.js'
 
 @Injectable({
   lifetime: 'singleton',
@@ -89,6 +90,11 @@ export class StreamFileActionCaches {
         ffmpegArgs.push('-t', String(Math.max(to - from, 1)))
       }
 
+      const threads = config?.value?.threads
+      if (threads && threads > 0) {
+        ffmpegArgs.push('-threads', String(threads))
+      }
+
       const audioStreamIndex = Math.max(
         0,
         audioStreams.findIndex((stream) => stream === audioStream),
@@ -116,11 +122,20 @@ export class StreamFileActionCaches {
       if (copyVideo) {
         ffmpegArgs.push('-c:v', 'copy')
       } else {
-        const videoCodec = video?.codec ?? 'libx264'
+        const requestedCodec = video?.codec ?? 'libx264'
+        let videoCodec: string = requestedCodec
+
+        const hwAccelMethod = config?.value?.hwAccelMethod
+        if (hwAccelMethod && hwAccelMethod !== 'none') {
+          const hwDetector = injector.getInstance(HwAccelDetector)
+          const targetCodec = requestedCodec === 'libx265' ? 'hevc' : 'h264'
+          videoCodec = await hwDetector.getEncoder(targetCodec, hwAccelMethod)
+        }
+
         ffmpegArgs.push('-c:v', videoCodec)
 
-        const supportsPreset = videoCodec === 'libx264' || videoCodec === 'libx265'
-        if (supportsPreset) {
+        const isSoftwareEncoder = videoCodec === 'libx264' || videoCodec === 'libx265'
+        if (isSoftwareEncoder) {
           ffmpegArgs.push('-preset', config?.value?.preset ?? 'ultrafast')
         }
 

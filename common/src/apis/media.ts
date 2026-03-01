@@ -186,6 +186,7 @@ export interface MediaApi extends RestApi {
     '/files/:letter/:path/stream': StreamFileEndpoint
     '/files/:letter/:path/master.m3u8': {
       url: { letter: string; path: string }
+      query: { videoCodecs?: string; audioCodecs?: string; containers?: string }
       result: unknown
     }
     '/files/:letter/:path/stream.m3u8': {
@@ -195,7 +196,7 @@ export interface MediaApi extends RestApi {
     }
     '/files/:letter/:path/segment/:index': {
       url: { letter: string; path: string; index: string }
-      query: { mode?: PlaybackMode; from?: number; to?: number; resolution?: string }
+      query: { mode?: PlaybackMode; from?: number; to?: number; resolution?: string; audioTrack?: number }
       result: unknown
     }
   }

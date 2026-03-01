@@ -4,11 +4,28 @@ import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
 import { Drive, getFileName } from 'common'
 import { promises } from 'fs'
+import { spawn } from 'child_process'
 import { FfprobeService } from '../../../ffprobe-service.js'
-import { execAsync } from '../../../utils/exec-async.js'
 import { getPhysicalParentPath, getPhysicalPath } from '../../../utils/physical-path-utils.js'
 
 const EXTRACTABLE_TEXT_CODECS = ['subrip', 'ass', 'ssa', 'mov_text', 'webvtt']
+
+const spawnAsync = (command: string, args: string[], options: { cwd: string }): Promise<void> =>
+  new Promise((resolve, reject) => {
+    const proc = spawn(command, args, { ...options, stdio: ['ignore', 'pipe', 'pipe'] })
+    let stderr = ''
+    proc.stderr.on('data', (data: Buffer) => {
+      stderr += data.toString()
+    })
+    proc.on('close', (code) => {
+      if (code === 0) {
+        resolve()
+      } else {
+        reject(new Error(`${command} exited with code ${code}: ${stderr.slice(0, 500)}`))
+      }
+    })
+    proc.on('error', reject)
+  })
 
 export const extractSubtitles = async ({ injector, file }: { injector: Injector; file: PiRatFile }) => {
   const logger = getLogger(injector).withScope('extract-subtitles')
@@ -44,11 +61,13 @@ export const extractSubtitles = async ({ injector, file }: { injector: Injector;
   await promises.mkdir(cwd, { recursive: true })
   const fileName = getFileName(file)
 
-  const mappings = subtitles
-    .map((s) => `-map 0:s:${s.relativeIndex} -c:s webvtt ${fileName}-subtitle-${s.streamIndex}.vtt`)
-    .join(' ')
+  const ffmpegArgs = ['-i', fullPath]
+  for (const s of subtitles) {
+    ffmpegArgs.push('-map', `0:s:${s.relativeIndex}`, '-c:s', 'webvtt', `${fileName}-subtitle-${s.streamIndex}.vtt`)
+  }
+  ffmpegArgs.push('-y')
 
-  await execAsync(`ffmpeg -i ${fullPath} ${mappings} -y`, { cwd })
+  await spawnAsync('ffmpeg', ffmpegArgs, { cwd })
 
   await logger.information({
     message: `Subtitles extracted for movie '${fileName}'`,

@@ -7,7 +7,7 @@ import type { MediaApi } from 'common'
 import { Drive, MovieFile, getFileName, getParentPath } from 'common'
 import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
-import { join } from 'path'
+import { resolve, relative } from 'path'
 
 type GetSubtitleFileEndpoint = MediaApi['GET']['/movies/:movieId/subtitles/:subtitleName']
 
@@ -32,8 +32,13 @@ export const GetSubtitleFileAction: RequestAction<GetSubtitleFileEndpoint> = asy
     if (!drive) continue
 
     const parentPath = getParentPath({ driveLetter: movieFile.driveLetter, path: movieFile.path })
-    const physicalParent = join(drive.physicalPath, parentPath)
-    const subtitlePath = join(physicalParent, subtitleName)
+    const physicalParent = resolve(drive.physicalPath, parentPath)
+    const subtitlePath = resolve(physicalParent, subtitleName)
+
+    const rel = relative(physicalParent, subtitlePath)
+    if (rel.startsWith('..') || resolve(subtitlePath) !== subtitlePath) {
+      throw new RequestError('Invalid subtitle path', 400)
+    }
 
     try {
       const fileStat = await stat(subtitlePath)

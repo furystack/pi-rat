@@ -103,7 +103,6 @@ export const generateMediaPlaylist = ({
     `#EXT-X-TARGETDURATION:${segmentDuration}`,
     '#EXT-X-MEDIA-SEQUENCE:0',
     '#EXT-X-PLAYLIST-TYPE:VOD',
-    '#EXT-X-MAP:URI="init.mp4"',
   ]
 
   for (let i = 0; i < segmentCount; i++) {
@@ -155,7 +154,7 @@ const getCodecString = (ffprobe: FfprobeData): string => {
   const audioCodecMap: Record<string, string> = {
     aac: 'mp4a.40.2',
     ac3: 'ac-3',
-    eac3: 'mp4a.40.5',
+    eac3: 'ec-3',
     opus: 'opus',
   }
 

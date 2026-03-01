@@ -3,6 +3,7 @@ import { usingAsync } from '@furystack/utils'
 import type { FfprobeData, MoviesConfig, StreamQueryParams } from 'common'
 import { describe, expect, it, vi } from 'vitest'
 import { FfprobeService } from '../../../ffprobe-service.js'
+import { HwAccelDetector } from './hw-accel-detector.js'
 import { StreamFileActionCaches } from './stream-file-action-caches.js'
 
 vi.mock('@furystack/core', () => ({
@@ -51,11 +52,19 @@ const mockFfprobe: FfprobeData = {
 
 const mockDrive = { letter: 'A', physicalPath: '/mnt/media' }
 
-const buildArgs = async (queryParams: StreamQueryParams) => {
+const buildArgs = async (queryParams: StreamQueryParams, configOverrides?: Partial<MoviesConfig['value']>) => {
   return await usingAsync(new Injector(), async (injector) => {
     injector.setExplicitInstance(
       { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
       FfprobeService,
+    )
+
+    injector.setExplicitInstance(
+      {
+        getEncoder: vi.fn().mockResolvedValue('h264_vaapi'),
+        detect: vi.fn().mockResolvedValue({ available: ['vaapi'], encoders: { h264: ['h264_vaapi'] } }),
+      } as unknown as HwAccelDetector,
+      HwAccelDetector,
     )
 
     const caches = injector.getInstance(StreamFileActionCaches)
@@ -63,7 +72,7 @@ const buildArgs = async (queryParams: StreamQueryParams) => {
     caches.moviesConfigCache = {
       get: vi.fn().mockResolvedValue({
         id: 'MOVIES_CONFIG',
-        value: { preset: 'ultrafast', watchFiles: 'all' },
+        value: { preset: 'ultrafast', watchFiles: 'all', ...configOverrides },
       } satisfies MoviesConfig),
     } as never
 
@@ -218,6 +227,66 @@ describe('ffMpegArgsCache', () => {
       })
 
       expect(args).not.toContain('-ac')
+    })
+  })
+
+  describe('threads config', () => {
+    it('should add -threads when configured', async () => {
+      const args = await buildArgs(
+        {
+          mode: 'transcode',
+          from: 0,
+          to: 10,
+          audio: { trackId: 1 },
+        },
+        { threads: 4 },
+      )
+
+      expect(args).toContain('-threads')
+      expect(args[args.indexOf('-threads') + 1]).toBe('4')
+    })
+
+    it('should NOT add -threads when not configured', async () => {
+      const args = await buildArgs({
+        mode: 'transcode',
+        from: 0,
+        to: 10,
+        audio: { trackId: 1 },
+      })
+
+      expect(args).not.toContain('-threads')
+    })
+  })
+
+  describe('hardware acceleration', () => {
+    it('should use hw encoder when hwAccelMethod is configured', async () => {
+      const args = await buildArgs(
+        {
+          mode: 'transcode',
+          from: 0,
+          to: 10,
+          audio: { trackId: 1 },
+          video: { codec: 'libx264' },
+        },
+        { hwAccelMethod: 'vaapi' },
+      )
+
+      expect(args[args.indexOf('-c:v') + 1]).toBe('h264_vaapi')
+      expect(args).not.toContain('-preset')
+    })
+
+    it('should NOT use hw encoder in remux mode', async () => {
+      const args = await buildArgs(
+        {
+          mode: 'remux',
+          from: 0,
+          to: 10,
+          audio: { trackId: 1 },
+        },
+        { hwAccelMethod: 'vaapi' },
+      )
+
+      expect(args[args.indexOf('-c:v') + 1]).toBe('copy')
     })
   })
 })

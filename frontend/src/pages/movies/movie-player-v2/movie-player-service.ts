@@ -9,7 +9,7 @@ import type {
   StreamQueryParams,
   SubtitleTrackInfo,
 } from 'common'
-import Hls from 'hls.js'
+import type Hls from 'hls.js'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { environmentOptions } from '../../../environment-options.js'
 
@@ -23,9 +23,14 @@ export const videoCodecs = {
 export const audioCodecs = {
   aac: 'mp4a.40.2',
   ac3: 'ac-3',
-  eac3: 'mp4a.40.5',
+  eac3: 'ec-3',
   opus: 'opus',
   dts: 'dts+',
+}
+
+const loadHls = async () => {
+  const mod = await import('hls.js')
+  return mod.default
 }
 
 const buildCodecSupportMap = () => {
@@ -148,20 +153,27 @@ export class MoviePlayerService implements AsyncDisposable {
     if (info.mode === 'direct-play') {
       this.startDirectPlayback(videoElement, info)
     } else {
-      this.startHlsPlayback(videoElement)
+      void this.startHlsPlayback(videoElement)
     }
+  }
+
+  private toServiceUrl(apiUrl: string): string {
+    const stripped = apiUrl.startsWith('/api/') ? apiUrl.slice(4) : apiUrl
+    return `${environmentOptions.serviceUrl}${stripped}`
   }
 
   private startDirectPlayback(videoElement: HTMLVideoElement, info: PlaybackInfoResponse) {
     void this.logger.verbose({ message: 'Starting direct playback' })
-    videoElement.src = `${environmentOptions.serviceUrl}${info.streamUrl.startsWith('/api') ? info.streamUrl.slice(4) : info.streamUrl}`
+    videoElement.src = this.toServiceUrl(info.streamUrl)
     if (this.currentProgress > 0) {
       videoElement.currentTime = this.currentProgress
     }
   }
 
-  private startHlsPlayback(videoElement: HTMLVideoElement) {
-    const hlsUrl = `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8`
+  private async startHlsPlayback(videoElement: HTMLVideoElement) {
+    const hlsUrl = this.toServiceUrl(
+      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8`,
+    )
 
     if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
       void this.logger.verbose({ message: 'Using native HLS playback' })
@@ -172,36 +184,38 @@ export class MoviePlayerService implements AsyncDisposable {
       return
     }
 
-    if (!Hls.isSupported()) {
+    const HlsModule = await loadHls()
+
+    if (!HlsModule.isSupported()) {
       void this.logger.error({ message: 'HLS is not supported in this browser' })
       return
     }
 
     void this.logger.verbose({ message: 'Starting HLS playback via hls.js' })
 
-    this.hls = new Hls({
+    this.hls = new HlsModule({
       xhrSetup: (xhr) => {
         xhr.withCredentials = true
       },
       startPosition: this.currentProgress > 0 ? this.currentProgress : -1,
     })
 
-    this.hls.on(Hls.Events.ERROR, (_event, data) => {
+    this.hls.on(HlsModule.Events.ERROR, (_event, data) => {
       if (data.fatal) {
         void this.logger.error({
           message: `HLS fatal error: ${data.type}`,
           data: { details: data.details },
         })
 
-        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+        if (data.type === HlsModule.ErrorTypes.NETWORK_ERROR) {
           this.hls?.startLoad()
-        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+        } else if (data.type === HlsModule.ErrorTypes.MEDIA_ERROR) {
           this.hls?.recoverMediaError()
         }
       }
     })
 
-    this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+    this.hls.on(HlsModule.Events.MANIFEST_PARSED, () => {
       void this.logger.verbose({ message: 'HLS manifest parsed' })
     })
 
