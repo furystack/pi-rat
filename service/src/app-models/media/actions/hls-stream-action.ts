@@ -1,11 +1,13 @@
 import { getLogger } from '@furystack/logging'
+import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
-import type { MediaApi } from 'common'
+import type { HlsStreamEndpoint, PlaybackMode } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { generateMediaPlaylist } from '../services/hls-manifest-generator.js'
 
-type HlsStreamEndpoint = MediaApi['GET']['/files/:letter/:path/stream.m3u8']
+const VALID_MODES: PlaybackMode[] = ['direct-play', 'remux', 'direct-stream', 'transcode']
+const VALID_RESOLUTIONS = ['1080p', '720p', '480p', '360p'] as const
 
 export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
   injector,
@@ -22,6 +24,14 @@ export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
 
   const duration = ffprobe.format.duration || 0
   const mode = query.mode || 'transcode'
+  if (!VALID_MODES.includes(mode)) {
+    throw new RequestError('Invalid playback mode', 400)
+  }
+
+  if (query.resolution && !(VALID_RESOLUTIONS as readonly string[]).includes(query.resolution)) {
+    throw new RequestError('Invalid resolution', 400)
+  }
+
   const segmentDuration = 10
 
   const encodedLetter = encodeURIComponent(letter)

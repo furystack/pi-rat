@@ -1,0 +1,5 @@
+releases:
+  common: minor
+  frontend: minor
+  pi-rat: minor
+  service: minor

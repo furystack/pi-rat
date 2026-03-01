@@ -233,8 +233,9 @@ export class MoviePlayerService implements AsyncDisposable {
 
     await this.fetchPlaybackInfo()
 
-    if (this.videoElement) {
-      this.startPlayback(this.videoElement, this.playbackInfo.getValue()!)
+    const info = this.playbackInfo.getValue()
+    if (this.videoElement && info) {
+      this.startPlayback(this.videoElement, info)
     }
   }
 

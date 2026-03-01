@@ -26,6 +26,50 @@ const mockFfprobe: FfprobeData = {
 }
 
 describe('HlsStreamAction', () => {
+  it('should reject invalid playback mode', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        FfprobeService,
+      )
+
+      try {
+        await HlsStreamAction({
+          injector,
+          getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
+          getQuery: () => ({ mode: 'invalid' as never }),
+          response: { writeHead: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Should have thrown')
+      } catch (error) {
+        expect((error as Error).message).toContain('Invalid playback mode')
+      }
+    })
+  })
+
+  it('should reject invalid resolution', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        FfprobeService,
+      )
+
+      try {
+        await HlsStreamAction({
+          injector,
+          getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
+          getQuery: () => ({ mode: 'transcode', resolution: '999p' }),
+          response: { writeHead: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Should have thrown')
+      } catch (error) {
+        expect((error as Error).message).toContain('Invalid resolution')
+      }
+    })
+  })
+
   it('should return a valid M3U8 media playlist', async () => {
     let writtenBody = ''
     const response = {

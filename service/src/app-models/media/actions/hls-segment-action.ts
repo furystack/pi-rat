@@ -1,15 +1,15 @@
 import { getLogger } from '@furystack/logging'
+import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
 import { spawn } from 'child_process'
-import type { MediaApi, PlaybackMode } from 'common'
+import type { HlsSegmentEndpoint, PlaybackMode } from 'common'
 import mime from 'mime'
 import { SegmentCache } from '../services/segment-cache.js'
 import { StreamFileActionCaches } from '../services/stream-file-action-caches.js'
 
-type HlsSegmentEndpoint = MediaApi['GET']['/files/:letter/:path/segment/:index']
-
 const VALID_RESOLUTIONS = ['1080p', '720p', '480p', '360p'] as const
+const VALID_MODES: PlaybackMode[] = ['direct-play', 'remux', 'direct-stream', 'transcode']
 
 export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
   injector,
@@ -22,10 +22,25 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
   const query = getQuery()
 
   const segmentIndex = parseInt(index, 10)
+  if (isNaN(segmentIndex) || segmentIndex < 0) {
+    throw new RequestError('Invalid segment index', 400)
+  }
+
   const from = query.from ?? 0
   const to = query.to ?? from + 10
+  if (from < 0 || to <= from) {
+    throw new RequestError('Invalid time range', 400)
+  }
+
   const mode: PlaybackMode = query.mode ?? 'transcode'
+  if (!VALID_MODES.includes(mode)) {
+    throw new RequestError('Invalid playback mode', 400)
+  }
+
   const resolution = query.resolution as (typeof VALID_RESOLUTIONS)[number] | undefined
+  if (resolution && !VALID_RESOLUTIONS.includes(resolution)) {
+    throw new RequestError('Invalid resolution', 400)
+  }
 
   const segmentCache = injector.getInstance(SegmentCache)
 

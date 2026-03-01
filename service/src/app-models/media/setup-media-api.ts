@@ -80,9 +80,15 @@ export const setupMediaRestApi = async (injector: Injector) => {
         '/files/:letter/:path/stream': Authorize()(
           Validate({ schema: mediaApiSchema, schemaName: 'StreamFileEndpoint' })(StreamAction),
         ),
-        '/files/:letter/:path/master.m3u8': Authorize()(HlsMasterAction),
-        '/files/:letter/:path/stream.m3u8': Authorize()(HlsStreamAction),
-        '/files/:letter/:path/segment/:index': Authorize()(HlsSegmentAction),
+        '/files/:letter/:path/master.m3u8': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsMasterEndpoint' })(HlsMasterAction),
+        ),
+        '/files/:letter/:path/stream.m3u8': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsStreamEndpoint' })(HlsStreamAction),
+        ),
+        '/files/:letter/:path/segment/:index': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsSegmentEndpoint' })(HlsSegmentAction),
+        ),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"id">' })(
           createGetEntityEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),

@@ -164,6 +164,24 @@ export type StreamFileEndpoint = {
   result: unknown
 }
 
+export type HlsMasterEndpoint = {
+  url: { letter: string; path: string }
+  query: { videoCodecs?: string; audioCodecs?: string; containers?: string }
+  result: unknown
+}
+
+export type HlsStreamEndpoint = {
+  url: { letter: string; path: string }
+  query: { mode?: PlaybackMode; resolution?: string }
+  result: unknown
+}
+
+export type HlsSegmentEndpoint = {
+  url: { letter: string; path: string; index: string }
+  query: { mode?: PlaybackMode; from?: number; to?: number; resolution?: string; audioTrack?: number }
+  result: unknown
+}
+
 export interface MediaApi extends RestApi {
   GET: {
     '/movies': GetCollectionEndpoint<Movie>
@@ -184,21 +202,9 @@ export interface MediaApi extends RestApi {
     '/movie-files': GetCollectionEndpoint<MovieFile>
     '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
     '/files/:letter/:path/stream': StreamFileEndpoint
-    '/files/:letter/:path/master.m3u8': {
-      url: { letter: string; path: string }
-      query: { videoCodecs?: string; audioCodecs?: string; containers?: string }
-      result: unknown
-    }
-    '/files/:letter/:path/stream.m3u8': {
-      url: { letter: string; path: string }
-      query: { mode?: PlaybackMode; resolution?: string }
-      result: unknown
-    }
-    '/files/:letter/:path/segment/:index': {
-      url: { letter: string; path: string; index: string }
-      query: { mode?: PlaybackMode; from?: number; to?: number; resolution?: string; audioTrack?: number }
-      result: unknown
-    }
+    '/files/:letter/:path/master.m3u8': HlsMasterEndpoint
+    '/files/:letter/:path/stream.m3u8': HlsStreamEndpoint
+    '/files/:letter/:path/segment/:index': HlsSegmentEndpoint
   }
   POST: {
     '/movies': PostEndpoint<Movie, 'imdbId', Omit<Movie, 'createdAt' | 'updatedAt'>>

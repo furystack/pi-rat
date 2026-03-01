@@ -125,4 +125,25 @@ describe('SegmentCache', () => {
     expect(cache.getStats().entries).toBe(0)
     expect(cache.getStats().totalSizeMb).toBe(0)
   })
+
+  it('should evict oldest entries when cache exceeds max size', async () => {
+    const { promises: fsPromises } = await import('fs')
+
+    // Override getMaxCacheSize to return a small value (100 bytes)
+    ;(cache as unknown as { getMaxCacheSize: () => Promise<number> }).getMaxCacheSize = async () => 100
+
+    const data50 = Buffer.alloc(50, 'a')
+    const data60 = Buffer.alloc(60, 'b')
+
+    await cache.put('A', 'test.mkv', 0, 'transcode', data50)
+    expect(cache.getStats().entries).toBe(1)
+
+    await cache.put('A', 'test.mkv', 1, 'transcode', data60)
+
+    // Segment 0 should be evicted to make room for segment 1
+    expect(cache.getStats().entries).toBe(1)
+    expect(await cache.has('A', 'test.mkv', 0, 'transcode')).toBe(false)
+    expect(await cache.has('A', 'test.mkv', 1, 'transcode')).toBe(true)
+    expect(vi.mocked(fsPromises.unlink)).toHaveBeenCalled()
+  })
 })

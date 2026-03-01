@@ -6395,6 +6395,120 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
+    "HlsMasterEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "videoCodecs": {
+              "type": "string"
+            },
+            "audioCodecs": {
+              "type": "string"
+            },
+            "containers": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
+    "HlsSegmentEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "index": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path", "index"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "from": {
+              "type": "number"
+            },
+            "to": {
+              "type": "number"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "audioTrack": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
+    "HlsStreamEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "resolution": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
     "LinkMovie": {
       "type": "object",
       "properties": {
@@ -6506,118 +6620,13 @@
               "$ref": "#/definitions/StreamFileEndpoint"
             },
             "/files/:letter/:path/master.m3u8": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "letter": {
-                      "type": "string"
-                    },
-                    "path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["letter", "path"],
-                  "additionalProperties": false
-                },
-                "query": {
-                  "type": "object",
-                  "properties": {
-                    "videoCodecs": {
-                      "type": "string"
-                    },
-                    "audioCodecs": {
-                      "type": "string"
-                    },
-                    "containers": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "result": {}
-              },
-              "required": ["url", "query", "result"],
-              "additionalProperties": false
+              "$ref": "#/definitions/HlsMasterEndpoint"
             },
             "/files/:letter/:path/stream.m3u8": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "letter": {
-                      "type": "string"
-                    },
-                    "path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["letter", "path"],
-                  "additionalProperties": false
-                },
-                "query": {
-                  "type": "object",
-                  "properties": {
-                    "mode": {
-                      "$ref": "#/definitions/PlaybackMode"
-                    },
-                    "resolution": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "result": {}
-              },
-              "required": ["url", "query", "result"],
-              "additionalProperties": false
+              "$ref": "#/definitions/HlsStreamEndpoint"
             },
             "/files/:letter/:path/segment/:index": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "letter": {
-                      "type": "string"
-                    },
-                    "path": {
-                      "type": "string"
-                    },
-                    "index": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["letter", "path", "index"],
-                  "additionalProperties": false
-                },
-                "query": {
-                  "type": "object",
-                  "properties": {
-                    "mode": {
-                      "$ref": "#/definitions/PlaybackMode"
-                    },
-                    "from": {
-                      "type": "number"
-                    },
-                    "to": {
-                      "type": "number"
-                    },
-                    "resolution": {
-                      "type": "string"
-                    },
-                    "audioTrack": {
-                      "type": "number"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "result": {}
-              },
-              "required": ["url", "query", "result"],
-              "additionalProperties": false
+              "$ref": "#/definitions/HlsSegmentEndpoint"
             }
           },
           "required": [
