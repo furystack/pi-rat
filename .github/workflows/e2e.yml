@@ -27,6 +27,9 @@ jobs:
       - name: Install Playwright browsers
         run: yarn playwright install --with-deps
 
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Dockerize
         run: yarn dockerize
 
