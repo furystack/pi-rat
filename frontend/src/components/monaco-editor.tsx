@@ -51,12 +51,11 @@ export const MonacoEditor = Shade<MonacoEditorProps>({
           ...props.options,
         })
         editorInstance.setValue(props.value || '')
-        if (props.onchange) {
-          editorInstance.onKeyUp(() => {
-            const value = editorInstance!.getValue()
-            props.onchange?.(value)
-          })
-        }
+        editorInstance.onDidChangeModelContent(() => {
+          const value = editorInstance!.getValue()
+          props.onchange?.(value)
+          props.onValueChange?.(value)
+        })
 
         themeSub = themeProvider.subscribe('themeChanged', () => {
           const updatedName = registerShadesTheme(themeProvider)
