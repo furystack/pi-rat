@@ -6521,9 +6521,24 @@
                   "required": ["letter", "path"],
                   "additionalProperties": false
                 },
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "videoCodecs": {
+                      "type": "string"
+                    },
+                    "audioCodecs": {
+                      "type": "string"
+                    },
+                    "containers": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
                 "result": {}
               },
-              "required": ["url", "result"],
+              "required": ["url", "query", "result"],
               "additionalProperties": false
             },
             "/files/:letter/:path/stream.m3u8": {
@@ -6592,6 +6607,9 @@
                     },
                     "resolution": {
                       "type": "string"
+                    },
+                    "audioTrack": {
+                      "type": "number"
                     }
                   },
                   "additionalProperties": false
