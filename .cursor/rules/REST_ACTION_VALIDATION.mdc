@@ -47,12 +47,18 @@ ffmpegArgs.push('-ss', String(from))      // negative from goes through
 
 ## Path Traversal Prevention
 
-When constructing file paths from user input, always validate against directory traversal:
+When constructing file paths from user input, always validate against directory traversal. Do not rely solely on the router.
 
 ```typescript
-// ✅ Good - path traversal check
-const rel = relative(physicalParent, subtitlePath)
-if (rel.startsWith('..') || resolve(subtitlePath) !== subtitlePath) {
+// ✅ Good - explicit path traversal check
+if (path.includes('..') || path.includes('\0')) {
+  throw new RequestError('Invalid path', 400)
+}
+
+// ✅ Good - using path.relative to verify containment
+const resolvedPath = resolve(baseDir, userInputPath)
+const rel = relative(baseDir, resolvedPath)
+if (rel.startsWith('..') || isAbsolute(rel)) {
   throw new RequestError('Invalid path', 400)
 }
 ```

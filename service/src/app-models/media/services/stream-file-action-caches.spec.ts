@@ -10,11 +10,13 @@ vi.mock('@furystack/core', () => ({
   useSystemIdentityContext: ({ injector }: { injector: unknown }) => injector,
 }))
 
+const mockGetDataSetFor = vi.fn().mockReturnValue({
+  get: vi.fn().mockResolvedValue(undefined),
+  subscribe: vi.fn().mockReturnValue({ [Symbol.dispose]: vi.fn() }),
+})
+
 vi.mock('@furystack/repository', () => ({
-  getDataSetFor: () => ({
-    get: vi.fn().mockResolvedValue(undefined),
-    subscribe: vi.fn().mockReturnValue({ [Symbol.dispose]: vi.fn() }),
-  }),
+  getDataSetFor: (...args: unknown[]): unknown => mockGetDataSetFor(...args),
 }))
 
 vi.mock('@furystack/logging', () => ({
@@ -287,6 +289,66 @@ describe('ffMpegArgsCache', () => {
       )
 
       expect(args[args.indexOf('-c:v') + 1]).toBe('copy')
+    })
+  })
+
+  describe('configuration updates', () => {
+    it('should invalidate cache when MOVIES_CONFIG is updated', async () => {
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+
+        const mockConfigDataSet = {
+          get: vi.fn().mockResolvedValue({ id: 'MOVIES_CONFIG', value: {} }),
+          subscribe: vi.fn().mockReturnValue({ [Symbol.dispose]: vi.fn() }),
+        }
+
+        const mockDriveDataSet = {
+          get: vi.fn().mockResolvedValue(mockDrive),
+        }
+
+        mockGetDataSetFor.mockImplementation((_injector, model: { name: string }) => {
+          if (model.name === 'Config') return mockConfigDataSet
+          if (model.name === 'Drive') return mockDriveDataSet
+          return {}
+        })
+
+        const caches = injector.getInstance(StreamFileActionCaches)
+        caches.moviesConfigCache.setObsolete = vi.fn()
+
+        caches.init()
+
+        // Simulate config update event
+        const subscriptionHandler = mockConfigDataSet.subscribe.mock.calls[0][1] as (data: { id: string }) => void
+        subscriptionHandler({ id: 'MOVIES_CONFIG' })
+
+        expect(caches.moviesConfigCache.setObsolete).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('error handling', () => {
+    it('should throw if drive is not found', async () => {
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+
+        const caches = injector.getInstance(StreamFileActionCaches)
+        caches.driveCache.get = vi.fn().mockResolvedValue(null) as never
+        caches.moviesConfigCache.get = vi.fn().mockResolvedValue({ id: 'MOVIES_CONFIG', value: {} }) as never
+
+        await expect(
+          caches.ffMpegArgsCache.get({
+            injector,
+            file: { driveLetter: 'Z', path: 'test.mkv' },
+            queryParams: { from: 0, to: 10, mode: 'transcode', audio: { trackId: 0 } },
+          }),
+        ).rejects.toThrow('Drive Z not found')
+      })
     })
   })
 })

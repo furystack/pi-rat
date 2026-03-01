@@ -1,5 +1,6 @@
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
+import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
@@ -23,6 +24,10 @@ export const HlsMasterAction: RequestAction<HlsMasterEndpoint> = async ({
   const logger = getLogger(injector).withScope('HlsMasterAction')
   const { letter, path } = getUrlParams()
   const query = getQuery()
+
+  if (path.includes('..') || path.includes('\0')) {
+    throw new RequestError('Invalid path', 400)
+  }
 
   const file = { driveLetter: letter, path }
   const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)

@@ -242,4 +242,41 @@ describe('TranscodingSessionService', () => {
       svc.dispose()
     })
   })
+
+  it('should cleanup idle sessions automatically', async () => {
+    vi.useFakeTimers()
+    const startTime = Date.now()
+    vi.setSystemTime(startTime)
+
+    await usingAsync(new Injector(), async (injector) => {
+      const { StreamFileActionCaches } = await import('./stream-file-action-caches.js')
+      const caches = injector.getInstance(StreamFileActionCaches)
+      caches.ffMpegArgsCache = {
+        get: vi.fn().mockResolvedValue(['-i', 'test.mkv', 'pipe:1']),
+      } as never
+      caches.driveCache = { get: vi.fn().mockResolvedValue({ letter: 'A', physicalPath: '/mnt' }) } as never
+      caches.moviesConfigCache = {
+        get: vi.fn().mockResolvedValue({ id: 'MOVIES_CONFIG', value: { preset: 'ultrafast', watchFiles: 'all' } }),
+      } as never
+
+      const svc = injector.getInstance(TranscodingSessionService)
+
+      await svc.createSession({
+        driveLetter: 'A',
+        path: 'test.mkv',
+        mode: 'transcode',
+        queryParams: mockQueryParams,
+      })
+      expect(svc.getActiveSessionCount()).toBe(1)
+
+      // Advance time past timeout (5 mins + buffer)
+      // We need to advance system time AND timers
+      vi.setSystemTime(startTime + 5 * 60 * 1000 + 2000)
+      vi.advanceTimersByTime(5 * 60 * 1000 + 2000)
+
+      expect(svc.getActiveSessionCount()).toBe(0)
+      svc.dispose()
+    })
+    vi.useRealTimers()
+  })
 })

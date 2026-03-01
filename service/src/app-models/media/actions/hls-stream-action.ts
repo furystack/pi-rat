@@ -19,6 +19,10 @@ export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
   const { letter, path } = getUrlParams()
   const query = getQuery()
 
+  if (path.includes('..') || path.includes('\0')) {
+    throw new RequestError('Invalid path', 400)
+  }
+
   const file = { driveLetter: letter, path }
   const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 

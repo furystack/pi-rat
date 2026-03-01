@@ -21,6 +21,10 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
   const { letter, path, index } = getUrlParams()
   const query = getQuery()
 
+  if (path.includes('..') || path.includes('\0')) {
+    throw new RequestError('Invalid path', 400)
+  }
+
   const segmentIndex = parseInt(index, 10)
   if (isNaN(segmentIndex) || segmentIndex < 0) {
     throw new RequestError('Invalid segment index', 400)

@@ -1,4 +1,5 @@
 import { getLogger } from '@furystack/logging'
+import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
 import { spawn } from 'child_process'
@@ -21,6 +22,10 @@ export const StreamAction: RequestAction<StreamFileEndpoint> = async ({
   response.writeHead(200, head)
 
   const { letter, path } = getUrlParams()
+
+  if (path.includes('..') || path.includes('\0')) {
+    throw new RequestError('Invalid path', 400)
+  }
 
   const cache = injector.getInstance(StreamFileActionCaches)
 
