@@ -195,7 +195,7 @@ describe('ffMpegArgsCache', () => {
   })
 
   describe('time range', () => {
-    it('should add -ss before -i with correct timestamp offset', async () => {
+    it('should add -ss before -i for fast seeking', async () => {
       const args = await buildArgs({
         mode: 'remux',
         from: 30,
@@ -210,9 +210,6 @@ describe('ffMpegArgsCache', () => {
       const iIdx = args.indexOf('-i')
       const ssIdx = args.indexOf('-ss')
       expect(ssIdx).toBeLessThan(iIdx)
-
-      expect(args).toContain('-output_ts_offset')
-      expect(args[args.indexOf('-output_ts_offset') + 1]).toBe('30')
     })
   })
 

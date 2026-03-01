@@ -86,10 +86,6 @@ export class StreamFileActionCaches {
 
       ffmpegArgs.push('-i', fullPath)
 
-      if (typeof from === 'number') {
-        ffmpegArgs.push('-output_ts_offset', String(from))
-      }
-
       if (typeof to === 'number' && typeof from === 'number') {
         ffmpegArgs.push('-t', String(Math.max(to - from, 1)))
       }
