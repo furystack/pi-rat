@@ -1,7 +1,7 @@
 import { serializeToQueryString } from '@furystack/rest'
 import type { AudioTrackInfo, FfprobeData, SubtitleTrackInfo } from 'common'
 import { describe, expect, it } from 'vitest'
-import { generateMasterPlaylist, generateMediaPlaylist, generateSubtitlePlaylist } from './hls-manifest-generator.js'
+import { generateMasterPlaylist, generateSubtitlePlaylist } from './hls-manifest-generator.js'
 
 const createFfprobe = (overrides: Partial<FfprobeData> = {}): FfprobeData => ({
   streams: [
@@ -130,58 +130,6 @@ describe('generateMasterPlaylist', () => {
     expect(playlist).toContain('RESOLUTION=1280x720')
     expect(playlist).toContain('RESOLUTION=854x480')
     expect(playlist).toContain('RESOLUTION=640x360')
-  })
-})
-
-describe('generateMediaPlaylist', () => {
-  it('should produce a valid VOD media playlist', () => {
-    const playlist = generateMediaPlaylist({
-      duration: 120,
-      segmentDuration: 10,
-      baseUrl: '/api/media/files/A/test',
-      mode: 'remux',
-    })
-
-    expect(playlist).toContain('#EXTM3U')
-    expect(playlist).toContain('#EXT-X-PLAYLIST-TYPE:VOD')
-    expect(playlist).toContain('#EXT-X-ENDLIST')
-    expect(playlist).toContain('#EXT-X-TARGETDURATION:10')
-  })
-
-  it('should generate correct number of segments', () => {
-    const playlist = generateMediaPlaylist({
-      duration: 25,
-      segmentDuration: 10,
-      baseUrl: '/api/media/files/A/test',
-      mode: 'remux',
-    })
-
-    const segmentCount = (playlist.match(/#EXTINF:/g) || []).length
-    expect(segmentCount).toBe(3)
-  })
-
-  it('should handle the last segment with remaining duration', () => {
-    const playlist = generateMediaPlaylist({
-      duration: 25,
-      segmentDuration: 10,
-      baseUrl: '/api/media/files/A/test',
-      mode: 'remux',
-    })
-
-    expect(playlist).toContain('#EXTINF:5.000,')
-  })
-
-  it('should include mode in segment URLs', () => {
-    const playlist = generateMediaPlaylist({
-      duration: 20,
-      segmentDuration: 10,
-      baseUrl: '/api/media/files/A/test',
-      mode: 'transcode',
-      resolution: '720p',
-    })
-
-    expect(playlist).toContain(serializeToQueryString({ mode: 'transcode' }))
-    expect(playlist).toContain(serializeToQueryString({ resolution: '720p' }))
   })
 })
 

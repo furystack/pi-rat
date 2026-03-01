@@ -55,9 +55,17 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
         })
 
         hls.on(HlsModule.Events.FRAG_LOADED, (_e, data) => {
-          append(
-            `Frag ${data.frag.sn} loaded (${data.frag.start.toFixed(1)}-${(data.frag.start + data.frag.duration).toFixed(1)}s)`,
-          )
+          const f = data.frag
+          append(`Frag ${f.sn} [${f.type}] start=${f.start.toFixed(1)} dur=${f.duration.toFixed(1)} level=${f.level}`)
+        })
+
+        hls.on(HlsModule.Events.FRAG_BUFFERED, (_e, data) => {
+          const f = data.frag
+          const {startPTS} = (f as unknown as Record<string, number>)
+          const {endPTS} = (f as unknown as Record<string, number>)
+          if (startPTS !== undefined) {
+            append(`  -> buffered ${f.sn} [${f.type}] PTS=${startPTS.toFixed(2)}-${endPTS?.toFixed(2)}`)
+          }
         })
 
         hls.on(HlsModule.Events.ERROR, (_e, data) => {

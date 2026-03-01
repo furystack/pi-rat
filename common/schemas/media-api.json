@@ -6533,12 +6533,6 @@
             "mode": {
               "$ref": "#/definitions/PlaybackMode"
             },
-            "from": {
-              "type": "number"
-            },
-            "to": {
-              "type": "number"
-            },
             "resolution": {
               "type": "string"
             },

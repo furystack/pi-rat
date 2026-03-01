@@ -43,11 +43,6 @@ export const generateMasterPlaylist = ({
     )
   }
 
-  // Audio renditions are NOT emitted as separate HLS alternate renditions because
-  // segments contain both video+audio (not audio-only). Audio switching is handled
-  // at the application level via MoviePlayerService.switchAudioTrack() which reloads
-  // the entire stream with a different audioTrack parameter.
-
   const videoStream = ffprobe.streams.find((s) => s.codec_type === 'video')
   const sourceHeight = videoStream?.height || 1080
   const sourceWidth = videoStream?.width || 1920
@@ -75,56 +70,6 @@ export const generateMasterPlaylist = ({
     }
   }
 
-  return `${lines.join('\n')}\n`
-}
-
-export const generateMediaPlaylist = ({
-  duration,
-  segmentDuration,
-  baseUrl,
-  mode,
-  resolution,
-  audioTrack,
-}: {
-  duration: number
-  segmentDuration: number
-  baseUrl: string
-  mode: PlaybackMode
-  resolution?: string
-  audioTrack?: number
-}): string => {
-  const segmentCount = Math.ceil(duration / segmentDuration)
-
-  const initQuery = serializeToQueryString({
-    mode,
-    ...(audioTrack !== undefined ? { audioTrack } : {}),
-  })
-
-  const lines: string[] = [
-    '#EXTM3U',
-    '#EXT-X-VERSION:7',
-    `#EXT-X-TARGETDURATION:${segmentDuration}`,
-    '#EXT-X-MEDIA-SEQUENCE:0',
-    '#EXT-X-PLAYLIST-TYPE:VOD',
-    `#EXT-X-MAP:URI="${baseUrl}/init.mp4?${initQuery}"`,
-  ]
-
-  for (let i = 0; i < segmentCount; i++) {
-    const from = i * segmentDuration
-    const remaining = duration - from
-    const actualDuration = Math.min(segmentDuration, remaining)
-
-    const segmentQuery = serializeToQueryString({
-      mode,
-      from,
-      to: from + actualDuration,
-      ...(resolution ? { resolution } : {}),
-      ...(audioTrack !== undefined ? { audioTrack } : {}),
-    })
-    lines.push(`#EXTINF:${actualDuration.toFixed(3)},`, `${baseUrl}/segment/${i}.m4s?${segmentQuery}`)
-  }
-
-  lines.push('#EXT-X-ENDLIST')
   return `${lines.join('\n')}\n`
 }
 

@@ -2,13 +2,13 @@ import { getLogger } from '@furystack/logging'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
-import { spawn } from 'child_process'
 import type { HlsSegmentEndpoint, PlaybackMode } from 'common'
+import { createReadStream } from 'fs'
+import { stat } from 'fs/promises'
+import { join } from 'path'
 import mime from 'mime'
-import { SegmentCache } from '../services/segment-cache.js'
-import { StreamFileActionCaches } from '../services/stream-file-action-caches.js'
+import { TranscodingSessionService } from '../services/transcoding-session.js'
 
-const VALID_RESOLUTIONS = ['1080p', '720p', '480p', '360p'] as const
 const VALID_MODES: PlaybackMode[] = ['direct-play', 'remux', 'direct-stream', 'transcode']
 
 export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
@@ -30,107 +30,37 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
     throw new RequestError('Invalid segment index', 400)
   }
 
-  const from = query.from ?? 0
-  const to = query.to ?? from + 10
-  if (from < 0 || to <= from || to > 86_400) {
-    throw new RequestError('Invalid time range', 400)
-  }
-
   const mode: PlaybackMode = query.mode ?? 'transcode'
   if (!VALID_MODES.includes(mode)) {
     throw new RequestError('Invalid playback mode', 400)
   }
 
-  const resolution = query.resolution as (typeof VALID_RESOLUTIONS)[number] | undefined
-  if (resolution && !VALID_RESOLUTIONS.includes(resolution)) {
-    throw new RequestError('Invalid resolution', 400)
+  const sessionService = injector.getInstance(TranscodingSessionService)
+
+  const session = sessionService.getSession(letter, path, mode, query.audioTrack ?? 0, query.resolution)
+  if (!session) {
+    throw new RequestError('No active transcoding session', 404)
   }
 
-  const segmentCache = injector.getInstance(SegmentCache)
-
-  const cachedStream = await segmentCache.get(letter, path, segmentIndex, mode, resolution)
-  if (cachedStream) {
-    const mimeType = mime.getType('mp4')
-    response.writeHead(200, {
-      'Content-Type': mimeType || 'video/mp4',
-      'Cache-Control': 'public, max-age=3600',
-    })
-    cachedStream.pipe(response)
-    return BypassResult()
+  const ready = await sessionService.waitForSegment(session, segmentIndex)
+  if (!ready) {
+    throw new RequestError('Segment not available', 504)
   }
+
+  const segmentPath = join(session.sessionDir, `segment${segmentIndex}.m4s`)
+  const fileStat = await stat(segmentPath)
 
   const mimeType = mime.getType('mp4')
   response.writeHead(200, {
     'Content-Type': mimeType || 'video/mp4',
-    'Cache-Control': mode === 'remux' || mode === 'direct-play' ? 'public, max-age=3600' : 'no-cache',
+    'Content-Length': fileStat.size,
+    'Cache-Control': 'public, max-age=3600',
   })
 
-  const cache = injector.getInstance(StreamFileActionCaches)
+  const stream = createReadStream(segmentPath)
+  stream.pipe(response)
 
-  const ffmpegArgs = await cache.ffMpegArgsCache.get({
-    file: { driveLetter: letter, path },
-    queryParams: {
-      from,
-      to,
-      mode,
-      audio: { trackId: query.audioTrack ?? 0 },
-      ...(mode === 'transcode' && resolution && VALID_RESOLUTIONS.includes(resolution)
-        ? { video: { codec: 'libx264', resolution } }
-        : {}),
-    },
-    injector,
-  })
-
-  const abortController = new AbortController()
-
-  await logger.verbose({ message: `Spawning ffmpeg for HLS segment`, data: { from, to, mode, segmentIndex } })
-
-  const ffmpegProcess = spawn('ffmpeg', ffmpegArgs, {
-    stdio: ['ignore', 'pipe', 'pipe'],
-    signal: abortController.signal,
-  })
-
-  response.on('close', () => {
-    abortController.abort()
-  })
-
-  const chunks: Buffer[] = []
-  ffmpegProcess.stdout.on('data', (chunk: Buffer) => {
-    chunks.push(chunk)
-  })
-
-  ffmpegProcess.stderr.on('data', (data: Buffer) => {
-    void logger.verbose({ message: `ffmpeg stderr: ${data.toString()}` })
-  })
-
-  ffmpegProcess.on('error', (err) => {
-    void logger.error({ message: `ffmpeg process error: ${err.message}`, data: { err } })
-    response.end()
-  })
-
-  ffmpegProcess.on('close', (code) => {
-    void logger.verbose({ message: `ffmpeg process exited with code ${code}` })
-    if (code === 0 && chunks.length > 0) {
-      const fullBuffer = Buffer.concat(chunks)
-
-      // Strip ftyp+moov boxes — HLS media segments should only contain moof+mdat.
-      // The init segment (ftyp+moov) is served separately via #EXT-X-MAP.
-      let mediaStart = 0
-      while (mediaStart + 8 <= fullBuffer.length) {
-        const boxSize = fullBuffer.readUInt32BE(mediaStart)
-        const boxType = fullBuffer.toString('ascii', mediaStart + 4, mediaStart + 8)
-        if (boxType === 'moof' || boxType === 'mdat' || boxType === 'styp') break
-        if (boxSize < 8) break
-        mediaStart += boxSize
-      }
-
-      const mediaData = mediaStart > 0 ? fullBuffer.subarray(mediaStart) : fullBuffer
-      void segmentCache.put(letter, path, segmentIndex, mode, mediaData, resolution)
-      response.end(mediaData)
-    } else {
-      response.end()
-    }
-  })
+  await logger.verbose({ message: `Served segment ${segmentIndex} for ${letter}:${path}` })
 
   return BypassResult()
 }

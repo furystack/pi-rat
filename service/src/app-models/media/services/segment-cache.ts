@@ -42,8 +42,10 @@ export class SegmentCache {
     segmentIndex: number,
     mode: string,
     resolution?: string,
+    from?: number,
+    to?: number,
   ): string {
-    const input = `${driveLetter}:${path}:${segmentIndex}:${mode}:${resolution || ''}`
+    const input = `${driveLetter}:${path}:${segmentIndex}:${mode}:${resolution || ''}:${from ?? ''}:${to ?? ''}`
     return createHash('sha256').update(input).digest('hex').slice(0, 32)
   }
 
@@ -82,8 +84,10 @@ export class SegmentCache {
     segmentIndex: number,
     mode: string,
     resolution?: string,
+    from?: number,
+    to?: number,
   ): Promise<NodeJS.ReadableStream | null> {
-    const key = this.buildCacheKey(driveLetter, path, segmentIndex, mode, resolution)
+    const key = this.buildCacheKey(driveLetter, path, segmentIndex, mode, resolution, from, to)
     const entry = this.entries.get(key)
 
     if (!entry) return null
@@ -107,8 +111,10 @@ export class SegmentCache {
     mode: string,
     data: Buffer,
     resolution?: string,
+    from?: number,
+    to?: number,
   ): Promise<void> {
-    const key = this.buildCacheKey(driveLetter, path, segmentIndex, mode, resolution)
+    const key = this.buildCacheKey(driveLetter, path, segmentIndex, mode, resolution, from, to)
     const cacheDir = await this.getCacheDir()
     const filePath = join(cacheDir, `${key}.m4s`)
 
@@ -144,8 +150,10 @@ export class SegmentCache {
     segmentIndex: number,
     mode: string,
     resolution?: string,
+    from?: number,
+    to?: number,
   ): Promise<boolean> {
-    const key = this.buildCacheKey(driveLetter, path, segmentIndex, mode, resolution)
+    const key = this.buildCacheKey(driveLetter, path, segmentIndex, mode, resolution, from, to)
     return this.entries.has(key)
   }
 

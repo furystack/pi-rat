@@ -1,13 +1,12 @@
 import { getLogger } from '@furystack/logging'
 import { RequestError } from '@furystack/rest'
+import { serializeToQueryString } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
 import type { HlsStreamEndpoint, PlaybackMode } from 'common'
-import { FfprobeService } from '../../../ffprobe-service.js'
-import { generateMediaPlaylist } from '../services/hls-manifest-generator.js'
+import { TranscodingSessionService } from '../services/transcoding-session.js'
 
 const VALID_MODES: PlaybackMode[] = ['direct-play', 'remux', 'direct-stream', 'transcode']
-const VALID_RESOLUTIONS = ['1080p', '720p', '480p', '360p'] as const
 
 export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
   injector,
@@ -23,42 +22,51 @@ export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
     throw new RequestError('Invalid path', 400)
   }
 
-  const file = { driveLetter: letter, path }
-  const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
-
-  const duration = ffprobe.format.duration || 0
-  const mode = query.mode || 'transcode'
+  const mode: PlaybackMode = query.mode || 'transcode'
   if (!VALID_MODES.includes(mode)) {
     throw new RequestError('Invalid playback mode', 400)
   }
 
-  if (query.resolution && !(VALID_RESOLUTIONS as readonly string[]).includes(query.resolution)) {
-    throw new RequestError('Invalid resolution', 400)
+  const sessionService = injector.getInstance(TranscodingSessionService)
+
+  const session = await sessionService.getOrCreateSession({
+    driveLetter: letter,
+    path,
+    mode,
+    audioTrackId: query.audioTrack ?? 0,
+    resolution: query.resolution,
+  })
+
+  const playlistContent = await sessionService.readPlaylist(session)
+  if (!playlistContent) {
+    throw new RequestError('Failed to generate HLS playlist', 500)
   }
 
-  const segmentDuration = 10
-
+  // Build FuryStack-serialized query strings for the rewritten URLs
   const encodedLetter = encodeURIComponent(letter)
   const encodedPath = encodeURIComponent(path)
   const baseUrl = `/api/media/files/${encodedLetter}/${encodedPath}`
 
-  const playlist = generateMediaPlaylist({
-    duration,
-    segmentDuration,
-    baseUrl,
+  const queryParams = {
     mode,
-    resolution: query.resolution,
-    audioTrack: query.audioTrack,
-  })
+    audioTrack: query.audioTrack ?? 0,
+    ...(query.resolution ? { resolution: query.resolution } : {}),
+  }
+  const serializedQuery = serializeToQueryString(queryParams)
 
-  await logger.verbose({ message: `Generated media playlist for ${letter}:${path}`, data: { mode, duration } })
+  // Rewrite local filenames to API URLs with proper FuryStack-serialized query params
+  const rewritten = playlistContent
+    .replace(/URI="init\.mp4"/g, `URI="${baseUrl}/init.mp4?${serializedQuery}"`)
+    .replace(/segment(\d+)\.m4s/g, (_match, idx) => `${baseUrl}/segment/${idx}.m4s?${serializedQuery}`)
+
+  await logger.verbose({ message: `Serving HLS playlist for ${letter}:${path}`, data: { mode } })
 
   response.writeHead(200, {
     'Content-Type': 'application/vnd.apple.mpegurl',
-    'Content-Length': Buffer.byteLength(playlist),
+    'Content-Length': Buffer.byteLength(rewritten),
     'Cache-Control': 'no-cache',
   })
-  response.end(playlist)
+  response.end(rewritten)
 
   return BypassResult()
 }

@@ -178,7 +178,7 @@ export type HlsStreamEndpoint = {
 
 export type HlsSegmentEndpoint = {
   url: { letter: string; path: string; index: string }
-  query: { mode?: PlaybackMode; from?: number; to?: number; resolution?: string; audioTrack?: number }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
   result: unknown
 }
 

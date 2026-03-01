@@ -9,7 +9,7 @@ import { tmpdir } from 'os'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { HwAccelDetector } from '../services/hw-accel-detector.js'
 import { StreamFileActionCaches } from '../services/stream-file-action-caches.js'
-import { generateMasterPlaylist, generateMediaPlaylist } from '../services/hls-manifest-generator.js'
+import { generateMasterPlaylist } from '../services/hls-manifest-generator.js'
 import { buildAudioTrackList, buildSubtitleTrackList, resolvePlaybackMode } from '../services/stream-builder.js'
 
 vi.mock('@furystack/core', () => ({
@@ -235,21 +235,6 @@ describeIfFfmpeg('Integration: Stream file actions with real FFmpeg', () => {
       }
     })
 
-    it('should generate a valid media playlist with correct segment count', () => {
-      const duration = realFfprobe.format.duration || 5
-      const playlist = generateMediaPlaylist({
-        duration,
-        segmentDuration: 2,
-        baseUrl: '/api/media/files/T/test-fixture.mkv',
-        mode: 'remux',
-      })
-
-      expect(playlist).toContain('#EXTM3U')
-      expect(playlist).toContain('#EXT-X-PLAYLIST-TYPE:VOD')
-      expect(playlist).toContain('#EXT-X-ENDLIST')
-
-      const segmentCount = (playlist.match(/#EXTINF:/g) || []).length
-      expect(segmentCount).toBe(Math.ceil(duration / 2))
-    })
+    // generateMediaPlaylist tests removed — ffmpeg now generates the media playlist via -f hls
   })
 })
