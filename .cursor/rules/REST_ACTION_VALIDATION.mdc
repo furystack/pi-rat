@@ -1,0 +1,64 @@
+---
+description: REST action input validation patterns - Validate() wrappers and explicit param checking
+globs: service/src/**/actions/*.ts
+alwaysApply: false
+---
+
+# REST Action Input Validation
+
+## Always Use `Validate()` on REST Endpoints
+
+Every REST endpoint in `setup-*-api.ts` must be wrapped with `Validate()` to enforce schema validation on incoming requests. This applies to URL params, query params, and request bodies.
+
+```typescript
+// ✅ Good - Validate wraps the action
+'/files/:letter/:path/stream': Authorize()(
+  Validate({ schema: mediaApiSchema, schemaName: 'StreamFileEndpoint' })(StreamAction),
+),
+
+// ❌ Bad - no Validate, raw input reaches the action
+'/files/:letter/:path/master.m3u8': Authorize()(HlsMasterAction),
+```
+
+## Validate User-Controlled Params Before System Calls
+
+Even with `Validate()`, action handlers that pass user input to system processes (FFmpeg, file system, shell) must explicitly validate critical parameters:
+
+```typescript
+// ✅ Good - explicit bounds checking before FFmpeg
+const segmentIndex = parseInt(index, 10)
+if (isNaN(segmentIndex) || segmentIndex < 0) {
+  throw new RequestError('Invalid segment index', 400)
+}
+
+if (from < 0 || to <= from) {
+  throw new RequestError('Invalid time range', 400)
+}
+
+const VALID_MODES: PlaybackMode[] = ['direct-play', 'remux', 'direct-stream', 'transcode']
+if (!VALID_MODES.includes(mode)) {
+  throw new RequestError('Invalid playback mode', 400)
+}
+
+// ❌ Bad - unvalidated parseInt passed to FFmpeg args
+const segmentIndex = parseInt(index, 10) // NaN or negative goes through
+ffmpegArgs.push('-ss', String(from))      // negative from goes through
+```
+
+## Path Traversal Prevention
+
+When constructing file paths from user input, always validate against directory traversal. Do not rely solely on the router.
+
+```typescript
+// ✅ Good - explicit path traversal check
+if (path.includes('..') || path.includes('\0')) {
+  throw new RequestError('Invalid path', 400)
+}
+
+// ✅ Good - using path.relative to verify containment
+const resolvedPath = resolve(baseDir, userInputPath)
+const rel = relative(baseDir, resolvedPath)
+if (rel.startsWith('..') || isAbsolute(rel)) {
+  throw new RequestError('Invalid path', 400)
+}
+```

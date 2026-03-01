@@ -1,8 +1,25 @@
 import { createComponent } from '@furystack/shades'
-import type { FfprobeData, PiRatFile } from 'common'
+import type { FfprobeData, PiRatFile, SubtitleTrackInfo } from 'common'
 import { getFileName, getParentPath } from 'common'
 
 import { environmentOptions } from '../../../environment-options.js'
+
+/**
+ * Builds subtitle track elements from playback-info response data when available,
+ * falling back to the legacy ffprobe-based approach for backward compatibility.
+ */
+export const getSubtitleTracksFromPlaybackInfo = (subtitleTracks: SubtitleTrackInfo[]) => {
+  return subtitleTracks
+    .filter((track) => !track.requiresBurnIn && track.url)
+    .map((track) => (
+      <track
+        kind="captions"
+        label={track.label}
+        src={`${environmentOptions.serviceUrl}${track.url?.startsWith('/api') ? track.url.slice(4) : track.url}`}
+        srclang={track.language}
+      />
+    ))
+}
 
 export const getSubtitleTracks = (file: PiRatFile, ffProbeData: FfprobeData) => {
   const fileName = getFileName(file)

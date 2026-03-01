@@ -1,6 +1,31 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "AudioTrackInfo": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "number"
+        },
+        "label": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "codecName": {
+          "type": "string"
+        },
+        "channels": {
+          "type": "number"
+        },
+        "isDefault": {
+          "type": "boolean"
+        }
+      },
+      "required": ["index", "label", "language", "codecName", "channels", "isDefault"],
+      "additionalProperties": false
+    },
     "ChapterData": {
       "type": "object",
       "properties": {
@@ -34,6 +59,31 @@
         }
       },
       "required": ["id", "start", "start_time", "end", "end_time", "time_base", "tags"],
+      "additionalProperties": false
+    },
+    "CodecSupportMap": {
+      "type": "object",
+      "properties": {
+        "video": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "audio": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["video", "audio", "containers"],
       "additionalProperties": false
     },
     "DeleteEndpoint<Movie,\"imdbId\">": {
@@ -6345,6 +6395,245 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
+    "GetSubtitleFileEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "movieId": {
+              "type": "string"
+            },
+            "subtitleName": {
+              "type": "string"
+            }
+          },
+          "required": ["movieId", "subtitleName"],
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false
+    },
+    "GetSubtitlesEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "movieId": {
+              "type": "string"
+            }
+          },
+          "required": ["movieId"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false
+    },
+    "HlsInitEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "audioTrack": {
+              "type": "number"
+            },
+            "resolution": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
+    "HlsMasterEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "videoCodecs": {
+              "type": "string"
+            },
+            "audioCodecs": {
+              "type": "string"
+            },
+            "containers": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
+    "HlsSegmentEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "index": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path", "index"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "audioTrack": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
+    "HlsSessionTeardownEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "audioTrack": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          },
+          "required": ["success"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
+    "HlsStreamEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "letter": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["letter", "path"],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "$ref": "#/definitions/PlaybackMode"
+            },
+            "resolution": {
+              "type": "string"
+            },
+            "audioTrack": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "query", "result"],
+      "additionalProperties": false
+    },
     "LinkMovie": {
       "type": "object",
       "properties": {
@@ -6379,48 +6668,10 @@
               "$ref": "#/definitions/GetEntityEndpoint%3CMovie%2C%22imdbId%22%3E"
             },
             "/movies/:movieId/subtitles": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "movieId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["movieId"],
-                  "additionalProperties": false
-                },
-                "result": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": ["url", "result"],
-              "additionalProperties": false
+              "$ref": "#/definitions/GetSubtitlesEndpoint"
             },
             "/movies/:movieId/subtitles/:subtitleName": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "movieId": {
-                      "type": "string"
-                    },
-                    "subtitleName": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["movieId", "subtitleName"],
-                  "additionalProperties": false
-                },
-                "result": {}
-              },
-              "required": ["url", "result"],
-              "additionalProperties": false
+              "$ref": "#/definitions/GetSubtitleFileEndpoint"
             },
             "/my-watch-progresses": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CWatchHistoryEntry%3E"
@@ -6452,8 +6703,17 @@
             "/movie-files/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22id%22%3E"
             },
-            "/files/:letter/:path/stream": {
-              "$ref": "#/definitions/StreamFileEndpoint"
+            "/files/:letter/:path/master.m3u8": {
+              "$ref": "#/definitions/HlsMasterEndpoint"
+            },
+            "/files/:letter/:path/stream.m3u8": {
+              "$ref": "#/definitions/HlsStreamEndpoint"
+            },
+            "/files/:letter/:path/init.mp4": {
+              "$ref": "#/definitions/HlsInitEndpoint"
+            },
+            "/files/:letter/:path/segment/:index": {
+              "$ref": "#/definitions/HlsSegmentEndpoint"
             }
           },
           "required": [
@@ -6471,7 +6731,10 @@
             "/omdb-series-metadata/:id",
             "/movie-files",
             "/movie-files/:id",
-            "/files/:letter/:path/stream"
+            "/files/:letter/:path/master.m3u8",
+            "/files/:letter/:path/stream.m3u8",
+            "/files/:letter/:path/init.mp4",
+            "/files/:letter/:path/segment/:index"
           ],
           "additionalProperties": false
         },
@@ -6495,6 +6758,9 @@
             },
             "/scan-for-movies": {
               "$ref": "#/definitions/ScanForMoviesEndpoint"
+            },
+            "/playback-info": {
+              "$ref": "#/definitions/PlaybackInfoRequest"
             }
           },
           "required": [
@@ -6503,7 +6769,8 @@
             "/link-movie",
             "/extract-subtitles",
             "/save-watch-progress",
-            "/scan-for-movies"
+            "/scan-for-movies",
+            "/playback-info"
           ],
           "additionalProperties": false
         },
@@ -6546,9 +6813,17 @@
             },
             "/my-watch-progresses/:id": {
               "$ref": "#/definitions/DeleteEndpoint%3CWatchHistoryEntry%2C%22id%22%3E"
+            },
+            "/files/:letter/:path/hls-session": {
+              "$ref": "#/definitions/HlsSessionTeardownEndpoint"
             }
           },
-          "required": ["/movies/:id", "/movie-files/:id", "/my-watch-progresses/:id"],
+          "required": [
+            "/movies/:id",
+            "/movie-files/:id",
+            "/my-watch-progresses/:id",
+            "/files/:letter/:path/hls-session"
+          ],
           "additionalProperties": false
         },
         "HEAD": {
@@ -7171,6 +7446,73 @@
       "additionalProperties": false,
       "description": "Represents a File entry in pi-rat"
     },
+    "PlaybackInfoRequest": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "$ref": "#/definitions/PiRatFile"
+            },
+            "codecSupport": {
+              "$ref": "#/definitions/CodecSupportMap"
+            },
+            "selectedAudioTrackIndex": {
+              "type": "number"
+            },
+            "selectedSubtitleTrackIndex": {
+              "type": "number"
+            }
+          },
+          "required": ["file", "codecSupport"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/PlaybackInfoResponse"
+        }
+      },
+      "required": ["body", "result"],
+      "additionalProperties": false
+    },
+    "PlaybackInfoResponse": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "$ref": "#/definitions/PlaybackMode"
+        },
+        "streamUrl": {
+          "type": "string"
+        },
+        "audioTracks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AudioTrackInfo"
+          }
+        },
+        "subtitleTracks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubtitleTrackInfo"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "duration": {
+          "type": "number"
+        }
+      },
+      "required": ["mode", "streamUrl", "audioTracks", "subtitleTracks", "warnings", "duration"],
+      "additionalProperties": false
+    },
+    "PlaybackMode": {
+      "type": "string",
+      "enum": ["direct-play", "remux", "direct-stream", "transcode"]
+    },
     "PostEndpoint<Movie,\"imdbId\",Omit<Movie,(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
@@ -7273,90 +7615,34 @@
       "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
-    "StreamFileEndpoint": {
+    "SubtitleTrackInfo": {
       "type": "object",
       "properties": {
+        "index": {
+          "type": "number"
+        },
+        "label": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["srt", "ass", "webvtt", "pgs", "vobsub", "other"]
+        },
+        "source": {
+          "type": "string",
+          "enum": ["embedded", "external"]
+        },
+        "requiresBurnIn": {
+          "type": "boolean"
+        },
         "url": {
-          "type": "object",
-          "properties": {
-            "letter": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": ["letter", "path"],
-          "additionalProperties": false
-        },
-        "query": {
-          "$ref": "#/definitions/StreamQueryParams"
-        },
-        "result": {}
-      },
-      "required": ["url", "query", "result"],
-      "additionalProperties": false
-    },
-    "StreamQueryParams": {
-      "type": "object",
-      "properties": {
-        "audio": {
-          "type": "object",
-          "properties": {
-            "trackId": {
-              "type": "number",
-              "description": "Selects the audio track to stream. If not provided, the first audio track will be played"
-            },
-            "audioCodec": {
-              "type": "string",
-              "const": "aac",
-              "description": "Select the codec for audio encoding. If not provided, the original encoding will be used"
-            },
-            "mixdown": {
-              "type": "boolean",
-              "description": "Mix down multi-channel audio to stereo"
-            },
-            "bitrate": {
-              "type": "number",
-              "description": "The bitrate for the audio stream. If not provided, the original bitrate will be used"
-            }
-          },
-          "required": ["trackId"],
-          "additionalProperties": false,
-          "description": "Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc..."
-        },
-        "video": {
-          "type": "object",
-          "properties": {
-            "codec": {
-              "type": "string",
-              "const": "libx264",
-              "description": "The codec for video encoding. If not provided, the original encoding will be used"
-            },
-            "resolution": {
-              "type": "string",
-              "enum": ["4k", "1080p", "720p", "480p", "360p"],
-              "description": "The output resolution for the video stream. If not provided, the original resolution will be used"
-            },
-            "quality": {
-              "type": "string",
-              "enum": ["high", "medium", "low"],
-              "description": "Preset options"
-            }
-          },
-          "additionalProperties": false,
-          "description": "Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc..."
-        },
-        "from": {
-          "type": "number",
-          "description": "The start time in seconds"
-        },
-        "to": {
-          "type": "number",
-          "description": "The end time in seconds"
+          "type": "string"
         }
       },
-      "required": ["from", "to"],
+      "required": ["index", "label", "language", "format", "source", "requiresBurnIn"],
       "additionalProperties": false
     },
     "WatchHistoryEntry": {

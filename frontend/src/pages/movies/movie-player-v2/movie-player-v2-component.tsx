@@ -6,7 +6,7 @@ import { MediaApiClient } from '../../../services/api-clients/media-api-client.j
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
 import { getChaptersTrack } from './get-chapters-track.js'
-import { getSubtitleTracks } from './get-subtitle-tracks.js'
+import { getSubtitleTracks, getSubtitleTracksFromPlaybackInfo } from './get-subtitle-tracks.js'
 import './media-chrome.js'
 import { MoviePlayerService } from './movie-player-service.js'
 
@@ -19,7 +19,7 @@ type MoviePlayerProps = {
 
 export const MoviePlayerV2 = Shade<MoviePlayerProps>({
   shadowDomName: 'pirat-movie-player-v2',
-  render: ({ props, useDisposable, useRef, injector }) => {
+  render: ({ props, useDisposable, useObservable, useRef, injector }) => {
     const videoRef = useRef<HTMLVideoElement>('video')
     const containerRef = useRef<HTMLElement>('container')
 
@@ -47,7 +47,6 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     const { watchProgress, file } = props
 
     const api = injector.getInstance(MediaApiClient)
-
     const logger = getLogger(injector).withScope('MoviePlayerService')
 
     const mediaService = useDisposable(
@@ -55,15 +54,26 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       () => new MoviePlayerService(file, props.ffprobe, api, watchProgress?.watchedSeconds || 0, logger),
     )
 
-    useDisposable('sourceOpenListener', () => {
-      const handler = () => {
-        mediaService.MediaSource.duration = props.ffprobe.format.duration || 0
+    useDisposable('videoAttachment', () => {
+      const video = videoRef.current
+      if (video) {
+        mediaService.attachToVideo(video)
+        return { [Symbol.dispose]: () => {} }
       }
-      mediaService.MediaSource.addEventListener('sourceopen', handler)
-      return {
-        [Symbol.dispose]: () => mediaService.MediaSource.removeEventListener('sourceopen', handler),
-      }
+      const frameId = requestAnimationFrame(() => {
+        const deferredVideo = videoRef.current
+        if (deferredVideo) {
+          mediaService.attachToVideo(deferredVideo)
+        }
+      })
+      return { [Symbol.dispose]: () => cancelAnimationFrame(frameId) }
     })
+
+    const [playbackInfo] = useObservable('playbackInfo', mediaService.playbackInfo)
+    const subtitleElements =
+      playbackInfo && playbackInfo.subtitleTracks.length > 0
+        ? getSubtitleTracksFromPlaybackInfo(playbackInfo.subtitleTracks)
+        : getSubtitleTracks(props.file, props.ffprobe)
 
     return (
       <div
@@ -93,35 +103,8 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             <media-settings-menu-item>
               Quality
               <media-rendition-menu
-                mediaRenditionList={[
-                  {
-                    id: '1080p',
-                    width: 1920,
-                    height: 1080,
-                    src: mediaService.url,
-                  },
-                  {
-                    id: '720p',
-                    width: 1280,
-                    height: 720,
-                    src: mediaService.url,
-                  },
-                  {
-                    id: '480p',
-                    width: 854,
-                    height: 480,
-                    src: mediaService.url,
-                  },
-                  {
-                    id: '360p',
-                    width: 640,
-                    height: 360,
-                    src: mediaService.url,
-                  },
-                ]}
                 slot="submenu"
                 hidden
-                mediaRenditionSelected={mediaService.resolution.getValue() || undefined}
                 onchange={(ev) => {
                   const validValues = ['4k', '1080p', '720p', '480p', '360p'] as const
                   const { value } = ev.currentTarget as HTMLInputElement
@@ -150,7 +133,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
                 onchange={(ev) => {
                   const newId = parseInt((ev.target as HTMLInputElement).value, 10)
                   if (!isNaN(newId)) {
-                    mediaService.audioTrackId.setValue(newId)
+                    void mediaService.switchAudioTrack(newId)
                   }
                 }}
               >
@@ -164,99 +147,65 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             crossOrigin="use-credentials"
             autoplay
             onloadstart={(ev) => {
-              const audioTracks = mediaService.getAudioTracks()
+              const playbackInfoAudioTracks = mediaService.getAudioTrackInfoFromPlaybackInfo()
+              const audioTracks =
+                playbackInfoAudioTracks.length > 0
+                  ? playbackInfoAudioTracks
+                  : mediaService.getAudioTracks().map((t) => ({
+                      index: t.id,
+                      label:
+                        (t.stream.tags as Record<string, string>)?.title ||
+                        (t.stream.tags as Record<string, string>)?.language ||
+                        `Audio Track`,
+                      language: (t.stream.tags as Record<string, string>)?.language || 'unknown',
+                      codecName: t.codecName ?? 'unknown',
+                      channels: t.stream.channels ?? 2,
+                      isDefault: t.stream.disposition?.default === 1,
+                    }))
+
               const video = ev.currentTarget as HTMLVideoElement & {
                 audioTracks: AudioTrack[]
                 videoRenditions: Rendition[]
               }
-              video.audioTracks = audioTracks.map((track, index) => {
-                const id = track.stream.index.toFixed(0)
-                const { language = 'unknown' } = track.stream.tags as { language?: string }
-                const { title = language } = track.stream.tags as { title?: string }
-                const label = language || title || `Audio Track ${index + 1}`
-                return {
-                  id,
-                  label,
-                  language,
-                  enabled: false,
-                  kind: title,
-                }
-              })
-              video.audioTracks[0].enabled = true
+
+              video.audioTracks = audioTracks.map((track, index) => ({
+                id: track.index.toFixed(0),
+                label: track.label || track.language || `Audio Track ${index + 1}`,
+                language: track.language,
+                enabled: index === 0,
+                kind: track.label,
+              }))
 
               const currentValue = mediaService.resolution.getValue()
-
               const videoStream = props.ffprobe.streams.find((stream) => stream.codec_type === 'video')
               const height = videoStream?.height || 1080
 
               video.videoRenditions = [
                 ...(height >= 2160
-                  ? [
-                      {
-                        id: '4k',
-                        width: 3840,
-                        height: 2160,
-                        src: mediaService.url,
-                        selected: currentValue === '4k',
-                      },
-                    ]
+                  ? [{ id: '4k', width: 3840, height: 2160, src: '', selected: currentValue === '4k' }]
                   : []),
                 ...(height >= 1080
-                  ? [
-                      {
-                        id: '1080p',
-                        width: 1920,
-                        height: 1080,
-                        src: mediaService.url,
-                        selected: currentValue === '1080p',
-                      },
-                    ]
+                  ? [{ id: '1080p', width: 1920, height: 1080, src: '', selected: currentValue === '1080p' }]
                   : []),
                 ...(height >= 720
-                  ? [
-                      {
-                        id: '720p',
-                        width: 1280,
-                        height: 720,
-                        src: mediaService.url,
-                        selected: currentValue === '720p',
-                      },
-                    ]
+                  ? [{ id: '720p', width: 1280, height: 720, src: '', selected: currentValue === '720p' }]
                   : []),
                 ...(height >= 480
-                  ? [
-                      {
-                        id: '480p',
-                        width: 854,
-                        height: 480,
-                        src: mediaService.url,
-                        selected: currentValue === '480p',
-                      },
-                    ]
+                  ? [{ id: '480p', width: 854, height: 480, src: '', selected: currentValue === '480p' }]
                   : []),
-                {
-                  id: '360p',
-                  width: 640,
-                  height: 360,
-                  src: mediaService.url,
-                  selected: currentValue === '360p',
-                },
+                { id: '360p', width: 640, height: 360, src: '', selected: currentValue === '360p' },
               ]
 
-              mediaService.audioTrackId.setValue(parseInt(video.audioTracks[0].id as string, 10))
+              if (video.audioTracks[0]) {
+                mediaService.audioTrackId.setValue(parseInt(video.audioTracks[0].id as string, 10))
+              }
             }}
             ontimeupdate={(ev) => {
               const { currentTime } = ev.currentTarget as HTMLVideoElement
               mediaService.progress.setValue(currentTime || 0)
             }}
-            onseeked={(ev) => {
-              const { currentTime } = ev.currentTarget as HTMLVideoElement
-              void mediaService.onProgressChange(currentTime)
-            }}
-            currentTime={watchProgress?.watchedSeconds || 0}
-            src={mediaService.url}
           >
-            {...getSubtitleTracks(props.file, props.ffprobe)}
+            {...subtitleElements}
             {getChaptersTrack(props.ffprobe)}
           </video>
 
@@ -266,7 +215,6 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
           <media-control-bar style={{ width: '100%' }}>
             <media-play-button />
-
             <media-time-display />
             <media-time-range />
             <media-duration-display />

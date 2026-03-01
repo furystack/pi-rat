@@ -1272,6 +1272,24 @@ vitest
   - [ ] Observable error states tested
 - [ ] No brittle CSS selectors
 
+## Preventing Test Drift During Architecture Changes
+
+When refactoring a module's internal architecture (e.g., replacing per-segment ffmpeg spawning with a session-based `TranscodingSessionService`), **all spec files that mock the old internals must be rewritten in the same commit**. Stale mocks are silent failures — tests will compile and appear correct but fail at runtime with unrelated errors (e.g., "No DataSet found" instead of "Invalid segment index").
+
+### Checklist for Architecture Changes
+
+1. **Identify all spec files that import the old module** — search for `import.*old-module-name` across all `*.spec.ts` files
+2. **Rewrite mocks to target the new dependency** — e.g., replace `SegmentCache` mocks with `TranscodingSessionService` mocks
+3. **Remove tests for behavior that moved** — if validation moved from the action to the service, the action spec should not test that validation
+4. **Add tests for the new service** — the new service needs its own spec file with adequate coverage
+5. **Delete dead code** — if the old module is no longer imported by any non-test file, delete both the source and spec files
+
+### Common Symptoms of Test Drift
+
+- Tests fail with errors from unmocked dependencies (e.g., `Drive DataSet not found`)
+- Tests pass validation checks that no longer exist in the action under test
+- Mock setup references classes that are no longer used by the tested code
+
 **Tools:**
 
 - Unit/Integration: `vitest`

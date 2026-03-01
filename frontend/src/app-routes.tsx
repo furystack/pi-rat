@@ -116,6 +116,16 @@ export const appRoutes = {
       />
     ),
   },
+  '/hls-test/:driveLetter/:path': {
+    component: ({ match }: { match: MatchResult<{ driveLetter: string; path: string }> }) => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { PlainHlsPlayer } = await import('./pages/movies/plain-hls-player.js')
+          return <PlainHlsPlayer driveLetter={decode(match.params.driveLetter)} path={decode(match.params.path)} />
+        }}
+      />
+    ),
+  },
   '/movies/:imdbId/overview': {
     component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => (
       <PiRatLazyLoad

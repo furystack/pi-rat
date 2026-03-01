@@ -36,5 +36,20 @@ export interface MoviesConfig {
            */
           path?: string
         }>
+
+    /**
+     * Directory path for storing HLS segments. Defaults to system temp directory.
+     */
+    hlsSegmentPath?: string
+
+    /**
+     * Maximum cache size for HLS segments in megabytes. Defaults to 5000 (5GB).
+     */
+    hlsMaxCacheSizeMb?: number
+
+    /**
+     * Preferred hardware acceleration method for transcoding.
+     */
+    hwAccelMethod?: 'vaapi' | 'nvenc' | 'qsv' | 'videotoolbox' | 'none'
   }
 }

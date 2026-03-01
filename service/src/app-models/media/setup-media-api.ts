@@ -16,10 +16,17 @@ import mediaApiSchema from 'common/schemas/media-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
 import { ExtractSubtitlesAction } from './actions/extract-subtitles-action.js'
+import { GetSubtitleFileAction } from './actions/get-subtitle-file-action.js'
+import { GetSubtitlesAction } from './actions/get-subtitles-action.js'
+import { HlsInitAction } from './actions/hls-init-action.js'
+import { HlsMasterAction } from './actions/hls-master-action.js'
+import { HlsSegmentAction } from './actions/hls-segment-action.js'
+import { HlsSessionTeardownAction } from './actions/hls-session-teardown-action.js'
+import { HlsStreamAction } from './actions/hls-stream-action.js'
 import { LinkMovieAction } from './actions/link-movie-action.js'
+import { PlaybackInfoAction } from './actions/playback-info-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
 import { ScanForMoviesAction } from './actions/scan-for-movies-action.js'
-import { StreamAction } from './actions/stream-file-action.js'
 
 export const setupMediaRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -50,11 +57,12 @@ export const setupMediaRestApi = async (injector: Injector) => {
           schemaName: 'GetEntityEndpoint<WatchHistoryEntry,"id">',
         })(createGetEntityEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
 
-        // TODOs:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        '/movies/:movieId/subtitles': () => null as any, // TODO: Implement
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        '/movies/:movieId/subtitles/:subtitleName': () => null as any, // TODO: Implement
+        '/movies/:movieId/subtitles': Authenticate()(
+          Validate({ schema: mediaApiSchema, schemaName: 'GetSubtitlesEndpoint' })(GetSubtitlesAction),
+        ),
+        '/movies/:movieId/subtitles/:subtitleName': Authenticate()(
+          Validate({ schema: mediaApiSchema, schemaName: 'GetSubtitleFileEndpoint' })(GetSubtitleFileAction),
+        ),
         '/omdb-movie-metadata': Validate({
           schema: mediaApiSchema,
           schemaName: 'GetCollectionEndpoint<OmdbMovieMetadata>',
@@ -74,8 +82,17 @@ export const setupMediaRestApi = async (injector: Injector) => {
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
-        '/files/:letter/:path/stream': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'StreamFileEndpoint' })(StreamAction),
+        '/files/:letter/:path/master.m3u8': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsMasterEndpoint' })(HlsMasterAction),
+        ),
+        '/files/:letter/:path/stream.m3u8': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsStreamEndpoint' })(HlsStreamAction),
+        ),
+        '/files/:letter/:path/init.mp4': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsInitEndpoint' })(HlsInitAction),
+        ),
+        '/files/:letter/:path/segment/:index': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsSegmentEndpoint' })(HlsSegmentAction),
         ),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"id">' })(
           createGetEntityEndpoint({ model: MovieFile, primaryKey: 'id' }),
@@ -104,6 +121,9 @@ export const setupMediaRestApi = async (injector: Injector) => {
             schemaName: 'ScanForMoviesEndpoint',
           })(ScanForMoviesAction),
         ),
+        '/playback-info': Authenticate()(
+          Validate({ schema: mediaApiSchema, schemaName: 'PlaybackInfoRequest' })(PlaybackInfoAction),
+        ),
       },
       PATCH: {
         '/movies/:id': Validate({
@@ -125,6 +145,9 @@ export const setupMediaRestApi = async (injector: Injector) => {
           schema: mediaApiSchema,
           schemaName: 'DeleteEndpoint<WatchHistoryEntry,"id">',
         })(createDeleteEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
+        '/files/:letter/:path/hls-session': Authorize()(
+          Validate({ schema: mediaApiSchema, schemaName: 'HlsSessionTeardownEndpoint' })(HlsSessionTeardownAction),
+        ),
       },
     },
   })
