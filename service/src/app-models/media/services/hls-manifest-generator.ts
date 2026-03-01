@@ -1,3 +1,4 @@
+import { serializeToQueryString } from '@furystack/rest'
 import type { AudioTrackInfo, FfprobeData, PlaybackMode, SubtitleTrackInfo } from 'common'
 import { buildAudioTrackList, buildSubtitleTrackList } from './stream-builder.js'
 
@@ -61,7 +62,7 @@ export const generateMasterPlaylist = ({
     const audioGroup = audioTracks.length > 1 ? ',AUDIO="audio"' : ''
     lines.push(
       `#EXT-X-STREAM-INF:BANDWIDTH=${sourceBitrate},RESOLUTION=${sourceWidth}x${sourceHeight},CODECS="${getCodecString(ffprobe)}"${audioGroup}${subtitleGroup}`,
-      `${streamBase}/stream.m3u8?mode=${mode}`,
+      `${streamBase}/stream.m3u8?${serializeToQueryString({ mode })}`,
     )
   } else {
     const applicableVariants = DEFAULT_VARIANTS.filter((v) => v.height <= sourceHeight)
@@ -75,7 +76,7 @@ export const generateMasterPlaylist = ({
     for (const variant of applicableVariants) {
       lines.push(
         `#EXT-X-STREAM-INF:BANDWIDTH=${variant.bandwidth},RESOLUTION=${variant.resolution},CODECS="avc1.42E01E,mp4a.40.2"${audioGroup}${subtitleGroup}`,
-        `${streamBase}/stream.m3u8?mode=transcode&resolution=${variant.height}p`,
+        `${streamBase}/stream.m3u8?${serializeToQueryString({ mode: 'transcode' as PlaybackMode, resolution: `${variant.height}p` })}`,
       )
     }
   }
@@ -110,11 +111,13 @@ export const generateMediaPlaylist = ({
     const remaining = duration - from
     const actualDuration = Math.min(segmentDuration, remaining)
 
-    const resolutionParam = resolution ? `&resolution=${resolution}` : ''
-    lines.push(
-      `#EXTINF:${actualDuration.toFixed(3)},`,
-      `${baseUrl}/segment/${i}.m4s?mode=${mode}&from=${from}&to=${from + actualDuration}${resolutionParam}`,
-    )
+    const segmentQuery = serializeToQueryString({
+      mode,
+      from,
+      to: from + actualDuration,
+      ...(resolution ? { resolution } : {}),
+    })
+    lines.push(`#EXTINF:${actualDuration.toFixed(3)},`, `${baseUrl}/segment/${i}.m4s?${segmentQuery}`)
   }
 
   lines.push('#EXT-X-ENDLIST')

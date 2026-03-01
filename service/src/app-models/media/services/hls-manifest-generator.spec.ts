@@ -1,3 +1,4 @@
+import { serializeToQueryString } from '@furystack/rest'
 import type { AudioTrackInfo, FfprobeData, SubtitleTrackInfo } from 'common'
 import { describe, expect, it } from 'vitest'
 import { generateMasterPlaylist, generateMediaPlaylist, generateSubtitlePlaylist } from './hls-manifest-generator.js'
@@ -93,7 +94,7 @@ describe('generateMasterPlaylist', () => {
     expect(playlist).toContain('RESOLUTION=1280x720')
     expect(playlist).toContain('RESOLUTION=854x480')
     expect(playlist).toContain('RESOLUTION=640x360')
-    expect(playlist).toContain('mode=transcode')
+    expect(playlist).toContain(serializeToQueryString({ mode: 'transcode' }))
   })
 
   it('should produce a single variant for remux mode', () => {
@@ -108,7 +109,7 @@ describe('generateMasterPlaylist', () => {
 
     const streamInfCount = (playlist.match(/#EXT-X-STREAM-INF/g) || []).length
     expect(streamInfCount).toBe(1)
-    expect(playlist).toContain('mode=remux')
+    expect(playlist).toContain(serializeToQueryString({ mode: 'remux' }))
   })
 
   it('should filter transcode variants to source resolution', () => {
@@ -182,8 +183,8 @@ describe('generateMediaPlaylist', () => {
       resolution: '720p',
     })
 
-    expect(playlist).toContain('mode=transcode')
-    expect(playlist).toContain('resolution=720p')
+    expect(playlist).toContain(serializeToQueryString({ mode: 'transcode' }))
+    expect(playlist).toContain(serializeToQueryString({ resolution: '720p' }))
   })
 })
 

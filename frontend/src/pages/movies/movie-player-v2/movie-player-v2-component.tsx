@@ -58,8 +58,16 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       const video = videoRef.current
       if (video) {
         mediaService.attachToVideo(video)
+        return { [Symbol.dispose]: () => {} }
       }
-      return { [Symbol.dispose]: () => {} }
+      // On first render the ref isn't set yet — defer until after DOM creation
+      const frameId = requestAnimationFrame(() => {
+        const deferredVideo = videoRef.current
+        if (deferredVideo) {
+          mediaService.attachToVideo(deferredVideo)
+        }
+      })
+      return { [Symbol.dispose]: () => cancelAnimationFrame(frameId) }
     })
 
     const playbackInfoTracks = mediaService.getSubtitleTrackInfoFromPlaybackInfo()

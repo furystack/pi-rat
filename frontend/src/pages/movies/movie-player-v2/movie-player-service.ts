@@ -175,18 +175,20 @@ export class MoviePlayerService implements AsyncDisposable {
       `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8`,
     )
 
-    if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-      void this.logger.verbose({ message: 'Using native HLS playback' })
-      videoElement.src = hlsUrl
-      if (this.currentProgress > 0) {
-        videoElement.currentTime = this.currentProgress
-      }
-      return
-    }
-
     const HlsModule = await loadHls()
 
+    // Prefer hls.js over native HLS — many browsers (including Chromium) report
+    // canPlayType('application/vnd.apple.mpegurl') as 'maybe' without full support.
+    // hls.js also handles missing alternative renditions more gracefully.
     if (!HlsModule.isSupported()) {
+      if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+        void this.logger.verbose({ message: 'Using native HLS playback' })
+        videoElement.src = hlsUrl
+        if (this.currentProgress > 0) {
+          videoElement.currentTime = this.currentProgress
+        }
+        return
+      }
       void this.logger.error({ message: 'HLS is not supported in this browser' })
       return
     }
