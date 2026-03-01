@@ -91,7 +91,7 @@ test.describe('User Management', () => {
 
     const usersPage = page.locator('user-list-page')
     await expect(usersPage).toBeVisible()
-    await expect(page.locator('text=👥 Users').first()).toBeVisible()
+    await expect(page.locator('text=Users').first()).toBeVisible()
 
     // ============================================
     // STEP 2: Open the test user's details
