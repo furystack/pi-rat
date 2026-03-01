@@ -14,6 +14,7 @@ const mockLogger = {
   verbose: vi.fn().mockResolvedValue(undefined),
   error: vi.fn().mockResolvedValue(undefined),
   information: vi.fn().mockResolvedValue(undefined),
+  warning: vi.fn().mockResolvedValue(undefined),
 }
 
 const mockFile: PiRatFile = { driveLetter: 'A', path: 'movies/test.mkv' }

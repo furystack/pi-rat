@@ -6,12 +6,8 @@ import { BypassResult } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
 import { MovieFile } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
-import {
-  buildAudioTrackList,
-  buildSubtitleTrackList,
-  generateMasterPlaylist,
-} from '../services/hls-manifest-generator.js'
-import { resolvePlaybackMode } from '../services/stream-builder.js'
+import { generateMasterPlaylist } from '../services/hls-manifest-generator.js'
+import { buildSubtitleTrackList, resolvePlaybackMode } from '../services/stream-builder.js'
 
 type HlsMasterEndpoint = MediaApi['GET']['/files/:letter/:path/master.m3u8']
 
@@ -45,7 +41,6 @@ export const HlsMasterAction: RequestAction<HlsMasterEndpoint> = async ({
   })
   const movieFile = movieFiles[0]
 
-  const audioTracks = buildAudioTrackList(ffprobe)
   const subtitleTracks = buildSubtitleTrackList(ffprobe, file, movieFile?.relatedFiles, movieFile?.imdbId)
 
   const playlist = generateMasterPlaylist({
@@ -53,7 +48,6 @@ export const HlsMasterAction: RequestAction<HlsMasterEndpoint> = async ({
     file,
     mode,
     baseUrl: '/api/media',
-    audioTracks,
     subtitleTracks,
   })
 

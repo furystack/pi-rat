@@ -6697,9 +6697,6 @@
             "/movie-files/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3CMovieFile%2C%22id%22%3E"
             },
-            "/files/:letter/:path/stream": {
-              "$ref": "#/definitions/StreamFileEndpoint"
-            },
             "/files/:letter/:path/master.m3u8": {
               "$ref": "#/definitions/HlsMasterEndpoint"
             },
@@ -6728,7 +6725,6 @@
             "/omdb-series-metadata/:id",
             "/movie-files",
             "/movie-files/:id",
-            "/files/:letter/:path/stream",
             "/files/:letter/:path/master.m3u8",
             "/files/:letter/:path/stream.m3u8",
             "/files/:letter/:path/init.mp4",
@@ -7611,96 +7607,6 @@
         }
       },
       "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
-      "additionalProperties": false
-    },
-    "StreamFileEndpoint": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "object",
-          "properties": {
-            "letter": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": ["letter", "path"],
-          "additionalProperties": false
-        },
-        "query": {
-          "$ref": "#/definitions/StreamQueryParams"
-        },
-        "result": {}
-      },
-      "required": ["url", "query", "result"],
-      "additionalProperties": false
-    },
-    "StreamQueryParams": {
-      "type": "object",
-      "properties": {
-        "mode": {
-          "$ref": "#/definitions/PlaybackMode",
-          "description": "The playback mode determined by the server via /playback-info"
-        },
-        "audio": {
-          "type": "object",
-          "properties": {
-            "trackId": {
-              "type": "number",
-              "description": "Selects the audio track to stream. If not provided, the first audio track will be played"
-            },
-            "audioCodec": {
-              "type": "string",
-              "const": "aac",
-              "description": "Select the codec for audio encoding. If not provided, the original encoding will be used"
-            },
-            "mixdown": {
-              "type": "boolean",
-              "description": "Mix down multi-channel audio to stereo"
-            },
-            "bitrate": {
-              "type": "number",
-              "description": "The bitrate for the audio stream. If not provided, the original bitrate will be used"
-            }
-          },
-          "required": ["trackId"],
-          "additionalProperties": false,
-          "description": "Audio settings. If not provided, the first audio track will be played with the original encoding / bitrate / etc..."
-        },
-        "video": {
-          "type": "object",
-          "properties": {
-            "codec": {
-              "type": "string",
-              "enum": ["libx264", "libx265", "libvpx-vp9", "libaom-av1"],
-              "description": "The codec for video encoding. If not provided, the original encoding will be used"
-            },
-            "resolution": {
-              "type": "string",
-              "enum": ["4k", "1080p", "720p", "480p", "360p"],
-              "description": "The output resolution for the video stream. If not provided, the original resolution will be used"
-            },
-            "quality": {
-              "type": "string",
-              "enum": ["high", "medium", "low"],
-              "description": "Preset options"
-            }
-          },
-          "additionalProperties": false,
-          "description": "Video settings. If not provided, the original video track will be played with the original encoding / bitrate / etc..."
-        },
-        "from": {
-          "type": "number",
-          "description": "The start time in seconds"
-        },
-        "to": {
-          "type": "number",
-          "description": "The end time in seconds"
-        }
-      },
-      "required": ["from", "to"],
       "additionalProperties": false
     },
     "SubtitleTrackInfo": {

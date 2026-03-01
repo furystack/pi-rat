@@ -1,6 +1,5 @@
 import { serializeToQueryString } from '@furystack/rest'
-import type { AudioTrackInfo, FfprobeData, PlaybackMode, SubtitleTrackInfo } from 'common'
-import { buildAudioTrackList, buildSubtitleTrackList } from './stream-builder.js'
+import type { FfprobeData, PlaybackMode, SubtitleTrackInfo } from 'common'
 
 export type HlsVariant = {
   resolution: string
@@ -27,7 +26,6 @@ export const generateMasterPlaylist = ({
   file: { driveLetter: string; path: string }
   mode: PlaybackMode
   baseUrl: string
-  audioTracks: AudioTrackInfo[]
   subtitleTracks: SubtitleTrackInfo[]
 }): string => {
   const lines: string[] = ['#EXTM3U', '#EXT-X-VERSION:7']
@@ -73,26 +71,6 @@ export const generateMasterPlaylist = ({
   return `${lines.join('\n')}\n`
 }
 
-export const generateSubtitlePlaylist = ({
-  duration,
-  subtitleUrl,
-}: {
-  duration: number
-  subtitleUrl: string
-}): string => {
-  const lines: string[] = [
-    '#EXTM3U',
-    '#EXT-X-VERSION:7',
-    `#EXT-X-TARGETDURATION:${Math.ceil(duration)}`,
-    '#EXT-X-MEDIA-SEQUENCE:0',
-    '#EXT-X-PLAYLIST-TYPE:VOD',
-    `#EXTINF:${duration.toFixed(3)},`,
-    subtitleUrl,
-    '#EXT-X-ENDLIST',
-  ]
-  return `${lines.join('\n')}\n`
-}
-
 const getCodecString = (ffprobe: FfprobeData): string => {
   const videoStream = ffprobe.streams.find((s) => s.codec_type === 'video')
   const audioStream = ffprobe.streams.find((s) => s.codec_type === 'audio')
@@ -115,5 +93,3 @@ const getCodecString = (ffprobe: FfprobeData): string => {
 
   return `${videoCodec},${audioCodec}`
 }
-
-export { buildAudioTrackList, buildSubtitleTrackList }

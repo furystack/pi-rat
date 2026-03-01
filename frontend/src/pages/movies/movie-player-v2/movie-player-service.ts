@@ -6,7 +6,6 @@ import type {
   PiRatFile,
   PlaybackInfoResponse,
   PlaybackMode,
-  StreamQueryParams,
   SubtitleTrackInfo,
 } from 'common'
 import type Hls from 'hls.js'
@@ -76,7 +75,7 @@ export class MoviePlayerService implements AsyncDisposable {
   public audioTrackId = new ObservableValue(0)
   public playbackInfo = new ObservableValue<PlaybackInfoResponse | null>(null)
   public playbackMode = new ObservableValue<PlaybackMode>('transcode')
-  public resolution = new ObservableValue<Required<StreamQueryParams>['video']['resolution'] | undefined>(undefined)
+  public resolution = new ObservableValue<'4k' | '1080p' | '720p' | '480p' | '360p' | undefined>(undefined)
   public progress: ObservableValue<number>
 
   public async [Symbol.asyncDispose]() {
@@ -278,6 +277,9 @@ export class MoviePlayerService implements AsyncDisposable {
    */
   public async switchAudioTrack(trackIndex: number) {
     const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
+
+    await this.teardownHlsSession()
+
     this.audioTrackId.setValue(trackIndex)
     this.currentProgress = previousProgress
 

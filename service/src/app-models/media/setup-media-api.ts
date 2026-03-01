@@ -27,7 +27,6 @@ import { LinkMovieAction } from './actions/link-movie-action.js'
 import { PlaybackInfoAction } from './actions/playback-info-action.js'
 import { SaveWatchProgressAction } from './actions/save-watch-progress-action.js'
 import { ScanForMoviesAction } from './actions/scan-for-movies-action.js'
-import { StreamAction } from './actions/stream-file-action.js'
 
 export const setupMediaRestApi = async (injector: Injector) => {
   await useRestService<MediaApi>({
@@ -82,9 +81,6 @@ export const setupMediaRestApi = async (injector: Injector) => {
         })(createGetEntityEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' })),
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
-        ),
-        '/files/:letter/:path/stream': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'StreamFileEndpoint' })(StreamAction),
         ),
         '/files/:letter/:path/master.m3u8': Authorize()(
           Validate({ schema: mediaApiSchema, schemaName: 'HlsMasterEndpoint' })(HlsMasterAction),

@@ -1,7 +1,7 @@
 import { serializeToQueryString } from '@furystack/rest'
-import type { AudioTrackInfo, FfprobeData, SubtitleTrackInfo } from 'common'
+import type { FfprobeData, SubtitleTrackInfo } from 'common'
 import { describe, expect, it } from 'vitest'
-import { generateMasterPlaylist, generateSubtitlePlaylist } from './hls-manifest-generator.js'
+import { generateMasterPlaylist } from './hls-manifest-generator.js'
 
 const createFfprobe = (overrides: Partial<FfprobeData> = {}): FfprobeData => ({
   streams: [
@@ -20,11 +20,6 @@ const createFfprobe = (overrides: Partial<FfprobeData> = {}): FfprobeData => ({
   ...overrides,
 })
 
-const audioTracks: AudioTrackInfo[] = [
-  { index: 1, label: 'English', language: 'eng', codecName: 'aac', channels: 2, isDefault: true },
-  { index: 2, label: 'French', language: 'fra', codecName: 'ac3', channels: 6, isDefault: false },
-]
-
 const subtitleTracks: SubtitleTrackInfo[] = [
   { index: 3, label: 'English', language: 'eng', format: 'srt', source: 'embedded', requiresBurnIn: false },
   { index: 4, label: 'Japanese', language: 'jpn', format: 'ass', source: 'embedded', requiresBurnIn: false },
@@ -38,7 +33,6 @@ describe('generateMasterPlaylist', () => {
       file: { driveLetter: 'A', path: 'movies/test.mkv' },
       mode: 'remux',
       baseUrl: '/api/media',
-      audioTracks,
       subtitleTracks,
     })
 
@@ -53,7 +47,6 @@ describe('generateMasterPlaylist', () => {
       file: { driveLetter: 'A', path: 'movies/test.mkv' },
       mode: 'remux',
       baseUrl: '/api/media',
-      audioTracks,
       subtitleTracks: [],
     })
 
@@ -67,7 +60,6 @@ describe('generateMasterPlaylist', () => {
       file: { driveLetter: 'A', path: 'movies/test.mkv' },
       mode: 'remux',
       baseUrl: '/api/media',
-      audioTracks: [audioTracks[0]],
       subtitleTracks,
     })
 
@@ -83,7 +75,6 @@ describe('generateMasterPlaylist', () => {
       file: { driveLetter: 'A', path: 'movies/test.mkv' },
       mode: 'transcode',
       baseUrl: '/api/media',
-      audioTracks: [audioTracks[0]],
       subtitleTracks: [],
     })
 
@@ -100,7 +91,6 @@ describe('generateMasterPlaylist', () => {
       file: { driveLetter: 'A', path: 'movies/test.mkv' },
       mode: 'remux',
       baseUrl: '/api/media',
-      audioTracks: [audioTracks[0]],
       subtitleTracks: [],
     })
 
@@ -122,7 +112,6 @@ describe('generateMasterPlaylist', () => {
       file: { driveLetter: 'A', path: 'movies/test.mkv' },
       mode: 'transcode',
       baseUrl: '/api/media',
-      audioTracks: [audioTracks[0]],
       subtitleTracks: [],
     })
 
@@ -130,19 +119,5 @@ describe('generateMasterPlaylist', () => {
     expect(playlist).toContain('RESOLUTION=1280x720')
     expect(playlist).toContain('RESOLUTION=854x480')
     expect(playlist).toContain('RESOLUTION=640x360')
-  })
-})
-
-describe('generateSubtitlePlaylist', () => {
-  it('should produce a valid subtitle playlist', () => {
-    const playlist = generateSubtitlePlaylist({
-      duration: 120,
-      subtitleUrl: '/api/media/movies/tt123/subtitles/test.vtt',
-    })
-
-    expect(playlist).toContain('#EXTM3U')
-    expect(playlist).toContain('#EXT-X-ENDLIST')
-    expect(playlist).toContain('test.vtt')
-    expect(playlist).toContain('#EXTINF:120.000,')
   })
 })

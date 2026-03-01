@@ -19,7 +19,7 @@ type MoviePlayerProps = {
 
 export const MoviePlayerV2 = Shade<MoviePlayerProps>({
   shadowDomName: 'pirat-movie-player-v2',
-  render: ({ props, useDisposable, useRef, injector }) => {
+  render: ({ props, useDisposable, useObservable, useRef, injector }) => {
     const videoRef = useRef<HTMLVideoElement>('video')
     const containerRef = useRef<HTMLElement>('container')
 
@@ -60,7 +60,6 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
         mediaService.attachToVideo(video)
         return { [Symbol.dispose]: () => {} }
       }
-      // On first render the ref isn't set yet — defer until after DOM creation
       const frameId = requestAnimationFrame(() => {
         const deferredVideo = videoRef.current
         if (deferredVideo) {
@@ -70,10 +69,10 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       return { [Symbol.dispose]: () => cancelAnimationFrame(frameId) }
     })
 
-    const playbackInfoTracks = mediaService.getSubtitleTrackInfoFromPlaybackInfo()
+    const [playbackInfo] = useObservable('playbackInfo', mediaService.playbackInfo)
     const subtitleElements =
-      playbackInfoTracks.length > 0
-        ? getSubtitleTracksFromPlaybackInfo(playbackInfoTracks)
+      playbackInfo && playbackInfo.subtitleTracks.length > 0
+        ? getSubtitleTracksFromPlaybackInfo(playbackInfo.subtitleTracks)
         : getSubtitleTracks(props.file, props.ffprobe)
 
     return (
@@ -155,8 +154,8 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
                   : mediaService.getAudioTracks().map((t) => ({
                       index: t.id,
                       label:
-                        (t.stream.tags as Record<string, string>)?.language ||
                         (t.stream.tags as Record<string, string>)?.title ||
+                        (t.stream.tags as Record<string, string>)?.language ||
                         `Audio Track`,
                       language: (t.stream.tags as Record<string, string>)?.language || 'unknown',
                       codecName: t.codecName ?? 'unknown',

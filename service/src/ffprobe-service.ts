@@ -16,17 +16,6 @@ async function runFfprobe(filePath: string): Promise<FfprobeData> {
   return JSON.parse(stdout) as FfprobeData
 }
 
-async function extractKeyframeTimes(filePath: string): Promise<number[]> {
-  const stdout = await execAsync(
-    `ffprobe -v error -select_streams v:0 -show_entries frame=pts_time -of csv=p=0 -skip_frame nokey "${filePath}"`,
-    {},
-  )
-  return stdout
-    .split('\n')
-    .map((line) => parseFloat(line.trim()))
-    .filter((t) => !isNaN(t))
-}
-
 export type FfprobeResult = FfprobeData
 
 @Injectable({ lifetime: 'singleton' })
@@ -61,15 +50,6 @@ export class FfprobeService {
     },
   })
 
-  private keyframeCache = new Cache({
-    capacity: 50,
-    load: async (file: PiRatFile) => {
-      const drive = await this.driveDataSet.get(this.systemInjector, file.driveLetter)
-      if (!drive) throw new Error(`Drive ${file.driveLetter} not found`)
-      return extractKeyframeTimes(getPhysicalPath(drive, file))
-    },
-  })
-
   @Injected(FileWatcherService)
   declare private fileWatcherService: FileWatcherService
 
@@ -79,9 +59,5 @@ export class FfprobeService {
 
   public getFfprobeForPath = async (path: string) => {
     return await this.physicalFileCache.get(path)
-  }
-
-  public getKeyframeTimes = async (file: PiRatFile): Promise<number[]> => {
-    return await this.keyframeCache.get(file)
   }
 }
