@@ -134,6 +134,8 @@ describe('ffMpegArgsCache', () => {
       expect(args[args.indexOf('-c:a') + 1]).toBe('aac')
       expect(args).toContain('-preset')
       expect(args[args.indexOf('-preset') + 1]).toBe('ultrafast')
+      expect(args).toContain('-force_key_frames')
+      expect(args).toContain('-sc_threshold:v')
     })
   })
 
@@ -193,7 +195,7 @@ describe('ffMpegArgsCache', () => {
   })
 
   describe('time range', () => {
-    it('should add -ss before -i and normalize timestamps', async () => {
+    it('should add -ss before -i with correct timestamp offset', async () => {
       const args = await buildArgs({
         mode: 'remux',
         from: 30,
@@ -209,8 +211,8 @@ describe('ffMpegArgsCache', () => {
       const ssIdx = args.indexOf('-ss')
       expect(ssIdx).toBeLessThan(iIdx)
 
-      expect(args).toContain('-avoid_negative_ts')
-      expect(args[args.indexOf('-avoid_negative_ts') + 1]).toBe('make_zero')
+      expect(args).toContain('-output_ts_offset')
+      expect(args[args.indexOf('-output_ts_offset') + 1]).toBe('30')
     })
   })
 

@@ -182,15 +182,22 @@ export type HlsSegmentEndpoint = {
   result: unknown
 }
 
+export type GetSubtitlesEndpoint = {
+  url: { movieId: string }
+  result: string[]
+}
+
+export type GetSubtitleFileEndpoint = {
+  url: { movieId: string; subtitleName: string }
+  result: unknown
+}
+
 export interface MediaApi extends RestApi {
   GET: {
     '/movies': GetCollectionEndpoint<Movie>
     '/movies/:id': GetEntityEndpoint<Movie, 'imdbId'>
-    '/movies/:movieId/subtitles': { url: { movieId: string }; result: string[] }
-    '/movies/:movieId/subtitles/:subtitleName': {
-      url: { movieId: string; subtitleName: string }
-      result: unknown
-    }
+    '/movies/:movieId/subtitles': GetSubtitlesEndpoint
+    '/movies/:movieId/subtitles/:subtitleName': GetSubtitleFileEndpoint
     '/my-watch-progresses': GetCollectionEndpoint<WatchHistoryEntry>
     '/my-watch-progresses/:id': GetEntityEndpoint<WatchHistoryEntry, 'id'>
     '/series': GetCollectionEndpoint<Series>

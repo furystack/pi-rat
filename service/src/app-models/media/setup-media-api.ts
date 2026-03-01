@@ -57,10 +57,10 @@ export const setupMediaRestApi = async (injector: Injector) => {
         })(createGetEntityEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
 
         '/movies/:movieId/subtitles': Authenticate()(
-          Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<Movie>' })(GetSubtitlesAction),
+          Validate({ schema: mediaApiSchema, schemaName: 'GetSubtitlesEndpoint' })(GetSubtitlesAction),
         ),
         '/movies/:movieId/subtitles/:subtitleName': Authenticate()(
-          Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<Movie,"imdbId">' })(GetSubtitleFileAction),
+          Validate({ schema: mediaApiSchema, schemaName: 'GetSubtitleFileEndpoint' })(GetSubtitleFileAction),
         ),
         '/omdb-movie-metadata': Validate({
           schema: mediaApiSchema,

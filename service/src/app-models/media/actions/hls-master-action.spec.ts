@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
+import { serializeToQueryString } from '@furystack/rest'
 import type { FfprobeData } from 'common'
 import { describe, expect, it, vi } from 'vitest'
 import { FfprobeService } from '../../../ffprobe-service.js'
@@ -100,7 +101,7 @@ describe('HlsMasterAction', () => {
         request: {} as IncomingMessage,
       })
 
-      expect(writtenBody).toContain('mode=remux')
+      expect(writtenBody).toContain(serializeToQueryString({ mode: 'remux' as const }))
     })
   })
 

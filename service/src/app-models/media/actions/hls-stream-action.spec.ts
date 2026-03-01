@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
+import { serializeToQueryString } from '@furystack/rest'
 import type { FfprobeData } from 'common'
 import { describe, expect, it, vi } from 'vitest'
 import { FfprobeService } from '../../../ffprobe-service.js'
@@ -128,8 +129,8 @@ describe('HlsStreamAction', () => {
 
       const segmentCount = (writtenBody.match(/#EXTINF:/g) || []).length
       expect(segmentCount).toBe(6)
-      expect(writtenBody).toContain('mode=transcode')
-      expect(writtenBody).toContain('resolution=720p')
+      expect(writtenBody).toContain(serializeToQueryString({ mode: 'transcode' as const }))
+      expect(writtenBody).toContain(serializeToQueryString({ resolution: '720p' }))
     })
   })
 
@@ -156,7 +157,7 @@ describe('HlsStreamAction', () => {
         request: {} as IncomingMessage,
       })
 
-      expect(writtenBody).toContain('mode=transcode')
+      expect(writtenBody).toContain(serializeToQueryString({ mode: 'transcode' as const }))
     })
   })
 })

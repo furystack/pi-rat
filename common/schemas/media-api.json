@@ -6395,6 +6395,50 @@
       "additionalProperties": false,
       "description": "Endpoint model for getting a single entity"
     },
+    "GetSubtitleFileEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "movieId": {
+              "type": "string"
+            },
+            "subtitleName": {
+              "type": "string"
+            }
+          },
+          "required": ["movieId", "subtitleName"],
+          "additionalProperties": false
+        },
+        "result": {}
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false
+    },
+    "GetSubtitlesEndpoint": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "object",
+          "properties": {
+            "movieId": {
+              "type": "string"
+            }
+          },
+          "required": ["movieId"],
+          "additionalProperties": false
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["url", "result"],
+      "additionalProperties": false
+    },
     "HlsMasterEndpoint": {
       "type": "object",
       "properties": {
@@ -6546,48 +6590,10 @@
               "$ref": "#/definitions/GetEntityEndpoint%3CMovie%2C%22imdbId%22%3E"
             },
             "/movies/:movieId/subtitles": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "movieId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["movieId"],
-                  "additionalProperties": false
-                },
-                "result": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": ["url", "result"],
-              "additionalProperties": false
+              "$ref": "#/definitions/GetSubtitlesEndpoint"
             },
             "/movies/:movieId/subtitles/:subtitleName": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "object",
-                  "properties": {
-                    "movieId": {
-                      "type": "string"
-                    },
-                    "subtitleName": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["movieId", "subtitleName"],
-                  "additionalProperties": false
-                },
-                "result": {}
-              },
-              "required": ["url", "result"],
-              "additionalProperties": false
+              "$ref": "#/definitions/GetSubtitleFileEndpoint"
             },
             "/my-watch-progresses": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CWatchHistoryEntry%3E"

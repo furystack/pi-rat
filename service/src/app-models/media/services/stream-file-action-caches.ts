@@ -86,18 +86,15 @@ export class StreamFileActionCaches {
 
       ffmpegArgs.push('-i', fullPath)
 
+      if (typeof from === 'number') {
+        ffmpegArgs.push('-output_ts_offset', String(from))
+      }
+
       if (typeof to === 'number' && typeof from === 'number') {
         ffmpegArgs.push('-t', String(Math.max(to - from, 1)))
       }
 
-      ffmpegArgs.push(
-        '-avoid_negative_ts',
-        'make_zero',
-        '-f',
-        'mp4',
-        '-movflags',
-        'empty_moov+frag_keyframe+faststart+default_base_moof',
-      )
+      ffmpegArgs.push('-f', 'mp4', '-movflags', 'empty_moov+frag_keyframe+faststart+default_base_moof')
 
       const threads = config?.value?.threads
       if (threads && threads > 0) {
@@ -142,6 +139,10 @@ export class StreamFileActionCaches {
         }
 
         ffmpegArgs.push('-c:v', videoCodec)
+
+        // Force a keyframe at the start of the segment and prevent scene-cut
+        // keyframes from breaking alignment (mirrors Jellyfin's approach)
+        ffmpegArgs.push('-force_key_frames', 'expr:eq(t,0)', '-sc_threshold:v', '0')
 
         const isSoftwareEncoder = videoCodec === 'libx264' || videoCodec === 'libx265'
         if (isSoftwareEncoder) {
