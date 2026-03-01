@@ -172,7 +172,7 @@ export type HlsMasterEndpoint = {
 
 export type HlsStreamEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; resolution?: string }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
   result: unknown
 }
 

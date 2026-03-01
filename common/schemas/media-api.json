@@ -6500,6 +6500,9 @@
             },
             "resolution": {
               "type": "string"
+            },
+            "audioTrack": {
+              "type": "number"
             }
           },
           "additionalProperties": false

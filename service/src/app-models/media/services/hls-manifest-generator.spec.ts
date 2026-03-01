@@ -62,6 +62,8 @@ describe('generateMasterPlaylist', () => {
     expect(playlist).toContain('NAME="French"')
     expect(playlist).toContain('LANGUAGE="eng"')
     expect(playlist).toContain('LANGUAGE="fra"')
+    expect(playlist).toContain('stream.m3u8?')
+    expect(playlist).not.toContain('/audio/')
   })
 
   it('should include subtitle entries but exclude burn-in tracks', () => {

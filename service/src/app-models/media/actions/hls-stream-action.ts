@@ -48,6 +48,7 @@ export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
     baseUrl,
     mode,
     resolution: query.resolution,
+    audioTrack: query.audioTrack,
   })
 
   await logger.verbose({ message: `Generated media playlist for ${letter}:${path}`, data: { mode, duration } })

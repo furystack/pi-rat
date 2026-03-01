@@ -47,8 +47,9 @@ export const generateMasterPlaylist = ({
   for (let i = 0; i < audioTracks.length; i++) {
     const track = audioTracks[i]
     const isDefault = track.isDefault || i === 0 ? 'YES' : 'NO'
+    const audioQuery = serializeToQueryString({ mode, audioTrack: track.index })
     lines.push(
-      `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="${track.label}",LANGUAGE="${track.language}",DEFAULT=${isDefault},AUTOSELECT=${isDefault},URI="${streamBase}/audio/${track.index}/stream.m3u8"`,
+      `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="${track.label}",LANGUAGE="${track.language}",DEFAULT=${isDefault},AUTOSELECT=${isDefault},URI="${streamBase}/stream.m3u8?${audioQuery}"`,
     )
   }
 
@@ -90,12 +91,14 @@ export const generateMediaPlaylist = ({
   baseUrl,
   mode,
   resolution,
+  audioTrack,
 }: {
   duration: number
   segmentDuration: number
   baseUrl: string
   mode: PlaybackMode
   resolution?: string
+  audioTrack?: number
 }): string => {
   const segmentCount = Math.ceil(duration / segmentDuration)
   const lines: string[] = [
@@ -116,6 +119,7 @@ export const generateMediaPlaylist = ({
       from,
       to: from + actualDuration,
       ...(resolution ? { resolution } : {}),
+      ...(audioTrack !== undefined ? { audioTrack } : {}),
     })
     lines.push(`#EXTINF:${actualDuration.toFixed(3)},`, `${baseUrl}/segment/${i}.m4s?${segmentQuery}`)
   }
