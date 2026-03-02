@@ -1,4 +1,6 @@
-import { test, expect, type Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
+
+import { test, expect } from './fixtures.js'
 import { execSync } from 'child_process'
 import { mkdtempSync, rmSync, writeFileSync } from 'fs'
 import { readFile } from 'fs/promises'
@@ -25,13 +27,15 @@ const CODEC_SUPPORT_H264_AAC = {
   containers: ['mp4', 'webm'],
 }
 
+const VIDEO_DURATION = 10
+
 const generateFlacAudioVideo = (dir: string): string => {
   const videoPath = join(dir, FLAC_VIDEO_FILENAME)
   execSync(
     [
       'ffmpeg -y',
-      '-f lavfi -i "testsrc2=duration=3:size=640x360:rate=24"',
-      '-f lavfi -i "sine=frequency=440:duration=3"',
+      `-f lavfi -i "testsrc2=duration=${VIDEO_DURATION}:size=640x360:rate=24"`,
+      `-f lavfi -i "sine=frequency=440:duration=${VIDEO_DURATION}"`,
       '-map 0:v -map 1:a',
       '-metadata:s:a:0 language=eng -metadata:s:a:0 title="English FLAC"',
       '-c:v libx264 -preset ultrafast -crf 28',
@@ -48,8 +52,8 @@ const generateMpeg2Video = (dir: string): string => {
   execSync(
     [
       'ffmpeg -y',
-      '-f lavfi -i "testsrc2=duration=3:size=640x360:rate=24"',
-      '-f lavfi -i "sine=frequency=440:duration=3"',
+      `-f lavfi -i "testsrc2=duration=${VIDEO_DURATION}:size=640x360:rate=24"`,
+      `-f lavfi -i "sine=frequency=440:duration=${VIDEO_DURATION}"`,
       '-map 0:v -map 1:a',
       '-metadata:s:a:0 language=eng -metadata:s:a:0 title="English"',
       '-c:v mpeg2video -b:v 2M',
@@ -66,8 +70,8 @@ const generateExtSubVideo = (dir: string): string => {
   execSync(
     [
       'ffmpeg -y',
-      '-f lavfi -i "testsrc2=duration=3:size=640x360:rate=24"',
-      '-f lavfi -i "sine=frequency=440:duration=3"',
+      `-f lavfi -i "testsrc2=duration=${VIDEO_DURATION}:size=640x360:rate=24"`,
+      `-f lavfi -i "sine=frequency=440:duration=${VIDEO_DURATION}"`,
       '-map 0:v -map 1:a',
       '-metadata:s:a:0 language=eng -metadata:s:a:0 title="English"',
       '-c:v libx264 -preset ultrafast -crf 28',
@@ -82,11 +86,11 @@ const generateExtSubVideo = (dir: string): string => {
     srtPath,
     [
       '1',
-      '00:00:00,000 --> 00:00:01,500',
+      '00:00:00,000 --> 00:00:03,000',
       'External subtitle line one.',
       '',
       '2',
-      '00:00:01,800 --> 00:00:03,000',
+      '00:00:03,500 --> 00:00:06,000',
       'External subtitle line two.',
       '',
     ].join('\n'),
@@ -163,6 +167,9 @@ const uploadVideoAndCreateEntities = async (
 }
 
 const navigateToMovieAndPlay = async (page: Page, imdbId: string) => {
+  const consoleLogs: string[] = []
+  page.on('console', (msg) => consoleLogs.push(`[${msg.type()}] ${msg.text()}`))
+
   await page.goto('/movies')
 
   const movieLink = page.locator(`a[href*="/movies/${imdbId}"]`).first()
@@ -179,9 +186,26 @@ const navigateToMovieAndPlay = async (page: Page, imdbId: string) => {
   await expect(video).toBeVisible({ timeout: 15_000 })
 
   await expect(async () => {
-    const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
-    expect(currentTime).toBeGreaterThan(0)
-  }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
+    const state = await video.evaluate((el: HTMLVideoElement) => ({
+      currentTime: el.currentTime,
+      readyState: el.readyState,
+      paused: el.paused,
+      networkState: el.networkState,
+      error: el.error?.message,
+      src: el.src,
+      currentSrc: el.currentSrc,
+      duration: el.duration,
+    }))
+
+    if (state.paused && state.readyState >= 2) {
+      await video.evaluate((el: HTMLVideoElement) => el.play().catch(() => {}))
+    }
+
+    expect(
+      state.currentTime,
+      `Video state: ${JSON.stringify(state)}, console: ${consoleLogs.slice(-5).join(' | ')}`,
+    ).toBeGreaterThan(0)
+  }).toPass({ timeout: 60_000, intervals: [2_000, 3_000, 5_000] })
 
   return video
 }

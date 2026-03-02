@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
-import { expect, test } from '@playwright/test'
+
+import { test, expect } from './fixtures.js'
 import { assertAndDismissNoty, login, logout, navigateToAppSettings, registerUser } from './helpers.js'
 
 const TEST_USER_PASSWORD = 'testpassword123'

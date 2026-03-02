@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { test, expect } from './fixtures.js'
 import { assertAndDismissNoty, logout } from './helpers.js'
 
 test('User Registration and Login Flow', async ({ page }) => {

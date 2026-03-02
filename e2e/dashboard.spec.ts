@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
-import { expect, test } from '@playwright/test'
+
+import { test, expect } from './fixtures.js'
 import { randomUUID } from 'crypto'
 import { assertAndDismissNoty, login } from './helpers.js'
 

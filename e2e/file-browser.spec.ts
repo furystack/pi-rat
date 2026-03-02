@@ -1,4 +1,6 @@
-import { expect, test, type Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
+
+import { test, expect } from './fixtures.js'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { assertAndDismissNoty, login, uploadFile } from './helpers.js'

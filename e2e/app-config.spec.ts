@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { test, expect } from './fixtures.js'
 import { assertAndDismissNoty, login, navigateToAppSettings } from './helpers.js'
 
 const PRESET_LABELS: Record<string, string> = {

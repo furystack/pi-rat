@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { test, expect } from './fixtures.js'
 import { login, logout } from './helpers.js'
 
 test.describe('Pi-Rat Application', () => {

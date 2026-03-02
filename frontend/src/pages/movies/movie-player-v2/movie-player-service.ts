@@ -1,4 +1,5 @@
 import type { ScopedLogger } from '@furystack/logging'
+import { serializeToQueryString } from '@furystack/rest'
 import { ObservableValue } from '@furystack/utils'
 import type {
   AudioTrackInfo,
@@ -196,8 +197,9 @@ export class MoviePlayerService implements AsyncDisposable {
 
   private async startHlsPlayback(videoElement: HTMLVideoElement) {
     const mode = this.playbackMode.getValue()
+    const queryString = serializeToQueryString({ mode })
     const hlsUrl = this.toServiceUrl(
-      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encodeURIComponent(mode)}`,
+      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?${queryString}`,
     )
 
     const HlsModule = await loadHls()

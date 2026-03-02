@@ -1,3 +1,4 @@
+import { serializeToQueryString } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
 import type Hls from 'hls.js'
 import { environmentOptions } from '../../environment-options.js'
@@ -12,7 +13,7 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
     const videoRef = useRef<HTMLVideoElement>('video')
     const logRef = useRef<HTMLPreElement>('log')
 
-    const hlsUrl = `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(props.driveLetter)}/${encodeURIComponent(props.path)}/master.m3u8?mode=transcode`
+    const hlsUrl = `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(props.driveLetter)}/${encodeURIComponent(props.path)}/master.m3u8?${serializeToQueryString({ mode: 'transcode' as const })}`
 
     let hlsInstance: Hls | null = null
 
