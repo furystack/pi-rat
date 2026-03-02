@@ -167,6 +167,39 @@ describe('resolvePlaybackMode', () => {
     const withDts = resolvePlaybackMode({ ffprobe, codecSupport, selectedAudioTrackIndex: 2 })
     expect(withDts.mode).toBe('direct-stream')
   })
+
+  it('should return transcode when both video and audio codecs are unsupported', () => {
+    const ffprobe = createFfprobe({
+      streams: [
+        { index: 0, codec_type: 'video', codec_name: 'mpeg2video', tags: {} },
+        { index: 1, codec_type: 'audio', codec_name: 'flac', channels: 2, tags: {} },
+      ],
+    })
+    const codecSupport: CodecSupportMap = {
+      video: ['h264'],
+      audio: ['aac'],
+      containers: ['mp4'],
+    }
+    const result = resolvePlaybackMode({ ffprobe, codecSupport })
+    expect(result.mode).toBe('transcode')
+  })
+
+  it('should return transcode with warning when dvb_subtitle is selected', () => {
+    const ffprobe = createFfprobe({
+      streams: [
+        { index: 0, codec_type: 'video', codec_name: 'h264', tags: {} },
+        { index: 1, codec_type: 'audio', codec_name: 'aac', channels: 2, tags: {} },
+        { index: 2, codec_type: 'subtitle', codec_name: 'dvb_subtitle', tags: { language: 'eng' } },
+      ],
+    })
+    const result = resolvePlaybackMode({
+      ffprobe,
+      codecSupport: fullCodecSupport,
+      selectedSubtitleTrackIndex: 2,
+    })
+    expect(result.mode).toBe('transcode')
+    expect(result.warnings).toContain('Bitmap subtitles require transcoding, playback may be slower')
+  })
 })
 
 describe('buildAudioTrackList', () => {
@@ -347,5 +380,31 @@ describe('buildPlaybackInfoResponse', () => {
     expect(response.mode).toBe('remux')
     expect(response.streamUrl).toContain('/api/media/files/')
     expect(response.streamUrl).toContain('/master.m3u8')
+  })
+
+  it('should include external subtitle tracks from relatedFiles', () => {
+    const ffprobe = createFfprobe({
+      format: { format_name: 'mov,mp4', duration: 90 },
+    })
+    const file = { driveLetter: 'A', path: 'movies/test.mp4' }
+    const relatedFiles = [
+      { type: 'subtitle', path: 'movies/test.eng.srt' },
+      { type: 'trailer', path: 'movies/trailer.mp4' },
+    ]
+
+    const response = buildPlaybackInfoResponse({
+      ffprobe,
+      file,
+      codecSupport: fullCodecSupport,
+      relatedFiles,
+      streamBaseUrl: '/api/media',
+      movieId: 'tt9999999',
+    })
+
+    expect(response.mode).toBe('direct-play')
+    const externalSubs = response.subtitleTracks.filter((t) => t.source === 'external')
+    expect(externalSubs).toHaveLength(1)
+    expect(externalSubs[0].format).toBe('srt')
+    expect(externalSubs[0].url).toContain('/download')
   })
 })
