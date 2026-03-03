@@ -1,5 +1,4 @@
 import { Injectable } from '@furystack/inject'
-import { Lock } from 'semaphore-async-await'
 
 type SpeechRecognitionEvent = {
   results: SpeechRecognitionResultList
@@ -28,42 +27,49 @@ declare class webkitSpeechRecognition {
 
 @Injectable({ lifetime: 'singleton' })
 export class SpeechRecognitionService {
-  public lock = new Lock()
+  private pending: Promise<void> = Promise.resolve()
 
-  public async recognizeSpeech(): Promise<string> {
-    try {
-      await this.lock.acquire()
-
-      const speechRecognition = new webkitSpeechRecognition()
-
-      return new Promise((resolve, reject) => {
-        if (!speechRecognition) {
-          reject(new Error('Speech recognition is not supported in this browser.'))
-          return
+  public recognizeSpeech(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.pending = this.pending.then(async () => {
+        try {
+          const result = await this.performRecognition()
+          resolve(result)
+        } catch (e) {
+          reject(e instanceof Error ? e : new Error(String(e)))
         }
-
-        speechRecognition.lang = 'hu-HU'
-
-        speechRecognition.onresult = (event) => {
-          if (event.results.length > 0) {
-            resolve(event.results[0][0].transcript)
-          } else {
-            reject(new Error('No speech recognized.'))
-          }
-        }
-
-        speechRecognition.onerror = (event: SpeechRecognitionError) => {
-          reject(new Error(`Speech recognition error: ${event.error}`))
-        }
-
-        speechRecognition.onend = () => {
-          console.log('Speech recognition ended.')
-        }
-
-        speechRecognition.start()
       })
-    } finally {
-      this.lock.release()
-    }
+    })
+  }
+
+  private performRecognition(): Promise<string> {
+    const speechRecognition = new webkitSpeechRecognition()
+
+    return new Promise((resolve, reject) => {
+      if (!speechRecognition) {
+        reject(new Error('Speech recognition is not supported in this browser.'))
+        return
+      }
+
+      speechRecognition.lang = 'hu-HU'
+
+      speechRecognition.onresult = (event) => {
+        if (event.results.length > 0) {
+          resolve(event.results[0][0].transcript)
+        } else {
+          reject(new Error('No speech recognized.'))
+        }
+      }
+
+      speechRecognition.onerror = (event: SpeechRecognitionError) => {
+        reject(new Error(`Speech recognition error: ${event.error}`))
+      }
+
+      speechRecognition.onend = () => {
+        console.log('Speech recognition ended.')
+      }
+
+      speechRecognition.start()
+    })
   }
 }

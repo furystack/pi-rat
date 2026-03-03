@@ -41,7 +41,6 @@
     "monaco-editor": "^0.55.1",
     "ollama": "^0.6.3",
     "path-to-regexp": "^8.3.0",
-    "semaphore-async-await": "^1.5.1",
     "video.js": "8.23.8"
   }
 }

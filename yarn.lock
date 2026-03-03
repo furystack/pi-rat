@@ -4618,7 +4618,6 @@ __metadata:
     monaco-editor: "npm:^0.55.1"
     ollama: "npm:^0.6.3"
     path-to-regexp: "npm:^8.3.0"
-    semaphore-async-await: "npm:^1.5.1"
     typescript: "npm:^5.9.3"
     video.js: "npm:8.23.8"
     vite: "npm:^7.3.1"
@@ -7575,13 +7574,6 @@ __metadata:
     loose-envify: "npm:^1.1.0"
     object-assign: "npm:^4.1.1"
   checksum: 10c0/b0982e4b0f34f4ffa4f2f486161c0fd9ce9b88680b045dccbf250eb1aa4fd27413570645455187a83535e2370f5c667a251045547765408492bd883cbe95fcdb
-  languageName: node
-  linkType: hard
-
-"semaphore-async-await@npm:^1.5.1":
-  version: 1.5.1
-  resolution: "semaphore-async-await@npm:1.5.1"
-  checksum: 10c0/b5cc7bcbe755fa73d414b6ebabd9b73cec9193988ecb14b489753287acef77f4cf4c4eaa9c2cd942f24ec8e230d26116788c7405b256c39111b75c81e953a92f
   languageName: node
   linkType: hard
 
