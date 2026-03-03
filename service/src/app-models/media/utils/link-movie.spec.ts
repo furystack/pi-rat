@@ -29,11 +29,12 @@ vi.mock('@furystack/repository', () => ({
   },
 }))
 
-// Mock getLogger
 vi.mock('@furystack/logging', () => ({
   getLogger: () => ({
     withScope: () => ({
       debug: vi.fn().mockResolvedValue(undefined),
+      warning: vi.fn().mockResolvedValue(undefined),
+      error: vi.fn().mockResolvedValue(undefined),
     }),
   }),
 }))
@@ -50,7 +51,6 @@ vi.mock('./ensure-omdb-series-exists.js', () => ({
   ensureOmdbSeriesExists: vi.fn().mockResolvedValue(undefined),
 }))
 
-// Mock services
 const mockGetFfprobeForPiratFile = vi.fn().mockResolvedValue({ duration: 7200 })
 const mockFetchOmdbMovieMetadata = vi.fn()
 
@@ -67,13 +67,11 @@ describe('linkMovie', () => {
   const createTestInjector = () => {
     const injector = new Injector()
 
-    // Mock FfprobeService
     injector.setExplicitInstance(
       { getFfprobeForPiratFile: mockGetFfprobeForPiratFile } as unknown as FfprobeService,
       FfprobeService,
     )
 
-    // Mock OmdbClientService
     injector.setExplicitInstance(
       { fetchOmdbMovieMetadata: mockFetchOmdbMovieMetadata } as unknown as OmdbClientService,
       OmdbClientService,
@@ -164,9 +162,8 @@ describe('linkMovie', () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockOmdbStoreFind.mockResolvedValue([])
       mockFetchOmdbMovieMetadata.mockResolvedValue({
-        imdbID: 'tt1234567',
-        Title: 'Test Movie',
-        Year: '2024',
+        status: 'success',
+        data: { imdbID: 'tt1234567', Title: 'Test Movie', Year: '2024' },
       })
       mockMovieFileStoreAdd.mockResolvedValue({
         created: [{ id: 'new-file-id' }],
@@ -183,18 +180,63 @@ describe('linkMovie', () => {
       })
     })
 
-    it('should throw 404 when OMDB metadata not found', async () => {
+    it('should return metadata-not-found when OMDB returns not-found', async () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockOmdbStoreFind.mockResolvedValue([])
-      mockFetchOmdbMovieMetadata.mockResolvedValue(null)
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-found' })
 
       await usingAsync(createTestInjector(), async (injector) => {
-        await expect(
-          linkMovie({
-            injector,
-            file: createFile('movies/Unknown.Movie.2024.mkv'),
-          }),
-        ).rejects.toThrow('Metadata not found')
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Unknown.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('metadata-not-found')
+      })
+    })
+
+    it('should return rate-limited when OMDB is rate-limited', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'rate-limited' })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Some.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('rate-limited')
+      })
+    })
+
+    it('should return omdb-not-configured when OMDB is not configured', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-configured' })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Another.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('omdb-not-configured')
+      })
+    })
+
+    it('should return omdb-error when OMDB returns an error', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'error', error: new Error('Network failure') })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Error.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('omdb-error')
       })
     })
   })

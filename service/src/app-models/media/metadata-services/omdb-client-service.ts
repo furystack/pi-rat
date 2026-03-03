@@ -3,8 +3,26 @@ import { Injectable, Injected, type Injector } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor, type DataSet } from '@furystack/repository'
-import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata } from 'common'
+import { Semaphore, sleepAsync } from '@furystack/utils'
+import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata, PiRatFile } from 'common'
 import { Config } from 'common'
+
+export type OmdbFetchResult<T> =
+  | { status: 'success'; data: T }
+  | { status: 'not-found' }
+  | { status: 'rate-limited' }
+  | { status: 'not-configured' }
+  | { status: 'error'; error: unknown }
+
+const MAX_RETRIES = 3
+const INITIAL_BACKOFF_MS = 5_000
+const MAX_BACKOFF_MS = 60_000
+
+const isRateLimitResponse = (body: Record<string, unknown>): boolean =>
+  body.Response === 'False' && typeof body.Error === 'string' && body.Error.includes('limit')
+
+const isNotFoundResponse = (body: Record<string, unknown>): boolean =>
+  body.Response === 'False' && typeof body.Error === 'string' && !body.Error.includes('limit')
 
 @Injectable({ lifetime: 'singleton' })
 export class OmdbClientService {
@@ -19,7 +37,15 @@ export class OmdbClientService {
   @Injected((injector) => useSystemIdentityContext({ injector, username: 'omdb-service' }))
   declare private systemInjector: Injector
 
-  public async init() {
+  private readonly semaphore = new Semaphore(1)
+
+  public init() {
+    void this.initAsync().catch((error) => {
+      void this.logger.error({ message: 'Failed to initialize OMDB Client Service', data: { error } })
+    })
+  }
+
+  private async initAsync() {
     const config = await this.configDataSet.get(this.systemInjector, 'OMDB_CONFIG')
     if (!config) {
       this.config = undefined
@@ -64,22 +90,66 @@ export class OmdbClientService {
     })
   }
 
-  public async fetchOmdbMovieMetadata({
-    title,
-    year,
-    season,
-    episode,
-  }: {
-    title: string
-    year?: number
-    season?: number
-    episode?: number
-  }): Promise<OmdbMovieMetadata | undefined> {
+  private async fetchWithRetry(
+    url: string,
+    context: { file?: PiRatFile; description: string },
+  ): Promise<OmdbFetchResult<Record<string, unknown>>> {
+    let backoffMs = INITIAL_BACKOFF_MS
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      const response = await fetch(url)
+      if (!response.ok) {
+        return { status: 'error', error: new Error(`HTTP ${response.status}: ${response.statusText}`) }
+      }
+      const body = (await response.json()) as Record<string, unknown>
+
+      if (isRateLimitResponse(body)) {
+        if (attempt < MAX_RETRIES) {
+          await this.logger.warning({
+            message: `⏳  OMDB rate limit reached for ${context.description}, retrying in ${backoffMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})`,
+            data: { file: context.file },
+          })
+          await sleepAsync(backoffMs)
+          backoffMs = Math.min(backoffMs * 2, MAX_BACKOFF_MS)
+          continue
+        }
+        await this.logger.warning({
+          message: `🚫  OMDB rate limit reached for ${context.description}, all retries exhausted`,
+          data: { file: context.file },
+        })
+        return { status: 'rate-limited' }
+      }
+
+      if (isNotFoundResponse(body)) {
+        return { status: 'not-found' }
+      }
+
+      return { status: 'success', data: body }
+    }
+
+    return { status: 'rate-limited' }
+  }
+
+  public async fetchOmdbMovieMetadata(
+    {
+      title,
+      year,
+      season,
+      episode,
+    }: {
+      title: string
+      year?: number
+      season?: number
+      episode?: number
+    },
+    context?: { file?: PiRatFile },
+  ): Promise<OmdbFetchResult<OmdbMovieMetadata>> {
     if (!this.config) {
       await this.logger.error({
         message: '🚫   OMDB Service is not initialized, cannot fetch movie metadata',
+        data: { file: context?.file },
       })
-      return undefined
+      return { status: 'not-configured' }
     }
 
     const query = [
@@ -90,41 +160,55 @@ export class OmdbClientService {
       'plot=full',
     ].join('&')
 
+    const url = `http://www.omdbapi.com/?apikey=${this.config.value.apiKey}&${query}`
+    const description = `movie '${title}'${year ? ` (${year})` : ''}`
+
     try {
-      const omdbResult = await fetch(`http://www.omdbapi.com/?apikey=${this.config?.value.apiKey}&${query}`)
-      if (!omdbResult.ok) {
-        throw new Error('Failed to fetch OMDb data')
-      }
-      const omdbMeta: OmdbMovieMetadata = await omdbResult.json()
-      return omdbMeta
+      return await this.semaphore.execute(async () => {
+        const result = await this.fetchWithRetry(url, { file: context?.file, description })
+        if (result.status === 'success') {
+          return { status: 'success' as const, data: result.data as unknown as OmdbMovieMetadata }
+        }
+        return result
+      })
     } catch (error) {
       await this.logger.warning({
-        message: `❗  Failed to fetch OMDB Movie metadata`,
-        data: { error, title, year, season, episode },
+        message: `❗  Failed to fetch OMDB Movie metadata for ${description}`,
+        data: { error, title, year, season, episode, file: context?.file },
       })
-      return undefined
+      return { status: 'error', error }
     }
   }
 
-  public async fetchOmdbSeriesMetadata({ imdbId }: { imdbId: string }): Promise<OmdbSeriesMetadata | undefined> {
+  public async fetchOmdbSeriesMetadata(
+    { imdbId }: { imdbId: string },
+    context?: { file?: PiRatFile },
+  ): Promise<OmdbFetchResult<OmdbSeriesMetadata>> {
     if (!this.config) {
       await this.logger.error({
         message: '🚫   OMDB Service is not initialized, cannot fetch series metadata',
+        data: { file: context?.file },
       })
-      return undefined
+      return { status: 'not-configured' }
     }
     const query = [`i=${imdbId}`, 'plot=full'].join('&')
+    const url = `http://www.omdbapi.com/?apikey=${this.config.value.apiKey}&${query}`
+    const description = `series '${imdbId}'`
 
     try {
-      const omdbResult = await fetch(`http://www.omdbapi.com/?apikey=${this.config?.value.apiKey}&${query}`)
-      if (!omdbResult.ok) {
-        throw new Error('Failed to fetch OMDb data')
-      }
-      const omdbMeta: OmdbSeriesMetadata = await omdbResult.json()
-      return omdbMeta
+      return await this.semaphore.execute(async () => {
+        const result = await this.fetchWithRetry(url, { file: context?.file, description })
+        if (result.status === 'success') {
+          return { status: 'success' as const, data: result.data as unknown as OmdbSeriesMetadata }
+        }
+        return result
+      })
     } catch (error) {
-      await this.logger.warning({ message: `❗  Failed to fetch OMDB Series metadata`, data: { error, imdbId } })
-      return undefined
+      await this.logger.warning({
+        message: `❗  Failed to fetch OMDB Series metadata for ${description}`,
+        data: { error, imdbId, file: context?.file },
+      })
+      return { status: 'error', error }
     }
   }
 }

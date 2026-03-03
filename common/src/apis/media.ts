@@ -18,7 +18,17 @@ import type { PiRatFile } from '../models/pirat-file.js'
 
 export type LinkMovie = {
   body: PiRatFile
-  result: { status: 'already-linked' | 'linked' | 'failed' | 'not-movie-file' }
+  result: {
+    status:
+      | 'already-linked'
+      | 'linked'
+      | 'failed'
+      | 'not-movie-file'
+      | 'rate-limited'
+      | 'metadata-not-found'
+      | 'omdb-not-configured'
+      | 'omdb-error'
+  }
 }
 
 export type ExtractSubtitles = {
@@ -38,6 +48,16 @@ export type SaveWatchProgress = {
   result: WatchHistoryEntry
 }
 
+export type ScanProgress = {
+  total: number
+  linked: number
+  alreadyLinked: number
+  failed: number
+  rateLimited: number
+  metadataNotFound: number
+  skipped: number
+}
+
 export type ScanForMoviesEndpoint = {
   body: {
     root: PiRatFile
@@ -45,6 +65,7 @@ export type ScanForMoviesEndpoint = {
   }
   result: {
     added: MovieFile[]
+    progress: ScanProgress
   }
 }
 

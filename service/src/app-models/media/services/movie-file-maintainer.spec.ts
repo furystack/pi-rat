@@ -95,7 +95,10 @@ describe('MovieMaintainerService', () => {
     )
 
     const service = injector.getInstance(MovieMaintainerService)
-    await service.init()
+    service.init()
+    await vi.waitFor(() => {
+      expect(mockConfigGet).toHaveBeenCalled()
+    })
     return service
   }
 
