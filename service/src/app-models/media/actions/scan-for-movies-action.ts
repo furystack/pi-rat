@@ -3,7 +3,14 @@ import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
-import { Drive, MovieFile, type ScanForMoviesEndpoint, type ScanProgress } from 'common'
+import {
+  Drive,
+  MovieFile,
+  createScanProgress,
+  getProcessedCount,
+  updateScanProgress,
+  type ScanForMoviesEndpoint,
+} from 'common'
 import { MovieMaintainerService } from '../services/movie-file-maintainer.js'
 import { extractSubtitles } from '../utils/extract-subtitles.js'
 import { linkMovie } from '../utils/link-movie.js'
@@ -39,15 +46,7 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
     data: { count: toBeAdded.length },
   })
 
-  const progress: ScanProgress = {
-    total: toBeAdded.length,
-    linked: 0,
-    alreadyLinked: 0,
-    failed: 0,
-    rateLimited: 0,
-    metadataNotFound: 0,
-    skipped: 0,
-  }
+  const progress = createScanProgress(toBeAdded.length)
 
   const added: Array<Awaited<ReturnType<typeof linkMovie>>> = []
   for (const file of toBeAdded) {
@@ -64,7 +63,7 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
         })
       }
       added.push(result)
-      updateProgress(progress, result.status)
+      updateScanProgress(progress, result.status)
     } catch (error) {
       await logger.error({
         message: `Error linking movie file '${file.driveLetter}:${file.path}'`,
@@ -73,14 +72,8 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
       progress.failed++
     }
 
-    const processed =
-      progress.linked +
-      progress.alreadyLinked +
-      progress.failed +
-      progress.rateLimited +
-      progress.metadataNotFound +
-      progress.skipped
-    if (processed % PROGRESS_LOG_INTERVAL === 0) {
+    const processed = getProcessedCount(progress)
+    if (processed > 0 && processed % PROGRESS_LOG_INTERVAL === 0) {
       await logger.information({
         message: `Scan progress: ${processed}/${progress.total}`,
         data: { progress },
@@ -94,28 +87,7 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
   })
 
   return JsonResult({
-    status: true,
     added: added.filter((file) => file.status === 'linked').map((file) => file.movieFile),
     progress,
   })
-}
-
-const updateProgress = (progress: ScanProgress, status: string) => {
-  switch (status) {
-    case 'linked':
-      progress.linked++
-      break
-    case 'already-linked':
-      progress.alreadyLinked++
-      break
-    case 'rate-limited':
-      progress.rateLimited++
-      break
-    case 'metadata-not-found':
-      progress.metadataNotFound++
-      break
-    default:
-      progress.skipped++
-      break
-  }
 }

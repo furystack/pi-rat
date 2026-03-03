@@ -22,7 +22,12 @@ const isRateLimitResponse = (body: Record<string, unknown>): boolean =>
   body.Response === 'False' && typeof body.Error === 'string' && body.Error.includes('limit')
 
 const isNotFoundResponse = (body: Record<string, unknown>): boolean =>
-  body.Response === 'False' && typeof body.Error === 'string' && !body.Error.includes('limit')
+  body.Response === 'False' &&
+  typeof body.Error === 'string' &&
+  (body.Error.includes('not found') || body.Error.includes('Not found') || body.Error.includes('Incorrect IMDb ID'))
+
+const isErrorResponse = (body: Record<string, unknown>): boolean =>
+  body.Response === 'False' && typeof body.Error === 'string' && !isRateLimitResponse(body) && !isNotFoundResponse(body)
 
 @Injectable({ lifetime: 'singleton' })
 export class OmdbClientService {
@@ -122,6 +127,10 @@ export class OmdbClientService {
 
       if (isNotFoundResponse(body)) {
         return { status: 'not-found' }
+      }
+
+      if (isErrorResponse(body)) {
+        return { status: 'error', error: new Error(`OMDB API error: ${String(body.Error)}`) }
       }
 
       return { status: 'success', data: body }

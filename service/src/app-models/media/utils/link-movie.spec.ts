@@ -1,5 +1,4 @@
 import { Injector } from '@furystack/inject'
-import { RequestError } from '@furystack/rest'
 import { usingAsync } from '@furystack/utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PiRatFile } from 'common'
@@ -139,7 +138,7 @@ describe('linkMovie', () => {
       })
     })
 
-    it('should throw error when multiple OMDB results found', async () => {
+    it('should return failed when multiple OMDB results found', async () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockOmdbStoreFind.mockResolvedValue([
         { imdbID: 'tt1234567', Title: 'Test Movie 1' },
@@ -147,12 +146,12 @@ describe('linkMovie', () => {
       ])
 
       await usingAsync(createTestInjector(), async (injector) => {
-        await expect(
-          linkMovie({
-            injector,
-            file: createFile('movies/Test.Movie.2024.mkv'),
-          }),
-        ).rejects.toThrow(RequestError)
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Test.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('failed')
       })
     })
   })

@@ -35,14 +35,13 @@ export class SpeechRecognitionService {
   }
 
   private performRecognition(): Promise<string> {
+    if (typeof webkitSpeechRecognition === 'undefined') {
+      return Promise.reject(new Error('Speech recognition is not supported in this browser.'))
+    }
+
     const speechRecognition = new webkitSpeechRecognition()
 
     return new Promise((resolve, reject) => {
-      if (!speechRecognition) {
-        reject(new Error('Speech recognition is not supported in this browser.'))
-        return
-      }
-
       speechRecognition.lang = 'hu-HU'
 
       speechRecognition.onresult = (event) => {

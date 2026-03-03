@@ -504,6 +504,93 @@ export const UpdateUserAction: RequestAction<typeof UpdateUserApiEndpoint> = asy
 }
 ```
 
+## Result Types Over Throwing for Expected Failures
+
+### When to Use Discriminated Union Results
+
+For operations where multiple **expected** outcomes exist (not just success/failure), return a discriminated union instead of throwing. Reserve `RequestError` / `throw` for truly unexpected situations or REST action validation.
+
+**Use result types when:**
+
+- The caller needs to distinguish between different failure modes (rate limit, not found, not configured, etc.)
+- The operation is called in a loop or batch where throwing would abort the entire batch
+- The failure is an expected business outcome, not a programming error
+
+**Keep throwing when:**
+
+- The error is a REST action validation failure (bad input, unauthorized, etc.)
+- The error indicates a programming bug or data integrity issue
+- The caller cannot reasonably recover
+
+```typescript
+// ✅ Good - discriminated union for expected outcomes
+export type OperationResult<T> =
+  | { status: 'success'; data: T }
+  | { status: 'not-found' }
+  | { status: 'rate-limited' }
+  | { status: 'not-configured' }
+  | { status: 'error'; error: unknown }
+
+export const fetchMetadata = async (id: string): Promise<OperationResult<Metadata>> => {
+  if (!config) {
+    return { status: 'not-configured' }
+  }
+  // ... fetch logic with rate limit detection ...
+  if (rateLimited) {
+    return { status: 'rate-limited' }
+  }
+  return { status: 'success', data: result }
+}
+
+// ✅ Good - caller handles each status without try/catch
+const result = await fetchMetadata(id)
+if (result.status === 'rate-limited') {
+  updateProgress(progress, 'rate-limited')
+  continue
+}
+if (result.status === 'success') {
+  await processData(result.data)
+}
+
+// ❌ Avoid - throwing for expected outcomes in batch operations
+const fetchMetadata = async (id: string): Promise<Metadata> => {
+  // Throwing here would abort the entire batch
+  if (!config) throw new Error('Not configured')
+  if (rateLimited) throw new RequestError('Rate limited', 429)
+  if (!found) throw new RequestError('Not found', 404)
+  return result
+}
+```
+
+### Shared Status Mapping Utilities
+
+When a result type is consumed in multiple places (e.g., progress tracking), define the mapping utility alongside the type to keep them in sync:
+
+```typescript
+// ✅ Good - utility lives next to the type, uses the actual union type
+export type LinkMovieStatus = LinkMovie['result']['status']
+
+export const updateScanProgress = (progress: ScanProgress, status: LinkMovieStatus | 'skipped' | 'failed') => {
+  switch (status) {
+    case 'linked':
+      progress.linked++
+      break
+    case 'rate-limited':
+      progress.rateLimited++
+      break
+    // ... all cases handled with type safety
+    default:
+      progress.skipped++
+      break
+  }
+}
+
+// ❌ Avoid - duplicated switch statements with `string` parameter
+const updateProgress = (progress: ScanProgress, status: string) => {
+  /* ... */
+}
+```
+
 ## Summary
 
 **Key Principles:**
@@ -518,6 +605,8 @@ export const UpdateUserAction: RequestAction<typeof UpdateUserApiEndpoint> = asy
 8. **Cache error handling** in load functions
 9. **Form validation** with clear user feedback
 10. **Error recovery** with retry mechanisms
+11. **Result types** over throwing for expected failure modes in batch/loop operations
+12. **Shared status mapping** utilities alongside the types they consume
 
 **Error Handling Checklist:**
 
@@ -530,6 +619,8 @@ export const UpdateUserAction: RequestAction<typeof UpdateUserApiEndpoint> = asy
 - [ ] Input validation before processing
 - [ ] Cache errors handled properly
 - [ ] Form errors displayed clearly
+- [ ] Expected failure modes return result types, not throw
+- [ ] Status mapping utilities defined alongside types (not duplicated)
 
 **Tools:**
 

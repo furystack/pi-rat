@@ -5,7 +5,17 @@ import { getLogger } from '@furystack/logging'
 import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { PathHelper } from '@furystack/utils'
 import type { MoviesConfig, PiRatFile, ScanProgress } from 'common'
-import { Config, Drive, getFallbackMetadata, isMovieFile, isSampleFile, MovieFile } from 'common'
+import {
+  Config,
+  Drive,
+  createScanProgress,
+  getFallbackMetadata,
+  getProcessedCount,
+  isMovieFile,
+  isSampleFile,
+  MovieFile,
+  updateScanProgress,
+} from 'common'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { existsAsync } from '../../../utils/exists-async.js'
@@ -243,28 +253,14 @@ export class MovieMaintainerService {
       message: `🎬  Found ${allPossibleMovieFiles.length} possible movie files. Starting to link movies...`,
     })
 
-    const progress: ScanProgress = {
-      total: allPossibleMovieFiles.length,
-      linked: 0,
-      alreadyLinked: 0,
-      failed: 0,
-      rateLimited: 0,
-      metadataNotFound: 0,
-      skipped: 0,
-    }
+    const progress = createScanProgress(allPossibleMovieFiles.length)
 
     for (const file of allPossibleMovieFiles) {
       const result = await this.onAdd(file)
-      this.updateProgress(progress, result.status)
+      updateScanProgress(progress, result.status)
 
-      const processed =
-        progress.linked +
-        progress.alreadyLinked +
-        progress.failed +
-        progress.rateLimited +
-        progress.metadataNotFound +
-        progress.skipped
-      if (processed % PROGRESS_LOG_INTERVAL === 0) {
+      const processed = getProcessedCount(progress)
+      if (processed > 0 && processed % PROGRESS_LOG_INTERVAL === 0) {
         await this.logger.information({
           message: `🎬  Sync progress: ${processed}/${progress.total}`,
           data: { progress },
@@ -278,29 +274,6 @@ export class MovieMaintainerService {
     })
 
     return progress
-  }
-
-  private updateProgress(progress: ScanProgress, status: string) {
-    switch (status) {
-      case 'linked':
-        progress.linked++
-        break
-      case 'already-linked':
-        progress.alreadyLinked++
-        break
-      case 'rate-limited':
-        progress.rateLimited++
-        break
-      case 'metadata-not-found':
-        progress.metadataNotFound++
-        break
-      case 'failed':
-        progress.failed++
-        break
-      default:
-        progress.skipped++
-        break
-    }
   }
 
   public [Symbol.dispose]() {

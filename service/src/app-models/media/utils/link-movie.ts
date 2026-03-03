@@ -1,7 +1,6 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
-import { RequestError } from '@furystack/rest'
 import {
   getFallbackMetadata,
   getFileName,
@@ -73,7 +72,11 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   })
 
   if (storedResult.length > 1) {
-    throw new RequestError('Multiple results found', 400)
+    await logger.warning({
+      message: `Multiple OMDB results found for '${fileName}', skipping.`,
+      data: { file, title, year, count: storedResult.length },
+    })
+    return { status: 'failed' } as const
   }
 
   if (storedResult.length === 1) {
