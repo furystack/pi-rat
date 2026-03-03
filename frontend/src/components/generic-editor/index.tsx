@@ -2,10 +2,8 @@ import type { ChildrenList } from '@furystack/shades'
 import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
 import { Button, DataGrid, Fab, Icon, icons, NotyService, SelectionCell } from '@furystack/shades-common-components'
-import type { Uri } from 'monaco-editor'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import type { GenericEditorService } from './generic-editor-service.js'
-import { GenericMonacoEditor } from './generic-monaco-editor.js'
 
 type CreateEditorState = {
   mode: 'create'
@@ -22,13 +20,18 @@ type EditEditorState<T, TKey extends keyof T> = {
 
 type GenericEditorState<T, TKey extends keyof T> = CreateEditorState | ListEditorState | EditEditorState<T, TKey>
 
+export type EditorSchemaInfo = {
+  schemaName: string
+  jsonSchema: Record<string, unknown>
+}
+
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
   columns: DataGridProps<T, TColumns>['columns']
   headerComponents: DataGridProps<T, TColumns>['headerComponents']
   rowComponents: DataGridProps<T, TColumns>['rowComponents']
   styles: DataGridProps<T, TColumns>['styles']
-  modelUri?: Uri
+  schemaInfo?: EditorSchemaInfo
 }
 
 type EntityFromProps<Props> = Props extends { service: GenericEditorService<infer T, any, any> } ? T : never
@@ -41,7 +44,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
   render: ({ props, injector, useSearchState }) => {
-    const { service, columns, headerComponents, rowComponents, styles, modelUri } = props
+    const { service, columns, headerComponents, rowComponents, styles, schemaInfo } = props
 
     const refresh = () => service.findOptions.setValue({ ...service.findOptions.getValue() })
 
@@ -57,7 +60,10 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       return (
         <PiRatLazyLoad
           component={async () => {
-            const entry = await service.getSingleEntry(editorState.currentId)
+            const [{ GenericMonacoEditor }, entry] = await Promise.all([
+              import('./generic-monaco-editor.js'),
+              service.getSingleEntry(editorState.currentId),
+            ])
             return (
               <GenericMonacoEditor
                 value={entry!}
@@ -79,7 +85,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                     })
                   }
                 }}
-                modelUri={modelUri}
+                schemaInfo={schemaInfo}
               />
             )
           }}
@@ -89,32 +95,39 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 
     if (editorState.mode === 'create') {
       return (
-        <GenericMonacoEditor
-          service={service}
-          modelUri={modelUri}
-          value={{} as EntityFromProps<typeof props>}
-          onSave={async (value) => {
-            try {
-              const response = await service.postEntry(value)
-              setEditorState({
-                mode: 'edit',
-                currentId: response[service.extendedOptions.keyProperty] as EntityFromProps<
-                  typeof props
-                >[EntityKeyFromProps<typeof props>],
-              })
-              noty.emit('onNotyAdded', {
-                type: 'success',
-                title: '✨ Entity created',
-                body: 'Entity created successfully',
-              })
-              refresh()
-            } catch (error) {
-              noty.emit('onNotyAdded', {
-                type: 'error',
-                title: '❗ Failed to create entity',
-                body: (error as Error).toString(),
-              })
-            }
+        <PiRatLazyLoad
+          component={async () => {
+            const { GenericMonacoEditor } = await import('./generic-monaco-editor.js')
+            return (
+              <GenericMonacoEditor
+                service={service}
+                schemaInfo={schemaInfo}
+                value={{} as EntityFromProps<typeof props>}
+                onSave={async (value) => {
+                  try {
+                    const response = await service.postEntry(value)
+                    setEditorState({
+                      mode: 'edit',
+                      currentId: response[service.extendedOptions.keyProperty] as EntityFromProps<
+                        typeof props
+                      >[EntityKeyFromProps<typeof props>],
+                    })
+                    noty.emit('onNotyAdded', {
+                      type: 'success',
+                      title: '✨ Entity created',
+                      body: 'Entity created successfully',
+                    })
+                    refresh()
+                  } catch (error) {
+                    noty.emit('onNotyAdded', {
+                      type: 'error',
+                      title: '❗ Failed to create entity',
+                      body: (error as Error).toString(),
+                    })
+                  }
+                }}
+              />
+            )
           }}
         />
       )

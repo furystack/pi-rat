@@ -4,19 +4,11 @@ import loggingSchemas from 'common/schemas/logging-entities.json' with { type: '
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { LoggingService } from '../../services/logging-service.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const LoggingPage = Shade({
   shadowDomName: 'shade-app-logging-page',
   render: ({ useDisposable, injector }) => {
     const loggingService = injector.getInstance(LoggingService)
-
-    const modelProvider = injector.getInstance(MonacoModelProvider)
-
-    const modelUri = modelProvider.getModelUriForEntityType({
-      schemaName: 'LoggingService',
-      jsonSchema: { ...loggingSchemas, type: 'object', $ref: '#/definitions/LogEntry' },
-    })
 
     const service = useDisposable(
       'service',
@@ -51,7 +43,10 @@ export const LoggingPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        modelUri={modelUri}
+        schemaInfo={{
+          schemaName: 'LoggingService',
+          jsonSchema: { ...loggingSchemas, type: 'object', $ref: '#/definitions/LogEntry' },
+        }}
       />
     )
   },

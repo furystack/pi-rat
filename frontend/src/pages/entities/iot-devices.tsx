@@ -4,19 +4,11 @@ import iotSchemas from 'common/schemas/iot-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const IotDevicesPage = Shade({
   shadowDomName: 'shade-app-iot-devices-page',
   render: ({ useDisposable, injector }) => {
     const iotService = injector.getInstance(IotDevicesService)
-
-    const modelProvider = injector.getInstance(MonacoModelProvider)
-
-    const modelUri = modelProvider.getModelUriForEntityType({
-      schemaName: 'IotDevicesService',
-      jsonSchema: { ...iotSchemas, type: 'object', $ref: '#/definitions/Device' },
-    })
 
     const service = useDisposable(
       'service',
@@ -52,7 +44,10 @@ export const IotDevicesPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        modelUri={modelUri}
+        schemaInfo={{
+          schemaName: 'IotDevicesService',
+          jsonSchema: { ...iotSchemas, type: 'object', $ref: '#/definitions/Device' },
+        }}
       />
     )
   },

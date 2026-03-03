@@ -3,20 +3,12 @@ import { MovieFile } from 'common'
 import mediaSchemas from 'common/schemas/media-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 
 export const MovieFilesPage = Shade({
   shadowDomName: 'shade-app-movie-files-page',
   render: ({ useDisposable, injector }) => {
     const movieFilesService = injector.getInstance(MovieFilesService)
-
-    const modelProvider = injector.getInstance(MonacoModelProvider)
-
-    const modelUri = modelProvider.getModelUriForEntityType({
-      schemaName: 'MovieFile',
-      jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/MovieFile' },
-    })
 
     const service = useDisposable(
       'service',
@@ -43,7 +35,10 @@ export const MovieFilesPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        modelUri={modelUri}
+        schemaInfo={{
+          schemaName: 'MovieFile',
+          jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/MovieFile' },
+        }}
       />
     )
   },

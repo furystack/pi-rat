@@ -4,19 +4,11 @@ import configSchemas from 'common/schemas/config-entities.json' with { type: 'js
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { ConfigApiClient } from '../../services/api-clients/config-api-client.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const ConfigPage = Shade({
   shadowDomName: 'shade-app-configs-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(ConfigApiClient)
-
-    const modelProvider = injector.getInstance(MonacoModelProvider)
-
-    const modelUri = modelProvider.getModelUriForEntityType({
-      schemaName: 'Config',
-      jsonSchema: { ...configSchemas, type: 'object', $ref: '#/definitions/Config' },
-    })
 
     const service = useDisposable(
       'service',
@@ -68,7 +60,10 @@ export const ConfigPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        modelUri={modelUri}
+        schemaInfo={{
+          schemaName: 'Config',
+          jsonSchema: { ...configSchemas, type: 'object', $ref: '#/definitions/Config' },
+        }}
       />
     )
   },

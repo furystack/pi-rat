@@ -4,19 +4,11 @@ import mediaSchemas from 'common/schemas/media-entities.json' with { type: 'json
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const OmdbMovieMetadataPage = Shade({
   shadowDomName: 'shade-app-omdb-movie-metadata-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(MediaApiClient)
-
-    const modelProvider = injector.getInstance(MonacoModelProvider)
-
-    const modelUri = modelProvider.getModelUriForEntityType({
-      schemaName: 'OmdbMovieMetadata',
-      jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/OmdbMovieMetadata' },
-    })
 
     const service = useDisposable(
       'service',
@@ -57,7 +49,10 @@ export const OmdbMovieMetadataPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        modelUri={modelUri}
+        schemaInfo={{
+          schemaName: 'OmdbMovieMetadata',
+          jsonSchema: { ...mediaSchemas, type: 'object', $ref: '#/definitions/OmdbMovieMetadata' },
+        }}
       />
     )
   },
