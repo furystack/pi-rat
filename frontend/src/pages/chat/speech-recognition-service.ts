@@ -1,4 +1,5 @@
 import { Injectable } from '@furystack/inject'
+import { Semaphore } from '@furystack/utils'
 
 type SpeechRecognitionEvent = {
   results: SpeechRecognitionResultList
@@ -27,19 +28,10 @@ declare class webkitSpeechRecognition {
 
 @Injectable({ lifetime: 'singleton' })
 export class SpeechRecognitionService {
-  private pending: Promise<void> = Promise.resolve()
+  private readonly semaphore = new Semaphore(1)
 
   public recognizeSpeech(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      this.pending = this.pending.then(async () => {
-        try {
-          const result = await this.performRecognition()
-          resolve(result)
-        } catch (e) {
-          reject(e instanceof Error ? e : new Error(String(e)))
-        }
-      })
-    })
+    return this.semaphore.execute(() => this.performRecognition())
   }
 
   private performRecognition(): Promise<string> {

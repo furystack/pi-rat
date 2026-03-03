@@ -77,6 +77,15 @@ export class FfprobeService {
   @Injected(FileWatcherService)
   declare private fileWatcherService: FileWatcherService
 
+  constructor() {
+    this.piRatFileCache.addListener('onLoadError', ({ args, error }) => {
+      void this.logger.error({
+        message: `Background cache load failed for file '${args[0].path}'`,
+        data: { driveLetter: args[0].driveLetter, error },
+      })
+    })
+  }
+
   public getFfprobeForPiratFile = async (file: PiRatFile) => {
     return await this.piRatFileCache.get(file)
   }

@@ -11,5 +11,8 @@ export class DrivesApiClient {
       credentials: 'include',
       mode: 'cors',
     },
+    onResponseParseError: ({ response, error }) => {
+      console.error(`Failed to parse response from ${response.url}:`, error)
+    },
   })
 }

@@ -33,6 +33,24 @@ syncService.registerModel(ChatMessage)
 syncService.registerModel(LogEntry, { suspendDelayMs: 5000 })
 syncService.registerModel(AiChatMessage)
 
+const syncLogger = getLogger(shadeInjector).withScope('EntitySync')
+
+syncService.addListener('onConnect', () => {
+  void syncLogger.verbose({ message: 'Entity sync connected' })
+})
+
+syncService.addListener('onDisconnect', () => {
+  void syncLogger.warning({ message: 'Entity sync disconnected' })
+})
+
+syncService.addListener('onReconnectAttempt', ({ attempt }) => {
+  void syncLogger.warning({ message: `Entity sync reconnecting (attempt ${attempt})` })
+})
+
+syncService.addListener('onReconnectFailed', ({ attempt }) => {
+  void syncLogger.error({ message: `Entity sync reconnect failed (attempt ${attempt})` })
+})
+
 shadeInjector.setExplicitInstance(syncService)
 
 void shadeInjector.getInstance(SessionService).init()
