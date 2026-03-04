@@ -17,15 +17,29 @@ const loadCss = (() => {
     loaded = true
     const link = document.createElement('link')
     link.rel = 'stylesheet'
-    link.href = '/monaco-mfe/index.css'
+    link.href = new URL('index.css', import.meta.url).href
     document.head.appendChild(link)
   }
 })()
 
-const applyApiUpdate = (newApi: MonacoEditorMfeApi) => {
+let currentContainer: HTMLDivElement | undefined
+
+const applyApiUpdate = (newApi: MonacoEditorMfeApi, previousApi: MonacoEditorMfeApi) => {
   if (!editorInstance) return
+
   if (newApi.theme) {
     applyTheme(newApi.theme)
+  }
+
+  if (newApi.readOnly !== previousApi.readOnly) {
+    editorInstance.updateOptions({ readOnly: newApi.readOnly })
+  }
+
+  if (newApi.value !== previousApi.value) {
+    const currentValue = editorInstance.getValue()
+    if (newApi.value !== currentValue) {
+      editorInstance.setValue(newApi.value)
+    }
   }
 }
 
@@ -33,6 +47,10 @@ export const create = ({ api, rootElement }: { api: MonacoEditorMfeApi; rootElem
   if (editorInstance) {
     editorInstance.dispose()
     editorInstance = undefined
+  }
+
+  if (currentContainer?.parentElement) {
+    currentContainer.parentElement.removeChild(currentContainer)
   }
 
   loadCss()
@@ -58,12 +76,14 @@ export const create = ({ api, rootElement }: { api: MonacoEditorMfeApi; rootElem
   Object.defineProperty(container, 'props', {
     get: () => currentApi,
     set: (newApi: MonacoEditorMfeApi) => {
+      const previousApi = currentApi
       currentApi = newApi
-      applyApiUpdate(newApi)
+      applyApiUpdate(newApi, previousApi)
     },
   })
   container.updateComponent = () => {}
 
+  currentContainer = container
   rootElement.appendChild(container)
 
   editorInstance = editor.create(container, {
@@ -86,4 +106,8 @@ export const create = ({ api, rootElement }: { api: MonacoEditorMfeApi; rootElem
 export const destroy = () => {
   editorInstance?.dispose()
   editorInstance = undefined
+  if (currentContainer?.parentElement) {
+    currentContainer.parentElement.removeChild(currentContainer)
+  }
+  currentContainer = undefined
 }

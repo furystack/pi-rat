@@ -28,6 +28,7 @@ export type LinkMovie = {
       | 'metadata-not-found'
       | 'omdb-not-configured'
       | 'omdb-error'
+    error?: unknown
   }
 }
 

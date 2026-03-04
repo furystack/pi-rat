@@ -255,6 +255,8 @@ export class MovieMaintainerService {
 
     const progress = createScanProgress(allPossibleMovieFiles.length)
 
+    // Sequential to respect OMDB API rate limits. Parallel processing triggers
+    // rate-limit responses that waste retries and slow down overall throughput.
     for (const file of allPossibleMovieFiles) {
       const result = await this.onAdd(file)
       updateScanProgress(progress, result.status)
