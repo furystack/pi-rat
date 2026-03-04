@@ -4,6 +4,11 @@ import { getRgbFromColorString, getTextColor, type Theme } from '@furystack/shad
 
 type BuiltinTheme = 'vs' | 'vs-dark' | 'hc-black' | 'hc-light'
 
+/**
+ * Must stay in sync with `MonacoThemeData` in `monaco-mfe/src/theme.ts`.
+ * Defined separately because the MFE is loaded at runtime and cannot share
+ * compile-time types with the host.
+ */
 export type MonacoThemeData = {
   base: BuiltinTheme
   inherit: boolean

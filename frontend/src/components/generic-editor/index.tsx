@@ -20,6 +20,9 @@ type EditEditorState<T, TKey extends keyof T> = {
 
 type GenericEditorState<T, TKey extends keyof T> = CreateEditorState | ListEditorState | EditEditorState<T, TKey>
 
+/**
+ * Must stay in sync with `SchemaInfo` in `monaco-mfe/src/schema.ts`.
+ */
 export type EditorSchemaInfo = {
   schemaName: string
   jsonSchema: Record<string, unknown>

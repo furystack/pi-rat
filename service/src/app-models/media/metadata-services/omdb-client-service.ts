@@ -19,7 +19,7 @@ const INITIAL_BACKOFF_MS = 5_000
 const MAX_BACKOFF_MS = 60_000
 
 const isRateLimitResponse = (body: Record<string, unknown>): boolean =>
-  body.Response === 'False' && typeof body.Error === 'string' && body.Error.includes('limit')
+  body.Response === 'False' && typeof body.Error === 'string' && body.Error.includes('limit reached')
 
 const isNotFoundResponse = (body: Record<string, unknown>): boolean =>
   body.Response === 'False' &&
@@ -58,11 +58,11 @@ export class OmdbClientService {
         message: '🚫   No config found, OMDB Service will not be initialized',
       })
     } else {
+      this.config = config as OmdbConfig
       await this.logger.verbose({
         message: '✅   OMDB Service initialized',
       })
     }
-    this.config = config as OmdbConfig
 
     this.configDataSet.subscribe('onEntityAdded', ({ entity }) => {
       if (entity.id === 'OMDB_CONFIG') {
@@ -176,6 +176,9 @@ export class OmdbClientService {
       return await this.semaphore.execute(async () => {
         const result = await this.fetchWithRetry(url, { file: context?.file, description })
         if (result.status === 'success') {
+          if (typeof result.data.imdbID !== 'string') {
+            return { status: 'error', error: new Error(`Invalid OMDB response: missing imdbID`) }
+          }
           return { status: 'success' as const, data: result.data as unknown as OmdbMovieMetadata }
         }
         return result
@@ -208,6 +211,9 @@ export class OmdbClientService {
       return await this.semaphore.execute(async () => {
         const result = await this.fetchWithRetry(url, { file: context?.file, description })
         if (result.status === 'success') {
+          if (typeof result.data.imdbID !== 'string') {
+            return { status: 'error', error: new Error(`Invalid OMDB response: missing imdbID`) }
+          }
           return { status: 'success' as const, data: result.data as unknown as OmdbSeriesMetadata }
         }
         return result

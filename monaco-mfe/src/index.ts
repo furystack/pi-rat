@@ -30,6 +30,11 @@ const applyApiUpdate = (newApi: MonacoEditorMfeApi) => {
 }
 
 export const create = ({ api, rootElement }: { api: MonacoEditorMfeApi; rootElement: HTMLElement }) => {
+  if (editorInstance) {
+    editorInstance.dispose()
+    editorInstance = undefined
+  }
+
   loadCss()
 
   if (api.theme) {

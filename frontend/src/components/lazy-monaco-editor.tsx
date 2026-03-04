@@ -30,14 +30,16 @@ export const LazyMonacoEditor = Shade<LazyMonacoEditorProps>({
   render: ({ props, injector, useObservable, useDisposable }) => {
     const themeProvider = injector.getInstance(ThemeProviderService)
 
-    const [monacoTheme, setMonacoTheme] = useObservable(
-      'monacoTheme',
-      new ObservableValue(createMonacoTheme(themeProvider.getAssignedTheme())),
+    const monacoThemeObs = useDisposable(
+      'monacoThemeObs',
+      () => new ObservableValue(createMonacoTheme(themeProvider.getAssignedTheme())),
     )
+
+    const [monacoTheme] = useObservable('monacoTheme', monacoThemeObs)
 
     useDisposable('themeChange', () => {
       return themeProvider.subscribe('themeChanged', (newTheme) => {
-        setMonacoTheme(createMonacoTheme(newTheme))
+        monacoThemeObs.setValue(createMonacoTheme(newTheme))
       })
     })
 

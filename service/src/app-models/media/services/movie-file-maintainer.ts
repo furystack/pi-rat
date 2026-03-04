@@ -159,7 +159,7 @@ export class MovieMaintainerService {
   @Injected(FileWatcherService)
   declare private fileWatcherService: FileWatcherService
 
-  declare private addSubsciption: Disposable
+  declare private addSubscription: Disposable
 
   declare private unlinkDirSubscription: Disposable
 
@@ -216,7 +216,7 @@ export class MovieMaintainerService {
 
   private async initAsync() {
     this.config = (await this.configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
-    this.addSubsciption = this.fileWatcherService.subscribe('add', (file) => void this.onAdd(file))
+    this.addSubscription = this.fileWatcherService.subscribe('add', (file) => void this.onAdd(file))
     this.unlinkDirSubscription = this.fileWatcherService.subscribe('unlinkDir', (dir) => void this.onUnlinkDir(dir))
     this.unlinkSubscription = this.fileWatcherService.subscribe('unlink', (file) => void this.onUnlink(file))
 
@@ -277,7 +277,7 @@ export class MovieMaintainerService {
   }
 
   public [Symbol.dispose]() {
-    this.addSubsciption[Symbol.dispose]()
+    this.addSubscription[Symbol.dispose]()
     this.unlinkDirSubscription[Symbol.dispose]()
     this.unlinkSubscription[Symbol.dispose]()
   }

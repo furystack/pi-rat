@@ -2,6 +2,9 @@ import { json, Uri } from 'monaco-editor'
 
 const registeredSchemas = new Map<string, Uri>()
 
+/**
+ * Must stay in sync with `EditorSchemaInfo` in `frontend/src/components/generic-editor/index.tsx`.
+ */
 export type SchemaInfo = {
   schemaName: string
   jsonSchema: Record<string, unknown>
