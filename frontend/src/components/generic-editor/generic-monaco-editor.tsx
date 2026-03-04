@@ -43,7 +43,9 @@ export const GenericMonacoEditor: <T, TKey extends keyof T, TReadonlyProperties 
         <LazyMonacoEditor
           language="json"
           schemaInfo={props.schemaInfo}
-          onValueChange={currentValue.setValue.bind(currentValue)}
+          onValueChange={(newValue) => {
+            currentValue.setValue(newValue)
+          }}
           value={currentValue.getValue()}
         />
         <div

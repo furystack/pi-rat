@@ -75,10 +75,10 @@ export class OmdbClientService {
       this.configDataSet.subscribe('onEntityAdded', ({ entity }) => {
         if (entity.id === 'OMDB_CONFIG') {
           this.config = entity as OmdbConfig
+          void this.logger.information({
+            message: `🎬   OMDB Service config added`,
+          })
         }
-        void this.logger.information({
-          message: `🎬   OMDB Service config added`,
-        })
       }),
       this.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
         if (change.id === 'OMDB_CONFIG') {

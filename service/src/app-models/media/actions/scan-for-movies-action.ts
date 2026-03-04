@@ -69,7 +69,7 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
         message: `Error linking movie file '${file.driveLetter}:${file.path}'`,
         data: { file, error },
       })
-      progress.failed++
+      updateScanProgress(progress, 'failed')
     }
 
     const processed = getProcessedCount(progress)

@@ -94,6 +94,10 @@ export const create = ({ api, rootElement }: { api: MonacoEditorMfeApi; rootElem
   })
 
   if (modelUri) {
+    const existingModel = editor.getModel(modelUri)
+    if (existingModel) {
+      existingModel.dispose()
+    }
     const model = editor.createModel(editorInstance.getValue(), 'json', modelUri)
     editorInstance.setModel(model)
   }
@@ -104,7 +108,9 @@ export const create = ({ api, rootElement }: { api: MonacoEditorMfeApi; rootElem
 }
 
 export const destroy = () => {
+  const model = editorInstance?.getModel()
   editorInstance?.dispose()
+  model?.dispose()
   editorInstance = undefined
   if (currentContainer?.parentElement) {
     currentContainer.parentElement.removeChild(currentContainer)
