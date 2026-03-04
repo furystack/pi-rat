@@ -835,49 +835,49 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^13.3.0":
-  version: 13.3.0
-  resolution: "@furystack/shades-common-components@npm:13.3.0"
+"@furystack/shades-common-components@npm:^13.3.1":
+  version: 13.3.1
+  resolution: "@furystack/shades-common-components@npm:13.3.1"
   dependencies:
     "@furystack/cache": "npm:^6.1.0"
     "@furystack/core": "npm:^15.2.3"
     "@furystack/inject": "npm:^12.0.31"
-    "@furystack/shades": "npm:^12.2.5"
+    "@furystack/shades": "npm:^12.3.0"
     "@furystack/utils": "npm:^8.2.0"
     path-to-regexp: "npm:^8.3.0"
-  checksum: 10c0/f4913fb61c00426edd497bb1f3e84e4a31da7f9abba51d5da3cb93594a8cfaccc217e6344686cda58b90b9109d107d0e19a56c324ea5a4ae17ef24c884b4d9b7
+  checksum: 10c0/4fe3a8bf4efc15d78b6a8f0eeefbcf81f668af9e36757f32dca0695aae00593c6e68296913d4658a665777d20ea9cf571cb3897940dfedc2f27a3ddbf0c61787
   languageName: node
   linkType: hard
 
-"@furystack/shades-lottie@npm:^8.0.8":
-  version: 8.0.8
-  resolution: "@furystack/shades-lottie@npm:8.0.8"
+"@furystack/shades-lottie@npm:^8.0.9":
+  version: 8.0.9
+  resolution: "@furystack/shades-lottie@npm:8.0.9"
   dependencies:
-    "@furystack/shades": "npm:^12.2.5"
+    "@furystack/shades": "npm:^12.3.0"
     "@lottiefiles/lottie-player": "npm:^2.0.12"
-  checksum: 10c0/b2091586ac078568e4c2ce81c55e660a9523d142e7f4edf16b551c8db36d1c7d8ef84e12bdb255794b769744f10d76d2da4ab1a0558caa7e6d2f4fa0a10fd28f
+  checksum: 10c0/e5a6ea8633b44a96e8e015c1e535d3c83587d16a7b3f2523468cbcf98e039a086f4769cf1c3c84a143e3f6b808ee92b63052d3e66e3e06dc674450c7c87f5344
   languageName: node
   linkType: hard
 
-"@furystack/shades-mfe@npm:^2.0.8":
-  version: 2.0.8
-  resolution: "@furystack/shades-mfe@npm:2.0.8"
+"@furystack/shades-mfe@npm:^2.0.9":
+  version: 2.0.9
+  resolution: "@furystack/shades-mfe@npm:2.0.9"
   dependencies:
     "@furystack/inject": "npm:^12.0.31"
-    "@furystack/shades": "npm:^12.2.5"
-  checksum: 10c0/38289f325f3b06814edbed6b61245cfa102685f28b9aa2f124f2ce6f412ba0895e7fb3028fd96d40a96dc79c480566a19a710e20ad4520f83bd024a9a22af702
+    "@furystack/shades": "npm:^12.3.0"
+  checksum: 10c0/6e88f698dbed211ac95ced299f25de4a56fd7de24fd57453ab344adfb4697904a0973dc4eebbadcaa1336bd4ec91dc4641283dd3e698de4bdc560d07b0f3925d
   languageName: node
   linkType: hard
 
-"@furystack/shades@npm:^12.2.5":
-  version: 12.2.5
-  resolution: "@furystack/shades@npm:12.2.5"
+"@furystack/shades@npm:^12.3.0":
+  version: 12.3.0
+  resolution: "@furystack/shades@npm:12.3.0"
   dependencies:
     "@furystack/inject": "npm:^12.0.31"
     "@furystack/rest": "npm:^8.0.41"
     "@furystack/utils": "npm:^8.2.0"
     path-to-regexp: "npm:^8.3.0"
-  checksum: 10c0/e3a5d2874d6345c9ee9f396a74e603d6ec3ba2f991154e2638922a908b4835f4f1b9486899c3a62d2e75cb5b675feedb28a063a8f24f74265560b30ea810e30c
+  checksum: 10c0/13a5cde68a9af62ec3b15fa7abbdf710f0a08d4d544e5a5ed4b8424bd3762e859000e958e02aeb70ce34683dc7ce43588828f3fb9e91652f898924986bab00a4
   languageName: node
   linkType: hard
 
@@ -4611,10 +4611,10 @@ __metadata:
     "@furystack/logging": "npm:^8.1.0"
     "@furystack/rest": "npm:^8.0.41"
     "@furystack/rest-client-fetch": "npm:^8.1.0"
-    "@furystack/shades": "npm:^12.2.5"
-    "@furystack/shades-common-components": "npm:^13.3.0"
-    "@furystack/shades-lottie": "npm:^8.0.8"
-    "@furystack/shades-mfe": "npm:^2.0.8"
+    "@furystack/shades": "npm:^12.3.0"
+    "@furystack/shades-common-components": "npm:^13.3.1"
+    "@furystack/shades-lottie": "npm:^8.0.9"
+    "@furystack/shades-mfe": "npm:^2.0.9"
     "@furystack/utils": "npm:^8.2.0"
     "@types/marked": "npm:^6.0.0"
     "@types/node": "npm:^25.3.3"
@@ -5810,9 +5810,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^16.3.1":
-  version: 16.3.1
-  resolution: "lint-staged@npm:16.3.1"
+"lint-staged@npm:^16.3.2":
+  version: 16.3.2
+  resolution: "lint-staged@npm:16.3.2"
   dependencies:
     commander: "npm:^14.0.3"
     listr2: "npm:^9.0.5"
@@ -5822,7 +5822,7 @@ __metadata:
     yaml: "npm:^2.8.2"
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10c0/9aed98ab759c7acdcfb969c3c09b24597bd6717771ab1f1eec571038713bd0d0ad80304d0a737e5b7b7c64141e4ff9489022448492353f5d1b476223c43f40bc
+  checksum: 10c0/4cbaa85904a912215660ac3c69400b71beabe3fe7e82969cd32c726dbfb04b0f651d0660906215f955c1446ac6b520319e1c7a03c707353a5f038c3d0441a8c3
   languageName: node
   linkType: hard
 
@@ -6953,7 +6953,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.5.5"
     husky: "npm:^9.1.7"
     jsdom: "npm:^28.1.0"
-    lint-staged: "npm:^16.3.1"
+    lint-staged: "npm:^16.3.2"
     prettier: "npm:^3.8.1"
     rimraf: "npm:^6.1.3"
     typescript: "npm:^5.9.3"
