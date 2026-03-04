@@ -3,6 +3,7 @@ FROM node:lts-alpine as base
 COPY --chown=node:node /common /home/node/app/common
 COPY --chown=node:node /frontend /home/node/app/frontend
 COPY --chown=node:node /service /home/node/app/service
+COPY --chown=node:node /monaco-mfe /home/node/app/monaco-mfe
 
 COPY --chown=node:node /package.json /home/node/app/package.json
 COPY --chown=node:node /.yarn/releases /home/node/app/.yarn/releases

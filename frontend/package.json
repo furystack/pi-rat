@@ -28,6 +28,7 @@
     "@furystack/shades": "^12.2.5",
     "@furystack/shades-common-components": "^13.3.0",
     "@furystack/shades-lottie": "^8.0.8",
+    "@furystack/shades-mfe": "^2.0.8",
     "@furystack/utils": "^8.2.0",
     "@types/node": "^25.3.3",
     "@xterm/addon-fit": "^0.11.0",
@@ -38,7 +39,6 @@
     "hls.js": "^1.6.15",
     "marked": "^17.0.3",
     "media-chrome": "^4.18.0",
-    "monaco-editor": "^0.55.1",
     "ollama": "^0.6.3",
     "path-to-regexp": "^8.3.0",
     "video.js": "8.23.8"

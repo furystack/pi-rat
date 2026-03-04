@@ -1,7 +1,15 @@
 import type { DeepPartial } from '@furystack/utils'
 
 import { getRgbFromColorString, getTextColor, type Theme } from '@furystack/shades-common-components'
-import type { editor } from 'monaco-editor/esm/vs/editor/editor.api.js'
+
+type BuiltinTheme = 'vs' | 'vs-dark' | 'hc-black' | 'hc-light'
+
+export type MonacoThemeData = {
+  base: BuiltinTheme
+  inherit: boolean
+  rules: Array<{ token: string; foreground?: string; background?: string; fontStyle?: string }>
+  colors: Record<string, string>
+}
 
 const SHADES_THEME_NAME = 'shades-theme'
 
@@ -26,12 +34,12 @@ const withAlpha = (hex: string, alpha: number): string => {
  * Inherits syntax highlighting from the closest built-in base (`vs` or `vs-dark`)
  * and maps Shades design tokens to Monaco editor chrome colors.
  */
-export const createMonacoTheme = (theme: DeepPartial<Theme>): { name: string; data: editor.IStandaloneThemeData } => {
+export const createMonacoTheme = (theme: DeepPartial<Theme>): { name: string; data: MonacoThemeData } => {
   const bg = theme.background?.default
-  let base: editor.BuiltinTheme = 'vs-dark'
+  let base: BuiltinTheme = 'vs-dark'
   try {
     if (bg) {
-      base = getTextColor(bg, 'vs', 'vs-dark') as editor.BuiltinTheme
+      base = getTextColor(bg, 'vs', 'vs-dark') as BuiltinTheme
     }
   } catch (e) {
     console.warn('Failed to determine Monaco base theme from background color, falling back to vs-dark', e)
@@ -127,7 +135,7 @@ export const createMonacoTheme = (theme: DeepPartial<Theme>): { name: string; da
   mapWithAlpha('scrollbarSlider.activeBackground', theme.text?.secondary, 0.5)
 
   return {
-    name: SHADES_THEME_NAME,
+    name: theme.name || SHADES_THEME_NAME,
     data: {
       base,
       inherit: true,

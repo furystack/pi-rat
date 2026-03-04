@@ -3,7 +3,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { Skeleton } from '@furystack/shades-common-components'
 import { LogEntry as LogEntryModel } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
-import { MonacoEditor } from '../../components/monaco-editor.js'
+import { LazyMonacoEditor } from '../../components/lazy-monaco-editor.js'
 
 export const LogEntry = Shade<{ id: string }>({
   shadowDomName: 'shade-app-log-entry-page',
@@ -30,13 +30,7 @@ export const LogEntry = Shade<{ id: string }>({
 
     return (
       <div className="log-entry-container">
-        <MonacoEditor
-          options={{
-            language: 'json',
-            readOnly: true,
-          }}
-          value={JSON.stringify(logEntryState.data, null, 2)}
-        />
+        <LazyMonacoEditor language="json" readOnly value={JSON.stringify(logEntryState.data, null, 2)} />
       </div>
     )
   },

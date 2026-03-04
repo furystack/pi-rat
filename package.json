@@ -12,7 +12,8 @@
     "packages": [
       "common",
       "frontend",
-      "service"
+      "service",
+      "monaco-mfe"
     ]
   },
   "devDependencies": {
@@ -48,14 +49,15 @@
   },
   "scripts": {
     "prepare": "husky",
-    "build": "tsc -b common service frontend && yarn workspace frontend build",
+    "build:monaco-mfe": "yarn workspace monaco-mfe build",
+    "build": "yarn build:monaco-mfe && tsc -b common service frontend && yarn workspace frontend build",
     "create-schemas": "yarn workspace common create-schemas",
     "test:e2e:install": "yarn playwright test --grep @install --project chromium",
     "test:e2e": "yarn playwright test --grep-invert @install",
     "test": "vitest",
     "start:service": "yarn workspace service start",
     "start:frontend": "yarn workspace frontend start",
-    "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
+    "clean": "rimraf service/dist frontend/dist monaco-mfe/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
     "lint": "eslint .",
     "bumpVersions": "yarn version check --interactive",
     "applyReleaseChanges": "yarn version apply --all && yarn changelog apply && yarn format",

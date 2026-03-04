@@ -78,3 +78,5 @@ data/*.sqlite
 
 browser-temp
 test-results
+
+monaco-mfe/dist
