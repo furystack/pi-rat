@@ -42,12 +42,23 @@ const withAlpha = (hex: string, alpha: number): string => {
 export const createMonacoTheme = (theme: DeepPartial<Theme>): { name: string; data: MonacoThemeData } => {
   const bg = theme.background?.default
   let base: BuiltinTheme = 'vs-dark'
-  try {
-    if (bg) {
+  let detected = false
+
+  if (bg) {
+    try {
       base = getTextColor(bg, 'vs', 'vs-dark') as BuiltinTheme
+      detected = true
+    } catch {
+      // Background color detection failed, will try text color
     }
-  } catch (e) {
-    console.warn('Failed to determine Monaco base theme from background color, falling back to vs-dark', e)
+  }
+
+  if (!detected && theme.text?.primary) {
+    try {
+      base = getTextColor(theme.text.primary, 'vs-dark', 'vs') as BuiltinTheme
+    } catch (e) {
+      console.warn('Failed to determine Monaco base theme, falling back to vs-dark', e)
+    }
   }
 
   const colors: Record<string, string> = {}
