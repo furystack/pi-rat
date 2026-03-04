@@ -1,0 +1,6 @@
+releases:
+  common: minor
+  frontend: patch
+  monaco-mfe: patch
+  pi-rat: patch
+  service: patch

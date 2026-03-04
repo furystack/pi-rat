@@ -1,0 +1,31 @@
+<!-- version-type: patch -->
+
+# pi-rat
+
+<!--
+FORMATTING GUIDE:
+
+### Detailed Entry (appears first when merging)
+
+Use h3 (###) and below for detailed entries with paragraphs, code examples, and lists.
+
+### Simple List Items
+
+- Simple changes can be added as list items
+- They are collected together at the bottom of each section
+
+TIP: When multiple changelog drafts are merged, heading-based entries
+appear before simple list items within each section.
+-->
+
+## ✨ Features
+
+- Added `monaco-mfe` workspace to the monorepo for the Monaco Editor micro-frontend
+
+## 🔧 Refactoring
+
+- Updated `Dockerfile` to include `monaco-mfe` build step
+
+## ⬆️ Dependencies
+
+- Upgraded `eslint-plugin-playwright` to `^2.9.0` and `lint-staged` to `^16.3.1`

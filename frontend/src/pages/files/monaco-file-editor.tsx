@@ -1,7 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, NotyService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import { MonacoEditor } from '../../components/monaco-editor.js'
+import { LazyMonacoEditor } from '../../components/lazy-monaco-editor.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { environmentOptions } from '../../environment-options.js'
 import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
@@ -120,11 +120,8 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
 
     return (
       <div className="editor-container">
-        <MonacoEditor
-          options={{
-            language,
-            automaticLayout: true,
-          }}
+        <LazyMonacoEditor
+          language={language}
           value={value.getValue()}
           onValueChange={(newValue) => value.setValue(newValue)}
         />

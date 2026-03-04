@@ -4,7 +4,6 @@ import type { GetCollectionResult } from '@furystack/rest'
 import type { CollectionServiceOptions } from '@furystack/shades-common-components'
 import { CollectionService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import type { Uri } from 'monaco-editor/esm/vs/editor/editor.api.js'
 
 type GenericEditorServiceOptions<
   T,
@@ -19,8 +18,6 @@ type GenericEditorServiceOptions<
   patchEntity: (entityKey: T[TKey], update: Omit<T, TRedonlyProperties>) => Promise<void>
   postEntity: (entity: Omit<T, TRedonlyProperties>) => Promise<T>
   deleteEntities: (...entities: Array<T[TKey]>) => Promise<void>
-  schemaUri?: Uri
-  schema?: unknown
 }
 
 export class GenericEditorService<T, TKey extends keyof T, TOmittedProperties extends keyof T>

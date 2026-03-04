@@ -1,7 +1,6 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
-import { RequestError } from '@furystack/rest'
 import {
   getFallbackMetadata,
   getFileName,
@@ -73,12 +72,16 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   })
 
   if (storedResult.length > 1) {
-    throw new RequestError('Multiple results found', 400)
+    await logger.warning({
+      message: `Multiple OMDB results found for '${fileName}', skipping.`,
+      data: { file, title, year, count: storedResult.length },
+    })
+    return { status: 'failed' } as const
   }
 
   if (storedResult.length === 1) {
     const movie = await ensureMovieExists(storedResult[0], injector)
-    await ensureOmdbSeriesExists(storedResult[0], injector)
+    await ensureOmdbSeriesExists(storedResult[0], injector, { file })
 
     const {
       created: [newMovieFile],
@@ -90,7 +93,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     })
 
     await logger.debug({
-      message: `File ${fileName} linked succesfully.`,
+      message: `File ${fileName} linked successfully.`,
       data: { file, movieFile: newMovieFile, movie },
     })
 
@@ -98,21 +101,44 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   }
 
   const omdbClientService = injector.getInstance(OmdbClientService)
-  const result = await omdbClientService.fetchOmdbMovieMetadata({
-    title,
-    year,
-    season,
-    episode,
-  })
+  const result = await omdbClientService.fetchOmdbMovieMetadata({ title, year, season, episode }, { file })
 
-  if (!result || !result.imdbID) {
-    throw new RequestError('Metadata not found', 404)
+  if (result.status === 'rate-limited') {
+    await logger.warning({
+      message: `OMDB rate limit reached while linking '${fileName}', skipping.`,
+      data: { file, title, year },
+    })
+    return { status: 'rate-limited' } as const
   }
 
-  const added = await ensureOmdbMovieExists(result, injector)
+  if (result.status === 'not-found') {
+    await logger.debug({
+      message: `No OMDB metadata found for '${fileName}'.`,
+      data: { file, title, year },
+    })
+    return { status: 'metadata-not-found' } as const
+  }
+
+  if (result.status === 'not-configured') {
+    await logger.warning({
+      message: `OMDB service not configured, cannot link '${fileName}'.`,
+      data: { file },
+    })
+    return { status: 'omdb-not-configured' } as const
+  }
+
+  if (result.status === 'error') {
+    await logger.error({
+      message: `OMDB error while linking '${fileName}'.`,
+      data: { file, error: result.error },
+    })
+    return { status: 'omdb-error', error: result.error } as const
+  }
+
+  const added = await ensureOmdbMovieExists(result.data, injector)
 
   const movie = await ensureMovieExists(added, injector)
-  await ensureOmdbSeriesExists(added, injector)
+  await ensureOmdbSeriesExists(added, injector, { file })
 
   const {
     created: [newMovieFile],
@@ -121,6 +147,11 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     path,
     imdbId: added.imdbID,
     ffprobe: ffprobeResult,
+  })
+
+  await logger.debug({
+    message: `File ${fileName} linked successfully.`,
+    data: { file, movieFile: newMovieFile, movie },
   })
 
   return { status: 'linked', movieFile: newMovieFile, movie } as const

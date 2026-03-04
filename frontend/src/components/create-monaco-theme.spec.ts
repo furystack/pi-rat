@@ -140,11 +140,45 @@ describe('createMonacoTheme', () => {
   })
 
   describe('base theme fallback', () => {
-    it('should fall back to vs-dark and warn when getTextColor throws', () => {
+    it('should fall back to vs-dark when background is invalid and no text color is provided', () => {
+      const theme: DeepPartial<Theme> = {
+        background: { default: 'not-a-color' },
+      }
+      const result = createMonacoTheme(theme)
+      expect(result.data.base).toBe('vs-dark')
+    })
+
+    it('should detect vs-dark from light text color when no background is provided', () => {
+      const theme: DeepPartial<Theme> = {
+        text: { primary: '#e0e0e0' },
+      }
+      const result = createMonacoTheme(theme)
+      expect(result.data.base).toBe('vs-dark')
+    })
+
+    it('should detect vs from dark text color when no background is provided', () => {
+      const theme: DeepPartial<Theme> = {
+        text: { primary: '#212121' },
+      }
+      const result = createMonacoTheme(theme)
+      expect(result.data.base).toBe('vs')
+    })
+
+    it('should detect base from text color when background is invalid', () => {
+      const theme: DeepPartial<Theme> = {
+        background: { default: 'not-a-color' },
+        text: { primary: '#e0e0e0' },
+      }
+      const result = createMonacoTheme(theme)
+      expect(result.data.base).toBe('vs-dark')
+    })
+
+    it('should fall back to vs-dark and warn when both background and text color fail', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       const theme: DeepPartial<Theme> = {
         background: { default: 'not-a-color' },
+        text: { primary: 'also-not-a-color' },
       }
       const result = createMonacoTheme(theme)
       expect(result.data.base).toBe('vs-dark')

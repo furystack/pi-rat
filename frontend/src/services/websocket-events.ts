@@ -5,7 +5,10 @@ import type { WebsocketMessage } from 'common'
 import { environmentOptions } from '../environment-options.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class WebsocketNotificationsService extends EventHub<{ onMessage: WebsocketMessage; onInvalidMessage: [any] }> {
+export class WebsocketNotificationsService extends EventHub<{
+  onMessage: WebsocketMessage
+  onInvalidMessage: [unknown]
+}> {
   private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
 
   public socket: WebSocket

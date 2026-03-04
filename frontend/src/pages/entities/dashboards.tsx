@@ -5,19 +5,11 @@ import dashboardSchemas from 'common/schemas/dashboard-entities.json' with { typ
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { DashboardService } from '../../services/dashboards-service.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const DashboardsPage = Shade({
   shadowDomName: 'shade-app-dashboards-page',
   render: ({ useDisposable, injector }) => {
     const dashboardsService = injector.getInstance(DashboardService)
-
-    const modelProvider = injector.getInstance(MonacoModelProvider)
-
-    const modelUri = modelProvider.getModelUriForEntityType({
-      schemaName: 'Dashboard',
-      jsonSchema: { ...dashboardSchemas, type: 'object', $ref: '#/definitions/Dashboard' },
-    })
 
     const service = useDisposable(
       'service',
@@ -63,7 +55,10 @@ export const DashboardsPage = Shade({
             )
           },
         }}
-        modelUri={modelUri}
+        schemaInfo={{
+          schemaName: 'Dashboard',
+          jsonSchema: { ...dashboardSchemas, type: 'object', $ref: '#/definitions/Dashboard' },
+        }}
       />
     )
   },

@@ -19,10 +19,10 @@ This project uses Prettier for code formatting. **Always use the project's Prett
 
 ```bash
 # ✅ Good - format code
-yarn prettier:write
+yarn format
 
 # ✅ Good - check formatting
-yarn prettier:check
+yarn format:check
 ```
 
 ### ESLint Configuration
@@ -668,6 +668,6 @@ const count = 0;
 
 **Tools:**
 
-- Prettier: `yarn prettier:write`
+- Prettier: `yarn format`
 - ESLint: `yarn lint`
 - Type Check: `yarn build`

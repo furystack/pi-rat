@@ -1,15 +1,15 @@
 import { createComponent, Shade, type ChildrenList } from '@furystack/shades'
 import { Button } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
-import type { Uri } from 'monaco-editor'
-import { MonacoEditor } from '../monaco-editor.js'
+import { LazyMonacoEditor } from '../lazy-monaco-editor.js'
 import type { GenericEditorService } from './generic-editor-service.js'
+import type { EditorSchemaInfo } from './index.js'
 
 type GenericMonacoEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T> = {
   value: T
   onSave: (value: T) => Promise<void>
   service: GenericEditorService<T, TKey, TReadonlyProperties>
-  modelUri?: Uri
+  schemaInfo?: EditorSchemaInfo
 }
 
 type EntityFromProps<Props> = Props extends GenericMonacoEditorProps<infer T, any, any> ? T : never
@@ -40,12 +40,12 @@ export const GenericMonacoEditor: <T, TKey extends keyof T, TReadonlyProperties 
 
     return (
       <div style={{ position: 'fixed', top: '50px', height: 'calc(100% - 50px)', width: '100%' }}>
-        <MonacoEditor
-          options={{
-            language: 'json',
+        <LazyMonacoEditor
+          language="json"
+          schemaInfo={props.schemaInfo}
+          onValueChange={(newValue) => {
+            currentValue.setValue(newValue)
           }}
-          modelUri={props.modelUri}
-          onValueChange={currentValue.setValue.bind(currentValue)}
           value={currentValue.getValue()}
         />
         <div

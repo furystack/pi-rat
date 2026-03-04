@@ -4,19 +4,11 @@ import identitySchemas from 'common/schemas/identity-entities.json' with { type:
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
 import { GenericEditor } from '../../components/generic-editor/index.js'
 import { IdentityApiClient } from '../../services/api-clients/identity-api-client.js'
-import { MonacoModelProvider } from '../../services/monaco-model-provider.js'
 
 export const UsersPage = Shade({
   shadowDomName: 'shade-app-users-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(IdentityApiClient)
-
-    const modelProvider = injector.getInstance(MonacoModelProvider)
-
-    const modelUri = modelProvider.getModelUriForEntityType({
-      schemaName: 'User',
-      jsonSchema: { ...identitySchemas, type: 'object', $ref: '#/definitions/User' },
-    })
 
     const service = useDisposable(
       'service',
@@ -65,7 +57,10 @@ export const UsersPage = Shade({
         headerComponents={{}}
         styles={{}}
         rowComponents={{}}
-        modelUri={modelUri}
+        schemaInfo={{
+          schemaName: 'User',
+          jsonSchema: { ...identitySchemas, type: 'object', $ref: '#/definitions/User' },
+        }}
       />
     )
   },

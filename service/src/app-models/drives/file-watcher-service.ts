@@ -85,8 +85,10 @@ export class FileWatcherService extends EventHub<{
   @Injected((injector) => useSystemIdentityContext({ injector, username: 'file-watcher' }))
   declare private systemInjector: Injector
 
-  public async init() {
-    await this.startWatchCurrentDirectories()
+  public init() {
+    void this.startWatchCurrentDirectories().catch((error) => {
+      void this.logger.error({ message: 'Failed to initialize file watchers', data: { error } })
+    })
   }
 
   private async startWatchCurrentDirectories() {

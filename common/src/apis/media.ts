@@ -18,7 +18,18 @@ import type { PiRatFile } from '../models/pirat-file.js'
 
 export type LinkMovie = {
   body: PiRatFile
-  result: { status: 'already-linked' | 'linked' | 'failed' | 'not-movie-file' }
+  result: {
+    status:
+      | 'already-linked'
+      | 'linked'
+      | 'failed'
+      | 'not-movie-file'
+      | 'rate-limited'
+      | 'metadata-not-found'
+      | 'omdb-not-configured'
+      | 'omdb-error'
+    error?: unknown
+  }
 }
 
 export type ExtractSubtitles = {
@@ -38,6 +49,71 @@ export type SaveWatchProgress = {
   result: WatchHistoryEntry
 }
 
+export type ScanProgress = {
+  total: number
+  linked: number
+  alreadyLinked: number
+  failed: number
+  rateLimited: number
+  metadataNotFound: number
+  omdbNotConfigured: number
+  omdbError: number
+  skipped: number
+}
+
+export type LinkMovieStatus = LinkMovie['result']['status']
+
+export const updateScanProgress = (progress: ScanProgress, status: LinkMovieStatus | 'skipped' | 'failed') => {
+  switch (status) {
+    case 'linked':
+      progress.linked++
+      break
+    case 'already-linked':
+      progress.alreadyLinked++
+      break
+    case 'rate-limited':
+      progress.rateLimited++
+      break
+    case 'metadata-not-found':
+      progress.metadataNotFound++
+      break
+    case 'omdb-not-configured':
+      progress.omdbNotConfigured++
+      break
+    case 'omdb-error':
+      progress.omdbError++
+      break
+    case 'failed':
+      progress.failed++
+      break
+    default:
+      progress.skipped++
+      break
+  }
+}
+
+export const createScanProgress = (total: number): ScanProgress => ({
+  total,
+  linked: 0,
+  alreadyLinked: 0,
+  failed: 0,
+  rateLimited: 0,
+  metadataNotFound: 0,
+  omdbNotConfigured: 0,
+  omdbError: 0,
+  skipped: 0,
+})
+
+export const getProcessedCount = (progress: ScanProgress): number =>
+  progress.linked +
+  progress.alreadyLinked +
+  progress.failed +
+  progress.rateLimited +
+  progress.metadataNotFound +
+  progress.omdbNotConfigured +
+  progress.omdbError +
+  progress.skipped
+
 export type ScanForMoviesEndpoint = {
   body: {
     root: PiRatFile
@@ -45,6 +121,7 @@ export type ScanForMoviesEndpoint = {
   }
   result: {
     added: MovieFile[]
+    progress: ScanProgress
   }
 }
 
