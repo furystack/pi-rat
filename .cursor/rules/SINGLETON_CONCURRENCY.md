@@ -111,6 +111,76 @@ Use fire-and-forget init when:
 - The service **must** be fully initialized before any caller uses it (e.g., schema migrations)
 - The caller needs to know whether initialization succeeded before proceeding
 
+## Dispose-Before-Reinit Guard
+
+When a singleton service's `init()` method may be called more than once (e.g., triggered by config change events), dispose existing subscriptions before creating new ones. Without this guard, each call to `init()` creates duplicate event handlers while the old ones keep firing.
+
+### The Problem
+
+```typescript
+// ❌ Each init() call leaks old subscriptions — handlers accumulate
+@Injectable({ lifetime: 'singleton' })
+export class MyService {
+  declare private subscription: Disposable
+
+  private async initAsync() {
+    this.config = await this.configDataSet.get(...)
+    // Old subscription is overwritten but never disposed!
+    this.subscription = this.eventHub.subscribe('event', (e) => this.handle(e))
+  }
+}
+
+// Caller re-initializes on config update — duplicate handlers
+configDataSet.subscribe('onEntityUpdated', () => {
+  injector.getInstance(MyService).init()
+})
+```
+
+### The Fix: Dispose Old Subscriptions First
+
+```typescript
+// ✅ Old subscriptions are disposed before re-subscribing
+@Injectable({ lifetime: 'singleton' })
+export class MyService {
+  declare private subscription: Disposable
+
+  private async initAsync() {
+    this.subscription?.[Symbol.dispose]()
+
+    this.config = await this.configDataSet.get(...)
+    this.subscription = this.eventHub.subscribe('event', (e) => this.handle(e))
+  }
+}
+```
+
+For multiple subscriptions, use an array pattern:
+
+```typescript
+// ✅ Batch dispose for multiple subscriptions
+private configSubscriptions: Disposable[] = []
+
+private async initAsync() {
+  for (const sub of this.configSubscriptions) {
+    sub[Symbol.dispose]()
+  }
+  this.configSubscriptions = []
+
+  this.configSubscriptions.push(
+    this.dataSet.subscribe('onEntityAdded', ...),
+    this.dataSet.subscribe('onEntityUpdated', ...),
+    this.dataSet.subscribe('onEntityRemoved', ...),
+  )
+}
+```
+
+### When to Apply
+
+Apply this pattern when **any** of the following are true:
+
+1. The service subscribes to events or datasets during `init()`
+2. `init()` can be called more than once (e.g., from config change listeners)
+3. The service is re-initialized without being fully disposed first
+
 ### Don't Mutate Collections While Iterating
 
 When cleaning up entries from a `Map` or `Set` during iteration, collect keys first and delete in a separate pass:

@@ -24,6 +24,10 @@ appear before simple list items within each section.
 - Extended `LinkMovie` result status with `rate-limited`, `metadata-not-found`, `omdb-not-configured`, and `omdb-error` to provide more specific failure reasons instead of generic errors
 - Added `LinkMovieStatus` type alias for convenient reuse of link movie result statuses
 
+## 🔧 Refactoring
+
+- Changed `ScanForMoviesEndpoint` response shape: replaced `status: true` with `progress: ScanProgress` to provide detailed scan progress in the response
+
 ## ⬆️ Dependencies
 
 - Upgraded `@furystack/core` to `^15.2.3`, `@furystack/entity-sync` to `^1.0.4`, and `@furystack/rest` to `^8.0.41`

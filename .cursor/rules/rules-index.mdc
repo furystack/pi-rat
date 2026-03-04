@@ -10,5 +10,5 @@ This file contains a list of helpful information and context that the agent can 
 - [Package manager detection, script simplification, and CI/CD best practices](./SCRIPT_EXECUTION.md)
 - [Vitest patterns, Playwright E2E testing, and mocking strategies](./TESTING_GUIDELINES.md)
 - [REST action Validate() wrappers and explicit param checking before system calls](./REST_ACTION_VALIDATION.mdc)
-- [Singleton concurrency guards, getOrCreate race prevention, fire-and-forget init, and safe Map iteration](./SINGLETON_CONCURRENCY.md)
+- [Singleton concurrency guards, getOrCreate race prevention, fire-and-forget init, dispose-before-reinit, and safe Map iteration](./SINGLETON_CONCURRENCY.md)
 - [MFE runtime type boundaries, duplicate type contracts, and cross-package type sync](./MFE_TYPE_CONTRACTS.md)

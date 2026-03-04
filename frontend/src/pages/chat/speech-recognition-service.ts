@@ -57,7 +57,7 @@ export class SpeechRecognitionService {
       }
 
       speechRecognition.onend = () => {
-        console.log('Speech recognition ended.')
+        reject(new Error('Speech recognition ended without result.'))
       }
 
       speechRecognition.start()

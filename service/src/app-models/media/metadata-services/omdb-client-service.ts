@@ -50,7 +50,14 @@ export class OmdbClientService {
     })
   }
 
+  private configSubscriptions: Disposable[] = []
+
   private async initAsync() {
+    for (const sub of this.configSubscriptions) {
+      sub[Symbol.dispose]()
+    }
+    this.configSubscriptions = []
+
     const config = await this.configDataSet.get(this.systemInjector, 'OMDB_CONFIG')
     if (!config) {
       this.config = undefined
@@ -64,35 +71,36 @@ export class OmdbClientService {
       })
     }
 
-    this.configDataSet.subscribe('onEntityAdded', ({ entity }) => {
-      if (entity.id === 'OMDB_CONFIG') {
-        this.config = entity as OmdbConfig
-      }
-      void this.logger.information({
-        message: `🎬   OMDB Service config added`,
-      })
-    })
-    this.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
-      if (change.id === 'OMDB_CONFIG') {
-        this.config = {
-          ...this.config,
-          ...change,
-        } as OmdbConfig
+    this.configSubscriptions.push(
+      this.configDataSet.subscribe('onEntityAdded', ({ entity }) => {
+        if (entity.id === 'OMDB_CONFIG') {
+          this.config = entity as OmdbConfig
+        }
         void this.logger.information({
-          message: `🎬   OMDB Service config updated`,
-          data: change,
+          message: `🎬   OMDB Service config added`,
         })
-      }
-    })
-
-    this.configDataSet.subscribe('onEntityRemoved', ({ key }) => {
-      if (key === 'OMDB_CONFIG') {
-        this.config = undefined
-        void this.logger.information({
-          message: '🚫   OMDB Service config removed, service will not be able to fetch metadata',
-        })
-      }
-    })
+      }),
+      this.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
+        if (change.id === 'OMDB_CONFIG') {
+          this.config = {
+            ...this.config,
+            ...change,
+          } as OmdbConfig
+          void this.logger.information({
+            message: `🎬   OMDB Service config updated`,
+            data: change,
+          })
+        }
+      }),
+      this.configDataSet.subscribe('onEntityRemoved', ({ key }) => {
+        if (key === 'OMDB_CONFIG') {
+          this.config = undefined
+          void this.logger.information({
+            message: '🚫   OMDB Service config removed, service will not be able to fetch metadata',
+          })
+        }
+      }),
+    )
   }
 
   private async fetchWithRetry(

@@ -48,17 +48,18 @@ Based on pi-rat's `package.json`:
 ```json
 {
   "scripts": {
-    "build": "tsc -b common service frontend && yarn workspace frontend build",
+    "build:monaco-mfe": "yarn workspace monaco-mfe build",
+    "build": "yarn build:monaco-mfe && tsc -b common service frontend && yarn workspace frontend build",
     "create-schemas": "yarn workspace common create-schemas",
     "test:e2e:install": "yarn playwright test --grep @install --project chromium",
     "test:e2e": "yarn playwright test --grep-invert @install",
     "test": "vitest",
     "start:service": "yarn workspace service start",
     "start:frontend": "yarn workspace frontend start",
-    "clean": "rimraf service/dist frontend/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
+    "clean": "rimraf service/dist frontend/dist monaco-mfe/dist **/tsconfig.tsbuildinfo tsconfig.tsbuildinfo common/dist",
     "lint": "eslint .",
-    "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
   }
 }
 ```
@@ -90,8 +91,8 @@ yarn test:e2e               # E2E tests with Playwright
 
 ```bash
 yarn lint              # Run ESLint
-yarn prettier:write    # Format code
-yarn prettier:check    # Check formatting without changes
+yarn format            # Format code
+yarn format:check      # Check formatting without changes
 ```
 
 **Version Management:**
@@ -152,7 +153,7 @@ Prefer using defined npm scripts over direct command execution:
 # ✅ Good - using defined scripts
 yarn test
 yarn lint
-yarn prettier:write
+yarn format
 
 # ❌ Avoid - bypassing package.json scripts
 vitest
@@ -188,8 +189,8 @@ yarn start:frontend
 # ✅ Good - CI/CD sequence
 yarn install --frozen-lockfile  # Ensure exact versions
 yarn lint                       # Lint check
-yarn prettier:check             # Format check
-yarn test:                  # Unit tests
+yarn format:check               # Format check
+yarn test                       # Unit tests
 yarn build                      # Type check and build
 yarn test:e2e:install           # Install E2E prerequisites (once)
 yarn test:e2e                   # E2E tests
@@ -240,7 +241,7 @@ yarn sshIntoDocker  # For debugging
 
 ```bash
 # ✅ Good - pre-commit hooks (via Husky)
-yarn prettier:write    # Format changed files
+yarn format            # Format changed files
 yarn lint              # Lint changed files
 ```
 
@@ -311,7 +312,7 @@ yarn build
 - Development: `yarn start:service` + `yarn start:frontend`
 - Build: `yarn build`
 - Test: `yarn test` + `yarn test:e2e`
-- Format: `yarn prettier:write`
+- Format: `yarn format`
 - Lint: `yarn lint`
 - Clean: `yarn clean`
 - Schemas: `yarn create-schemas`
@@ -321,3 +322,4 @@ yarn build
 - `common` - Shared types and APIs
 - `service` - Backend service
 - `frontend` - Frontend application
+- `monaco-mfe` - Monaco Editor micro-frontend

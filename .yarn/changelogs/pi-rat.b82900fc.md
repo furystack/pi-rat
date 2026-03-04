@@ -18,6 +18,14 @@ TIP: When multiple changelog drafts are merged, heading-based entries
 appear before simple list items within each section.
 -->
 
+## ✨ Features
+
+- Added `monaco-mfe` workspace to the monorepo for the Monaco Editor micro-frontend
+
+## 🔧 Refactoring
+
+- Updated `Dockerfile` to include `monaco-mfe` build step
+
 ## ⬆️ Dependencies
 
 - Upgraded `eslint-plugin-playwright` to `^2.9.0` and `lint-staged` to `^16.3.1`

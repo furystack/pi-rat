@@ -221,31 +221,7 @@ const debouncedSearch = debounce((term: string) => {
 
 ## Cache Optimization
 
-### Cache Capacity
-
-Set appropriate cache capacity to balance memory and performance:
-
-```typescript
-// ✅ Good - appropriate cache sizes
-@Injectable({ lifetime: 'singleton' })
-export class DataService {
-  // Frequently accessed, small cache
-  public recentCache = new Cache({
-    capacity: 20,
-    load: async (id: string) => {
-      // Load function
-    },
-  })
-
-  // Larger cache for stable data
-  public userCache = new Cache({
-    capacity: 500,
-    load: async (id: string) => {
-      // Load function
-    },
-  })
-}
-```
+> **Note:** For detailed cache patterns (capacity, load functions, `get`/`getObservable`/`setExplicitValue`, error handling), see [CACHE_HANDLING.md](./CACHE_HANDLING.md).
 
 ### Preload Critical Data
 
@@ -380,50 +356,7 @@ export class DashboardService {
 
 ## Memory Management
 
-### Avoid Memory Leaks
-
-Properly dispose of subscriptions and resources:
-
-```typescript
-// ✅ Good - proper disposal
-export const DataComponent = Shade({
-  shadowDomName: 'data-component',
-  render: ({ injector, useDisposable }) => {
-    const dataService = injector.getInstance(DataService);
-
-    // useDisposable automatically cleans up
-    const subscription = useDisposable('subscription', () => {
-      const obs = dataService.data.subscribe((value) => {
-        console.log('Data updated:', value);
-      });
-
-      return {
-        [Symbol.dispose]: () => obs.dispose(),
-      };
-    });
-
-    return <div>Data Component</div>;
-  },
-});
-```
-
-### Clear Cached Data
-
-Clear caches when data becomes stale:
-
-```typescript
-// ✅ Good - clear stale caches
-@Injectable({ lifetime: 'singleton' })
-export class SessionService {
-  public async logout() {
-    // Clear all user-specific caches
-    this.userService.userCache.clear()
-    this.preferencesService.clear()
-
-    // Logout logic
-  }
-}
-```
+> **Note:** For detailed disposal patterns (manual subscriptions, `Symbol.dispose`, service init/dispose), see [OBSERVABLE_STATE.md](./OBSERVABLE_STATE.md). For re-init subscription leak prevention, see [SINGLETON_CONCURRENCY.md](./SINGLETON_CONCURRENCY.md).
 
 ## Summary
 

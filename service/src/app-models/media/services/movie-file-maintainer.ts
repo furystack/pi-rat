@@ -215,6 +215,10 @@ export class MovieMaintainerService {
   }
 
   private async initAsync() {
+    this.addSubscription?.[Symbol.dispose]()
+    this.unlinkDirSubscription?.[Symbol.dispose]()
+    this.unlinkSubscription?.[Symbol.dispose]()
+
     this.config = (await this.configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
     this.addSubscription = this.fileWatcherService.subscribe('add', (file) => void this.onAdd(file))
     this.unlinkDirSubscription = this.fileWatcherService.subscribe('unlinkDir', (dir) => void this.onUnlinkDir(dir))

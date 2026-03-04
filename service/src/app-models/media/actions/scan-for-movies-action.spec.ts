@@ -84,7 +84,7 @@ describe('ScanForMoviesAction', () => {
     mockCheckFolderForPossibleMovieFiles.mockResolvedValue([])
 
     const response = await callAction()
-    const {chunk} = (response as { chunk: { added: unknown[]; progress: { total: number } } })
+    const { chunk } = response as { chunk: { added: unknown[]; progress: { total: number } } }
 
     expect(chunk.added).toEqual([])
     expect(chunk.progress.total).toBe(0)
@@ -101,7 +101,7 @@ describe('ScanForMoviesAction', () => {
     })
 
     const response = await callAction()
-    const {chunk} = (response as { chunk: { added: unknown[]; progress: { total: number; linked: number } } })
+    const { chunk } = response as { chunk: { added: unknown[]; progress: { total: number; linked: number } } }
 
     expect(chunk.added).toHaveLength(2)
     expect(chunk.progress.total).toBe(2)
@@ -119,7 +119,7 @@ describe('ScanForMoviesAction', () => {
       .mockResolvedValueOnce({ status: 'already-linked' })
 
     const response = await callAction()
-    const {chunk} = (response as { chunk: { progress: { linked: number; alreadyLinked: number } } })
+    const { chunk } = response as { chunk: { progress: { linked: number; alreadyLinked: number } } }
 
     expect(chunk.progress.linked).toBe(1)
     expect(chunk.progress.alreadyLinked).toBe(1)
@@ -146,7 +146,7 @@ describe('ScanForMoviesAction', () => {
       .mockResolvedValueOnce({ status: 'linked', movieFile: { id: '2' }, movie: {} })
 
     const response = await callAction()
-    const {chunk} = (response as { chunk: { added: unknown[]; progress: { failed: number; linked: number } } })
+    const { chunk } = response as { chunk: { added: unknown[]; progress: { failed: number; linked: number } } }
 
     expect(chunk.added).toHaveLength(1)
     expect(chunk.progress.failed).toBe(1)
@@ -160,7 +160,7 @@ describe('ScanForMoviesAction', () => {
     mockLinkMovie.mockResolvedValue({ status: 'rate-limited' })
 
     const response = await callAction()
-    const {chunk} = (response as { chunk: { progress: { rateLimited: number } } })
+    const { chunk } = response as { chunk: { progress: { rateLimited: number } } }
 
     expect(chunk.progress.rateLimited).toBe(1)
   })

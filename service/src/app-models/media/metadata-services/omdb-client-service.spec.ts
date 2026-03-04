@@ -77,6 +77,8 @@ describe('OmdbClientService', () => {
     })
 
     it('should return success with movie metadata', async () => {
+      expect.assertions(2)
+
       globalThis.fetch = vi.fn().mockResolvedValue(
         createMockResponse({
           Response: 'True',
@@ -137,6 +139,8 @@ describe('OmdbClientService', () => {
     })
 
     it('should return error when fetch throws', async () => {
+      expect.assertions(2)
+
       globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
 
       const result = await service.fetchOmdbMovieMetadata({ title: 'Test' })
@@ -170,6 +174,8 @@ describe('OmdbClientService', () => {
     })
 
     it('should return success with series metadata', async () => {
+      expect.assertions(2)
+
       globalThis.fetch = vi.fn().mockResolvedValue(
         createMockResponse({
           Response: 'True',
