@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button, Form, Input, Paper, Typography } from '@furystack/shades-common-components'
+import { Button, Form, Input, cssVariableTheme, promisifyAnimation } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -19,30 +19,134 @@ export const isLoginPayload = (data: unknown): data is LoginPayload => {
 export const Login = Shade({
   shadowDomName: 'shade-login',
   css: {
-    padding: '1em',
-    marginTop: '48px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    '& .button-row': {
+    minHeight: 'calc(100vh - 80px)',
+    padding: '24px',
+
+    '& .login-card': {
+      width: '100%',
+      maxWidth: '420px',
+      padding: '48px 40px',
+      background: cssVariableTheme.action.backdrop,
+      backdropFilter: `blur(${cssVariableTheme.effects.blurMd})`,
+      borderRadius: cssVariableTheme.shape.borderRadius.md,
+      border: `1px solid ${cssVariableTheme.action.subtleBorder}`,
+      boxShadow: cssVariableTheme.shadows.lg,
+      transform: 'scale(0.95)',
+      opacity: '0',
+    },
+
+    '& .login-header': {
       display: 'flex',
-      justifyContent: 'space-between',
+      flexDirection: 'column',
       alignItems: 'center',
-      flexDirection: 'row',
-      padding: '1em 0',
+      marginBottom: '32px',
+    },
+
+    '& .login-logo': {
+      fontSize: '56px',
+      lineHeight: '1',
+      marginBottom: '16px',
+      filter: `drop-shadow(${cssVariableTheme.shadows.md})`,
+    },
+
+    '& .login-title': {
+      fontSize: cssVariableTheme.typography.fontSize.lg,
+      fontWeight: '600',
+      color: cssVariableTheme.text.primary,
+      margin: '0 0 6px 0',
+    },
+
+    '& .login-subtitle': {
+      fontSize: cssVariableTheme.typography.fontSize.sm,
+      color: cssVariableTheme.text.secondary,
+      margin: '0',
+    },
+
+    '& .login-form': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '16px',
+    },
+
+    '& .login-error': {
+      padding: '10px 14px',
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
+      backgroundColor: cssVariableTheme.palette.error.light,
+      color: cssVariableTheme.palette.error.dark,
+      fontSize: cssVariableTheme.typography.fontSize.sm,
+      border: `1px solid ${cssVariableTheme.palette.error.main}`,
+    },
+
+    '& .login-actions': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      marginTop: '8px',
+    },
+
+    '& .login-divider': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      color: cssVariableTheme.text.secondary,
+      fontSize: cssVariableTheme.typography.fontSize.sm,
+    },
+
+    '& .login-divider::before, & .login-divider::after': {
+      content: "''",
+      flex: '1',
+      height: '1px',
+      background: cssVariableTheme.action.subtleBorder,
+    },
+
+    '& .register-row': {
+      textAlign: 'center',
+      color: cssVariableTheme.text.secondary,
+      fontSize: cssVariableTheme.typography.fontSize.sm,
     },
   },
-  render: ({ injector, useObservable }) => {
+  render: ({ injector, useObservable, useRef, useDisposable }) => {
     const sessionService = injector.getInstance(SessionService)
     const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
+    const [loginError] = useObservable('loginError', sessionService.loginError)
+    const cardRef = useRef<HTMLElement>('card')
+
+    useDisposable('entryAnimation', () => {
+      const id = setTimeout(() => {
+        const el = cardRef.current
+        if (el) {
+          void promisifyAnimation(
+            el,
+            [
+              { transform: 'scale(0.95)', opacity: '0' },
+              { transform: 'scale(1)', opacity: '1' },
+            ],
+            { duration: 400, fill: 'forwards', easing: 'cubic-bezier(0.33, 1, 0.68, 1)' },
+          )
+        }
+      }, 50)
+      return { [Symbol.dispose]: () => clearTimeout(id) }
+    })
+
     return (
-      <Paper elevation={3} style={{ flexGrow: '1' }}>
+      <div ref={cardRef} className="login-card">
+        <div className="login-header">
+          <div className="login-logo">🐀</div>
+          <h2 className="login-title">Welcome to PI-Rat</h2>
+          <p className="login-subtitle">Sign in to continue</p>
+        </div>
+
         <Form<LoginPayload>
           validate={isLoginPayload}
           className="login-form"
-          onSubmit={({ userName, password }) => void sessionService.login(userName, password)}
+          onSubmit={({ userName, password }) => {
+            sessionService.loginError.setValue('')
+            void sessionService.login(userName, password)
+          }}
         >
-          <Typography variant="h2">Login</Typography>
           <Input
             labelTitle="E-mail address"
             name="userName"
@@ -59,20 +163,28 @@ export const Login = Shade({
             type="password"
             disabled={isOperationInProgress}
           />
-          <div className="button-row">
+
+          {loginError ? <div className="login-error">{loginError}</div> : null}
+
+          <div className="login-actions">
             <Button variant="contained" color="primary" type="submit" disabled={isOperationInProgress}>
-              Login
+              {isOperationInProgress ? 'Signing in...' : 'Sign In'}
             </Button>
-            <Button
-              variant="outlined"
-              onclick={() => navigateToRoute(injector, '/register')}
-              disabled={isOperationInProgress}
-            >
-              Create Account
-            </Button>
+
+            <div className="login-divider">or</div>
+
+            <div className="register-row">
+              <Button
+                variant="outlined"
+                onclick={() => navigateToRoute(injector, '/register')}
+                disabled={isOperationInProgress}
+              >
+                Create Account
+              </Button>
+            </div>
           </div>
         </Form>
-      </Paper>
+      </div>
     )
   },
 })
