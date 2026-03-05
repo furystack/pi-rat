@@ -26,6 +26,12 @@ type ExtractRoutePaths<T extends Record<string, NestedRoute<never>>> = {
         : never)
 }[keyof T & string]
 
+const entityEditorChildren = {
+  '/create': { component: () => <></> },
+  '/edit/:id': { component: () => <></> },
+  '/': { component: () => <></>, routingOptions: { end: false } },
+} satisfies Record<string, NestedRoute<never>>
+
 const settingsChildren = {
   '/': {
     component: () => <></>,
@@ -176,6 +182,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/users': {
     component: () => (
@@ -186,6 +193,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/dashboards': {
     component: () => (
@@ -196,6 +204,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/movies': {
     component: () => (
@@ -206,6 +215,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/movie-files': {
     component: () => (
@@ -216,6 +226,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/omdb-movie-metadata': {
     component: () => (
@@ -226,6 +237,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/omdb-series-metadata': {
     component: () => (
@@ -236,6 +248,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/config': {
     component: () => (
@@ -246,6 +259,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/iot-devices': {
     component: () => (
@@ -256,6 +270,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/entities/logging': {
     component: () => (
@@ -266,6 +281,7 @@ export const appRoutes = {
         }}
       />
     ),
+    children: entityEditorChildren,
   },
   '/file-browser': {
     component: () => (

@@ -39,6 +39,7 @@ export const LoggingPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/logging"
         columns={['createdAt', 'scope', 'message', 'level']}
         headerComponents={{}}
         styles={{}}

@@ -56,6 +56,7 @@ export const ConfigPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/config"
         columns={['id', 'value', 'createdAt', 'updatedAt']}
         headerComponents={{}}
         styles={{}}

@@ -53,6 +53,7 @@ export const UsersPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/users"
         columns={['username', 'roles']}
         headerComponents={{}}
         styles={{}}

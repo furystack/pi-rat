@@ -41,6 +41,7 @@ export const DashboardsPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/dashboards"
         columns={['name', 'description', 'createdAt', 'updatedAt', 'id']}
         headerComponents={{
           id: () => <>Preview</>,

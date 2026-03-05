@@ -1,24 +1,10 @@
 import type { ChildrenList } from '@furystack/shades'
-import { createComponent, Shade } from '@furystack/shades'
+import { LocationService, compileRoute, createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, DataGridProps } from '@furystack/shades-common-components'
 import { Button, DataGrid, Fab, Icon, icons, NotyService, SelectionCell } from '@furystack/shades-common-components'
+import { match } from 'path-to-regexp'
 import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import type { GenericEditorService } from './generic-editor-service.js'
-
-type CreateEditorState = {
-  mode: 'create'
-}
-
-type ListEditorState = {
-  mode: 'list'
-}
-
-type EditEditorState<T, TKey extends keyof T> = {
-  mode: 'edit'
-  currentId: T[TKey]
-}
-
-type GenericEditorState<T, TKey extends keyof T> = CreateEditorState | ListEditorState | EditEditorState<T, TKey>
 
 /**
  * Must stay in sync with `SchemaInfo` in `monaco-mfe/src/schema.ts`.
@@ -30,6 +16,7 @@ export type EditorSchemaInfo = {
 
 type GenericEditorProps<T, TKey extends keyof T, TReadonlyProperties extends keyof T, TColumns extends string> = {
   service: GenericEditorService<T, TKey, TReadonlyProperties>
+  basePath: string
   columns: DataGridProps<T, TColumns>['columns']
   headerComponents: DataGridProps<T, TColumns>['headerComponents']
   rowComponents: DataGridProps<T, TColumns>['rowComponents']
@@ -46,26 +33,36 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
   shadowDomName: 'shade-generic-editor',
-  render: ({ props, injector, useSearchState }) => {
-    const { service, columns, headerComponents, rowComponents, styles, schemaInfo } = props
+  render: ({ props, injector, useObservable }) => {
+    const { service, basePath, columns, headerComponents, rowComponents, styles, schemaInfo } = props
 
     const refresh = () => service.findOptions.setValue({ ...service.findOptions.getValue() })
 
     const noty = injector.getInstance(NotyService)
+    const locationService = injector.getInstance(LocationService)
 
-    const [editorState, setEditorState] = useSearchState<
-      GenericEditorState<EntityFromProps<typeof props>, EntityKeyFromProps<typeof props>>
-    >('gedst', {
-      mode: 'list',
-    })
+    const [currentPath] = useObservable('locationPath', locationService.onLocationPathChanged)
 
-    if (editorState.mode === 'edit' && editorState.currentId) {
+    const navigate = (path: string) => {
+      window.history.pushState({}, '', path)
+      locationService.updateState()
+    }
+
+    const navigateToEdit = (id: string) => navigate(compileRoute(`${basePath}/edit/:id`, { id }))
+
+    const editMatcher = match<{ id: string }>(`${basePath}/edit/:id`)
+    const createMatcher = match(`${basePath}/create`)
+
+    const editResult = editMatcher(currentPath)
+
+    if (editResult) {
+      const currentId = editResult.params.id as EntityFromProps<typeof props>[EntityKeyFromProps<typeof props>]
       return (
         <PiRatLazyLoad
           component={async () => {
             const [{ GenericMonacoEditor }, entry] = await Promise.all([
               import('./generic-monaco-editor.js'),
-              service.getSingleEntry(editorState.currentId),
+              service.getSingleEntry(currentId),
             ])
             return (
               <GenericMonacoEditor
@@ -73,7 +70,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 service={service}
                 onSave={async (value) => {
                   try {
-                    await service.patchEntry(editorState.currentId, value)
+                    await service.patchEntry(currentId, value)
                     noty.emit('onNotyAdded', {
                       type: 'success',
                       title: '📝 Entity updated',
@@ -96,7 +93,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       )
     }
 
-    if (editorState.mode === 'create') {
+    if (createMatcher(currentPath)) {
       return (
         <PiRatLazyLoad
           component={async () => {
@@ -109,12 +106,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
                 onSave={async (value) => {
                   try {
                     const response = await service.postEntry(value)
-                    setEditorState({
-                      mode: 'edit',
-                      currentId: response[service.extendedOptions.keyProperty] as EntityFromProps<
-                        typeof props
-                      >[EntityKeyFromProps<typeof props>],
-                    })
+                    navigateToEdit(String(response[service.extendedOptions.keyProperty]))
                     noty.emit('onNotyAdded', {
                       type: 'success',
                       title: '✨ Entity created',
@@ -145,8 +137,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         <div style={{ width: '156px' }}>
           <Button
             onclick={() => {
-              setEditorState({ mode: 'edit', currentId: entry[service.extendedOptions.keyProperty] })
-              refresh()
+              navigateToEdit(String(entry[service.extendedOptions.keyProperty]))
             }}
           >
             <Icon icon={icons.edit} size="small" />
@@ -197,7 +188,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
         />
         <Fab
           onclick={() => {
-            setEditorState({ mode: 'create' })
+            navigate(`${basePath}/create`)
           }}
         >
           <Icon icon={icons.plus} />

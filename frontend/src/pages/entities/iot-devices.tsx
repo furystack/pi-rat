@@ -40,6 +40,7 @@ export const IotDevicesPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/iot-devices"
         columns={['name', 'ipAddress', 'macAddress', 'updatedAt']}
         headerComponents={{}}
         styles={{}}
