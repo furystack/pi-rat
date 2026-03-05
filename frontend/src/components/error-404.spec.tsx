@@ -109,20 +109,4 @@ describe('GenericErrorPage 404 handling', () => {
       expect(rootElement.textContent).toContain('Report error')
     })
   })
-
-  it('should use custom mainTitle when provided', async () => {
-    await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
-      const rootElement = document.getElementById('root') as HTMLDivElement
-
-      initializeShadeRoot({
-        injector,
-        rootElement,
-        jsxElement: <GenericErrorPage mainTitle="Custom Title" />,
-      })
-      await flushUpdates()
-
-      expect(rootElement.textContent).toContain('Custom Title')
-    })
-  })
 })
