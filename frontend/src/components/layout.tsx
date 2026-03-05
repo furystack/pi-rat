@@ -29,7 +29,7 @@ export const Layout = Shade({
                 <PageLayout
                   appBar={{
                     variant: 'permanent',
-                    component: <Header title="🐀 PI-Rat" />,
+                    component: <Header title="PI-Rat" />,
                   }}
                 >
                   <Body />

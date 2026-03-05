@@ -1,5 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Form, Input, cssVariableTheme, promisifyAnimation } from '@furystack/shades-common-components'
+import { PiRatLogo } from '../components/pi-rat-logo.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -46,8 +47,6 @@ export const Login = Shade({
     },
 
     '& .login-logo': {
-      fontSize: '56px',
-      lineHeight: '1',
       marginBottom: '16px',
       filter: `drop-shadow(${cssVariableTheme.shadows.md})`,
     },
@@ -134,7 +133,9 @@ export const Login = Shade({
     return (
       <div ref={cardRef} className="login-card">
         <div className="login-header">
-          <div className="login-logo">🐀</div>
+          <div className="login-logo">
+            <PiRatLogo size={80} />
+          </div>
           <h2 className="login-title">Welcome to PI-Rat</h2>
           <p className="login-subtitle">Sign in to continue</p>
         </div>
