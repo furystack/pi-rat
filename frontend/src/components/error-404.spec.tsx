@@ -1,24 +1,11 @@
 import { Injector } from '@furystack/inject'
-import { ScreenService, createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
+import { ResponseError } from '@furystack/rest-client-fetch'
+import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
-import { ObservableValue, usingAsync } from '@furystack/utils'
+import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { darkTheme } from '../themes/dark.js'
-import { Error404 } from './error-404.js'
-
-const createMockScreenService = () => {
-  return {
-    screenSize: {
-      atLeast: {
-        xs: new ObservableValue(true),
-        sm: new ObservableValue(true),
-        md: new ObservableValue(true),
-        lg: new ObservableValue(true),
-        xl: new ObservableValue(false),
-      },
-    },
-  } as unknown as ScreenService
-}
+import { GenericErrorPage } from './generic-error.js'
 
 const createMockThemeProviderService = () => {
   return {
@@ -26,7 +13,11 @@ const createMockThemeProviderService = () => {
   } as unknown as ThemeProviderService
 }
 
-describe('Error404', () => {
+const create404ResponseError = () => {
+  return new ResponseError('Not Found', { status: 404 } as Response)
+}
+
+describe('GenericErrorPage 404 handling', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="root"></div>'
   })
@@ -35,77 +26,103 @@ describe('Error404', () => {
     document.body.innerHTML = ''
   })
 
-  it('should render with correct shadow DOM name', async () => {
+  it('should render Result with status 404 for a 404 ResponseError', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
       injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <Error404 />,
+        jsxElement: <GenericErrorPage error={create404ResponseError()} />,
       })
       await flushUpdates()
 
-      const error404 = rootElement.querySelector('shade-404-not-found')
-      expect(error404).toBeTruthy()
+      const result = rootElement.querySelector('shade-result')
+      expect(result).toBeTruthy()
+      expect(result?.getAttribute('data-status')).toBe('404')
     })
   })
 
-  it('should display 404 error message', async () => {
+  it('should render Result with status error for a generic error', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
       injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <Error404 />,
+        jsxElement: <GenericErrorPage error={new Error('Something broke')} />,
       })
       await flushUpdates()
 
-      const error404 = rootElement.querySelector('shade-404-not-found')
-      expect(error404?.textContent).toContain('The page you are looking for is not exists')
+      const result = rootElement.querySelector('shade-result')
+      expect(result).toBeTruthy()
+      expect(result?.getAttribute('data-status')).toBe('error')
     })
   })
 
-  it('should display helpful suggestions', async () => {
+  it('should render Go Home button', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
       injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <Error404 />,
+        jsxElement: <GenericErrorPage error={create404ResponseError()} />,
       })
       await flushUpdates()
 
-      const error404 = rootElement.querySelector('shade-404-not-found')
-      expect(error404?.textContent).toContain('The URL above is correct')
-      expect(error404?.textContent).toContain('You have logged in')
-      expect(error404?.textContent).toContain('You have the neccessary permissions')
+      expect(rootElement.textContent).toContain('Go Home')
     })
   })
 
-  it('should render GenericErrorPage component', async () => {
+  it('should render Retry button when retry prop is provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
       injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <Error404 />,
+        jsxElement: <GenericErrorPage error={new Error('fail')} retry={async () => {}} />,
       })
       await flushUpdates()
 
-      const genericErrorPage = rootElement.querySelector('multiverse-generic-error-page')
-      expect(genericErrorPage).toBeTruthy()
+      expect(rootElement.textContent).toContain('Retry')
+    })
+  })
+
+  it('should render Report error button when error is provided', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
+
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <GenericErrorPage error={new Error('fail')} />,
+      })
+      await flushUpdates()
+
+      expect(rootElement.textContent).toContain('Report error')
+    })
+  })
+
+  it('should use custom mainTitle when provided', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      const rootElement = document.getElementById('root') as HTMLDivElement
+
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <GenericErrorPage mainTitle="Custom Title" />,
+      })
+      await flushUpdates()
+
+      expect(rootElement.textContent).toContain('Custom Title')
     })
   })
 })

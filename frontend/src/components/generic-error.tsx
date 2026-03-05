@@ -1,108 +1,89 @@
 import { ResponseError } from '@furystack/rest-client-fetch'
-import { createComponent, ScreenService, Shade } from '@furystack/shades'
-import { Button, Icon, icons, ThemeProviderService, Typography } from '@furystack/shades-common-components'
-import deadSmiley from '../animations/error-dead-smiley.json' with { type: 'json' }
-import redCross from '../animations/error-red-cross.json' with { type: 'json' }
+import { createComponent, Shade } from '@furystack/shades'
+import {
+  Button,
+  Icon,
+  icons,
+  Result,
+  resultDefaultTitles,
+  type ResultStatus,
+} from '@furystack/shades-common-components'
 import { ErrorReporter } from '../services/error-reporter.js'
-import { Error404 } from './error-404.js'
-import { ErrorDisplay } from './error-display.js'
 
 export type GenericErrorProps = {
-  mainTitle?: string
+  /*mainTitle?: string
   subtitle?: string
-  description?: JSX.Element
+  description?: JSX.Element*/
   error?: unknown
   retry?: () => Promise<void>
 }
 
+const deriveStatus = (error: unknown): ResultStatus => {
+  if (error instanceof ResponseError) {
+    const code = error.response.status
+    if (code === 404) return '404'
+    if (code === 403) return '403'
+    if (code >= 500) return '500'
+  }
+  return 'error'
+}
+
+const deriveDescription = (error: unknown): string => {
+  if (error instanceof ResponseError && error.response.statusText) {
+    return error.response.statusText
+  }
+  if (error instanceof Error) {
+    switch (error.message) {
+      case '404':
+        return 'The content you are looking for does not exist.'
+      case '403':
+        return 'You are not authorized to access this content.'
+      case '500':
+        return 'An error occurred while loading the content. Please try again later.'
+      case 'Network Error':
+        return 'Unable to connect to the server. Please check your internet connection.'
+      case 'Timeout':
+        return 'The request timed out. Please try again later.'
+      case 'AbortError':
+        return 'The request was aborted. Please try again later.'
+      case 'Invalid JSON':
+        return 'The server returned invalid JSON. Please try again later.'
+      case 'Invalid URL':
+        return 'The server returned an invalid URL. Please try again later.'
+      case 'Failed to fetch':
+        return 'Failed to fetch the content. Please try again later.'
+      default:
+        return error.message
+    }
+  }
+  return 'An error occurred while loading the content. Please try again later.'
+}
+
 export const GenericErrorPage = Shade<GenericErrorProps>({
   shadowDomName: 'multiverse-generic-error-page',
-  css: {
-    '& .error-container': {
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      alignItems: 'center',
-      padding: '0 100px',
-      paddingTop: '4em',
-    },
-    '& .error-container.desktop': {
-      justifyContent: 'center',
-    },
-    '& .error-container.mobile': {
-      justifyContent: 'flex-start',
-    },
-    '& .error-content': {
-      display: 'flex',
-      flexDirection: 'column',
-      perspective: '400px',
-      animation: 'shake 150ms 2 linear',
-    },
-    '& .error-main': {
-      display: 'flex',
-      flexWrap: 'wrap',
-    },
-    '& .error-message': {
-      maxWidth: '750px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-    },
-    '& .error-message h1': {
-      marginTop: '0',
-      whiteSpace: 'nowrap',
-    },
-    '& .error-actions': {
-      display: 'flex',
-      marginTop: '2em',
-      width: '70%',
-      justifyContent: 'space-evenly',
-      whiteSpace: 'nowrap',
-    },
-  },
   render: ({ props, injector }) => {
-    if (props.error && props.error instanceof ResponseError && props.error.response.status === 404) {
-      return <Error404 />
-    }
+    const status = deriveStatus(props.error)
+    const mainTitle = resultDefaultTitles[status]
+    const description = deriveDescription(props.error)
 
-    const isDesktop = injector.getInstance(ScreenService).screenSize.atLeast.md.getValue()
-    const { theme } = injector.getInstance(ThemeProviderService)
     return (
-      <div className={`error-container ${isDesktop ? 'desktop' : 'mobile'}`} style={{ color: theme.text.secondary }}>
-        <div className="error-content">
-          <div className="error-main">
-            <lottie-player
-              autoplay
-              style={{ width: '250px', height: '250px' }}
-              mode="bounce"
-              src={Math.random() > 0.5 ? JSON.stringify(redCross) : JSON.stringify(deadSmiley)}
-            ></lottie-player>
-            <div className="error-message">
-              <Typography variant="h1">{props.mainTitle || 'WhoOoOops... 😱'}</Typography>
-              <Typography variant="h3">{props.subtitle || 'Something terrible happened 😓'}</Typography>
-
-              {props.description || <ErrorDisplay error={props.error} />}
-            </div>
-          </div>
-        </div>
-        <div className="error-actions">
-          <a href="/">
-            <Button>
-              <Icon icon={icons.home} size="small" /> Go Home
-            </Button>
-          </a>
-          {props.retry ? (
-            <Button onclick={() => props.retry?.()}>
-              <Icon icon={icons.refresh} size="small" /> Retry
-            </Button>
-          ) : null}
-          {props.error ? (
-            <Button onclick={() => injector.getInstance(ErrorReporter).sendErrorReport(props.error as Error)}>
-              <Icon icon={icons.send} size="small" /> Report error
-            </Button>
-          ) : null}
-        </div>
-      </div>
+      <Result status={status} title={mainTitle} subtitle={description}>
+        <a href="/">
+          <Button>
+            <Icon icon={icons.home} size="small" /> Go Home
+          </Button>
+        </a>
+        {props.retry ? (
+          <Button onclick={() => props.retry?.()}>
+            <Icon icon={icons.refresh} size="small" /> Retry
+          </Button>
+        ) : null}
+        {props.error ? (
+          <Button onclick={() => injector.getInstance(ErrorReporter).sendErrorReport(props.error as Error)}>
+            <Icon icon={icons.send} size="small" /> Report error
+          </Button>
+        ) : null}
+      </Result>
     )
   },
 })
