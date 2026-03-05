@@ -13,7 +13,6 @@
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",
     "@furystack/rest": "^8.0.41",
-    "@types/marked": "^6.0.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
   },
@@ -37,7 +36,6 @@
     "@xterm/xterm": "^6.0.0",
     "common": "workspace:^",
     "hls.js": "^1.6.15",
-    "marked": "^17.0.4",
     "media-chrome": "^4.18.0",
     "ollama": "^0.6.3",
     "path-to-regexp": "^8.3.0",

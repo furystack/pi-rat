@@ -1,9 +1,8 @@
 import { useCollectionSync } from '@furystack/entity-sync-client'
 import { createComponent, Shade, styledElement } from '@furystack/shades'
-import { cssVariableTheme, Skeleton } from '@furystack/shades-common-components'
+import { cssVariableTheme, MarkdownDisplay, Skeleton } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
 import { ChatMessage } from 'common'
-import { marked } from 'marked'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { DeleteChatMessage } from './delete-chat-message.js'
 
@@ -112,15 +111,9 @@ export const MessageList = Shade<{ chat: Chat }>({
                 </span>
                 <DeleteChatMessage chatMessage={message} />
               </ChatLineHeader>
-              <div
-                style={{ overflowX: 'auto', width: 'calc(100% - 32px)' }}
-                innerHTML={
-                  marked(message.content, {
-                    gfm: true,
-                    breaks: true,
-                  }) as string
-                }
-              />
+              <div style={{ overflowX: 'auto', width: 'calc(100% - 32px)' }}>
+                <MarkdownDisplay content={message.content} />
+              </div>
             </div>
           </ChatLine>
         ))}

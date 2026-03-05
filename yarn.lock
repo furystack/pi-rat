@@ -1699,15 +1699,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/marked@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@types/marked@npm:6.0.0"
-  dependencies:
-    marked: "npm:*"
-  checksum: 10c0/1a831af52413b1a208c91539d3bdda9be83d5451dc094c3cbc07e3e07186970673b9ec3ad5edd6c136b1249875c41e22c39eacb3c00ea7c59d0873c35c273035
-  languageName: node
-  linkType: hard
-
 "@types/ms@npm:*":
   version: 2.1.0
   resolution: "@types/ms@npm:2.1.0"
@@ -4554,7 +4545,6 @@ __metadata:
     "@furystack/shades-lottie": "npm:^8.0.10"
     "@furystack/shades-mfe": "npm:^2.0.10"
     "@furystack/utils": "npm:^8.2.0"
-    "@types/marked": "npm:^6.0.0"
     "@types/node": "npm:^25.3.3"
     "@xterm/addon-fit": "npm:^0.11.0"
     "@xterm/addon-search": "npm:^0.16.0"
@@ -4562,7 +4552,6 @@ __metadata:
     "@xterm/xterm": "npm:^6.0.0"
     common: "workspace:^"
     hls.js: "npm:^1.6.15"
-    marked: "npm:^17.0.4"
     media-chrome: "npm:^4.18.0"
     ollama: "npm:^0.6.3"
     path-to-regexp: "npm:^8.3.0"
@@ -5983,15 +5972,6 @@ __metadata:
     socks-proxy-agent: "npm:^6.0.0"
     ssri: "npm:^8.0.0"
   checksum: 10c0/2c737faf6a7f67077679da548b5bfeeef890595bf8c4323a1f76eae355d27ebb33dcf9cf1a673f944cf2f2a7cbf4e2b09f0a0a62931737728f210d902c6be966
-  languageName: node
-  linkType: hard
-
-"marked@npm:*, marked@npm:^17.0.4":
-  version: 17.0.4
-  resolution: "marked@npm:17.0.4"
-  bin:
-    marked: bin/marked.js
-  checksum: 10c0/a6f6a2df8157835bc23b2bede31f1cae7af75af7a2cd2e070d640c5a490e6cfe5eb63309cf353d7b373f7aef04ead4f2de51a59905bb829c462d802484468cd9
   languageName: node
   linkType: hard
 
