@@ -6,14 +6,15 @@ import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 export const seriesRoutes = {
   '/series': {
     meta: { title: 'Series', icon: icons.film },
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { SeriesList } = await import('../pages/movies/series-list.js')
-          return <SeriesList />
-        }}
-      />
-    ),
+    component: ({ outlet }: { outlet?: JSX.Element }) =>
+      outlet || (
+        <PiRatLazyLoad
+          component={async () => {
+            const { SeriesList } = await import('../pages/movies/series-list.js')
+            return <SeriesList />
+          }}
+        />
+      ),
     children: {
       '/:imdbId': {
         meta: {

@@ -6,14 +6,15 @@ import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 
 export const fileBrowserRoute = {
   meta: { title: 'File Browser', icon: icons.folderOpen },
-  component: () => (
-    <PiRatLazyLoad
-      component={async () => {
-        const { DrivesPage } = await import('../pages/file-browser/index.js')
-        return <DrivesPage />
-      }}
-    />
-  ),
+  component: ({ outlet }: { outlet?: JSX.Element }) =>
+    outlet || (
+      <PiRatLazyLoad
+        component={async () => {
+          const { DrivesPage } = await import('../pages/file-browser/index.js')
+          return <DrivesPage />
+        }}
+      />
+    ),
   children: {
     '/open-file/:driveLetter/:path': {
       meta: {

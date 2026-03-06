@@ -7,14 +7,15 @@ import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 export const movieRoutes = {
   '/movies': {
     meta: { title: 'Movies', icon: icons.film },
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { MovieList } = await import('../pages/movies/movie-list.js')
-          return <MovieList />
-        }}
-      />
-    ),
+    component: ({ outlet }: { outlet?: JSX.Element }) =>
+      outlet || (
+        <PiRatLazyLoad
+          component={async () => {
+            const { MovieList } = await import('../pages/movies/movie-list.js')
+            return <MovieList />
+          }}
+        />
+      ),
     children: {
       '/:id/watch': {
         meta: {

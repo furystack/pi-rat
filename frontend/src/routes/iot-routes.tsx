@@ -16,14 +16,15 @@ export const iotRoute = {
   children: {
     '/devices': {
       meta: { title: 'Devices', icon: icons.plug },
-      component: () => (
-        <PiRatLazyLoad
-          component={async () => {
-            const { DeviceList } = await import('../pages/iot/device-list.js')
-            return <DeviceList />
-          }}
-        />
-      ),
+      component: ({ outlet }: { outlet?: JSX.Element }) =>
+        outlet || (
+          <PiRatLazyLoad
+            component={async () => {
+              const { DeviceList } = await import('../pages/iot/device-list.js')
+              return <DeviceList />
+            }}
+          />
+        ),
       children: {
         '/:id': {
           meta: {
