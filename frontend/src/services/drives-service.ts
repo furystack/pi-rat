@@ -135,16 +135,15 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
     }
   }).bind(this)
 
-  private isInitialized = false
-
   public init() {
-    this.isInitialized = true
     this.socket.addListener('onMessage', this.onMessage)
   }
 
   public [Symbol.dispose](): void {
-    if (this.isInitialized) {
+    try {
       this.socket.removeListener('onMessage', this.onMessage)
+    } catch {
+      // socket may not have been resolved if init() was never called
     }
     this.volumesCache[Symbol.dispose]()
     this.singleVolumeCache[Symbol.dispose]()

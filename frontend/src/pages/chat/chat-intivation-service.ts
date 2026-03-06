@@ -6,12 +6,15 @@ import type { ChatInvitation } from 'common'
 import { ChatApiClient } from '../../services/api-clients/chat-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class ChatInvitationService extends EventHub<{
-  invitationAccepted: ChatInvitation
-  invitationCreated: ChatInvitation
-  invitationRejected: ChatInvitation
-  invitationRevoked: ChatInvitation
-}> {
+export class ChatInvitationService
+  extends EventHub<{
+    invitationAccepted: ChatInvitation
+    invitationCreated: ChatInvitation
+    invitationRejected: ChatInvitation
+    invitationRevoked: ChatInvitation
+  }>
+  implements Disposable
+{
   @Injected(ChatApiClient)
   declare private readonly chatApiClient: ChatApiClient
 
@@ -149,5 +152,11 @@ export class ChatInvitationService extends EventHub<{
     this.chatInvitationQueryCache.obsoleteRange(() => true)
     this.emit('invitationRevoked', result)
     return result
+  }
+
+  public [Symbol.dispose](): void {
+    this.chatInvitationCache[Symbol.dispose]()
+    this.chatInvitationQueryCache[Symbol.dispose]()
+    super[Symbol.dispose]()
   }
 }

@@ -39,13 +39,17 @@ export class SessionService implements IdentityContext, Disposable {
         this.isInitialized = true
         try {
           const { result } = await this.api.call({ method: 'GET', action: '/isAuthenticated' })
+          if (this.isDisposed) return
           this.state.setValue(result.isAuthenticated ? 'authenticated' : 'unauthenticated')
           if (result.isAuthenticated) {
             const { result: usr } = await this.api.call({ method: 'GET', action: '/currentUser' })
+            if (this.isDisposed) return
             this.currentUser.setValue({ username: usr.username, roles: usr.roles })
           }
         } catch (error) {
-          this.state.setValue('offline')
+          if (!this.isDisposed) {
+            this.state.setValue('offline')
+          }
         }
       }
     })

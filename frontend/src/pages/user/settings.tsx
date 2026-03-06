@@ -13,7 +13,6 @@ import {
   Paper,
   Typography,
 } from '@furystack/shades-common-components'
-import { ObservableValue } from '@furystack/utils'
 import { SessionService } from '../../services/session.js'
 
 export type PasswordResetPayload = {
@@ -48,16 +47,16 @@ const SecuritySection = Shade({
       borderRadius: cssVariableTheme.shape.borderRadius.sm,
     },
   },
-  render: ({ injector, useDisposable }) => {
+  render: ({ injector, useState }) => {
     const session = injector.getInstance(SessionService)
     const notyService = injector.getInstance(NotyService)
 
-    const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
-    const error = useDisposable('error', () => new ObservableValue<string>(''))
+    const [isLoading, setIsLoading] = useState('isLoading', false)
+    const [error, setError] = useState('error', '')
 
     const handlePasswordReset = async (data: PasswordResetPayload) => {
-      isLoading.setValue(true)
-      error.setValue('')
+      setIsLoading(true)
+      setError('')
 
       try {
         await session.resetPassword(data.currentPassword, data.newPassword)
@@ -67,14 +66,14 @@ const SecuritySection = Shade({
         form?.reset()
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to update password'
-        error.setValue(errorMessage)
+        setError(errorMessage)
         notyService.emit('onNotyAdded', {
           title: 'Error',
           body: errorMessage,
           type: 'error',
         })
       } finally {
-        isLoading.setValue(false)
+        setIsLoading(false)
       }
     }
 
@@ -123,16 +122,10 @@ const SecuritySection = Shade({
             style={{ marginBottom: '16px' }}
           />
 
-          {error.getValue() && <div className="error-message">{error.getValue()}</div>}
+          {error && <div className="error-message">{error}</div>}
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isLoading.getValue()}
-            style={{ marginTop: '8px' }}
-          >
-            {isLoading.getValue() ? 'Updating...' : 'Update Password'}
+          <Button type="submit" variant="contained" color="primary" disabled={isLoading} style={{ marginTop: '8px' }}>
+            {isLoading ? 'Updating...' : 'Update Password'}
           </Button>
         </Form>
       </Paper>
