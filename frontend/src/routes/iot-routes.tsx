@@ -29,6 +29,7 @@ export const iotRoute = {
         '/:id': {
           meta: {
             title: ({ match }: TitleResolverOptions<{ id: string }>): string => `Device ${match.params.id}`,
+            icon: icons.plug,
             hidden: true,
           },
           component: ({ match }: { match: MatchResult<{ id: string }> }) => (

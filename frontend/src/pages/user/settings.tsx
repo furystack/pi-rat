@@ -4,6 +4,7 @@ import {
   Chip,
   cssVariableTheme,
   Form,
+  getCssVariable,
   Icon,
   icons,
   Input,
@@ -11,9 +12,12 @@ import {
   PageContainer,
   PageHeader,
   Paper,
+  ThemeProviderService,
   Typography,
 } from '@furystack/shades-common-components'
 import { SessionService } from '../../services/session.js'
+import { darkTheme } from '../../themes/dark.js'
+import { lightTheme } from '../../themes/light.js'
 
 export type PasswordResetPayload = {
   currentPassword: string
@@ -222,6 +226,89 @@ const ProfileSection = Shade({
   },
 })
 
+const ThemesSection = Shade({
+  shadowDomName: 'user-settings-themes',
+  css: {
+    '& .theme-options': {
+      display: 'flex',
+      gap: cssVariableTheme.spacing.md,
+    },
+    '& .theme-option': {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: cssVariableTheme.spacing.sm,
+      padding: cssVariableTheme.spacing.md,
+      borderRadius: cssVariableTheme.shape.borderRadius.md,
+      border: `2px solid ${cssVariableTheme.action.subtleBorder}`,
+      cursor: 'pointer',
+      transition: `all ${cssVariableTheme.transitions.duration.normal} ease`,
+      minWidth: '100px',
+    },
+    '& .theme-option:hover': {
+      borderColor: cssVariableTheme.text.secondary,
+    },
+    '& .theme-option[data-active]': {
+      borderColor: cssVariableTheme.palette.primary.main,
+      backgroundColor: cssVariableTheme.action.hoverBackground,
+    },
+    '& .theme-label': {
+      fontSize: cssVariableTheme.typography.fontSize.sm,
+      color: cssVariableTheme.text.primary,
+    },
+  },
+  render: ({ injector, useState, useDisposable }) => {
+    const themeProvider = injector.getInstance(ThemeProviderService)
+    const [theme, setTheme] = useState<'light' | 'dark'>(
+      'theme',
+      getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'dark' : 'light',
+    )
+
+    useDisposable('traceThemeChange', () =>
+      themeProvider.subscribe('themeChanged', () => {
+        setTheme(
+          getCssVariable(themeProvider.theme.background.default) === darkTheme.background.default ? 'dark' : 'light',
+        )
+      }),
+    )
+
+    return (
+      <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
+        <Typography
+          variant="h4"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: cssVariableTheme.spacing.sm,
+            margin: `0 0 ${cssVariableTheme.spacing.md} 0`,
+          }}
+        >
+          <Icon icon={icons.sun} size="small" /> Theme
+        </Typography>
+
+        <div className="theme-options">
+          <div
+            className="theme-option"
+            {...(theme === 'light' ? { 'data-active': '' } : {})}
+            onclick={() => themeProvider.setAssignedTheme(lightTheme)}
+          >
+            <Icon icon={icons.sun} />
+            <span className="theme-label">Light</span>
+          </div>
+          <div
+            className="theme-option"
+            {...(theme === 'dark' ? { 'data-active': '' } : {})}
+            onclick={() => themeProvider.setAssignedTheme(darkTheme)}
+          >
+            <Icon icon={icons.moon} />
+            <span className="theme-label">Dark</span>
+          </div>
+        </div>
+      </Paper>
+    )
+  },
+})
+
 export const UserSettingsPage = Shade({
   shadowDomName: 'user-settings-page',
   render: () => {
@@ -229,6 +316,7 @@ export const UserSettingsPage = Shade({
       <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.settings} />} title="User Settings" />
         <ProfileSection />
+        <ThemesSection />
         <SecuritySection />
       </PageContainer>
     )

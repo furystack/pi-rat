@@ -41,6 +41,17 @@ export const miscRoutes = {
       />
     ),
   },
+  '/about': {
+    meta: { title: 'About', icon: icons.info },
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { AboutPage } = await import('../pages/about.js')
+          return <AboutPage />
+        }}
+      />
+    ),
+  },
   '/': {
     meta: { title: 'Home', icon: icons.home },
     routingOptions: { end: false },

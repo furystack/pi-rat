@@ -50,7 +50,7 @@ export const movieRoutes = {
     },
   },
   '/hls-test/:driveLetter/:path': {
-    meta: { title: 'HLS Test', hidden: true },
+    meta: { title: 'HLS Test', icon: icons.play, hidden: true },
     component: ({ match }: { match: MatchResult<{ driveLetter: string; path: string }> }) => (
       <PiRatLazyLoad
         component={async () => {

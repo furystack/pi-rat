@@ -43,6 +43,11 @@ export const UserAvatarMenu = Shade({
             label: 'User Settings',
             icon: (<Icon icon={icons.user} size="small" />) as JSX.Element,
           },
+          {
+            key: 'about',
+            label: 'About',
+            icon: (<Icon icon={icons.info} size="small" />) as JSX.Element,
+          },
           { type: 'divider' as const },
           {
             key: 'logout',
@@ -60,6 +65,9 @@ export const UserAvatarMenu = Shade({
           break
         case 'user-settings':
           navigateToRoute(injector, '/user/settings')
+          break
+        case 'about':
+          navigateToRoute(injector, '/about')
           break
         case 'logout':
           void session.logout()

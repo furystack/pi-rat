@@ -1,4 +1,4 @@
-import { Shade, createComponent } from '@furystack/shades'
+import { Shade, NestedRouteLink, createComponent } from '@furystack/shades'
 import { Button, cssVariableTheme, Form, Input } from '@furystack/shades-common-components'
 
 import { AuthLayout } from '../components/auth-layout.js'
@@ -63,6 +63,22 @@ export const Login = Shade({
       color: cssVariableTheme.text.secondary,
       fontSize: cssVariableTheme.typography.fontSize.sm,
     },
+
+    '& .login-footer': {
+      textAlign: 'center',
+      marginTop: cssVariableTheme.spacing.lg,
+    },
+
+    '& .login-footer nested-route-link': {
+      color: cssVariableTheme.text.secondary,
+      fontSize: cssVariableTheme.typography.fontSize.xs,
+      textDecoration: 'none',
+    },
+
+    '& .login-footer nested-route-link:hover': {
+      color: cssVariableTheme.text.primary,
+      textDecoration: 'underline',
+    },
   },
   render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService)
@@ -116,6 +132,9 @@ export const Login = Shade({
             </div>
           </div>
         </Form>
+        <div className="login-footer">
+          <NestedRouteLink href="/about">About PI-Rat</NestedRouteLink>
+        </div>
       </AuthLayout>
     )
   },

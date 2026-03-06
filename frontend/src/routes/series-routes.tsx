@@ -19,6 +19,7 @@ export const seriesRoutes = {
       '/:imdbId': {
         meta: {
           title: ({ match }: TitleResolverOptions<{ imdbId: string }>): string => `Series ${match.params.imdbId}`,
+          icon: icons.film,
           hidden: true,
         },
         component: ({ match }: { match: MatchResult<{ imdbId: string }> }) => (

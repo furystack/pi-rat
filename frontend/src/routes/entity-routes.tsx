@@ -1,12 +1,32 @@
+import type { Injector } from '@furystack/inject'
 import { createComponent } from '@furystack/shades'
+import type { IconDefinition } from '@furystack/shades-common-components'
 import { icons } from '@furystack/shades-common-components'
-import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 
-const entityEditorChildren = {
-  '/create': { meta: { title: 'Create', icon: icons.plus, hidden: true }, component: () => <></> },
-  '/edit/:id': { meta: { title: 'Edit', icon: icons.edit, hidden: true }, component: () => <></> },
-  '/': { component: () => <></>, routingOptions: { end: false } },
+import { hasCacheValue } from '@furystack/cache'
+import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
+import { DashboardService } from '../services/dashboards-service.js'
+import { MovieFilesService } from '../services/movie-files-service.js'
+import { MoviesService } from '../services/movies-service.js'
+
+type EntityEditorChildrenOptions = {
+  icon: IconDefinition
+  editTitle: (id: string, injector: Injector) => string
 }
+
+const getEntityEditorChildren = ({ icon, editTitle }: EntityEditorChildrenOptions) => ({
+  '/create': { meta: { title: 'Create', icon: icons.plus, hidden: true }, component: () => <></> },
+  '/edit/:id': {
+    meta: {
+      title: ({ match, injector }: { match: { params: object }; injector: Injector }) =>
+        editTitle((match.params as { id: string }).id, injector),
+      icon,
+      hidden: true,
+    },
+    component: () => <></>,
+  },
+  '/': { component: () => <></>, routingOptions: { end: false } },
+})
 
 export const entityRoute = {
   meta: { title: 'Entities', icon: icons.layers },
@@ -29,7 +49,10 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.folderOpen,
+        editTitle: (id) => id,
+      }),
     },
     '/users': {
       meta: { title: 'Users', icon: icons.users },
@@ -41,7 +64,10 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.users,
+        editTitle: (id) => id,
+      }),
     },
     '/dashboards': {
       meta: { title: 'Dashboards', icon: icons.layers },
@@ -53,7 +79,13 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.layers,
+        editTitle: (id, injector) => {
+          const state = injector.getInstance(DashboardService).getDashboardAsObservable(id).getValue()
+          return hasCacheValue(state) ? state.value.name : id
+        },
+      }),
     },
     '/movies': {
       meta: { title: 'Movies', icon: icons.film },
@@ -65,7 +97,13 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.film,
+        editTitle: (id, injector) => {
+          const state = injector.getInstance(MoviesService).getMovieAsObservable(id).getValue()
+          return hasCacheValue(state) ? state.value?.title : id
+        },
+      }),
     },
     '/movie-files': {
       meta: { title: 'Movie Files', icon: icons.file },
@@ -77,7 +115,13 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.file,
+        editTitle: (id, injector) => {
+          const state = injector.getInstance(MovieFilesService).getMovieFileAsObservable(id).getValue()
+          return hasCacheValue(state) ? state.value?.path : id
+        },
+      }),
     },
     '/omdb-movie-metadata': {
       meta: { title: 'OMDB Movie Metadata', icon: icons.globe },
@@ -89,7 +133,10 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.globe,
+        editTitle: (id) => id,
+      }),
     },
     '/omdb-series-metadata': {
       meta: { title: 'OMDB Series Metadata', icon: icons.globe },
@@ -101,7 +148,10 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.globe,
+        editTitle: (id) => id,
+      }),
     },
     '/config': {
       meta: { title: 'Config', icon: icons.settings },
@@ -113,7 +163,10 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.settings,
+        editTitle: (id) => id,
+      }),
     },
     '/iot-devices': {
       meta: { title: 'IoT Devices', icon: icons.plug },
@@ -125,7 +178,10 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.plug,
+        editTitle: (id) => id,
+      }),
     },
     '/logging': {
       meta: { title: 'Logging', icon: icons.fileText },
@@ -137,7 +193,10 @@ export const entityRoute = {
           }}
         />
       ),
-      children: entityEditorChildren,
+      children: getEntityEditorChildren({
+        icon: icons.fileText,
+        editTitle: (id) => id,
+      }),
     },
     '/': {
       component: () => <></>,

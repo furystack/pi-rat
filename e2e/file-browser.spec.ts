@@ -8,7 +8,7 @@ let tempPath: string
 let tempDriveLetter: string
 
 const gotoFileBrowser = async (page: Page) => {
-  await page.locator('shade-app-bar-link', { hasText: 'Files' }).click()
+  await page.goto('/file-browser')
   await expect(page.getByRole('button', { name: '+' })).toBeVisible()
 }
 
