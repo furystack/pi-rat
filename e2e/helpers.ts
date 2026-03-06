@@ -20,7 +20,7 @@ export const login = async (page: Page, username = 'testuser@gmail.com', passwor
 
   const usernameInput = loginForm.locator('input[name="userName"]')
   const passwordInput = loginForm.locator('input[name="password"]')
-  const submitButton = page.getByRole('button', { name: 'Login' })
+  const submitButton = page.getByRole('button', { name: 'Sign In' })
 
   await usernameInput.fill(username)
   await passwordInput.fill(password)
