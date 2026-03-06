@@ -37,7 +37,7 @@ const mockFfprobe: FfprobeData = {
       disposition: { default: 1 },
     },
   ],
-  format: { format_name: 'mov,mp4', duration: 120 },
+  format: { format_name: 'mov,mp4', duration: '120' },
   chapters: [],
 }
 
@@ -73,7 +73,7 @@ describe('PlaybackInfoAction', () => {
   it('should return remux mode when container is incompatible', async () => {
     const mkvFfprobe: FfprobeData = {
       ...mockFfprobe,
-      format: { format_name: 'matroska,webm', duration: 120 },
+      format: { format_name: 'matroska,webm', duration: '120' },
     }
 
     mockFind.mockResolvedValue([])

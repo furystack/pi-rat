@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { AppLink } from '../../app-routes.js'
+import { AppLink } from '../../routes/index.js'
 import { Dashboard } from 'common'
 import dashboardSchemas from 'common/schemas/dashboard-entities.json' with { type: 'json' }
 import { GenericEditorService } from '../../components/generic-editor/generic-editor-service.js'
@@ -41,6 +41,7 @@ export const DashboardsPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/dashboards"
         columns={['name', 'description', 'createdAt', 'updatedAt', 'id']}
         headerComponents={{
           id: () => <>Preview</>,

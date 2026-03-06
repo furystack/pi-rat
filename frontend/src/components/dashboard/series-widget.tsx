@@ -2,7 +2,7 @@ import type { CacheWithValue } from '@furystack/cache'
 import { Shade, createComponent } from '@furystack/shades'
 import { CacheView, cssVariableTheme, Skeleton } from '@furystack/shades-common-components'
 import type { Series } from 'common'
-import { AppLink } from '../../app-routes.js'
+import { AppLink } from '../../routes/index.js'
 import { SeriesService } from '../../services/series-service.js'
 import { WidgetCard } from './widget-card.js'
 
@@ -49,7 +49,6 @@ export const SeriesWidget = Shade<{
         content={SeriesWidgetContent}
         contentProps={{ index: props.index, size: props.size }}
         loader={<Skeleton />}
-        error={() => <>:(</>}
       />
     )
   },

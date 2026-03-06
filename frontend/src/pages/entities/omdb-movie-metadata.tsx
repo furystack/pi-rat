@@ -45,6 +45,7 @@ export const OmdbMovieMetadataPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/omdb-movie-metadata"
         columns={['imdbID', 'Title', 'Year', 'updatedAt']}
         headerComponents={{}}
         styles={{}}

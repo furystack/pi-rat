@@ -103,7 +103,7 @@ export const FolderPanel = Shade<{
                   : PathHelper.joinPaths(path || '/', v.name)
               setCurrentDrive({ letter, path: newPath })
             } else {
-              navigateToRoute(injector, '/file-browser/openFile/:driveLetter/:path', {
+              navigateToRoute(injector, '/file-browser/open-file/:driveLetter/:path', {
                 driveLetter: encode(currentDrive.letter),
                 path: encode(getFullPath(path, v.name)),
               })

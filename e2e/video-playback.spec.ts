@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { execSync } from 'child_process'
 import { mkdtempSync, rmSync, writeFileSync } from 'fs'
 import { readFile } from 'fs/promises'
@@ -7,11 +7,14 @@ import { join } from 'path'
 
 import { login } from './helpers.js'
 
-const TEST_VIDEO_FILENAME = 'Test.Movie.2024.mkv'
-const TEST_MOVIE_IMDB_ID = 'tt9999999'
+const getTestVideoFileName = (browserName: string, workerIndex: number) =>
+  `Test.Movie.2024.${browserName}.w${workerIndex}.mkv`
+const getTestMovieImdbId = (browserName: string, workerIndex: number) => `tt9999999-${browserName}-w${workerIndex}`
 
 let testDriveLetter: string
+let testDrivePath: string
 let movieFileId: string
+let workerIndex: number
 
 /**
  * Generates a small MKV test video with:
@@ -21,10 +24,10 @@ let movieFileId: string
  *
  * @returns The path to the temporary directory containing the video
  */
-const generateTestVideo = (): string => {
+const generateTestVideo = (browserName: string, wIndex: number): string => {
   const dir = mkdtempSync(join(tmpdir(), 'pi-rat-e2e-'))
   const srtPath = join(dir, 'subs.srt')
-  const videoPath = join(dir, TEST_VIDEO_FILENAME)
+  const videoPath = join(dir, getTestVideoFileName(browserName, wIndex))
 
   writeFileSync(
     srtPath,
@@ -62,10 +65,10 @@ const generateTestVideo = (): string => {
   return dir
 }
 
-const navigateToMovieAndPlay = async (page: Page) => {
+const navigateToMovieAndPlay = async (page: Page, browserName: string, wIndex: number) => {
   await page.goto('/movies')
 
-  const movieLink = page.locator(`a[href*="/movies/${TEST_MOVIE_IMDB_ID}"]`).first()
+  const movieLink = page.locator(`a[href*="/movies/${getTestMovieImdbId(browserName, wIndex)}"]`).first()
   await expect(movieLink).toBeVisible({ timeout: 10_000 })
   await movieLink.click()
 
@@ -100,9 +103,10 @@ const openSettingsSubmenu = async (page: Page, menuItemText: string) => {
 test.describe('Video Playback @media', () => {
   test.beforeAll(async ({ browser }) => {
     const browserName = browser.browserType().name()
-    testDriveLetter = `e2e-v-${browserName[0]}`
+    ;({ workerIndex } = test.info())
+    testDriveLetter = `e2e-v-${browserName[0]}${workerIndex}`
 
-    const tempDir = generateTestVideo()
+    const tempDir = generateTestVideo(browserName, workerIndex)
 
     const context = await browser.newContext()
     const page = await context.newPage()
@@ -110,24 +114,29 @@ test.describe('Video Playback @media', () => {
     await login(page)
 
     // Pre-cleanup: remove leftover data from previous failed runs
-    await page.request.delete(`/api/media/movies/${TEST_MOVIE_IMDB_ID}`)
+    await page.request.delete(`/api/media/movies/${getTestMovieImdbId(browserName, workerIndex)}`)
     await page.request.delete(`/api/drives/volumes/${testDriveLetter}`)
 
     // Create a drive for the test video
-    const drivePath = join(process.env?.E2E_TEMP || '/tmp', 'video-test', browserName)
+    testDrivePath = join(
+      process.env?.E2E_TEMP || process.cwd(),
+      'browser-temp',
+      'video-playback-tests',
+      `${browserName}-w${workerIndex}`,
+    )
     const createDriveRes = await page.request.post('/api/drives/volumes', {
-      data: { letter: testDriveLetter, physicalPath: drivePath },
+      data: { letter: testDriveLetter, physicalPath: testDrivePath },
     })
     expect(createDriveRes.ok(), `Drive creation failed: ${createDriveRes.status()}`).toBeTruthy()
 
     // Upload the generated video to the drive
-    const videoBuffer = await readFile(join(tempDir, TEST_VIDEO_FILENAME))
+    const videoBuffer = await readFile(join(tempDir, getTestVideoFileName(browserName, workerIndex)))
     const uploadRes = await page.request.post(
       `/api/drives/volumes/${encodeURIComponent(testDriveLetter)}/${encodeURIComponent('/')}/upload`,
       {
         multipart: {
           file: {
-            name: TEST_VIDEO_FILENAME,
+            name: getTestVideoFileName(browserName, workerIndex),
             mimeType: 'video/x-matroska',
             buffer: videoBuffer,
           },
@@ -137,26 +146,17 @@ test.describe('Video Playback @media', () => {
     expect(uploadRes.ok(), `Video upload failed: ${uploadRes.status()}`).toBeTruthy()
 
     // Retrieve ffprobe data from the server
-    const ffprobeRes = await page.request.get(`/api/drives/files/${testDriveLetter}/${TEST_VIDEO_FILENAME}/ffprobe`)
+    const ffprobeRes = await page.request.get(
+      `/api/drives/files/${testDriveLetter}/${getTestVideoFileName(browserName, workerIndex)}/ffprobe`,
+    )
     expect(ffprobeRes.ok(), `Ffprobe failed: ${ffprobeRes.status()}`).toBeTruthy()
-    const ffprobeData = (await ffprobeRes.json()) as {
-      streams: Array<Record<string, unknown>>
-      [key: string]: unknown
-    }
-
-    // The schema expects stream `profile` as number but ffprobe returns a string.
-    // Remove it to pass schema validation — it's optional and not needed for playback.
-    for (const stream of ffprobeData.streams) {
-      if (typeof stream.profile === 'string') {
-        delete stream.profile
-      }
-    }
+    const ffprobeData = await ffprobeRes.json()
 
     // Create Movie entity (bypasses OMDB dependency)
     const createMovieRes = await page.request.post('/api/media/movies', {
       data: {
-        imdbId: TEST_MOVIE_IMDB_ID,
-        title: 'E2E Test Movie',
+        imdbId: getTestMovieImdbId(browserName, workerIndex),
+        title: `E2E Test Movie w${workerIndex}`,
         year: 2024,
         genre: ['Test'],
         type: 'movie',
@@ -168,8 +168,8 @@ test.describe('Video Playback @media', () => {
     const createMovieFileRes = await page.request.post('/api/media/movie-files', {
       data: {
         driveLetter: testDriveLetter,
-        path: TEST_VIDEO_FILENAME,
-        imdbId: TEST_MOVIE_IMDB_ID,
+        path: getTestVideoFileName(browserName, workerIndex),
+        imdbId: getTestMovieImdbId(browserName, workerIndex),
         ffprobe: ffprobeData,
       },
     })
@@ -184,7 +184,7 @@ test.describe('Video Playback @media', () => {
     await context.close()
   })
 
-  test.afterAll(async ({ browser }) => {
+  test.afterAll(async ({ browser, browserName }) => {
     const context = await browser.newContext()
     const page = await context.newPage()
     await page.goto('/')
@@ -193,8 +193,12 @@ test.describe('Video Playback @media', () => {
     if (movieFileId) {
       await page.request.delete(`/api/media/movie-files/${movieFileId}`)
     }
-    await page.request.delete(`/api/media/movies/${TEST_MOVIE_IMDB_ID}`)
+    await page.request.delete(`/api/media/movies/${getTestMovieImdbId(browserName, workerIndex)}`)
     await page.request.delete(`/api/drives/volumes/${testDriveLetter}`)
+
+    if (testDrivePath) {
+      rmSync(testDrivePath, { recursive: true, force: true })
+    }
 
     await context.close()
   })
@@ -204,15 +208,15 @@ test.describe('Video Playback @media', () => {
     await login(page)
   })
 
-  test('Playback smoke: video loads and currentTime advances', async ({ page }) => {
-    await navigateToMovieAndPlay(page)
+  test('Playback smoke: video loads and currentTime advances', async ({ page, browserName }) => {
+    await navigateToMovieAndPlay(page, browserName, workerIndex)
 
     const errorDialog = page.locator('[role="alertdialog"], .error-dialog, shade-noty[data-type="error"]')
     await expect(errorDialog).toHaveCount(0)
   })
 
-  test('Subtitle switching: tracks are listed and selectable', async ({ page }) => {
-    await navigateToMovieAndPlay(page)
+  test('Subtitle switching: tracks are listed and selectable', async ({ page, browserName }) => {
+    await navigateToMovieAndPlay(page, browserName, workerIndex)
     await openSettingsSubmenu(page, 'Captions')
 
     const captionOptions = page.locator('media-captions-menu media-chrome-menu-item')
@@ -223,8 +227,8 @@ test.describe('Video Playback @media', () => {
     await captionOptions.first().click()
   })
 
-  test('Audio switching: multiple tracks shown, switching resumes playback', async ({ page }) => {
-    const video = await navigateToMovieAndPlay(page)
+  test('Audio switching: multiple tracks shown, switching resumes playback', async ({ page, browserName }) => {
+    const video = await navigateToMovieAndPlay(page, browserName, workerIndex)
     await openSettingsSubmenu(page, 'Audio')
 
     const audioOptions = page.locator('media-audio-track-menu media-chrome-menu-item')
@@ -241,8 +245,8 @@ test.describe('Video Playback @media', () => {
     }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
   })
 
-  test('Quality switching (HLS): quality options are listed and selectable', async ({ page }) => {
-    const video = await navigateToMovieAndPlay(page)
+  test('Quality switching (HLS): quality options are listed and selectable', async ({ page, browserName }) => {
+    const video = await navigateToMovieAndPlay(page, browserName, workerIndex)
     await openSettingsSubmenu(page, 'Quality')
 
     const qualityOptions = page.locator('media-rendition-menu media-chrome-menu-item')

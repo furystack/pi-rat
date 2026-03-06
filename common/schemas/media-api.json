@@ -246,16 +246,16 @@
           "type": "string"
         },
         "start_time": {
-          "type": "number"
+          "type": "string"
         },
         "duration": {
-          "type": "number"
+          "type": "string"
         },
         "size": {
-          "type": "number"
+          "type": "string"
         },
         "bit_rate": {
-          "type": "number"
+          "type": "string"
         },
         "probe_score": {
           "type": "number"
@@ -276,7 +276,7 @@
           "type": "string"
         },
         "profile": {
-          "type": "number"
+          "type": "string"
         },
         "codec_type": {
           "type": "string"
@@ -315,7 +315,7 @@
           "type": "string"
         },
         "level": {
-          "type": "string"
+          "type": "number"
         },
         "color_range": {
           "type": "string"
@@ -357,7 +357,7 @@
           "type": "number"
         },
         "start_time": {
-          "type": "number"
+          "type": "string"
         },
         "duration_ts": {
           "type": "string"
@@ -387,7 +387,7 @@
           "type": "string"
         },
         "sample_rate": {
-          "type": "number"
+          "type": "string"
         },
         "channels": {
           "type": "number"

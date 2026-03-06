@@ -70,7 +70,7 @@ test('User Registration and Login Flow', async ({ page }) => {
   const loginPasswordInput = loginForm.locator('input[name="password"]')
   await expect(loginPasswordInput).toBeVisible()
 
-  const loginSubmitButton = page.locator('shade-login button', { hasText: 'Login' })
+  const loginSubmitButton = page.locator('shade-login button', { hasText: 'Sign In' })
   await expect(loginSubmitButton).toBeVisible()
   await expect(loginSubmitButton).toBeEnabled()
 

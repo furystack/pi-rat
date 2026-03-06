@@ -39,6 +39,7 @@ export const MoviesPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/movies"
         columns={['title', 'year', 'type', 'imdbId']}
         headerComponents={{}}
         styles={{}}

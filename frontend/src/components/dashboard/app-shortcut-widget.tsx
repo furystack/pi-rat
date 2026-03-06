@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { AppShortcutWidget as AppShortcutWidgetData } from 'common'
-import type { AppPaths } from '../../app-routes.js'
+import type { AppPaths } from '../../routes/index.js'
 import { IconUrlWidget } from './icon-url-widget.js'
 
 export const AppShortcutWidget = Shade<AppShortcutWidgetData>({

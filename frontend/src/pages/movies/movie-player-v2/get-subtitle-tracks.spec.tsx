@@ -63,7 +63,7 @@ describe('getSubtitleTracks', () => {
           tags: { language: 'eng', title: 'English' },
         },
       ],
-      format: { format_name: 'matroska', duration: 100 },
+      format: { format_name: 'matroska', duration: '100' },
       chapters: [],
     }
 
@@ -75,7 +75,7 @@ describe('getSubtitleTracks', () => {
     const file = { driveLetter: 'A', path: 'movies/test.mkv' }
     const ffprobe: FfprobeData = {
       streams: [{ index: 0, codec_type: 'video', codec_name: 'h264', tags: {} }],
-      format: { format_name: 'matroska', duration: 100 },
+      format: { format_name: 'matroska', duration: '100' },
       chapters: [],
     }
 

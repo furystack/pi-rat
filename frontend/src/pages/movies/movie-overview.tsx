@@ -4,6 +4,7 @@ import { serializeToQueryString } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, CacheView, Skeleton, Typography } from '@furystack/shades-common-components'
 import type { Movie } from 'common'
+import { GenericErrorPage } from '../../components/generic-error.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { MoviesService } from '../../services/movies-service.js'
@@ -144,7 +145,7 @@ export const MovieOverview = Shade<{ imdbId: string }>({
         args={[props.imdbId]}
         content={MovieOverviewContent}
         loader={<Skeleton />}
-        error={() => <>:(</>}
+        error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
       />
     )
   },

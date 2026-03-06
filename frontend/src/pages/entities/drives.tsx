@@ -40,6 +40,7 @@ export const DrivesPage = Shade({
     return (
       <GenericEditor
         service={service}
+        basePath="/entities/drives"
         columns={['letter', 'physicalPath']}
         headerComponents={{}}
         styles={{}}

@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@types/ffprobe": "^1.1.8",
-    "@types/formidable": "^3.4.7",
+    "@types/formidable": "^3.5.0",
     "@types/node": "^25.3.3",
     "@types/ping": "^0.4.4",
     "typescript": "^5.9.3"

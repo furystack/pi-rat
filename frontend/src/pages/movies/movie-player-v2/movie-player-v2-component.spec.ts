@@ -136,7 +136,7 @@ describe('MoviePlayerV2 component logic', () => {
           { index: 0, codec_type: 'video', codec_name: 'h264', tags: {} },
           { index: 2, codec_type: 'subtitle', codec_name: 'subrip', tags: { language: 'eng', title: 'English' } },
         ],
-        format: { format_name: 'matroska', duration: 100 },
+        format: { format_name: 'matroska', duration: '100' },
         chapters: [],
       }
 
@@ -158,7 +158,7 @@ describe('MoviePlayerV2 component logic', () => {
           { index: 0, codec_type: 'video', codec_name: 'h264', tags: {} },
           { index: 2, codec_type: 'subtitle', codec_name: 'subrip', tags: { language: 'eng', title: 'English' } },
         ],
-        format: { format_name: 'matroska', duration: 100 },
+        format: { format_name: 'matroska', duration: '100' },
         chapters: [],
       }
 
@@ -173,7 +173,7 @@ describe('MoviePlayerV2 component logic', () => {
           { index: 2, codec_type: 'subtitle', codec_name: 'subrip', tags: { language: 'eng', title: 'English' } },
           { index: 3, codec_type: 'subtitle', codec_name: 'ass', tags: { language: 'jpn', title: 'Japanese' } },
         ],
-        format: { format_name: 'matroska', duration: 100 },
+        format: { format_name: 'matroska', duration: '100' },
         chapters: [],
       }
 
@@ -208,7 +208,7 @@ describe('MoviePlayerV2 component logic', () => {
         warnings: [],
         duration: 100,
       }
-      const ffprobe: FfprobeData = { streams: [], format: { duration: 100 }, chapters: [] }
+      const ffprobe: FfprobeData = { streams: [], format: { duration: '100' }, chapters: [] }
 
       const result = selectSubtitleElements(playbackInfo, { driveLetter: 'A', path: 'test.mkv' }, ffprobe)
       expect(result).toHaveLength(1)

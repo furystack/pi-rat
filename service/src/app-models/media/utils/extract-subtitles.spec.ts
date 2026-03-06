@@ -49,7 +49,7 @@ const ffprobeWithSubs: FfprobeData = {
     { index: 2, codec_type: 'subtitle', codec_name: 'subrip', tags: { language: 'eng' } },
     { index: 3, codec_type: 'subtitle', codec_name: 'ass', tags: { language: 'jpn' } },
   ],
-  format: { format_name: 'matroska', duration: 120 },
+  format: { format_name: 'matroska', duration: '120' },
   chapters: [],
 }
 
@@ -58,7 +58,7 @@ const ffprobeNoSubs: FfprobeData = {
     { index: 0, codec_type: 'video', codec_name: 'h264', tags: {} },
     { index: 1, codec_type: 'audio', codec_name: 'aac', channels: 2, tags: {} },
   ],
-  format: { format_name: 'matroska', duration: 120 },
+  format: { format_name: 'matroska', duration: '120' },
   chapters: [],
 }
 
@@ -68,7 +68,7 @@ const ffprobeBitmapSubs: FfprobeData = {
     { index: 1, codec_type: 'audio', codec_name: 'aac', channels: 2, tags: {} },
     { index: 2, codec_type: 'subtitle', codec_name: 'hdmv_pgs_subtitle', tags: { language: 'eng' } },
   ],
-  format: { format_name: 'matroska', duration: 120 },
+  format: { format_name: 'matroska', duration: '120' },
   chapters: [],
 }
 

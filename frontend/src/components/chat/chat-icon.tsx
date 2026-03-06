@@ -1,5 +1,5 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { AppBarAppLink } from '../../app-routes.js'
+import { AppBarAppLink } from '../../routes/index.js'
 import { SessionService } from '../../services/session.js'
 
 export const ChatIcon = Shade({
