@@ -132,9 +132,9 @@ export const registerUser = async (page: Page, username: string, password: strin
   await assertAndDismissNoty(page, 'Account created successfully')
 }
 
-export const uploadFile = async (page: Page, filePath: string, mime: string) => {
+export const uploadFile = async (page: Page, filePath: string, mime: string, destFileName?: string) => {
   const fileContent = await readFile(filePath, { encoding: 'utf-8' })
-  const fileName = basename(filePath)
+  const fileName = destFileName ?? basename(filePath)
 
   const dataTransfer = await page.evaluateHandle(
     async ([fileNameToUpload, type, content]) => {

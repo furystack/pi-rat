@@ -59,7 +59,7 @@ test.describe('File Browser', () => {
       `${browserName}-w${workerIndex}`,
     )
     const tempDriveLetter = `test-${browserName[0]}${workerIndex}`
-    const fileName = 'upload.md'
+    const fileName = `upload-${browserName[0]}${workerIndex}.md`
 
     await page.goto('/')
     await login(page)
@@ -70,7 +70,7 @@ test.describe('File Browser', () => {
 
     await selectDrive(page, tempDriveLetter)
 
-    await uploadFile(page, './e2e/test-files/upload.md', 'text/markdown')
+    await uploadFile(page, './e2e/test-files/upload.md', 'text/markdown', fileName)
 
     await openFile(page, fileName)
 
@@ -83,7 +83,7 @@ test.describe('File Browser', () => {
 
     await deleteFile(page, fileName)
 
-    const removedFileContent = page.locator('upload.md')
+    const removedFileContent = page.getByText(fileName)
     await expect(removedFileContent).not.toBeVisible()
 
     await page.locator('shade-app-bar-link', { hasText: 'PI-Rat' }).click()
