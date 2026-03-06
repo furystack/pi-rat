@@ -3,7 +3,7 @@ import { serializeToQueryString } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
 import { CacheView, Skeleton } from '@furystack/shades-common-components'
 import type { Device, DeviceAvailability as DeviceAvailabilityProps, Icon as IconType } from 'common'
-import { AppLink } from '../../app-routes.js'
+import { AppLink } from '../../routes/index.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 import { SessionService } from '../../services/session.js'
@@ -27,7 +27,7 @@ const DeviceAvailabilityContent = Shade<{
       <AppLink
         tabIndex={0}
         title={device.name}
-        href="/iot/device/:id"
+        href="/iot/devices/:id"
         params={{ id: device.name }}
         style={{ textDecoration: 'none' }}
       >

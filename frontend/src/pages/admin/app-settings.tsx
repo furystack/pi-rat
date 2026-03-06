@@ -1,7 +1,7 @@
 import { createComponent, LocationService, Shade } from '@furystack/shades'
 import { Drawer, Icon, icons, Menu, type MenuEntry } from '@furystack/shades-common-components'
 import { match } from 'path-to-regexp'
-import type { AppPaths } from '../../app-routes.js'
+import type { AppPaths } from '../../routes/index.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 
 type AppSettingsPageProps = {

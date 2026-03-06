@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { AppBar, Button, Icon, icons } from '@furystack/shades-common-components'
-import { AppBarAppLink } from '../app-routes.js'
+import { AppBarAppLink } from '../routes/index.js'
 import { environmentOptions } from '../environment-options.js'
 import { SessionService } from '../services/session.js'
 import { AiIcon } from './ai/ai-icon.js'
