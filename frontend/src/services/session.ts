@@ -59,6 +59,7 @@ export class SessionService implements IdentityContext, Disposable {
     await usingAsync(this.operation(), async () => {
       try {
         const { result: usr } = await this.api.call({ method: 'POST', action: '/login', body: { username, password } })
+        if (this.isDisposed) return
         this.currentUser.setValue({ username: usr.username, roles: usr.roles })
         this.state.setValue('authenticated')
         this.notys.emit('onNotyAdded', {
@@ -67,6 +68,7 @@ export class SessionService implements IdentityContext, Disposable {
           type: 'success',
         })
       } catch (error) {
+        if (this.isDisposed) return
         this.loginError.setValue(error instanceof Error ? error.message : '')
         this.notys.emit('onNotyAdded', {
           body: 'Please check your credentials',
@@ -85,6 +87,7 @@ export class SessionService implements IdentityContext, Disposable {
           action: '/register',
           body: { username, password },
         })
+        if (this.isDisposed) return
         this.currentUser.setValue({ username: usr.username, roles: usr.roles })
         this.state.setValue('authenticated')
         navigateToRoute(this.injector, '/')
@@ -94,6 +97,7 @@ export class SessionService implements IdentityContext, Disposable {
           type: 'success',
         })
       } catch (error) {
+        if (this.isDisposed) return
         this.loginError.setValue(error instanceof Error ? error.message : '')
         this.notys.emit('onNotyAdded', {
           body: 'Please check your details and try again',
@@ -107,6 +111,7 @@ export class SessionService implements IdentityContext, Disposable {
   public async logout(): Promise<void> {
     return await usingAsync(this.operation(), async () => {
       void this.api.call({ method: 'POST', action: '/logout' })
+      if (this.isDisposed) return
       this.currentUser.setValue(null)
       this.state.setValue('unauthenticated')
       this.notys.emit('onNotyAdded', {
@@ -129,6 +134,8 @@ export class SessionService implements IdentityContext, Disposable {
         action: '/password-reset',
         body: { currentPassword, newPassword },
       })
+
+      if (this.isDisposed) return
 
       if (result.success) {
         this.notys.emit('onNotyAdded', {

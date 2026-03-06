@@ -8,7 +8,7 @@ type AppSettingsPageProps = {
   outlet?: JSX.Element
 }
 
-const menuItems: Array<MenuEntry & { href?: AppPaths }> = [
+const getMenuItems = (): Array<MenuEntry & { href?: AppPaths }> => [
   {
     type: 'group',
     key: 'media',
@@ -40,12 +40,13 @@ const menuItems: Array<MenuEntry & { href?: AppPaths }> = [
   },
 ]
 
-const settingsRoutes = menuItems.flatMap((entry) =>
-  'children' in entry ? entry.children.flatMap((c) => (c.key ? [c.key] : [])) : [],
-)
+const getSettingsRoutes = () =>
+  getMenuItems().flatMap((entry) => ('children' in entry ? entry.children.flatMap((c) => (c.key ? [c.key] : [])) : []))
 
-const getSelectedKey = (currentPath: string) =>
-  settingsRoutes.find((route) => !!match(route)(currentPath)) ?? settingsRoutes[0]
+const getSelectedKey = (currentPath: string) => {
+  const routes = getSettingsRoutes()
+  return routes.find((route) => !!match(route)(currentPath)) ?? routes[0]
+}
 
 export const AppSettingsPage = Shade<AppSettingsPageProps>({
   shadowDomName: 'app-settings-page',
@@ -60,7 +61,7 @@ export const AppSettingsPage = Shade<AppSettingsPageProps>({
     return (
       <>
         <Drawer position="left" variant="permanent">
-          <Menu items={menuItems} selectedKey={selectedKey} onSelect={handleSelect} />
+          <Menu items={getMenuItems()} selectedKey={selectedKey} onSelect={handleSelect} />
         </Drawer>
         {props.outlet}
       </>

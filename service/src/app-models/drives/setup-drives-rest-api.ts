@@ -50,13 +50,17 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'GetDirectoryEntries' })(
           GetDirectoryEntriesAction,
         ),
-        '/files/:letter/:path/download': DownloadAction,
+        '/files/:letter/:path/download': Validate({ schema: drivesApiSchema, schemaName: 'DownloadEndpoint' })(
+          DownloadAction,
+        ),
         '/files/:letter/:path/ffprobe': Validate({ schema: drivesApiSchema, schemaName: 'FfprobeEndpoint' })(
           FfprobeAction,
         ),
       },
       POST: {
-        '/volumes/:letter/:path/upload': UploadAction,
+        '/volumes/:letter/:path/upload': Validate({ schema: drivesApiSchema, schemaName: 'UploadEndpoint' })(
+          UploadAction,
+        ),
         '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostDriveEndpoint' })(
           createPostEndpoint({
             model: Drive,
@@ -78,11 +82,15 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         ),
       },
       DELETE: {
-        '/volumes/:id': createDeleteEndpoint({
-          model: Drive,
-          primaryKey: 'letter',
-        }),
-        '/files/:letter/:path': DeleteFileAction,
+        '/volumes/:id': Validate({ schema: drivesApiSchema, schemaName: 'DeleteEndpoint<Drive,"letter">' })(
+          createDeleteEndpoint({
+            model: Drive,
+            primaryKey: 'letter',
+          }),
+        ),
+        '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'DeleteFileEndpoint' })(
+          DeleteFileAction,
+        ),
       },
     },
   })

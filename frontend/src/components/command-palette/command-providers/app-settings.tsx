@@ -6,7 +6,7 @@ import { navigateToRoute } from '../../../navigate-to-route.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 
-const AppSettingsSuggestions: SuggestionOptions[] = [
+const getAppSettingsSuggestions = (): SuggestionOptions[] => [
   {
     name: 'Application Settings',
     description: 'Configure application-wide settings',
@@ -27,20 +27,22 @@ export const appSettingsCommandProvider: CommandProvider = async ({ term, inject
     return []
   }
 
-  const fullHits = AppSettingsSuggestions.filter((c) => c.name.toLowerCase() === term.toLowerCase()).map((c) =>
-    createSuggestion({ ...c, score: 1 }),
-  )
-  const startsWith = AppSettingsSuggestions.filter((c) => c.name.toLowerCase().startsWith(term.toLowerCase())).map(
-    (c) => createSuggestion({ ...c, score: 2 }),
-  )
+  const suggestions = getAppSettingsSuggestions()
 
-  const contains = AppSettingsSuggestions.filter((c) => c.name.toLowerCase().includes(term.toLowerCase())).map((c) =>
-    createSuggestion({ ...c, score: 3 }),
-  )
+  const fullHits = suggestions
+    .filter((c) => c.name.toLowerCase() === term.toLowerCase())
+    .map((c) => createSuggestion({ ...c, score: 1 }))
+  const startsWith = suggestions
+    .filter((c) => c.name.toLowerCase().startsWith(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
 
-  const descriptionContains = AppSettingsSuggestions.filter((c) =>
-    c.description.toLowerCase().includes(term.toLowerCase()),
-  ).map((c) => createSuggestion({ ...c, score: 2 }))
+  const contains = suggestions
+    .filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 3 }))
+
+  const descriptionContains = suggestions
+    .filter((c) => c.description.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
 
   return distinctByName(...fullHits, ...startsWith, ...contains, ...descriptionContains)
 }

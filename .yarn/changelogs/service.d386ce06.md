@@ -22,6 +22,11 @@ appear before simple list items within each section.
 
 - Fixed `FfprobeService` not disposing its `piRatFileCache` and `physicalFileCache` Cache instances by implementing the `Disposable` protocol
 
+## ♻️ Refactoring
+
+- Added `Validate()` wrappers to REST endpoints missing request validation (`DownloadAction`, `UploadAction`, delete endpoints in drives; `IsAuthenticated`, `LoginAction`, `LogoutAction` in identity)
+- Reordered `Authenticate()`/`Authorize()` and `Validate()` wrappers in media API so that `Validate()` runs first (fail-fast on malformed requests)
+
 ## ⬆️ Dependencies
 
 - Bumped `@furystack/cache` from `^6.1.0` to `^6.1.1`

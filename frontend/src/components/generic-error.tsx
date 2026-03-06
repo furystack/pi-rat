@@ -1,5 +1,5 @@
 import { ResponseError } from '@furystack/rest-client-fetch'
-import { createComponent, Shade } from '@furystack/shades'
+import { createComponent, NestedRouteLink, Shade } from '@furystack/shades'
 import {
   Button,
   Icon,
@@ -65,11 +65,11 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
 
     return (
       <Result status={status} title={mainTitle} subtitle={description}>
-        <a href="/">
+        <NestedRouteLink href="/">
           <Button>
             <Icon icon={icons.home} size="small" /> Go Home
           </Button>
-        </a>
+        </NestedRouteLink>
         {props.retry ? (
           <Button onclick={() => props.retry?.()}>
             <Icon icon={icons.refresh} size="small" /> Retry

@@ -143,7 +143,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
     try {
       this.socket.removeListener('onMessage', this.onMessage)
     } catch {
-      // socket may not have been resolved if init() was never called
+      // @Injected property may throw during disposal if injector is already disposed, or if init() was never called
     }
     this.volumesCache[Symbol.dispose]()
     this.singleVolumeCache[Symbol.dispose]()
