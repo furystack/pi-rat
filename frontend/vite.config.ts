@@ -51,6 +51,7 @@ function serveMonacoMfe(): Plugin {
 
 export default defineConfig(async () => {
   return {
+    // Preserve class names so entity-sync can match models by constructor.name on the wire
     esbuild: {
       keepNames: true,
     },
