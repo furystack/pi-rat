@@ -1,8 +1,8 @@
-import { getCurrentUser } from '@furystack/core'
 import { createComponent } from '@furystack/shades'
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { Icon, icons } from '@furystack/shades-common-components'
 import { navigateToRoute } from '../../../navigate-to-route.js'
+import { SessionService } from '../../../services/session.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 
@@ -104,7 +104,8 @@ export const entitiesCommandProvider: CommandProvider = async ({ term, injector 
     return []
   }
 
-  if (!(await getCurrentUser(injector))?.roles?.includes('admin')) {
+  const currentUser = injector.getInstance(SessionService).currentUser.getValue()
+  if (!currentUser?.roles?.includes('admin')) {
     return []
   }
 

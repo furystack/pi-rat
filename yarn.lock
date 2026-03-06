@@ -846,9 +846,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@furystack/shades-common-components@npm:^13.4.1":
-  version: 13.4.1
-  resolution: "@furystack/shades-common-components@npm:13.4.1"
+"@furystack/shades-common-components@npm:^13.5.0":
+  version: 13.5.0
+  resolution: "@furystack/shades-common-components@npm:13.5.0"
   dependencies:
     "@furystack/cache": "npm:^6.1.1"
     "@furystack/core": "npm:^15.2.4"
@@ -856,7 +856,7 @@ __metadata:
     "@furystack/shades": "npm:^12.5.0"
     "@furystack/utils": "npm:^8.2.1"
     path-to-regexp: "npm:^8.3.0"
-  checksum: 10c0/63adc611972657f388a613974b95676037b98eeed971591d772a295cba74d72040a165d7a90d4bf22d7f78c9c56406be2a38e75c0a79efabbc6a1950e24396bd
+  checksum: 10c0/10a3c924e306d79f57ea6600793bf80541dbb875ed9e48d62aec78e99d6a0573bc1a61b3fe526cb53472c00e75ef37e9191b2c1ce5b3d7b45154cedbb4ccce60
   languageName: node
   linkType: hard
 
@@ -4561,7 +4561,7 @@ __metadata:
     "@furystack/rest": "npm:^8.0.42"
     "@furystack/rest-client-fetch": "npm:^8.1.1"
     "@furystack/shades": "npm:^12.5.0"
-    "@furystack/shades-common-components": "npm:^13.4.1"
+    "@furystack/shades-common-components": "npm:^13.5.0"
     "@furystack/shades-lottie": "npm:^8.0.11"
     "@furystack/shades-mfe": "npm:^2.0.11"
     "@furystack/utils": "npm:^8.2.1"
