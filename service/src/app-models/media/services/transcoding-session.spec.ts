@@ -43,7 +43,7 @@ const mockFfprobe: FfprobeData = {
     { index: 0, codec_type: 'video', codec_name: 'h264', width: 1920, height: 1080, tags: {} },
     { index: 1, codec_type: 'audio', codec_name: 'aac', channels: 2, tags: {}, disposition: { default: 1 } },
   ],
-  format: { format_name: 'matroska', duration: 60 },
+  format: { format_name: 'matroska', duration: '60' },
   chapters: [],
 }
 

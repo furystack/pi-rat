@@ -19,7 +19,7 @@ interface FfprobeStream {
   index: number
   codec_name?: string | undefined
   codec_long_name?: string | undefined
-  profile?: number | undefined
+  profile?: string | undefined
   codec_type?: string | undefined
   codec_time_base?: string | undefined
   codec_tag_string?: string | undefined
@@ -32,7 +32,7 @@ interface FfprobeStream {
   sample_aspect_ratio?: string | undefined
   display_aspect_ratio?: string | undefined
   pix_fmt?: string | undefined
-  level?: string | undefined
+  level?: number | undefined
   color_range?: string | undefined
   color_space?: string | undefined
   color_transfer?: string | undefined
@@ -46,7 +46,7 @@ interface FfprobeStream {
   avg_frame_rate?: string | undefined
   time_base?: string | undefined
   start_pts?: number | undefined
-  start_time?: number | undefined
+  start_time?: string | undefined
   duration_ts?: string | undefined
   duration?: string | undefined
   bit_rate?: string | undefined
@@ -56,7 +56,7 @@ interface FfprobeStream {
   nb_read_frames?: string | undefined
   nb_read_packets?: string | undefined
   sample_fmt?: string | undefined
-  sample_rate?: number | undefined
+  sample_rate?: string | undefined
   channels?: number | undefined
   channel_layout?: string | undefined
   bits_per_sample?: number | undefined
@@ -71,10 +71,10 @@ interface FfprobeFormat {
   nb_programs?: number | undefined
   format_name?: string | undefined
   format_long_name?: string | undefined
-  start_time?: number | undefined
-  duration?: number | undefined
-  size?: number | undefined
-  bit_rate?: number | undefined
+  start_time?: string | undefined
+  duration?: string | undefined
+  size?: string | undefined
+  bit_rate?: string | undefined
   probe_score?: number | undefined
   tags?: unknown
 }

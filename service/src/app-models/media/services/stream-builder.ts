@@ -209,6 +209,6 @@ export const buildPlaybackInfoResponse = ({
     audioTracks: buildAudioTrackList(ffprobe),
     subtitleTracks: buildSubtitleTrackList(ffprobe, file, relatedFiles, movieId),
     warnings,
-    duration: ffprobe.format.duration ?? 0,
+    duration: parseFloat(ffprobe.format.duration ?? '0') || 0,
   }
 }

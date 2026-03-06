@@ -28,7 +28,7 @@ const createFfprobe = (overrides: Partial<FfprobeData> = {}): FfprobeData => ({
   ],
   format: {
     format_name: 'matroska,webm',
-    duration: 7200,
+    duration: '7200',
   },
   chapters: [],
   ...overrides,
@@ -43,7 +43,7 @@ const fullCodecSupport: CodecSupportMap = {
 describe('resolvePlaybackMode', () => {
   it('should return direct-play when all codecs and container are supported', () => {
     const ffprobe = createFfprobe({
-      format: { format_name: 'mov,mp4,m4a,3gp,3g2,mj2', duration: 100 },
+      format: { format_name: 'mov,mp4,m4a,3gp,3g2,mj2', duration: '100' },
     })
     const result = resolvePlaybackMode({ ffprobe, codecSupport: fullCodecSupport })
     expect(result.mode).toBe('direct-play')
@@ -52,7 +52,7 @@ describe('resolvePlaybackMode', () => {
 
   it('should return remux when codecs are supported but container is not', () => {
     const ffprobe = createFfprobe({
-      format: { format_name: 'matroska,webm', duration: 100 },
+      format: { format_name: 'matroska,webm', duration: '100' },
     })
     const codecSupport: CodecSupportMap = {
       video: ['h264'],
@@ -119,7 +119,7 @@ describe('resolvePlaybackMode', () => {
         { index: 1, codec_type: 'audio', codec_name: 'aac', channels: 2, tags: {} },
         { index: 2, codec_type: 'subtitle', codec_name: 'subrip', tags: { language: 'eng' } },
       ],
-      format: { format_name: 'mov,mp4', duration: 100 },
+      format: { format_name: 'mov,mp4', duration: '100' },
     })
     const result = resolvePlaybackMode({
       ffprobe,
@@ -152,7 +152,7 @@ describe('resolvePlaybackMode', () => {
         },
         { index: 2, codec_type: 'audio', codec_name: 'dts', channels: 6, tags: { language: 'fra' } },
       ],
-      format: { format_name: 'mov,mp4', duration: 100 },
+      format: { format_name: 'mov,mp4', duration: '100' },
     })
 
     const codecSupport: CodecSupportMap = {
@@ -309,7 +309,7 @@ describe('buildSubtitleTrackList', () => {
 describe('buildPlaybackInfoResponse', () => {
   it('should return a complete response with correct stream URL for direct-play', () => {
     const ffprobe = createFfprobe({
-      format: { format_name: 'mov,mp4', duration: 120 },
+      format: { format_name: 'mov,mp4', duration: '120' },
     })
     const file = { driveLetter: 'A', path: 'movies/test.mp4' }
 

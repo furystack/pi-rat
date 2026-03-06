@@ -139,18 +139,7 @@ test.describe('Video Playback @media', () => {
     // Retrieve ffprobe data from the server
     const ffprobeRes = await page.request.get(`/api/drives/files/${testDriveLetter}/${TEST_VIDEO_FILENAME}/ffprobe`)
     expect(ffprobeRes.ok(), `Ffprobe failed: ${ffprobeRes.status()}`).toBeTruthy()
-    const ffprobeData = (await ffprobeRes.json()) as {
-      streams: Array<Record<string, unknown>>
-      [key: string]: unknown
-    }
-
-    // The schema expects stream `profile` as number but ffprobe returns a string.
-    // Remove it to pass schema validation — it's optional and not needed for playback.
-    for (const stream of ffprobeData.streams) {
-      if (typeof stream.profile === 'string') {
-        delete stream.profile
-      }
-    }
+    const ffprobeData = await ffprobeRes.json()
 
     // Create Movie entity (bypasses OMDB dependency)
     const createMovieRes = await page.request.post('/api/media/movies', {

@@ -39,7 +39,7 @@ const mockFfprobe: FfprobeData = {
       disposition: {},
     },
   ],
-  format: { format_name: 'matroska', duration: 120 },
+  format: { format_name: 'matroska', duration: '120' },
   chapters: [],
 }
 
