@@ -32,6 +32,5 @@ export const fileBrowserRoute = {
         />
       ),
     },
-    '/': { component: () => <></>, routingOptions: { end: false } },
   },
 }

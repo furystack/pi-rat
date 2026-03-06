@@ -30,7 +30,6 @@ export const seriesRoutes = {
           />
         ),
       },
-      '/': { component: () => <></>, routingOptions: { end: false } },
     },
   },
 }

@@ -35,7 +35,6 @@ export const iotRoute = {
             <div style={{ paddingTop: '5em' }}>Device {match.params.id}</div>
           ),
         },
-        '/': { component: () => <></>, routingOptions: { end: false } },
       },
     },
     '/': {

@@ -47,7 +47,6 @@ export const movieRoutes = {
           />
         ),
       },
-      '/': { component: () => <></>, routingOptions: { end: false } },
     },
   },
   '/hls-test/:driveLetter/:path': {
