@@ -54,7 +54,7 @@ export const DrivesPage = Shade({
     }
 
     return (
-      <div className="drives-container">
+      <div className="drives-container" data-testid="drives-container">
         <FolderPanel
           focused={focused === 'ld'}
           searchStateKey="ld"

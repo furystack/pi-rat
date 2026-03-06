@@ -23,6 +23,9 @@ const config: PlaywrightTestConfig = {
     baseURL: 'http://localhost:9090',
     actionTimeout: isInCi ? 30000 : 15000, // 30 second timeout for actions like click, fill, etc. in CI, 15 seconds locally
     navigationTimeout: isInCi ? 30000 : 15000, // 30 second timeout for navigation in CI, 15 seconds locally
+    contextOptions: {
+      reducedMotion: 'reduce',
+    },
   },
 
   projects: [
