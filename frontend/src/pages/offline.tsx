@@ -1,5 +1,5 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Typography } from '@furystack/shades-common-components'
+import { Result } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
 
 export const Offline = Shade({
@@ -10,29 +10,18 @@ export const Offline = Shade({
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '0 100px',
-    '& #offline': {
-      display: 'flex',
-      flexDirection: 'column',
-      perspective: '400px',
-    },
   },
   render: () => {
     return (
-      <>
-        <div id="offline">
-          <Typography variant="h1">WhoOoOops... 😱</Typography>
-          <Typography variant="h3">The service seems to be offline 😓</Typography>
-          <Typography variant="body1">
-            There was a trouble connecting to the backend service at{' '}
-            <a href={environmentOptions.serviceUrl} target="_blank">
-              {environmentOptions.serviceUrl}
-            </a>
-            . It seems to be the service is unaccessible at the moment. You can check the following things:
-          </Typography>
+      <Result
+        status="error"
+        title="Service Offline"
+        subtitle={`There was a trouble connecting to the backend service at ${environmentOptions.serviceUrl}. It seems the service is inaccessible at the moment.`}
+      >
+        <div style={{ textAlign: 'left' }}>
           <ul>
             <li>
-              The URL above is correct. You can set in in your 'SERVICE_URL' environment variable before building the
+              The URL above is correct. You can set it in your 'SERVICE_URL' environment variable before building the
               app.
             </li>
             <li>
@@ -40,9 +29,10 @@ export const Offline = Shade({
             </li>
             <li>You have started the service :)</li>
           </ul>
+          {/* eslint-disable-next-line furystack/prefer-nested-route-link -- Intentional full page reload to re-check service connectivity */}
+          <a href="/">Reload page</a>
         </div>
-        <a href="/">Reload page</a>
-      </>
+      </Result>
     )
   },
 })
