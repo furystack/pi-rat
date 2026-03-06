@@ -9,12 +9,20 @@ import { IdentityApiClient } from './api-clients/identity-api-client.js'
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
 
 @Injectable({ lifetime: 'singleton' })
-export class SessionService implements IdentityContext {
+export class SessionService implements IdentityContext, Disposable {
   declare private readonly injector: Injector
   private readonly operation = () => {
     this.isOperationInProgress.setValue(true)
-    return { [Symbol.dispose]: () => this.isOperationInProgress.setValue(false) }
+    return {
+      [Symbol.dispose]: () => {
+        if (!this.isDisposed) {
+          this.isOperationInProgress.setValue(false)
+        }
+      },
+    }
   }
+
+  private isDisposed = false
 
   public state = new ObservableValue<SessionState>('initializing')
   public currentUser = new ObservableValue<Pick<User, 'username' | 'roles'> | null>(null)
@@ -157,4 +165,12 @@ export class SessionService implements IdentityContext {
 
   @Injected(NotyService)
   declare private readonly notys: NotyService
+
+  public [Symbol.dispose](): void {
+    this.isDisposed = true
+    this.state[Symbol.dispose]()
+    this.currentUser[Symbol.dispose]()
+    this.loginError[Symbol.dispose]()
+    this.isOperationInProgress[Symbol.dispose]()
+  }
 }

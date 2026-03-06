@@ -5,7 +5,7 @@ import type { FindOptions, WithOptionalId } from '@furystack/core'
 import { DashboardsApiClient } from './api-clients/dashboards-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class DashboardService {
+export class DashboardService implements Disposable {
   @Injected(DashboardsApiClient)
   declare private readonly dashboardsApiClient: DashboardsApiClient
 
@@ -76,5 +76,10 @@ export class DashboardService {
     })
     this.dashboardQueryCache.flushAll()
     return result
+  }
+
+  public [Symbol.dispose](): void {
+    this.dashboardCache[Symbol.dispose]()
+    this.dashboardQueryCache[Symbol.dispose]()
   }
 }

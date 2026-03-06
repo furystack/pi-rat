@@ -7,7 +7,7 @@ import { DrivesApiClient } from './api-clients/drives-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMessage }> {
+export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMessage }> implements Disposable {
   @Injected(DrivesApiClient)
   declare private readonly drivesApiClient: DrivesApiClient
 
@@ -135,11 +135,20 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
     }
   }).bind(this)
 
+  private isInitialized = false
+
   public init() {
+    this.isInitialized = true
     this.socket.addListener('onMessage', this.onMessage)
   }
 
-  public dispose() {
-    this.socket.removeListener('onMessage', this.onMessage)
+  public [Symbol.dispose](): void {
+    if (this.isInitialized) {
+      this.socket.removeListener('onMessage', this.onMessage)
+    }
+    this.volumesCache[Symbol.dispose]()
+    this.singleVolumeCache[Symbol.dispose]()
+    this.fileListCache[Symbol.dispose]()
+    super[Symbol.dispose]()
   }
 }

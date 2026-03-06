@@ -3,7 +3,7 @@ import { InstallApiClient } from './api-clients/install-api-client.js'
 import { Cache } from '@furystack/cache'
 
 @Injectable({ lifetime: 'singleton' })
-export class InstallService {
+export class InstallService implements Disposable {
   @Injected(InstallApiClient)
   declare private readonly apiClient: InstallApiClient
 
@@ -19,4 +19,8 @@ export class InstallService {
 
   public getServiceStatus = this.cache.get.bind(this.cache)
   public getServiceStatusAsObservable = this.cache.getObservable.bind(this.cache)
+
+  public [Symbol.dispose](): void {
+    this.cache[Symbol.dispose]()
+  }
 }

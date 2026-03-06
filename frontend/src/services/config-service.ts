@@ -6,7 +6,7 @@ import type { Config, ConfigType } from 'common'
 import { ConfigApiClient } from './api-clients/config-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class ConfigService {
+export class ConfigService implements Disposable {
   @Injected(ConfigApiClient)
   declare private readonly configApiClient: ConfigApiClient
 
@@ -98,5 +98,10 @@ export class ConfigService {
       this.configCache.flushAll()
     }
     this.configsQueryCache.flushAll()
+  }
+
+  public [Symbol.dispose](): void {
+    this.configCache[Symbol.dispose]()
+    this.configsQueryCache[Symbol.dispose]()
   }
 }

@@ -6,7 +6,7 @@ import { IotApiClient } from './api-clients/iot-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class IotDevicesService {
+export class IotDevicesService implements Disposable {
   @Injected(WebsocketNotificationsService)
   declare readonly websocketNotificationsService: WebsocketNotificationsService
 
@@ -182,5 +182,12 @@ export class IotDevicesService {
           })
       }
     })
+  }
+
+  public [Symbol.dispose](): void {
+    this.deviceCache[Symbol.dispose]()
+    this.deviceQueryCache[Symbol.dispose]()
+    this.deviceAwakeHistoryCache[Symbol.dispose]()
+    this.devicePingHistoryCache[Symbol.dispose]()
   }
 }

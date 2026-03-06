@@ -44,8 +44,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
     const [currentPath] = useObservable('locationPath', locationService.onLocationPathChanged)
 
     const navigate = (path: string) => {
-      window.history.pushState({}, '', path)
-      locationService.updateState()
+      locationService.navigate(path)
     }
 
     const navigateToEdit = (id: string) => navigate(compileRoute(`${basePath}/edit/:id`, { id }))

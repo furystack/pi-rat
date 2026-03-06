@@ -5,7 +5,7 @@ import type { FindOptions } from '@furystack/core'
 import type { Series } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
-export class SeriesService {
+export class SeriesService implements Disposable {
   @Injected(MediaApiClient)
   declare private readonly mediaApiClient: MediaApiClient
 
@@ -51,4 +51,9 @@ export class SeriesService {
   public findSeries = this.seriesQueryCache.get.bind(this.seriesQueryCache)
 
   public findSeriesAsObservable = this.seriesQueryCache.getObservable.bind(this.seriesQueryCache)
+
+  public [Symbol.dispose](): void {
+    this.seriesCache[Symbol.dispose]()
+    this.seriesQueryCache[Symbol.dispose]()
+  }
 }
