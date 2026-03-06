@@ -72,8 +72,7 @@ export const RouteIndexPage = Shade<RouteIndexPageProps>({
     const [currentPath] = useObservable('locationChange', locationService.onLocationPathChanged)
 
     const navigate = (path: string) => {
-      window.history.pushState({}, '', path)
-      locationService.updateState()
+      locationService.navigate(path)
     }
 
     const children = getParentNavChildren(currentPath)

@@ -4,7 +4,7 @@ import { PiRatFile } from 'common'
 import { DrivesApiClient } from './api-clients/drives-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class FfprobeService {
+export class FfprobeService implements Disposable {
   @Injected(DrivesApiClient)
   declare private readonly mediaApiClient: DrivesApiClient
 
@@ -23,4 +23,8 @@ export class FfprobeService {
   public getFfprobe = this.ffprobeCache.get.bind(this.ffprobeCache)
 
   public getFfprobeAsObservable = this.ffprobeCache.getObservable.bind(this.ffprobeCache)
+
+  public [Symbol.dispose](): void {
+    this.ffprobeCache[Symbol.dispose]()
+  }
 }

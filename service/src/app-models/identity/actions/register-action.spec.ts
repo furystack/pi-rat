@@ -36,6 +36,7 @@ vi.mock('@furystack/repository', () => ({
     const name = typeof model === 'function' ? model.name : ''
     if (name === 'User') return mockUserDataSet
     if (name === 'PasswordCredential') return mockCredentialDataSet
+    // eslint-disable-next-line furystack/rest-action-use-request-error -- Test mock helper, not a REST action
     throw new Error(`Unknown model: ${name}`)
   },
 }))

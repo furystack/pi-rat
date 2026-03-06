@@ -3,7 +3,7 @@ import { Injectable, Injected } from '@furystack/inject'
 import { AiApiClient } from '../../services/api-clients/ai-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class AiModelService {
+export class AiModelService implements Disposable {
   @Injected(AiApiClient)
   declare private aiApiClient: AiApiClient
 
@@ -22,5 +22,9 @@ export class AiModelService {
 
   public getModelsAsObservable() {
     return this.cache.getObservable()
+  }
+
+  public [Symbol.dispose](): void {
+    this.cache[Symbol.dispose]()
   }
 }

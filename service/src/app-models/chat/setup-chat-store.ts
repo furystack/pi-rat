@@ -132,6 +132,7 @@ export const setupChatStore = async (injector: Injector) => {
         },
       )
 
+      // eslint-disable-next-line furystack/no-direct-physical-store -- Physical store access needed to initialize Sequelize model for foreign key associations
       const chatStore = getStoreManager(injector).getStoreFor(Chat, 'id')
       if (chatStore instanceof SequelizeStore) {
         await chatStore.getModel()
@@ -201,6 +202,7 @@ export const setupChatStore = async (injector: Injector) => {
         },
       )
 
+      // eslint-disable-next-line furystack/no-direct-physical-store -- Physical store access needed to initialize Sequelize model for foreign key associations
       const chatStore = getStoreManager(injector).getStoreFor(Chat, 'id')
       if (chatStore instanceof SequelizeStore) {
         await chatStore.getModel()

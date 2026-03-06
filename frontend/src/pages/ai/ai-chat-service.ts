@@ -5,7 +5,7 @@ import type { AiChat } from 'common'
 import { AiApiClient } from '../../services/api-clients/ai-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class AiChatService {
+export class AiChatService implements Disposable {
   @Injected(AiApiClient)
   declare private aiApi: AiApiClient
 
@@ -82,5 +82,10 @@ export class AiChatService {
     this.aiChatQueryCache.obsoleteRange(() => true)
 
     return result
+  }
+
+  public [Symbol.dispose](): void {
+    this.aiChatCache[Symbol.dispose]()
+    this.aiChatQueryCache[Symbol.dispose]()
   }
 }

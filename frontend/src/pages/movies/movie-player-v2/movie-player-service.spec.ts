@@ -1,5 +1,6 @@
 import type { FfprobeData, PiRatFile, PlaybackInfoResponse } from 'common'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { usingAsync } from '@furystack/utils'
 import { MoviePlayerService, videoCodecs, audioCodecs } from './movie-player-service.js'
 
 vi.mock('hls.js', () => ({
@@ -67,137 +68,157 @@ describe('MoviePlayerService', () => {
     vi.clearAllMocks()
   })
 
-  it('should initialize with correct observable defaults', () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
-    expect(service.audioTrackId.getValue()).toBe(0)
-    expect(service.playbackMode.getValue()).toBe('transcode')
-    expect(service.progress.getValue()).toBe(0)
-    expect(service.resolution.getValue()).toBeUndefined()
-    void service[Symbol.asyncDispose]()
+  it('should initialize with correct observable defaults', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        expect(service.audioTrackId.getValue()).toBe(0)
+        expect(service.playbackMode.getValue()).toBe('transcode')
+        expect(service.progress.getValue()).toBe(0)
+        expect(service.resolution.getValue()).toBeUndefined()
+      },
+    )
   })
 
-  it('should initialize with non-zero progress', () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 42, mockLogger as never)
-    expect(service.progress.getValue()).toBe(42)
-    void service[Symbol.asyncDispose]()
+  it('should initialize with non-zero progress', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 42, mockLogger as never),
+      async (service) => {
+        expect(service.progress.getValue()).toBe(42)
+      },
+    )
   })
 
   it('should fetch playback info on initialize', async () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(api.call).toHaveBeenCalledWith(
+            expect.objectContaining({
+              method: 'POST',
+              action: '/playback-info',
+              body: expect.objectContaining({
+                file: mockFile,
+                codecSupport: expect.objectContaining({ video: expect.any(Array), audio: expect.any(Array) }),
+              }),
+            }),
+          )
+        })
 
-    await vi.waitFor(() => {
-      expect(api.call).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          action: '/playback-info',
-          body: expect.objectContaining({
-            file: mockFile,
-            codecSupport: expect.objectContaining({ video: expect.any(Array), audio: expect.any(Array) }),
-          }),
-        }),
-      )
-    })
-
-    expect(service.playbackInfo.getValue()).toEqual(mockPlaybackInfoResponse)
-    expect(service.playbackMode.getValue()).toBe('remux')
-    void service[Symbol.asyncDispose]()
+        expect(service.playbackInfo.getValue()).toEqual(mockPlaybackInfoResponse)
+        expect(service.playbackMode.getValue()).toBe('remux')
+      },
+    )
   })
 
   it('should handle playback info fetch failure gracefully', async () => {
     api.call.mockRejectedValueOnce(new Error('Network error'))
 
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(api.call).toHaveBeenCalled()
+        })
 
-    await vi.waitFor(() => {
-      expect(api.call).toHaveBeenCalled()
-    })
-
-    expect(service.playbackInfo.getValue()).toBeNull()
-    void service[Symbol.asyncDispose]()
+        expect(service.playbackInfo.getValue()).toBeNull()
+      },
+    )
   })
 
   it('should return audio tracks from playback info', async () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
 
-    await vi.waitFor(() => {
-      expect(service.playbackInfo.getValue()).not.toBeNull()
-    })
-
-    const tracks = service.getAudioTrackInfoFromPlaybackInfo()
-    expect(tracks).toHaveLength(2)
-    expect(tracks[0].language).toBe('eng')
-    expect(tracks[1].language).toBe('fra')
-    void service[Symbol.asyncDispose]()
+        const tracks = service.getAudioTrackInfoFromPlaybackInfo()
+        expect(tracks).toHaveLength(2)
+        expect(tracks[0].language).toBe('eng')
+        expect(tracks[1].language).toBe('fra')
+      },
+    )
   })
 
   it('should return subtitle tracks from playback info', async () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
 
-    await vi.waitFor(() => {
-      expect(service.playbackInfo.getValue()).not.toBeNull()
-    })
-
-    const tracks = service.getSubtitleTrackInfoFromPlaybackInfo()
-    expect(tracks).toHaveLength(0)
-    void service[Symbol.asyncDispose]()
+        const tracks = service.getSubtitleTrackInfoFromPlaybackInfo()
+        expect(tracks).toHaveLength(0)
+      },
+    )
   })
 
-  it('should build audio track list from ffprobe', () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
-
-    const tracks = service.getAudioTracks()
-    expect(tracks).toHaveLength(2)
-    expect(tracks[0].id).toBe(1)
-    expect(tracks[0].codecName).toBe('aac')
-    expect(tracks[1].id).toBe(2)
-    expect(tracks[1].codecName).toBe('dts')
-    void service[Symbol.asyncDispose]()
+  it('should build audio track list from ffprobe', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        const tracks = service.getAudioTracks()
+        expect(tracks).toHaveLength(2)
+        expect(tracks[0].id).toBe(1)
+        expect(tracks[0].codecName).toBe('aac')
+        expect(tracks[1].id).toBe(2)
+        expect(tracks[1].codecName).toBe('dts')
+      },
+    )
   })
 
   it('should switch audio track and re-fetch playback info', async () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
 
-    await vi.waitFor(() => {
-      expect(service.playbackInfo.getValue()).not.toBeNull()
-    })
+        api.call.mockClear()
 
-    api.call.mockClear()
-
-    await service.switchAudioTrack(2)
-    expect(service.audioTrackId.getValue()).toBe(2)
-    expect(api.call).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: 'POST',
-        action: '/playback-info',
-        body: expect.objectContaining({
-          selectedAudioTrackIndex: 2,
-        }),
-      }),
+        await service.switchAudioTrack(2)
+        expect(service.audioTrackId.getValue()).toBe(2)
+        expect(api.call).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            action: '/playback-info',
+            body: expect.objectContaining({
+              selectedAudioTrackIndex: 2,
+            }),
+          }),
+        )
+      },
     )
-    void service[Symbol.asyncDispose]()
   })
 
   it('should handle switchAudioTrack when fetchPlaybackInfo fails', async () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
 
-    await vi.waitFor(() => {
-      expect(service.playbackInfo.getValue()).not.toBeNull()
-    })
+        api.call.mockRejectedValueOnce(new Error('Failed'))
 
-    api.call.mockRejectedValueOnce(new Error('Failed'))
-
-    await service.switchAudioTrack(2)
-    expect(service.audioTrackId.getValue()).toBe(2)
-    void service[Symbol.asyncDispose]()
+        await service.switchAudioTrack(2)
+        expect(service.audioTrackId.getValue()).toBe(2)
+      },
+    )
   })
 
   it('should dispose without errors', async () => {
-    const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
-
-    await expect(service[Symbol.asyncDispose]()).resolves.not.toThrow()
+    await expect(
+      usingAsync(new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never), async () => {}),
+    ).resolves.not.toThrow()
   })
 
-  it('should defer video attachment when no playback info yet', () => {
+  it('should defer video attachment when no playback info yet', async () => {
     api.call.mockReturnValue(new Promise(() => {}))
 
     const service = new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never)
@@ -210,6 +231,7 @@ describe('MoviePlayerService', () => {
     service.attachToVideo(mockVideo)
 
     expect(service.videoElement).toBe(mockVideo)
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Cannot use usingAsync: mock uses a never-resolving promise, so asyncDispose would hang
     void service[Symbol.asyncDispose]()
   })
 })

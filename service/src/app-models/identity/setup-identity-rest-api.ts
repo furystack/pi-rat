@@ -44,11 +44,15 @@ export const setupIdentityRestApi = async (injector: Injector) => {
             primaryKey: 'username',
           }),
         ),
-        '/isAuthenticated': IsAuthenticated,
+        '/isAuthenticated': Validate({ schema: identityApiSchema, schemaName: 'IsAuthenticatedAction' })(
+          IsAuthenticated,
+        ),
       },
       POST: {
-        '/login': LoginAction as RequestAction<PiRatLoginAction>,
-        '/logout': LogoutAction,
+        '/login': Validate({ schema: identityApiSchema, schemaName: 'LoginAction' })(
+          LoginAction as RequestAction<PiRatLoginAction>,
+        ),
+        '/logout': Validate({ schema: identityApiSchema, schemaName: 'LogoutAction' })(LogoutAction),
         '/register': Validate({ schema: identityApiSchema, schemaName: 'RegisterAction' })(RegisterAction),
         '/users': Validate({ schema: identityApiSchema, schemaName: 'PostUserEndpoint' })(
           createPostEndpoint({

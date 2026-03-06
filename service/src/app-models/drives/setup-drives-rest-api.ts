@@ -50,12 +50,15 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'GetDirectoryEntries' })(
           GetDirectoryEntriesAction,
         ),
-        '/files/:letter/:path/download': DownloadAction,
+        '/files/:letter/:path/download': Validate({ schema: drivesApiSchema, schemaName: 'DownloadEndpoint' })(
+          DownloadAction,
+        ),
         '/files/:letter/:path/ffprobe': Validate({ schema: drivesApiSchema, schemaName: 'FfprobeEndpoint' })(
           FfprobeAction,
         ),
       },
       POST: {
+        // eslint-disable-next-line furystack/rest-action-validate-wrapper -- Multipart/form-data upload; Validate() expects a JSON body which is incompatible with formidable parsing
         '/volumes/:letter/:path/upload': UploadAction,
         '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostDriveEndpoint' })(
           createPostEndpoint({
@@ -78,11 +81,15 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         ),
       },
       DELETE: {
-        '/volumes/:id': createDeleteEndpoint({
-          model: Drive,
-          primaryKey: 'letter',
-        }),
-        '/files/:letter/:path': DeleteFileAction,
+        '/volumes/:id': Validate({ schema: drivesApiSchema, schemaName: 'DeleteEndpoint<Drive,"letter">' })(
+          createDeleteEndpoint({
+            model: Drive,
+            primaryKey: 'letter',
+          }),
+        ),
+        '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'DeleteFileEndpoint' })(
+          DeleteFileAction,
+        ),
       },
     },
   })

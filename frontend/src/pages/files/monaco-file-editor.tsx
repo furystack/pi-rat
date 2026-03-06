@@ -103,6 +103,7 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
   render: ({ props, useDisposable }) => {
     const { initialValue, language } = props
 
+    // eslint-disable-next-line furystack/require-use-observable-for-render -- Intentionally non-reactive: value is read on-demand via .getValue() in keyboard/click handlers
     const value = useDisposable('value', () => new ObservableValue(initialValue))
 
     useDisposable('save', () => {
@@ -122,6 +123,7 @@ const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onS
       <div className="editor-container">
         <LazyMonacoEditor
           language={language}
+          // eslint-disable-next-line furystack/no-direct-get-value-in-render -- Initial value for Monaco; editor manages its own state
           value={value.getValue()}
           onValueChange={(newValue) => value.setValue(newValue)}
         />

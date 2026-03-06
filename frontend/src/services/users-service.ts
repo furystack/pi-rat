@@ -5,7 +5,7 @@ import type { Roles, User } from 'common'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
 @Injectable({ lifetime: 'singleton' })
-export class UsersService {
+export class UsersService implements Disposable {
   @Injected(IdentityApiClient)
   declare private readonly identityApiClient: IdentityApiClient
 
@@ -72,5 +72,10 @@ export class UsersService {
     })
     this.userCache.remove(username)
     this.userQueryCache.flushAll()
+  }
+
+  public [Symbol.dispose](): void {
+    this.userCache[Symbol.dispose]()
+    this.userQueryCache[Symbol.dispose]()
   }
 }

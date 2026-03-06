@@ -38,6 +38,7 @@ export class GenericEditorService<T, TKey extends keyof T, TOmittedProperties ex
   })
 
   public [Symbol.dispose](): void {
+    this.findOptions[Symbol.dispose]()
     this.editedEntry[Symbol.dispose]()
     super[Symbol.dispose]()
     this.refreshSubscription[Symbol.dispose]()

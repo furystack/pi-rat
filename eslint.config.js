@@ -1,6 +1,7 @@
 // @ts-check
 
 import eslint from '@eslint/js'
+import furystack from '@furystack/eslint-plugin'
 import prettierConfig from 'eslint-config-prettier'
 import jsdoc from 'eslint-plugin-jsdoc'
 import playwright from 'eslint-plugin-playwright'
@@ -27,7 +28,15 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
+  {
+    plugins: { furystack },
+    ...furystack.configs.recommendedStrict,
+  },
   prettierConfig,
+  {
+    files: ['frontend/**/*.tsx', 'frontend/**/*.ts'],
+    ...furystack.configs.shadesStrict,
+  },
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,

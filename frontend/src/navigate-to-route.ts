@@ -15,10 +15,10 @@ export const navigateToRoute = <TPath extends AppPaths>(
   const [params, options] = args
   const destinationPath = params ? compileRoute(path, params as Record<string, string>) : path
   const fullPath = destinationPath + (options?.queryString ? `?${options.queryString}` : '') || '/'
+  const locationService = injector.getInstance(LocationService)
   if (options?.replace) {
-    window.history.replaceState({}, '', fullPath)
+    locationService.replace(fullPath)
   } else {
-    window.history.pushState({}, '', fullPath)
+    locationService.navigate(fullPath)
   }
-  injector.getInstance(LocationService).updateState()
 }

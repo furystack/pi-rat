@@ -57,12 +57,13 @@ export const setupMediaRestApi = async (injector: Injector) => {
           schemaName: 'GetEntityEndpoint<WatchHistoryEntry,"id">',
         })(createGetEntityEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
 
-        '/movies/:movieId/subtitles': Authenticate()(
-          Validate({ schema: mediaApiSchema, schemaName: 'GetSubtitlesEndpoint' })(GetSubtitlesAction),
+        '/movies/:movieId/subtitles': Validate({ schema: mediaApiSchema, schemaName: 'GetSubtitlesEndpoint' })(
+          Authenticate()(GetSubtitlesAction),
         ),
-        '/movies/:movieId/subtitles/:subtitleName': Authenticate()(
-          Validate({ schema: mediaApiSchema, schemaName: 'GetSubtitleFileEndpoint' })(GetSubtitleFileAction),
-        ),
+        '/movies/:movieId/subtitles/:subtitleName': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetSubtitleFileEndpoint',
+        })(Authenticate()(GetSubtitleFileAction)),
         '/omdb-movie-metadata': Validate({
           schema: mediaApiSchema,
           schemaName: 'GetCollectionEndpoint<OmdbMovieMetadata>',
@@ -82,17 +83,17 @@ export const setupMediaRestApi = async (injector: Injector) => {
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
-        '/files/:letter/:path/master.m3u8': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'HlsMasterEndpoint' })(HlsMasterAction),
+        '/files/:letter/:path/master.m3u8': Validate({ schema: mediaApiSchema, schemaName: 'HlsMasterEndpoint' })(
+          Authorize()(HlsMasterAction),
         ),
-        '/files/:letter/:path/stream.m3u8': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'HlsStreamEndpoint' })(HlsStreamAction),
+        '/files/:letter/:path/stream.m3u8': Validate({ schema: mediaApiSchema, schemaName: 'HlsStreamEndpoint' })(
+          Authorize()(HlsStreamAction),
         ),
-        '/files/:letter/:path/init.mp4': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'HlsInitEndpoint' })(HlsInitAction),
+        '/files/:letter/:path/init.mp4': Validate({ schema: mediaApiSchema, schemaName: 'HlsInitEndpoint' })(
+          Authorize()(HlsInitAction),
         ),
-        '/files/:letter/:path/segment/:index': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'HlsSegmentEndpoint' })(HlsSegmentAction),
+        '/files/:letter/:path/segment/:index': Validate({ schema: mediaApiSchema, schemaName: 'HlsSegmentEndpoint' })(
+          Authorize()(HlsSegmentAction),
         ),
         '/movie-files/:id': Validate({ schema: mediaApiSchema, schemaName: 'GetEntityEndpoint<MovieFile,"id">' })(
           createGetEntityEndpoint({ model: MovieFile, primaryKey: 'id' }),
@@ -106,23 +107,20 @@ export const setupMediaRestApi = async (injector: Injector) => {
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'PostEndpoint<MovieFile,"id">' })(
           createPostEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),
-        '/link-movie': Authorize('admin')(
-          Validate({ schema: mediaApiSchema, schemaName: 'LinkMovie' })(LinkMovieAction),
+        '/link-movie': Validate({ schema: mediaApiSchema, schemaName: 'LinkMovie' })(
+          Authorize('admin')(LinkMovieAction),
         ),
-        '/extract-subtitles': Authorize('admin')(
-          Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(ExtractSubtitlesAction),
+        '/extract-subtitles': Validate({ schema: mediaApiSchema, schemaName: 'ExtractSubtitles' })(
+          Authorize('admin')(ExtractSubtitlesAction),
         ),
-        '/save-watch-progress': Authenticate()(
-          Validate({ schema: mediaApiSchema, schemaName: 'SaveWatchProgress' })(SaveWatchProgressAction),
+        '/save-watch-progress': Validate({ schema: mediaApiSchema, schemaName: 'SaveWatchProgress' })(
+          Authenticate()(SaveWatchProgressAction),
         ),
-        '/scan-for-movies': Authorize('admin')(
-          Validate({
-            schema: mediaApiSchema,
-            schemaName: 'ScanForMoviesEndpoint',
-          })(ScanForMoviesAction),
+        '/scan-for-movies': Validate({ schema: mediaApiSchema, schemaName: 'ScanForMoviesEndpoint' })(
+          Authorize('admin')(ScanForMoviesAction),
         ),
-        '/playback-info': Authenticate()(
-          Validate({ schema: mediaApiSchema, schemaName: 'PlaybackInfoRequest' })(PlaybackInfoAction),
+        '/playback-info': Validate({ schema: mediaApiSchema, schemaName: 'PlaybackInfoRequest' })(
+          Authenticate()(PlaybackInfoAction),
         ),
       },
       PATCH: {
@@ -145,9 +143,10 @@ export const setupMediaRestApi = async (injector: Injector) => {
           schema: mediaApiSchema,
           schemaName: 'DeleteEndpoint<WatchHistoryEntry,"id">',
         })(createDeleteEndpoint({ model: WatchHistoryEntry, primaryKey: 'id' })),
-        '/files/:letter/:path/hls-session': Authorize()(
-          Validate({ schema: mediaApiSchema, schemaName: 'HlsSessionTeardownEndpoint' })(HlsSessionTeardownAction),
-        ),
+        '/files/:letter/:path/hls-session': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'HlsSessionTeardownEndpoint',
+        })(Authorize()(HlsSessionTeardownAction)),
       },
     },
   })

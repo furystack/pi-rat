@@ -6,7 +6,7 @@ import { navigateToRoute } from '../../../navigate-to-route.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 
-const EntitySuggestions: SuggestionOptions[] = [
+const getEntitySuggestions = (): SuggestionOptions[] => [
   {
     name: 'Config entities',
     description: 'List, edit and create config entities',
@@ -108,20 +108,22 @@ export const entitiesCommandProvider: CommandProvider = async ({ term, injector 
     return []
   }
 
-  const fullHits = EntitySuggestions.filter((c) => c.name.toLowerCase() === term.toLowerCase()).map((c) =>
-    createSuggestion({ ...c, score: 1 }),
-  )
-  const startsWith = EntitySuggestions.filter((c) => c.name.toLowerCase().startsWith(term.toLowerCase())).map((c) =>
-    createSuggestion({ ...c, score: 2 }),
-  )
+  const suggestions = getEntitySuggestions()
 
-  const contains = EntitySuggestions.filter((c) => c.name.toLowerCase().includes(term.toLowerCase())).map((c) =>
-    createSuggestion({ ...c, score: 3 }),
-  )
+  const fullHits = suggestions
+    .filter((c) => c.name.toLowerCase() === term.toLowerCase())
+    .map((c) => createSuggestion({ ...c, score: 1 }))
+  const startsWith = suggestions
+    .filter((c) => c.name.toLowerCase().startsWith(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
 
-  const descriptionContains = EntitySuggestions.filter((c) =>
-    c.description.toLowerCase().includes(term.toLowerCase()),
-  ).map((c) => createSuggestion({ ...c, score: 2 }))
+  const contains = suggestions
+    .filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 3 }))
+
+  const descriptionContains = suggestions
+    .filter((c) => c.description.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 2 }))
 
   return distinctByName(...fullHits, ...startsWith, ...contains, ...descriptionContains)
 }

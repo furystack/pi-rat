@@ -28,7 +28,7 @@ async function runFfprobe(filePath: string): Promise<FfprobeData> {
 export type FfprobeResult = FfprobeData
 
 @Injectable({ lifetime: 'singleton' })
-export class FfprobeService {
+export class FfprobeService implements Disposable {
   @Injected((injector) => getLogger(injector).withScope('FfprobeService'))
   declare private readonly logger: ScopedLogger
 
@@ -92,5 +92,10 @@ export class FfprobeService {
 
   public getFfprobeForPath = async (path: string) => {
     return await this.physicalFileCache.get(path)
+  }
+
+  public [Symbol.dispose](): void {
+    this.piRatFileCache[Symbol.dispose]()
+    this.physicalFileCache[Symbol.dispose]()
   }
 }

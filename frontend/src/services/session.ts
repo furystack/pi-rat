@@ -9,12 +9,20 @@ import { IdentityApiClient } from './api-clients/identity-api-client.js'
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
 
 @Injectable({ lifetime: 'singleton' })
-export class SessionService implements IdentityContext {
+export class SessionService implements IdentityContext, Disposable {
   declare private readonly injector: Injector
   private readonly operation = () => {
     this.isOperationInProgress.setValue(true)
-    return { [Symbol.dispose]: () => this.isOperationInProgress.setValue(false) }
+    return {
+      [Symbol.dispose]: () => {
+        if (!this.isDisposed) {
+          this.isOperationInProgress.setValue(false)
+        }
+      },
+    }
   }
+
+  private isDisposed = false
 
   public state = new ObservableValue<SessionState>('initializing')
   public currentUser = new ObservableValue<Pick<User, 'username' | 'roles'> | null>(null)
@@ -31,13 +39,17 @@ export class SessionService implements IdentityContext {
         this.isInitialized = true
         try {
           const { result } = await this.api.call({ method: 'GET', action: '/isAuthenticated' })
+          if (this.isDisposed) return
           this.state.setValue(result.isAuthenticated ? 'authenticated' : 'unauthenticated')
           if (result.isAuthenticated) {
             const { result: usr } = await this.api.call({ method: 'GET', action: '/currentUser' })
+            if (this.isDisposed) return
             this.currentUser.setValue({ username: usr.username, roles: usr.roles })
           }
         } catch (error) {
-          this.state.setValue('offline')
+          if (!this.isDisposed) {
+            this.state.setValue('offline')
+          }
         }
       }
     })
@@ -47,6 +59,7 @@ export class SessionService implements IdentityContext {
     await usingAsync(this.operation(), async () => {
       try {
         const { result: usr } = await this.api.call({ method: 'POST', action: '/login', body: { username, password } })
+        if (this.isDisposed) return
         this.currentUser.setValue({ username: usr.username, roles: usr.roles })
         this.state.setValue('authenticated')
         this.notys.emit('onNotyAdded', {
@@ -55,6 +68,7 @@ export class SessionService implements IdentityContext {
           type: 'success',
         })
       } catch (error) {
+        if (this.isDisposed) return
         this.loginError.setValue(error instanceof Error ? error.message : '')
         this.notys.emit('onNotyAdded', {
           body: 'Please check your credentials',
@@ -73,6 +87,7 @@ export class SessionService implements IdentityContext {
           action: '/register',
           body: { username, password },
         })
+        if (this.isDisposed) return
         this.currentUser.setValue({ username: usr.username, roles: usr.roles })
         this.state.setValue('authenticated')
         navigateToRoute(this.injector, '/')
@@ -82,6 +97,7 @@ export class SessionService implements IdentityContext {
           type: 'success',
         })
       } catch (error) {
+        if (this.isDisposed) return
         this.loginError.setValue(error instanceof Error ? error.message : '')
         this.notys.emit('onNotyAdded', {
           body: 'Please check your details and try again',
@@ -95,6 +111,7 @@ export class SessionService implements IdentityContext {
   public async logout(): Promise<void> {
     return await usingAsync(this.operation(), async () => {
       void this.api.call({ method: 'POST', action: '/logout' })
+      if (this.isDisposed) return
       this.currentUser.setValue(null)
       this.state.setValue('unauthenticated')
       this.notys.emit('onNotyAdded', {
@@ -117,6 +134,8 @@ export class SessionService implements IdentityContext {
         action: '/password-reset',
         body: { currentPassword, newPassword },
       })
+
+      if (this.isDisposed) return
 
       if (result.success) {
         this.notys.emit('onNotyAdded', {
@@ -157,4 +176,12 @@ export class SessionService implements IdentityContext {
 
   @Injected(NotyService)
   declare private readonly notys: NotyService
+
+  public [Symbol.dispose](): void {
+    this.isDisposed = true
+    this.state[Symbol.dispose]()
+    this.currentUser[Symbol.dispose]()
+    this.loginError[Symbol.dispose]()
+    this.isOperationInProgress[Symbol.dispose]()
+  }
 }

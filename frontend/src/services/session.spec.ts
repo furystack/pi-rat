@@ -316,6 +316,75 @@ describe('SessionService', () => {
     })
   })
 
+  describe('dispose', () => {
+    it('should not update state when disposed during init', async () => {
+      let resolveAuth: (value: unknown) => void
+      const mockCall = vi.fn().mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveAuth = resolve
+          }),
+      )
+
+      const { injector } = createTestInjector(mockCall)
+      const service = injector.getInstance(SessionService)
+
+      const setStateSpy = vi.spyOn(service.state, 'setValue')
+      const setCurrentUserSpy = vi.spyOn(service.currentUser, 'setValue')
+
+      const initPromise = service.init()
+      setStateSpy.mockClear()
+      setCurrentUserSpy.mockClear()
+
+      service[Symbol.dispose]()
+
+      resolveAuth!({ result: { isAuthenticated: true } })
+      await initPromise
+
+      expect(setStateSpy).not.toHaveBeenCalled()
+      expect(setCurrentUserSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not update state when disposed during init error', async () => {
+      let rejectAuth: (reason: unknown) => void
+      const mockCall = vi.fn().mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectAuth = reject
+          }),
+      )
+
+      const { injector } = createTestInjector(mockCall)
+      const service = injector.getInstance(SessionService)
+
+      const setStateSpy = vi.spyOn(service.state, 'setValue')
+
+      const initPromise = service.init()
+      setStateSpy.mockClear()
+
+      service[Symbol.dispose]()
+
+      rejectAuth!(new Error('Network error'))
+      await initPromise
+
+      expect(setStateSpy).not.toHaveBeenCalled()
+    })
+
+    it('should dispose all observables', async () => {
+      const mockCall = vi.fn()
+
+      const { injector } = createTestInjector(mockCall)
+      const service = injector.getInstance(SessionService)
+
+      service[Symbol.dispose]()
+
+      expect(() => service.state.setValue('offline')).toThrow()
+      expect(() => service.currentUser.setValue(null)).toThrow()
+      expect(() => service.loginError.setValue('test')).toThrow()
+      expect(() => service.isOperationInProgress.setValue(false)).toThrow()
+    })
+  })
+
   describe('isOperationInProgress', () => {
     it('should be true during operations', async () => {
       let capturedInProgress: boolean | undefined

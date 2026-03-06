@@ -5,7 +5,7 @@ import type { FindOptions, WithOptionalId } from '@furystack/core'
 import type { Movie, MovieFile } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
-export class MovieFilesService {
+export class MovieFilesService implements Disposable {
   @Injected(MediaApiClient)
   declare private readonly mediaApiClient: MediaApiClient
 
@@ -135,5 +135,10 @@ export class MovieFilesService {
         },
       })
     })
+  }
+
+  public [Symbol.dispose](): void {
+    this.movieFileCache[Symbol.dispose]()
+    this.movieFileQueryCache[Symbol.dispose]()
   }
 }

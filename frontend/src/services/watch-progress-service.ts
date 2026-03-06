@@ -6,7 +6,7 @@ import type { WatchHistoryEntry } from 'common'
 import type { PiRatFile } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
-export class WatchProgressService {
+export class WatchProgressService implements Disposable {
   @Injected(MediaApiClient)
   declare private readonly mediaApiClient: MediaApiClient
 
@@ -154,5 +154,10 @@ export class WatchProgressService {
         },
       })
     })
+  }
+
+  public [Symbol.dispose](): void {
+    this.watchProgressCache[Symbol.dispose]()
+    this.watchProgressQueryCache[Symbol.dispose]()
   }
 }
