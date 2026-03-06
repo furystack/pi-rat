@@ -58,9 +58,8 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         ),
       },
       POST: {
-        '/volumes/:letter/:path/upload': Validate({ schema: drivesApiSchema, schemaName: 'UploadEndpoint' })(
-          UploadAction,
-        ),
+        // eslint-disable-next-line furystack/rest-action-validate-wrapper -- Multipart/form-data upload; Validate() expects a JSON body which is incompatible with formidable parsing
+        '/volumes/:letter/:path/upload': UploadAction,
         '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostDriveEndpoint' })(
           createPostEndpoint({
             model: Drive,
