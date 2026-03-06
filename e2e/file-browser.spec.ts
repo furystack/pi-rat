@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { readFile } from 'fs/promises'
+import { rmSync } from 'fs'
 import { join } from 'path'
 import { assertAndDismissNoty, login, uploadFile } from './helpers.js'
 
@@ -50,8 +51,14 @@ test.describe('File Browser', () => {
     page,
     browserName,
   }) => {
-    const tempPath = join(process.env?.E2E_TEMP || process.cwd(), 'browser-temp', 'file-browser-tests', browserName)
-    const tempDriveLetter = `test-${browserName[0]}`
+    const { workerIndex } = test.info()
+    const tempPath = join(
+      process.env?.E2E_TEMP || process.cwd(),
+      'browser-temp',
+      'file-browser-tests',
+      `${browserName}-w${workerIndex}`,
+    )
+    const tempDriveLetter = `test-${browserName[0]}${workerIndex}`
     const fileName = 'upload.md'
 
     await page.goto('/')
@@ -91,5 +98,7 @@ test.describe('File Browser', () => {
     await page.reload()
 
     await expect(driveLine).not.toBeVisible()
+
+    rmSync(tempPath, { recursive: true, force: true })
   })
 })
