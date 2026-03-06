@@ -50,7 +50,7 @@ test.describe('File Browser', () => {
     page,
     browserName,
   }) => {
-    const tempPath = join(process.env?.E2E_TEMP || process.cwd(), 'browser-temp', browserName)
+    const tempPath = join(process.env?.E2E_TEMP || process.cwd(), 'browser-temp', 'file-browser-tests', browserName)
     const tempDriveLetter = `test-${browserName[0]}`
     const fileName = 'upload.md'
 
