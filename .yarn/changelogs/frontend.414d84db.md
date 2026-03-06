@@ -74,7 +74,11 @@ Replaced the dedicated `Error404` component with a unified `GenericErrorPage` th
 
 ## ⬆️ Dependencies
 
-<!-- PLACEHOLDER: Describe dependency updates (deps:) -->
+- Removed `marked` and `@types/marked` (replaced by `MarkdownDisplay` from `@furystack/shades-common-components`)
+- Updated `@furystack/shades` ^12.2.5 → ^12.4.0
+- Updated `@furystack/shades-common-components` ^13.3.0 → ^13.4.0
+- Updated `@furystack/shades-lottie` ^8.0.8 → ^8.0.10
+- Updated `@furystack/shades-mfe` ^2.0.8 → ^2.0.10
 
 ## 🔧 Chores
 

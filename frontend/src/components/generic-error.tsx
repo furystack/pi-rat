@@ -11,9 +11,6 @@ import {
 import { ErrorReporter } from '../services/error-reporter.js'
 
 export type GenericErrorProps = {
-  /*mainTitle?: string
-  subtitle?: string
-  description?: JSX.Element*/
   error?: unknown
   retry?: () => Promise<void>
 }
