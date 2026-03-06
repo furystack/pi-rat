@@ -3,6 +3,7 @@ import type { GetCollectionResult } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, CacheView, Skeleton, Typography } from '@furystack/shades-common-components'
 import { getFullPath, type DirectoryEntry, type MovieFile } from 'common'
+import { GenericErrorPage } from '../generic-error.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
 import { InstallService } from '../../services/install-service.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
@@ -93,7 +94,7 @@ export const RelatedMoviesModalContent = Shade<{
         content={RelatedMoviesContent}
         contentProps={{ drive, path, file }}
         loader={<Skeleton />}
-        error={() => <>:(</>}
+        error={(err, retry) => <GenericErrorPage error={err} retry={async () => retry()} />}
       />
     )
   },
