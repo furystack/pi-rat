@@ -1,9 +1,9 @@
 import { createComponent, NestedRouter, Shade } from '@furystack/shades'
-import { cssVariableTheme, PageLayout } from '@furystack/shades-common-components'
 import type { AppBarVariant } from '@furystack/shades-common-components'
+import { cssVariableTheme, PageLayout } from '@furystack/shades-common-components'
 
-import { appRoutes, authRoutes } from '../routes/index.js'
 import { Init, Offline } from '../pages/index.js'
+import { appRoutes, authRoutes } from '../routes/index.js'
 import { SessionService } from '../services/session.js'
 import { Header } from './header.js'
 
@@ -30,7 +30,7 @@ export const Body = Shade({
               component: <Header title="PI-Rat" />,
             }}
           >
-            <NestedRouter routes={appRoutes} />
+            <NestedRouter routes={appRoutes} viewTransition />
           </PageLayout>
         )
       case 'offline':
