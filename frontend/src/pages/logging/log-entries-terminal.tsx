@@ -52,7 +52,6 @@ const useDisposableTerminal = (
       terminal.open(container)
       fitAddon.fit()
     })
-
     return {
       terminal,
       webLinksAddon,
@@ -119,13 +118,16 @@ export const LogEntriesTerminal = Shade({
   },
   render: (renderOptions) => {
     const containerRef = renderOptions.useRef<HTMLDivElement>('container')
-    const { terminal } = useDisposableTerminal(renderOptions, containerRef)
 
     const logState = useCollectionSync(renderOptions, LogEntry, {
       order: { createdAt: 'DESC' },
     })
 
-    fillTerminalWithLogEntries(terminal, logState)
+    queueMicrotask(() => {
+      const { terminal } = useDisposableTerminal(renderOptions, containerRef)
+
+      fillTerminalWithLogEntries(terminal, logState)
+    })
 
     return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
   },
