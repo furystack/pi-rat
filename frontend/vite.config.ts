@@ -51,6 +51,9 @@ function serveMonacoMfe(): Plugin {
 
 export default defineConfig(async () => {
   return {
+    esbuild: {
+      keepNames: true,
+    },
     plugins: [
       serveMonacoMfe(),
       codecovVitePlugin({
