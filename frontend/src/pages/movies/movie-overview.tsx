@@ -1,6 +1,5 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { isLoadedCacheResult } from '@furystack/cache'
-import { serializeToQueryString } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, CacheView, Skeleton, Typography } from '@furystack/shades-common-components'
 import type { Movie } from 'common'
@@ -114,14 +113,7 @@ const MovieOverviewContent = Shade<{ data: CacheWithValue<Movie> }>({
             <span>
               <Button
                 onclick={() => {
-                  navigateToRoute(
-                    injector,
-                    '/entities/movies',
-                    {},
-                    {
-                      queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: movie.imdbId } }),
-                    },
-                  )
+                  navigateToRoute(injector, '/entities/movies/edit/:id', { id: movie.imdbId })
                 }}
               >
                 Edit

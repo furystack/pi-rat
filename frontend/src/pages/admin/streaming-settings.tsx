@@ -63,24 +63,24 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'streaming-settings-content',
   css: {
     '& .page-description': {
-      marginBottom: '24px',
+      marginBottom: cssVariableTheme.spacing.lg,
       color: cssVariableTheme.text.secondary,
     },
     '& .section-title': {
-      marginBottom: '16px',
+      marginBottom: cssVariableTheme.spacing.md,
       color: cssVariableTheme.text.primary,
       fontSize: cssVariableTheme.typography.fontSize.lg,
     },
     '& .form-field': {
-      marginBottom: '24px',
+      marginBottom: cssVariableTheme.spacing.lg,
     },
     '& .switch-description': {
       color: cssVariableTheme.text.secondary,
     },
     '& .section-divider': {
       borderTop: `1px solid ${cssVariableTheme.background.default}`,
-      margin: '24px 0',
-      paddingTop: '24px',
+      margin: `${cssVariableTheme.spacing.lg} 0`,
+      paddingTop: cssVariableTheme.spacing.lg,
     },
     '& .field-hint': {
       color: cssVariableTheme.text.secondary,
@@ -89,7 +89,7 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     },
     '& .form-footer': {
       borderTop: `1px solid ${cssVariableTheme.background.default}`,
-      paddingTop: '16px',
+      paddingTop: cssVariableTheme.spacing.md,
     },
   },
   render: ({ props, injector, useObservable, useDisposable }) => {
@@ -147,7 +147,7 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
           Configure media transcoding and file watching settings.
         </Typography>
 
-        <Paper elevation={1} style={{ padding: '24px' }}>
+        <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
           <Form<StreamingRawFormData> validate={isStreamingRawFormData} onSubmit={(data) => void handleSubmit(data)}>
             <Typography variant="h3" className="section-title">
               File Discovery
@@ -306,7 +306,7 @@ export const StreamingSettingsPage = Shade({
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.play} />} title="Streaming Settings" />
         <CacheView
           cache={configService.configCache}

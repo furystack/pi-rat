@@ -95,7 +95,7 @@ describe('Dashboard', () => {
     await flushUpdates()
 
     const el = document.querySelector('pi-rat-dashboard')
-    const contextTarget = el?.querySelector('div > div') as HTMLElement
+    const contextTarget = el?.querySelector('div') as HTMLElement
     expect(contextTarget).toBeTruthy()
 
     contextTarget.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 100, clientY: 200 }))
@@ -121,8 +121,7 @@ describe('Dashboard', () => {
     await flushUpdates()
 
     const el = document.querySelector('pi-rat-dashboard')
-    const contextTarget = el?.querySelector('div > div') as HTMLElement
-
+    const contextTarget = el?.querySelector('div') as HTMLElement
     contextTarget.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 100, clientY: 200 }))
     await flushUpdates()
     await new Promise((resolve) => setTimeout(resolve, 50))
@@ -146,7 +145,7 @@ describe('Dashboard', () => {
     await flushUpdates()
 
     const el = document.querySelector('pi-rat-dashboard')
-    const contextTarget = el?.querySelector('div > div') as HTMLElement
+    const contextTarget = el?.querySelector('div') as HTMLElement
 
     contextTarget.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 100, clientY: 200 }))
     await flushUpdates()
@@ -171,7 +170,7 @@ describe('Dashboard', () => {
     await flushUpdates()
 
     const el = document.querySelector('pi-rat-dashboard')
-    const contextTarget = el?.querySelector('div > div') as HTMLElement
+    const contextTarget = el?.querySelector('div') as HTMLElement
 
     contextTarget.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 100, clientY: 200 }))
     await flushUpdates()

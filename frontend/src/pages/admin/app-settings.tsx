@@ -1,6 +1,7 @@
 import { createComponent, LocationService, Shade } from '@furystack/shades'
-import { Drawer, Icon, icons, Menu, type MenuEntry } from '@furystack/shades-common-components'
+import { Drawer, DrawerToggleButton, Icon, icons, Menu, type MenuEntry } from '@furystack/shades-common-components'
 import { match } from 'path-to-regexp'
+
 import type { AppPaths } from '../../routes/index.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 
@@ -50,6 +51,14 @@ const getSelectedKey = (currentPath: string) => {
 
 export const AppSettingsPage = Shade<AppSettingsPageProps>({
   shadowDomName: 'app-settings-page',
+  css: {
+    '& .settings-toggle': {
+      position: 'absolute',
+      top: '8px',
+      left: '8px',
+      zIndex: '1',
+    },
+  },
   render: ({ props, injector, useObservable }) => {
     const [currentPath] = useObservable('locationChange', injector.getInstance(LocationService).onLocationPathChanged)
     const selectedKey = getSelectedKey(currentPath)
@@ -60,7 +69,10 @@ export const AppSettingsPage = Shade<AppSettingsPageProps>({
 
     return (
       <>
-        <Drawer position="left" variant="permanent">
+        <div className="settings-toggle">
+          <DrawerToggleButton position="left" />
+        </div>
+        <Drawer position="left" variant="collapsible" collapseOnBreakpoint="md" defaultOpen>
           <Menu items={getMenuItems()} selectedKey={selectedKey} onSelect={handleSelect} />
         </Drawer>
         {props.outlet}

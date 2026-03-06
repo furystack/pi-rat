@@ -31,7 +31,7 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
       borderBottom: `1px solid ${cssVariableTheme.action.subtleBorder}`,
     },
     '& th': {
-      padding: '12px 16px',
+      padding: `${cssVariableTheme.spacing.sm} ${cssVariableTheme.spacing.md}`,
       textAlign: 'left',
       fontWeight: '600',
       color: cssVariableTheme.text.primary,
@@ -48,7 +48,7 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
       backgroundColor: cssVariableTheme.background.default,
     },
     '& td': {
-      padding: '12px 16px',
+      padding: `${cssVariableTheme.spacing.sm} ${cssVariableTheme.spacing.md}`,
     },
     '& .username-cell': {
       color: cssVariableTheme.text.primary,
@@ -56,7 +56,7 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
     },
     '& .roles-cell': {
       display: 'flex',
-      gap: '8px',
+      gap: cssVariableTheme.spacing.sm,
       flexWrap: 'wrap',
     },
     '& .no-roles': {
@@ -70,7 +70,7 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
       textAlign: 'right',
     },
     '& .empty-row td': {
-      padding: '24px 16px',
+      padding: `${cssVariableTheme.spacing.lg} ${cssVariableTheme.spacing.md}`,
       textAlign: 'center',
       color: cssVariableTheme.text.secondary,
     },
@@ -150,7 +150,7 @@ export const UserListPage = Shade<UserListPageProps>({
     const usersService = injector.getInstance(UsersService)
 
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader
           icon={<Icon icon={icons.users} />}
           title="Users"

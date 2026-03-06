@@ -182,7 +182,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
             ...styles,
             header: { width: '128px', ...styles?.header },
             cell: { width: '128px', ...styles?.cell },
-            wrapper: { marginTop: '56px', ...styles?.wrapper },
+            wrapper: { ...styles?.wrapper },
           }}
         />
         <Fab

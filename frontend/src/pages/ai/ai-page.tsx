@@ -1,5 +1,6 @@
-import { createComponent, Shade } from '@furystack/shades'
-import { Paper, Typography } from '@furystack/shades-common-components'
+import { createComponent, ScreenService, Shade } from '@furystack/shades'
+import { Button, cssVariableTheme, Icon, icons, Paper, Typography } from '@furystack/shades-common-components'
+
 import { AiChatList } from './ai-chat-list.js'
 import { AiChat } from './ai-chat.js'
 import { CreateAiChatButton } from './create-ai-chat-button.js'
@@ -7,13 +8,12 @@ import { CreateAiChatButton } from './create-ai-chat-button.js'
 export const AiPage = Shade({
   shadowDomName: 'pi-rat-ai-page',
   css: {
-    marginTop: '48px',
     display: 'flex',
     flexDirection: 'column',
     maxWidth: '100%',
     width: '100%',
-    height: 'calc(100% - 48px)',
-    gap: '16px',
+    height: '100%',
+    gap: cssVariableTheme.spacing.md,
     overflow: 'hidden',
     '& .ai-container': {
       display: 'flex',
@@ -26,10 +26,14 @@ export const AiPage = Shade({
     '& .ai-header': {
       display: 'flex',
       flexDirection: 'row',
-      flexGrow: '1',
-      flex: '5',
       justifyContent: 'space-between',
       alignItems: 'center',
+      padding: `0 ${cssVariableTheme.spacing.md}`,
+    },
+    '& .ai-header-left': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: cssVariableTheme.spacing.sm,
     },
     '& .ai-body': {
       display: 'flex',
@@ -38,24 +42,44 @@ export const AiPage = Shade({
       overflow: 'hidden',
       flexGrow: '1',
     },
+    '& .ai-sidebar': {
+      flexShrink: '0',
+      width: '280px',
+    },
+    '& .ai-sidebar.hidden': {
+      display: 'none',
+    },
   },
-  render: ({ useSearchState }) => {
+  render: ({ injector, useSearchState, useObservable, useState }) => {
     const [selectedChatId, setSelectedChatId] = useSearchState('selectedChat', '')
+    const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
+    const [isSidebarOpen, setSidebarOpen] = useState('sidebarOpen', true)
+
+    const showSidebar = isDesktop || isSidebarOpen
 
     return (
       <div className="ai-container">
-        <Paper style={{ display: 'flex', flexDirection: 'row', width: 'calc(100% - 48px)', flexGrow: '0' }}>
+        <Paper>
           <div className="ai-header">
-            <Typography variant="h1">AI Chats</Typography>
+            <div className="ai-header-left">
+              {!isDesktop ? (
+                <Button variant="outlined" onclick={() => setSidebarOpen(!isSidebarOpen)}>
+                  <Icon icon={icons.menu} size="small" />
+                </Button>
+              ) : null}
+              <Typography variant="h1">AI Chats</Typography>
+            </div>
             <CreateAiChatButton />
           </div>
         </Paper>
         <div className="ai-body">
-          <AiChatList
-            style={{ height: '100%', minWidth: '250px' }}
-            onSelect={({ id }) => setSelectedChatId(id)}
-            selectedChatId={selectedChatId}
-          />
+          <div className={`ai-sidebar${showSidebar ? '' : ' hidden'}`}>
+            <AiChatList
+              style={{ height: '100%', width: '100%' }}
+              onSelect={({ id }) => setSelectedChatId(id)}
+              selectedChatId={selectedChatId}
+            />
+          </div>
           <AiChat selectedChatId={selectedChatId} />
         </div>
       </div>

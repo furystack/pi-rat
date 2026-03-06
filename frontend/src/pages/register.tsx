@@ -1,5 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button, Form, Input, Paper, Typography } from '@furystack/shades-common-components'
+import { Button, cssVariableTheme, Form, Input } from '@furystack/shades-common-components'
+
+import { AuthLayout } from '../components/auth-layout.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -26,24 +28,26 @@ export const isRegisterPayload = (data: unknown): data is RegisterPayload => {
 export const Register = Shade({
   shadowDomName: 'shade-register',
   css: {
-    padding: '1em',
-    marginTop: '48px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    '& .button-row': {
+    '& .register-form': {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: cssVariableTheme.spacing.md,
+    },
+
+    '& .register-actions': {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       flexDirection: 'row',
-      padding: '1em 0',
+      paddingTop: cssVariableTheme.spacing.sm,
     },
   },
   render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService)
     const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
+
     return (
-      <Paper elevation={3} style={{ flexGrow: '1' }}>
+      <AuthLayout title="Create Account" subtitle="Join PI-Rat to get started">
         <Form<RegisterPayload>
           validate={isRegisterPayload}
           className="register-form"
@@ -51,7 +55,6 @@ export const Register = Shade({
             void sessionService.register(userName, password)
           }}
         >
-          <Typography variant="h2">Create Account</Typography>
           <Input
             labelTitle="E-mail address"
             name="userName"
@@ -76,7 +79,7 @@ export const Register = Shade({
             type="password"
             disabled={isOperationInProgress}
           />
-          <div className="button-row">
+          <div className="register-actions">
             <Button variant="contained" color="primary" type="submit" disabled={isOperationInProgress}>
               Create Account
             </Button>
@@ -85,7 +88,7 @@ export const Register = Shade({
             </Button>
           </div>
         </Form>
-      </Paper>
+      </AuthLayout>
     )
   },
 })

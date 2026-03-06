@@ -7,7 +7,6 @@ export const DeviceList = Shade({
   shadowDomName: 'pi-rat-device-list',
   css: {
     '& .device-grid': {
-      marginTop: '64px',
       display: 'flex',
       width: '100%',
       flexWrap: 'wrap',

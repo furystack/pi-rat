@@ -31,13 +31,13 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
   css: {
     '& .section-title': {
       marginTop: '0',
-      marginBottom: '16px',
+      marginBottom: cssVariableTheme.spacing.md,
       color: cssVariableTheme.text.primary,
     },
     '& .info-grid': {
       display: 'grid',
       gridTemplateColumns: '150px 1fr',
-      gap: '12px',
+      gap: cssVariableTheme.spacing.sm,
       alignItems: 'center',
     },
     '& .info-label': {
@@ -48,11 +48,11 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       color: cssVariableTheme.text.primary,
     },
     '& .roles-container': {
-      marginBottom: '16px',
+      marginBottom: cssVariableTheme.spacing.md,
     },
     '& .roles-list': {
       display: 'flex',
-      gap: '8px',
+      gap: cssVariableTheme.spacing.sm,
       flexWrap: 'wrap',
       minHeight: '32px',
     },
@@ -61,21 +61,21 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
       fontStyle: 'italic',
     },
     '& .add-role-container': {
-      marginBottom: '16px',
+      marginBottom: cssVariableTheme.spacing.md,
     },
     '& .validation-error': {
       color: cssVariableTheme.palette.error.main,
       backgroundColor: cssVariableTheme.palette.error.light,
-      padding: '12px',
-      borderRadius: '4px',
-      marginBottom: '16px',
-      fontSize: '14px',
+      padding: cssVariableTheme.spacing.sm,
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
+      marginBottom: cssVariableTheme.spacing.md,
+      fontSize: cssVariableTheme.typography.fontSize.sm,
     },
     '& .button-row': {
       display: 'flex',
-      gap: '12px',
+      gap: cssVariableTheme.spacing.sm,
       borderTop: `1px solid ${cssVariableTheme.action.subtleBorder}`,
-      paddingTop: '16px',
+      paddingTop: cssVariableTheme.spacing.md,
     },
   },
   render: ({ props, injector, useState, useObservable, useDisposable }) => {
@@ -208,7 +208,7 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
 
     return (
       <>
-        <Paper elevation={1} style={{ padding: '24px' }}>
+        <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
           <Typography variant="h3" className="section-title">
             User Information
           </Typography>
@@ -225,7 +225,7 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
           </div>
         </Paper>
 
-        <Paper elevation={1} style={{ padding: '24px' }}>
+        <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
           <Typography variant="h3" className="section-title">
             Roles
           </Typography>
@@ -307,7 +307,7 @@ export const UserDetailsPage = Shade<UserDetailsPageProps>({
     const usersService = injector.getInstance(UsersService)
 
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.user} />} title="User Details" />
         <CacheView
           cache={usersService.userCache}

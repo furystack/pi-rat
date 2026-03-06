@@ -41,8 +41,8 @@ const SecuritySection = Shade({
     '& .error-message': {
       color: cssVariableTheme.palette.error.main,
       fontSize: cssVariableTheme.typography.fontSize.sm,
-      marginBottom: '16px',
-      padding: '8px',
+      marginBottom: cssVariableTheme.spacing.md,
+      padding: cssVariableTheme.spacing.sm,
       backgroundColor: cssVariableTheme.palette.error.light,
       borderRadius: cssVariableTheme.shape.borderRadius.sm,
     },
@@ -78,8 +78,16 @@ const SecuritySection = Shade({
     }
 
     return (
-      <Paper elevation={1} style={{ padding: '24px' }}>
-        <Typography variant="h4" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 16px 0' }}>
+      <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
+        <Typography
+          variant="h4"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: cssVariableTheme.spacing.sm,
+            margin: `0 0 ${cssVariableTheme.spacing.md} 0`,
+          }}
+        >
           <Icon icon={icons.lock} size="small" /> Security
         </Typography>
 
@@ -99,7 +107,7 @@ const SecuritySection = Shade({
             placeholder="Enter your current password"
             required
             minLength={4}
-            style={{ marginBottom: '16px' }}
+            style={{ marginBottom: cssVariableTheme.spacing.md }}
           />
 
           <Input
@@ -109,7 +117,7 @@ const SecuritySection = Shade({
             variant="outlined"
             placeholder="Enter a new password"
             required
-            style={{ marginBottom: '16px' }}
+            style={{ marginBottom: cssVariableTheme.spacing.md }}
           />
 
           <Input
@@ -119,12 +127,18 @@ const SecuritySection = Shade({
             variant="outlined"
             placeholder="Re-enter the new password"
             required
-            style={{ marginBottom: '16px' }}
+            style={{ marginBottom: cssVariableTheme.spacing.md }}
           />
 
           {error && <div className="error-message">{error}</div>}
 
-          <Button type="submit" variant="contained" color="primary" disabled={isLoading} style={{ marginTop: '8px' }}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={isLoading}
+            style={{ marginTop: cssVariableTheme.spacing.sm }}
+          >
             {isLoading ? 'Updating...' : 'Update Password'}
           </Button>
         </Form>
@@ -137,7 +151,7 @@ const ProfileSection = Shade({
   shadowDomName: 'user-settings-profile',
   css: {
     '& .field-group': {
-      marginBottom: '16px',
+      marginBottom: cssVariableTheme.spacing.md,
     },
     '& .field-group:last-child': {
       marginBottom: '0',
@@ -158,7 +172,7 @@ const ProfileSection = Shade({
     },
     '& .roles-list': {
       display: 'flex',
-      gap: '8px',
+      gap: cssVariableTheme.spacing.sm,
       flexWrap: 'wrap',
     },
   },
@@ -169,8 +183,16 @@ const ProfileSection = Shade({
     if (!currentUser) return null
 
     return (
-      <Paper elevation={1} style={{ padding: '24px' }}>
-        <Typography variant="h4" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 0 16px 0' }}>
+      <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
+        <Typography
+          variant="h4"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: cssVariableTheme.spacing.sm,
+            margin: `0 0 ${cssVariableTheme.spacing.md} 0`,
+          }}
+        >
           <Icon icon={icons.user} size="small" /> Profile
         </Typography>
 
@@ -204,7 +226,7 @@ export const UserSettingsPage = Shade({
   shadowDomName: 'user-settings-page',
   render: () => {
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.settings} />} title="User Settings" />
         <ProfileSection />
         <SecuritySection />

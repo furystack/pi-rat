@@ -1,11 +1,19 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { Icon, icons, PageContainer, PageHeader, Paper, Typography } from '@furystack/shades-common-components'
+import {
+  cssVariableTheme,
+  Icon,
+  icons,
+  PageContainer,
+  PageHeader,
+  Paper,
+  Typography,
+} from '@furystack/shades-common-components'
 
 export const AdminSettingsPage = Shade({
   shadowDomName: 'admin-settings-page',
   render: () => {
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.settings} />} title="Application Administration" />
         <Paper elevation={1} style={{ padding: '24px' }}>
           <Typography variant="body1" color="textSecondary">

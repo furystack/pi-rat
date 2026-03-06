@@ -39,9 +39,9 @@ describe('navigateToRoute', () => {
       const replace = vi.fn()
       injector.setExplicitInstance({ navigate, replace } as unknown as LocationService, LocationService)
 
-      navigateToRoute(injector, '/entities/movies', {}, { queryString: 'gedst=%7B%22mode%22%3A%22edit%22%7D' })
+      navigateToRoute(injector, '/entities/movies/edit/:id', { id: 'tt1234567' })
 
-      expect(navigate).toHaveBeenCalledWith('/entities/movies?gedst=%7B%22mode%22%3A%22edit%22%7D')
+      expect(navigate).toHaveBeenCalledWith('/entities/movies/edit/tt1234567')
     })
   })
 

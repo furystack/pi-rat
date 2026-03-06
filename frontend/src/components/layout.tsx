@@ -1,8 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
-import { cssVariableTheme, NotyList, PageLayout } from '@furystack/shades-common-components'
+import { cssVariableTheme, NotyList } from '@furystack/shades-common-components'
 import { InstallService } from '../services/install-service.js'
 import { Body } from './body.js'
-import { Header } from './header.js'
 import { PiRatLazyLoad } from './pirat-lazy-load.js'
 
 export const Layout = Shade({
@@ -25,16 +24,7 @@ export const Layout = Shade({
           component={async () => {
             const result = await injector.getInstance(InstallService).getServiceStatus()
             if (result.state === 'installed') {
-              return (
-                <PageLayout
-                  appBar={{
-                    variant: 'permanent',
-                    component: <Header title="PI-Rat" />,
-                  }}
-                >
-                  <Body />
-                </PageLayout>
-              )
+              return <Body />
             } else if (result.state === 'needsInstall') {
               const { InstallerPage } = await import('../installer/index.js')
               return <InstallerPage />

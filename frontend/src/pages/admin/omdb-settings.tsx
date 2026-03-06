@@ -39,11 +39,11 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'omdb-settings-content',
   css: {
     '& .page-description': {
-      marginBottom: '24px',
+      marginBottom: cssVariableTheme.spacing.lg,
       color: cssVariableTheme.text.secondary,
     },
     '& .form-field': {
-      marginBottom: '24px',
+      marginBottom: cssVariableTheme.spacing.lg,
     },
     '& .api-key-row': {
       display: 'flex',
@@ -63,7 +63,7 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     },
     '& .form-footer': {
       borderTop: `1px solid ${cssVariableTheme.background.default}`,
-      paddingTop: '16px',
+      paddingTop: cssVariableTheme.spacing.md,
     },
   },
   render: ({ props, injector, useObservable, useDisposable, useState }) => {
@@ -115,7 +115,7 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
           Configure the OMDB API integration for fetching movie and series metadata.
         </Typography>
 
-        <Paper elevation={1} style={{ padding: '24px' }}>
+        <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
           <Form<OmdbRawFormData> validate={isOmdbRawFormData} onSubmit={(data) => void handleSubmit(data)}>
             <div className="form-field">
               <div className="api-key-row">
@@ -200,7 +200,7 @@ export const OmdbSettingsPage = Shade({
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.film} />} title="OMDB Settings" />
         <CacheView
           cache={configService.configCache}

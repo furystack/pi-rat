@@ -112,11 +112,11 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 
     return (
       <>
-        <Typography variant="body1" color="textSecondary" style={{ marginBottom: '24px' }}>
+        <Typography variant="body1" color="textSecondary" style={{ marginBottom: cssVariableTheme.spacing.lg }}>
           Configure how frequently IOT devices are pinged to check their availability.
         </Typography>
 
-        <Paper elevation={1} style={{ padding: '24px' }}>
+        <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
           <Form<IotRawFormData>
             validate={(data): data is IotRawFormData => {
               const isValid = isIotRawFormData(data)
@@ -129,7 +129,7 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
             }}
             onSubmit={(data) => void handleSubmit(data)}
           >
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: cssVariableTheme.spacing.lg }}>
               <Input
                 labelTitle="Ping Interval (ms)"
                 name="pingIntervalMs"
@@ -141,13 +141,19 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
                 required
                 style={{ maxWidth: '250px' }}
               />
-              <small style={{ color: cssVariableTheme.text.secondary, display: 'block', marginTop: '4px' }}>
+              <small
+                style={{
+                  color: cssVariableTheme.text.secondary,
+                  display: 'block',
+                  marginTop: cssVariableTheme.spacing.xs,
+                }}
+              >
                 How often to ping all IOT devices ({MIN_PING_INTERVAL_MS}ms - {MAX_PING_INTERVAL_MS}ms). Default:{' '}
                 {DEFAULT_PING_INTERVAL_MS}ms ({DEFAULT_PING_INTERVAL_MS / 1000} seconds).
               </small>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: cssVariableTheme.spacing.lg }}>
               <Input
                 labelTitle="Ping Timeout (ms)"
                 name="pingTimeoutMs"
@@ -159,7 +165,13 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
                 required
                 style={{ maxWidth: '250px' }}
               />
-              <small style={{ color: cssVariableTheme.text.secondary, display: 'block', marginTop: '4px' }}>
+              <small
+                style={{
+                  color: cssVariableTheme.text.secondary,
+                  display: 'block',
+                  marginTop: cssVariableTheme.spacing.xs,
+                }}
+              >
                 Timeout for each ping request ({MIN_PING_TIMEOUT_MS}ms - {MAX_PING_TIMEOUT_MS}ms, must be less than
                 interval). Default: {DEFAULT_PING_TIMEOUT_MS}ms ({DEFAULT_PING_TIMEOUT_MS / 1000} seconds).
               </small>
@@ -170,9 +182,9 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
                 style={{
                   color: cssVariableTheme.palette.error.main,
                   backgroundColor: cssVariableTheme.palette.error.light,
-                  padding: '12px',
-                  borderRadius: '4px',
-                  marginBottom: '16px',
+                  padding: cssVariableTheme.spacing.sm,
+                  borderRadius: cssVariableTheme.shape.borderRadius.sm,
+                  marginBottom: cssVariableTheme.spacing.md,
                 }}
                 data-testid="validation-error"
               >
@@ -180,7 +192,12 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
               </div>
             )}
 
-            <div style={{ borderTop: `1px solid ${cssVariableTheme.background.default}`, paddingTop: '16px' }}>
+            <div
+              style={{
+                borderTop: `1px solid ${cssVariableTheme.background.default}`,
+                paddingTop: cssVariableTheme.spacing.md,
+              }}
+            >
               <Button type="submit" variant="contained" color="primary" disabled={isLoading}>
                 {isLoading ? 'Saving...' : 'Save Settings'}
               </Button>
@@ -198,7 +215,7 @@ export const IotSettingsPage = Shade({
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.plug} />} title="IOT Device Availability" />
         <CacheView
           cache={configService.configCache}

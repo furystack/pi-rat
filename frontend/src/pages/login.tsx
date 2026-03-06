@@ -1,6 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
-import { Button, Form, Input, cssVariableTheme, promisifyAnimation } from '@furystack/shades-common-components'
-import { PiRatLogo } from '../components/pi-rat-logo.js'
+import { Button, cssVariableTheme, Form, Input } from '@furystack/shades-common-components'
+
+import { AuthLayout } from '../components/auth-layout.js'
 import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
@@ -20,58 +21,14 @@ export const isLoginPayload = (data: unknown): data is LoginPayload => {
 export const Login = Shade({
   shadowDomName: 'shade-login',
   css: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 'calc(100vh - 80px)',
-    padding: '24px',
-
-    '& .login-card': {
-      width: '100%',
-      maxWidth: '420px',
-      padding: '48px 40px',
-      background: cssVariableTheme.action.backdrop,
-      backdropFilter: `blur(${cssVariableTheme.effects.blurMd})`,
-      borderRadius: cssVariableTheme.shape.borderRadius.md,
-      border: `1px solid ${cssVariableTheme.action.subtleBorder}`,
-      boxShadow: cssVariableTheme.shadows.lg,
-      transform: 'scale(0.95)',
-      opacity: '0',
-    },
-
-    '& .login-header': {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      marginBottom: '32px',
-    },
-
-    '& .login-logo': {
-      marginBottom: '16px',
-      filter: `drop-shadow(${cssVariableTheme.shadows.md})`,
-    },
-
-    '& .login-title': {
-      fontSize: cssVariableTheme.typography.fontSize.lg,
-      fontWeight: '600',
-      color: cssVariableTheme.text.primary,
-      margin: '0 0 6px 0',
-    },
-
-    '& .login-subtitle': {
-      fontSize: cssVariableTheme.typography.fontSize.sm,
-      color: cssVariableTheme.text.secondary,
-      margin: '0',
-    },
-
     '& .login-form': {
       display: 'flex',
       flexDirection: 'column',
-      gap: '16px',
+      gap: cssVariableTheme.spacing.md,
     },
 
     '& .login-error': {
-      padding: '10px 14px',
+      padding: `${cssVariableTheme.spacing.sm} ${cssVariableTheme.spacing.md}`,
       borderRadius: cssVariableTheme.shape.borderRadius.sm,
       backgroundColor: cssVariableTheme.palette.error.light,
       color: cssVariableTheme.palette.error.dark,
@@ -82,14 +39,14 @@ export const Login = Shade({
     '& .login-actions': {
       display: 'flex',
       flexDirection: 'column',
-      gap: '12px',
-      marginTop: '8px',
+      gap: cssVariableTheme.spacing.sm,
+      marginTop: cssVariableTheme.spacing.sm,
     },
 
     '& .login-divider': {
       display: 'flex',
       alignItems: 'center',
-      gap: '12px',
+      gap: cssVariableTheme.spacing.sm,
       color: cssVariableTheme.text.secondary,
       fontSize: cssVariableTheme.typography.fontSize.sm,
     },
@@ -107,39 +64,13 @@ export const Login = Shade({
       fontSize: cssVariableTheme.typography.fontSize.sm,
     },
   },
-  render: ({ injector, useObservable, useRef, useDisposable }) => {
+  render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService)
     const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
     const [loginError] = useObservable('loginError', sessionService.loginError)
-    const cardRef = useRef<HTMLElement>('card')
-
-    useDisposable('entryAnimation', () => {
-      const id = setTimeout(() => {
-        const el = cardRef.current
-        if (el) {
-          void promisifyAnimation(
-            el,
-            [
-              { transform: 'scale(0.95)', opacity: '0' },
-              { transform: 'scale(1)', opacity: '1' },
-            ],
-            { duration: 400, fill: 'forwards', easing: 'cubic-bezier(0.33, 1, 0.68, 1)' },
-          )
-        }
-      }, 50)
-      return { [Symbol.dispose]: () => clearTimeout(id) }
-    })
 
     return (
-      <div ref={cardRef} className="login-card">
-        <div className="login-header">
-          <div className="login-logo">
-            <PiRatLogo size={80} />
-          </div>
-          <h2 className="login-title">Welcome to PI-Rat</h2>
-          <p className="login-subtitle">Sign in to continue</p>
-        </div>
-
+      <AuthLayout title="Welcome to PI-Rat" subtitle="Sign in to continue">
         <Form<LoginPayload>
           validate={isLoginPayload}
           className="login-form"
@@ -185,7 +116,7 @@ export const Login = Shade({
             </div>
           </div>
         </Form>
-      </div>
+      </AuthLayout>
     )
   },
 })

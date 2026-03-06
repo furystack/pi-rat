@@ -1,5 +1,6 @@
 import { hasCacheValue, isObsoleteCacheResult } from '@furystack/cache'
 import { createComponent, Shade } from '@furystack/shades'
+import { cssVariableTheme } from '@furystack/shades-common-components'
 import { DrivesService } from '../../services/drives-service.js'
 import { CreateDriveWizard } from './create-drive-wizard.js'
 import { FolderPanel } from './folder-panel.js'
@@ -22,11 +23,9 @@ export const DrivesPage = Shade({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      top: '56px',
-      position: 'fixed',
       flexDirection: 'row',
-      gap: '8px',
-      height: 'calc(100% - 48px)',
+      gap: cssVariableTheme.spacing.sm,
+      height: '100%',
       width: '100%',
     },
   },

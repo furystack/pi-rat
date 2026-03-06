@@ -9,7 +9,6 @@ export const MovieList = Shade({
   shadowDomName: 'shade-series-list',
   css: {
     '& .movie-grid': {
-      marginTop: '64px',
       display: 'flex',
       width: '100%',
       flexWrap: 'wrap',

@@ -47,11 +47,11 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   shadowDomName: 'ai-settings-content',
   css: {
     '& .page-description': {
-      marginBottom: '24px',
+      marginBottom: cssVariableTheme.spacing.lg,
       color: cssVariableTheme.text.secondary,
     },
     '& .form-field': {
-      marginBottom: '24px',
+      marginBottom: cssVariableTheme.spacing.lg,
     },
     '& .field-hint': {
       color: cssVariableTheme.text.secondary,
@@ -61,13 +61,13 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     '& .validation-error': {
       color: cssVariableTheme.palette.error.main,
       backgroundColor: cssVariableTheme.palette.error.light,
-      padding: '12px',
-      borderRadius: '4px',
-      marginBottom: '16px',
+      padding: cssVariableTheme.spacing.sm,
+      borderRadius: cssVariableTheme.shape.borderRadius.sm,
+      marginBottom: cssVariableTheme.spacing.md,
     },
     '& .form-footer': {
       borderTop: `1px solid ${cssVariableTheme.background.default}`,
-      paddingTop: '16px',
+      paddingTop: cssVariableTheme.spacing.md,
     },
   },
   render: ({ props, injector, useObservable, useDisposable }) => {
@@ -117,7 +117,7 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
           Configure the connection to your Ollama server for AI-powered features.
         </Typography>
 
-        <Paper elevation={1} style={{ padding: '24px' }}>
+        <Paper elevation={1} style={{ padding: cssVariableTheme.spacing.lg }}>
           <Form<OllamaRawFormData>
             validate={(data): data is OllamaRawFormData => {
               const isValid = isOllamaRawFormData(data)
@@ -166,7 +166,7 @@ export const AiSettingsPage = Shade({
     const configService = injector.getInstance(ConfigService)
 
     return (
-      <PageContainer gap="24px">
+      <PageContainer gap={cssVariableTheme.spacing.lg}>
         <PageHeader icon={<Icon icon={icons.wand} />} title="Ollama Integration" />
         <CacheView
           cache={configService.configCache}
