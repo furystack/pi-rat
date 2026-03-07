@@ -41,7 +41,7 @@ const ChatLineAvatar = styledElement('div', {
 })
 
 export const MessageList = Shade<{ chat: Chat }>({
-  shadowDomName: 'shade-app-message-list',
+  customElementName: 'shade-app-message-list',
   css: {
     display: 'block',
     width: '100%',

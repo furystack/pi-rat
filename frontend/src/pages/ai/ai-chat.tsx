@@ -6,7 +6,7 @@ import { AiChatMessageList } from './ai-chat-message-list.js'
 import { AiChatService } from './ai-chat-service.js'
 
 export const AiChat = Shade<{ selectedChatId: string }>({
-  shadowDomName: 'pi-rat-ai-chat',
+  customElementName: 'pi-rat-ai-chat',
   style: {
     display: 'flex',
     width: '100%',

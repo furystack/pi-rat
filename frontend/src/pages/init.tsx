@@ -2,7 +2,7 @@ import { Shade, createComponent } from '@furystack/shades'
 import { Loader, Typography } from '@furystack/shades-common-components'
 
 export const Init = Shade({
-  shadowDomName: 'shade-init',
+  customElementName: 'shade-init',
   css: {
     display: 'flex',
     height: '100%',

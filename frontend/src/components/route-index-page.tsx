@@ -29,7 +29,7 @@ type RouteIndexPageProps = {
 }
 
 export const RouteIndexPage = Shade<RouteIndexPageProps>({
-  shadowDomName: 'pi-rat-route-index-page',
+  customElementName: 'pi-rat-route-index-page',
   css: {
     '& .index-grid': {
       display: 'flex',

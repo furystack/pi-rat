@@ -18,7 +18,7 @@ export const isLoginPayload = (data: unknown): data is LoginPayload => {
 }
 
 export const Login = Shade({
-  shadowDomName: 'shade-login',
+  customElementName: 'shade-login',
   css: {
     display: 'flex',
     justifyContent: 'center',

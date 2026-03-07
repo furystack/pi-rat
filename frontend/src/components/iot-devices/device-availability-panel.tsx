@@ -5,7 +5,7 @@ import type { Device } from 'common'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 
 export const DeviceAvailabilityPanel = Shade<Device>({
-  shadowDomName: 'device-availability-panel',
+  customElementName: 'device-availability-panel',
   render: ({ props, useObservable, injector, useDisposable }) => {
     const iotService = injector.getInstance(IotDevicesService)
 

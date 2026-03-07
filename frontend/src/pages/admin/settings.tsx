@@ -2,7 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { Icon, icons, PageContainer, PageHeader, Paper, Typography } from '@furystack/shades-common-components'
 
 export const AdminSettingsPage = Shade({
-  shadowDomName: 'admin-settings-page',
+  customElementName: 'admin-settings-page',
   render: () => {
     return (
       <PageContainer gap="24px">

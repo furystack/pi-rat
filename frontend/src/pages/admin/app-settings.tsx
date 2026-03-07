@@ -49,7 +49,7 @@ const getSelectedKey = (currentPath: string) => {
 }
 
 export const AppSettingsPage = Shade<AppSettingsPageProps>({
-  shadowDomName: 'app-settings-page',
+  customElementName: 'app-settings-page',
   render: ({ props, injector, useObservable }) => {
     const [currentPath] = useObservable('locationChange', injector.getInstance(LocationService).onLocationPathChanged)
     const selectedKey = getSelectedKey(currentPath)

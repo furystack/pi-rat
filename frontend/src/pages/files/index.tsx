@@ -7,7 +7,7 @@ import { MonacoFileEditor } from './monaco-file-editor.js'
 import { UnknownType } from './unknown-type.js'
 
 export const FilesPage = Shade<{ letter: string; path: string }>({
-  shadowDomName: 'drives-files-page',
+  customElementName: 'drives-files-page',
   render: ({ props, injector }) => {
     const { letter, path } = props
 

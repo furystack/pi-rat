@@ -8,14 +8,14 @@ import { DashboardService } from '../../services/dashboards-service.js'
 import { Dashboard } from './index.js'
 
 const DefaultDashboardContent = Shade<{ data: CacheWithValue<GetCollectionResult<DashboardType>> }>({
-  shadowDomName: 'pi-rat-default-dashboard-content',
+  customElementName: 'pi-rat-default-dashboard-content',
   render: ({ props }) => {
     return <Dashboard {...props.data.value.entries[0]} />
   },
 })
 
 export const DefaultDashboard = Shade({
-  shadowDomName: 'pi-rat-default-dashboard',
+  customElementName: 'pi-rat-default-dashboard',
   render: ({ injector }) => {
     const dashboardService = injector.getInstance(DashboardService)
     return (

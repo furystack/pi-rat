@@ -18,7 +18,7 @@ export const GenericMonacoEditor: <T, TKey extends keyof T, TReadonlyProperties 
   props: GenericMonacoEditorProps<T, TKey, TReadonlyProperties>,
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
-  shadowDomName: 'shade-generic-monaco-editor',
+  customElementName: 'shade-generic-monaco-editor',
   render: ({ props, useDisposable }) => {
     // eslint-disable-next-line furystack/require-use-observable-for-render -- Intentionally non-reactive: value is read on-demand via .getValue() in keyboard/click handlers
     const currentValue = useDisposable('currentValue', () => new ObservableValue(JSON.stringify(props.value, null, 2)))

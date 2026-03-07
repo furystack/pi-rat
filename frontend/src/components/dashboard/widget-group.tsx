@@ -4,7 +4,7 @@ import type { WidgetGroup as WidgetGroupData } from 'common'
 import { Widget } from './widget.js'
 
 export const WidgetGroup = Shade<WidgetGroupData>({
-  shadowDomName: 'pi-rat-widget-group',
+  customElementName: 'pi-rat-widget-group',
   css: {
     display: 'flex',
     flexDirection: 'column',

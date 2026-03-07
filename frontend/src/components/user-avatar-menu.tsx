@@ -5,7 +5,7 @@ import { navigateToRoute } from '../navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
 export const UserAvatarMenu = Shade({
-  shadowDomName: 'user-avatar-menu',
+  customElementName: 'user-avatar-menu',
   css: {
     display: 'flex',
     alignItems: 'center',

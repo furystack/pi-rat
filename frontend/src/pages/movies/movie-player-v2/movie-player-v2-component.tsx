@@ -18,7 +18,7 @@ type MoviePlayerProps = {
 }
 
 export const MoviePlayerV2 = Shade<MoviePlayerProps>({
-  shadowDomName: 'pirat-movie-player-v2',
+  customElementName: 'pirat-movie-player-v2',
   render: ({ props, useDisposable, useObservable, useRef, injector }) => {
     const videoRef = useRef<HTMLVideoElement>('video')
     const containerRef = useRef<HTMLElement>('container')

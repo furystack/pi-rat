@@ -9,7 +9,7 @@ export const FileInfoModal = Shade<{
   currentDriveLetter: string
   currentPath: string
 }>({
-  shadowDomName: 'file-info-modal',
+  customElementName: 'file-info-modal',
   css: {
     '& table': {
       fontWeight: 'lighter',

@@ -5,7 +5,7 @@ import { Chat } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
 
 export const ChatList = Shade({
-  shadowDomName: 'shade-app-chat-list',
+  customElementName: 'shade-app-chat-list',
   style: {
     display: 'flex',
   },

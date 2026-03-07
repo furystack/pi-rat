@@ -2,7 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { AiModelService } from './ai-model-service.js'
 
 export const AiModelSelector = Shade<{ value?: string; onSelect?: (newValue: string) => void }>({
-  shadowDomName: 'pi-rat-ai-model-selector',
+  customElementName: 'pi-rat-ai-model-selector',
   style: {
     display: 'flex',
     flexDirection: 'column',

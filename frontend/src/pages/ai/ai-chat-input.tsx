@@ -15,7 +15,7 @@ export const isAiMessagePayload = (data: unknown): data is AiMessagePayload => {
 }
 
 export const AiChatInput = Shade<{ selectedChatId: string }>({
-  shadowDomName: 'pi-rat-ai-chat-input',
+  customElementName: 'pi-rat-ai-chat-input',
   style: {
     display: 'flex',
     flexDirection: 'row',

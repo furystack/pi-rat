@@ -13,7 +13,7 @@ export type SeriesListProps = {
 }
 
 export const SeriesOverview = Shade<SeriesListProps>({
-  shadowDomName: 'series-overview-page',
+  customElementName: 'series-overview-page',
   render: ({ props, injector, useObservable }) => {
     const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
     const seriesService = injector.getInstance(SeriesService)

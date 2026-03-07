@@ -3,7 +3,7 @@ import { Typography } from '@furystack/shades-common-components'
 import { environmentOptions } from '../../environment-options.js'
 
 export const ImageViewer = Shade<{ letter: string; path: string }>({
-  shadowDomName: 'drives-files-image-viewer',
+  customElementName: 'drives-files-image-viewer',
   render: ({ props }) => {
     const { letter, path } = props
     return (

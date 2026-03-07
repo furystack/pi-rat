@@ -11,7 +11,7 @@ import { SeriesWidget } from './series-widget.js'
 import { WidgetGroup } from './widget-group.js'
 
 export const Widget = Shade<WidgetData>({
-  shadowDomName: 'pi-rat-widget',
+  customElementName: 'pi-rat-widget',
   render: ({ props }) => {
     switch (props.type) {
       case 'app-shortcut': {

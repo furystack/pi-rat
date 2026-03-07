@@ -23,7 +23,7 @@ type ManageMovieModalProps = {
 }
 
 export const RelatedMoviesModal = Shade<ManageMovieModalProps>({
-  shadowDomName: 'shade-app-manage-movie-modal',
+  customElementName: 'shade-app-manage-movie-modal',
   css: {
     '& .modal-center': {
       display: 'flex',

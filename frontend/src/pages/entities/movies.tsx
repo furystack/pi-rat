@@ -6,7 +6,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { MoviesService } from '../../services/movies-service.js'
 
 export const MoviesPage = Shade({
-  shadowDomName: 'shade-app-movies-page',
+  customElementName: 'shade-app-movies-page',
   render: ({ useDisposable, injector }) => {
     const moviesService = injector.getInstance(MoviesService)
 

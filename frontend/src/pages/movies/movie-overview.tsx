@@ -13,7 +13,7 @@ import { WatchProgressService } from '../../services/watch-progress-service.js'
 import { MediaOverviewLayout } from './media-overview-layout.js'
 
 export const PlayButtons = Shade<{ imdbId: string }>({
-  shadowDomName: 'shade-movie-play-buttons',
+  customElementName: 'shade-movie-play-buttons',
   render: ({ props, useObservable, injector }) => {
     const watchProgressService = injector.getInstance(WatchProgressService)
     const movieFileService = injector.getInstance(MovieFilesService)
@@ -94,7 +94,7 @@ export const PlayButtons = Shade<{ imdbId: string }>({
 })
 
 const MovieOverviewContent = Shade<{ data: CacheWithValue<Movie> }>({
-  shadowDomName: 'shade-movie-overview-content',
+  customElementName: 'shade-movie-overview-content',
   render: ({ props, useObservable, injector }) => {
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
     const movie = props.data.value
@@ -135,7 +135,7 @@ const MovieOverviewContent = Shade<{ data: CacheWithValue<Movie> }>({
 })
 
 export const MovieOverview = Shade<{ imdbId: string }>({
-  shadowDomName: 'shade-movie-overview',
+  customElementName: 'shade-movie-overview',
   render: ({ props, injector }) => {
     const movieService = injector.getInstance(MoviesService)
 

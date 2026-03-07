@@ -9,7 +9,7 @@ Only subscribe to the observables you actually need:
 ```typescript
 // ✅ Good - subscribe only to needed data
 export const UserName = Shade<{ userId: string }>({
-  shadowDomName: 'user-name',
+  customElementName: 'user-name',
   render: ({ props, injector, useObservable }) => {
     const userService = injector.getInstance(UserService);
     const [user] = useObservable('user', userService.getUserById(props.userId));
@@ -21,7 +21,7 @@ export const UserName = Shade<{ userId: string }>({
 
 // ❌ Avoid - subscribing to unnecessary data
 export const UserName = Shade<{ userId: string }>({
-  shadowDomName: 'user-name',
+  customElementName: 'user-name',
   render: ({ props, injector, useObservable }) => {
     const userService = injector.getInstance(UserService);
     const [allUsers] = useObservable('users', userService.allUsers); // Unnecessary
@@ -39,7 +39,7 @@ Shades components automatically handle disposal of observables created with `use
 ```typescript
 // ✅ Good - automatic disposal
 export const DataDisplay = Shade({
-  shadowDomName: 'data-display',
+  customElementName: 'data-display',
   render: ({ injector, useObservable, useDisposable }) => {
     const dataService = injector.getInstance(DataService);
 
@@ -158,7 +158,7 @@ Debounce user input to reduce unnecessary operations:
 ```typescript
 // ✅ Good - debounced search
 export const SearchInput = Shade({
-  shadowDomName: 'search-input',
+  customElementName: 'search-input',
   render: ({ injector, useDisposable }) => {
     const searchService = injector.getInstance(SearchService);
     const searchTerm = useDisposable('searchTerm', () => new ObservableValue(''));
@@ -253,7 +253,7 @@ Avoid rendering unnecessary content:
 ```typescript
 // ✅ Good - conditional rendering
 export const UserProfile = Shade<{ userId: string }>({
-  shadowDomName: 'user-profile',
+  customElementName: 'user-profile',
   render: ({ props, injector, useObservable }) => {
     const userService = injector.getInstance(UserService);
     const [user] = useObservable('user', userService.getUserById(props.userId));
@@ -281,7 +281,7 @@ For large lists, consider virtual scrolling:
 ```typescript
 // ✅ Good - virtual scrolling for large lists (100+ items)
 export const LargeList = Shade<{ items: Item[] }>({
-  shadowDomName: 'large-list',
+  customElementName: 'large-list',
   render: ({ props }) => {
     // Implement virtual scrolling logic
     // Only render visible items

@@ -44,7 +44,7 @@ export const isOllamaRawFormData = (data: unknown): data is OllamaRawFormData =>
 }
 
 const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
-  shadowDomName: 'ai-settings-content',
+  customElementName: 'ai-settings-content',
   css: {
     '& .page-description': {
       marginBottom: '24px',
@@ -161,7 +161,7 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 })
 
 export const AiSettingsPage = Shade({
-  shadowDomName: 'ai-settings-page',
+  customElementName: 'ai-settings-page',
   render: ({ injector }) => {
     const configService = injector.getInstance(ConfigService)
 

@@ -161,7 +161,7 @@ Apply when setting up infrastructure or scripts:
 - No `any` type (TYPESCRIPT_GUIDELINES.mdc)
 - RequestError for API errors (ERROR_HANDLING.md)
 - Proper disposal patterns (OBSERVABLE_STATE.md)
-- shadowDomName for Shades components (FRONTEND_PATTERNS.mdc)
+- customElementName for Shades components (FRONTEND_PATTERNS.mdc)
 
 ### High (SHOULD follow)
 

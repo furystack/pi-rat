@@ -19,7 +19,7 @@ This is a **FuryStack-based** application with Shades components, REST APIs, and
 
 ### New UI Component
 
-1. Create Shade component with `shadowDomName`
+1. Create Shade component with `customElementName`
 2. Use `useObservable` for global state, `useDisposable` for local state
 3. Follow existing styling patterns with CSS variables
 

@@ -6,7 +6,7 @@ import { MoviesService } from '../../services/movies-service.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
 
 export const MovieList = Shade({
-  shadowDomName: 'shade-series-list',
+  customElementName: 'shade-series-list',
   css: {
     '& .movie-grid': {
       marginTop: '64px',

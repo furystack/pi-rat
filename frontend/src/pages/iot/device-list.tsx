@@ -4,7 +4,7 @@ import { IotDevicesService } from '../../services/iot-devices-service.js'
 import { Widget } from '../../components/dashboard/widget.js'
 
 export const DeviceList = Shade({
-  shadowDomName: 'pi-rat-device-list',
+  customElementName: 'pi-rat-device-list',
   css: {
     '& .device-grid': {
       marginTop: '64px',

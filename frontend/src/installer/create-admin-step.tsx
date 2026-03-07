@@ -25,7 +25,7 @@ export const isCreateAdminPayload = (data: unknown): data is CreateAdminPayload 
 }
 
 export const CreateAdminStep = Shade<WizardStepProps>({
-  shadowDomName: 'create-admin-step',
+  customElementName: 'create-admin-step',
   render: ({ props, injector }) => {
     return (
       <WizardStep

@@ -1,7 +1,8 @@
+import type { FindOptions } from '@furystack/core'
 import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService } from '@furystack/shades-common-components'
 import { DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
-import { ObservableValue, PathHelper } from '@furystack/utils'
+import { PathHelper } from '@furystack/utils'
 import { getFullPath, type DirectoryEntry } from 'common'
 import { environmentOptions } from '../../environment-options.js'
 import { DrivesService } from '../../services/drives-service.js'
@@ -19,7 +20,7 @@ export const FileList = Shade<{
   onActivate?: (entry: DirectoryEntry) => void
   service: CollectionService<DirectoryEntry>
 }>({
-  shadowDomName: 'file-list',
+  customElementName: 'file-list',
   css: {
     '& .file-row': {
       display: 'flex',
@@ -35,13 +36,16 @@ export const FileList = Shade<{
       overflow: 'hidden',
     },
   },
-  render: ({ useDisposable, props, injector }) => {
+  render: ({ useDisposable, useState, props, injector }) => {
     const { currentDriveLetter, currentPath, service } = props
 
     const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
 
-    const findOptions = useDisposable('findOptions', () => new ObservableValue({}))
+    const [findOptions, setFindOptions] = useState<FindOptions<DirectoryEntry, Array<keyof DirectoryEntry>>>(
+      'findOptions',
+      {},
+    )
 
     const activate = () => {
       const focused = service.focusedEntry.getValue()
@@ -156,6 +160,7 @@ export const FileList = Shade<{
         <DataGrid
           collectionService={service}
           findOptions={findOptions}
+          onFindOptionsChange={setFindOptions}
           columns={['name']}
           headerComponents={{
             name: () => (

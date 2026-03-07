@@ -3,7 +3,7 @@ import { Paper, Typography } from '@furystack/shades-common-components'
 import { environmentOptions } from '../../environment-options.js'
 
 export const UnknownType = Shade<{ letter: string; path: string }>({
-  shadowDomName: 'drives-file-unknown-type-page',
+  customElementName: 'drives-file-unknown-type-page',
   render: ({ props }) => {
     const { letter, path } = props
     return (

@@ -44,7 +44,7 @@ type IconUrlWidgetProps = {
 }
 
 export const IconUrlWidget = Shade<IconUrlWidgetProps>({
-  shadowDomName: 'icon-url-widget',
+  customElementName: 'icon-url-widget',
   css: {
     '& .widget-card': {
       width: '256px',

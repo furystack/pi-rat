@@ -282,7 +282,7 @@ import { myRoutes } from './routes/my-routes.js'
 
 ```typescript
 const MyComponent = Shade<{ prop: string }>({
-  shadowDomName: 'my-component',
+  customElementName: 'my-component',
   render: ({ props, injector, useObservable, useDisposable }) => {
     // Global state subscriptions
     const session = injector.getInstance(SessionService)
@@ -313,7 +313,7 @@ Never use `document.querySelector()` in Shades components. It bypasses shadow DO
 ```typescript
 // ❌ Bad - using document.querySelector
 export const MyForm = Shade({
-  shadowDomName: 'my-form',
+  customElementName: 'my-form',
   render: ({ useDisposable }) => {
     const handleSubmit = async () => {
       // This may fail due to shadow DOM encapsulation
@@ -327,7 +327,7 @@ export const MyForm = Shade({
 
 // ✅ Good - use element from Shades context
 export const MyForm = Shade({
-  shadowDomName: 'my-form',
+  customElementName: 'my-form',
   render: ({ element, useDisposable }) => {
     const handleSubmit = async () => {
       // Use element.querySelector to query within component's shadow DOM
@@ -341,7 +341,7 @@ export const MyForm = Shade({
 
 // ✅ Better - use state to trigger re-render instead of DOM manipulation
 export const MyForm = Shade({
-  shadowDomName: 'my-form',
+  customElementName: 'my-form',
   render: ({ useDisposable, useObservable }) => {
     const formKey = useDisposable('formKey', () => new ObservableValue(0))
     const [key] = useObservable('formKeyValue', formKey)
@@ -367,7 +367,7 @@ When you need to access DOM elements within a Shades component:
 ```typescript
 // ✅ Good - using element context for input focus
 export const SearchInput = Shade({
-  shadowDomName: 'search-input',
+  customElementName: 'search-input',
   constructed: ({ element }) => {
     // Safe to use element.querySelector after construction
     element.querySelector<HTMLInputElement>('input[autofocus]')?.focus()
@@ -512,7 +512,7 @@ const UserSettingsPage = Shade({
 })
 
 const SecuritySection = Shade({
-  shadowDomName: 'user-settings-security',
+  customElementName: 'user-settings-security',
   render: ({ injector, useDisposable }) => {
     // Form logic here
     return (

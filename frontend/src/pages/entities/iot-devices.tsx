@@ -6,7 +6,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 
 export const IotDevicesPage = Shade({
-  shadowDomName: 'shade-app-iot-devices-page',
+  customElementName: 'shade-app-iot-devices-page',
   render: ({ useDisposable, injector }) => {
     const iotService = injector.getInstance(IotDevicesService)
 

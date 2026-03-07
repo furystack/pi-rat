@@ -6,7 +6,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { DrivesService } from '../../services/drives-service.js'
 
 export const DrivesPage = Shade({
-  shadowDomName: 'shade-app-drives-page',
+  customElementName: 'shade-app-drives-page',
   render: ({ useDisposable, injector }) => {
     const drivesService = injector.getInstance(DrivesService)
 

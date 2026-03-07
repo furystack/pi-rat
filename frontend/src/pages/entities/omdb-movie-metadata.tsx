@@ -6,7 +6,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
 
 export const OmdbMovieMetadataPage = Shade({
-  shadowDomName: 'shade-app-omdb-movie-metadata-page',
+  customElementName: 'shade-app-omdb-movie-metadata-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(MediaApiClient)
 

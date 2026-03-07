@@ -19,7 +19,7 @@ const randomizeBlobVars = (el?: HTMLElement) =>
   })
 
 export const Blob = Shade({
-  shadowDomName: 'shade-bubbles-blob',
+  customElementName: 'shade-bubbles-blob',
   render: ({ useHostProps }) => {
     const vars = {
       '--x': `${randomInRange(-300, 300)}`,
@@ -70,7 +70,7 @@ const randomizeBlobGroupVars = (el?: HTMLElement) =>
   })
 
 const BlobGroup = Shade({
-  shadowDomName: 'shade-bubbles-blob-group',
+  customElementName: 'shade-bubbles-blob-group',
   render: ({ children, useHostProps }) => {
     const vars = {
       '--x': `${randomInRange(0, 100)}`,
@@ -106,7 +106,7 @@ const BlobGroup = Shade({
 export const blob = <div></div>
 
 export const BubbleBackground = Shade({
-  shadowDomName: 'bubble-background',
+  customElementName: 'bubble-background',
   render: ({ children, useDisposable, useRef }) => {
     const containerRef = useRef<HTMLElement>('container')
 

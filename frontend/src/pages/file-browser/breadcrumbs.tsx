@@ -6,7 +6,7 @@ export const BreadCrumbs = Shade<{
   currentPath: string
   onChangePath: (newPath: string) => void
 }>({
-  shadowDomName: 'drives-breadcrumbs',
+  customElementName: 'drives-breadcrumbs',
   render: ({ props }) => {
     const { currentDrive: drive, currentPath: path, onChangePath: setPath } = props
 

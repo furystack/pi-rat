@@ -4,7 +4,7 @@ import { FullScreenLoader } from './fullscreen-loader.js'
 import { GenericErrorPage } from './generic-error.js'
 
 export const PiRatLazyLoad = Shade<Pick<LazyLoadProps, 'component'>>({
-  shadowDomName: 'shade-pirat-lazy-load',
+  customElementName: 'shade-pirat-lazy-load',
   render: ({ props, children }) => {
     return (
       <LazyLoad

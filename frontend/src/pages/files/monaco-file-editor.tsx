@@ -25,7 +25,7 @@ const getMonacoLanguage = (path: string) => {
 }
 
 export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
-  shadowDomName: 'drives-files-monaco-editor',
+  customElementName: 'drives-files-monaco-editor',
   render: ({ props, injector }) => {
     const { letter, path } = props
 
@@ -84,7 +84,7 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
 })
 
 const MonacoTextFileEditor = Shade<{ initialValue: string; language: string; onSave: (newValue: string) => void }>({
-  shadowDomName: 'monaco-text-file-editor',
+  customElementName: 'monaco-text-file-editor',
   css: {
     '& .editor-container': {
       position: 'fixed',

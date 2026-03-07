@@ -8,7 +8,7 @@ type MediaOverviewLayoutProps = {
 }
 
 export const MediaOverviewLayout = Shade<MediaOverviewLayoutProps>({
-  shadowDomName: 'media-overview-layout',
+  customElementName: 'media-overview-layout',
   css: {
     '& .overview-page': {
       width: '100%',

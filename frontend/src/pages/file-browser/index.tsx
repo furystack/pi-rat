@@ -10,7 +10,7 @@ export type DriveLocation = {
 }
 
 export const DrivesPage = Shade({
-  shadowDomName: 'drives-page',
+  customElementName: 'drives-page',
   css: {
     '& .empty-state': {
       marginTop: '8em',

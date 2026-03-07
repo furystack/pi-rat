@@ -6,7 +6,7 @@ import { GenericErrorPage } from '../../components/generic-error.js'
 import { LazyMonacoEditor } from '../../components/lazy-monaco-editor.js'
 
 export const LogEntry = Shade<{ id: string }>({
-  shadowDomName: 'shade-app-log-entry-page',
+  customElementName: 'shade-app-log-entry-page',
   css: {
     '& .log-entry-container': {
       position: 'fixed',

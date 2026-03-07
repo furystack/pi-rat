@@ -36,7 +36,7 @@ export const isOmdbRawFormData = (data: unknown): data is OmdbRawFormData => {
 }
 
 const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
-  shadowDomName: 'omdb-settings-content',
+  customElementName: 'omdb-settings-content',
   css: {
     '& .page-description': {
       marginBottom: '24px',
@@ -195,7 +195,7 @@ const OmdbSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 })
 
 export const OmdbSettingsPage = Shade({
-  shadowDomName: 'omdb-settings-page',
+  customElementName: 'omdb-settings-page',
   render: ({ injector }) => {
     const configService = injector.getInstance(ConfigService)
 

@@ -12,7 +12,7 @@ const DriveSelectorContent = Shade<{
   searchStateKey: string
   defaultDriveLetter: string
 }>({
-  shadowDomName: 'drive-selector-content',
+  customElementName: 'drive-selector-content',
   render: ({ props, useSearchState }) => {
     const [currentDrive, setCurrentDrive] = useSearchState(props.searchStateKey, {
       path: '/',
@@ -40,7 +40,7 @@ export const DriveSelector = Shade<{
   searchStateKey: string
   defaultDriveLetter: string
 }>({
-  shadowDomName: 'drive-selector',
+  customElementName: 'drive-selector',
   render: ({ props, injector }) => {
     const drivesService = injector.getInstance(DrivesService)
 

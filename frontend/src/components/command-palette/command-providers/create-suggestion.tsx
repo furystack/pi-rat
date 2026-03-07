@@ -18,7 +18,7 @@ type SuggestionItemProps = {
 }
 
 const SuggestionItem = Shade<SuggestionItemProps>({
-  shadowDomName: 'command-palette-suggestion-item',
+  customElementName: 'command-palette-suggestion-item',
   css: {
     display: 'flex',
     alignItems: 'center',

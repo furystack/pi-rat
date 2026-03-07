@@ -4,7 +4,7 @@ import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
 import { SeriesService } from '../../services/series-service.js'
 
 export const SeriesList = Shade({
-  shadowDomName: 'shade-movie-list',
+  customElementName: 'shade-movie-list',
   css: {
     '& .series-grid': {
       marginTop: '64px',

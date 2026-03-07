@@ -10,7 +10,7 @@ import { MessageInput } from './message-input.js'
 import { MessageList } from './message-list.js'
 
 export const ChatFlow = Shade({
-  shadowDomName: 'shade-app-chat-flow',
+  customElementName: 'shade-app-chat-flow',
   css: {
     display: 'flex',
     '& .empty-state': {

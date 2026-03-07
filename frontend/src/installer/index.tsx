@@ -6,7 +6,7 @@ import { CreateAdminStep } from './create-admin-step.js'
 import { WelcomeStep } from './welcome-step.js'
 
 export const InstallerPage = Shade({
-  shadowDomName: 'shade-installer-page',
+  customElementName: 'shade-installer-page',
   render: () => {
     return (
       <BubbleBackground

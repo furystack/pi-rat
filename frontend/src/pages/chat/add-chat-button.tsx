@@ -19,7 +19,7 @@ export const isAddChatPayload = (data: unknown): data is AddChatPayload => {
 }
 
 export const AddChatButton = Shade({
-  shadowDomName: 'shade-app-chat-add-chat-button',
+  customElementName: 'shade-app-chat-add-chat-button',
   render: ({ useState, injector }) => {
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
 

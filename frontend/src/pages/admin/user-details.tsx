@@ -27,7 +27,7 @@ type RoleChange = {
 }
 
 const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
-  shadowDomName: 'user-details-content',
+  customElementName: 'user-details-content',
   css: {
     '& .section-title': {
       marginTop: '0',
@@ -302,7 +302,7 @@ type UserDetailsPageProps = {
 }
 
 export const UserDetailsPage = Shade<UserDetailsPageProps>({
-  shadowDomName: 'user-details-page',
+  customElementName: 'user-details-page',
   render: ({ props, injector }) => {
     const usersService = injector.getInstance(UsersService)
 

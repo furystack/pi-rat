@@ -57,7 +57,7 @@ const deriveDescription = (error: unknown): string => {
 }
 
 export const GenericErrorPage = Shade<GenericErrorProps>({
-  shadowDomName: 'multiverse-generic-error-page',
+  customElementName: 'multiverse-generic-error-page',
   render: ({ props, injector }) => {
     const status = deriveStatus(props.error)
     const mainTitle = resultDefaultTitles[status]

@@ -5,7 +5,7 @@ import { SessionService } from '../../services/session.js'
 import { ChatService } from './chat-service.js'
 
 export const DeleteChatButton = Shade<{ chat: Chat }>({
-  shadowDomName: 'shade-app-delete-chat-button',
+  customElementName: 'shade-app-delete-chat-button',
   render: ({ injector, props, useSearchState }) => {
     const chatService = injector.getInstance(ChatService)
 
