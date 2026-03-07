@@ -16,7 +16,7 @@ export class IotAppModel implements InternalAppModel {
 
   declare private injector: Injector
 
-  private options!: IotPluginOptions
+  private options: IotPluginOptions | undefined
 
   public configure(options: IotPluginOptions) {
     this.options = options
@@ -24,6 +24,9 @@ export class IotAppModel implements InternalAppModel {
   }
 
   public async setup() {
+    if (!this.options) {
+      throw new Error('IotAppModel.configure() must be called before setup()')
+    }
     await Promise.all([setupIotStore(this.injector, this.options), setupIotApi(this.injector, this.options)])
   }
 }

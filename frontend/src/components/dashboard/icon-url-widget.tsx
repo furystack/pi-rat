@@ -38,7 +38,7 @@ const blur = (el: HTMLElement) => {
 type IconUrlWidgetProps = {
   index?: number
   description?: string
-  url: AppPaths
+  url: AppPaths | (string & {})
   icon: JSX.Element
   name: string
 }

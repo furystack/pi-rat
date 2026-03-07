@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { IotDevicesService } from './iot-devices-service.js'
 import { IotApiClient } from './api-clients/iot-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
-import type { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
+import type { Device, DeviceAwakeHistory, DevicePingHistory } from '@pi-rat/iot-common'
 
 const createMockDevice = (name = 'test-device', ipAddress = '192.168.1.100'): Device => ({
   name,

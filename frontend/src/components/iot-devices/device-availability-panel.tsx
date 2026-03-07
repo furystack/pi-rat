@@ -1,7 +1,7 @@
 import { hasCacheValue } from '@furystack/cache'
 import { Shade, createComponent } from '@furystack/shades'
 import { cssVariableTheme, Icon, icons, Loader } from '@furystack/shades-common-components'
-import type { Device } from 'common'
+import type { Device } from '@pi-rat/iot-common'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 
 export const DeviceAvailabilityPanel = Shade<Device>({

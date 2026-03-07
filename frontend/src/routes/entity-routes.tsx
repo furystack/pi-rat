@@ -107,18 +107,6 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/iot-devices': {
-    meta: { title: 'IoT Devices', icon: icons.plug },
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { IotDevicesPage } = await import('../pages/entities/iot-devices.js')
-          return <IotDevicesPage />
-        }}
-      />
-    ),
-    children: entityEditorChildren,
-  },
   '/logging': {
     meta: { title: 'Logging', icon: icons.fileText },
     component: () => (

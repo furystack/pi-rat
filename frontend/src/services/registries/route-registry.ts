@@ -6,6 +6,11 @@ export class RouteRegistry {
   private pluginRoutes: Record<string, NestedRoute<unknown>> = {}
 
   public registerRoutes(routes: Record<string, NestedRoute<unknown>>) {
+    for (const key of Object.keys(routes)) {
+      if (key in this.pluginRoutes) {
+        console.warn(`[RouteRegistry] Route '${key}' is already registered and will be overwritten`)
+      }
+    }
     Object.assign(this.pluginRoutes, routes)
   }
 

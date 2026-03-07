@@ -1,7 +1,7 @@
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
 import { Injectable, Injected } from '@furystack/inject'
-import type { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
+import type { Device, DeviceAwakeHistory, DevicePingHistory } from '@pi-rat/iot-common'
 import { IotApiClient } from './api-clients/iot-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 

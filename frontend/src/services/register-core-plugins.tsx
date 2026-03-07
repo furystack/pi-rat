@@ -3,7 +3,6 @@ import type { Injector } from '@furystack/inject'
 import type {
   AppShortcutWidget as AppShortcutWidgetData,
   ContinueWatchingWidgetGroup as ContinueWatchingData,
-  DeviceAvailability as DeviceAvailabilityData,
   EntityShortcutWidget as EntityShortcutWidgetData,
   HtmlWidget as HtmlWidgetData,
   MarkdownWidget as MarkdownWidgetData,
@@ -14,7 +13,6 @@ import type {
 
 import { AppShortcutWidget } from '../components/dashboard/app-shortcut-widget.js'
 import { ContinueWatchingWidgetGroup } from '../components/dashboard/continue-watching.js'
-import { DeviceAvailability } from '../components/dashboard/device-availability.js'
 import { EntityShortcutWidget } from '../components/dashboard/entity-shortcut-widget.js'
 import { HtmlWidget } from '../components/dashboard/html-widget.js'
 import { MarkdownWidget } from '../components/dashboard/markdown-widget.js'
@@ -30,9 +28,9 @@ import { searchSeriesCommandProvider } from '../components/command-palette/comma
 import { CommandProviderRegistry, WidgetRegistry } from './registries/index.js'
 
 /**
- * Registers all built-in widgets and command providers into the registries.
- * When plugins are extracted, their registrations will move to their own
- * registerXxxPlugin() functions.
+ * Registers core built-in widgets and command providers into the registries.
+ * Plugin-specific registrations live in their own register functions
+ * (e.g. registerIotFrontend).
  */
 export const registerCorePlugins = (injector: Injector) => {
   const w = injector.getInstance(WidgetRegistry)
@@ -44,7 +42,6 @@ export const registerCorePlugins = (injector: Injector) => {
   w.registerWidget('movie', (p) => <MovieWidget {...(p as MovieWidgetData)} />)
   w.registerWidget('series', (p) => <SeriesWidget {...(p as SeriesWidgetData)} />)
   w.registerWidget('continue-watching', (p) => <ContinueWatchingWidgetGroup {...(p as ContinueWatchingData)} />)
-  w.registerWidget('device-availability', (p) => <DeviceAvailability {...(p as DeviceAvailabilityData)} />)
 
   const c = injector.getInstance(CommandProviderRegistry)
   c.registerProvider(appSettingsCommandProvider)

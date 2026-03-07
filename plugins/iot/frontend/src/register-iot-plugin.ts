@@ -3,11 +3,18 @@ import type { Injector } from '@furystack/inject'
 /**
  * Registers the IoT plugin's frontend contributions.
  *
- * Currently a placeholder that will be populated when IoT frontend code
- * is fully migrated to this package. For now, IoT routes/widgets/settings/entities
- * are still registered via registerCorePlugins() in the main frontend package.
+ * Phase 2 TODO: Move IoT pages, components, and services from the core frontend
+ * into this package. Currently, IoT frontend registrations are handled by
+ * registerIotFrontend() in the core frontend because the page components depend
+ * on shared core utilities (PiRatLazyLoad, GenericEditor, AppLink, etc.) that
+ * haven't been extracted into a shared package yet.
+ *
+ * Once shared frontend utilities are extracted, this function will:
+ * - Register IoT routes via RouteRegistry
+ * - Register device-availability widget via WidgetRegistry
+ * - Register IoT settings via SettingsRegistry
+ * - Register IoT entity routes via EntityRouteRegistry
  */
 export const registerIotPlugin = (_injector: Injector) => {
-  // IoT frontend registrations will be moved here from registerCorePlugins()
-  // when the IoT pages, components, and services are migrated to this package.
+  // Placeholder for Phase 2 - see registerIotFrontend() in the core frontend
 }

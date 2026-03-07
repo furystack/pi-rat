@@ -10,7 +10,12 @@ export const settingsChildren = {
   '/': {
     component: () => <></>,
     onVisit: async ({ injector }: { injector: Injector }) => {
-      navigateToRoute(injector, '/app-settings/omdb', {}, { replace: true })
+      const pluginSettings = injector.getInstance(SettingsRegistry).getSettingsRoutes()
+      const allKeys = [...Object.keys(settingsChildren).filter((k) => k !== '/'), ...Object.keys(pluginSettings)]
+      const firstPath = allKeys[0]
+      if (firstPath) {
+        navigateToRoute(injector, `/app-settings${firstPath}` as '/app-settings', {}, { replace: true })
+      }
     },
   },
   '/omdb': {
@@ -31,17 +36,6 @@ export const settingsChildren = {
         component={async () => {
           const { StreamingSettingsPage } = await import('../pages/admin/streaming-settings.js')
           return <StreamingSettingsPage />
-        }}
-      />
-    ),
-  },
-  '/iot': {
-    meta: { title: 'IoT Settings', icon: icons.plug },
-    component: () => (
-      <PiRatLazyLoad
-        component={async () => {
-          const { IotSettingsPage } = await import('../pages/admin/iot-settings.js')
-          return <IotSettingsPage />
         }}
       />
     ),

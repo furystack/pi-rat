@@ -2,7 +2,8 @@ import type { CacheWithValue } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
 import { CacheView, Skeleton } from '@furystack/shades-common-components'
-import type { Device, DeviceAvailability as DeviceAvailabilityProps, Icon as IconType } from 'common'
+import type { Device } from '@pi-rat/iot-common'
+import type { DeviceAvailability as DeviceAvailabilityProps, Icon as IconType } from 'common'
 import { AppLink } from '../../routes/index.js'
 import { navigateToRoute } from '../../navigate-to-route.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
@@ -44,7 +45,7 @@ const DeviceAvailabilityContent = Shade<{
                     ev.stopImmediatePropagation()
                     navigateToRoute(
                       injector,
-                      '/entities/iot-devices',
+                      '/entities/iot-devices' as '/entities',
                       {},
                       {
                         queryString: serializeToQueryString({

@@ -8,7 +8,6 @@ const entityValues: SchemaGenerationSetting[] = [
   { inputFile: './src/models/drives/*.ts', outputFile: './schemas/drives-entities.json', type: '*' },
   { inputFile: './src/models/identity/*.ts', outputFile: './schemas/identity-entities.json', type: '*' },
   { inputFile: './src/models/install/*.ts', outputFile: './schemas/install-entitis.json', type: '*' },
-  { inputFile: './src/models/iot/*.ts', outputFile: './schemas/iot-entities.json', type: '*' },
   { inputFile: './src/models/media/*.ts', outputFile: './schemas/media-entities.json', type: '*' },
   { inputFile: './src/models/logging/*.ts', outputFile: './schemas/logging-entities.json', type: '*' },
 ]
@@ -21,7 +20,6 @@ const apiValues: SchemaGenerationSetting[] = [
   { inputFile: './src/apis/drives.ts', outputFile: './schemas/drives-api.json', type: '*' },
   { inputFile: './src/apis/identity.ts', outputFile: './schemas/identity-api.json', type: '*' },
   { inputFile: './src/apis/install.ts', outputFile: './schemas/install-api.json', type: '*' },
-  { inputFile: './src/apis/iot.ts', outputFile: './schemas/iot-api.json', type: '*' },
   { inputFile: './src/apis/logging.ts', outputFile: './schemas/logging-api.json', type: '*' },
   { inputFile: './src/apis/media.ts', outputFile: './schemas/media-api.json', type: '*' },
 ]

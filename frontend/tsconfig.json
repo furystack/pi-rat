@@ -11,5 +11,5 @@
     "lib": ["WebWorker", "DOM", "ES2021", "DOM.Iterable"]
   },
   "include": ["src", "src/**/*.json", "src/*.json"],
-  "references": [{ "path": "../common" }, { "path": "../plugins/iot/common" }, { "path": "../plugins/iot/frontend" }]
+  "references": [{ "path": "../common" }, { "path": "../plugins/iot/common" }]
 }

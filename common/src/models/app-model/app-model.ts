@@ -7,7 +7,7 @@ export interface AppModel {
 }
 
 export type EntitySyncModelConfig = {
-  model: new (...args: any[]) => object
+  model: new (...args: unknown[]) => object
   primaryKey: string
   debounceMs?: number
 }

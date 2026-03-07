@@ -80,15 +80,6 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     },
   },
   {
-    name: 'IOT Device Entities',
-    description: 'List, edit and create IOT Device entities',
-    icon: '📡',
-    score: 1,
-    onSelected: ({ injector }) => {
-      navigateToRoute(injector, '/entities/iot-devices')
-    },
-  },
-  {
     name: 'Log entries',
     description: 'View the log entries',
     icon: <Icon icon={icons.fileText} size="small" />,

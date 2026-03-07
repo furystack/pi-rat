@@ -9,6 +9,10 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./bin/schema-utils": {
+      "import": "./dist/bin/schema-utils.js",
+      "types": "./dist/bin/schema-utils.d.ts"
+    },
     "./schemas/*": {
       "import": "./schemas/*"
     },

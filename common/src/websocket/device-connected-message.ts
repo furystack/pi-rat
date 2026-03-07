@@ -1,6 +1,4 @@
-import type { Device } from '../models/iot/device.js'
-
 export interface DeviceConnectedMessage {
   type: 'device-connected'
-  device: Device
+  device: { name: string; ipAddress?: string; macAddress?: string }
 }

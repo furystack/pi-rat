@@ -9,8 +9,8 @@ import { ThemeProviderService } from '@furystack/shades-common-components'
 import { AiChatMessage, Chat, ChatMessage, LogEntry } from 'common'
 import { Layout } from './components/layout.js'
 import { environmentOptions } from './environment-options.js'
-import { registerIotPlugin } from '@pi-rat/iot-frontend'
 import { registerCorePlugins } from './services/register-core-plugins.js'
+import { registerIotFrontend } from './services/register-iot-frontend.js'
 import { SessionService } from './services/session.js'
 import { registerThemeSwitchCheat } from './theme-switch-cheat.js'
 import { darkTheme } from './themes/dark.js'
@@ -56,7 +56,7 @@ syncService.addListener('onReconnectFailed', ({ attempt }) => {
 shadeInjector.setExplicitInstance(syncService)
 
 registerCorePlugins(shadeInjector)
-registerIotPlugin(shadeInjector)
+registerIotFrontend(shadeInjector)
 
 void shadeInjector.getInstance(SessionService).init()
 
