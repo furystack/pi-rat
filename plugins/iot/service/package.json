@@ -1,0 +1,30 @@
+{
+  "name": "@pi-rat/iot-service",
+  "version": "0.1.0",
+  "license": "GPL-2.0-only",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "dependencies": {
+    "@furystack/core": "^15.2.5",
+    "@furystack/inject": "^12.0.32",
+    "@furystack/logging": "^8.1.1",
+    "@furystack/repository": "^10.1.6",
+    "@furystack/rest-service": "^12.3.0",
+    "@furystack/sequelize-store": "^6.0.44",
+    "@furystack/utils": "^8.2.1",
+    "@pi-rat/iot-common": "workspace:^",
+    "common": "workspace:^",
+    "ping": "^1.0.0",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/ping": "^0.4.4"
+  }
+}

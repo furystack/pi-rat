@@ -1,10 +1,8 @@
 import { Injectable, Injected } from '@furystack/inject'
 import { getLogger, type ScopedLogger } from '@furystack/logging'
-import type { AppModel } from 'common'
+import type { AppModel, EntitySyncModelConfig, InternalAppModel } from 'common'
 
-export interface InternalAppModel extends AppModel {
-  setup?: () => Promise<void>
-}
+export type { EntitySyncModelConfig, InternalAppModel } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class AppModelManager {
@@ -48,6 +46,13 @@ export class AppModelManager {
         }
       }),
     )
+  }
+
+  public getEntitySyncModels(): EntitySyncModelConfig[] {
+    return [...this.appModels.values()].flatMap((am) => {
+      const internalAm = am as InternalAppModel
+      return internalAm.getEntitySyncModels ? internalAm.getEntitySyncModels() : []
+    })
   }
 
   private updateAppModelState(appModelId: string, state: AppModel['state']) {

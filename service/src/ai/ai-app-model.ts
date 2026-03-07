@@ -1,6 +1,6 @@
 import { Injectable, type Injector } from '@furystack/inject'
-import type { AppState } from 'common'
-import type { InternalAppModel } from '../AppModelManager.js'
+import { AiChatMessage, type AppState } from 'common'
+import type { EntitySyncModelConfig, InternalAppModel } from '../AppModelManager.js'
 import { AiManifest } from './ai-manifest.js'
 import { setupAiRestApi } from './setup-ai-rest-api.js'
 import { setupAi } from './setup-ai.js'
@@ -13,6 +13,10 @@ export class AiAppModel implements InternalAppModel {
   }
 
   declare private injector: Injector
+
+  public getEntitySyncModels(): EntitySyncModelConfig[] {
+    return [{ model: AiChatMessage, primaryKey: 'id' }]
+  }
 
   public async setup() {
     await Promise.all([setupAi(this.injector), setupAiRestApi(this.injector)])

@@ -1,5 +1,6 @@
 import { Injectable, Injector } from '@furystack/inject'
-import type { InternalAppModel } from '../../AppModelManager.js'
+import { Chat, ChatMessage } from 'common'
+import type { EntitySyncModelConfig, InternalAppModel } from '../../AppModelManager.js'
 import { ChatAppManifest } from './manifest.js'
 import { setupChatRestApi } from './setup-chat-api.js'
 import { setupChatStore } from './setup-chat-store.js'
@@ -12,6 +13,13 @@ export class ChatAppModel implements InternalAppModel {
   }
 
   declare private injector: Injector
+
+  public getEntitySyncModels(): EntitySyncModelConfig[] {
+    return [
+      { model: Chat, primaryKey: 'id' },
+      { model: ChatMessage, primaryKey: 'id', debounceMs: 100 },
+    ]
+  }
 
   public async setup() {
     await Promise.all([setupChatStore(this.injector), setupChatRestApi(this.injector)])

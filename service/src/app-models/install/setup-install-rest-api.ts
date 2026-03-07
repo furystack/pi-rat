@@ -6,8 +6,16 @@ import installApiSchema from 'common/schemas/install-api.json' with { type: 'jso
 
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
+import { GetAppModels } from './actions/get-app-models.js'
 import { GetServiceStatus } from './actions/get-service-status.js'
 import { PostInstallAction } from './actions/post-install-action.js'
+
+// AppModelManifest's Record<string, string[]> generates additionalProperties
+// as an object in JSON Schema, which is valid but incompatible with the
+// Validate type's narrower boolean-only additionalProperties definition.
+const schema = installApiSchema as unknown as {
+  definitions: Record<string, { required?: string[]; additionalProperties?: boolean; [key: string]: unknown }>
+}
 
 export const setupInstallRestApi = async (injector: Injector) => {
   await useRestService<InstallApi>({
@@ -17,12 +25,11 @@ export const setupInstallRestApi = async (injector: Injector) => {
     cors: getCorsOptions(),
     api: {
       GET: {
-        '/serviceStatus': Validate({ schema: installApiSchema, schemaName: 'GetServiceStatusAction' })(
-          GetServiceStatus,
-        ),
+        '/serviceStatus': Validate({ schema, schemaName: 'GetServiceStatusAction' })(GetServiceStatus),
+        '/app-models': Validate({ schema, schemaName: 'GetAppModelsAction' })(GetAppModels),
       },
       POST: {
-        '/install': Validate({ schema: installApiSchema, schemaName: 'InstallAction' })(PostInstallAction),
+        '/install': Validate({ schema, schemaName: 'InstallAction' })(PostInstallAction),
       },
     },
   })

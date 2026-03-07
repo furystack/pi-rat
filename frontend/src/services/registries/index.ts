@@ -1,0 +1,7 @@
+export { RouteRegistry } from './route-registry.js'
+export { WidgetRegistry } from './widget-registry.js'
+export { CommandProviderRegistry } from './command-provider-registry.js'
+export { SettingsRegistry } from './settings-registry.js'
+export { EntityRouteRegistry } from './entity-route-registry.js'
+export { FileContextMenuRegistry, type FileContextMenuContribution } from './file-context-menu-registry.js'
+export { FileAssociationRegistry, type FileAssociation } from './file-association-registry.js'

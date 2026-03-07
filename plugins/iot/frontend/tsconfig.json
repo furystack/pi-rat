@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "jsx": "react",
+    "jsxFactory": "createComponent",
+    "jsxFragmentFactory": "createComponent",
+    "resolveJsonModule": true,
+    "lib": ["WebWorker", "DOM", "ES2021", "DOM.Iterable"]
+  },
+  "include": ["src", "src/**/*.json", "src/*.json"],
+  "references": [{ "path": "../../../common" }, { "path": "../common" }]
+}

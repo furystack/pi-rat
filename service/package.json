@@ -32,6 +32,7 @@
     "@furystack/sequelize-store": "^6.0.44",
     "@furystack/utils": "^8.2.1",
     "@furystack/websocket-api": "^13.2.2",
+    "@pi-rat/iot-service": "workspace:^",
     "chokidar": "^5.0.0",
     "common": "workspace:^",
     "formidable": "^3.5.4",

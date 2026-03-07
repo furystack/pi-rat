@@ -19,6 +19,9 @@ export default tseslint.config(
       '*/esm/*',
       '*/types/*',
       '*/dist/*',
+      'plugins/*/common/dist/*',
+      'plugins/*/service/dist/*',
+      'plugins/*/frontend/dist/*',
       '.yarn/*',
       'eslint.config.js',
       'prettier.config.js',
@@ -34,7 +37,7 @@ export default tseslint.config(
   },
   prettierConfig,
   {
-    files: ['frontend/**/*.tsx', 'frontend/**/*.ts'],
+    files: ['frontend/**/*.tsx', 'frontend/**/*.ts', 'plugins/*/frontend/**/*.tsx', 'plugins/*/frontend/**/*.ts'],
     ...furystack.configs.shadesStrict,
   },
   {

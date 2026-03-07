@@ -29,6 +29,7 @@
     "@furystack/shades-lottie": "^9.0.0",
     "@furystack/shades-mfe": "^3.0.0",
     "@furystack/utils": "^8.2.1",
+    "@pi-rat/iot-frontend": "workspace:^",
     "@types/node": "^25.3.5",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-search": "^0.16.0",

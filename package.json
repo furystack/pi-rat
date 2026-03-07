@@ -13,7 +13,10 @@
       "common",
       "frontend",
       "service",
-      "monaco-mfe"
+      "monaco-mfe",
+      "plugins/*/common",
+      "plugins/*/service",
+      "plugins/*/frontend"
     ]
   },
   "devDependencies": {
@@ -51,8 +54,8 @@
   "scripts": {
     "prepare": "husky",
     "build:monaco-mfe": "yarn workspace monaco-mfe build",
-    "build": "yarn build:monaco-mfe && tsc -b common service frontend && yarn workspace frontend build",
-    "create-schemas": "yarn workspace common create-schemas",
+    "build": "yarn build:monaco-mfe && tsc -b common plugins/iot/common plugins/iot/service service plugins/iot/frontend frontend && yarn workspace frontend build",
+    "create-schemas": "yarn workspace common create-schemas && yarn workspace @pi-rat/iot-common create-schemas",
     "test:e2e:install": "yarn playwright test --grep @install --project chromium",
     "test:e2e": "yarn playwright test --grep-invert @install",
     "test": "vitest",

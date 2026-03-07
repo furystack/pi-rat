@@ -1,7 +1,8 @@
 import { createComponent, NestedRouter, Shade } from '@furystack/shades'
 import { cssVariableTheme } from '@furystack/shades-common-components'
-import { appRoutes, authRoutes } from '../routes/index.js'
+import { authRoutes, createAppRoutes } from '../routes/index.js'
 import { Init, Offline } from '../pages/index.js'
+import { RouteRegistry } from '../services/registries/index.js'
 import { SessionService } from '../services/session.js'
 
 export const Body = Shade({
@@ -14,8 +15,11 @@ export const Body = Shade({
     const [sessionState] = useObservable('sessionState', session.state)
 
     switch (sessionState) {
-      case 'authenticated':
-        return <NestedRouter routes={appRoutes} />
+      case 'authenticated': {
+        const coreRoutes = createAppRoutes(injector)
+        const pluginRoutes = injector.getInstance(RouteRegistry).getRoutes()
+        return <NestedRouter routes={{ ...coreRoutes, ...pluginRoutes }} />
+      }
       case 'offline':
         return <Offline />
       case 'unauthenticated':

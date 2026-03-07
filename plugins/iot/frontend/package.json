@@ -1,0 +1,23 @@
+{
+  "name": "@pi-rat/iot-frontend",
+  "version": "0.1.0",
+  "license": "GPL-2.0-only",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "dependencies": {
+    "@furystack/cache": "^6.1.1",
+    "@furystack/inject": "^12.0.32",
+    "@furystack/rest-client-fetch": "^8.1.2",
+    "@furystack/shades": "^13.0.0",
+    "@furystack/shades-common-components": "^14.0.0",
+    "@furystack/utils": "^8.2.1",
+    "@pi-rat/iot-common": "workspace:^",
+    "common": "workspace:^"
+  }
+}

@@ -2,6 +2,7 @@ import { Injector } from '@furystack/inject'
 import { createComponent, flushUpdates, initializeShadeRoot } from '@furystack/shades'
 import { usingAsync } from '@furystack/utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { registerCorePlugins } from '../../services/register-core-plugins.js'
 
 import { Widget } from './widget.js'
 
@@ -23,6 +24,7 @@ describe('Widget', () => {
 
   it('should render AppShortcutWidget for app-shortcut type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -42,6 +44,7 @@ describe('Widget', () => {
 
   it('should render EntityShortcutWidget for entity-shortcut type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -61,6 +64,7 @@ describe('Widget', () => {
 
   it('should render HtmlWidget for html type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -81,6 +85,7 @@ describe('Widget', () => {
 
   it('should render MarkdownWidget for markdown type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -100,6 +105,7 @@ describe('Widget', () => {
 
   it('should render WidgetGroup for group type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -119,6 +125,7 @@ describe('Widget', () => {
 
   it('should render MovieWidget for movie type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -138,6 +145,7 @@ describe('Widget', () => {
 
   it('should render SeriesWidget for series type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -157,6 +165,7 @@ describe('Widget', () => {
 
   it('should render ContinueWatchingWidgetGroup for continue-watching type', async () => {
     await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({

@@ -1283,6 +1283,51 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pi-rat/iot-common@workspace:^, @pi-rat/iot-common@workspace:plugins/iot/common":
+  version: 0.0.0-use.local
+  resolution: "@pi-rat/iot-common@workspace:plugins/iot/common"
+  dependencies:
+    "@furystack/rest": "npm:^8.1.0"
+    common: "workspace:^"
+    ts-json-schema-generator: "npm:^2.9.0"
+  languageName: unknown
+  linkType: soft
+
+"@pi-rat/iot-frontend@workspace:^, @pi-rat/iot-frontend@workspace:plugins/iot/frontend":
+  version: 0.0.0-use.local
+  resolution: "@pi-rat/iot-frontend@workspace:plugins/iot/frontend"
+  dependencies:
+    "@furystack/cache": "npm:^6.1.1"
+    "@furystack/inject": "npm:^12.0.32"
+    "@furystack/rest-client-fetch": "npm:^8.1.2"
+    "@furystack/shades": "npm:^13.0.0"
+    "@furystack/shades-common-components": "npm:^14.0.0"
+    "@furystack/utils": "npm:^8.2.1"
+    "@pi-rat/iot-common": "workspace:^"
+    common: "workspace:^"
+  languageName: unknown
+  linkType: soft
+
+"@pi-rat/iot-service@workspace:^, @pi-rat/iot-service@workspace:plugins/iot/service":
+  version: 0.0.0-use.local
+  resolution: "@pi-rat/iot-service@workspace:plugins/iot/service"
+  dependencies:
+    "@furystack/core": "npm:^15.2.5"
+    "@furystack/inject": "npm:^12.0.32"
+    "@furystack/logging": "npm:^8.1.1"
+    "@furystack/repository": "npm:^10.1.6"
+    "@furystack/rest-service": "npm:^12.3.0"
+    "@furystack/sequelize-store": "npm:^6.0.44"
+    "@furystack/utils": "npm:^8.2.1"
+    "@pi-rat/iot-common": "workspace:^"
+    "@types/ping": "npm:^0.4.4"
+    common: "workspace:^"
+    ping: "npm:^1.0.0"
+    sequelize: "npm:^6.37.7"
+    sqlite3: "npm:^5.1.7"
+  languageName: unknown
+  linkType: soft
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -4609,6 +4654,7 @@ __metadata:
     "@furystack/shades-lottie": "npm:^9.0.0"
     "@furystack/shades-mfe": "npm:^3.0.0"
     "@furystack/utils": "npm:^8.2.1"
+    "@pi-rat/iot-frontend": "workspace:^"
     "@types/node": "npm:^25.3.5"
     "@xterm/addon-fit": "npm:^0.11.0"
     "@xterm/addon-search": "npm:^0.16.0"
@@ -7642,6 +7688,7 @@ __metadata:
     "@furystack/sequelize-store": "npm:^6.0.44"
     "@furystack/utils": "npm:^8.2.1"
     "@furystack/websocket-api": "npm:^13.2.2"
+    "@pi-rat/iot-service": "workspace:^"
     "@types/ffprobe": "npm:^1.1.8"
     "@types/formidable": "npm:^3.5.0"
     "@types/node": "npm:^25.3.5"

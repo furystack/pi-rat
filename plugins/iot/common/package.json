@@ -1,0 +1,34 @@
+{
+  "name": "@pi-rat/iot-common",
+  "version": "0.1.0",
+  "license": "GPL-2.0-only",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./schemas/*": {
+      "import": "./schemas/*"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "scripts": {
+    "create-schemas": "node ./dist/bin/create-schemas.js"
+  },
+  "devDependencies": {
+    "ts-json-schema-generator": "^2.9.0"
+  },
+  "dependencies": {
+    "@furystack/rest": "^8.1.0",
+    "common": "workspace:^"
+  }
+}

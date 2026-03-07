@@ -4,6 +4,7 @@ import { icons } from '@furystack/shades-common-components'
 import type { MatchResult } from 'path-to-regexp'
 import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 import { navigateToRoute } from '../navigate-to-route.js'
+import { SettingsRegistry } from '../services/registries/index.js'
 
 export const settingsChildren = {
   '/': {
@@ -95,4 +96,15 @@ export const settingsRoute = {
     />
   ),
   children: settingsChildren,
+}
+
+export const createSettingsRoute = (injector: Injector) => {
+  const pluginSettings = injector.getInstance(SettingsRegistry).getSettingsRoutes()
+  return {
+    ...settingsRoute,
+    children: {
+      ...settingsChildren,
+      ...pluginSettings,
+    },
+  }
 }
