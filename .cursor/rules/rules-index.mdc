@@ -12,3 +12,4 @@ This file contains a list of helpful information and context that the agent can 
 - [REST action Validate() wrappers and explicit param checking before system calls](./REST_ACTION_VALIDATION.mdc)
 - [Singleton concurrency guards, getOrCreate race prevention, fire-and-forget init, dispose-before-reinit, and safe Map iteration](./SINGLETON_CONCURRENCY.md)
 - [MFE runtime type boundaries, duplicate type contracts, and cross-package type sync](./MFE_TYPE_CONTRACTS.md)
+- [Plugin architecture: package structure, extraction checklist, dependency direction, registries, AppModel pattern, and schema generation](./PLUGIN_ARCHITECTURE.md)

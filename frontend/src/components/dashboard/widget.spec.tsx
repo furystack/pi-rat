@@ -183,6 +183,24 @@ describe('Widget', () => {
     })
   })
 
+  it('should render fallback for unknown widget type', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      registerCorePlugins(injector)
+      const rootElement = document.getElementById('root') as HTMLDivElement
+
+      initializeShadeRoot({
+        injector,
+        rootElement,
+        jsxElement: <Widget type="nonexistent-type" />,
+      })
+      await flushUpdates()
+
+      const widget = document.querySelector('pi-rat-widget')
+      expect(widget).toBeTruthy()
+      expect(widget?.textContent).toContain('Unknown widget type: nonexistent-type')
+    })
+  })
+
   // Note: DeviceAvailability widget test is skipped because it requires complex
   // service mocking (IotDevicesService, SessionService) that's beyond the scope
   // of a simple component routing test. The routing logic is verified by the
