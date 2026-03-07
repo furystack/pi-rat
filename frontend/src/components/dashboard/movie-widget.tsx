@@ -17,7 +17,7 @@ const MovieWidgetContent = Shade<{
   index?: number
   size?: number
 }>({
-  shadowDomName: 'pi-rat-movie-widget-content',
+  customElementName: 'pi-rat-movie-widget-content',
   render: ({ props, injector, useObservable }) => {
     const { size = 256 } = props
     const movie = props.data.value
@@ -133,7 +133,7 @@ export const MovieWidget = Shade<{
   index?: number
   size?: number
 }>({
-  shadowDomName: 'pi-rat-movie-widget',
+  customElementName: 'pi-rat-movie-widget',
   render: ({ props, injector }) => {
     const movieService = injector.getInstance(MoviesService)
 

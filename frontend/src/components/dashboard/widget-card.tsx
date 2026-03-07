@@ -27,7 +27,7 @@ const blur = (card: HTMLElement) => {
 }
 
 export const WidgetCard = Shade<WidgetCardProps>({
-  shadowDomName: 'pi-rat-widget-card',
+  customElementName: 'pi-rat-widget-card',
   css: {
     '& .card': {
       display: 'flex',

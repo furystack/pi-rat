@@ -25,7 +25,7 @@ export const FolderPanel = Shade<{
   defaultDriveLetter: string
   focused?: boolean
 }>({
-  shadowDomName: 'folder-panel',
+  customElementName: 'folder-panel',
   css: {
     height: '100%',
     width: '50%',

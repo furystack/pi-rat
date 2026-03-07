@@ -16,7 +16,7 @@ const DeviceAvailabilityContent = Shade<{
   size: number
   icon?: IconType
 }>({
-  shadowDomName: 'pi-rat-device-availability-content',
+  customElementName: 'pi-rat-device-availability-content',
   render: ({ props, injector, useObservable }) => {
     const { size } = props
     const device = props.data.value
@@ -79,7 +79,7 @@ const DeviceAvailabilityContent = Shade<{
 })
 
 export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: number; size?: number }>({
-  shadowDomName: 'pi-rat-device-availability-widget',
+  customElementName: 'pi-rat-device-availability-widget',
   elementBase: HTMLDivElement,
   elementBaseName: 'div',
   render: ({ props, injector }) => {

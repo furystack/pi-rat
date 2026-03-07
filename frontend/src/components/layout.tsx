@@ -6,7 +6,7 @@ import { Header } from './header.js'
 import { PiRatLazyLoad } from './pirat-lazy-load.js'
 
 export const Layout = Shade({
-  shadowDomName: 'shade-app-layout',
+  customElementName: 'shade-app-layout',
   css: {
     width: '100%',
     height: '100%',

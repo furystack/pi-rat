@@ -9,7 +9,7 @@ import { SpeechRecognitionService } from './speech-recognition-service.js'
 import { SpeechSynthesisService } from './speech-synthesis-service.js'
 
 export const ChatPage = Shade({
-  shadowDomName: 'shade-app-chat-page',
+  customElementName: 'shade-app-chat-page',
   css: {
     marginTop: '48px',
     display: 'flex',

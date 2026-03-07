@@ -3,7 +3,7 @@ import { Result } from '@furystack/shades-common-components'
 import { environmentOptions } from '../environment-options.js'
 
 export const Offline = Shade({
-  shadowDomName: 'shade-offline',
+  customElementName: 'shade-offline',
   css: {
     display: 'flex',
     flexDirection: 'column',

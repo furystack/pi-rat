@@ -6,7 +6,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { LoggingService } from '../../services/logging-service.js'
 
 export const LoggingPage = Shade({
-  shadowDomName: 'shade-app-logging-page',
+  customElementName: 'shade-app-logging-page',
   render: ({ useDisposable, injector }) => {
     const loggingService = injector.getInstance(LoggingService)
 

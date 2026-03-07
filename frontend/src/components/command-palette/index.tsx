@@ -8,7 +8,7 @@ import { searchMovieCommandProvider } from './command-providers/search-movie.js'
 import { searchSeriesCommandProvider } from './command-providers/search-series.js'
 
 export const PiRatCommandPalette = Shade({
-  shadowDomName: 'pirat-command-palette',
+  customElementName: 'pirat-command-palette',
   render: () => {
     return (
       <CommandPalette

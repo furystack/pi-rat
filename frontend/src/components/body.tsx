@@ -5,7 +5,7 @@ import { Init, Offline } from '../pages/index.js'
 import { SessionService } from '../services/session.js'
 
 export const Body = Shade({
-  shadowDomName: 'shade-app-body',
+  customElementName: 'shade-app-body',
   css: {
     color: cssVariableTheme.text.secondary,
   },

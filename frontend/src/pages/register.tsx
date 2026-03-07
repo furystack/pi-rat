@@ -24,7 +24,7 @@ export const isRegisterPayload = (data: unknown): data is RegisterPayload => {
 }
 
 export const Register = Shade({
-  shadowDomName: 'shade-register',
+  customElementName: 'shade-register',
   css: {
     padding: '1em',
     marginTop: '48px',

@@ -42,7 +42,7 @@ export const SoundControl = Shade<{
   isMuted: ObservableValue<boolean>
   volume: ObservableValue<number>
 }>({
-  shadowDomName: 'pirat-movie-player-v2-sound-control',
+  customElementName: 'pirat-movie-player-v2-sound-control',
   css: {
     display: 'flex',
     alignItems: 'center',
@@ -70,7 +70,7 @@ export const SoundControl = Shade<{
 })
 
 export const ControlArea = Shade<ControlAreaProps>({
-  shadowDomName: 'pirat-movie-player-v2-control-area',
+  customElementName: 'pirat-movie-player-v2-control-area',
   css: {
     '& .control-bar': {
       position: 'absolute',

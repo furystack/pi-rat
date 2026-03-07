@@ -60,7 +60,7 @@ const PRESET_OPTIONS = [
 ] as const
 
 const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
-  shadowDomName: 'streaming-settings-content',
+  customElementName: 'streaming-settings-content',
   css: {
     '& .page-description': {
       marginBottom: '24px',
@@ -301,7 +301,7 @@ const StreamingSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 })
 
 export const StreamingSettingsPage = Shade({
-  shadowDomName: 'streaming-settings-page',
+  customElementName: 'streaming-settings-page',
   render: ({ injector }) => {
     const configService = injector.getInstance(ConfigService)
 

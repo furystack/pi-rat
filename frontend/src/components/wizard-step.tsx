@@ -14,7 +14,7 @@ export const WizardStep = Shade<
     onSubmit?: (formData: Record<string, string>) => void | Promise<void>
   } & WizardStepProps
 >({
-  shadowDomName: 'wizard-step',
+  customElementName: 'wizard-step',
   css: {
     '& form': {
       padding: '32px',

@@ -32,7 +32,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
   props: GenericEditorProps<T, TKey, TReadonlyProperties, TColumns>,
   childrenList: ChildrenList,
 ) => JSX.Element = Shade({
-  shadowDomName: 'shade-generic-editor',
+  customElementName: 'shade-generic-editor',
   render: ({ props, injector, useObservable }) => {
     const { service, basePath, columns, headerComponents, rowComponents, styles, schemaInfo } = props
 

@@ -8,7 +8,7 @@ import { SessionService } from '../../services/session.js'
 import { Widget } from './widget.js'
 
 export const Dashboard = Shade<DashboardData>({
-  shadowDomName: 'pi-rat-dashboard',
+  customElementName: 'pi-rat-dashboard',
   render: ({ props, injector, useObservable, useDisposable }) => {
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
 

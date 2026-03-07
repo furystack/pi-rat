@@ -19,7 +19,7 @@ export const FileList = Shade<{
   onActivate?: (entry: DirectoryEntry) => void
   service: CollectionService<DirectoryEntry>
 }>({
-  shadowDomName: 'file-list',
+  customElementName: 'file-list',
   css: {
     '& .file-row': {
       display: 'flex',

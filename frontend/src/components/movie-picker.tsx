@@ -4,7 +4,7 @@ import type { Movie } from 'common'
 import { MoviesService } from '../services/movies-service.js'
 
 export const MoviePicker = Shade({
-  shadowDomName: 'movie-picker',
+  customElementName: 'movie-picker',
   render: ({ injector }) => {
     const moviesService = injector.getInstance(MoviesService)
     return (

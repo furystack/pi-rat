@@ -30,7 +30,7 @@ export const isCreateAiChatPayload = (data: unknown): data is CreateAiChatPayloa
 }
 
 export const CreateAiChatButton = Shade({
-  shadowDomName: 'pi-rat-create-ai-chat-button',
+  customElementName: 'pi-rat-create-ai-chat-button',
   render: ({ injector, useState }) => {
     const aiChatService = injector.getInstance(AiChatService)
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)

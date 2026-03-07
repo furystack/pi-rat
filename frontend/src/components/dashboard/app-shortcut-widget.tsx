@@ -4,7 +4,7 @@ import type { AppPaths } from '../../routes/index.js'
 import { IconUrlWidget } from './icon-url-widget.js'
 
 export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
-  shadowDomName: 'pi-rat-app-shortcut-widget',
+  customElementName: 'pi-rat-app-shortcut-widget',
   render: ({ props }) => {
     const { appName, ...rest } = props
     switch (props.appName) {

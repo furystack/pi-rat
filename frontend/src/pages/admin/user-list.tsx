@@ -19,7 +19,7 @@ import { GenericErrorPage } from '../../components/generic-error.js'
 import { UsersService } from '../../services/users-service.js'
 
 const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> }>({
-  shadowDomName: 'user-list-content',
+  customElementName: 'user-list-content',
   css: {
     '& .users-table': {
       width: '100%',
@@ -145,7 +145,7 @@ const UserListContent = Shade<{ data: CacheWithValue<GetCollectionResult<User>> 
 type UserListPageProps = Record<string, never>
 
 export const UserListPage = Shade<UserListPageProps>({
-  shadowDomName: 'user-list-page',
+  customElementName: 'user-list-page',
   render: ({ injector }) => {
     const usersService = injector.getInstance(UsersService)
 

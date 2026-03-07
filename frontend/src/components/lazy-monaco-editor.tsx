@@ -20,7 +20,7 @@ type LazyMonacoEditorProps = {
 }
 
 export const LazyMonacoEditor = Shade<LazyMonacoEditorProps>({
-  shadowDomName: 'lazy-monaco-editor',
+  customElementName: 'lazy-monaco-editor',
   css: {
     display: 'block',
     height: '100%',

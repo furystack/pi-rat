@@ -5,7 +5,7 @@ import { AiChat } from './ai-chat.js'
 import { CreateAiChatButton } from './create-ai-chat-button.js'
 
 export const AiPage = Shade({
-  shadowDomName: 'pi-rat-ai-page',
+  customElementName: 'pi-rat-ai-page',
   css: {
     marginTop: '48px',
     display: 'flex',

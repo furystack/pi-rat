@@ -36,7 +36,7 @@ export const isPasswordResetPayload = (data: unknown): data is PasswordResetPayl
 }
 
 const SecuritySection = Shade({
-  shadowDomName: 'user-settings-security',
+  customElementName: 'user-settings-security',
   css: {
     '& .error-message': {
       color: cssVariableTheme.palette.error.main,
@@ -134,7 +134,7 @@ const SecuritySection = Shade({
 })
 
 const ProfileSection = Shade({
-  shadowDomName: 'user-settings-profile',
+  customElementName: 'user-settings-profile',
   css: {
     '& .field-group': {
       marginBottom: '16px',
@@ -201,7 +201,7 @@ const ProfileSection = Shade({
 })
 
 export const UserSettingsPage = Shade({
-  shadowDomName: 'user-settings-page',
+  customElementName: 'user-settings-page',
   render: () => {
     return (
       <PageContainer gap="24px">

@@ -7,7 +7,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { DashboardService } from '../../services/dashboards-service.js'
 
 export const DashboardsPage = Shade({
-  shadowDomName: 'shade-app-dashboards-page',
+  customElementName: 'shade-app-dashboards-page',
   render: ({ useDisposable, injector }) => {
     const dashboardsService = injector.getInstance(DashboardService)
 

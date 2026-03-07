@@ -4,7 +4,7 @@ import { PiRatLazyLoad } from '../pirat-lazy-load.js'
 import { DashboardService } from '../../services/dashboards-service.js'
 
 export const LoadableDashboard = Shade<{ id: string }>({
-  shadowDomName: 'pi-rat-loadable-dashboard',
+  customElementName: 'pi-rat-loadable-dashboard',
   render: ({ injector, props }) => {
     return (
       <PiRatLazyLoad

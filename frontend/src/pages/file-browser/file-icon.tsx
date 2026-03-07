@@ -8,7 +8,7 @@ const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
 const textDocumentExtensions = ['txt', 'md', 'doc', 'docx', 'pdf', 'rtf', 'odt', 'xls', 'xlsx', 'csv', 'ppt', 'pptx']
 
 export const FileIcon = Shade<{ entry: DirectoryEntry }>({
-  shadowDomName: 'file-icon',
+  customElementName: 'file-icon',
   render: ({ props }) => {
     const { entry } = props
     const { name } = entry

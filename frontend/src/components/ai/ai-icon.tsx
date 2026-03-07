@@ -3,7 +3,7 @@ import { AppBarAppLink } from '../../routes/index.js'
 import { SessionService } from '../../services/session.js'
 
 export const AiIcon = Shade({
-  shadowDomName: 'shade-app-ai-icon',
+  customElementName: 'shade-app-ai-icon',
   render: ({ injector, useObservable }) => {
     const session = injector.getInstance(SessionService)
     const [sessionState] = useObservable('sessionState', session.state)

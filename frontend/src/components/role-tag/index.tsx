@@ -11,7 +11,7 @@ type RoleTagProps = {
 }
 
 export const RoleTag = Shade<RoleTagProps>({
-  shadowDomName: 'role-tag',
+  customElementName: 'role-tag',
   css: {
     '& button': {
       opacity: '0.7',

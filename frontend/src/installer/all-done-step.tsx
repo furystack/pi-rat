@@ -6,7 +6,7 @@ import { WizardStep } from '../components/wizard-step.js'
 import done from './done.json' with { type: 'json' }
 
 export const AllDoneStep = Shade<WizardStepProps>({
-  shadowDomName: 'all-done-step',
+  customElementName: 'all-done-step',
   render: ({ props }) => {
     return (
       <WizardStep title="All done!" {...props}>

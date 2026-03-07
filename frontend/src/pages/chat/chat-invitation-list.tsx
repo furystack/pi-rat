@@ -6,7 +6,7 @@ import { SessionService } from '../../services/session.js'
 import { ChatInvitationService } from './chat-intivation-service.js'
 
 export const ChatInvitationList = Shade({
-  shadowDomName: 'shade-app-chat-invitation-list',
+  customElementName: 'shade-app-chat-invitation-list',
   style: {
     display: 'flex',
     width: '100%',

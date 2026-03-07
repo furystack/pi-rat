@@ -13,7 +13,7 @@ export const FileContextMenu = Shade<{
   currentPath: string
   open: () => void
 }>({
-  shadowDomName: 'file-context-menu',
+  customElementName: 'file-context-menu',
   render: ({ children, props, useState, injector, useDisposable }) => {
     const { entry, currentDriveLetter, currentPath, open } = props
     const [isInfoVisible, setInfoVisible] = useState('isInfoVisible', false)

@@ -6,7 +6,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { IdentityApiClient } from '../../services/api-clients/identity-api-client.js'
 
 export const UsersPage = Shade({
-  shadowDomName: 'shade-app-users-page',
+  customElementName: 'shade-app-users-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(IdentityApiClient)
 

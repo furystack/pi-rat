@@ -7,7 +7,7 @@ import { ErrorDisplay } from '../../components/error-display.js'
 export const AiChatMessageList = Shade<{
   selectedChatId: string
 }>({
-  shadowDomName: 'pi-rat-ai-chat-message-list',
+  customElementName: 'pi-rat-ai-chat-message-list',
   css: {
     display: 'block',
     width: '100%',

@@ -15,7 +15,7 @@ const RelatedMoviesContent = Shade<{
   path: string
   file: DirectoryEntry
 }>({
-  shadowDomName: 'shade-app-related-movies-content',
+  customElementName: 'shade-app-related-movies-content',
   render: ({ props, useObservable, injector }) => {
     const { drive, path, file } = props
     const linkedFiles = props.data
@@ -75,7 +75,7 @@ export const RelatedMoviesModalContent = Shade<{
   drive: string
   path: string
 }>({
-  shadowDomName: 'shade-app-related-movies-modal-content',
+  customElementName: 'shade-app-related-movies-modal-content',
   render: ({ injector, props }) => {
     const { drive, path, file } = props
     const linkedFilesService = injector.getInstance(MovieFilesService)

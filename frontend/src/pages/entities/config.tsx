@@ -6,7 +6,7 @@ import { GenericEditor } from '../../components/generic-editor/index.js'
 import { ConfigApiClient } from '../../services/api-clients/config-api-client.js'
 
 export const ConfigPage = Shade({
-  shadowDomName: 'shade-app-configs-page',
+  customElementName: 'shade-app-configs-page',
   render: ({ useDisposable, injector }) => {
     const api = injector.getInstance(ConfigApiClient)
 

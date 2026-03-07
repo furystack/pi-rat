@@ -8,7 +8,7 @@ import { MoviesService } from '../../services/movies-service.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 
 export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProps>({
-  shadowDomName: 'continue-watching-widget-group',
+  customElementName: 'continue-watching-widget-group',
   css: {
     '& .continue-watching-container': {
       display: 'flex',

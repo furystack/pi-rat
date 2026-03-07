@@ -40,7 +40,7 @@ const createSvg = (size: number) =>
 </svg>`
 
 export const PiRatLogo = Shade<PiRatLogoProps>({
-  shadowDomName: 'pi-rat-logo',
+  customElementName: 'pi-rat-logo',
   render: ({ props }) => {
     const size = props.size ?? 24
 

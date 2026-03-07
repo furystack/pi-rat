@@ -16,7 +16,7 @@ export interface HeaderProps {
 }
 
 const AdminLinks = Shade({
-  shadowDomName: 'shade-app-header-admin-links',
+  customElementName: 'shade-app-header-admin-links',
   css: {
     display: 'flex',
     placeContent: 'center',
@@ -37,7 +37,7 @@ const AdminLinks = Shade({
 })
 
 export const Header = Shade<HeaderProps>({
-  shadowDomName: 'shade-app-header',
+  customElementName: 'shade-app-header',
   css: {
     '& .header-spacer': {
       flex: '1',

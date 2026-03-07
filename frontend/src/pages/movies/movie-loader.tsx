@@ -6,7 +6,7 @@ import { WatchProgressService } from '../../services/watch-progress-service.js'
 import { MoviePlayerV2 } from './movie-player-v2/movie-player-v2-component.js'
 
 export const MovieLoader = Shade<{ movieFileId: string }>({
-  shadowDomName: 'pirat-movie-loader',
+  customElementName: 'pirat-movie-loader',
   render: ({ props, injector }) => {
     const movieFilesService = injector.getInstance(MovieFilesService)
     const watchProgressService = injector.getInstance(WatchProgressService)

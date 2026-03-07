@@ -15,7 +15,7 @@ export const isChatMessagePayload = (data: unknown): data is ChatMessagePayload 
 }
 
 export const MessageInput = Shade<{ chat: Chat }>({
-  shadowDomName: 'shade-app-message-input',
+  customElementName: 'shade-app-message-input',
   render: ({ injector, props, useRef }) => {
     const chatService = injector.getInstance(ChatMessageService)
     const session = injector.getInstance(SessionService)

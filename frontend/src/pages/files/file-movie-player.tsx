@@ -8,7 +8,7 @@ import { WatchProgressService } from '../../services/watch-progress-service.js'
 import { MoviePlayerV2 } from '../movies/movie-player-v2/movie-player-v2-component.js'
 
 export const FileMoviePlayer = Shade<{ file: PiRatFile }>({
-  shadowDomName: 'pirat-file-movie-player',
+  customElementName: 'pirat-file-movie-player',
   render: ({ props, injector }) => {
     const { file } = props
 

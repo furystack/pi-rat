@@ -11,7 +11,7 @@ type GithubLogoProps = {
 }
 
 export const GithubLogo = Shade<GithubLogoProps>({
-  shadowDomName: 'github-logo',
+  customElementName: 'github-logo',
   elementBaseName: 'img',
   elementBase: HTMLImageElement,
   render: ({ props, useDisposable, useState, injector, useHostProps }) => {

@@ -31,7 +31,7 @@ export const isInvitePayload = (data: unknown): data is InvitePayload => {
 }
 
 export const InviteButton = Shade<{ chat: Chat }>({
-  shadowDomName: 'shade-app-invite-button',
+  customElementName: 'shade-app-invite-button',
   render: ({ useState, props, injector }) => {
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
 

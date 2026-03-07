@@ -3,7 +3,7 @@ import type { EntityShortcutWidget as EntityShortcutWidgetData } from 'common'
 import { IconUrlWidget } from './icon-url-widget.js'
 
 export const EntityShortcutWidget = Shade<EntityShortcutWidgetData>({
-  shadowDomName: 'pi-rat-entity-shortcut-widget',
+  customElementName: 'pi-rat-entity-shortcut-widget',
   render: ({ props }) => {
     const { entityName, ...rest } = props
     switch (props.entityName) {

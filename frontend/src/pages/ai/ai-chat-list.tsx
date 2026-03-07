@@ -11,7 +11,7 @@ const AiChatListContent = Shade<{
   selectedChatId?: string
   onSelect: (chat: AiChat) => void
 }>({
-  shadowDomName: 'pi-rat-ai-chat-list-content',
+  customElementName: 'pi-rat-ai-chat-list-content',
   render: ({ props }) => {
     return (
       <Paper style={{ padding: '16px', height: 'calc(100% - 48px)' }}>
@@ -42,7 +42,7 @@ const AiChatListContent = Shade<{
 })
 
 export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiChat) => void }>({
-  shadowDomName: 'pi-rat-ai-chat-list',
+  customElementName: 'pi-rat-ai-chat-list',
   render: ({ injector, props }) => {
     const aiChatService = injector.getInstance(AiChatService)
 

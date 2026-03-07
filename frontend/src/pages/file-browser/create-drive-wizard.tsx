@@ -22,7 +22,7 @@ export const isAddDrivePayload = (data: unknown): data is AddDrivePayload => {
 }
 
 export const AddDriveStep = Shade<WizardStepProps>({
-  shadowDomName: 'add-drive-step',
+  customElementName: 'add-drive-step',
   render: ({ props, injector }) => {
     return (
       <WizardStep
@@ -76,7 +76,7 @@ export const AddDriveStep = Shade<WizardStepProps>({
 })
 
 export const CreateDriveWizard = Shade<{ onDriveAdded?: () => void }>({
-  shadowDomName: 'create-drive-wizard',
+  customElementName: 'create-drive-wizard',
   render: ({ useState, props }) => {
     const [isOpened, setIsOpened] = useState('isOpened', false)
     return (

@@ -2,7 +2,7 @@ import { Shade, createComponent } from '@furystack/shades'
 import { Loader, Typography } from '@furystack/shades-common-components'
 
 export const FullScreenLoader = Shade<{ message?: string }>({
-  shadowDomName: 'pirat-fullscreen-loader',
+  customElementName: 'pirat-fullscreen-loader',
   css: {
     display: 'flex',
     height: '100%',

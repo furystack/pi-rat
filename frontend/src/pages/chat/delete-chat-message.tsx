@@ -5,7 +5,7 @@ import { SessionService } from '../../services/session.js'
 import { ChatMessageService } from './chat-messages-service.js'
 
 export const DeleteChatMessage = Shade<{ chatMessage: ChatMessage }>({
-  shadowDomName: 'shade-app-delete-chat-message',
+  customElementName: 'shade-app-delete-chat-message',
   render: ({ injector, props }) => {
     const currentUser = injector.getInstance(SessionService).currentUser.getValue()
     const { chatMessage } = props

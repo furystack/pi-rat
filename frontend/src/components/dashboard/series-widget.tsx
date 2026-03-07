@@ -11,7 +11,7 @@ const SeriesWidgetContent = Shade<{
   index?: number
   size?: number
 }>({
-  shadowDomName: 'pi-rat-series-widget-content',
+  customElementName: 'pi-rat-series-widget-content',
   render: ({ props }) => {
     const { size = 256 } = props
     const series = props.data.value
@@ -38,7 +38,7 @@ export const SeriesWidget = Shade<{
   index?: number
   size?: number
 }>({
-  shadowDomName: 'pi-rat-series-widget',
+  customElementName: 'pi-rat-series-widget',
   render: ({ props, injector }) => {
     const seriesService = injector.getInstance(SeriesService)
 

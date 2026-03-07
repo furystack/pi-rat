@@ -109,7 +109,7 @@ const fillTerminalWithLogEntries = (
 }
 
 export const LogEntriesTerminal = Shade({
-  shadowDomName: 'shade-app-log-entries-terminal-page',
+  customElementName: 'shade-app-log-entries-terminal-page',
   css: {
     position: 'fixed',
     top: '0',

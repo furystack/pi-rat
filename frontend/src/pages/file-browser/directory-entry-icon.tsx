@@ -4,7 +4,7 @@ import type { DirectoryEntry } from 'common'
 import { FileIcon } from './file-icon.js'
 
 export const DirectoryEntryIcon = Shade<{ entry: DirectoryEntry }>({
-  shadowDomName: 'directory-entry-icon',
+  customElementName: 'directory-entry-icon',
   render: ({ props }) => {
     const { entry } = props
     const icon = entry.isDirectory ? (

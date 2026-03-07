@@ -5,7 +5,7 @@ import { WizardStep } from '../components/wizard-step.js'
 import welcome from './welcome.json' with { type: 'json' }
 
 export const WelcomeStep = Shade<WizardStepProps>({
-  shadowDomName: 'welcome-step',
+  customElementName: 'welcome-step',
   render: ({ props }) => {
     return (
       <WizardStep title="Welcome to PI-RAT Installer" {...props}>

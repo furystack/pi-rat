@@ -7,7 +7,7 @@ import { environmentOptions } from '../../environment-options.js'
  * no watch progress, no audio/subtitle track management. Just hls.js + a <video>.
  */
 export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
-  shadowDomName: 'plain-hls-player',
+  customElementName: 'plain-hls-player',
   render: ({ props, useDisposable, useRef }) => {
     const videoRef = useRef<HTMLVideoElement>('video')
     const logRef = useRef<HTMLPreElement>('log')
