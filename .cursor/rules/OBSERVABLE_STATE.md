@@ -75,7 +75,7 @@ Use `useObservable` to subscribe to observables in Shades components:
 ```typescript
 // ✅ Good - useObservable in component
 export const UserDisplay = Shade({
-  shadowDomName: 'user-display',
+  customElementName: 'user-display',
   render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService);
 
@@ -103,7 +103,7 @@ Subscribe to multiple observables:
 ```typescript
 // ✅ Good - multiple observable subscriptions
 export const Dashboard = Shade({
-  shadowDomName: 'dashboard',
+  customElementName: 'dashboard',
   render: ({ injector, useObservable }) => {
     const sessionService = injector.getInstance(SessionService);
     const statsService = injector.getInstance(StatsService);
@@ -135,7 +135,7 @@ export const Dashboard = Shade({
 ```typescript
 // ✅ Good - component re-renders when value changes
 export const FormComponent = Shade({
-  shadowDomName: 'form-component',
+  customElementName: 'form-component',
   render: ({ useDisposable, useObservable }) => {
     // Create the observable with useDisposable
     const isLoadingObs = useDisposable('isLoading', () => new ObservableValue(false))
@@ -169,7 +169,7 @@ export const FormComponent = Shade({
 
 // ❌ Bad - component won't re-render when values change!
 export const BrokenFormComponent = Shade({
-  shadowDomName: 'broken-form',
+  customElementName: 'broken-form',
   render: ({ useDisposable }) => {
     const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
     const error = useDisposable('error', () => new ObservableValue<string>(''))
@@ -200,7 +200,7 @@ Use `useDisposable` for component-local reactive state:
 ```typescript
 // ✅ Good - local state with useDisposable
 export const SearchForm = Shade({
-  shadowDomName: 'search-form',
+  customElementName: 'search-form',
   render: ({ injector, useDisposable }) => {
     const searchService = injector.getInstance(SearchService);
 
@@ -246,7 +246,7 @@ export const SearchForm = Shade({
 ```typescript
 // ✅ Good - automatic cleanup with useDisposable
 export const DataComponent = Shade({
-  shadowDomName: 'data-component',
+  customElementName: 'data-component',
   render: ({ injector, useDisposable }) => {
     const dataService = injector.getInstance(DataService);
 
@@ -388,7 +388,7 @@ Always use `useObservable` or `useDisposable` for automatic cleanup:
 ```typescript
 // ✅ Good - automatic subscription cleanup
 export const DataDisplay = Shade({
-  shadowDomName: 'data-display',
+  customElementName: 'data-display',
   render: ({ injector, useObservable }) => {
     const dataService = injector.getInstance(DataService);
 
@@ -401,7 +401,7 @@ export const DataDisplay = Shade({
 
 // ❌ Avoid - manual subscription without cleanup
 export const DataDisplay = Shade({
-  shadowDomName: 'data-display',
+  customElementName: 'data-display',
   render: ({ injector }) => {
     const dataService = injector.getInstance(DataService);
     let data = '';
@@ -491,7 +491,7 @@ export class UserService {
 
 // Component usage
 export const UserList = Shade({
-  shadowDomName: 'user-list',
+  customElementName: 'user-list',
   render: ({ injector, useObservable }) => {
     const userService = injector.getInstance(UserService);
 
@@ -518,7 +518,7 @@ Manage form state with observables:
 ```typescript
 // ✅ Good - form state with observables
 export const LoginForm = Shade({
-  shadowDomName: 'login-form',
+  customElementName: 'login-form',
   render: ({ injector, useDisposable }) => {
     const authService = injector.getInstance(AuthService);
 
@@ -621,7 +621,7 @@ loggingService.init()
 
 // Or use useDisposable for automatic disposal
 export const LogViewer = Shade({
-  shadowDomName: 'log-viewer',
+  customElementName: 'log-viewer',
   render: ({ injector, useDisposable }) => {
     const loggingService = useDisposable('loggingService', () => {
       const service = injector.getInstance(LoggingService)

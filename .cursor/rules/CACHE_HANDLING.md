@@ -134,7 +134,7 @@ Use `getObservable()` for reactive subscriptions in components:
 ```typescript
 // ✅ Good - using getObservable() in components
 export const MovieDetails = Shade<{ movieId: string }>({
-  shadowDomName: 'movie-details',
+  customElementName: 'movie-details',
   render: ({ props, injector, useObservable }) => {
     const movieService = injector.getInstance(MovieService);
 
@@ -344,7 +344,7 @@ Subscribe to cache observables in components:
 ```typescript
 // ✅ Good - cache subscription in component
 export const UserProfile = Shade<{ userId: string }>({
-  shadowDomName: 'user-profile',
+  customElementName: 'user-profile',
   render: ({ props, injector, useObservable }) => {
     const userService = injector.getInstance(UserService);
 
@@ -395,7 +395,7 @@ Subscribe to multiple caches in one component:
 ```typescript
 // ✅ Good - multiple cache subscriptions
 export const MovieWithReviews = Shade<{ movieId: string }>({
-  shadowDomName: 'movie-with-reviews',
+  customElementName: 'movie-with-reviews',
   render: ({ props, injector, useObservable }) => {
     const movieService = injector.getInstance(MovieService);
     const reviewService = injector.getInstance(ReviewService);

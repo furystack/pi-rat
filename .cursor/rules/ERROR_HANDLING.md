@@ -116,7 +116,7 @@ Display user-friendly error messages in components:
 ```typescript
 // ✅ Good - component error handling
 export const UserList = Shade({
-  shadowDomName: 'user-list',
+  customElementName: 'user-list',
   render: ({ injector, useObservable }) => {
     const userService = injector.getInstance(UserService);
     const [error] = useObservable('error', userService.error);
@@ -158,7 +158,7 @@ Handle form validation errors with clear user feedback:
 ```typescript
 // ✅ Good - form validation with error display
 export const RegistrationForm = Shade({
-  shadowDomName: 'registration-form',
+  customElementName: 'registration-form',
   render: ({ injector, useDisposable }) => {
     const authService = injector.getInstance(AuthService);
     const error = useDisposable('error', () => new ObservableValue(''));
@@ -268,7 +268,7 @@ export const getUserFriendlyErrorMessage = (error: unknown): string => {
 ```typescript
 // ✅ Good - using error utility
 export const DataDisplay = Shade({
-  shadowDomName: 'data-display',
+  customElementName: 'data-display',
   render: ({ injector, useObservable, useDisposable }) => {
     const dataService = injector.getInstance(DataService);
     const [data] = useObservable('data', dataService.data);
@@ -351,7 +351,7 @@ Provide fallback content when errors occur:
 ```typescript
 // ✅ Good - graceful degradation
 export const UserAvatar = Shade<{ userId: string }>({
-  shadowDomName: 'user-avatar',
+  customElementName: 'user-avatar',
   render: ({ props, injector, useObservable, useDisposable }) => {
     const userService = injector.getInstance(UserService);
     const hasError = useDisposable('hasError', () => new ObservableValue(false));

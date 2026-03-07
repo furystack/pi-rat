@@ -96,7 +96,7 @@ Check for:
 - RequestError usage (proper HTTP codes: 409, 400, 401, 404, 500)
 - Observable patterns (ObservableValue, subscriptions, disposal)
 - Cache patterns (get, getObservable, setExplicitValue)
-- Shades component patterns (shadowDomName, useObservable, useDisposable)
+- Shades component patterns (customElementName, useObservable, useDisposable)
 - Injectable services and dependency injection
 - Action patterns (RequestAction, proper logging)
 - Navigation patterns (navigateToRoute usage)

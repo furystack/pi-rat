@@ -36,6 +36,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
   render: ({ props, injector, useObservable }) => {
     const { service, basePath, columns, headerComponents, rowComponents, styles, schemaInfo } = props
 
+    const [findOptions] = useObservable('findOptions', service.findOptions)
+
     const refresh = () => service.findOptions.setValue({ ...service.findOptions.getValue() })
 
     const noty = injector.getInstance(NotyService)
@@ -174,7 +176,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
       <>
         <DataGrid
           collectionService={service}
-          findOptions={service.findOptions}
+          findOptions={findOptions}
+          onFindOptionsChange={(opts) => service.findOptions.setValue(opts)}
           columns={['selection', ...columns, 'actions'] as unknown as typeof columns}
           headerComponents={extendedHeaderComponents as unknown as typeof headerComponents}
           rowComponents={extendedRowComponents as unknown as typeof rowComponents}

@@ -28,7 +28,7 @@ type ButtonProps = {
 };
 
 export const Button = Shade<ButtonProps>({
-  shadowDomName: 'pi-rat-button',
+  customElementName: 'pi-rat-button',
   render: ({ props }) => {
     const variant = props.variant ?? 'contained';
     const color = props.color ?? 'primary';
@@ -51,7 +51,7 @@ export const Button = Shade<ButtonProps>({
 
 // ✅ Good - explicit return type for complex conditional logic
 export const StatusBadge = Shade<{ status: string }>({
-  shadowDomName: 'status-badge',
+  customElementName: 'status-badge',
   render: ({ props }): JSX.Element | null => {
     switch (props.status) {
       case 'active':
@@ -88,7 +88,7 @@ type UserProfileProps = {
 };
 
 export const UserProfile = Shade<UserProfileProps>({
-  shadowDomName: 'user-profile',
+  customElementName: 'user-profile',
   render: ({ props }) => {
     // Component implementation
   },
@@ -132,7 +132,7 @@ type ListProps<T> = {
 };
 
 export const List = <T,>(props: ListProps<T>) => Shade({
-  shadowDomName: 'generic-list',
+  customElementName: 'generic-list',
   render: () => {
     return (
       <ul data-testid="list">
@@ -172,7 +172,7 @@ type DataListProps<T extends DataItem> = {
 };
 
 export const DataList = <T extends DataItem>(props: DataListProps<T>) => Shade({
-  shadowDomName: 'data-list',
+  customElementName: 'data-list',
   render: () => {
     return (
       <div data-testid="data-list">
@@ -481,7 +481,7 @@ const hasUsers = users.length > 0; // Inferred as boolean
 
 // ✅ Good - infer component return types when straightforward
 export const SimpleComponent = Shade<{ title: string }>({
-  shadowDomName: 'simple-component',
+  customElementName: 'simple-component',
   render: ({ props }) => {
     return <div>{props.title}</div>; // Return type inferred
   },

@@ -180,7 +180,7 @@ function getData() {}
 ```typescript
 // ✅ Good - Shades component with event handlers
 const MyComponent = Shade({
-  shadowDomName: 'my-component',
+  customElementName: 'my-component',
   render: ({ props, injector }) => {
     const handleButtonClick = () => {
       // Internal logic
@@ -255,7 +255,7 @@ type UserProfileProps = {
 };
 
 export const UserProfile = Shade<UserProfileProps>({
-  shadowDomName: 'user-profile',
+  customElementName: 'user-profile',
   render: ({ props }) => {
     // Component implementation
   },
@@ -489,7 +489,7 @@ const formatDate = (date: Date): string => {
 
 // 5. Main component
 export const UserProfile = Shade<UserProfileProps>({
-  shadowDomName: 'user-profile',
+  customElementName: 'user-profile',
   render: ({ props, injector, useObservable, useDisposable }) => {
     // Services
     const userService = injector.getInstance(UserService);
@@ -628,7 +628,7 @@ export const formatCurrency = (value: number, currency: string): string => {
  * UserProfile component displays user information and allows editing
  */
 export const UserProfile = Shade<UserProfileProps>({
-  shadowDomName: 'user-profile',
+  customElementName: 'user-profile',
   render: ({ props }) => {
     // Component implementation
   },
