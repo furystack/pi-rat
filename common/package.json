@@ -30,9 +30,9 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@furystack/core": "^15.2.4",
-    "@furystack/entity-sync": "^1.0.5",
-    "@furystack/rest": "^8.0.42",
+    "@furystack/core": "^15.2.5",
+    "@furystack/entity-sync": "^1.0.6",
+    "@furystack/rest": "^8.1.0",
     "ollama": "^0.6.3"
   }
 }
