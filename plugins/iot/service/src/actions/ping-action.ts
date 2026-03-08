@@ -36,9 +36,5 @@ export const PingAction: RequestAction<PingEndpoint> = async ({ injector, getUrl
     ping: isNaN(time) ? 0 : time,
   })
 
-  if (!result.alive) {
-    return JsonResult({ success: true, ...pingEntry.created[0] })
-  } else {
-    return JsonResult({ success: true, ...pingEntry.created[0] })
-  }
+  return JsonResult({ success: true, ...pingEntry.created[0] })
 }

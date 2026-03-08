@@ -59,7 +59,11 @@ export class FooAppModel implements InternalAppModel {
   manifest = FooManifest
   state: AppState = { type: 'initializing' }
 
-  public configure(options: FooOptions) {
+  declare private injector: Injector
+
+  private options: FooPluginOptions | undefined
+
+  public configure(options: FooPluginOptions) {
     this.options = options
     return this
   }
@@ -68,7 +72,7 @@ export class FooAppModel implements InternalAppModel {
     if (!this.options) {
       throw new Error('FooAppModel.configure() must be called before setup()')
     }
-    // Setup stores, REST API, etc.
+    await Promise.all([setupFooStore(this.injector, this.options), setupFooApi(this.injector, this.options)])
   }
 
   public getEntitySyncModels(): EntitySyncModelConfig[] {
@@ -77,7 +81,34 @@ export class FooAppModel implements InternalAppModel {
 }
 ```
 
+### configure() Options Pattern
+
+Plugin AppModels cannot directly import core service internals (e.g., `getPort()`, `getCorsOptions()`, `WebsocketService`). Instead, the host passes these via `configure()`:
+
+```typescript
+// In service.ts (host)
+const fooAppModel = injector.getInstance(FooAppModel).configure({
+  port: getPort(),
+  cors: getCorsOptions(),
+  getDbSettings: getDefaultDbSettings,
+  withRole,
+  announce: (message, filter) =>
+    injector.getInstance(WebsocketService).announce(message, filter),
+})
+await appModelManager.registerInternalAppModels(fooAppModel, ...)
+```
+
+The options type combines store and API setup needs:
+
+```typescript
+export type FooPluginOptions = FooStoreSetupOptions & FooApiSetupOptions
+```
+
+### Key Rules
+
 - `configure()` must be called before `setup()` -- add a guard
+- `configure()` returns `this` for chaining
+- `declare private injector: Injector` is auto-injected by FuryStack DI -- do NOT add `@Injected`
 - `getEntitySyncModels()` is optional; only implement if the plugin has entities that need WebSocket sync
 
 ## Schema Generation
@@ -101,4 +132,44 @@ Plugin service packages import schemas from their own common package:
 
 ```typescript
 import fooApiSchema from '@pi-rat/foo-common/schemas/foo-api.json' with { type: 'json' }
+```
+
+## Type Safety at Plugin Boundaries
+
+Plugin routes and types are not statically known to the core `AppPaths` type. This creates type friction at certain boundaries:
+
+### Navigation to Plugin Entity Routes
+
+Plugin-provided entity routes (e.g., `/iot-devices`) are not in `AppPaths`. Use `EntityRouteRegistry.navigateToEntityRoute()` which validates the path is registered and builds the full `/entities/<path>` URL:
+
+```typescript
+// ✅ Good -- use registry navigation (warns if path is unregistered)
+injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/iot-devices', {
+  queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: device.name } }),
+})
+
+// ❌ Avoid -- raw LocationService with unvalidated string
+injector.getInstance(LocationService).navigate('/entities/iot-devices')
+
+// ❌ Avoid -- type assertion to bypass AppPaths constraint
+navigateToRoute(injector, '/entities/iot-devices' as '/entities', {})
+```
+
+### Widget URLs
+
+`IconUrlWidget` accepts `url: AppPaths | (string & {})` to support plugin-provided URLs while preserving autocomplete for core paths.
+
+### Websocket Message Types
+
+When `common` needs to reference a plugin model type (e.g., `Device` in websocket messages), use an inline structural type instead of importing from the plugin package. This avoids a circular dependency from `common` -> `@pi-rat/*`:
+
+```typescript
+// ✅ Good -- inline shape in common
+export interface DeviceConnectedMessage {
+  type: 'device-connected'
+  device: { name: string; ipAddress?: string; macAddress?: string }
+}
+
+// ❌ Avoid -- common importing from plugin
+import type { Device } from '@pi-rat/iot-common'
 ```

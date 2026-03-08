@@ -1,5 +1,12 @@
+import type { Injector } from '@furystack/inject'
 import { Injectable } from '@furystack/inject'
 import type { NestedRoute } from '@furystack/shades'
+import { LocationService } from '@furystack/shades'
+
+export type NavigateToEntityRouteOptions = {
+  queryString?: string
+  replace?: boolean
+}
 
 @Injectable({ lifetime: 'singleton' })
 export class EntityRouteRegistry {
@@ -14,5 +21,18 @@ export class EntityRouteRegistry {
 
   public getEntityRoutes(): Record<string, NestedRoute<unknown>> {
     return { ...this.entityRoutes }
+  }
+
+  public navigateToEntityRoute(injector: Injector, path: string, options?: NavigateToEntityRouteOptions) {
+    if (!(path in this.entityRoutes)) {
+      console.warn(`[EntityRouteRegistry] Navigating to unregistered entity route '${path}'`)
+    }
+    const fullPath = `/entities${path}${options?.queryString ? `?${options.queryString}` : ''}`
+    const locationService = injector.getInstance(LocationService)
+    if (options?.replace) {
+      locationService.replace(fullPath)
+    } else {
+      locationService.navigate(fullPath)
+    }
   }
 }

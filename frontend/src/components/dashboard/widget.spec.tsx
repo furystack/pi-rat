@@ -191,7 +191,7 @@ describe('Widget', () => {
       initializeShadeRoot({
         injector,
         rootElement,
-        jsxElement: <Widget type="nonexistent-type" />,
+        jsxElement: <Widget {...({ type: 'nonexistent-type' } as unknown as Parameters<typeof Widget>[0])} />,
       })
       await flushUpdates()
 

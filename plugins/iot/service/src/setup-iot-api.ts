@@ -2,6 +2,7 @@ import { isAuthorized } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
 import {
   Validate,
+  createDeleteEndpoint,
   createGetCollectionEndpoint,
   createGetEntityEndpoint,
   createPatchEndpoint,
@@ -63,7 +64,7 @@ export const setupIotApi = async (injector: Injector, options: IotApiSetupOption
       },
       DELETE: {
         '/devices/:id': Validate({ schema: iotApiSchema, schemaName: 'DeleteEndpoint<Device,"name">' })(
-          createPatchEndpoint({
+          createDeleteEndpoint({
             model: Device,
             primaryKey: 'name',
           }),

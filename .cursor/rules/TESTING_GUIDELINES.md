@@ -1272,6 +1272,16 @@ vitest
   - [ ] Observable error states tested
 - [ ] No brittle CSS selectors
 
+## Testing Frontend Registries
+
+Frontend registries (`WidgetRegistry`, `RouteRegistry`, `FileAssociationRegistry`, etc.) are simple Map/array wrappers, but their lookup and filtering logic has non-trivial edge cases worth testing:
+
+- **`FileAssociationRegistry.getAssociationForFile`**: Test edge cases like no extension, case sensitivity, multiple dots in filename, empty path
+- **`FileContextMenuRegistry.getContributions`**: Test `isApplicable` filtering with various directory entry types
+- **`RouteRegistry` / `SettingsRegistry` / `EntityRouteRegistry`**: Test duplicate-key warning behavior and overwrite semantics
+
+Registries get indirect coverage from component tests (e.g., `widget.spec.tsx` exercises `WidgetRegistry`), but dedicated specs ensure the lookup logic is correct in isolation.
+
 ## Preventing Test Drift During Architecture Changes
 
 When refactoring a module's internal architecture (e.g., replacing per-segment ffmpeg spawning with a session-based `TranscodingSessionService`), **all spec files that mock the old internals must be rewritten in the same commit**. Stale mocks are silent failures — tests will compile and appear correct but fail at runtime with unrelated errors (e.g., "No DataSet found" instead of "Invalid segment index").

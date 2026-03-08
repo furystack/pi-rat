@@ -1,12 +1,14 @@
+import { getCurrentUser } from '@furystack/core'
 import { createComponent } from '@furystack/shades'
-import { icons } from '@furystack/shades-common-components'
+import { Icon, icons } from '@furystack/shades-common-components'
 import type { Injector } from '@furystack/inject'
 import type { DeviceAvailability as DeviceAvailabilityData } from 'common'
 
+import { createSuggestion, distinctByName } from '../components/command-palette/command-providers/create-suggestion.js'
 import { DeviceAvailability } from '../components/dashboard/device-availability.js'
 import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 import { entityEditorChildren } from '../routes/entity-routes.js'
-import { EntityRouteRegistry, SettingsRegistry, WidgetRegistry } from './registries/index.js'
+import { CommandProviderRegistry, EntityRouteRegistry, SettingsRegistry, WidgetRegistry } from './registries/index.js'
 
 /**
  * Registers IoT plugin contributions to the frontend registries.
@@ -20,6 +22,34 @@ export const registerIotFrontend = (injector: Injector) => {
   injector
     .getInstance(WidgetRegistry)
     .registerWidget('device-availability', (p) => <DeviceAvailability {...(p as DeviceAvailabilityData)} />)
+
+  const iotSuggestion = {
+    name: 'IOT Device Entities',
+    description: 'List, edit and create IOT Device entities',
+    icon: <Icon icon={icons.plug} size="small" />,
+    score: 1,
+    onSelected: ({ injector: i }: { injector: Injector }) => {
+      i.getInstance(EntityRouteRegistry).navigateToEntityRoute(i, '/iot-devices')
+    },
+  }
+
+  injector.getInstance(CommandProviderRegistry).registerProvider(async ({ term, injector: i }) => {
+    if (!term) return []
+    if (!(await getCurrentUser(i))?.roles?.includes('admin')) return []
+
+    const suggestions = [iotSuggestion]
+    const fullHits = suggestions
+      .filter((c) => c.name.toLowerCase() === term.toLowerCase())
+      .map((c) => createSuggestion({ ...c, score: 1 }))
+    const contains = suggestions
+      .filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
+      .map((c) => createSuggestion({ ...c, score: 3 }))
+    const descriptionContains = suggestions
+      .filter((c) => c.description.toLowerCase().includes(term.toLowerCase()))
+      .map((c) => createSuggestion({ ...c, score: 2 }))
+
+    return distinctByName(...fullHits, ...contains, ...descriptionContains)
+  })
 
   injector.getInstance(SettingsRegistry).registerSettingsRoute('/iot', {
     meta: { title: 'IoT Settings', icon: icons.plug },
