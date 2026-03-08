@@ -38,18 +38,13 @@ export const appRoutes = {
 }
 
 /**
- * Creates the full app routes with registry-aware settings and entity routes
+ * Creates the full app routes with registry-aware settings and entity routes.
+ * Spreads appRoutes to stay structurally linked with AppPaths type derivation.
  */
 export const createAppRoutes = (injector: Injector) => ({
-  ...movieRoutes,
-  ...seriesRoutes,
+  ...appRoutes,
   '/app-settings': createSettingsRoute(injector),
   '/entities': createEntityRoute(injector),
-  '/file-browser': fileBrowserRoute,
-  '/iot': iotRoute,
-  '/logging': loggingRoute,
-  '/user': userRoute,
-  ...miscRoutes,
 })
 
 export const authRoutes = _authRoutes

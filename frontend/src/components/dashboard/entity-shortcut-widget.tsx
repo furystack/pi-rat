@@ -41,6 +41,7 @@ export const EntityShortcutWidget = Shade<EntityShortcutWidgetData>({
       case 'config':
         return <IconUrlWidget {...rest} name="Config" url={`/entities${ENTITY_PATHS.config}`} icon={<>⚙️</>} />
       case 'device':
+        // TODO(plugin-extraction): Remove `as AppPaths` once IoT routes are fully dynamic
         return (
           <IconUrlWidget {...rest} name="IOT Devices" url={`/entities${IOT_ENTITY_ROUTE}` as AppPaths} icon={<>📡</>} />
         )

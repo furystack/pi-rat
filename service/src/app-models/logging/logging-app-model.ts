@@ -1,6 +1,6 @@
 import { Injectable, type Injector } from '@furystack/inject'
 import { entitySyncConfig, LogEntry } from 'common'
-import type { EntitySyncModelConfig, InternalAppModel } from '../../AppModelManager.js'
+import type { EntitySyncModelConfig, InternalAppModel } from 'common'
 import { LoggingManifest } from './logging-manifest.js'
 import { setupLoggerInstance } from './setup-logger-instance.js'
 import { setupLoggingRestApi } from './setup-logging-rest-api.js'

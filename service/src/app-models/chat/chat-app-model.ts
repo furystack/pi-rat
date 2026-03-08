@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@furystack/inject'
 import { Chat, ChatMessage, entitySyncConfig } from 'common'
-import type { EntitySyncModelConfig, InternalAppModel } from '../../AppModelManager.js'
+import type { EntitySyncModelConfig, InternalAppModel } from 'common'
 import { ChatAppManifest } from './manifest.js'
 import { setupChatRestApi } from './setup-chat-api.js'
 import { setupChatStore } from './setup-chat-store.js'

@@ -191,6 +191,29 @@ injector.getInstance(LocationService).navigate('/entities/iot-devices')
 
 `AppPaths` is derived from the static `appRoutes` object and does NOT include dynamically registered plugin routes. This is a deliberate trade-off: core navigation gets full type safety via `AppLink`, while plugin routes use typed constants for typo prevention but not exhaustive path checking.
 
+### Static Route Object and Runtime Route Builder Must Stay Linked
+
+`appRoutes` (static, used for `AppPaths` type derivation) and `createAppRoutes()` (runtime, used by the router) must share structure. **Always derive `createAppRoutes` from `appRoutes`** with targeted overrides for registry-aware routes:
+
+```typescript
+// ✅ Good -- runtime builder spreads the static object
+export const createAppRoutes = (injector: Injector) => ({
+  ...appRoutes,
+  '/app-settings': createSettingsRoute(injector),
+  '/entities': createEntityRoute(injector),
+})
+
+// ❌ Avoid -- independent assembly that can silently diverge
+export const createAppRoutes = (injector: Injector) => ({
+  ...movieRoutes,
+  ...seriesRoutes,
+  '/app-settings': createSettingsRoute(injector),
+  // Forgot '/logging' -- no compile error
+})
+```
+
+The same principle applies to any pair of static-type-derivation objects and runtime route builders (e.g., `settingsChildren`/`createSettingsRoute`, `entityChildren`/`createEntityRoute`).
+
 ### Widget Registration
 
 `WidgetRegistry` provides two registration methods:

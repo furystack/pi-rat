@@ -1,6 +1,11 @@
 import { Injectable, type Injector } from '@furystack/inject'
-import { AiChatMessage, entitySyncConfig, type AppState } from 'common'
-import type { EntitySyncModelConfig, InternalAppModel } from '../AppModelManager.js'
+import {
+  AiChatMessage,
+  entitySyncConfig,
+  type AppState,
+  type EntitySyncModelConfig,
+  type InternalAppModel,
+} from 'common'
 import { AiManifest } from './ai-manifest.js'
 import { setupAiRestApi } from './setup-ai-rest-api.js'
 import { setupAi } from './setup-ai.js'

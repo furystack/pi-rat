@@ -64,10 +64,7 @@ describe('AppModelManager', () => {
       await manager.registerInternalAppModels(appModel)
 
       const registered = manager.appModels.get('test-model')
-      expect(registered?.state.type).toBe('error')
-      if (registered?.state.type === 'error') {
-        expect(registered.state.error).toBe('Setup failed')
-      }
+      expect(registered?.state).toEqual({ type: 'error', error: 'Setup failed' })
     })
   })
 
