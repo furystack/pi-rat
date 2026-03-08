@@ -15,10 +15,15 @@ import { AwakeAction } from './actions/awake-action.js'
 import { PingAction } from './actions/ping-action.js'
 import { DeviceAvailabilityHub } from './device-availability-hub.js'
 
+import type { DeviceConnectedMessage, DeviceDisconnectedMessage } from 'common'
+
 export type IotApiSetupOptions = {
   port: number
   cors: { origins: string[] }
-  announce: (message: unknown, filter?: (options: { injector: Injector }) => Promise<boolean>) => Promise<void>
+  announce: (
+    message: DeviceConnectedMessage | DeviceDisconnectedMessage,
+    filter?: (options: { injector: Injector }) => Promise<boolean>,
+  ) => Promise<void>
 }
 
 export const setupIotApi = async (injector: Injector, options: IotApiSetupOptions) => {

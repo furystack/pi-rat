@@ -10,9 +10,10 @@ import { GetAppModels } from './actions/get-app-models.js'
 import { GetServiceStatus } from './actions/get-service-status.js'
 import { PostInstallAction } from './actions/post-install-action.js'
 
-// AppModelManifest's Record<string, string[]> generates additionalProperties
-// as an object in JSON Schema, which is valid but incompatible with the
-// Validate type's narrower boolean-only additionalProperties definition.
+// TODO: AppModelManifest's Record<string, string[]> generates additionalProperties
+// as an object in JSON Schema, which is valid but incompatible with the Validate
+// type's narrower boolean-only additionalProperties definition. This cast can be
+// removed once @furystack/rest-service Validate accepts full JSON Schema additionalProperties.
 const schema = installApiSchema as unknown as {
   definitions: Record<string, { required?: string[]; additionalProperties?: boolean; [key: string]: unknown }>
 }

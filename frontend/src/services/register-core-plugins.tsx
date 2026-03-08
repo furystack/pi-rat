@@ -1,15 +1,5 @@
 import { createComponent } from '@furystack/shades'
 import type { Injector } from '@furystack/inject'
-import type {
-  AppShortcutWidget as AppShortcutWidgetData,
-  ContinueWatchingWidgetGroup as ContinueWatchingData,
-  EntityShortcutWidget as EntityShortcutWidgetData,
-  HtmlWidget as HtmlWidgetData,
-  MarkdownWidget as MarkdownWidgetData,
-  MovieWidget as MovieWidgetData,
-  SeriesWidget as SeriesWidgetData,
-  WidgetGroup as WidgetGroupData,
-} from 'common'
 
 import { AppShortcutWidget } from '../components/dashboard/app-shortcut-widget.js'
 import { ContinueWatchingWidgetGroup } from '../components/dashboard/continue-watching.js'
@@ -34,14 +24,14 @@ import { CommandProviderRegistry, WidgetRegistry } from './registries/index.js'
  */
 export const registerCorePlugins = (injector: Injector) => {
   const w = injector.getInstance(WidgetRegistry)
-  w.registerWidget('app-shortcut', (p) => <AppShortcutWidget {...(p as AppShortcutWidgetData)} />)
-  w.registerWidget('entity-shortcut', (p) => <EntityShortcutWidget {...(p as EntityShortcutWidgetData)} />)
-  w.registerWidget('html', (p) => <HtmlWidget {...(p as HtmlWidgetData)} />)
-  w.registerWidget('markdown', (p) => <MarkdownWidget {...(p as MarkdownWidgetData)} />)
-  w.registerWidget('group', (p) => <WidgetGroup {...(p as WidgetGroupData)} />)
-  w.registerWidget('movie', (p) => <MovieWidget {...(p as MovieWidgetData)} />)
-  w.registerWidget('series', (p) => <SeriesWidget {...(p as SeriesWidgetData)} />)
-  w.registerWidget('continue-watching', (p) => <ContinueWatchingWidgetGroup {...(p as ContinueWatchingData)} />)
+  w.registerWidget('app-shortcut', (p) => <AppShortcutWidget {...p} />)
+  w.registerWidget('entity-shortcut', (p) => <EntityShortcutWidget {...p} />)
+  w.registerWidget('html', (p) => <HtmlWidget {...p} />)
+  w.registerWidget('markdown', (p) => <MarkdownWidget {...p} />)
+  w.registerWidget('group', (p) => <WidgetGroup {...p} />)
+  w.registerWidget('movie', (p) => <MovieWidget {...p} />)
+  w.registerWidget('series', (p) => <SeriesWidget {...p} />)
+  w.registerWidget('continue-watching', (p) => <ContinueWatchingWidgetGroup {...p} />)
 
   const c = injector.getInstance(CommandProviderRegistry)
   c.registerProvider(appSettingsCommandProvider)

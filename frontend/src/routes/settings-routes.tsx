@@ -1,9 +1,8 @@
 import type { Injector } from '@furystack/inject'
-import { createComponent, type TitleResolverOptions } from '@furystack/shades'
+import { createComponent, LocationService, type TitleResolverOptions } from '@furystack/shades'
 import { icons } from '@furystack/shades-common-components'
 import type { MatchResult } from 'path-to-regexp'
 import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
-import { navigateToRoute } from '../navigate-to-route.js'
 import { SettingsRegistry } from '../services/registries/index.js'
 
 export const settingsChildren = {
@@ -14,7 +13,7 @@ export const settingsChildren = {
       const allKeys = [...Object.keys(settingsChildren).filter((k) => k !== '/'), ...Object.keys(pluginSettings)]
       const firstPath = allKeys[0]
       if (firstPath) {
-        navigateToRoute(injector, `/app-settings${firstPath}` as '/app-settings', {}, { replace: true })
+        injector.getInstance(LocationService).replace(`/app-settings${firstPath}`)
       }
     },
   },

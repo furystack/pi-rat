@@ -2,7 +2,7 @@ import { promises } from 'fs'
 import { join } from 'path'
 import { createGenerator } from 'ts-json-schema-generator'
 
-export interface SchemaGenerationSetting {
+export type SchemaGenerationSetting = {
   inputFile: string
   outputFile: string
   type: string

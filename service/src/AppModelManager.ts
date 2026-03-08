@@ -6,7 +6,7 @@ export type { EntitySyncModelConfig, InternalAppModel } from 'common'
 
 @Injectable({ lifetime: 'singleton' })
 export class AppModelManager {
-  public appModels = new Map<string, AppModel>()
+  public appModels = new Map<string, InternalAppModel>()
 
   @Injected((injector) => getLogger(injector).withScope(AppModelManager.name))
   declare private readonly logger: ScopedLogger
@@ -49,10 +49,7 @@ export class AppModelManager {
   }
 
   public getEntitySyncModels(): EntitySyncModelConfig[] {
-    return [...this.appModels.values()].flatMap((am) => {
-      const internalAm = am as InternalAppModel
-      return internalAm.getEntitySyncModels ? internalAm.getEntitySyncModels() : []
-    })
+    return [...this.appModels.values()].flatMap((am) => am.getEntitySyncModels?.() ?? [])
   }
 
   private updateAppModelState(appModelId: string, state: AppModel['state']) {

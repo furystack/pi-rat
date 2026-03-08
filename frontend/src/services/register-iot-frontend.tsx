@@ -2,7 +2,6 @@ import { getCurrentUser } from '@furystack/core'
 import { createComponent } from '@furystack/shades'
 import { Icon, icons } from '@furystack/shades-common-components'
 import type { Injector } from '@furystack/inject'
-import type { DeviceAvailability as DeviceAvailabilityData } from 'common'
 
 import { createSuggestion, distinctByName } from '../components/command-palette/command-providers/create-suggestion.js'
 import { DeviceAvailability } from '../components/dashboard/device-availability.js'
@@ -19,9 +18,7 @@ import { CommandProviderRegistry, EntityRouteRegistry, SettingsRegistry, WidgetR
  * registrations and their components will move to @pi-rat/iot-frontend.
  */
 export const registerIotFrontend = (injector: Injector) => {
-  injector
-    .getInstance(WidgetRegistry)
-    .registerWidget('device-availability', (p) => <DeviceAvailability {...(p as DeviceAvailabilityData)} />)
+  injector.getInstance(WidgetRegistry).registerWidget('device-availability', (p) => <DeviceAvailability {...p} />)
 
   const iotSuggestion = {
     name: 'IOT Device Entities',

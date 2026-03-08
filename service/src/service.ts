@@ -39,8 +39,7 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       cors: getCorsOptions(),
       getDbSettings: getDefaultDbSettings,
       withRole,
-      announce: (message, filter) =>
-        injector.getInstance(WebsocketService).announce(message as Parameters<WebsocketService['announce']>[0], filter),
+      announce: (message, filter) => injector.getInstance(WebsocketService).announce(message, filter),
     })
 
     await appModelManager.registerInternalAppModels(
