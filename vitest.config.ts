@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       enabled: true,
-      include: ['common/src/**/*.ts', 'frontend/src/**/*.ts', 'service/src/**/*.ts'],
+      include: ['common/src/**/*.ts', 'frontend/src/**/*.ts', 'service/src/**/*.ts', 'plugins/*/service/src/**/*.ts'],
     },
     projects: [
       {
@@ -24,6 +24,12 @@ export default defineConfig({
           name: 'Frontend',
           environment: 'jsdom',
           include: ['frontend/src/**/*.spec.(ts|tsx)'],
+        },
+      },
+      {
+        test: {
+          name: 'Plugins',
+          include: ['plugins/*/service/src/**/*.spec.ts'],
         },
       },
     ],

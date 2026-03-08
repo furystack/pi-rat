@@ -2,7 +2,7 @@ import { Injector } from '@furystack/inject'
 import { useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { usingAsync } from '@furystack/utils'
 import { describe, expect, it, vi } from 'vitest'
-import type { AppModelManifest, InternalAppModel } from 'common'
+import { entitySyncConfig, type AppModelManifest, type InternalAppModel } from 'common'
 import { AppModelManager } from './AppModelManager.js'
 
 const createManifest = (id: string, name?: string): AppModelManifest => ({
@@ -118,16 +118,20 @@ describe('AppModelManager', () => {
         useLogging(injector, VerboseConsoleLogger)
         const manager = injector.getInstance(AppModelManager)
 
-        class EntityA {}
-        class EntityB {}
+        class EntityA {
+          declare id: string
+        }
+        class EntityB {
+          declare name: string
+        }
 
         const model1 = createAppModel({
           manifest: createManifest('model-1'),
-          getEntitySyncModels: () => [{ model: EntityA, primaryKey: 'id' }],
+          getEntitySyncModels: () => [entitySyncConfig({ model: EntityA, primaryKey: 'id' })],
         })
         const model2 = createAppModel({
           manifest: createManifest('model-2'),
-          getEntitySyncModels: () => [{ model: EntityB, primaryKey: 'name', debounceMs: 200 }],
+          getEntitySyncModels: () => [entitySyncConfig({ model: EntityB, primaryKey: 'name', debounceMs: 200 })],
         })
 
         await manager.registerInternalAppModels(model1, model2)

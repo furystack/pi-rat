@@ -76,7 +76,7 @@ export class FooAppModel implements InternalAppModel {
   }
 
   public getEntitySyncModels(): EntitySyncModelConfig[] {
-    return [{ model: FooEntity, primaryKey: 'id' }]
+    return [entitySyncConfig({ model: FooEntity, primaryKey: 'id' })]
   }
 }
 ```
@@ -110,6 +110,7 @@ export type FooPluginOptions = FooStoreSetupOptions & FooApiSetupOptions
 - `configure()` returns `this` for chaining
 - `declare private injector: Injector` is auto-injected by FuryStack DI -- do NOT add `@Injected`
 - `getEntitySyncModels()` is optional; only implement if the plugin has entities that need WebSocket sync
+- Always use `entitySyncConfig()` helper when returning entity sync configs -- it enforces `primaryKey` matches a real property on the model at compile time
 
 ## Schema Generation
 
@@ -138,9 +139,26 @@ import fooApiSchema from '@pi-rat/foo-common/schemas/foo-api.json' with { type: 
 
 Plugin routes and types are not statically known to the core `AppPaths` type. This creates type friction at certain boundaries:
 
-### Navigation to Plugin Entity Routes
+### Entity Sync Config
 
-Plugin-provided entity routes (e.g., `/iot-devices`) are not in `AppPaths`. Use `EntityRouteRegistry.navigateToEntityRoute()` which validates the path is registered and builds the full `/entities/<path>` URL:
+Use the `entitySyncConfig()` helper from `common` to validate that `primaryKey` is a real property on the model:
+
+```typescript
+import { entitySyncConfig, LogEntry } from 'common'
+
+// ✅ Good -- primaryKey validated against model properties
+entitySyncConfig({ model: LogEntry, primaryKey: 'id' })
+
+// ❌ Compile error -- 'nonexistent' is not a key of LogEntry
+entitySyncConfig({ model: LogEntry, primaryKey: 'nonexistent' })
+
+// ❌ Avoid -- unvalidated inline object (typo compiles without error)
+{ model: LogEntry, primaryKey: 'nonexistent' }
+```
+
+### Navigation to Entity Routes
+
+**Always use `EntityRouteRegistry.navigateToEntityRoute()`** for entity navigation -- both in plugin code AND core code. It validates the path is registered and builds the full `/entities/<path>` URL:
 
 ```typescript
 // ✅ Good -- use registry navigation (warns if path is unregistered)
@@ -151,13 +169,13 @@ injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/iot-
 // ❌ Avoid -- raw LocationService with unvalidated string
 injector.getInstance(LocationService).navigate('/entities/iot-devices')
 
-// ❌ Avoid -- type assertion to bypass AppPaths constraint
-navigateToRoute(injector, '/entities/iot-devices' as '/entities', {})
+// ❌ Avoid -- navigateToRoute with hardcoded entity path
+navigateToRoute(injector, '/entities/iot-devices')
 ```
 
 ### Widget URLs
 
-`IconUrlWidget` accepts `url: AppPaths | (string & {})` to support plugin-provided URLs while preserving autocomplete for core paths.
+`IconUrlWidget` accepts `` url: AppPaths | `/${string}` `` to support plugin-provided URLs while preserving autocomplete for core paths. The `` `/${string}` `` template literal enforces that URLs start with `/` without allowing arbitrary strings.
 
 ### Websocket Message Types
 
@@ -172,4 +190,33 @@ export interface DeviceConnectedMessage {
 
 // ❌ Avoid -- common importing from plugin
 import type { Device } from '@pi-rat/iot-common'
+```
+
+### Registry Lookup Type Safety
+
+Registry `register*` methods should use generic constraints to validate inputs at the call site. Registry `get*` methods should constrain their key parameter to the discriminant union type, not `string`:
+
+```typescript
+// ✅ Good -- getRenderer constrains to known widget types
+public getRenderer(type: Widget['type']): WidgetRenderer | undefined
+
+// ❌ Avoid -- accepts arbitrary strings
+public getRenderer(type: string): WidgetRenderer | undefined
+```
+
+### Type Guards Over Casts
+
+When narrowing a union type (e.g., `Config` to `IotConfig`), prefer a type guard over a bare `as` cast:
+
+```typescript
+// ✅ Good -- runtime check validates the narrowing
+const isIotConfig = (config: Config): config is Config & IotConfig => config.id === 'IOT_CONFIG'
+
+const loaded = await this.configDataSet.get(injector, 'IOT_CONFIG')
+if (loaded && isIotConfig(loaded)) {
+  /* ... */
+}
+
+// ❌ Avoid -- unsafe cast with no runtime validation
+const loaded = (await this.configDataSet.get(injector, 'IOT_CONFIG')) as IotConfig
 ```

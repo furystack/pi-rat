@@ -17,7 +17,7 @@ export class WidgetRegistry {
     this.renderers.set(type, renderer as WidgetRenderer)
   }
 
-  public getRenderer(type: string): WidgetRenderer | undefined {
+  public getRenderer(type: Widget['type']): WidgetRenderer | undefined {
     return this.renderers.get(type)
   }
 }

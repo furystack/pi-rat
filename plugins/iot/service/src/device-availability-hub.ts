@@ -16,6 +16,8 @@ const defaultIotConfig: IotConfig = {
   },
 }
 
+const isIotConfig = (config: Config): config is Config & IotConfig => config.id === 'IOT_CONFIG'
+
 @Injectable({ lifetime: 'singleton' })
 export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconnected: Device; refresh: null }> {
   private devices: Device[] = []
@@ -35,8 +37,8 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
 
   private getCurrentConfig = async () => {
     try {
-      const loaded = (await this.configDataSet.get(this.systemInjector, 'IOT_CONFIG')) as IotConfig
-      return loaded || defaultIotConfig
+      const loaded = await this.configDataSet.get(this.systemInjector, 'IOT_CONFIG')
+      return loaded && isIotConfig(loaded) ? loaded : defaultIotConfig
     } catch (error) {
       await this.logger.warning({
         message: 'Error while loading IOT_CONFIG, falling back to defaults',
@@ -64,7 +66,7 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
               await this.devicePingHistoryDataSet.add(this.systemInjector, {
                 name: device.name,
                 isAvailable: newStatus,
-                ping: parseFloat(avg) || undefined,
+                ping: isNaN(parseFloat(avg)) ? undefined : parseFloat(avg),
                 createdAt: new Date().toISOString(),
               })
               this.deviceStatusMap.set(device.name, newStatus)

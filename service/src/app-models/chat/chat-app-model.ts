@@ -1,5 +1,5 @@
 import { Injectable, Injector } from '@furystack/inject'
-import { Chat, ChatMessage } from 'common'
+import { Chat, ChatMessage, entitySyncConfig } from 'common'
 import type { EntitySyncModelConfig, InternalAppModel } from '../../AppModelManager.js'
 import { ChatAppManifest } from './manifest.js'
 import { setupChatRestApi } from './setup-chat-api.js'
@@ -16,8 +16,8 @@ export class ChatAppModel implements InternalAppModel {
 
   public getEntitySyncModels(): EntitySyncModelConfig[] {
     return [
-      { model: Chat, primaryKey: 'id' },
-      { model: ChatMessage, primaryKey: 'id', debounceMs: 100 },
+      entitySyncConfig({ model: Chat, primaryKey: 'id' }),
+      entitySyncConfig({ model: ChatMessage, primaryKey: 'id', debounceMs: 100 }),
     ]
   }
 

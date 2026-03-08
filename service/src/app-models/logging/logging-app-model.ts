@@ -1,5 +1,5 @@
 import { Injectable, type Injector } from '@furystack/inject'
-import { LogEntry } from 'common'
+import { entitySyncConfig, LogEntry } from 'common'
 import type { EntitySyncModelConfig, InternalAppModel } from '../../AppModelManager.js'
 import { LoggingManifest } from './logging-manifest.js'
 import { setupLoggerInstance } from './setup-logger-instance.js'
@@ -17,7 +17,7 @@ export class LoggingAppModel implements InternalAppModel {
   }
 
   public getEntitySyncModels(): EntitySyncModelConfig[] {
-    return [{ model: LogEntry, primaryKey: 'id', debounceMs: 200 }]
+    return [entitySyncConfig({ model: LogEntry, primaryKey: 'id', debounceMs: 200 })]
   }
 
   public async setup() {

@@ -229,51 +229,44 @@ export const myRoutes = [myRoute] as const
 
 ### Navigation
 
-**Always use `navigateToRoute()` for programmatic navigation.** Never manipulate `window.history` or `LocationService` directly in components.
+Use the appropriate navigation method depending on the route type:
+
+- **Entity routes**: Use `EntityRouteRegistry.navigateToEntityRoute()` -- it prefixes with `/entities/` and warns on unregistered routes
+- **General routes**: Use `navigateToRoute()` helper for type-safe navigation with path params
+- **Never** manipulate `window.history` or `LocationService` directly in components
 
 ```typescript
-// ✅ Good - Use navigateToRoute helper
-import { navigateToRoute } from '../navigate-to-route.js'
-import { userDetailsRoute } from './routes/user-routes.js'
+// ✅ Good - Entity route navigation via registry
+import { EntityRouteRegistry } from '../services/registries/index.js'
 
-const MyComponent = Shade({
-  render: ({ injector }) => {
-    const handleUserClick = (username: string) => {
-      navigateToRoute(injector, userDetailsRoute, { username })
-    }
-    
-    return <button onclick={() => handleUserClick('john')}>View User</button>
-  }
-})
+const handleDeviceClick = (name: string) => {
+  injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/iot-devices', {
+    queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: name } }),
+  })
+}
+
+// ✅ Good - General route navigation via navigateToRoute
+import { navigateToRoute } from '../navigate-to-route.js'
+
+const handleUserClick = (username: string) => {
+  navigateToRoute(injector, '/movies/:imdbId/overview', { imdbId: 'tt1234567' })
+}
 
 // ❌ Bad - Direct history/location manipulation
-const MyComponent = Shade({
-  render: ({ injector }) => {
-    const locationService = injector.getInstance(LocationService)
-    
-    const handleUserClick = (username: string) => {
-      // Don't do this - bypasses route system, no type safety
-      window.history.pushState({}, '', `/users/${username}`)
-      locationService.updateState()
-    }
-  }
-})
+window.history.pushState({}, '', `/users/${username}`)
 ```
 
-### Why Use navigateToRoute
+### Route and Plugin Registration
 
-1. **Type safety** - Route params are type-checked at compile time
-2. **Centralized routes** - Routes defined in one place, referenced everywhere
-3. **URL compilation** - Handles path-to-regexp compilation automatically
-4. **Consistency** - Same pattern across the codebase
-
-### Integration
+Routes and features are registered through registries, not hardcoded into static objects:
 
 ```typescript
-// Add routes to body.tsx
-import { myRoutes } from './routes/my-routes.js'
-
-<Router routes={[...existingRoutes, ...myRoutes]} />
+// ✅ Good - Register via registries
+injector.getInstance(RouteRegistry).registerRoutes({ '/iot': iotRoute })
+injector.getInstance(EntityRouteRegistry).registerEntityRoute('/iot-devices', deviceRoute)
+injector.getInstance(SettingsRegistry).registerSettingsRoute('/iot', iotSettingsRoute)
+injector.getInstance(WidgetRegistry).registerWidget('device-availability', renderer)
+injector.getInstance(CommandProviderRegistry).registerProvider(iotCommandProvider)
 ```
 
 ## Component Architecture
@@ -604,69 +597,51 @@ const handleMyFeatureClick = () => {
 
 #### Adding Command Palette Provider
 
+Define a command provider and register it via `CommandProviderRegistry` in the plugin's registration function:
+
 ```typescript
-// command-providers/my-feature.tsx
-import { getCurrentUser } from '@furystack/core'
-import type { CommandProvider } from '@furystack/shades-common-components'
-import { navigateToRoute } from '../../../navigate-to-route.js'
-import { myFeatureRoute } from '../../routes/my-routes.js'
-import type { SuggestionOptions } from './create-suggestion.js'
-import { createSuggestion, distinctByName } from './create-suggestion.js'
+// In registerMyPlugin() or registerCorePlugins()
+import { CommandProviderRegistry, EntityRouteRegistry } from '../services/registries/index.js'
+import { createSuggestion, distinctByName } from '../components/command-palette/command-providers/create-suggestion.js'
 
-const MyFeatureSuggestions: SuggestionOptions[] = [
-  {
-    name: 'My Feature',
-    description: 'Description of the feature',
-    icon: '🔧',
-    score: 1,
-    onSelected: ({ injector }) => {
-      navigateToRoute(injector, myFeatureRoute, {})
-    },
-  },
-]
-
-export const myFeatureCommandProvider: CommandProvider = async ({ term, injector }) => {
+const myCommandProvider: CommandProvider = async ({ term, injector }) => {
   if (!term) return []
-
-  // Optional: role-based access
   if (!(await getCurrentUser(injector))?.roles?.includes('admin')) return []
 
-  const fullHits = MyFeatureSuggestions.filter((c) => c.name.toLowerCase() === term.toLowerCase())
-    .map((c) => createSuggestion({ ...c, score: 1 }))
-  const startsWith = MyFeatureSuggestions.filter((c) => c.name.toLowerCase().startsWith(term.toLowerCase()))
-    .map((c) => createSuggestion({ ...c, score: 2 }))
-  const contains = MyFeatureSuggestions.filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
-    .map((c) => createSuggestion({ ...c, score: 3 }))
-  const descriptionContains = MyFeatureSuggestions.filter((c) => c.description.toLowerCase().includes(term.toLowerCase()))
-    .map((c) => createSuggestion({ ...c, score: 2 }))
+  const suggestions = [
+    {
+      name: 'My Feature',
+      description: 'Description of the feature',
+      icon: <Icon icon={icons.settings} size="small" />,
+      score: 1,
+      onSelected: ({ injector: i }: { injector: Injector }) => {
+        i.getInstance(EntityRouteRegistry).navigateToEntityRoute(i, '/my-entities')
+      },
+    },
+  ]
 
-  return distinctByName(...fullHits, ...startsWith, ...contains, ...descriptionContains)
+  const fullHits = suggestions.filter((c) => c.name.toLowerCase() === term.toLowerCase())
+    .map((c) => createSuggestion({ ...c, score: 1 }))
+  const contains = suggestions.filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
+    .map((c) => createSuggestion({ ...c, score: 3 }))
+
+  return distinctByName(...fullHits, ...contains)
 }
 
-// Register in command-palette/index.tsx
-import { myFeatureCommandProvider } from './command-providers/my-feature.js'
-
-commandProviders={[
-  myFeatureCommandProvider,
-  // ... other providers
-]}
+// Register via registry (not inline in component props)
+injector.getInstance(CommandProviderRegistry).registerProvider(myCommandProvider)
 ```
 
-#### Adding App Shortcut Widget
+#### Adding Custom Widget Types
+
+Register custom widget renderers via `WidgetRegistry` in the plugin's registration function:
 
 ```typescript
-// 1. Update common/src/models/dashboard/app-shortcut-widget.ts
-export interface AppShortcutWidget {
-  type: 'app-shortcut'
-  appName: 'home' | 'browser' | /* ... */ | 'my-feature'
-}
-
-// 2. Update frontend/src/components/dashboard/app-shortcut-widget.tsx
-import { myFeatureRoute } from '../routes/my-routes.js'
-
-case 'my-feature':
-  return <IconUrlWidget {...rest} name="My Feature" url={myFeatureRoute.url} icon={<>🔧</>} />
+// In registerMyPlugin()
+injector.getInstance(WidgetRegistry).registerWidget('my-widget-type', (p) => <MyWidget {...p} />)
 ```
+
+For app/entity shortcut widgets, update the corresponding switch statements in `app-shortcut-widget.tsx` or `entity-shortcut-widget.tsx` with the new `appName` or `entityName` value.
 
 ### Access Control Patterns
 
