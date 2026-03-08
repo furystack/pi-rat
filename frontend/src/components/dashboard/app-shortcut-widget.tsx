@@ -1,12 +1,13 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type { AppShortcutWidget as AppShortcutWidgetData } from 'common'
+import type { AppPaths } from '../../routes/index.js'
 import { IconUrlWidget } from './icon-url-widget.js'
 
 export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
   customElementName: 'pi-rat-app-shortcut-widget',
   render: ({ props }) => {
     const { appName, ...rest } = props
-    switch (props.appName) {
+    switch (appName) {
       case 'home':
         return <IconUrlWidget {...rest} name="Home" url="/" icon={<>🐀</>} />
       case 'browser':
@@ -22,7 +23,7 @@ export const AppShortcutWidget = Shade<AppShortcutWidgetData>({
       case 'app-settings':
         return <IconUrlWidget {...rest} name="Application Settings" url="/app-settings" icon={<>🔧</>} />
       default:
-        return <IconUrlWidget {...rest} name={appName} url={`/${appName}`} icon={<>🚫</>} />
+        return <IconUrlWidget {...rest} name={appName} url={`/${String(appName)}` as AppPaths} icon={<>🚫</>} />
     }
   },
 })

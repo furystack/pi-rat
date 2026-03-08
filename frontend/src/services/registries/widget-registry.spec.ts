@@ -39,4 +39,15 @@ describe('WidgetRegistry', () => {
       warnSpy.mockRestore()
     })
   })
+
+  it('should register and retrieve a plugin widget renderer', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      const registry = injector.getInstance(WidgetRegistry)
+      const renderer = vi.fn()
+
+      registry.registerPluginWidget<{ type: 'custom-plugin-widget'; data: string }>('custom-plugin-widget', renderer)
+
+      expect(registry.getRenderer('custom-plugin-widget')).toBe(renderer)
+    })
+  })
 })

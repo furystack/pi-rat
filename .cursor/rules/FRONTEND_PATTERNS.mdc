@@ -258,16 +258,7 @@ window.history.pushState({}, '', `/users/${username}`)
 
 ### Route and Plugin Registration
 
-Routes and features are registered through registries, not hardcoded into static objects:
-
-```typescript
-// ✅ Good - Register via registries
-injector.getInstance(RouteRegistry).registerRoutes({ '/iot': iotRoute })
-injector.getInstance(EntityRouteRegistry).registerEntityRoute('/iot-devices', deviceRoute)
-injector.getInstance(SettingsRegistry).registerSettingsRoute('/iot', iotSettingsRoute)
-injector.getInstance(WidgetRegistry).registerWidget('device-availability', renderer)
-injector.getInstance(CommandProviderRegistry).registerProvider(iotCommandProvider)
-```
+Routes and features are registered through registries, not hardcoded into static objects. For detailed patterns (typed route constants, widget registration, navigation), see [PLUGIN_ARCHITECTURE.md](./PLUGIN_ARCHITECTURE.md#type-safety-at-plugin-boundaries).
 
 ## Component Architecture
 
@@ -595,53 +586,9 @@ const handleMyFeatureClick = () => {
 )}
 ```
 
-#### Adding Command Palette Provider
+#### Adding Command Palette Providers and Widget Types
 
-Define a command provider and register it via `CommandProviderRegistry` in the plugin's registration function:
-
-```typescript
-// In registerMyPlugin() or registerCorePlugins()
-import { CommandProviderRegistry, EntityRouteRegistry } from '../services/registries/index.js'
-import { createSuggestion, distinctByName } from '../components/command-palette/command-providers/create-suggestion.js'
-
-const myCommandProvider: CommandProvider = async ({ term, injector }) => {
-  if (!term) return []
-  if (!(await getCurrentUser(injector))?.roles?.includes('admin')) return []
-
-  const suggestions = [
-    {
-      name: 'My Feature',
-      description: 'Description of the feature',
-      icon: <Icon icon={icons.settings} size="small" />,
-      score: 1,
-      onSelected: ({ injector: i }: { injector: Injector }) => {
-        i.getInstance(EntityRouteRegistry).navigateToEntityRoute(i, '/my-entities')
-      },
-    },
-  ]
-
-  const fullHits = suggestions.filter((c) => c.name.toLowerCase() === term.toLowerCase())
-    .map((c) => createSuggestion({ ...c, score: 1 }))
-  const contains = suggestions.filter((c) => c.name.toLowerCase().includes(term.toLowerCase()))
-    .map((c) => createSuggestion({ ...c, score: 3 }))
-
-  return distinctByName(...fullHits, ...contains)
-}
-
-// Register via registry (not inline in component props)
-injector.getInstance(CommandProviderRegistry).registerProvider(myCommandProvider)
-```
-
-#### Adding Custom Widget Types
-
-Register custom widget renderers via `WidgetRegistry` in the plugin's registration function:
-
-```typescript
-// In registerMyPlugin()
-injector.getInstance(WidgetRegistry).registerWidget('my-widget-type', (p) => <MyWidget {...p} />)
-```
-
-For app/entity shortcut widgets, update the corresponding switch statements in `app-shortcut-widget.tsx` or `entity-shortcut-widget.tsx` with the new `appName` or `entityName` value.
+See [PLUGIN_ARCHITECTURE.md](./PLUGIN_ARCHITECTURE.md#frontend-registries) for how to register command providers and widget renderers via registries.
 
 ### Access Control Patterns
 

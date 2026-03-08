@@ -9,6 +9,8 @@ import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 import { entityEditorChildren } from '../routes/entity-routes.js'
 import { CommandProviderRegistry, EntityRouteRegistry, SettingsRegistry, WidgetRegistry } from './registries/index.js'
 
+export const IOT_ENTITY_ROUTE = '/iot-devices' as const
+
 /**
  * Registers IoT plugin contributions to the frontend registries.
  *
@@ -26,7 +28,7 @@ export const registerIotFrontend = (injector: Injector) => {
     icon: <Icon icon={icons.plug} size="small" />,
     score: 1,
     onSelected: ({ injector: i }: { injector: Injector }) => {
-      i.getInstance(EntityRouteRegistry).navigateToEntityRoute(i, '/iot-devices')
+      i.getInstance(EntityRouteRegistry).navigateToEntityRoute(i, IOT_ENTITY_ROUTE)
     },
   }
 
@@ -60,7 +62,7 @@ export const registerIotFrontend = (injector: Injector) => {
     ),
   })
 
-  injector.getInstance(EntityRouteRegistry).registerEntityRoute('/iot-devices', {
+  injector.getInstance(EntityRouteRegistry).registerEntityRoute(IOT_ENTITY_ROUTE, {
     meta: { title: 'IoT Devices', icon: icons.plug },
     component: () => (
       <PiRatLazyLoad

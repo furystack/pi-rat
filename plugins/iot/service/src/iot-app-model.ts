@@ -6,6 +6,18 @@ import { setupIotStore, type IotStoreSetupOptions } from './setup-store.js'
 
 export type IotPluginOptions = IotStoreSetupOptions & IotApiSetupOptions
 
+/**
+ * IoT plugin AppModel. Requires explicit configuration before setup:
+ *
+ * ```ts
+ * const iot = injector.getInstance(IotAppModel).configure({ port, cors, ... })
+ * await appModelManager.registerInternalAppModels(iot)
+ * ```
+ *
+ * `configure()` must be called before `setup()` (enforced at runtime).
+ * This pattern exists because plugin AppModels cannot directly import
+ * host-level services like `getPort()` or `WebsocketService`.
+ */
 @Injectable({ lifetime: 'singleton' })
 export class IotAppModel implements InternalAppModel {
   state: AppState = {
@@ -27,6 +39,7 @@ export class IotAppModel implements InternalAppModel {
     if (!this.options) {
       throw new Error('IotAppModel.configure() must be called before setup()')
     }
-    await Promise.all([setupIotStore(this.injector, this.options), setupIotApi(this.injector, this.options)])
+    const opts = this.options
+    await Promise.all([setupIotStore(this.injector, opts), setupIotApi(this.injector, opts)])
   }
 }

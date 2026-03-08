@@ -5,6 +5,7 @@ import { CacheView, Skeleton } from '@furystack/shades-common-components'
 import type { Device } from '@pi-rat/iot-common'
 import type { DeviceAvailability as DeviceAvailabilityProps, Icon as IconType } from 'common'
 import { AppLink } from '../../routes/index.js'
+import { IOT_ENTITY_ROUTE } from '../../services/register-iot-frontend.js'
 import { EntityRouteRegistry } from '../../services/registries/index.js'
 import { IotDevicesService } from '../../services/iot-devices-service.js'
 import { SessionService } from '../../services/session.js'
@@ -43,7 +44,7 @@ const DeviceAvailabilityContent = Shade<{
                   onclick={(ev) => {
                     ev.preventDefault()
                     ev.stopImmediatePropagation()
-                    injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/iot-devices', {
+                    injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, IOT_ENTITY_ROUTE, {
                       queryString: serializeToQueryString({
                         gedst: { mode: 'edit', currentId: device.name },
                       }),

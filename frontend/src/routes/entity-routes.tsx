@@ -4,6 +4,18 @@ import { icons } from '@furystack/shades-common-components'
 import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
 import { EntityRouteRegistry } from '../services/registries/index.js'
 
+export const ENTITY_PATHS = {
+  drives: '/drives',
+  users: '/users',
+  dashboards: '/dashboards',
+  movies: '/movies',
+  movieFiles: '/movie-files',
+  omdbMovieMetadata: '/omdb-movie-metadata',
+  omdbSeriesMetadata: '/omdb-series-metadata',
+  config: '/config',
+  logging: '/logging',
+} as const satisfies Record<string, `/${string}`>
+
 export const entityEditorChildren = {
   '/create': { meta: { title: 'Create', icon: icons.plus, hidden: true }, component: () => <></> },
   '/edit/:id': { meta: { title: 'Edit', icon: icons.edit, hidden: true }, component: () => <></> },
@@ -11,7 +23,7 @@ export const entityEditorChildren = {
 }
 
 const entityChildren = {
-  '/drives': {
+  [ENTITY_PATHS.drives]: {
     meta: { title: 'Drives', icon: icons.folderOpen },
     component: () => (
       <PiRatLazyLoad
@@ -23,7 +35,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/users': {
+  [ENTITY_PATHS.users]: {
     meta: { title: 'Users', icon: icons.users },
     component: () => (
       <PiRatLazyLoad
@@ -35,7 +47,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/dashboards': {
+  [ENTITY_PATHS.dashboards]: {
     meta: { title: 'Dashboards', icon: icons.layers },
     component: () => (
       <PiRatLazyLoad
@@ -47,7 +59,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/movies': {
+  [ENTITY_PATHS.movies]: {
     meta: { title: 'Movies', icon: icons.film },
     component: () => (
       <PiRatLazyLoad
@@ -59,7 +71,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/movie-files': {
+  [ENTITY_PATHS.movieFiles]: {
     meta: { title: 'Movie Files', icon: icons.file },
     component: () => (
       <PiRatLazyLoad
@@ -71,7 +83,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/omdb-movie-metadata': {
+  [ENTITY_PATHS.omdbMovieMetadata]: {
     meta: { title: 'OMDB Movie Metadata', icon: icons.globe },
     component: () => (
       <PiRatLazyLoad
@@ -83,7 +95,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/omdb-series-metadata': {
+  [ENTITY_PATHS.omdbSeriesMetadata]: {
     meta: { title: 'OMDB Series Metadata', icon: icons.globe },
     component: () => (
       <PiRatLazyLoad
@@ -95,7 +107,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/config': {
+  [ENTITY_PATHS.config]: {
     meta: { title: 'Config', icon: icons.settings },
     component: () => (
       <PiRatLazyLoad
@@ -107,7 +119,7 @@ const entityChildren = {
     ),
     children: entityEditorChildren,
   },
-  '/logging': {
+  [ENTITY_PATHS.logging]: {
     meta: { title: 'Logging', icon: icons.fileText },
     component: () => (
       <PiRatLazyLoad

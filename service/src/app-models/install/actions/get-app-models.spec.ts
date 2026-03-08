@@ -17,13 +17,15 @@ const createManifest = (id: string): AppModelManifest => ({
 })
 
 const callAction = async (injector: Injector) => {
-  const result = await GetAppModels({
+  const actionContext = {
     injector,
     getBody: async () => ({}),
     getQuery: () => ({}),
     getUrlParams: () => ({}),
     headers: {},
-  } as unknown as Parameters<typeof GetAppModels>[0])
+  } as unknown as Parameters<typeof GetAppModels>[0]
+
+  const result = await GetAppModels(actionContext)
   return result as { chunk: unknown; statusCode: number }
 }
 

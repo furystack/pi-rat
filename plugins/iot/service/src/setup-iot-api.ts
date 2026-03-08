@@ -15,7 +15,16 @@ import { AwakeAction } from './actions/awake-action.js'
 import { PingAction } from './actions/ping-action.js'
 import { DeviceAvailabilityHub } from './device-availability-hub.js'
 
-import type { DeviceConnectedMessage, DeviceDisconnectedMessage } from 'common'
+import type { DeviceConnectedMessage, DeviceDisconnectedMessage, WebsocketDeviceInfo } from 'common'
+
+/**
+ * Compile-time assertion: Device must be assignable to WebsocketDeviceInfo.
+ * If Device drops/renames a field that WebsocketDeviceInfo expects, this will
+ * fail to compile -- preventing silent drift between the two types.
+ */
+type _AssertDeviceExtendsWsInfo = Device extends WebsocketDeviceInfo ? true : never
+const _assertDeviceCompat: _AssertDeviceExtendsWsInfo = true
+void _assertDeviceCompat
 
 export type IotApiSetupOptions = {
   port: number

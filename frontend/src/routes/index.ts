@@ -54,6 +54,12 @@ export const createAppRoutes = (injector: Injector) => ({
 
 export const authRoutes = _authRoutes
 
+/**
+ * Statically known route paths derived from `appRoutes` and `authRoutes`.
+ * Plugin-registered routes (via RouteRegistry, EntityRouteRegistry, etc.) are
+ * dynamic and NOT included in this type. Plugin routes use template literal
+ * types (`/${string}`) in registries and are validated at runtime.
+ */
 export type AppPaths = ExtractRoutePaths<typeof appRoutes & typeof authRoutes>
 
 export const AppLink = NestedRouteLink as unknown as <TPath extends AppPaths>(

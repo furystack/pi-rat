@@ -10,13 +10,12 @@ import { GetAppModels } from './actions/get-app-models.js'
 import { GetServiceStatus } from './actions/get-service-status.js'
 import { PostInstallAction } from './actions/post-install-action.js'
 
-// TODO: AppModelManifest's Record<string, string[]> generates additionalProperties
-// as an object in JSON Schema, which is valid but incompatible with the Validate
-// type's narrower boolean-only additionalProperties definition. This cast can be
-// removed once @furystack/rest-service Validate accepts full JSON Schema additionalProperties.
-const schema = installApiSchema as unknown as {
-  definitions: Record<string, { required?: string[]; additionalProperties?: boolean; [key: string]: unknown }>
-}
+// TODO(@furystack/rest-service): Validate's type expects additionalProperties as
+// `boolean`, but ts-json-schema-generator emits `{ "type": "object" }` for
+// Record<string, string[]> in AppModelManifest. Both are valid JSON Schema; the
+// mismatch is in the library's type definition, not the runtime behavior.
+// Remove this cast once Validate accepts full JSON Schema additionalProperties.
+const schema = installApiSchema as unknown as Parameters<typeof Validate>[0]['schema']
 
 export const setupInstallRestApi = async (injector: Injector) => {
   await useRestService<InstallApi>({

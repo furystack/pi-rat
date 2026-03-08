@@ -2,6 +2,7 @@ import { getCurrentUser } from '@furystack/core'
 import { createComponent } from '@furystack/shades'
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { Icon, icons } from '@furystack/shades-common-components'
+import { ENTITY_PATHS } from '../../../routes/entity-routes.js'
 import { EntityRouteRegistry } from '../../../services/registries/index.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
@@ -13,7 +14,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.settings} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/config')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.config)
     },
   },
   {
@@ -22,7 +23,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.layers} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/dashboards')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.dashboards)
     },
   },
   {
@@ -31,7 +32,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: '💽',
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/drives')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.drives)
     },
   },
   {
@@ -40,7 +41,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.user} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/users')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.users)
     },
   },
   {
@@ -49,7 +50,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.film} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/movies')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.movies)
     },
   },
   {
@@ -58,7 +59,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.file} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/movie-files')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.movieFiles)
     },
   },
   {
@@ -67,7 +68,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.globe} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/omdb-movie-metadata')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.omdbMovieMetadata)
     },
   },
   {
@@ -76,7 +77,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.globe} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/omdb-series-metadata')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.omdbSeriesMetadata)
     },
   },
   {
@@ -85,7 +86,7 @@ const getEntitySuggestions = (): SuggestionOptions[] => [
     icon: <Icon icon={icons.fileText} size="small" />,
     score: 1,
     onSelected: ({ injector }) => {
-      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, '/logging')
+      injector.getInstance(EntityRouteRegistry).navigateToEntityRoute(injector, ENTITY_PATHS.logging)
     },
   },
 ]
