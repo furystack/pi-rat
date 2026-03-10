@@ -9,7 +9,7 @@ import type {
   SubtitleTrackInfo,
 } from 'common'
 import type Hls from 'hls.js'
-import { environmentOptions } from '../../../environment-options.js'
+import { environmentOptions } from '../../../utils/environment-options.js'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 
 export const videoCodecs = {

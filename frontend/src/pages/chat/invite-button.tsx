@@ -11,7 +11,7 @@ import {
 } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { ChatInvitationService } from './chat-intivation-service.js'
 
 export type InvitePayload = {
@@ -34,8 +34,6 @@ export const InviteButton = Shade<{ chat: Chat }>({
   customElementName: 'shade-app-invite-button',
   render: ({ useState, props, injector }) => {
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
-
-    const currentUser = injector.getInstance(SessionService).currentUser.getValue()
 
     const invitationService = injector.getInstance(ChatInvitationService)
     const noty = injector.getInstance(NotyService)
@@ -75,7 +73,7 @@ export const InviteButton = Shade<{ chat: Chat }>({
                     status: 'pending',
                     chatName: props.chat.name,
                     createdAt: new Date(),
-                    createdBy: currentUser!.username,
+                    createdBy: getUser(injector).username,
                     id: crypto.randomUUID(),
                     message: formData.message.trim() || '',
                   })

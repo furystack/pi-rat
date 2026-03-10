@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
 import type { ExtractRouteParams } from '@furystack/shades'
 import { LocationService, compileRoute } from '@furystack/shades'
-import type { AppPaths } from './routes/index.js'
+import type { AppPaths } from '../routes/index.js'
 
 export type NavigateOptions = { queryString?: string; replace?: boolean }
 

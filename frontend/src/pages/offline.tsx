@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Result } from '@furystack/shades-common-components'
-import { environmentOptions } from '../environment-options.js'
+import { environmentOptions } from '../utils/environment-options.js'
 
 export const Offline = Shade({
   customElementName: 'shade-offline',

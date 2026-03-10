@@ -3,7 +3,7 @@ import { Button, NotyService } from '@furystack/shades-common-components'
 import { ObservableValue } from '@furystack/utils'
 import { LazyMonacoEditor } from '../../components/lazy-monaco-editor.js'
 import { PiRatLazyLoad } from '../../components/pirat-lazy-load.js'
-import { environmentOptions } from '../../environment-options.js'
+import { environmentOptions } from '../../utils/environment-options.js'
 import { DrivesApiClient } from '../../services/api-clients/drives-api-client.js'
 import { getErrorMessage } from '../../services/get-error-message.js'
 

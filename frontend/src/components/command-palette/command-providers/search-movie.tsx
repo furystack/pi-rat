@@ -1,6 +1,6 @@
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { createSuggestion } from './create-suggestion.js'
-import { navigateToRoute } from '../../../navigate-to-route.js'
+import { navigateToRoute } from '../../../utils/navigate-to-route.js'
 import { createComponent } from '@furystack/shades'
 import { MoviesService } from '../../../services/movies-service.js'
 

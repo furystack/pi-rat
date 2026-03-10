@@ -1,7 +1,7 @@
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { SeriesService } from '../../../services/series-service.js'
 import { createSuggestion } from './create-suggestion.js'
-import { navigateToRoute } from '../../../navigate-to-route.js'
+import { navigateToRoute } from '../../../utils/navigate-to-route.js'
 import { createComponent } from '@furystack/shades'
 
 export const searchSeriesCommandProvider: CommandProvider = async ({ term, injector }) => {

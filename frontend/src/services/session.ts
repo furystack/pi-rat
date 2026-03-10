@@ -3,7 +3,7 @@ import { Injectable, Injected, type Injector } from '@furystack/inject'
 import { NotyService } from '@furystack/shades-common-components'
 import { ObservableValue, usingAsync } from '@furystack/utils'
 import type { Roles } from 'common'
-import { navigateToRoute } from '../navigate-to-route.js'
+import { navigateToRoute } from '../utils/navigate-to-route.js'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
 export type SessionState = 'initializing' | 'offline' | 'unauthenticated' | 'authenticated'
@@ -25,7 +25,7 @@ export class SessionService implements IdentityContext, Disposable {
   private isDisposed = false
 
   public state = new ObservableValue<SessionState>('initializing')
-  public currentUser = new ObservableValue<Pick<User, 'username' | 'roles'> | null>(null)
+  public currentUser = new ObservableValue<User | null>(null)
 
   public isOperationInProgress = new ObservableValue(true)
 
@@ -56,6 +56,7 @@ export class SessionService implements IdentityContext, Disposable {
   }
 
   public async login(username: string, password: string): Promise<void> {
+    this.loginError.setValue('')
     await usingAsync(this.operation(), async () => {
       try {
         const { result: usr } = await this.api.call({ method: 'POST', action: '/login', body: { username, password } })
@@ -80,6 +81,7 @@ export class SessionService implements IdentityContext, Disposable {
   }
 
   public async register(username: string, password: string): Promise<void> {
+    this.loginError.setValue('')
     await usingAsync(this.operation(), async () => {
       try {
         const { result: usr } = await this.api.call({
@@ -110,7 +112,11 @@ export class SessionService implements IdentityContext, Disposable {
 
   public async logout(): Promise<void> {
     return await usingAsync(this.operation(), async () => {
-      void this.api.call({ method: 'POST', action: '/logout' })
+      try {
+        await this.api.call({ method: 'POST', action: '/logout' })
+      } catch (error) {
+        console.warn('Logout API call failed:', error)
+      }
       if (this.isDisposed) return
       this.currentUser.setValue(null)
       this.state.setValue('unauthenticated')
@@ -155,6 +161,8 @@ export class SessionService implements IdentityContext, Disposable {
     }
     return true
   }
+
+  // Generic signature required by IdentityContext interface
   public async getCurrentUser<TUser extends User>(): Promise<TUser> {
     const currentUser = this.currentUser.getValue()
     if (!currentUser) {
@@ -165,10 +173,7 @@ export class SessionService implements IdentityContext, Disposable {
       })
       throw Error('No user available')
     }
-    return {
-      username: currentUser.username,
-      roles: currentUser.roles,
-    } as TUser
+    return currentUser as TUser
   }
 
   @Injected(IdentityApiClient)

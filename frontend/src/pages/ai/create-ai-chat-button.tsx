@@ -11,7 +11,7 @@ import {
 } from '@furystack/shades-common-components'
 import type { AiChat } from 'common'
 import { ErrorDisplay } from '../../components/error-display.js'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { AiChatService } from './ai-chat-service.js'
 import { AiModelSelector } from './ai-model-selector.js'
 
@@ -34,7 +34,6 @@ export const CreateAiChatButton = Shade({
   render: ({ injector, useState }) => {
     const aiChatService = injector.getInstance(AiChatService)
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
-    const session = injector.getInstance(SessionService)
 
     const noty = injector.getInstance(NotyService)
 
@@ -74,7 +73,7 @@ export const CreateAiChatButton = Shade({
                     ...chat,
                     id: crypto.randomUUID(),
                     createdAt: new Date(),
-                    owner: session.currentUser.getValue()!.username,
+                    owner: getUser(injector).username,
                     status: 'active',
                     visibility: 'private',
                     description: chat.description,

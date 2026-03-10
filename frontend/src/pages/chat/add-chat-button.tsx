@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, cssVariableTheme, Form, Input, Modal, Paper, Typography } from '@furystack/shades-common-components'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { ChatService } from './chat-service.js'
 
 export type AddChatPayload = {
@@ -22,8 +22,6 @@ export const AddChatButton = Shade({
   customElementName: 'shade-app-chat-add-chat-button',
   render: ({ useState, injector }) => {
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
-
-    const session = injector.getInstance(SessionService)
 
     const chats = injector.getInstance(ChatService)
 
@@ -58,7 +56,7 @@ export const AddChatButton = Shade({
                     id: crypto.randomUUID(),
                     participants: [],
                     createdAt: new Date(),
-                    owner: session.currentUser.getValue()?.username || '',
+                    owner: getUser(injector).username,
                   })
                   .then(() => {
                     setIsModalOpen(false)

@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import type Hls from 'hls.js'
-import { environmentOptions } from '../../environment-options.js'
+import { environmentOptions } from '../../utils/environment-options.js'
 
 /**
  * Minimal HLS player for debugging — no media-chrome, no MoviePlayerService,

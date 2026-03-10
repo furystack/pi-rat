@@ -1,7 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, NotyService } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { ChatService } from './chat-service.js'
 
 export const DeleteChatButton = Shade<{ chat: Chat }>({
@@ -9,7 +9,6 @@ export const DeleteChatButton = Shade<{ chat: Chat }>({
   render: ({ injector, props, useSearchState }) => {
     const chatService = injector.getInstance(ChatService)
 
-    const user = injector.getInstance(SessionService).currentUser.getValue()
     const noty = injector.getInstance(NotyService)
 
     const [selectedChatId, setSelectedChatId] = useSearchState('selectedChatId', '')
@@ -24,7 +23,7 @@ export const DeleteChatButton = Shade<{ chat: Chat }>({
     return (
       <Button
         color="error"
-        disabled={props.chat.owner !== user?.username}
+        disabled={props.chat.owner !== getUser(injector).username}
         onclick={async () => {
           if (!confirm('Are you sure you want to delete this chat? This action cannot be undone.')) {
             return

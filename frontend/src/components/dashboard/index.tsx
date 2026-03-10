@@ -3,7 +3,7 @@ import { Shade, createComponent } from '@furystack/shades'
 import { ContextMenu, ContextMenuManager } from '@furystack/shades-common-components'
 import type { ContextMenuItem } from '@furystack/shades-common-components'
 import type { Dashboard as DashboardData } from 'common'
-import { navigateToRoute } from '../../navigate-to-route.js'
+import { navigateToRoute } from '../../utils/navigate-to-route.js'
 import { SessionService } from '../../services/session.js'
 import { Widget } from './widget.js'
 

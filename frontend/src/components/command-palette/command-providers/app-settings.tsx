@@ -2,7 +2,7 @@ import { getCurrentUser } from '@furystack/core'
 import { createComponent } from '@furystack/shades'
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { Icon, icons } from '@furystack/shades-common-components'
-import { navigateToRoute } from '../../../navigate-to-route.js'
+import { navigateToRoute } from '../../../utils/navigate-to-route.js'
 import type { SuggestionOptions } from './create-suggestion.js'
 import { createSuggestion, distinctByName } from './create-suggestion.js'
 

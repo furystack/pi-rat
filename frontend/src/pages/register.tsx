@@ -1,6 +1,6 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Form, Input, Paper, Typography } from '@furystack/shades-common-components'
-import { navigateToRoute } from '../navigate-to-route.js'
+import { navigateToRoute } from '../utils/navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
 export type RegisterPayload = {

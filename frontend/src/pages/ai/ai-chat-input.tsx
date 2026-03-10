@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, Form, Input } from '@furystack/shades-common-components'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { AiChatMessageService } from './ai-chat-message-service.js'
 import { AiChatService } from './ai-chat-service.js'
 
@@ -24,7 +24,6 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
   render: ({ props, injector, useObservable, useRef }) => {
     const aiChatMessageService = injector.getInstance(AiChatMessageService)
     const aiChatService = injector.getInstance(AiChatService)
-    const sessionService = injector.getInstance(SessionService)
     const formRef = useRef<HTMLFormElement>('form')
 
     const [selectedChat] = useObservable(
@@ -47,7 +46,7 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
               role: 'user',
               createdAt: new Date(),
               id: crypto.randomUUID(),
-              owner: sessionService.currentUser.getValue()!.username,
+              owner: getUser(injector).username,
               visibility: selectedChat?.value?.entries[0]?.visibility ?? 'private',
             })
             .then(() => {

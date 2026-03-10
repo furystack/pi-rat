@@ -8,7 +8,7 @@ import { Terminal } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
 import { LogEntry } from 'common'
 import { compile, match, type MatchResult } from 'path-to-regexp'
-import { navigateToRoute } from '../../navigate-to-route.js'
+import { navigateToRoute } from '../../utils/navigate-to-route.js'
 
 const useDisposableTerminal = (
   { useDisposable, injector }: Pick<RenderOptions<object>, 'useDisposable' | 'injector'>,
