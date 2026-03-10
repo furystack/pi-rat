@@ -6,7 +6,6 @@ import { getLogger } from '@furystack/logging'
 import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { Semaphore } from '@furystack/utils'
 import { Drive, PiRatFile, type FfprobeData } from 'common'
-import { FileWatcherService } from './app-models/drives/file-watcher-service.js'
 import { execFileAsync } from './utils/exec-file-async.js'
 import { existsAsync } from './utils/exists-async.js'
 import { getPhysicalPath } from './utils/physical-path-utils.js'
@@ -73,9 +72,6 @@ export class FfprobeService implements Disposable {
       })
     },
   })
-
-  @Injected(FileWatcherService)
-  declare private fileWatcherService: FileWatcherService
 
   constructor() {
     this.piRatFileCache.addListener('onLoadError', ({ args, error }) => {

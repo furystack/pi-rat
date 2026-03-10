@@ -11,6 +11,7 @@ import { useSequelize } from '@furystack/sequelize-store'
 import { DataTypes, Model } from 'sequelize'
 
 import { authorizedOnly } from '../../authorization/authorized-only.js'
+import { ExternalServiceStatusRegistry } from '../../external-service-status-registry.js'
 import { withRole } from '../../authorization/with-role.js'
 import type { FfprobeResult } from '../../ffprobe-service.js'
 import { getDefaultDbSettings } from '../../get-default-db-options.js'
@@ -694,7 +695,9 @@ export const setupMedia = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
-  injector.getInstance(OmdbClientService)
+  const omdbClientService = injector.getInstance(OmdbClientService)
+
+  injector.getInstance(ExternalServiceStatusRegistry).register('omdb', () => !!omdbClientService.config)
 
   const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
   const movieDataSet = getDataSetFor(injector, Movie, 'imdbId')
