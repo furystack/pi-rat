@@ -7,9 +7,9 @@ import { withRole } from './with-role.js'
 describe('withRoleOnly', () => {
   it('Should fail if not authorized', async () => {
     await usingAsync(new Injector(), async (i) => {
-      const ic = i.getInstance(IdentityContext)
+      const ic = new IdentityContext()
       Object.assign(ic, { isAuthenticated: async () => false })
-      i.setExplicitInstance(ic)
+      i.setExplicitInstance(ic, IdentityContext)
       const result = await withRole('admin')({ injector: i })
       expect(result).toEqual({
         isAllowed: false,
@@ -19,9 +19,9 @@ describe('withRoleOnly', () => {
   })
   it('Should fail if authorized without roles', async () => {
     await usingAsync(new Injector(), async (i) => {
-      const ic = i.getInstance(IdentityContext)
+      const ic = new IdentityContext()
       Object.assign(ic, { isAuthenticated: async () => true })
-      i.setExplicitInstance(ic)
+      i.setExplicitInstance(ic, IdentityContext)
       const result = await withRole('admin')({ injector: i })
       expect(result).toEqual({
         isAllowed: false,
@@ -32,11 +32,11 @@ describe('withRoleOnly', () => {
 
   it('Should pass if authorized and roles are provided', async () => {
     await usingAsync(new Injector(), async (i) => {
-      const ic = i.getInstance(IdentityContext)
+      const ic = new IdentityContext()
       Object.assign(ic, { isAuthenticated: async () => true })
       Object.assign(ic, { isAuthorized: async () => true })
 
-      i.setExplicitInstance(ic)
+      i.setExplicitInstance(ic, IdentityContext)
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       /// @ts-expect-error
       const result = await withRole('role1', 'admin')({ injector: i })

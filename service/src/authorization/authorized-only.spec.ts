@@ -7,9 +7,9 @@ import { describe, expect, it } from 'vitest'
 describe('authorizedOnly', () => {
   it('Should fail if not authorized', async () => {
     await usingAsync(new Injector(), async (i) => {
-      const ic = i.getInstance(IdentityContext)
+      const ic = new IdentityContext()
       Object.assign(ic, { isAuthenticated: async () => false })
-      i.setExplicitInstance(ic)
+      i.setExplicitInstance(ic, IdentityContext)
       const result = await authorizedOnly({ injector: i })
       expect(result).toEqual({
         isAllowed: false,
@@ -19,9 +19,9 @@ describe('authorizedOnly', () => {
   })
   it('Should succeed if authorized', async () => {
     await usingAsync(new Injector(), async (i) => {
-      const ic = i.getInstance(IdentityContext)
+      const ic = new IdentityContext()
       Object.assign(ic, { isAuthenticated: async () => true })
-      i.setExplicitInstance(ic)
+      i.setExplicitInstance(ic, IdentityContext)
       const result = await authorizedOnly({ injector: i })
       expect(result).toEqual({
         isAllowed: true,
