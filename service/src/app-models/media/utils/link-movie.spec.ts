@@ -410,4 +410,182 @@ describe('linkMovie', () => {
       })
     })
   })
+
+  describe('fetching new TMDB data', () => {
+    it('should link via TMDB when OMDB is not configured', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-configured' })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({
+        status: 'success',
+        data: {
+          movie: {
+            imdb_id: 'tt5551234',
+            title: 'TMDB Movie',
+            release_date: '2024-06-15',
+            runtime: 120,
+          },
+        },
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        injector.setExplicitInstance(
+          {
+            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+          } as unknown as TmdbClientService,
+          TmdbClientService,
+        )
+
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/TMDB.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        expect(mockFetchTmdbMovieMetadata).toHaveBeenCalled()
+      })
+    })
+
+    it('should link via TMDB with episode/series data', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-configured' })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({
+        status: 'success',
+        data: {
+          movie: {
+            imdb_id: 'tt5551234',
+            title: 'Episode Title',
+            release_date: '2024-03-01',
+            runtime: 45,
+          },
+          episode: {
+            season_number: 2,
+            episode_number: 5,
+          },
+          series: {
+            name: 'Test Series',
+            external_ids: { imdb_id: 'tt9876543' },
+          },
+        },
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        injector.setExplicitInstance(
+          {
+            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+          } as unknown as TmdbClientService,
+          TmdbClientService,
+        )
+
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Test.Series.S02E05.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+      })
+    })
+
+    it('should return rate-limited when TMDB is rate-limited', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-found' })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({ status: 'rate-limited' })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Rate.Limited.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('rate-limited')
+      })
+    })
+
+    it('should fall back to TMDB when OMDB returns not-found', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-found' })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({
+        status: 'success',
+        data: {
+          movie: {
+            imdb_id: 'tt7771234',
+            title: 'Fallback Movie',
+            release_date: '2024-01-01',
+            runtime: 90,
+          },
+        },
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        injector.setExplicitInstance(
+          {
+            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+          } as unknown as TmdbClientService,
+          TmdbClientService,
+        )
+
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Fallback.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        expect(mockFetchOmdbMovieMetadata).toHaveBeenCalled()
+        expect(mockFetchTmdbMovieMetadata).toHaveBeenCalled()
+      })
+    })
+
+    it('should fall back to TMDB when OMDB returns error', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockOmdbStoreFind.mockResolvedValue([])
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'error', error: new Error('OMDB failure') })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({
+        status: 'success',
+        data: {
+          movie: {
+            imdb_id: 'tt1112222',
+            title: 'Error Fallback Movie',
+            release_date: '2024-05-01',
+            runtime: 100,
+          },
+        },
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        injector.setExplicitInstance(
+          {
+            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+          } as unknown as TmdbClientService,
+          TmdbClientService,
+        )
+
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Error.Fallback.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        expect(mockFetchTmdbMovieMetadata).toHaveBeenCalled()
+      })
+    })
+  })
 })

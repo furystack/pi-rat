@@ -16,6 +16,7 @@ import type {
   TmdbSearchMovieResult,
   TmdbSearchTvResult,
 } from './tmdb-api-types.js'
+import { buildSyntheticMovieFromEpisode } from './build-synthetic-movie.js'
 
 export type TmdbFetchResult<T> =
   | { status: 'success'; data: T }
@@ -50,6 +51,10 @@ export class TmdbClientService {
   declare private systemInjector: Injector
 
   private readonly semaphore = new Semaphore(1)
+
+  private getLanguage(override?: string): string {
+    return override ?? this.config?.value.defaultLanguage ?? 'en-US'
+  }
 
   public init() {
     void this.initAsync().catch((error) => {
@@ -166,7 +171,7 @@ export class TmdbClientService {
   ): Promise<TmdbFetchResult<TmdbPaginatedResponse<TmdbSearchMovieResult>>> {
     const params = new URLSearchParams({
       query: title,
-      language: options?.language ?? this.config?.value.defaultLanguage ?? 'en-US',
+      language: this.getLanguage(options?.language),
     })
     if (options?.year) params.set('year', String(options.year))
 
@@ -181,7 +186,7 @@ export class TmdbClientService {
   ): Promise<TmdbFetchResult<TmdbPaginatedResponse<TmdbSearchTvResult>>> {
     const params = new URLSearchParams({
       query: title,
-      language: options?.language ?? this.config?.value.defaultLanguage ?? 'en-US',
+      language: this.getLanguage(options?.language),
     })
 
     return this.semaphore.execute(() => this.fetchJson(`/search/tv?${params}`, { description: `search tv '${title}'` }))
@@ -192,7 +197,7 @@ export class TmdbClientService {
     options?: { language?: string },
   ): Promise<TmdbFetchResult<TmdbMovieDetailsResponse>> {
     const params = new URLSearchParams({
-      language: options?.language ?? this.config?.value.defaultLanguage ?? 'en-US',
+      language: this.getLanguage(options?.language),
       append_to_response: 'external_ids',
     })
 
@@ -206,7 +211,7 @@ export class TmdbClientService {
     options?: { language?: string },
   ): Promise<TmdbFetchResult<TmdbTvDetailsResponse>> {
     const params = new URLSearchParams({
-      language: options?.language ?? this.config?.value.defaultLanguage ?? 'en-US',
+      language: this.getLanguage(options?.language),
       append_to_response: 'external_ids',
     })
 
@@ -222,7 +227,7 @@ export class TmdbClientService {
     options?: { language?: string },
   ): Promise<TmdbFetchResult<TmdbEpisodeDetailsResponse>> {
     const params = new URLSearchParams({
-      language: options?.language ?? this.config?.value.defaultLanguage ?? 'en-US',
+      language: this.getLanguage(options?.language),
     })
 
     return this.semaphore.execute(() =>
@@ -235,7 +240,7 @@ export class TmdbClientService {
   public async findByImdbId(imdbId: string): Promise<TmdbFetchResult<TmdbFindByIdResponse>> {
     const params = new URLSearchParams({
       external_source: 'imdb_id',
-      language: this.config?.value.defaultLanguage ?? 'en-US',
+      language: this.getLanguage(),
     })
 
     return this.semaphore.execute(() =>
@@ -319,41 +324,10 @@ export class TmdbClientService {
     const episodeResult = await this.getEpisodeDetails(tvId, season, episode)
     if (episodeResult.status !== 'success') return episodeResult
 
-    // Build a synthetic TmdbMovieDetailsResponse from series+episode data
-    // so the caller gets a consistent shape for ensureMovieExists
-    const syntheticMovie: TmdbMovieDetailsResponse = {
-      adult: tvResult.data.adult,
-      backdrop_path: episodeResult.data.still_path,
-      belongs_to_collection: null,
-      budget: 0,
-      genres: tvResult.data.genres,
-      homepage: '',
-      id: episodeResult.data.id,
-      imdb_id: imdbId,
-      origin_country: tvResult.data.origin_country,
-      original_language: tvResult.data.original_language,
-      original_title: episodeResult.data.name,
-      overview: episodeResult.data.overview,
-      popularity: 0,
-      poster_path: tvResult.data.poster_path,
-      production_companies: [],
-      production_countries: [],
-      release_date: episodeResult.data.air_date,
-      revenue: 0,
-      runtime: episodeResult.data.runtime ?? 0,
-      spoken_languages: [],
-      status: 'Released',
-      tagline: '',
-      title: episodeResult.data.name,
-      video: false,
-      vote_average: episodeResult.data.vote_average,
-      vote_count: episodeResult.data.vote_count,
-    }
-
     return {
       status: 'success',
       data: {
-        movie: syntheticMovie,
+        movie: buildSyntheticMovieFromEpisode(tvResult.data, episodeResult.data, imdbId),
         episode: episodeResult.data,
         series: tvResult.data,
       },

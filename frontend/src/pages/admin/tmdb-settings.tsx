@@ -28,7 +28,7 @@ type TmdbRawFormData = {
   additionalLanguages: string
 }
 
-const isTmdbRawFormData = (data: unknown): data is TmdbRawFormData => {
+export const isTmdbRawFormData = (data: unknown): data is TmdbRawFormData => {
   if (typeof data !== 'object' || data === null) return false
   const d = data as Record<string, unknown>
   return typeof d.apiKey === 'string'

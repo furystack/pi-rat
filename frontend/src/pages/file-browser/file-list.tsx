@@ -1,19 +1,17 @@
 import type { FindOptions } from '@furystack/core'
 import { createComponent, Shade } from '@furystack/shades'
-import type { CollectionService, ContextMenuItem } from '@furystack/shades-common-components'
+import type { CollectionService } from '@furystack/shades-common-components'
 import {
   Button,
   ContextMenu,
   ContextMenuManager,
   DataGrid,
   Dialog,
-  Icon,
-  icons,
   NotyService,
   SelectionCell,
 } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
-import { getFallbackMetadata, getFullPath, isMovieFile, isSampleFile, type DirectoryEntry } from 'common'
+import { getFallbackMetadata, isMovieFile, isSampleFile, type DirectoryEntry } from 'common'
 
 import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
 import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
@@ -24,7 +22,9 @@ import { environmentOptions } from '../../utils/environment-options.js'
 import { triggerDownload } from '../../utils/trigger-download.js'
 import { BreadCrumbs } from './breadcrumbs.js'
 import { DirectoryEntryIcon } from './directory-entry-icon.js'
+import { getContextMenuItems } from './file-context-menu-items.js'
 import { FileInfoModal } from './file-info-modal.js'
+import { handleFileDrop } from './file-upload-handler.js'
 
 export const FileList = Shade<{
   currentDriveLetter: string
@@ -54,6 +54,8 @@ export const FileList = Shade<{
 
     const drivesService = injector.getInstance(DrivesService)
     const notyService = injector.getInstance(NotyService)
+    const mediaApiClient = injector.getInstance(MediaApiClient)
+    const sessionService = injector.getInstance(SessionService)
 
     const [findOptions, setFindOptions] = useState<FindOptions<DirectoryEntry, Array<keyof DirectoryEntry>>>(
       'findOptions',
@@ -89,125 +91,12 @@ export const FileList = Shade<{
       }
     }
 
-    const getContextMenuItems = (entry: DirectoryEntry): Array<ContextMenuItem<() => void>> => {
-      const path = `${currentDriveLetter}:${currentPath}/${entry.name}`
-      const movieMetadata = entry.isFile && !isSampleFile(path) && isMovieFile(path) && getFallbackMetadata(path)
-      const allowScanForMovies = entry.isDirectory
-
-      return [
-        {
-          type: 'item',
-          icon: <Icon icon={icons.folderOpen} size="small" />,
-          label: 'Open',
-          data: () => props.onActivate?.(entry),
-        },
-        ...(movieMetadata
-          ? [
-              {
-                type: 'item' as const,
-                icon: <Icon icon={icons.film} size="small" />,
-                label: `Related movie: ${movieMetadata.title} ${
-                  movieMetadata.type === 'episode' ? `S${movieMetadata.season}E${movieMetadata.episode}` : ''
-                }`,
-                data: () => setRelatedMoviesVisible(true),
-              },
-              {
-                type: 'item' as const,
-                icon: <Icon icon={icons.messageCircle} size="small" />,
-                label: 'Extract Subtitles',
-                data: () => {
-                  injector
-                    .getInstance(MediaApiClient)
-                    .call({
-                      method: 'POST',
-                      action: '/extract-subtitles',
-                      body: {
-                        driveLetter: currentDriveLetter,
-                        path: getFullPath(currentPath, entry.name),
-                      },
-                    })
-                    .then(() => {
-                      notyService.emit('onNotyAdded', {
-                        type: 'success',
-                        title: 'Subtitles extracted',
-                        body: <>Subtitles extracted successfully for file {entry.name}</>,
-                      })
-                    })
-                    .catch(() => {
-                      notyService.emit('onNotyAdded', {
-                        type: 'error',
-                        title: 'Subtitles extraction failed',
-                        body: <>Subtitles extraction failed for file {entry.name}</>,
-                      })
-                    })
-                },
-              },
-            ]
-          : []),
-        ...(allowScanForMovies
-          ? [
-              {
-                type: 'item' as const,
-                icon: <Icon icon={icons.film} size="small" />,
-                label: 'Scan for movies',
-                data: () => {
-                  injector
-                    .getInstance(MediaApiClient)
-                    .call({
-                      method: 'POST',
-                      action: '/scan-for-movies',
-                      body: {
-                        root: {
-                          driveLetter: currentDriveLetter,
-                          path: getFullPath(currentPath, entry.name),
-                        },
-                        autoExtractSubtitles: false,
-                      },
-                    })
-                    .then(() => {
-                      notyService.emit('onNotyAdded', {
-                        type: 'success',
-                        title: 'Movies scanned',
-                        body: <>Movies scanned successfully for folder {entry.name}</>,
-                      })
-                    })
-                    .catch(() => {
-                      notyService.emit('onNotyAdded', {
-                        type: 'error',
-                        title: 'Movies scanning failed',
-                        body: <>Movies scanning failed for folder {entry.name}</>,
-                      })
-                    })
-                },
-              },
-            ]
-          : []),
-        {
-          type: 'item',
-          icon: <Icon icon={icons.info} size="small" />,
-          label: 'Show file info',
-          data: () => setInfoVisible(true),
-        },
-        ...(entry.name !== '..'
-          ? [
-              {
-                type: 'separator' as const,
-              },
-              {
-                type: 'item' as const,
-                icon: <Icon icon={icons.trash} size="small" />,
-                label: 'Delete',
-                data: () => {
-                  const targets = collectDeleteTargets()
-                  if (targets.length > 0) {
-                    setEntriesToDelete(targets)
-                    setDeleteDialogVisible(true)
-                  }
-                },
-              },
-            ]
-          : []),
-      ]
+    const requestDelete = () => {
+      const targets = collectDeleteTargets()
+      if (targets.length > 0) {
+        setEntriesToDelete(targets)
+        setDeleteDialogVisible(true)
+      }
     }
 
     const handleContextMenu = (entry: DirectoryEntry, ev: MouseEvent) => {
@@ -215,7 +104,16 @@ export const FileList = Shade<{
       setActiveEntry(entry)
       contextMenuManager.open({
         position: { x: ev.clientX, y: ev.clientY },
-        items: getContextMenuItems(entry),
+        items: getContextMenuItems(entry, {
+          currentDriveLetter,
+          currentPath,
+          mediaApiClient,
+          notyService,
+          onActivate: props.onActivate,
+          onShowRelatedMovies: () => setRelatedMoviesVisible(true),
+          onShowFileInfo: () => setInfoVisible(true),
+          onDeleteRequest: requestDelete,
+        }),
       })
     }
 
@@ -225,7 +123,7 @@ export const FileList = Shade<{
         for (const entry of entriesToDelete) {
           await drivesService.removeFile({
             letter: currentDriveLetter,
-            path: getFullPath(currentPath, entry.name),
+            path: `${currentPath}/${entry.name}`,
           })
         }
         notyService.emit('onNotyAdded', {
@@ -266,11 +164,7 @@ export const FileList = Shade<{
         }
 
         if (ev.key === 'Delete') {
-          const targets = collectDeleteTargets()
-          if (targets.length > 0) {
-            setEntriesToDelete(targets)
-            setDeleteDialogVisible(true)
-          }
+          requestDelete()
         }
       }
       window.addEventListener('keydown', listener)
@@ -294,47 +188,8 @@ export const FileList = Shade<{
           ondragover={(ev) => {
             ev.preventDefault()
           }}
-          ondrop={async (ev) => {
-            ev.preventDefault()
-            if (ev.dataTransfer?.files) {
-              const session = injector.getInstance(SessionService)
-              if (!(await session.isAuthorized('admin'))) {
-                return notyService.emit('onNotyAdded', {
-                  type: 'warning',
-                  title: 'Not authorized',
-                  body: <>You are not authorized to upload files</>,
-                })
-              }
-
-              const formData = new FormData()
-              for (const file of ev.dataTransfer.files) {
-                formData.append('uploads', file)
-              }
-              await fetch(
-                `${environmentOptions.serviceUrl}/drives/volumes/${encodeURIComponent(
-                  currentDriveLetter,
-                )}/${encodeURIComponent(currentPath)}/upload`,
-                {
-                  method: 'POST',
-                  credentials: 'include',
-                  body: formData,
-                },
-              )
-                .then(() => {
-                  notyService.emit('onNotyAdded', {
-                    type: 'success',
-                    title: 'Upload completed',
-                    body: <>The files are upploaded succesfully</>,
-                  })
-                })
-                .catch((err) =>
-                  notyService.emit('onNotyAdded', {
-                    title: 'Upload failed',
-                    body: <>{getErrorMessage(err)}</>,
-                    type: 'error',
-                  }),
-                )
-            }
+          ondrop={(ev) => {
+            void handleFileDrop({ ev, sessionService, notyService, currentDriveLetter, currentPath })
           }}
           ondblclick={activate}
           onkeydown={(ev) => {
