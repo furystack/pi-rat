@@ -10489,6 +10489,9 @@
             },
             "containers": {
               "type": "string"
+            },
+            "audioTrack": {
+              "type": "number"
             }
           },
           "additionalProperties": false

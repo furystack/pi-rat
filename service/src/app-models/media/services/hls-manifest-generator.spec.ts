@@ -157,4 +157,47 @@ describe('generateMasterPlaylist', () => {
     expect(playlist).not.toContain('RESOLUTION=3840x2160')
     expect(playlist).toContain('RESOLUTION=1920x1080')
   })
+
+  it('should propagate audioTrack into variant URLs for transcode mode', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'transcode',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+      audioTrack: 2,
+    })
+
+    expect(playlist).toContain('audioTrack')
+    const variantLines = playlist.split('\n').filter((l) => l.includes('stream.m3u8'))
+    for (const line of variantLines) {
+      expect(line).toContain('audioTrack')
+    }
+  })
+
+  it('should propagate audioTrack into variant URL for remux mode', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'remux',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+      audioTrack: 3,
+    })
+
+    const variantLine = playlist.split('\n').find((l) => l.includes('stream.m3u8'))
+    expect(variantLine).toContain('audioTrack')
+  })
+
+  it('should not include audioTrack when not specified', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'transcode',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+    })
+
+    expect(playlist).not.toContain('audioTrack')
+  })
 })

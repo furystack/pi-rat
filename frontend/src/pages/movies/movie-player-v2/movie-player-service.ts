@@ -204,8 +204,10 @@ export class MoviePlayerService implements AsyncDisposable {
 
   private async startHlsPlayback(videoElement: HTMLVideoElement) {
     const mode = this.playbackMode.getValue()
+    const audioTrack = this.audioTrackId.getValue()
+    const audioParam = audioTrack ? `&audioTrack=${encode(String(audioTrack))}` : ''
     const hlsUrl = this.toServiceUrl(
-      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encode(mode)}`,
+      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encode(mode)}${audioParam}`,
     )
 
     const HlsModule = await loadHls()
@@ -310,6 +312,7 @@ export class MoviePlayerService implements AsyncDisposable {
 
     this.resolution.setValue(value)
     this.currentProgress = previousProgress
+    this.progress.setValue(previousProgress)
 
     if (value) {
       if (this.playbackMode.getValue() !== 'transcode') {

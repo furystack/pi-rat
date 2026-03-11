@@ -177,7 +177,7 @@ export type PlaybackInfoResponse = {
 
 export type HlsMasterEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; videoCodecs?: string; audioCodecs?: string; containers?: string }
+  query: { mode?: PlaybackMode; videoCodecs?: string; audioCodecs?: string; containers?: string; audioTrack?: number }
   result: unknown
 }
 

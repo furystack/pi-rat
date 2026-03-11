@@ -310,7 +310,7 @@ describe('switchResolution', () => {
         service.videoElement = mockVideo
 
         await service.switchResolution('480p')
-        expect(service.progress.getValue()).toBe(50)
+        expect(service.progress.getValue()).toBe(75)
       },
     )
   })

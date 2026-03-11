@@ -22,12 +22,14 @@ export const generateMasterPlaylist = ({
   mode,
   baseUrl,
   subtitleTracks,
+  audioTrack,
 }: {
   ffprobe: FfprobeData
   file: { driveLetter: string; path: string }
   mode: PlaybackMode
   baseUrl: string
   subtitleTracks: SubtitleTrackInfo[]
+  audioTrack?: number
 }): string => {
   const lines: string[] = ['#EXTM3U', '#EXT-X-VERSION:7']
 
@@ -47,11 +49,13 @@ export const generateMasterPlaylist = ({
   const sourceWidth = videoStream?.width || 1920
   const sourceBitrate = ffprobe.format.bit_rate || 5000000
 
+  const audioTrackQuery = audioTrack !== undefined ? { audioTrack } : {}
+
   if (mode === 'remux' || mode === 'direct-play' || mode === 'direct-stream') {
     const subtitleGroup = subtitleTracks.filter((t) => !t.requiresBurnIn).length > 0 ? ',SUBTITLES="subs"' : ''
     lines.push(
       `#EXT-X-STREAM-INF:BANDWIDTH=${sourceBitrate},RESOLUTION=${sourceWidth}x${sourceHeight},CODECS="${getCodecString(ffprobe)}"${subtitleGroup}`,
-      `${streamBase}/stream.m3u8?${serializeToQueryString({ mode })}`,
+      `${streamBase}/stream.m3u8?${serializeToQueryString({ mode, ...audioTrackQuery })}`,
     )
   } else {
     const applicableVariants = DEFAULT_VARIANTS.filter((v) => v.height <= sourceHeight)
@@ -64,7 +68,7 @@ export const generateMasterPlaylist = ({
     for (const variant of applicableVariants) {
       lines.push(
         `#EXT-X-STREAM-INF:BANDWIDTH=${variant.bandwidth},RESOLUTION=${variant.resolution},CODECS="avc1.42E01E,mp4a.40.2"${subtitleGroup}`,
-        `${streamBase}/stream.m3u8?${serializeToQueryString({ mode: 'transcode' as PlaybackMode, resolution: `${variant.height}p` })}`,
+        `${streamBase}/stream.m3u8?${serializeToQueryString({ mode: 'transcode' as PlaybackMode, resolution: `${variant.height}p`, ...audioTrackQuery })}`,
       )
     }
   }
