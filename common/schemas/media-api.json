@@ -528,58 +528,6 @@
             }
           ]
         },
-        "title": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
         "year": {
           "anyOf": [
             {
@@ -664,162 +612,6 @@
                     "anyOf": [
                       {
                         "type": "number"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "genre": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$ne": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "thumbnailImageUrl": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
-        "plot": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "not": {}
-                      }
-                    ]
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "type": "string"
                       },
                       {
                         "not": {}
@@ -1505,6 +1297,612 @@
                         "not": {}
                       }
                     ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "FilterType<MovieMetadataLocalized>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieMetadataLocalized%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieMetadataLocalized%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieMetadataLocalized%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CMovieMetadataLocalized%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "movieImdbId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "plot": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "posterUrl": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "genre": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$like": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$regex": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$ne": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["omdb", "tmdb"]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["omdb", "tmdb"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "sourceId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
                 }
               },
@@ -4518,58 +4916,6 @@
             }
           ]
         },
-        "title": {
-          "anyOf": [
-            {
-              "type": "object",
-              "properties": {
-                "$startsWith": {
-                  "type": "string"
-                },
-                "$endsWith": {
-                  "type": "string"
-                },
-                "$like": {
-                  "type": "string"
-                },
-                "$regex": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$eq": {
-                  "type": "string"
-                },
-                "$ne": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "$in": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "$nin": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          ]
-        },
         "year": {
           "anyOf": [
             {
@@ -4622,7 +4968,397 @@
             }
           ]
         },
-        "thumbnailImageUrl": {
+        "numberOfSeasons": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "FilterType<SeriesMetadataLocalized>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeriesMetadataLocalized%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeriesMetadataLocalized%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeriesMetadataLocalized%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CSeriesMetadataLocalized%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "seriesImdbId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "plot": {
           "anyOf": [
             {
               "type": "object",
@@ -4670,7 +5406,2443 @@
             }
           ]
         },
-        "plot": {
+        "posterUrl": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$endsWith": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$like": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$regex": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                },
+                "$ne": {
+                  "type": "string",
+                  "enum": ["omdb", "tmdb"]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["omdb", "tmdb"]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["omdb", "tmdb"]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "sourceId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "FilterType<TmdbMovieMetadata>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbMovieMetadata%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbMovieMetadata%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbMovieMetadata%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbMovieMetadata%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$gt": {
+                  "type": "number"
+                },
+                "$gte": {
+                  "type": "number"
+                },
+                "$lt": {
+                  "type": "number"
+                },
+                "$lte": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "imdbId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "originalTitle": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "overview": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "releaseDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "runtime": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "posterPath": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "backdropPath": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "genres": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "name"],
+                    "additionalProperties": false
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "name"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["id", "name"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["id", "name"],
+                      "additionalProperties": false
+                    }
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "voteAverage": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "voteCount": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "popularity": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "originalLanguage": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "spokenLanguages": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "iso_639_1": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["iso_639_1", "name"],
+                    "additionalProperties": false
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "iso_639_1": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["iso_639_1", "name"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "iso_639_1": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["iso_639_1", "name"],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "iso_639_1": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["iso_639_1", "name"],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "productionCountries": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "iso_3166_1": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["iso_3166_1", "name"],
+                    "additionalProperties": false
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "iso_3166_1": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["iso_3166_1", "name"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "iso_3166_1": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["iso_3166_1", "name"],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "iso_3166_1": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["iso_3166_1", "name"],
+                          "additionalProperties": false
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "status": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "tagline": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "budget": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "revenue": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "createdAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "updatedAt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    },
+    "FilterType<TmdbSeriesMetadata>": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$and": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbSeriesMetadata%3E"
+          }
+        },
+        "$not": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbSeriesMetadata%3E"
+          }
+        },
+        "$nor": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbSeriesMetadata%3E"
+          }
+        },
+        "$or": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FilterType%3CTmdbSeriesMetadata%3E"
+          }
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$gt": {
+                  "type": "number"
+                },
+                "$gte": {
+                  "type": "number"
+                },
+                "$lt": {
+                  "type": "number"
+                },
+                "$lte": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "imdbId": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "originalName": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "overview": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "firstAirDate": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "posterPath": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "backdropPath": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "genres": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "name"],
+                    "additionalProperties": false
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "name"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["id", "name"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["id", "name"],
+                      "additionalProperties": false
+                    }
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "voteAverage": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "voteCount": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "numberOfSeasons": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "numberOfEpisodes": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "number"
+                },
+                "$ne": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "status": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "originalLanguage": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$startsWith": {
+                  "type": "string"
+                },
+                "$endsWith": {
+                  "type": "string"
+                },
+                "$like": {
+                  "type": "string"
+                },
+                "$regex": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "string"
+                },
+                "$ne": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "languages": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "$eq": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "$ne": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "$in": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                },
+                "$nin": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "not": {}
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "language": {
           "anyOf": [
             {
               "type": "object",
@@ -5256,7 +8428,7 @@
         }
       }
     },
-    "FindOptions<Movie,(\"imdbId\"|\"title\"|\"year\"|\"duration\"|\"genre\"|\"thumbnailImageUrl\"|\"plot\"|\"type\"|\"seriesId\"|\"season\"|\"episode\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<Movie,(\"imdbId\"|\"year\"|\"duration\"|\"type\"|\"seriesId\"|\"season\"|\"episode\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -5274,27 +8446,11 @@
               "type": "string",
               "enum": ["ASC", "DESC"]
             },
-            "title": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
             "year": {
               "type": "string",
               "enum": ["ASC", "DESC"]
             },
             "duration": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "genre": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "thumbnailImageUrl": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "plot": {
               "type": "string",
               "enum": ["ASC", "DESC"]
             },
@@ -5330,21 +8486,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "imdbId",
-              "title",
-              "year",
-              "duration",
-              "genre",
-              "thumbnailImageUrl",
-              "plot",
-              "type",
-              "seriesId",
-              "season",
-              "episode",
-              "createdAt",
-              "updatedAt"
-            ]
+            "enum": ["imdbId", "year", "duration", "type", "seriesId", "season", "episode", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
@@ -5408,6 +8550,96 @@
         },
         "filter": {
           "$ref": "#/definitions/FilterType%3CMovieFile%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FindOptions<MovieMetadataLocalized,(\"id\"|\"movieImdbId\"|\"language\"|\"title\"|\"plot\"|\"posterUrl\"|\"genre\"|\"source\"|\"sourceId\"|\"createdAt\"|\"updatedAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "movieImdbId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "language": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "title": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "plot": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "posterUrl": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "genre": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "source": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "sourceId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id",
+              "movieImdbId",
+              "language",
+              "title",
+              "plot",
+              "posterUrl",
+              "genre",
+              "source",
+              "sourceId",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CMovieMetadataLocalized%3E",
           "description": "The fields should match this filter"
         }
       },
@@ -5754,7 +8986,7 @@
       "additionalProperties": false,
       "description": "Type for default filtering model"
     },
-    "FindOptions<Series,(\"imdbId\"|\"title\"|\"year\"|\"thumbnailImageUrl\"|\"plot\"|\"createdAt\"|\"updatedAt\")[]>": {
+    "FindOptions<Series,(\"imdbId\"|\"year\"|\"numberOfSeasons\"|\"createdAt\"|\"updatedAt\")[]>": {
       "type": "object",
       "properties": {
         "top": {
@@ -5772,19 +9004,11 @@
               "type": "string",
               "enum": ["ASC", "DESC"]
             },
-            "title": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
             "year": {
               "type": "string",
               "enum": ["ASC", "DESC"]
             },
-            "thumbnailImageUrl": {
-              "type": "string",
-              "enum": ["ASC", "DESC"]
-            },
-            "plot": {
+            "numberOfSeasons": {
               "type": "string",
               "enum": ["ASC", "DESC"]
             },
@@ -5804,12 +9028,377 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["imdbId", "title", "year", "thumbnailImageUrl", "plot", "createdAt", "updatedAt"]
+            "enum": ["imdbId", "year", "numberOfSeasons", "createdAt", "updatedAt"]
           },
           "description": "The result set will be limited to these fields"
         },
         "filter": {
           "$ref": "#/definitions/FilterType%3CSeries%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FindOptions<SeriesMetadataLocalized,(\"id\"|\"seriesImdbId\"|\"language\"|\"title\"|\"plot\"|\"posterUrl\"|\"source\"|\"sourceId\"|\"createdAt\"|\"updatedAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "seriesImdbId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "language": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "title": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "plot": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "posterUrl": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "source": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "sourceId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id",
+              "seriesImdbId",
+              "language",
+              "title",
+              "plot",
+              "posterUrl",
+              "source",
+              "sourceId",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CSeriesMetadataLocalized%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FindOptions<TmdbMovieMetadata,(\"id\"|\"imdbId\"|\"title\"|\"originalTitle\"|\"overview\"|\"releaseDate\"|\"runtime\"|\"posterPath\"|\"backdropPath\"|\"genres\"|\"voteAverage\"|\"voteCount\"|\"popularity\"|\"originalLanguage\"|\"spokenLanguages\"|\"productionCountries\"|\"status\"|\"tagline\"|\"budget\"|\"revenue\"|\"language\"|\"createdAt\"|\"updatedAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "imdbId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "title": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "originalTitle": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "overview": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "releaseDate": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "runtime": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "posterPath": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "backdropPath": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "genres": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "voteAverage": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "voteCount": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "popularity": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "originalLanguage": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "spokenLanguages": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "productionCountries": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "status": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "tagline": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "budget": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "revenue": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "language": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id",
+              "imdbId",
+              "title",
+              "originalTitle",
+              "overview",
+              "releaseDate",
+              "runtime",
+              "posterPath",
+              "backdropPath",
+              "genres",
+              "voteAverage",
+              "voteCount",
+              "popularity",
+              "originalLanguage",
+              "spokenLanguages",
+              "productionCountries",
+              "status",
+              "tagline",
+              "budget",
+              "revenue",
+              "language",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CTmdbMovieMetadata%3E",
+          "description": "The fields should match this filter"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Type for default filtering model"
+    },
+    "FindOptions<TmdbSeriesMetadata,(\"id\"|\"imdbId\"|\"name\"|\"originalName\"|\"overview\"|\"firstAirDate\"|\"posterPath\"|\"backdropPath\"|\"genres\"|\"voteAverage\"|\"voteCount\"|\"numberOfSeasons\"|\"numberOfEpisodes\"|\"status\"|\"originalLanguage\"|\"languages\"|\"language\"|\"createdAt\"|\"updatedAt\")[]>": {
+      "type": "object",
+      "properties": {
+        "top": {
+          "type": "number",
+          "description": "Limits the hits"
+        },
+        "skip": {
+          "type": "number",
+          "description": "Skips the first N hit"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "imdbId": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "name": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "originalName": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "overview": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "firstAirDate": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "posterPath": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "backdropPath": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "genres": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "voteAverage": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "voteCount": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "numberOfSeasons": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "numberOfEpisodes": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "status": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "originalLanguage": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "languages": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "language": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "createdAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            },
+            "updatedAt": {
+              "type": "string",
+              "enum": ["ASC", "DESC"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Sets up an order by a field and a direction"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id",
+              "imdbId",
+              "name",
+              "originalName",
+              "overview",
+              "firstAirDate",
+              "posterPath",
+              "backdropPath",
+              "genres",
+              "voteAverage",
+              "voteCount",
+              "numberOfSeasons",
+              "numberOfEpisodes",
+              "status",
+              "originalLanguage",
+              "languages",
+              "language",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "description": "The result set will be limited to these fields"
+        },
+        "filter": {
+          "$ref": "#/definitions/FilterType%3CTmdbSeriesMetadata%3E",
           "description": "The fields should match this filter"
         }
       },
@@ -5889,7 +9478,7 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CMovie%2C(%22imdbId%22%7C%22title%22%7C%22year%22%7C%22duration%22%7C%22genre%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CMovie%2C(%22imdbId%22%7C%22year%22%7C%22duration%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
@@ -5916,6 +9505,26 @@
         },
         "result": {
           "$ref": "#/definitions/GetCollectionResult%3CMovieFile%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "GetCollectionEndpoint<MovieMetadataLocalized>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CMovieMetadataLocalized%2C(%22id%22%7C%22movieImdbId%22%7C%22language%22%7C%22title%22%7C%22plot%22%7C%22posterUrl%22%7C%22genre%22%7C%22source%22%7C%22sourceId%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CMovieMetadataLocalized%3E"
         }
       },
       "required": ["query", "result"],
@@ -5969,13 +9578,73 @@
           "type": "object",
           "properties": {
             "findOptions": {
-              "$ref": "#/definitions/FindOptions%3CSeries%2C(%22imdbId%22%7C%22title%22%7C%22year%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+              "$ref": "#/definitions/FindOptions%3CSeries%2C(%22imdbId%22%7C%22year%22%7C%22numberOfSeasons%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
             }
           },
           "additionalProperties": false
         },
         "result": {
           "$ref": "#/definitions/GetCollectionResult%3CSeries%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "GetCollectionEndpoint<SeriesMetadataLocalized>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CSeriesMetadataLocalized%2C(%22id%22%7C%22seriesImdbId%22%7C%22language%22%7C%22title%22%7C%22plot%22%7C%22posterUrl%22%7C%22source%22%7C%22sourceId%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CSeriesMetadataLocalized%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "GetCollectionEndpoint<TmdbMovieMetadata>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CTmdbMovieMetadata%2C(%22id%22%7C%22imdbId%22%7C%22title%22%7C%22originalTitle%22%7C%22overview%22%7C%22releaseDate%22%7C%22runtime%22%7C%22posterPath%22%7C%22backdropPath%22%7C%22genres%22%7C%22voteAverage%22%7C%22voteCount%22%7C%22popularity%22%7C%22originalLanguage%22%7C%22spokenLanguages%22%7C%22productionCountries%22%7C%22status%22%7C%22tagline%22%7C%22budget%22%7C%22revenue%22%7C%22language%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CTmdbMovieMetadata%3E"
+        }
+      },
+      "required": ["query", "result"],
+      "additionalProperties": false,
+      "description": "Rest endpoint model for getting / querying collections"
+    },
+    "GetCollectionEndpoint<TmdbSeriesMetadata>": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "findOptions": {
+              "$ref": "#/definitions/FindOptions%3CTmdbSeriesMetadata%2C(%22id%22%7C%22imdbId%22%7C%22name%22%7C%22originalName%22%7C%22overview%22%7C%22firstAirDate%22%7C%22posterPath%22%7C%22backdropPath%22%7C%22genres%22%7C%22voteAverage%22%7C%22voteCount%22%7C%22numberOfSeasons%22%7C%22numberOfEpisodes%22%7C%22status%22%7C%22originalLanguage%22%7C%22languages%22%7C%22language%22%7C%22createdAt%22%7C%22updatedAt%22)%5B%5D%3E"
+            }
+          },
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/GetCollectionResult%3CTmdbSeriesMetadata%3E"
         }
       },
       "required": ["query", "result"],
@@ -6032,6 +9701,25 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/MovieFile"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "GetCollectionResult<MovieMetadataLocalized>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MovieMetadataLocalized"
           },
           "description": "List of the selected entities"
         }
@@ -6097,6 +9785,63 @@
       "additionalProperties": false,
       "description": "Response Model for GetCollection"
     },
+    "GetCollectionResult<SeriesMetadataLocalized>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SeriesMetadataLocalized"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "GetCollectionResult<TmdbMovieMetadata>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TmdbMovieMetadata"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
+    "GetCollectionResult<TmdbSeriesMetadata>": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number",
+          "description": "The Total count of entities"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TmdbSeriesMetadata"
+          },
+          "description": "List of the selected entities"
+        }
+      },
+      "required": ["count", "entries"],
+      "additionalProperties": false,
+      "description": "Response Model for GetCollection"
+    },
     "GetCollectionResult<WatchHistoryEntry>": {
       "type": "object",
       "properties": {
@@ -6128,12 +9873,8 @@
                 "type": "string",
                 "enum": [
                   "imdbId",
-                  "title",
                   "year",
                   "duration",
-                  "genre",
-                  "thumbnailImageUrl",
-                  "plot",
                   "type",
                   "seriesId",
                   "season",
@@ -6196,6 +9937,54 @@
         },
         "result": {
           "$ref": "#/definitions/MovieFile"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetEntityEndpoint<MovieMetadataLocalized,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "movieImdbId",
+                  "language",
+                  "title",
+                  "plot",
+                  "posterUrl",
+                  "genre",
+                  "source",
+                  "sourceId",
+                  "createdAt",
+                  "updatedAt"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/MovieMetadataLocalized"
         }
       },
       "required": ["query", "url", "result"],
@@ -6340,7 +10129,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["imdbId", "title", "year", "thumbnailImageUrl", "plot", "createdAt", "updatedAt"]
+                "enum": ["imdbId", "year", "numberOfSeasons", "createdAt", "updatedAt"]
               },
               "description": "The list of fields to select"
             }
@@ -6360,6 +10149,169 @@
         },
         "result": {
           "$ref": "#/definitions/Series"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetEntityEndpoint<SeriesMetadataLocalized,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "seriesImdbId",
+                  "language",
+                  "title",
+                  "plot",
+                  "posterUrl",
+                  "source",
+                  "sourceId",
+                  "createdAt",
+                  "updatedAt"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/SeriesMetadataLocalized"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetEntityEndpoint<TmdbMovieMetadata,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "imdbId",
+                  "title",
+                  "originalTitle",
+                  "overview",
+                  "releaseDate",
+                  "runtime",
+                  "posterPath",
+                  "backdropPath",
+                  "genres",
+                  "voteAverage",
+                  "voteCount",
+                  "popularity",
+                  "originalLanguage",
+                  "spokenLanguages",
+                  "productionCountries",
+                  "status",
+                  "tagline",
+                  "budget",
+                  "revenue",
+                  "language",
+                  "createdAt",
+                  "updatedAt"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "number",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/TmdbMovieMetadata"
+        }
+      },
+      "required": ["query", "url", "result"],
+      "additionalProperties": false,
+      "description": "Endpoint model for getting a single entity"
+    },
+    "GetEntityEndpoint<TmdbSeriesMetadata,\"id\">": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "id",
+                  "imdbId",
+                  "name",
+                  "originalName",
+                  "overview",
+                  "firstAirDate",
+                  "posterPath",
+                  "backdropPath",
+                  "genres",
+                  "voteAverage",
+                  "voteCount",
+                  "numberOfSeasons",
+                  "numberOfEpisodes",
+                  "status",
+                  "originalLanguage",
+                  "languages",
+                  "language",
+                  "createdAt",
+                  "updatedAt"
+                ]
+              },
+              "description": "The list of fields to select"
+            }
+          },
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "number",
+              "description": "The entity's unique identifier"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "result": {
+          "$ref": "#/definitions/TmdbSeriesMetadata"
         }
       },
       "required": ["query", "url", "result"],
@@ -6684,8 +10636,8 @@
                 "not-movie-file",
                 "rate-limited",
                 "metadata-not-found",
-                "omdb-not-configured",
-                "omdb-error"
+                "provider-not-configured",
+                "provider-error"
               ]
             },
             "error": {}
@@ -6706,8 +10658,8 @@
         "not-movie-file",
         "rate-limited",
         "metadata-not-found",
-        "omdb-not-configured",
-        "omdb-error"
+        "provider-not-configured",
+        "provider-error"
       ]
     },
     "MediaApi": {
@@ -6752,6 +10704,30 @@
             "/omdb-series-metadata/:id": {
               "$ref": "#/definitions/GetEntityEndpoint%3COmdbSeriesMetadata%2C%22imdbID%22%3E"
             },
+            "/tmdb-movie-metadata": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CTmdbMovieMetadata%3E"
+            },
+            "/tmdb-movie-metadata/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CTmdbMovieMetadata%2C%22id%22%3E"
+            },
+            "/tmdb-series-metadata": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CTmdbSeriesMetadata%3E"
+            },
+            "/tmdb-series-metadata/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CTmdbSeriesMetadata%2C%22id%22%3E"
+            },
+            "/movie-metadata-localized": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CMovieMetadataLocalized%3E"
+            },
+            "/movie-metadata-localized/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CMovieMetadataLocalized%2C%22id%22%3E"
+            },
+            "/series-metadata-localized": {
+              "$ref": "#/definitions/GetCollectionEndpoint%3CSeriesMetadataLocalized%3E"
+            },
+            "/series-metadata-localized/:id": {
+              "$ref": "#/definitions/GetEntityEndpoint%3CSeriesMetadataLocalized%2C%22id%22%3E"
+            },
             "/movie-files": {
               "$ref": "#/definitions/GetCollectionEndpoint%3CMovieFile%3E"
             },
@@ -6784,6 +10760,14 @@
             "/omdb-movie-metadata/:id",
             "/omdb-series-metadata",
             "/omdb-series-metadata/:id",
+            "/tmdb-movie-metadata",
+            "/tmdb-movie-metadata/:id",
+            "/tmdb-series-metadata",
+            "/tmdb-series-metadata/:id",
+            "/movie-metadata-localized",
+            "/movie-metadata-localized/:id",
+            "/series-metadata-localized",
+            "/series-metadata-localized/:id",
             "/movie-files",
             "/movie-files/:id",
             "/files/:letter/:path/master.m3u8",
@@ -6851,7 +10835,22 @@
               "url": {},
               "query": {},
               "body": {},
-              "headers": {}
+              "headers": {},
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "deprecated": {
+                "type": "boolean"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
             },
             "required": ["result"],
             "additionalProperties": false
@@ -6890,7 +10889,22 @@
               "url": {},
               "query": {},
               "body": {},
-              "headers": {}
+              "headers": {},
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "deprecated": {
+                "type": "boolean"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
             },
             "required": ["result"],
             "additionalProperties": false
@@ -6905,7 +10919,22 @@
               "url": {},
               "query": {},
               "body": {},
-              "headers": {}
+              "headers": {},
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "deprecated": {
+                "type": "boolean"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
             },
             "required": ["result"],
             "additionalProperties": false
@@ -6920,7 +10949,22 @@
               "url": {},
               "query": {},
               "body": {},
-              "headers": {}
+              "headers": {},
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "deprecated": {
+                "type": "boolean"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
             },
             "required": ["result"],
             "additionalProperties": false
@@ -6935,7 +10979,22 @@
               "url": {},
               "query": {},
               "body": {},
-              "headers": {}
+              "headers": {},
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "deprecated": {
+                "type": "boolean"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
             },
             "required": ["result"],
             "additionalProperties": false
@@ -6951,26 +11010,11 @@
         "imdbId": {
           "type": "string"
         },
-        "title": {
-          "type": "string"
-        },
         "year": {
           "type": "number"
         },
         "duration": {
           "type": "number"
-        },
-        "genre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
         },
         "type": {
           "type": "string",
@@ -6992,7 +11036,7 @@
           "type": "string"
         }
       },
-      "required": ["imdbId", "title", "createdAt", "updatedAt"],
+      "required": ["imdbId", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "MovieFile": {
@@ -7032,6 +11076,50 @@
         }
       },
       "required": ["id", "driveLetter", "path", "ffprobe"],
+      "additionalProperties": false
+    },
+    "MovieMetadataLocalized": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "movieImdbId": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "plot": {
+          "type": "string"
+        },
+        "posterUrl": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string",
+          "enum": ["omdb", "tmdb"]
+        },
+        "sourceId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "movieImdbId", "language", "title", "source", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "OmdbMovieMetadata": {
@@ -7288,7 +11376,7 @@
       "additionalProperties": false
     },
     "Omit<Movie,(\"createdAt\"|\"updatedAt\")>": {
-      "$ref": "#/definitions/Pick%3CMovie%2CExclude%3C(%22imdbId%22%7C%22title%22%7C%22year%22%7C%22duration%22%7C%22genre%22%7C%22thumbnailImageUrl%22%7C%22plot%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
+      "$ref": "#/definitions/Pick%3CMovie%2CExclude%3C(%22imdbId%22%7C%22year%22%7C%22duration%22%7C%22type%22%7C%22seriesId%22%7C%22season%22%7C%22episode%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22createdAt%22%7C%22updatedAt%22)%3E%3E"
     },
     "Omit<WatchHistoryEntry,(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>": {
       "$ref": "#/definitions/Pick%3CWatchHistoryEntry%2CExclude%3C(%22id%22%7C%22userName%22%7C%22driveLetter%22%7C%22path%22%7C%22watchedSeconds%22%7C%22completed%22%7C%22createdAt%22%7C%22updatedAt%22)%2C(%22userName%22%7C%22createdAt%22%7C%22updatedAt%22%7C%22id%22)%3E%3E"
@@ -7337,26 +11425,11 @@
         "imdbId": {
           "type": "string"
         },
-        "title": {
-          "type": "string"
-        },
         "year": {
           "type": "number"
         },
         "duration": {
           "type": "number"
-        },
-        "genre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
         },
         "type": {
           "type": "string",
@@ -7422,13 +11495,10 @@
       "additionalProperties": false,
       "description": "Endpoint model for updating entities"
     },
-    "Pick<Movie,Exclude<(\"imdbId\"|\"title\"|\"year\"|\"duration\"|\"genre\"|\"thumbnailImageUrl\"|\"plot\"|\"type\"|\"seriesId\"|\"season\"|\"episode\"|\"createdAt\"|\"updatedAt\"),(\"createdAt\"|\"updatedAt\")>>": {
+    "Pick<Movie,Exclude<(\"imdbId\"|\"year\"|\"duration\"|\"type\"|\"seriesId\"|\"season\"|\"episode\"|\"createdAt\"|\"updatedAt\"),(\"createdAt\"|\"updatedAt\")>>": {
       "type": "object",
       "properties": {
         "imdbId": {
-          "type": "string"
-        },
-        "title": {
           "type": "string"
         },
         "year": {
@@ -7436,18 +11506,6 @@
         },
         "duration": {
           "type": "number"
-        },
-        "genre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
         },
         "type": {
           "type": "string",
@@ -7463,7 +11521,7 @@
           "type": "number"
         }
       },
-      "required": ["imdbId", "title"],
+      "required": ["imdbId"],
       "additionalProperties": false
     },
     "Pick<WatchHistoryEntry,Exclude<(\"id\"|\"userName\"|\"driveLetter\"|\"path\"|\"watchedSeconds\"|\"completed\"|\"createdAt\"|\"updatedAt\"),(\"userName\"|\"createdAt\"|\"updatedAt\"|\"id\")>>": {
@@ -7666,10 +11724,10 @@
         "metadataNotFound": {
           "type": "number"
         },
-        "omdbNotConfigured": {
+        "providerNotConfigured": {
           "type": "number"
         },
-        "omdbError": {
+        "providerError": {
           "type": "number"
         },
         "skipped": {
@@ -7683,8 +11741,8 @@
         "failed",
         "rateLimited",
         "metadataNotFound",
-        "omdbNotConfigured",
-        "omdbError",
+        "providerNotConfigured",
+        "providerError",
         "skipped"
       ],
       "additionalProperties": false
@@ -7695,16 +11753,48 @@
         "imdbId": {
           "type": "string"
         },
-        "title": {
-          "type": "string"
-        },
         "year": {
           "type": "string"
         },
-        "thumbnailImageUrl": {
+        "numberOfSeasons": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["imdbId", "year", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "SeriesMetadataLocalized": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "seriesImdbId": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
           "type": "string"
         },
         "plot": {
+          "type": "string"
+        },
+        "posterUrl": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["omdb", "tmdb"]
+        },
+        "sourceId": {
           "type": "string"
         },
         "createdAt": {
@@ -7714,7 +11804,7 @@
           "type": "string"
         }
       },
-      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
+      "required": ["id", "seriesImdbId", "language", "title", "source", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "SubtitleTrackInfo": {
@@ -7745,6 +11835,221 @@
         }
       },
       "required": ["index", "label", "language", "format", "source", "requiresBurnIn"],
+      "additionalProperties": false
+    },
+    "TmdbMovieMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "originalTitle": {
+          "type": "string"
+        },
+        "overview": {
+          "type": "string"
+        },
+        "releaseDate": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "number"
+        },
+        "posterPath": {
+          "type": "string"
+        },
+        "backdropPath": {
+          "type": "string"
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "name"],
+            "additionalProperties": false
+          }
+        },
+        "voteAverage": {
+          "type": "number"
+        },
+        "voteCount": {
+          "type": "number"
+        },
+        "popularity": {
+          "type": "number"
+        },
+        "originalLanguage": {
+          "type": "string"
+        },
+        "spokenLanguages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "iso_639_1": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["iso_639_1", "name"],
+            "additionalProperties": false
+          }
+        },
+        "productionCountries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "iso_3166_1": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["iso_3166_1", "name"],
+            "additionalProperties": false
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "number"
+        },
+        "revenue": {
+          "type": "number"
+        },
+        "language": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "originalTitle",
+        "overview",
+        "genres",
+        "originalLanguage",
+        "language",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "TmdbSeriesMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "originalName": {
+          "type": "string"
+        },
+        "overview": {
+          "type": "string"
+        },
+        "firstAirDate": {
+          "type": "string"
+        },
+        "posterPath": {
+          "type": "string"
+        },
+        "backdropPath": {
+          "type": "string"
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "name"],
+            "additionalProperties": false
+          }
+        },
+        "voteAverage": {
+          "type": "number"
+        },
+        "voteCount": {
+          "type": "number"
+        },
+        "numberOfSeasons": {
+          "type": "number"
+        },
+        "numberOfEpisodes": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "originalLanguage": {
+          "type": "string"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "language": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "originalName",
+        "overview",
+        "genres",
+        "originalLanguage",
+        "language",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "updateScanProgress": {

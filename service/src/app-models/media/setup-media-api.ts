@@ -11,7 +11,18 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
-import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
+import {
+  Movie,
+  MovieFile,
+  MovieMetadataLocalized,
+  OmdbMovieMetadata,
+  OmdbSeriesMetadata,
+  Series,
+  SeriesMetadataLocalized,
+  TmdbMovieMetadata,
+  TmdbSeriesMetadata,
+  WatchHistoryEntry,
+} from 'common'
 import mediaApiSchema from 'common/schemas/media-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
@@ -80,6 +91,38 @@ export const setupMediaRestApi = async (injector: Injector) => {
           schema: mediaApiSchema,
           schemaName: 'GetEntityEndpoint<OmdbSeriesMetadata,"imdbID">',
         })(createGetEntityEndpoint({ model: OmdbSeriesMetadata, primaryKey: 'imdbID' })),
+        '/tmdb-movie-metadata': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetCollectionEndpoint<TmdbMovieMetadata>',
+        })(createGetCollectionEndpoint({ model: TmdbMovieMetadata, primaryKey: 'id' })),
+        '/tmdb-movie-metadata/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<TmdbMovieMetadata,"id">',
+        })(createGetEntityEndpoint({ model: TmdbMovieMetadata, primaryKey: 'id' })),
+        '/tmdb-series-metadata': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetCollectionEndpoint<TmdbSeriesMetadata>',
+        })(createGetCollectionEndpoint({ model: TmdbSeriesMetadata, primaryKey: 'id' })),
+        '/tmdb-series-metadata/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<TmdbSeriesMetadata,"id">',
+        })(createGetEntityEndpoint({ model: TmdbSeriesMetadata, primaryKey: 'id' })),
+        '/movie-metadata-localized': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetCollectionEndpoint<MovieMetadataLocalized>',
+        })(createGetCollectionEndpoint({ model: MovieMetadataLocalized, primaryKey: 'id' })),
+        '/movie-metadata-localized/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<MovieMetadataLocalized,"id">',
+        })(createGetEntityEndpoint({ model: MovieMetadataLocalized, primaryKey: 'id' })),
+        '/series-metadata-localized': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetCollectionEndpoint<SeriesMetadataLocalized>',
+        })(createGetCollectionEndpoint({ model: SeriesMetadataLocalized, primaryKey: 'id' })),
+        '/series-metadata-localized/:id': Validate({
+          schema: mediaApiSchema,
+          schemaName: 'GetEntityEndpoint<SeriesMetadataLocalized,"id">',
+        })(createGetEntityEndpoint({ model: SeriesMetadataLocalized, primaryKey: 'id' })),
         '/movie-files': Validate({ schema: mediaApiSchema, schemaName: 'GetCollectionEndpoint<MovieFile>' })(
           createGetCollectionEndpoint({ model: MovieFile, primaryKey: 'id' }),
         ),

@@ -23,6 +23,17 @@ export const settingsChildren = {
       />
     ),
   },
+  '/tmdb': {
+    meta: { title: 'TMDB Settings', icon: icons.film },
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { TmdbSettingsPage } = await import('../pages/admin/tmdb-settings.js')
+          return <TmdbSettingsPage />
+        }}
+      />
+    ),
+  },
   '/streaming': {
     meta: { title: 'Streaming Settings', icon: icons.play },
     component: () => (

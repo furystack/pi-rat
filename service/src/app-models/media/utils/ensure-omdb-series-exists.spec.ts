@@ -28,6 +28,14 @@ vi.mock('./ensure-series-exists.js', () => ({
   ensureSeriesExists: (...args: unknown[]) => mockEnsureSeriesExists(...args) as unknown,
 }))
 
+vi.mock('./ensure-localized-metadata-exists.js', () => ({
+  ensureSeriesLocalizedMetadataExists: vi.fn().mockResolvedValue({}),
+}))
+
+vi.mock('./map-omdb-to-localized.js', () => ({
+  mapOmdbSeriesToLocalized: vi.fn().mockReturnValue({}),
+}))
+
 const { ensureOmdbSeriesExists } = await import('./ensure-omdb-series-exists.js')
 
 const createMeta = (overrides?: Partial<OmdbMovieMetadata>): OmdbMovieMetadata =>
@@ -63,7 +71,12 @@ describe('ensureOmdbSeriesExists', () => {
   })
 
   it('should call ensureSeriesExists with stored result when series is already in database', async () => {
-    const storedSeries = { imdbID: 'tt9999999', Title: 'Stored Series' } as OmdbSeriesMetadata
+    const storedSeries = {
+      imdbID: 'tt9999999',
+      Title: 'Stored Series',
+      Year: '2024',
+      totalSeasons: '3',
+    } as OmdbSeriesMetadata
     mockOmdbSeriesGet.mockResolvedValue(storedSeries)
 
     await usingAsync(createTestInjector(), async (injector) => {
@@ -71,12 +84,20 @@ describe('ensureOmdbSeriesExists', () => {
 
       expect(mockOmdbSeriesGet).toHaveBeenCalled()
       expect(mockFetchOmdbSeriesMetadata).not.toHaveBeenCalled()
-      expect(mockEnsureSeriesExists).toHaveBeenCalledWith(storedSeries, injector)
+      expect(mockEnsureSeriesExists).toHaveBeenCalledWith(
+        { imdbId: 'tt9999999', year: '2024', numberOfSeasons: 3 },
+        injector,
+      )
     })
   })
 
   it('should fetch from OMDB, add to dataset, and call ensureSeriesExists when not stored', async () => {
-    const fetchedSeries = { imdbID: 'tt9999999', Title: 'Fetched Series' } as OmdbSeriesMetadata
+    const fetchedSeries = {
+      imdbID: 'tt9999999',
+      Title: 'Fetched Series',
+      Year: '2023',
+      totalSeasons: '5',
+    } as OmdbSeriesMetadata
     mockOmdbSeriesGet.mockResolvedValue(undefined)
     mockFetchOmdbSeriesMetadata.mockResolvedValue({ status: 'success', data: fetchedSeries })
     mockOmdbSeriesAdd.mockResolvedValue({ created: [fetchedSeries] })
@@ -86,7 +107,10 @@ describe('ensureOmdbSeriesExists', () => {
 
       expect(mockFetchOmdbSeriesMetadata).toHaveBeenCalledWith({ imdbId: 'tt9999999' }, { file: undefined })
       expect(mockOmdbSeriesAdd).toHaveBeenCalledWith(injector, fetchedSeries)
-      expect(mockEnsureSeriesExists).toHaveBeenCalledWith(fetchedSeries, injector)
+      expect(mockEnsureSeriesExists).toHaveBeenCalledWith(
+        { imdbId: 'tt9999999', year: '2023', numberOfSeasons: 5 },
+        injector,
+      )
     })
   })
 

@@ -1,45 +1,35 @@
 import type { CommandProvider } from '@furystack/shades-common-components'
-import { SeriesService } from '../../../services/series-service.js'
 import { createSuggestion } from './create-suggestion.js'
 import { navigateToRoute } from '../../../utils/navigate-to-route.js'
 import { createComponent } from '@furystack/shades'
+import { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 
 export const searchSeriesCommandProvider: CommandProvider = async ({ term, injector }) => {
   if (term.length > 4) {
-    const seriesService = injector.getInstance(SeriesService)
-    const relatedSeries = await seriesService.findSeries({
-      filter: {
-        $or: [
-          {
-            title: {
-              $like: `%${term}%`,
-            },
+    const mediaApiClient = injector.getInstance(MediaApiClient)
+    const { result: relatedLocalized } = await mediaApiClient.call({
+      method: 'GET',
+      action: '/series-metadata-localized',
+      query: {
+        findOptions: {
+          filter: {
+            title: { $like: `%${term}%` },
           },
-          {
-            imdbId: {
-              $like: `%${term}%`,
-            },
-          },
-          {
-            plot: {
-              $like: `%${term}%`,
-            },
-          },
-        ],
+        },
       },
     })
-    return relatedSeries.entries.map((series) =>
+    return relatedLocalized.entries.map((entry) =>
       createSuggestion({
-        icon: series.thumbnailImageUrl ? (
-          <img src={series.thumbnailImageUrl} alt={series.title} style={{ height: '64px', marginRight: '16px' }} />
+        icon: entry.posterUrl ? (
+          <img src={entry.posterUrl} alt={entry.title} style={{ height: '64px', marginRight: '16px' }} />
         ) : (
           '🎥'
         ),
-        name: series.title,
-        description: series.plot,
+        name: entry.title,
+        description: entry.plot || '',
         score: 5,
         onSelected: () => {
-          navigateToRoute(injector, '/series/:imdbId', { imdbId: series.imdbId })
+          navigateToRoute(injector, '/series/:imdbId', { imdbId: entry.seriesImdbId })
         },
       }),
     )

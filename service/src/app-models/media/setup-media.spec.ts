@@ -36,7 +36,6 @@ const createMovieFile = (overrides: Partial<MovieFile> = {}): MovieFile =>
 const createMovie = (overrides: Partial<Movie> = {}): Movie =>
   ({
     imdbId: 'tt1234567',
-    title: 'Test Movie',
     ...overrides,
   }) as Movie
 

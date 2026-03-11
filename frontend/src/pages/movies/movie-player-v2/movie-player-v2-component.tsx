@@ -211,7 +211,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
           <media-loading-indicator slot="centered-chrome"></media-loading-indicator>
           <media-error-dialog slot="dialog"></media-error-dialog>
-          <media-poster-image slot="poster" src={props.movie?.thumbnailImageUrl} />
+          <media-poster-image slot="poster" />
 
           <media-control-bar style={{ width: '100%' }}>
             <media-play-button />

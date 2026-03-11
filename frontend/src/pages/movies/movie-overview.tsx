@@ -3,9 +3,10 @@ import { isLoadedCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, CacheView, Skeleton, Typography } from '@furystack/shades-common-components'
-import type { Movie } from 'common'
+import type { Movie, MovieMetadataLocalized } from 'common'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { navigateToRoute } from '../../utils/navigate-to-route.js'
+import { LocalizedMetadataService } from '../../services/localized-metadata-service.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { MoviesService } from '../../services/movies-service.js'
 import { SessionService } from '../../services/session.js'
@@ -99,14 +100,23 @@ const MovieOverviewContent = Shade<{ data: CacheWithValue<Movie> }>({
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
     const movie = props.data.value
 
+    const localizedService = injector.getInstance(LocalizedMetadataService)
+    const [localized] = useObservable('localized', localizedService.getMovieLocalizedAsObservable(movie.imdbId))
+
+    const localizedData = (localized as CacheWithValue<MovieMetadataLocalized | undefined> | undefined)?.value
+    const title = localizedData?.title ?? movie.imdbId
+    const plot = localizedData?.plot
+    const posterUrl = localizedData?.posterUrl
+    const genre = localizedData?.genre
+
     return (
-      <MediaOverviewLayout thumbnailUrl={movie.thumbnailImageUrl || ''} title={movie.title}>
-        <Typography variant="h1">{movie.title}</Typography>
+      <MediaOverviewLayout thumbnailUrl={posterUrl || ''} title={title}>
+        <Typography variant="h1">{title}</Typography>
         <Typography variant="caption">
-          {movie.year?.toString()} &nbsp; {movie.genre}
+          {movie.year?.toString()} &nbsp; {genre?.join(', ')}
         </Typography>
         <Typography variant="body1" align="justify">
-          {movie.plot}
+          {plot}
         </Typography>
         <div>
           <PlayButtons imdbId={movie.imdbId} />

@@ -13,6 +13,7 @@ export const GetServiceStatus: RequestAction<GetServiceStatusAction> = async ({ 
     state,
     services: {
       omdb: services.omdb ?? false,
+      tmdb: services.tmdb ?? false,
       github: services.github ?? false,
     },
   })

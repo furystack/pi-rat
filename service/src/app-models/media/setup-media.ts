@@ -2,7 +2,18 @@ import type { Injector } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 
-import { Movie, MovieFile, OmdbMovieMetadata, OmdbSeriesMetadata, Series, WatchHistoryEntry } from 'common'
+import {
+  Movie,
+  MovieFile,
+  MovieMetadataLocalized,
+  OmdbMovieMetadata,
+  OmdbSeriesMetadata,
+  Series,
+  SeriesMetadataLocalized,
+  TmdbMovieMetadata,
+  TmdbSeriesMetadata,
+  WatchHistoryEntry,
+} from 'common'
 
 import { getCurrentUser, isAuthorized } from '@furystack/core'
 import type { AuthorizationResult, DataSet } from '@furystack/repository'
@@ -17,16 +28,13 @@ import type { FfprobeResult } from '../../ffprobe-service.js'
 import { getDefaultDbSettings } from '../../get-default-db-options.js'
 import { WebsocketService } from '../../websocket-service.js'
 import { OmdbClientService } from './metadata-services/omdb-client-service.js'
+import { TmdbClientService } from './metadata-services/tmdb-client-service.js'
 import { useMovieFileMaintainer } from './services/movie-file-maintainer.js'
 
 class MovieModel extends Model<Movie, Movie> implements Movie {
-  declare title: string
   declare imdbId: string
   declare year?: number | undefined
   declare duration?: number | undefined
-  declare genre?: string[] | undefined
-  declare thumbnailImageUrl?: string | undefined
-  declare plot?: string | undefined
   declare type?: 'episode' | 'movie' | undefined
   declare seriesId?: string | undefined
   declare season?: number | undefined
@@ -59,10 +67,8 @@ class WatchHistoryEntryModel extends Model<WatchHistoryEntry, WatchHistoryEntry>
 
 class SeriesModel extends Model<Series, Series> implements Series {
   declare imdbId: string
-  declare title: string
   declare year: string
-  declare thumbnailImageUrl?: string | undefined
-  declare plot: string
+  declare numberOfSeasons?: number | undefined
   declare createdAt: string
   declare updatedAt: string
 }
@@ -127,6 +133,87 @@ class OmdbSeriesMetadataModel extends Model<OmdbSeriesMetadata, OmdbSeriesMetada
   declare updatedAt: string
 }
 
+class TmdbMovieMetadataModel extends Model<TmdbMovieMetadata, TmdbMovieMetadata> implements TmdbMovieMetadata {
+  declare id: number
+  declare imdbId?: string
+  declare title: string
+  declare originalTitle: string
+  declare overview: string
+  declare releaseDate?: string
+  declare runtime?: number
+  declare posterPath?: string
+  declare backdropPath?: string
+  declare genres: Array<{ id: number; name: string }>
+  declare voteAverage?: number
+  declare voteCount?: number
+  declare popularity?: number
+  declare originalLanguage: string
+  declare spokenLanguages?: Array<{ iso_639_1: string; name: string }>
+  declare productionCountries?: Array<{ iso_3166_1: string; name: string }>
+  declare status?: string
+  declare tagline?: string
+  declare budget?: number
+  declare revenue?: number
+  declare language: string
+  declare createdAt: string
+  declare updatedAt: string
+}
+
+class TmdbSeriesMetadataModel extends Model<TmdbSeriesMetadata, TmdbSeriesMetadata> implements TmdbSeriesMetadata {
+  declare id: number
+  declare imdbId?: string
+  declare name: string
+  declare originalName: string
+  declare overview: string
+  declare firstAirDate?: string
+  declare posterPath?: string
+  declare backdropPath?: string
+  declare genres: Array<{ id: number; name: string }>
+  declare voteAverage?: number
+  declare voteCount?: number
+  declare numberOfSeasons?: number
+  declare numberOfEpisodes?: number
+  declare status?: string
+  declare originalLanguage: string
+  declare languages?: string[]
+  declare language: string
+  declare createdAt: string
+  declare updatedAt: string
+}
+
+class MovieMetadataLocalizedModel
+  extends Model<MovieMetadataLocalized, MovieMetadataLocalized>
+  implements MovieMetadataLocalized
+{
+  declare id: string
+  declare movieImdbId: string
+  declare language: string
+  declare title: string
+  declare plot?: string
+  declare posterUrl?: string
+  declare genre?: string[]
+  declare source: 'omdb' | 'tmdb'
+  declare sourceId?: string
+  declare createdAt: string
+  declare updatedAt: string
+}
+
+class SeriesMetadataLocalizedModel
+  extends Model<SeriesMetadataLocalized, SeriesMetadataLocalized>
+  implements SeriesMetadataLocalized
+{
+  declare id: string
+  declare seriesImdbId: string
+  declare language: string
+  declare title: string
+  declare plot?: string
+  declare posterUrl?: string
+  declare source: 'omdb' | 'tmdb'
+  declare sourceId?: string
+  declare createdAt: string
+  declare updatedAt: string
+}
+
 export const announceMovieFileAdded = async ({
   entity,
   injector,
@@ -179,10 +266,6 @@ export const setupMedia = async (injector: Injector) => {
             allowNull: false,
             primaryKey: true,
           },
-          title: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
           duration: {
             type: DataTypes.INTEGER,
             allowNull: true,
@@ -191,24 +274,12 @@ export const setupMedia = async (injector: Injector) => {
             type: DataTypes.INTEGER,
             allowNull: true,
           },
-          genre: {
-            type: DataTypes.JSON, //DataTypes.ARRAY(DataTypes.STRING),
-            allowNull: true,
-          },
           episode: {
             type: DataTypes.INTEGER,
             allowNull: true,
           },
           season: {
             type: DataTypes.INTEGER,
-            allowNull: true,
-          },
-          plot: {
-            type: DataTypes.STRING,
-            allowNull: true,
-          },
-          thumbnailImageUrl: {
-            type: DataTypes.STRING,
             allowNull: true,
           },
           type: {
@@ -339,21 +410,13 @@ export const setupMedia = async (injector: Injector) => {
             type: DataTypes.STRING,
             primaryKey: true,
           },
-          title: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
           year: {
             type: DataTypes.STRING,
             allowNull: false,
           },
-          thumbnailImageUrl: {
-            type: DataTypes.STRING,
+          numberOfSeasons: {
+            type: DataTypes.INTEGER,
             allowNull: true,
-          },
-          plot: {
-            type: DataTypes.STRING,
-            allowNull: false,
           },
           createdAt: {
             type: DataTypes.DATE,
@@ -617,6 +680,330 @@ export const setupMedia = async (injector: Injector) => {
     },
   })
 
+  useSequelize({
+    injector,
+    model: TmdbMovieMetadata,
+    sequelizeModel: TmdbMovieMetadataModel,
+    primaryKey: 'id',
+    options: dbOptions,
+    initModel: async (sequelize) => {
+      TmdbMovieMetadataModel.init(
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            allowNull: false,
+          },
+          imdbId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          originalTitle: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          overview: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+          },
+          releaseDate: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          runtime: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          posterPath: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          backdropPath: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          genres: {
+            type: DataTypes.JSON,
+            allowNull: true,
+          },
+          voteAverage: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+          },
+          voteCount: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          popularity: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+          },
+          originalLanguage: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          spokenLanguages: {
+            type: DataTypes.JSON,
+            allowNull: true,
+          },
+          productionCountries: {
+            type: DataTypes.JSON,
+            allowNull: true,
+          },
+          status: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          tagline: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          budget: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          revenue: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          language: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+        },
+        { sequelize, indexes: [{ fields: ['imdbId'] }] },
+      )
+    },
+  })
+
+  useSequelize({
+    injector,
+    model: TmdbSeriesMetadata,
+    sequelizeModel: TmdbSeriesMetadataModel,
+    primaryKey: 'id',
+    options: dbOptions,
+    initModel: async (sequelize) => {
+      TmdbSeriesMetadataModel.init(
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            allowNull: false,
+          },
+          imdbId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          originalName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          overview: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+          },
+          firstAirDate: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          posterPath: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          backdropPath: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          genres: {
+            type: DataTypes.JSON,
+            allowNull: true,
+          },
+          voteAverage: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+          },
+          voteCount: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          numberOfSeasons: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          numberOfEpisodes: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+          },
+          status: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          originalLanguage: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          languages: {
+            type: DataTypes.JSON,
+            allowNull: true,
+          },
+          language: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+        },
+        { sequelize, indexes: [{ fields: ['imdbId'] }] },
+      )
+    },
+  })
+
+  useSequelize({
+    injector,
+    model: MovieMetadataLocalized,
+    sequelizeModel: MovieMetadataLocalizedModel,
+    primaryKey: 'id',
+    options: dbOptions,
+    initModel: async (sequelize) => {
+      MovieMetadataLocalizedModel.init(
+        {
+          id: {
+            type: DataTypes.UUIDV4,
+            primaryKey: true,
+            allowNull: false,
+            defaultValue: () => crypto.randomUUID(),
+          },
+          movieImdbId: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          language: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          plot: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+          },
+          posterUrl: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          genre: {
+            type: DataTypes.JSON,
+            allowNull: true,
+          },
+          source: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          sourceId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+        },
+        {
+          sequelize,
+          indexes: [{ fields: ['movieImdbId'] }, { fields: ['movieImdbId', 'language', 'source'], unique: true }],
+        },
+      )
+    },
+  })
+
+  useSequelize({
+    injector,
+    model: SeriesMetadataLocalized,
+    sequelizeModel: SeriesMetadataLocalizedModel,
+    primaryKey: 'id',
+    options: dbOptions,
+    initModel: async (sequelize) => {
+      SeriesMetadataLocalizedModel.init(
+        {
+          id: {
+            type: DataTypes.UUIDV4,
+            primaryKey: true,
+            allowNull: false,
+            defaultValue: () => crypto.randomUUID(),
+          },
+          seriesImdbId: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          language: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          plot: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+          },
+          posterUrl: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          source: {
+            type: DataTypes.STRING,
+            allowNull: false,
+          },
+          sourceId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+        },
+        {
+          sequelize,
+          indexes: [{ fields: ['seriesImdbId'] }, { fields: ['seriesImdbId', 'language', 'source'], unique: true }],
+        },
+      )
+    },
+  })
+
   const repo = getRepository(injector)
 
   repo.createDataSet(Movie, 'imdbId', {
@@ -695,9 +1082,39 @@ export const setupMedia = async (injector: Injector) => {
     authorizeRemove: withRole('admin'),
   })
 
+  repo.createDataSet(TmdbMovieMetadata, 'id', {
+    authorizeGet: authorizedOnly,
+    authorizeAdd: withRole('admin'),
+    authorizeUpdate: withRole('admin'),
+    authorizeRemove: withRole('admin'),
+  })
+
+  repo.createDataSet(TmdbSeriesMetadata, 'id', {
+    authorizeGet: authorizedOnly,
+    authorizeAdd: withRole('admin'),
+    authorizeUpdate: withRole('admin'),
+    authorizeRemove: withRole('admin'),
+  })
+
+  repo.createDataSet(MovieMetadataLocalized, 'id', {
+    authorizeGet: authorizedOnly,
+    authorizeAdd: withRole('admin'),
+    authorizeUpdate: withRole('admin'),
+    authorizeRemove: withRole('admin'),
+  })
+
+  repo.createDataSet(SeriesMetadataLocalized, 'id', {
+    authorizeGet: authorizedOnly,
+    authorizeAdd: withRole('admin'),
+    authorizeUpdate: withRole('admin'),
+    authorizeRemove: withRole('admin'),
+  })
+
   const omdbClientService = injector.getInstance(OmdbClientService)
+  const tmdbClientService = injector.getInstance(TmdbClientService)
 
   injector.getInstance(ExternalServiceStatusRegistry).register('omdb', () => !!omdbClientService.config)
+  injector.getInstance(ExternalServiceStatusRegistry).register('tmdb', () => !!tmdbClientService.config)
 
   const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
   const movieDataSet = getDataSetFor(injector, Movie, 'imdbId')

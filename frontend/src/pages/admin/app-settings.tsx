@@ -15,6 +15,7 @@ const getMenuItems = (): Array<MenuEntry & { href?: AppPaths }> => [
     label: 'Media',
     children: [
       { key: '/app-settings/omdb', label: 'OMDB Settings', icon: <Icon icon={icons.film} size="small" /> },
+      { key: '/app-settings/tmdb', label: 'TMDB Settings', icon: <Icon icon={icons.film} size="small" /> },
       { key: '/app-settings/streaming', label: 'Streaming Settings', icon: <Icon icon={icons.play} size="small" /> },
     ],
   },

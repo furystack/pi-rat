@@ -1,25 +1,32 @@
 import type { Injector } from '@furystack/inject'
 import { getDataSetFor } from '@furystack/repository'
-import { Movie, type OmdbMovieMetadata } from 'common'
+import { Movie } from 'common'
 
-export const ensureMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
+type MovieInput = {
+  imdbId: string
+  year?: number
+  duration?: number
+  type?: 'movie' | 'episode'
+  seriesId?: string
+  season?: number
+  episode?: number
+}
+
+export const ensureMovieExists = async (input: MovieInput, injector: Injector) => {
   const movieDataSet = getDataSetFor(injector, Movie, 'imdbId')
-  const existingMovie = await movieDataSet.get(injector, omdbMeta.imdbID)
+  const existingMovie = await movieDataSet.get(injector, input.imdbId)
 
   if (!existingMovie) {
     const {
       created: [newMovie],
     } = await movieDataSet.add(injector, {
-      imdbId: omdbMeta.imdbID,
-      title: omdbMeta.Title,
-      year: parseInt(omdbMeta.Year, 10),
-      season: omdbMeta.Season ? parseInt(omdbMeta.Season, 10) : undefined,
-      episode: omdbMeta.Episode ? parseInt(omdbMeta.Episode, 10) : undefined,
-      type: omdbMeta.Type,
-      duration: omdbMeta.Runtime ? parseInt(omdbMeta.Runtime, 10) : undefined,
-      thumbnailImageUrl: omdbMeta.Poster,
-      plot: omdbMeta.Plot,
-      seriesId: omdbMeta.seriesID,
+      imdbId: input.imdbId,
+      year: input.year,
+      duration: input.duration,
+      type: input.type,
+      seriesId: input.seriesId,
+      season: input.season,
+      episode: input.episode,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })

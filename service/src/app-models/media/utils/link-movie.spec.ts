@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PiRatFile } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
+import { TmdbClientService } from '../metadata-services/tmdb-client-service.js'
 import { linkMovie } from './link-movie.js'
 
 const mockMovieFileStoreFind = vi.fn()
@@ -24,6 +25,11 @@ vi.mock('@furystack/repository', () => ({
         find: (...args: unknown[]) => mockOmdbStoreFind(...args) as unknown,
       }
     }
+    if (name === 'Config') {
+      return {
+        get: vi.fn().mockResolvedValue(null),
+      }
+    }
     return {}
   },
 }))
@@ -39,7 +45,7 @@ vi.mock('@furystack/logging', () => ({
 }))
 
 vi.mock('./ensure-movie-exists.js', () => ({
-  ensureMovieExists: vi.fn().mockResolvedValue({ imdbId: 'tt1234567', title: 'Test Movie' }),
+  ensureMovieExists: vi.fn().mockResolvedValue({ imdbId: 'tt1234567' }),
 }))
 
 vi.mock('./ensure-omdb-movie-exists.js', () => ({
@@ -50,8 +56,30 @@ vi.mock('./ensure-omdb-series-exists.js', () => ({
   ensureOmdbSeriesExists: vi.fn().mockResolvedValue(undefined),
 }))
 
+vi.mock('./ensure-tmdb-movie-exists.js', () => ({
+  ensureTmdbMovieExists: vi.fn().mockResolvedValue({}),
+}))
+
+vi.mock('./ensure-tmdb-series-exists.js', () => ({
+  ensureTmdbSeriesExists: vi.fn().mockResolvedValue(undefined),
+}))
+
+vi.mock('./ensure-localized-metadata-exists.js', () => ({
+  ensureMovieLocalizedMetadataExists: vi.fn().mockResolvedValue({}),
+  ensureSeriesLocalizedMetadataExists: vi.fn().mockResolvedValue({}),
+}))
+
+vi.mock('./map-omdb-to-localized.js', () => ({
+  mapOmdbMovieToLocalized: vi.fn().mockReturnValue({}),
+}))
+
+vi.mock('./map-tmdb-to-localized.js', () => ({
+  mapTmdbMovieToLocalized: vi.fn().mockReturnValue({}),
+}))
+
 const mockGetFfprobeForPiratFile = vi.fn().mockResolvedValue({ duration: 7200 })
 const mockFetchOmdbMovieMetadata = vi.fn()
+const mockFetchTmdbMovieMetadata = vi.fn()
 
 describe('linkMovie', () => {
   beforeEach(() => {
@@ -74,6 +102,11 @@ describe('linkMovie', () => {
     injector.setExplicitInstance(
       { fetchOmdbMovieMetadata: mockFetchOmdbMovieMetadata } as unknown as OmdbClientService,
       OmdbClientService,
+    )
+
+    injector.setExplicitInstance(
+      { fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata, config: undefined } as unknown as TmdbClientService,
+      TmdbClientService,
     )
 
     return injector
@@ -183,6 +216,7 @@ describe('linkMovie', () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockOmdbStoreFind.mockResolvedValue([])
       mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-found' })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({ status: 'not-found' })
 
       await usingAsync(createTestInjector(), async (injector) => {
         const result = await linkMovie({
@@ -209,10 +243,11 @@ describe('linkMovie', () => {
       })
     })
 
-    it('should return omdb-not-configured when OMDB is not configured', async () => {
+    it('should return metadata-not-found when all providers are not configured', async () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockOmdbStoreFind.mockResolvedValue([])
       mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-configured' })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({ status: 'not-configured' })
 
       await usingAsync(createTestInjector(), async (injector) => {
         const result = await linkMovie({
@@ -220,14 +255,15 @@ describe('linkMovie', () => {
           file: createFile('movies/Another.Movie.2024.mkv'),
         })
 
-        expect(result.status).toBe('omdb-not-configured')
+        expect(result.status).toBe('metadata-not-found')
       })
     })
 
-    it('should return omdb-error when OMDB returns an error', async () => {
+    it('should return metadata-not-found when all providers return errors', async () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockOmdbStoreFind.mockResolvedValue([])
       mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'error', error: new Error('Network failure') })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({ status: 'error', error: new Error('Network failure') })
 
       await usingAsync(createTestInjector(), async (injector) => {
         const result = await linkMovie({
@@ -235,7 +271,7 @@ describe('linkMovie', () => {
           file: createFile('movies/Error.Movie.2024.mkv'),
         })
 
-        expect(result.status).toBe('omdb-error')
+        expect(result.status).toBe('metadata-not-found')
       })
     })
   })

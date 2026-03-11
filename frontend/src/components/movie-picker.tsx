@@ -13,14 +13,14 @@ export const MoviePicker = Shade({
           const result = await moviesService.findMovie({
             top: 10,
             filter: {
-              $or: [{ title: { $like: `%${term}%` } }],
+              $or: [{ imdbId: { $like: `%${term}%` } }],
             },
           })
           return result.entries
         }}
         defaultPrefix=""
         getSuggestionEntry={(entry) => ({
-          element: <div>{entry.title}</div>,
+          element: <div>{entry.imdbId}</div>,
           score: 1,
         })}
         onSelectSuggestion={(entry: Movie) => {

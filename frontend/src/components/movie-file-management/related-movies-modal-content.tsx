@@ -33,7 +33,8 @@ const RelatedMoviesContent = Shade<{
           <Typography variant="body1">
             No related movie is linked to this file
             <>
-              {serviceStatus.status === 'loaded' && serviceStatus.value.services.omdb ? (
+              {serviceStatus.status === 'loaded' &&
+              (serviceStatus.value.services.omdb || serviceStatus.value.services.tmdb) ? (
                 <Button
                   onclick={async () => {
                     const mediaApiClient = injector.getInstance(MediaApiClient)
@@ -51,7 +52,7 @@ const RelatedMoviesContent = Shade<{
                   🔗 Link movie
                 </Button>
               ) : (
-                <Button disabled>OMDB not available</Button>
+                <Button disabled>No metadata provider available</Button>
               )}
             </>
           </Typography>

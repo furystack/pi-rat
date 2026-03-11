@@ -103,6 +103,30 @@ export const entityRoute = {
       ),
       children: entityEditorChildren,
     },
+    '/tmdb-movie-metadata': {
+      meta: { title: 'TMDB Movie Metadata', icon: icons.globe },
+      component: () => (
+        <PiRatLazyLoad
+          component={async () => {
+            const { TmdbMovieMetadataPage } = await import('../pages/entities/tmdb-movie-metadata.js')
+            return <TmdbMovieMetadataPage />
+          }}
+        />
+      ),
+      children: entityEditorChildren,
+    },
+    '/tmdb-series-metadata': {
+      meta: { title: 'TMDB Series Metadata', icon: icons.globe },
+      component: () => (
+        <PiRatLazyLoad
+          component={async () => {
+            const { TmdbSeriesMetadataPage } = await import('../pages/entities/tmdb-series-metadata.js')
+            return <TmdbSeriesMetadataPage />
+          }}
+        />
+      ),
+      children: entityEditorChildren,
+    },
     '/config': {
       meta: { title: 'Config', icon: icons.settings },
       component: () => (

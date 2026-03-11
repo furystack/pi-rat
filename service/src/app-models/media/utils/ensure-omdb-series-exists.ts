@@ -4,6 +4,8 @@ import { getDataSetFor } from '@furystack/repository'
 import { OmdbSeriesMetadata, type OmdbMovieMetadata, type PiRatFile } from 'common'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { ensureSeriesExists } from './ensure-series-exists.js'
+import { ensureSeriesLocalizedMetadataExists } from './ensure-localized-metadata-exists.js'
+import { mapOmdbSeriesToLocalized } from './map-omdb-to-localized.js'
 
 export const ensureOmdbSeriesExists = async (
   omdbMeta: OmdbMovieMetadata,
@@ -33,8 +35,24 @@ export const ensureOmdbSeriesExists = async (
     const {
       created: [newAdded],
     } = await omdbSeriesDataSet.add(injector, result.data)
-    await ensureSeriesExists(newAdded, injector)
+    await ensureSeriesExists(
+      {
+        imdbId: newAdded.imdbID,
+        year: newAdded.Year,
+        numberOfSeasons: parseInt(newAdded.totalSeasons, 10) || undefined,
+      },
+      injector,
+    )
+    await ensureSeriesLocalizedMetadataExists(mapOmdbSeriesToLocalized(newAdded), injector)
   } else {
-    await ensureSeriesExists(storedResult, injector)
+    await ensureSeriesExists(
+      {
+        imdbId: storedResult.imdbID,
+        year: storedResult.Year,
+        numberOfSeasons: parseInt(storedResult.totalSeasons, 10) || undefined,
+      },
+      injector,
+    )
+    await ensureSeriesLocalizedMetadataExists(mapOmdbSeriesToLocalized(storedResult), injector)
   }
 }

@@ -3,9 +3,10 @@ import { isLoadedCacheResult } from '@furystack/cache'
 import { serializeToQueryString } from '@furystack/rest'
 import { LazyLoad, Shade, createComponent } from '@furystack/shades'
 import { CacheView, cssVariableTheme, Skeleton } from '@furystack/shades-common-components'
-import type { Movie } from 'common'
+import type { Movie, MovieMetadataLocalized } from 'common'
 import { AppLink } from '../../routes/index.js'
 import { navigateToRoute } from '../../utils/navigate-to-route.js'
+import { LocalizedMetadataService } from '../../services/localized-metadata-service.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { MoviesService } from '../../services/movies-service.js'
 import { SessionService } from '../../services/session.js'
@@ -25,15 +26,22 @@ const MovieWidgetContent = Shade<{
 
     const movieFileService = injector.getInstance(MovieFilesService)
     const watchProgressService = injector.getInstance(WatchProgressService)
+    const localizedService = injector.getInstance(LocalizedMetadataService)
 
     const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
     const [movieFile] = useObservable(
       'movieFile',
       movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: imdbId } } }),
     )
+    const [localized] = useObservable('localized', localizedService.getMovieLocalizedAsObservable(imdbId))
+
+    const localizedData = (localized as CacheWithValue<MovieMetadataLocalized | undefined> | undefined)?.value
+    const title = localizedData?.title ?? imdbId
+    const plot = localizedData?.plot
+    const posterUrl = localizedData?.posterUrl
 
     return (
-      <AppLink tabIndex={0} title={movie.plot || movie.title} href="/movies/:imdbId/overview" params={{ imdbId }}>
+      <AppLink tabIndex={0} title={plot || title} href="/movies/:imdbId/overview" params={{ imdbId }}>
         <WidgetCard size={size} index={props.index}>
           <div
             className="overlay"
@@ -80,14 +88,18 @@ const MovieWidgetContent = Shade<{
               </div>
             ) : null}
           </div>
-          <img
-            src={movie.thumbnailImageUrl as string}
-            alt={movie.title}
-            className="cover"
-            style={{ backgroundColor: cssVariableTheme.background.default }}
-          />
+          {posterUrl ? (
+            <img
+              src={posterUrl}
+              alt={title}
+              className="cover"
+              style={{ backgroundColor: cssVariableTheme.background.default }}
+            />
+          ) : (
+            <div className="cover" style={{ backgroundColor: cssVariableTheme.background.default }} />
+          )}
           <div className="title-bar">
-            {movie.title}
+            {title}
             <LazyLoad
               loader={<div />}
               component={async () => {
