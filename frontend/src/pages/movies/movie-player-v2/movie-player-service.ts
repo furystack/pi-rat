@@ -1,16 +1,17 @@
 import type { ScopedLogger } from '@furystack/logging'
 import { ObservableValue } from '@furystack/utils'
-import type {
-  AudioTrackInfo,
-  FfprobeData,
-  PiRatFile,
-  PlaybackInfoResponse,
-  PlaybackMode,
-  SubtitleTrackInfo,
+import {
+  encode,
+  type AudioTrackInfo,
+  type FfprobeData,
+  type PiRatFile,
+  type PlaybackInfoResponse,
+  type PlaybackMode,
+  type SubtitleTrackInfo,
 } from 'common'
 import type Hls from 'hls.js'
-import { environmentOptions } from '../../../utils/environment-options.js'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
+import { environmentOptions } from '../../../utils/environment-options.js'
 
 export const videoCodecs = {
   h264: 'avc1.42E01E',
@@ -197,7 +198,7 @@ export class MoviePlayerService implements AsyncDisposable {
   private async startHlsPlayback(videoElement: HTMLVideoElement) {
     const mode = this.playbackMode.getValue()
     const hlsUrl = this.toServiceUrl(
-      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encodeURIComponent(mode)}`,
+      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encode(mode)}`,
     )
 
     const HlsModule = await loadHls()
