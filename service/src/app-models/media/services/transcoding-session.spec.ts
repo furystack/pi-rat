@@ -655,9 +655,9 @@ describe('TranscodingSessionService', () => {
       if (existsSync(testDir)) rmSync(testDir, { recursive: true, force: true })
     })
 
-    it('should return playlist content when file exists', async () => {
+    it('should return playlist content when file exists and has ENDLIST', async () => {
       vi.useRealTimers()
-      const playlistContent = '#EXTM3U\n#EXT-X-VERSION:7\nsegment0.m4s\n'
+      const playlistContent = '#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-ENDLIST\n'
       writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
 
       const service = new TranscodingSessionService()
@@ -665,10 +665,74 @@ describe('TranscodingSessionService', () => {
         const mockSession = {
           sessionDir: testDir,
           state: 'running' as const,
+          totalDuration: 60,
         } as Parameters<typeof service.readPlaylist>[0]
 
         const result = await service.readPlaylist(mockSession)
         expect(result).toBe(playlistContent)
+      } finally {
+        service.dispose()
+      }
+    })
+
+    it('should pad playlist with remaining segments when ENDLIST is missing', async () => {
+      vi.useRealTimers()
+      const playlistContent = [
+        '#EXTM3U',
+        '#EXT-X-VERSION:7',
+        '#EXT-X-TARGETDURATION:6',
+        '#EXT-X-MAP:URI="init.mp4"',
+        '#EXTINF:6.000000,',
+        'segment0.m4s',
+        '#EXTINF:6.000000,',
+        'segment1.m4s',
+        '',
+      ].join('\n')
+      writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
+
+      const service = new TranscodingSessionService()
+      try {
+        const mockSession = {
+          sessionDir: testDir,
+          state: 'running' as const,
+          totalDuration: 30,
+        } as Parameters<typeof service.readPlaylist>[0]
+
+        const result = await service.readPlaylist(mockSession)
+        expect(result).toContain('#EXT-X-ENDLIST')
+        expect(result).toContain('segment2.m4s')
+        expect(result).toContain('segment3.m4s')
+        expect(result).toContain('segment4.m4s')
+      } finally {
+        service.dispose()
+      }
+    })
+
+    it('should add ENDLIST when all segments are already encoded', async () => {
+      vi.useRealTimers()
+      const playlistContent = [
+        '#EXTM3U',
+        '#EXT-X-VERSION:7',
+        '#EXT-X-TARGETDURATION:6',
+        '#EXTINF:6.000000,',
+        'segment0.m4s',
+        '#EXTINF:6.000000,',
+        'segment1.m4s',
+        '',
+      ].join('\n')
+      writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
+
+      const service = new TranscodingSessionService()
+      try {
+        const mockSession = {
+          sessionDir: testDir,
+          state: 'running' as const,
+          totalDuration: 12,
+        } as Parameters<typeof service.readPlaylist>[0]
+
+        const result = await service.readPlaylist(mockSession)
+        expect(result).toContain('#EXT-X-ENDLIST')
+        expect(result).not.toContain('segment2.m4s')
       } finally {
         service.dispose()
       }
@@ -681,6 +745,7 @@ describe('TranscodingSessionService', () => {
         const mockSession = {
           sessionDir: testDir,
           state: 'error' as const,
+          totalDuration: 60,
         } as Parameters<typeof service.readPlaylist>[0]
 
         const result = await service.readPlaylist(mockSession)

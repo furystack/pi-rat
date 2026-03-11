@@ -38,6 +38,7 @@ const mockSession = {
   driveLetter: 'A',
   path: 'test.mkv',
   audioTrackId: 0,
+  totalDuration: 16,
   createdAt: Date.now(),
   lastAccessedAt: Date.now(),
   ffmpegProcess: { killed: false, kill: vi.fn() },

@@ -27,6 +27,7 @@ type TranscodingSessionEntry = {
   path: string
   audioTrackId: number
   resolution?: string
+  totalDuration: number
   createdAt: number
   lastAccessedAt: number
 }
@@ -169,7 +170,7 @@ export class TranscodingSessionService {
       mkdirSync(sessionDir, { recursive: true })
     }
 
-    const ffmpegArgs = await this.buildHlsFfmpegArgs({
+    const { args: ffmpegArgs, totalDuration } = await this.buildHlsFfmpegArgs({
       driveLetter,
       path,
       mode,
@@ -197,6 +198,7 @@ export class TranscodingSessionService {
       path,
       audioTrackId,
       resolution,
+      totalDuration,
       createdAt: Date.now(),
       lastAccessedAt: Date.now(),
     }
@@ -280,7 +282,61 @@ export class TranscodingSessionService {
     const playlistPath = join(session.sessionDir, 'playlist.m3u8')
     const ready = await this.waitForFile(playlistPath, session)
     if (!ready) return null
-    return readFile(playlistPath, 'utf-8')
+    const content = await readFile(playlistPath, 'utf-8')
+    return this.padPlaylistToFullDuration(content, session.totalDuration)
+  }
+
+  /**
+   * If the playlist is still being written by FFmpeg (no #EXT-X-ENDLIST),
+   * pad it with the remaining expected segments so that clients see the
+   * full VOD duration from the first request. The segment-serving endpoint
+   * already waits for segments that haven't been transcoded yet.
+   */
+  private padPlaylistToFullDuration(playlist: string, totalDuration: number): string {
+    if (totalDuration <= 0 || playlist.includes('#EXT-X-ENDLIST')) {
+      return playlist
+    }
+
+    const lines = playlist.split('\n')
+
+    let encodedDuration = 0
+    let maxSegmentIndex = -1
+    for (const line of lines) {
+      const extinfMatch = line.match(/^#EXTINF:([\d.]+)/)
+      if (extinfMatch) {
+        encodedDuration += parseFloat(extinfMatch[1])
+      }
+      const segmentMatch = line.match(/^segment(\d+)\.m4s/)
+      if (segmentMatch) {
+        maxSegmentIndex = Math.max(maxSegmentIndex, parseInt(segmentMatch[1], 10))
+      }
+    }
+
+    const remainingDuration = totalDuration - encodedDuration
+    if (remainingDuration <= 0) {
+      return `${playlist.trimEnd()}\n#EXT-X-ENDLIST\n`
+    }
+
+    const fullSegmentCount = Math.floor(remainingDuration / SEGMENT_DURATION)
+    const lastSegmentDuration = remainingDuration - fullSegmentCount * SEGMENT_DURATION
+
+    const padLines: string[] = []
+    let nextIndex = maxSegmentIndex + 1
+
+    for (let i = 0; i < fullSegmentCount; i++) {
+      padLines.push(`#EXTINF:${SEGMENT_DURATION.toFixed(6)},`)
+      padLines.push(`segment${nextIndex}.m4s`)
+      nextIndex++
+    }
+
+    if (lastSegmentDuration > 0.01) {
+      padLines.push(`#EXTINF:${lastSegmentDuration.toFixed(6)},`)
+      padLines.push(`segment${nextIndex}.m4s`)
+    }
+
+    padLines.push('#EXT-X-ENDLIST')
+
+    return `${playlist.trimEnd()}\n${padLines.join('\n')}\n`
   }
 
   private async buildHlsFfmpegArgs({
@@ -297,7 +353,7 @@ export class TranscodingSessionService {
     audioTrackId: number
     resolution?: string
     sessionDir: string
-  }): Promise<string[]> {
+  }): Promise<{ args: string[]; totalDuration: number }> {
     const [drive, config, ffprobe] = await Promise.all([
       (async () => {
         const driveDataSet = getDataSetFor(this.injector, Drive, 'letter')
@@ -313,6 +369,7 @@ export class TranscodingSessionService {
 
     if (!drive) throw new Error(`Drive ${driveLetter} not found`)
 
+    const totalDuration = parseFloat(ffprobe.format.duration ?? '0') || 0
     const fullPath = join(drive.physicalPath, path)
     const audioStreams = ffprobe.streams.filter((s) => s.codec_type === 'audio')
     const audioStream = audioStreams.find((t) => t.index === audioTrackId) || audioStreams[0]
@@ -401,7 +458,7 @@ export class TranscodingSessionService {
     args.push('-hls_list_size', '0')
     args.push('-y', join(sessionDir, 'playlist.m3u8'))
 
-    return args
+    return { args, totalDuration }
   }
 
   public getActiveSessionCount(): number {
