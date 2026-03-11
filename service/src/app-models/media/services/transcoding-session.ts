@@ -415,22 +415,26 @@ export class TranscodingSessionService {
     audioTrackId: number = 0,
     resolution?: string,
   ) {
-    if (resolution !== undefined) {
-      const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
-      const session = this.sessions.get(key)
-      if (session) {
-        this.destroySession(session)
-        this.sessions.delete(key)
-      }
-      return
+    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+    const session = this.sessions.get(key)
+    if (session) {
+      this.destroySession(session)
+      this.sessions.delete(key)
     }
+  }
 
-    const prefix = `${driveLetter}:${path}:${mode}:${audioTrackId}:`
+  /**
+   * Removes all transcoding sessions for a given file, regardless of mode,
+   * audio track, or resolution. Used when a client disconnects or navigates
+   * away — there is no reason to keep any session alive for that file.
+   */
+  public removeAllSessionsForFile(driveLetter: string, path: string) {
+    const prefix = `${driveLetter}:${path}:`
     const keysToRemove = [...this.sessions.keys()].filter((k) => k.startsWith(prefix))
     for (const key of keysToRemove) {
       const session = this.sessions.get(key)
       if (session) {
-        void this.logger.verbose({ message: `Removing session: ${key}` })
+        void this.logger.verbose({ message: `Removing session for file teardown: ${key}` })
         this.destroySession(session)
         this.sessions.delete(key)
       }
