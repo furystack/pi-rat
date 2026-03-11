@@ -1,17 +1,28 @@
 import type { FindOptions } from '@furystack/core'
 import { createComponent, Shade } from '@furystack/shades'
-import type { CollectionService } from '@furystack/shades-common-components'
-import { DataGrid, NotyService, SelectionCell } from '@furystack/shades-common-components'
+import type { CollectionService, ContextMenuItem } from '@furystack/shades-common-components'
+import {
+  ContextMenu,
+  ContextMenuManager,
+  DataGrid,
+  Icon,
+  icons,
+  NotyService,
+  SelectionCell,
+} from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
-import { getFullPath, type DirectoryEntry } from 'common'
-import { environmentOptions } from '../../utils/environment-options.js'
+import { getFallbackMetadata, getFullPath, isMovieFile, isSampleFile, type DirectoryEntry } from 'common'
+
+import { RelatedMoviesModal } from '../../components/movie-file-management/related-movies-modal.js'
+import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { getErrorMessage } from '../../services/get-error-message.js'
 import { SessionService } from '../../services/session.js'
+import { environmentOptions } from '../../utils/environment-options.js'
 import { triggerDownload } from '../../utils/trigger-download.js'
 import { BreadCrumbs } from './breadcrumbs.js'
 import { DirectoryEntryIcon } from './directory-entry-icon.js'
-import { FileContextMenu } from './file-context-menu.js'
+import { FileInfoModal } from './file-info-modal.js'
 
 export const FileList = Shade<{
   currentDriveLetter: string
@@ -47,12 +58,129 @@ export const FileList = Shade<{
       {},
     )
 
+    const [activeEntry, setActiveEntry] = useState<DirectoryEntry | null>('activeEntry', null)
+    const [isInfoVisible, setInfoVisible] = useState('isInfoVisible', false)
+    const [isRelatedMoviesVisible, setRelatedMoviesVisible] = useState('isRelatedMoviesVisible', false)
+
+    const contextMenuManager = useDisposable('contextMenuManager', () => new ContextMenuManager<() => void>())
+
     const activate = () => {
       const focused = service.focusedEntry.getValue()
       const isComponentFocused = service.hasFocus.getValue()
       if (isComponentFocused && focused) {
         props.onActivate?.(focused)
       }
+    }
+
+    const getContextMenuItems = (entry: DirectoryEntry): Array<ContextMenuItem<() => void>> => {
+      const path = `${currentDriveLetter}:${currentPath}/${entry.name}`
+      const movieMetadata = entry.isFile && !isSampleFile(path) && isMovieFile(path) && getFallbackMetadata(path)
+      const allowScanForMovies = entry.isDirectory
+
+      return [
+        {
+          type: 'item',
+          icon: <Icon icon={icons.folderOpen} size="small" />,
+          label: 'Open',
+          data: () => props.onActivate?.(entry),
+        },
+        ...(movieMetadata
+          ? [
+              {
+                type: 'item' as const,
+                icon: <Icon icon={icons.film} size="small" />,
+                label: `Related movie: ${movieMetadata.title} ${
+                  movieMetadata.type === 'episode' ? `S${movieMetadata.season}E${movieMetadata.episode}` : ''
+                }`,
+                data: () => setRelatedMoviesVisible(true),
+              },
+              {
+                type: 'item' as const,
+                icon: <Icon icon={icons.messageCircle} size="small" />,
+                label: 'Extract Subtitles',
+                data: () => {
+                  injector
+                    .getInstance(MediaApiClient)
+                    .call({
+                      method: 'POST',
+                      action: '/extract-subtitles',
+                      body: {
+                        driveLetter: currentDriveLetter,
+                        path: getFullPath(currentPath, entry.name),
+                      },
+                    })
+                    .then(() => {
+                      notyService.emit('onNotyAdded', {
+                        type: 'success',
+                        title: 'Subtitles extracted',
+                        body: <>Subtitles extracted successfully for file {entry.name}</>,
+                      })
+                    })
+                    .catch(() => {
+                      notyService.emit('onNotyAdded', {
+                        type: 'error',
+                        title: 'Subtitles extraction failed',
+                        body: <>Subtitles extraction failed for file {entry.name}</>,
+                      })
+                    })
+                },
+              },
+            ]
+          : []),
+        ...(allowScanForMovies
+          ? [
+              {
+                type: 'item' as const,
+                icon: <Icon icon={icons.film} size="small" />,
+                label: 'Scan for movies',
+                data: () => {
+                  injector
+                    .getInstance(MediaApiClient)
+                    .call({
+                      method: 'POST',
+                      action: '/scan-for-movies',
+                      body: {
+                        root: {
+                          driveLetter: currentDriveLetter,
+                          path: getFullPath(currentPath, entry.name),
+                        },
+                        autoExtractSubtitles: false,
+                      },
+                    })
+                    .then(() => {
+                      notyService.emit('onNotyAdded', {
+                        type: 'success',
+                        title: 'Movies scanned',
+                        body: <>Movies scanned successfully for folder {entry.name}</>,
+                      })
+                    })
+                    .catch(() => {
+                      notyService.emit('onNotyAdded', {
+                        type: 'error',
+                        title: 'Movies scanning failed',
+                        body: <>Movies scanning failed for folder {entry.name}</>,
+                      })
+                    })
+                },
+              },
+            ]
+          : []),
+        {
+          type: 'item',
+          icon: <Icon icon={icons.info} size="small" />,
+          label: 'Show file info',
+          data: () => setInfoVisible(true),
+        },
+      ]
+    }
+
+    const handleContextMenu = (entry: DirectoryEntry, ev: MouseEvent) => {
+      ev.preventDefault()
+      setActiveEntry(entry)
+      contextMenuManager.open({
+        position: { x: ev.clientX, y: ev.clientY },
+        items: getContextMenuItems(entry),
+      })
     }
 
     useDisposable('keypressListener', () => {
@@ -102,85 +230,92 @@ export const FileList = Shade<{
       }
     })
 
-    return (
-      <div
-        data-testid="file-drop"
-        ondragover={(ev) => {
-          ev.preventDefault()
-        }}
-        ondrop={async (ev) => {
-          ev.preventDefault()
-          if (ev.dataTransfer?.files) {
-            const session = injector.getInstance(SessionService)
-            if (!(await session.isAuthorized('admin'))) {
-              return notyService.emit('onNotyAdded', {
-                type: 'warning',
-                title: 'Not authorized',
-                body: <>You are not authorized to upload files</>,
-              })
-            }
+    const activeEntryPath = activeEntry ? `${currentDriveLetter}:${currentPath}/${activeEntry.name}` : ''
+    const activeMovieMetadata =
+      activeEntry?.isFile &&
+      activeEntryPath &&
+      !isSampleFile(activeEntryPath) &&
+      isMovieFile(activeEntryPath) &&
+      getFallbackMetadata(activeEntryPath)
 
-            const formData = new FormData()
-            for (const file of ev.dataTransfer.files) {
-              formData.append('uploads', file)
-            }
-            await fetch(
-              `${environmentOptions.serviceUrl}/drives/volumes/${encodeURIComponent(
-                currentDriveLetter,
-              )}/${encodeURIComponent(currentPath)}/upload`,
-              {
-                method: 'POST',
-                credentials: 'include',
-                body: formData,
-              },
-            )
-              .then(() => {
-                notyService.emit('onNotyAdded', {
-                  type: 'success',
-                  title: 'Upload completed',
-                  body: <>The files are upploaded succesfully</>,
-                })
-              })
-              .catch((err) =>
-                notyService.emit('onNotyAdded', {
-                  title: 'Upload failed',
-                  body: <>{getErrorMessage(err)}</>,
-                  type: 'error',
-                }),
-              )
-          }
-        }}
-        ondblclick={activate}
-        onkeydown={(ev) => {
-          if (ev.key === 'Enter') {
-            activate()
-          }
-        }}
-      >
-        <DataGrid
-          collectionService={service}
-          findOptions={findOptions}
-          onFindOptionsChange={setFindOptions}
-          columns={['name']}
-          headerComponents={{
-            name: () => (
-              <BreadCrumbs
-                currentDrive={currentDriveLetter}
-                currentPath={currentPath}
-                onChangePath={props.onChangePath}
-              />
-            ),
+    return (
+      <>
+        <div
+          data-testid="file-drop"
+          ondragover={(ev) => {
+            ev.preventDefault()
           }}
-          styles={{}}
-          rowComponents={{
-            name: (entry) => (
-              <FileContextMenu
-                entry={entry}
-                currentDriveLetter={currentDriveLetter}
-                currentPath={currentPath}
-                open={activate}
-              >
-                <div className="file-row" title={entry.name}>
+          ondrop={async (ev) => {
+            ev.preventDefault()
+            if (ev.dataTransfer?.files) {
+              const session = injector.getInstance(SessionService)
+              if (!(await session.isAuthorized('admin'))) {
+                return notyService.emit('onNotyAdded', {
+                  type: 'warning',
+                  title: 'Not authorized',
+                  body: <>You are not authorized to upload files</>,
+                })
+              }
+
+              const formData = new FormData()
+              for (const file of ev.dataTransfer.files) {
+                formData.append('uploads', file)
+              }
+              await fetch(
+                `${environmentOptions.serviceUrl}/drives/volumes/${encodeURIComponent(
+                  currentDriveLetter,
+                )}/${encodeURIComponent(currentPath)}/upload`,
+                {
+                  method: 'POST',
+                  credentials: 'include',
+                  body: formData,
+                },
+              )
+                .then(() => {
+                  notyService.emit('onNotyAdded', {
+                    type: 'success',
+                    title: 'Upload completed',
+                    body: <>The files are upploaded succesfully</>,
+                  })
+                })
+                .catch((err) =>
+                  notyService.emit('onNotyAdded', {
+                    title: 'Upload failed',
+                    body: <>{getErrorMessage(err)}</>,
+                    type: 'error',
+                  }),
+                )
+            }
+          }}
+          ondblclick={activate}
+          onkeydown={(ev) => {
+            if (ev.key === 'Enter') {
+              activate()
+            }
+          }}
+        >
+          <DataGrid
+            collectionService={service}
+            findOptions={findOptions}
+            onFindOptionsChange={setFindOptions}
+            columns={['name']}
+            headerComponents={{
+              name: () => (
+                <BreadCrumbs
+                  currentDrive={currentDriveLetter}
+                  currentPath={currentPath}
+                  onChangePath={props.onChangePath}
+                />
+              ),
+            }}
+            styles={{}}
+            rowComponents={{
+              name: (entry) => (
+                <div
+                  className="file-row"
+                  title={entry.name}
+                  oncontextmenu={(ev: MouseEvent) => handleContextMenu(entry, ev)}
+                >
                   <div>
                     <SelectionCell entry={entry} service={service} />
                   </div>
@@ -189,11 +324,30 @@ export const FileList = Shade<{
                   </div>
                   <div className="file-name">{entry.name}</div>
                 </div>
-              </FileContextMenu>
-            ),
-          }}
-        />
-      </div>
+              ),
+            }}
+          />
+        </div>
+        <ContextMenu manager={contextMenuManager} onItemSelect={(action) => action()} />
+        {activeEntry && (
+          <FileInfoModal
+            entry={activeEntry}
+            isInfoVisible={isInfoVisible}
+            onClose={() => setInfoVisible(false)}
+            currentDriveLetter={currentDriveLetter}
+            currentPath={currentPath}
+          />
+        )}
+        {activeEntry && activeMovieMetadata && (
+          <RelatedMoviesModal
+            drive={currentDriveLetter}
+            path={currentPath}
+            file={activeEntry}
+            isOpened={isRelatedMoviesVisible}
+            onClose={() => setRelatedMoviesVisible(false)}
+          />
+        )}
+      </>
     )
   },
 })
