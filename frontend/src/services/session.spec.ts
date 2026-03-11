@@ -215,7 +215,6 @@ describe('SessionService', () => {
 
     it('should still clear state when logout API call fails', async () => {
       const mockCall = vi.fn().mockRejectedValue(new Error('Network error'))
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
@@ -230,10 +229,7 @@ describe('SessionService', () => {
         expect(service.currentUser.getValue()).toBeNull()
         expect(service.state.getValue()).toBe('unauthenticated')
         expect(mockNotyService.emit).toHaveBeenCalledWith('onNotyAdded', expect.objectContaining({ type: 'info' }))
-        expect(warnSpy).toHaveBeenCalledWith('Logout API call failed:', expect.any(Error))
       })
-
-      warnSpy.mockRestore()
     })
   })
 

@@ -3,7 +3,7 @@ import { Injectable, Injected, type Injector } from '@furystack/inject'
 import { getLogger, type ScopedLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PlaybackMode } from 'common'
-import { Config, Drive, type MoviesConfig } from 'common'
+import { Config, Drive, HLS_SEGMENT_DURATION, type MoviesConfig } from 'common'
 import { spawn, type ChildProcess } from 'child_process'
 import { createHash } from 'crypto'
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'fs'
@@ -34,7 +34,6 @@ type TranscodingSessionEntry = {
 }
 
 const SESSION_IDLE_TIMEOUT_MS = 5 * 60 * 1000
-const SEGMENT_DURATION = 6
 const WAIT_POLL_INTERVAL_MS = 100
 const WAIT_TIMEOUT_MS = 60_000
 const DEFAULT_MAX_CACHE_SIZE_MB = 5000
@@ -326,14 +325,14 @@ export class TranscodingSessionService {
       return `${playlist.trimEnd()}\n#EXT-X-ENDLIST\n`
     }
 
-    const fullSegmentCount = Math.floor(remainingDuration / SEGMENT_DURATION)
-    const lastSegmentDuration = remainingDuration - fullSegmentCount * SEGMENT_DURATION
+    const fullSegmentCount = Math.floor(remainingDuration / HLS_SEGMENT_DURATION)
+    const lastSegmentDuration = remainingDuration - fullSegmentCount * HLS_SEGMENT_DURATION
 
     const padLines: string[] = []
     let nextIndex = maxSegmentIndex + 1
 
     for (let i = 0; i < fullSegmentCount; i++) {
-      padLines.push(`#EXTINF:${SEGMENT_DURATION.toFixed(6)},`)
+      padLines.push(`#EXTINF:${HLS_SEGMENT_DURATION.toFixed(6)},`)
       padLines.push(`segment${nextIndex}.m4s`)
       nextIndex++
     }
@@ -442,7 +441,7 @@ export class TranscodingSessionService {
       args.push('-c:v', videoCodec)
 
       // Force keyframes at segment boundaries (offset by startTime when -copyts preserves original PTS)
-      args.push('-force_key_frames', `expr:gte(t,n_forced*${SEGMENT_DURATION}+${startTime})`)
+      args.push('-force_key_frames', `expr:gte(t,n_forced*${HLS_SEGMENT_DURATION}+${startTime})`)
       args.push('-sc_threshold:v', '0')
 
       const isSoftwareEncoder = videoCodec === 'libx264' || videoCodec === 'libx265'
@@ -466,7 +465,7 @@ export class TranscodingSessionService {
 
     // HLS muxer output (the core change from per-segment to continuous)
     args.push('-f', 'hls')
-    args.push('-hls_time', String(SEGMENT_DURATION))
+    args.push('-hls_time', String(HLS_SEGMENT_DURATION))
     args.push('-hls_segment_type', 'fmp4')
     args.push('-hls_fmp4_init_filename', 'init.mp4')
     args.push('-hls_segment_filename', join(sessionDir, 'segment%d.m4s'))

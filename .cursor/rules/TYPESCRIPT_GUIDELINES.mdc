@@ -551,6 +551,30 @@ const value = 'hello' as string;
 const value = unknownValue as User; // Prefer type guard
 ```
 
+### Double-Cast Anti-Pattern (`as unknown as T`)
+
+**NEVER** use `undefined as unknown as T` or `null as unknown as T` to satisfy a type contract.
+This hides a design flaw — if a function doesn't have the value, the return type should reflect that.
+
+```typescript
+// ❌ FORBIDDEN - double-cast to satisfy type
+return { status: 'linked', movieFile: undefined as unknown as MovieFile, movie };
+
+// ✅ Good - use a narrower return type that doesn't require the value
+type ProviderResult =
+  | { status: 'skip' }
+  | { status: 'rate-limited' }
+  | { status: 'linked'; imdbId: string };
+
+return { status: 'linked', imdbId: added.imdbID };
+
+// ✅ Good - if the caller needs different shapes, use discriminated unions
+type InternalResult = { status: 'linked'; imdbId: string };
+type FullResult = { status: 'linked'; movieFile: MovieFile; movie: Movie };
+```
+
+If you encounter `as unknown as T`, refactor the types so the cast is unnecessary.
+
 ### Non-Null Assertion Operator
 
 - Avoid using `!` operator when possible

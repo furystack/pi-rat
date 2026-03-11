@@ -114,8 +114,8 @@ export class SessionService implements IdentityContext, Disposable {
     return await usingAsync(this.operation(), async () => {
       try {
         await this.api.call({ method: 'POST', action: '/logout' })
-      } catch (error) {
-        console.warn('Logout API call failed:', error)
+      } catch {
+        // Logout failure is non-critical — session is cleared client-side regardless
       }
       if (this.isDisposed) return
       this.currentUser.setValue(null)

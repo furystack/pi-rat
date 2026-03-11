@@ -29,15 +29,7 @@ import { ensureMovieLocalizedMetadataExists } from './ensure-localized-metadata-
 import { mapOmdbMovieToLocalized } from './map-omdb-to-localized.js'
 import { mapTmdbMovieToLocalized } from './map-tmdb-to-localized.js'
 
-type LinkResult =
-  | { status: 'already-linked' }
-  | { status: 'linked'; movieFile: MovieFile; movie: unknown }
-  | { status: 'failed' }
-  | { status: 'not-movie-file' }
-  | { status: 'rate-limited' }
-  | { status: 'metadata-not-found' }
-  | { status: 'provider-not-configured' }
-  | { status: 'provider-error'; error?: unknown }
+type ProviderResult = { status: 'skip' } | { status: 'rate-limited' } | { status: 'linked'; imdbId: string }
 
 const getProviderPriority = async (injector: Injector): Promise<Array<'omdb' | 'tmdb'>> => {
   try {
@@ -56,7 +48,7 @@ const tryOmdbProvider = async (
   injector: Injector,
   { title, year, season, episode }: { title: string; year?: number; season?: number; episode?: number },
   context?: { file?: PiRatFile },
-): Promise<LinkResult | { status: 'skip' }> => {
+): Promise<ProviderResult> => {
   const omdbClientService = injector.getInstance(OmdbClientService)
   const result = await omdbClientService.fetchOmdbMovieMetadata({ title, year, season, episode }, context)
 
@@ -66,7 +58,7 @@ const tryOmdbProvider = async (
   if (result.status === 'error') return { status: 'skip' }
 
   const added = await ensureOmdbMovieExists(result.data, injector)
-  const movie = await ensureMovieExists(
+  await ensureMovieExists(
     {
       imdbId: added.imdbID,
       year: parseInt(added.Year, 10),
@@ -81,14 +73,14 @@ const tryOmdbProvider = async (
   await ensureMovieLocalizedMetadataExists(mapOmdbMovieToLocalized(added), injector)
   await ensureOmdbSeriesExists(added, injector, context)
 
-  return { status: 'linked', movieFile: undefined as unknown as MovieFile, movie }
+  return { status: 'linked', imdbId: added.imdbID }
 }
 
 const tryTmdbProvider = async (
   injector: Injector,
   { title, year, season, episode }: { title: string; year?: number; season?: number; episode?: number },
   context?: { file?: PiRatFile },
-): Promise<LinkResult | { status: 'skip' }> => {
+): Promise<ProviderResult> => {
   const tmdbClientService = injector.getInstance(TmdbClientService)
   const result = await tmdbClientService.fetchTmdbMovieMetadata({ title, year, season, episode }, context)
 
@@ -98,12 +90,14 @@ const tryTmdbProvider = async (
   if (result.status === 'error') return { status: 'skip' }
 
   const { movie: tmdbMovie, series: tmdbSeries } = result.data
-  const imdbId = tmdbMovie.imdb_id!
+  const imdbId = tmdbMovie.imdb_id
+  if (!imdbId) return { status: 'skip' }
+
   const language = tmdbClientService.config?.value.defaultLanguage?.slice(0, 2) ?? 'en'
 
   await ensureTmdbMovieExists(tmdbMovie, language, injector)
 
-  const movie = await ensureMovieExists(
+  await ensureMovieExists(
     {
       imdbId,
       year: tmdbMovie.release_date ? parseInt(tmdbMovie.release_date.slice(0, 4), 10) : undefined,
@@ -124,7 +118,32 @@ const tryTmdbProvider = async (
     }
   }
 
-  return { status: 'linked', movieFile: undefined as unknown as MovieFile, movie }
+  return { status: 'linked', imdbId }
+}
+
+/**
+ * Tries each configured provider to populate localized metadata for a movie
+ * already linked via a direct IMDB ID (ffprobe tags or .nfo file).
+ */
+const enrichMetadataFromProviders = async (
+  injector: Injector,
+  params: { title: string; year?: number; season?: number; episode?: number },
+  context?: { file?: PiRatFile },
+) => {
+  const priority = await getProviderPriority(injector)
+  const providers: Record<string, typeof tryOmdbProvider> = {
+    omdb: tryOmdbProvider,
+    tmdb: tryTmdbProvider,
+  }
+
+  for (const provider of priority) {
+    const tryProvider = providers[provider]
+    if (!tryProvider) continue
+
+    const result = await tryProvider(injector, params, context)
+    if (result.status === 'linked') return
+    if (result.status === 'rate-limited') return
+  }
 }
 
 export const linkMovie = async (options: { injector: Injector; file: PiRatFile }) => {
@@ -218,6 +237,14 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       data: { file, movieFile: newMovieFile, movie, source: tagImdbId ? 'ffprobe-tags' : 'nfo-file' },
     })
 
+    // Fire-and-forget: enrich localized metadata via providers
+    void enrichMetadataFromProviders(injector, { title, year, season, episode }, { file }).catch((error) => {
+      void logger.warning({
+        message: `Failed to enrich metadata for '${fileName}' after direct-ID link`,
+        data: { error },
+      })
+    })
+
     return { status: 'linked', movieFile: newMovieFile, movie } as const
   }
 
@@ -281,7 +308,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     tmdb: tryTmdbProvider,
   }
 
-  let imdbId: string | undefined
+  let linkedImdbId: string | undefined
   for (const provider of priority) {
     const tryProvider = providers[provider]
     if (!tryProvider) continue
@@ -297,12 +324,12 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       return { status: 'rate-limited' } as const
     }
     if (result.status === 'linked') {
-      imdbId = (result.movie as { imdbId?: string })?.imdbId
+      linkedImdbId = result.imdbId
       break
     }
   }
 
-  if (!imdbId) {
+  if (!linkedImdbId) {
     await logger.debug({
       message: `No metadata found for '${fileName}' from any provider.`,
       data: { file, title, year },
@@ -315,7 +342,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   } = await movieFileDataSet.add(injector, {
     driveLetter,
     path,
-    imdbId,
+    imdbId: linkedImdbId,
     ffprobe: ffprobeResult,
   })
 
@@ -324,5 +351,5 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     data: { file, movieFile: newMovieFile },
   })
 
-  return { status: 'linked', movieFile: newMovieFile, movie: { imdbId } } as const
+  return { status: 'linked', movieFile: newMovieFile, movie: { imdbId: linkedImdbId } } as const
 }

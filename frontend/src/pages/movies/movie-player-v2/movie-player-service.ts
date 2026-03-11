@@ -2,6 +2,7 @@ import type { ScopedLogger } from '@furystack/logging'
 import { ObservableValue } from '@furystack/utils'
 import {
   encode,
+  HLS_SEGMENT_DURATION,
   type AudioTrackInfo,
   type FfprobeData,
   type PiRatFile,
@@ -60,8 +61,6 @@ const buildCodecSupportMap = () => {
 
 export type ResolutionValue = '4k' | '1080p' | '720p' | '480p' | '360p'
 
-const SEGMENT_DURATION = 6
-
 export class MoviePlayerService implements AsyncDisposable {
   constructor(
     private readonly file: PiRatFile,
@@ -71,7 +70,7 @@ export class MoviePlayerService implements AsyncDisposable {
     private readonly logger: ScopedLogger,
   ) {
     this.progress = new ObservableValue(this.currentProgress)
-    this.hlsStartTime = Math.floor(this.currentProgress / SEGMENT_DURATION) * SEGMENT_DURATION
+    this.hlsStartTime = Math.floor(this.currentProgress / HLS_SEGMENT_DURATION) * HLS_SEGMENT_DURATION
 
     void this.initialize()
   }
@@ -79,6 +78,7 @@ export class MoviePlayerService implements AsyncDisposable {
   private hls: Hls | null = null
   private originalPlaybackMode: PlaybackMode = 'transcode'
   private isSwitching = false
+  private seekGeneration = 0
   private hlsStartTime = 0
   public videoElement: HTMLVideoElement | null = null
   public audioTrackId = new ObservableValue(0)
@@ -302,20 +302,14 @@ export class MoviePlayerService implements AsyncDisposable {
     this.audioTrackId.setValue(trackIndex)
     this.currentProgress = previousProgress
     this.progress.setValue(previousProgress)
-    this.hlsStartTime = Math.floor(previousProgress / SEGMENT_DURATION) * SEGMENT_DURATION
+    this.hlsStartTime = Math.floor(previousProgress / HLS_SEGMENT_DURATION) * HLS_SEGMENT_DURATION
 
     await this.fetchPlaybackInfo()
 
     const info = this.playbackInfo.getValue()
     if (this.videoElement && info) {
       this.startPlayback(this.videoElement, info)
-      const video = this.videoElement
-      const onCanPlay = () => {
-        video.removeEventListener('canplay', onCanPlay)
-        this.isSwitching = false
-        void video.play().catch(() => {})
-      }
-      video.addEventListener('canplay', onCanPlay)
+      this.waitForCanPlay(this.videoElement)
     } else {
       this.isSwitching = false
     }
@@ -344,20 +338,14 @@ export class MoviePlayerService implements AsyncDisposable {
     this.resolution.setValue(value)
     this.currentProgress = previousProgress
     this.progress.setValue(previousProgress)
-    this.hlsStartTime = Math.floor(previousProgress / SEGMENT_DURATION) * SEGMENT_DURATION
+    this.hlsStartTime = Math.floor(previousProgress / HLS_SEGMENT_DURATION) * HLS_SEGMENT_DURATION
     this.playbackMode.setValue(targetMode)
 
     if (this.videoElement) {
       const info = this.playbackInfo.getValue()
       if (info) {
         this.startPlayback(this.videoElement, info)
-        const video = this.videoElement
-        const onCanPlay = () => {
-          video.removeEventListener('canplay', onCanPlay)
-          this.isSwitching = false
-          void video.play().catch(() => {})
-        }
-        video.addEventListener('canplay', onCanPlay)
+        this.waitForCanPlay(this.videoElement)
       } else {
         this.isSwitching = false
       }
@@ -380,7 +368,7 @@ export class MoviePlayerService implements AsyncDisposable {
 
     if (this.isTimeBuffered(video, targetSeconds)) return
 
-    const quantizedStart = Math.floor(targetSeconds / SEGMENT_DURATION) * SEGMENT_DURATION
+    const quantizedStart = Math.floor(targetSeconds / HLS_SEGMENT_DURATION) * HLS_SEGMENT_DURATION
     if (quantizedStart === this.hlsStartTime) return
 
     void this.restartHlsAtTime(targetSeconds, quantizedStart)
@@ -398,8 +386,12 @@ export class MoviePlayerService implements AsyncDisposable {
 
   private async restartHlsAtTime(targetSeconds: number, quantizedStart: number) {
     this.isSwitching = true
+    const generation = ++this.seekGeneration
 
     await this.teardownHlsSession()
+
+    if (generation !== this.seekGeneration) return
+
     if (this.hls) {
       this.hls.destroy()
       this.hls = null
@@ -411,16 +403,19 @@ export class MoviePlayerService implements AsyncDisposable {
 
     if (this.videoElement) {
       void this.startHlsPlayback(this.videoElement)
-      const video = this.videoElement
-      const onCanPlay = () => {
-        video.removeEventListener('canplay', onCanPlay)
-        this.isSwitching = false
-        void video.play().catch(() => {})
-      }
-      video.addEventListener('canplay', onCanPlay)
+      this.waitForCanPlay(this.videoElement)
     } else {
       this.isSwitching = false
     }
+  }
+
+  private waitForCanPlay(video: HTMLVideoElement) {
+    const onCanPlay = () => {
+      video.removeEventListener('canplay', onCanPlay)
+      this.isSwitching = false
+      void video.play().catch(() => {})
+    }
+    video.addEventListener('canplay', onCanPlay)
   }
 
   public getIsSwitching(): boolean {
