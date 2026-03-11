@@ -391,13 +391,18 @@ export class TranscodingSessionService {
 
     const args: string[] = []
 
-    // Input seeking (before -i for fast keyframe-based seeking)
+    // Input seeking (before -i for fast keyframe-based seeking).
+    // Do NOT add -copyts here: it preserves the original PTS from the
+    // source file which causes a mismatch between the HLS playlist
+    // timeline (starts at 0) and the media PTS (starts at ~startTime).
+    // This breaks hls.js startPosition, causes the progress bar to
+    // show 00:00, and introduces audio/video desync because -ss seeks
+    // to the nearest video keyframe while audio seeking is sample-precise.
+    // The client adds hlsStartTime to video.currentTime instead.
     if (startTime > 0) {
       args.push('-ss', String(startTime))
     }
 
-    // Input with timestamp preservation (like Jellyfin)
-    args.push('-copyts', '-avoid_negative_ts', 'disabled')
     args.push('-i', fullPath)
 
     // Thread config
@@ -440,8 +445,8 @@ export class TranscodingSessionService {
 
       args.push('-c:v', videoCodec)
 
-      // Force keyframes at segment boundaries (offset by startTime when -copyts preserves original PTS)
-      args.push('-force_key_frames', `expr:gte(t,n_forced*${HLS_SEGMENT_DURATION}+${startTime})`)
+      // Force keyframes at segment boundaries (t starts from 0 since we don't use -copyts)
+      args.push('-force_key_frames', `expr:gte(t,n_forced*${HLS_SEGMENT_DURATION})`)
       args.push('-sc_threshold:v', '0')
 
       const isSoftwareEncoder = videoCodec === 'libx264' || videoCodec === 'libx265'

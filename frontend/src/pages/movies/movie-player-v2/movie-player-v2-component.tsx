@@ -233,12 +233,12 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
             }}
             onseeking={(ev) => {
               const { currentTime } = ev.currentTarget as HTMLVideoElement
-              mediaService.seekToTime(currentTime)
+              mediaService.seekToTime(mediaService.streamTimeToAbsolute(currentTime))
             }}
             ontimeupdate={(ev) => {
               if (mediaService.isSwitching.getValue()) return
               const { currentTime } = ev.currentTarget as HTMLVideoElement
-              mediaService.progress.setValue(currentTime || 0)
+              mediaService.progress.setValue(mediaService.streamTimeToAbsolute(currentTime) || 0)
             }}
           >
             {...subtitleElements}

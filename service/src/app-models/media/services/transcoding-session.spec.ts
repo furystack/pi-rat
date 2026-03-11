@@ -1103,7 +1103,7 @@ describe('TranscodingSessionService', () => {
       })
     })
 
-    it('should offset -force_key_frames by startTime for transcode mode', async () => {
+    it('should use 0-based -force_key_frames for transcode mode (no startTime offset since -copyts is not used)', async () => {
       const mockProcess = createMockProcess()
       mockSpawn.mockReturnValue(mockProcess)
 
@@ -1130,7 +1130,7 @@ describe('TranscodingSessionService', () => {
           const args = lastCall[1]
           const fkfIndex = args.indexOf('-force_key_frames')
           expect(fkfIndex).toBeGreaterThanOrEqual(0)
-          expect(args[fkfIndex + 1]).toBe('expr:gte(t,n_forced*6+3600)')
+          expect(args[fkfIndex + 1]).toBe('expr:gte(t,n_forced*6)')
         } finally {
           service.dispose()
         }

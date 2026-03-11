@@ -10,7 +10,7 @@ import {
   type PlaybackMode,
   type SubtitleTrackInfo,
 } from 'common'
-import type Hls from 'hls.js'
+import Hls from 'hls.js'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { environmentOptions } from '../../../utils/environment-options.js'
 
@@ -27,11 +27,6 @@ export const audioCodecs = {
   eac3: 'ec-3',
   opus: 'opus',
   dts: 'dts+',
-}
-
-const loadHls = async () => {
-  const mod = await import('hls.js')
-  return mod.default
 }
 
 const buildCodecSupportMap = () => {
@@ -87,7 +82,29 @@ export class MoviePlayerService implements AsyncDisposable {
   public resolution = new ObservableValue<ResolutionValue | undefined>(undefined)
   public progress: ObservableValue<number>
 
+  /**
+   * Converts a 0-based stream time (from video.currentTime during HLS)
+   * to the absolute file position. For direct-play, the value is returned
+   * unchanged because the video element already uses absolute timestamps.
+   */
+  public streamTimeToAbsolute(streamTime: number): number {
+    const mode = this.playbackMode.getValue()
+    if (mode === 'direct-play') return streamTime
+    return streamTime + this.hlsStartTime
+  }
+
+  private getAbsoluteProgress(): number {
+    const video = this.videoElement
+    if (!video) return this.progress.getValue()
+    return this.streamTimeToAbsolute(video.currentTime)
+  }
+
   public async [Symbol.asyncDispose]() {
+    if (this.seekDebounceTimer) {
+      clearTimeout(this.seekDebounceTimer)
+      this.seekDebounceTimer = null
+    }
+
     await this.teardownHlsSession()
 
     this.progress[Symbol.dispose]()
@@ -187,7 +204,7 @@ export class MoviePlayerService implements AsyncDisposable {
     if (mode === 'direct-play') {
       this.startDirectPlayback(videoElement, info)
     } else {
-      void this.startHlsPlayback(videoElement)
+      this.startHlsPlayback(videoElement)
     }
   }
 
@@ -204,7 +221,7 @@ export class MoviePlayerService implements AsyncDisposable {
     }
   }
 
-  private async startHlsPlayback(videoElement: HTMLVideoElement) {
+  private startHlsPlayback(videoElement: HTMLVideoElement) {
     const mode = this.playbackMode.getValue()
     const audioTrack = this.audioTrackId.getValue()
     const audioParam = audioTrack ? `&audioTrack=${encode(String(audioTrack))}` : ''
@@ -213,12 +230,10 @@ export class MoviePlayerService implements AsyncDisposable {
       `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encode(mode)}${audioParam}${startTimeParam}`,
     )
 
-    const HlsModule = await loadHls()
-
     // Prefer hls.js over native HLS — many browsers (including Chromium) report
     // canPlayType('application/vnd.apple.mpegurl') as 'maybe' without full support.
     // hls.js also handles missing alternative renditions more gracefully.
-    if (!HlsModule.isSupported()) {
+    if (!Hls.isSupported()) {
       if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
         void this.logger.verbose({ message: 'Using native HLS playback' })
         videoElement.src = hlsUrl
@@ -233,23 +248,24 @@ export class MoviePlayerService implements AsyncDisposable {
 
     void this.logger.verbose({ message: 'Starting HLS playback via hls.js' })
 
-    this.hls = new HlsModule({
+    this.hls = new Hls({
       xhrSetup: (xhr) => {
         xhr.withCredentials = true
       },
-      startPosition: this.currentProgress > 0 ? this.currentProgress : -1,
+
+      startPosition: this.currentProgress > this.hlsStartTime ? this.currentProgress - this.hlsStartTime : -1,
     })
 
-    this.hls.on(HlsModule.Events.ERROR, (_event, data) => {
+    this.hls.on(Hls.Events.ERROR, (_event, data) => {
       if (data.fatal) {
         void this.logger.error({
           message: `HLS fatal error: ${data.type}`,
           data: { details: data.details },
         })
 
-        if (data.type === HlsModule.ErrorTypes.NETWORK_ERROR) {
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
           this.hls?.startLoad()
-        } else if (data.type === HlsModule.ErrorTypes.MEDIA_ERROR) {
+        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
           this.hls?.recoverMediaError()
         }
       }
@@ -257,7 +273,7 @@ export class MoviePlayerService implements AsyncDisposable {
 
     const { hls } = this
 
-    hls.on(HlsModule.Events.MANIFEST_PARSED, () => {
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
       void this.logger.verbose({ message: 'HLS manifest parsed' })
 
       const resolutionHeightMap: Record<string, number> = {
@@ -279,7 +295,7 @@ export class MoviePlayerService implements AsyncDisposable {
         hls.currentLevel = levelIndex >= 0 ? levelIndex : -1
       })
 
-      hls.on(HlsModule.Events.DESTROYING, () => sub[Symbol.dispose]())
+      hls.on(Hls.Events.DESTROYING, () => sub[Symbol.dispose]())
     })
 
     this.hls.loadSource(hlsUrl)
@@ -290,7 +306,7 @@ export class MoviePlayerService implements AsyncDisposable {
    * Switches audio track and reloads from current position
    */
   public async switchAudioTrack(trackIndex: number) {
-    const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
+    const previousProgress = this.getAbsoluteProgress()
 
     this.isSwitching.setValue(true)
     await this.teardownHlsSession()
@@ -315,22 +331,17 @@ export class MoviePlayerService implements AsyncDisposable {
    * Switches resolution and restarts playback. Forces transcode mode when a
    * specific resolution is requested; restores the original mode on "Auto".
    *
-   * If already in transcode mode, just changes hls.js level (no reload).
-   * A full reload only happens when the playback mode changes.
+   * Always tears down the existing server-side HLS session to ensure the
+   * old ffmpeg process is cleaned up before the new one starts.
    */
   public async switchResolution(value: ResolutionValue | undefined) {
-    const currentMode = this.playbackMode.getValue()
     const targetMode = value ? 'transcode' : this.originalPlaybackMode
 
-    if (currentMode === 'transcode' && targetMode === 'transcode') {
-      this.resolution.setValue(value)
-      return
-    }
-
-    const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
-    await this.teardownHlsSession()
+    const previousProgress = this.getAbsoluteProgress()
 
     this.isSwitching.setValue(true)
+    await this.teardownHlsSession()
+
     this.resolution.setValue(value)
     this.currentProgress = previousProgress
     this.progress.setValue(previousProgress)
@@ -350,10 +361,14 @@ export class MoviePlayerService implements AsyncDisposable {
     }
   }
 
+  private seekDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
   /**
-   * Handles a seek to a new time position. If the target is not within the
-   * video's buffered ranges and we're in HLS mode, tears down the current
-   * session and starts a new one with server-side seeking via `-ss`.
+   * Handles a seek to a new absolute file time position. If the target is
+   * before the current playlist start, tears down the current session and
+   * starts a new one with server-side seeking via `-ss`. Forward seeks
+   * within the current playlist are left to hls.js which can load the
+   * required segments on its own.
    */
   public seekToTime(targetSeconds: number) {
     const mode = this.playbackMode.getValue()
@@ -362,12 +377,23 @@ export class MoviePlayerService implements AsyncDisposable {
     const video = this.videoElement
     if (!video) return
 
-    if (this.isTimeBuffered(video, targetSeconds)) return
+    // Convert absolute file time to 0-based stream time for the buffer check
+    const streamTime = targetSeconds - this.hlsStartTime
+    if (streamTime >= 0 && this.isTimeBuffered(video, streamTime)) return
+
+    // hls.js can handle forward seeks within the current VOD playlist
+    if (targetSeconds >= this.hlsStartTime) return
 
     const quantizedStart = Math.floor(targetSeconds / HLS_SEGMENT_DURATION) * HLS_SEGMENT_DURATION
-    if (quantizedStart === this.hlsStartTime) return
 
-    void this.restartHlsAtTime(targetSeconds, quantizedStart)
+    if (this.seekDebounceTimer) {
+      clearTimeout(this.seekDebounceTimer)
+    }
+
+    this.seekDebounceTimer = setTimeout(() => {
+      this.seekDebounceTimer = null
+      void this.restartHlsAtTime(targetSeconds, quantizedStart)
+    }, 300)
   }
 
   private isTimeBuffered(video: HTMLVideoElement, time: number): boolean {
@@ -398,7 +424,7 @@ export class MoviePlayerService implements AsyncDisposable {
     this.progress.setValue(targetSeconds)
 
     if (this.videoElement) {
-      void this.startHlsPlayback(this.videoElement)
+      this.startHlsPlayback(this.videoElement)
       this.waitForCanPlay(this.videoElement)
     } else {
       this.isSwitching.setValue(false)
