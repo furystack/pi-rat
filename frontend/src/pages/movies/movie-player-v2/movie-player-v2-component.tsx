@@ -236,7 +236,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               mediaService.seekToTime(currentTime)
             }}
             ontimeupdate={(ev) => {
-              if (mediaService.getIsSwitching()) return
+              if (mediaService.isSwitching.getValue()) return
               const { currentTime } = ev.currentTarget as HTMLVideoElement
               mediaService.progress.setValue(currentTime || 0)
             }}

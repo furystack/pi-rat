@@ -77,7 +77,7 @@ export class MoviePlayerService implements AsyncDisposable {
 
   private hls: Hls | null = null
   private originalPlaybackMode: PlaybackMode = 'transcode'
-  private isSwitching = false
+  public isSwitching = new ObservableValue(false)
   private seekGeneration = 0
   private hlsStartTime = 0
   public videoElement: HTMLVideoElement | null = null
@@ -95,6 +95,7 @@ export class MoviePlayerService implements AsyncDisposable {
     this.playbackInfo[Symbol.dispose]()
     this.playbackMode[Symbol.dispose]()
     this.audioTrackId[Symbol.dispose]()
+    this.isSwitching[Symbol.dispose]()
     if (this.hls) {
       this.hls.destroy()
       this.hls = null
@@ -113,12 +114,7 @@ export class MoviePlayerService implements AsyncDisposable {
           letter: this.file.driveLetter,
           path: this.file.path,
         },
-        query: {
-          mode,
-          audioTrack: this.audioTrackId.getValue(),
-          resolution: this.resolution.getValue(),
-          startTime: this.hlsStartTime || undefined,
-        },
+        query: {},
       })
     } catch (error) {
       void this.logger.warning({ message: 'Failed to tear down HLS session', data: { error } })
@@ -296,7 +292,7 @@ export class MoviePlayerService implements AsyncDisposable {
   public async switchAudioTrack(trackIndex: number) {
     const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
 
-    this.isSwitching = true
+    this.isSwitching.setValue(true)
     await this.teardownHlsSession()
 
     this.audioTrackId.setValue(trackIndex)
@@ -311,7 +307,7 @@ export class MoviePlayerService implements AsyncDisposable {
       this.startPlayback(this.videoElement, info)
       this.waitForCanPlay(this.videoElement)
     } else {
-      this.isSwitching = false
+      this.isSwitching.setValue(false)
     }
   }
 
@@ -334,7 +330,7 @@ export class MoviePlayerService implements AsyncDisposable {
     const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
     await this.teardownHlsSession()
 
-    this.isSwitching = true
+    this.isSwitching.setValue(true)
     this.resolution.setValue(value)
     this.currentProgress = previousProgress
     this.progress.setValue(previousProgress)
@@ -347,10 +343,10 @@ export class MoviePlayerService implements AsyncDisposable {
         this.startPlayback(this.videoElement, info)
         this.waitForCanPlay(this.videoElement)
       } else {
-        this.isSwitching = false
+        this.isSwitching.setValue(false)
       }
     } else {
-      this.isSwitching = false
+      this.isSwitching.setValue(false)
     }
   }
 
@@ -361,7 +357,7 @@ export class MoviePlayerService implements AsyncDisposable {
    */
   public seekToTime(targetSeconds: number) {
     const mode = this.playbackMode.getValue()
-    if (mode === 'direct-play' || this.isSwitching) return
+    if (mode === 'direct-play' || this.isSwitching.getValue()) return
 
     const video = this.videoElement
     if (!video) return
@@ -385,7 +381,7 @@ export class MoviePlayerService implements AsyncDisposable {
   }
 
   private async restartHlsAtTime(targetSeconds: number, quantizedStart: number) {
-    this.isSwitching = true
+    this.isSwitching.setValue(true)
     const generation = ++this.seekGeneration
 
     await this.teardownHlsSession()
@@ -405,21 +401,17 @@ export class MoviePlayerService implements AsyncDisposable {
       void this.startHlsPlayback(this.videoElement)
       this.waitForCanPlay(this.videoElement)
     } else {
-      this.isSwitching = false
+      this.isSwitching.setValue(false)
     }
   }
 
   private waitForCanPlay(video: HTMLVideoElement) {
     const onCanPlay = () => {
       video.removeEventListener('canplay', onCanPlay)
-      this.isSwitching = false
+      this.isSwitching.setValue(false)
       void video.play().catch(() => {})
     }
     video.addEventListener('canplay', onCanPlay)
-  }
-
-  public getIsSwitching(): boolean {
-    return this.isSwitching
   }
 
   public getAudioTrackInfoFromPlaybackInfo(): AudioTrackInfo[] {

@@ -5,9 +5,10 @@ import { buildTmdbImageUrl } from '../metadata-services/tmdb-client-service.js'
 
 export const mapTmdbMovieToLocalized = (
   tmdbMovie: TmdbMovieDetailsResponse,
+  imdbId: string,
   language: string,
 ): Omit<MovieMetadataLocalized, 'id' | 'createdAt' | 'updatedAt'> => ({
-  movieImdbId: tmdbMovie.imdb_id!,
+  movieImdbId: imdbId,
   language,
   title: tmdbMovie.title,
   plot: tmdbMovie.overview || undefined,

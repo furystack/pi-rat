@@ -17,7 +17,7 @@ describe('mapTmdbMovieToLocalized', () => {
     }) as TmdbMovieDetailsResponse
 
   it('should map all fields correctly', () => {
-    const result = mapTmdbMovieToLocalized(createTmdbMovie(), 'en')
+    const result = mapTmdbMovieToLocalized(createTmdbMovie(), 'tt1234567', 'en')
 
     expect(result).toEqual({
       movieImdbId: 'tt1234567',
@@ -34,20 +34,25 @@ describe('mapTmdbMovieToLocalized', () => {
   it('should set posterUrl to undefined when poster_path is null', () => {
     const movie = createTmdbMovie()
     movie.poster_path = null
-    const result = mapTmdbMovieToLocalized(movie, 'en')
+    const result = mapTmdbMovieToLocalized(movie, 'tt1234567', 'en')
     expect(result.posterUrl).toBeUndefined()
   })
 
   it('should set plot to undefined when overview is empty', () => {
     const movie = createTmdbMovie()
     movie.overview = ''
-    const result = mapTmdbMovieToLocalized(movie, 'en')
+    const result = mapTmdbMovieToLocalized(movie, 'tt1234567', 'en')
     expect(result.plot).toBeUndefined()
   })
 
   it('should use provided language', () => {
-    const result = mapTmdbMovieToLocalized(createTmdbMovie(), 'fr')
+    const result = mapTmdbMovieToLocalized(createTmdbMovie(), 'tt1234567', 'fr')
     expect(result.language).toBe('fr')
+  })
+
+  it('should use the explicitly provided imdbId', () => {
+    const result = mapTmdbMovieToLocalized(createTmdbMovie(), 'tt0000001', 'en')
+    expect(result.movieImdbId).toBe('tt0000001')
   })
 })
 

@@ -12,6 +12,7 @@ import {
   MovieFile,
   OmdbMovieMetadata,
   type MetadataProviderConfig,
+  type Movie,
   type PiRatFile,
 } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
@@ -29,7 +30,20 @@ import { ensureMovieLocalizedMetadataExists } from './ensure-localized-metadata-
 import { mapOmdbMovieToLocalized } from './map-omdb-to-localized.js'
 import { mapTmdbMovieToLocalized } from './map-tmdb-to-localized.js'
 
-type ProviderResult = { status: 'skip' } | { status: 'rate-limited' } | { status: 'linked'; imdbId: string }
+type ProviderResult =
+  | { status: 'skip' }
+  | { status: 'rate-limited' }
+  | { status: 'linked'; imdbId: string; movie: Movie }
+
+/**
+ * Normalizes an IETF locale (e.g. 'en-US') to a storage-friendly language code.
+ * Preserves region for Chinese (zh-CN vs zh-TW) where it distinguishes scripts.
+ */
+const normalizeLanguage = (locale: string): string => {
+  const parts = locale.split('-')
+  if (parts[0] === 'zh' && parts[1]) return `${parts[0]}-${parts[1]}`
+  return parts[0]
+}
 
 const getProviderPriority = async (injector: Injector): Promise<Array<'omdb' | 'tmdb'>> => {
   try {
@@ -58,7 +72,7 @@ const tryOmdbProvider = async (
   if (result.status === 'error') return { status: 'skip' }
 
   const added = await ensureOmdbMovieExists(result.data, injector)
-  await ensureMovieExists(
+  const movie = await ensureMovieExists(
     {
       imdbId: added.imdbID,
       year: parseInt(added.Year, 10),
@@ -73,7 +87,7 @@ const tryOmdbProvider = async (
   await ensureMovieLocalizedMetadataExists(mapOmdbMovieToLocalized(added), injector)
   await ensureOmdbSeriesExists(added, injector, context)
 
-  return { status: 'linked', imdbId: added.imdbID }
+  return { status: 'linked', imdbId: added.imdbID, movie }
 }
 
 const tryTmdbProvider = async (
@@ -93,11 +107,11 @@ const tryTmdbProvider = async (
   const imdbId = tmdbMovie.imdb_id
   if (!imdbId) return { status: 'skip' }
 
-  const language = tmdbClientService.config?.value.defaultLanguage?.slice(0, 2) ?? 'en'
+  const language = normalizeLanguage(tmdbClientService.config?.value.defaultLanguage ?? 'en-US')
 
   await ensureTmdbMovieExists(tmdbMovie, language, injector)
 
-  await ensureMovieExists(
+  const movie = await ensureMovieExists(
     {
       imdbId,
       year: tmdbMovie.release_date ? parseInt(tmdbMovie.release_date.slice(0, 4), 10) : undefined,
@@ -109,7 +123,7 @@ const tryTmdbProvider = async (
     },
     injector,
   )
-  await ensureMovieLocalizedMetadataExists(mapTmdbMovieToLocalized(tmdbMovie, language), injector)
+  await ensureMovieLocalizedMetadataExists(mapTmdbMovieToLocalized(tmdbMovie, imdbId, language), injector)
 
   if (tmdbSeries) {
     const seriesImdbId = tmdbSeries.external_ids?.imdb_id
@@ -118,7 +132,12 @@ const tryTmdbProvider = async (
     }
   }
 
-  return { status: 'linked', imdbId }
+  return { status: 'linked', imdbId, movie }
+}
+
+const metadataProviders: Record<string, typeof tryOmdbProvider> = {
+  omdb: tryOmdbProvider,
+  tmdb: tryTmdbProvider,
 }
 
 /**
@@ -131,13 +150,9 @@ const enrichMetadataFromProviders = async (
   context?: { file?: PiRatFile },
 ) => {
   const priority = await getProviderPriority(injector)
-  const providers: Record<string, typeof tryOmdbProvider> = {
-    omdb: tryOmdbProvider,
-    tmdb: tryTmdbProvider,
-  }
 
   for (const provider of priority) {
-    const tryProvider = providers[provider]
+    const tryProvider = metadataProviders[provider]
     if (!tryProvider) continue
 
     const result = await tryProvider(injector, params, context)
@@ -303,14 +318,10 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   // Try providers in priority order
   const priority = await getProviderPriority(injector)
-  const providers: Record<string, typeof tryOmdbProvider> = {
-    omdb: tryOmdbProvider,
-    tmdb: tryTmdbProvider,
-  }
 
-  let linkedImdbId: string | undefined
+  let linkedResult: { imdbId: string; movie: Movie } | undefined
   for (const provider of priority) {
-    const tryProvider = providers[provider]
+    const tryProvider = metadataProviders[provider]
     if (!tryProvider) continue
 
     const result = await tryProvider(injector, { title, year, season, episode }, { file })
@@ -324,12 +335,12 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
       return { status: 'rate-limited' } as const
     }
     if (result.status === 'linked') {
-      linkedImdbId = result.imdbId
+      linkedResult = result
       break
     }
   }
 
-  if (!linkedImdbId) {
+  if (!linkedResult) {
     await logger.debug({
       message: `No metadata found for '${fileName}' from any provider.`,
       data: { file, title, year },
@@ -342,14 +353,14 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   } = await movieFileDataSet.add(injector, {
     driveLetter,
     path,
-    imdbId: linkedImdbId,
+    imdbId: linkedResult.imdbId,
     ffprobe: ffprobeResult,
   })
 
   await logger.debug({
     message: `File ${fileName} linked successfully.`,
-    data: { file, movieFile: newMovieFile },
+    data: { file, movieFile: newMovieFile, movie: linkedResult.movie },
   })
 
-  return { status: 'linked', movieFile: newMovieFile, movie: { imdbId: linkedImdbId } } as const
+  return { status: 'linked', movieFile: newMovieFile, movie: linkedResult.movie } as const
 }

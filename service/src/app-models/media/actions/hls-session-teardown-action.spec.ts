@@ -21,7 +21,7 @@ describe('HlsSessionTeardownAction', () => {
         await HlsSessionTeardownAction({
           injector,
           getUrlParams: () => ({ letter: 'A', path: '../etc/passwd' }),
-          getQuery: () => ({ mode: 'transcode' }),
+          getQuery: () => ({}),
           response: {} as ServerResponse,
           request: {} as IncomingMessage,
         })
@@ -44,7 +44,7 @@ describe('HlsSessionTeardownAction', () => {
       const result = await HlsSessionTeardownAction({
         injector,
         getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
-        getQuery: () => ({ mode: 'transcode', audioTrack: 1, resolution: '720p' }),
+        getQuery: () => ({}),
         response: {} as ServerResponse,
         request: {} as IncomingMessage,
       })
