@@ -32,28 +32,14 @@ describe('HlsSessionTeardownAction', () => {
     })
   })
 
-  it('should reject invalid playback mode', async () => {
-    await usingAsync(new Injector(), async (injector) => {
-      try {
-        await HlsSessionTeardownAction({
-          injector,
-          getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
-          getQuery: () => ({ mode: 'invalid' as never }),
-          response: {} as ServerResponse,
-          request: {} as IncomingMessage,
-        })
-        expect.fail('Should have thrown')
-      } catch (error) {
-        expect((error as Error).message).toContain('Invalid playback mode')
-      }
-    })
-  })
-
-  it('should call removeSession and return success', async () => {
-    const removeSession = vi.fn()
+  it('should call removeAllSessionsForFile and return success', async () => {
+    const removeAllSessionsForFile = vi.fn()
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance({ removeSession } as unknown as TranscodingSessionService, TranscodingSessionService)
+      injector.setExplicitInstance(
+        { removeAllSessionsForFile } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       const result = await HlsSessionTeardownAction({
         injector,
@@ -63,7 +49,7 @@ describe('HlsSessionTeardownAction', () => {
         request: {} as IncomingMessage,
       })
 
-      expect(removeSession).toHaveBeenCalledWith('A', 'test.mkv', 'transcode', 1, '720p')
+      expect(removeAllSessionsForFile).toHaveBeenCalledWith('A', 'test.mkv')
       expect(result).toEqual({
         chunk: { success: true },
         headers: { 'Content-Type': 'application/json' },
@@ -72,11 +58,14 @@ describe('HlsSessionTeardownAction', () => {
     })
   })
 
-  it('should default mode to transcode and audioTrack to 0', async () => {
-    const removeSession = vi.fn()
+  it('should remove all sessions regardless of query params', async () => {
+    const removeAllSessionsForFile = vi.fn()
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance({ removeSession } as unknown as TranscodingSessionService, TranscodingSessionService)
+      injector.setExplicitInstance(
+        { removeAllSessionsForFile } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
 
       await HlsSessionTeardownAction({
         injector,
@@ -86,7 +75,7 @@ describe('HlsSessionTeardownAction', () => {
         request: {} as IncomingMessage,
       })
 
-      expect(removeSession).toHaveBeenCalledWith('B', 'movie.mp4', 'transcode', 0, undefined)
+      expect(removeAllSessionsForFile).toHaveBeenCalledWith('B', 'movie.mp4')
     })
   })
 })

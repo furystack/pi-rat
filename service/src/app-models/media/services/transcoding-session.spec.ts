@@ -1034,5 +1034,188 @@ describe('TranscodingSessionService', () => {
         }
       })
     })
+
+    it('should include -ss before -i when startTime is set', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+            startTime: 3600,
+          })
+
+          const lastCall = mockSpawn.mock.lastCall as [string, string[]]
+          const args = lastCall[1]
+          const ssIndex = args.indexOf('-ss')
+          const iIndex = args.indexOf('-i')
+          expect(ssIndex).toBeGreaterThanOrEqual(0)
+          expect(args[ssIndex + 1]).toBe('3600')
+          expect(ssIndex).toBeLessThan(iIndex)
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+
+    it('should not include -ss when startTime is 0', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+            startTime: 0,
+          })
+
+          const lastCall = mockSpawn.mock.lastCall as [string, string[]]
+          const args = lastCall[1]
+          expect(args).not.toContain('-ss')
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+
+    it('should offset -force_key_frames by startTime for transcode mode', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+            startTime: 3600,
+          })
+
+          const lastCall = mockSpawn.mock.lastCall as [string, string[]]
+          const args = lastCall[1]
+          const fkfIndex = args.indexOf('-force_key_frames')
+          expect(fkfIndex).toBeGreaterThanOrEqual(0)
+          expect(args[fkfIndex + 1]).toBe('expr:gte(t,n_forced*6+3600)')
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+
+    it('should create separate sessions for different startTime values', async () => {
+      const mockProcess = createMockProcess()
+      mockSpawn.mockReturnValue(mockProcess)
+
+      await usingAsync(new Injector(), async (injector) => {
+        injector.setExplicitInstance(
+          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+          FfprobeService,
+        )
+        injector.setExplicitInstance(
+          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+          HwAccelDetector,
+        )
+
+        const service = injector.getInstance(TranscodingSessionService)
+        try {
+          const session1 = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+            startTime: 0,
+          })
+          const session2 = await service.getOrCreateSession({
+            driveLetter: 'A',
+            path: 'test.mkv',
+            mode: 'transcode',
+            startTime: 3600,
+          })
+
+          expect(session1).not.toBe(session2)
+          expect(mockSpawn).toHaveBeenCalledTimes(2)
+          expect(service.getActiveSessionCount()).toBe(2)
+        } finally {
+          service.dispose()
+        }
+      })
+    })
+  })
+
+  describe('padPlaylistToFullDuration with startTime', () => {
+    const testDir = join(tmpdir(), 'pirat-test-pad-starttime')
+
+    beforeEach(() => {
+      if (!existsSync(testDir)) mkdirSync(testDir, { recursive: true })
+    })
+
+    afterEach(() => {
+      if (existsSync(testDir)) rmSync(testDir, { recursive: true, force: true })
+    })
+
+    it('should pad based on remaining duration from startTime', async () => {
+      vi.useRealTimers()
+      const playlistContent = [
+        '#EXTM3U',
+        '#EXT-X-VERSION:7',
+        '#EXT-X-TARGETDURATION:6',
+        '#EXT-X-MAP:URI="init.mp4"',
+        '#EXTINF:6.000000,',
+        'segment0.m4s',
+        '',
+      ].join('\n')
+      writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
+
+      const service = new TranscodingSessionService()
+      try {
+        const mockSession = {
+          sessionDir: testDir,
+          state: 'running' as const,
+          totalDuration: 120,
+          startTime: 108,
+        } as Parameters<typeof service.readPlaylist>[0]
+
+        const result = await service.readPlaylist(mockSession)
+        expect(result).toContain('#EXT-X-ENDLIST')
+        expect(result).toContain('segment1.m4s')
+        expect(result).not.toContain('segment3.m4s')
+      } finally {
+        service.dispose()
+      }
+    })
   })
 })

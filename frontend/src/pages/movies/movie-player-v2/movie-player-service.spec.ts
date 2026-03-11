@@ -3,13 +3,22 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { usingAsync } from '@furystack/utils'
 import { MoviePlayerService, videoCodecs, audioCodecs } from './movie-player-service.js'
 
-vi.mock('hls.js', () => ({
-  default: {
+vi.mock('hls.js', () => {
+  class MockHls {
+    on = vi.fn()
+    loadSource = vi.fn()
+    attachMedia = vi.fn()
+    destroy = vi.fn()
+    levels: unknown[] = []
+    currentLevel = -1
+  }
+  Object.assign(MockHls, {
     isSupported: () => true,
-    Events: { ERROR: 'hlsError', MANIFEST_PARSED: 'hlsManifestParsed' },
+    Events: { ERROR: 'hlsError', MANIFEST_PARSED: 'hlsManifestParsed', DESTROYING: 'hlsDestroying' },
     ErrorTypes: { NETWORK_ERROR: 'networkError', MEDIA_ERROR: 'mediaError' },
-  },
-}))
+  })
+  return { default: MockHls }
+})
 
 const mockLogger = {
   verbose: vi.fn().mockResolvedValue(undefined),
@@ -306,7 +315,11 @@ describe('switchResolution', () => {
           expect(service.playbackInfo.getValue()).not.toBeNull()
         })
 
-        const mockVideo = { currentTime: 75 } as HTMLVideoElement
+        const mockVideo = {
+          currentTime: 75,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        } as unknown as HTMLVideoElement
         service.videoElement = mockVideo
 
         await service.switchResolution('480p')
@@ -358,6 +371,144 @@ describe('switchResolution', () => {
             action: '/files/:letter/:path/hls-session',
           }),
         )
+      },
+    )
+  })
+})
+
+describe('seekToTime', () => {
+  let api: ReturnType<typeof createMockApi>
+
+  beforeEach(() => {
+    api = createMockApi()
+    vi.clearAllMocks()
+  })
+
+  it('should not seek in direct-play mode', async () => {
+    const directPlayResponse: PlaybackInfoResponse = {
+      ...mockPlaybackInfoResponse,
+      mode: 'direct-play',
+    }
+    api.call.mockResolvedValue({ result: directPlayResponse })
+
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        api.call.mockClear()
+        service.seekToTime(3600)
+        expect(api.call).not.toHaveBeenCalled()
+      },
+    )
+  })
+
+  it('should not seek when already switching', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        await service.switchAudioTrack(2)
+        api.call.mockClear()
+        service.seekToTime(3600)
+        expect(api.call).not.toHaveBeenCalled()
+      },
+    )
+  })
+
+  it('should not restart if target is within buffered range', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        const mockVideo = {
+          currentTime: 10,
+          buffered: {
+            length: 1,
+            start: () => 0,
+            end: () => 30,
+          },
+        } as unknown as HTMLVideoElement
+        service.videoElement = mockVideo
+
+        api.call.mockClear()
+        service.seekToTime(15)
+        expect(api.call).not.toHaveBeenCalled()
+      },
+    )
+  })
+
+  it('should not restart if quantized startTime is the same', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        const mockVideo = {
+          currentTime: 0,
+          buffered: { length: 0, start: () => 0, end: () => 0 },
+        } as unknown as HTMLVideoElement
+        service.videoElement = mockVideo
+
+        api.call.mockClear()
+        service.seekToTime(3)
+        expect(api.call).not.toHaveBeenCalled()
+      },
+    )
+  })
+
+  it('should restart HLS session when seeking beyond buffered range', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        const mockVideo = {
+          currentTime: 10,
+          buffered: {
+            length: 1,
+            start: () => 0,
+            end: () => 30,
+          },
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          canPlayType: vi.fn().mockReturnValue(''),
+        } as unknown as HTMLVideoElement
+        service.videoElement = mockVideo
+
+        api.call.mockClear()
+        service.seekToTime(3600)
+
+        await vi.waitFor(() => {
+          expect(api.call).toHaveBeenCalledWith(
+            expect.objectContaining({
+              method: 'DELETE',
+              action: '/files/:letter/:path/hls-session',
+            }),
+          )
+          expect(service.progress.getValue()).toBe(3600)
+        })
+      },
+    )
+  })
+
+  it('should initialize hlsStartTime from watch progress', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 3605, mockLogger as never),
+      async (service) => {
+        expect(service.progress.getValue()).toBe(3605)
       },
     )
   })

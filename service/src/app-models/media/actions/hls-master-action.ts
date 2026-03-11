@@ -60,6 +60,7 @@ export const HlsMasterAction: RequestAction<HlsMasterEndpoint> = async ({
     baseUrl: '/api/media',
     subtitleTracks,
     audioTrack: query.audioTrack,
+    startTime: query.startTime,
   })
 
   await logger.verbose({ message: `Generated master playlist for ${letter}:${path}`, data: { mode } })

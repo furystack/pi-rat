@@ -37,7 +37,14 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
 
   const sessionService = injector.getInstance(TranscodingSessionService)
 
-  const session = sessionService.getSession(letter, path, mode, query.audioTrack ?? 0, query.resolution)
+  const session = sessionService.getSession(
+    letter,
+    path,
+    mode,
+    query.audioTrack ?? 0,
+    query.resolution,
+    query.startTime ?? 0,
+  )
   if (!session) {
     throw new RequestError('No active transcoding session', 404)
   }

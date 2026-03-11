@@ -231,7 +231,12 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
                 mediaService.audioTrackId.setValue(parseInt(video.audioTracks[0].id as string, 10))
               }
             }}
+            onseeking={(ev) => {
+              const { currentTime } = ev.currentTarget as HTMLVideoElement
+              mediaService.seekToTime(currentTime)
+            }}
             ontimeupdate={(ev) => {
+              if (mediaService.getIsSwitching()) return
               const { currentTime } = ev.currentTarget as HTMLVideoElement
               mediaService.progress.setValue(currentTime || 0)
             }}

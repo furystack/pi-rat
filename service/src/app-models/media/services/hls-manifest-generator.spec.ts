@@ -200,4 +200,59 @@ describe('generateMasterPlaylist', () => {
 
     expect(playlist).not.toContain('audioTrack')
   })
+
+  it('should propagate startTime into variant URLs for transcode mode', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'transcode',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+      startTime: 3600,
+    })
+
+    const variantLines = playlist.split('\n').filter((l) => l.includes('stream.m3u8'))
+    for (const line of variantLines) {
+      expect(line).toContain('startTime')
+    }
+  })
+
+  it('should propagate startTime into variant URL for remux mode', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'remux',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+      startTime: 1800,
+    })
+
+    const variantLine = playlist.split('\n').find((l) => l.includes('stream.m3u8'))
+    expect(variantLine).toContain('startTime')
+  })
+
+  it('should not include startTime when not specified', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'transcode',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+    })
+
+    expect(playlist).not.toContain('startTime')
+  })
+
+  it('should not include startTime when set to 0', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'transcode',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+      startTime: 0,
+    })
+
+    expect(playlist).not.toContain('startTime')
+  })
 })

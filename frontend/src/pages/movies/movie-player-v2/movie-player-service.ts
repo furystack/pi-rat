@@ -60,6 +60,8 @@ const buildCodecSupportMap = () => {
 
 export type ResolutionValue = '4k' | '1080p' | '720p' | '480p' | '360p'
 
+const SEGMENT_DURATION = 6
+
 export class MoviePlayerService implements AsyncDisposable {
   constructor(
     private readonly file: PiRatFile,
@@ -69,12 +71,15 @@ export class MoviePlayerService implements AsyncDisposable {
     private readonly logger: ScopedLogger,
   ) {
     this.progress = new ObservableValue(this.currentProgress)
+    this.hlsStartTime = Math.floor(this.currentProgress / SEGMENT_DURATION) * SEGMENT_DURATION
 
     void this.initialize()
   }
 
   private hls: Hls | null = null
   private originalPlaybackMode: PlaybackMode = 'transcode'
+  private isSwitching = false
+  private hlsStartTime = 0
   public videoElement: HTMLVideoElement | null = null
   public audioTrackId = new ObservableValue(0)
   public playbackInfo = new ObservableValue<PlaybackInfoResponse | null>(null)
@@ -112,6 +117,7 @@ export class MoviePlayerService implements AsyncDisposable {
           mode,
           audioTrack: this.audioTrackId.getValue(),
           resolution: this.resolution.getValue(),
+          startTime: this.hlsStartTime || undefined,
         },
       })
     } catch (error) {
@@ -139,8 +145,8 @@ export class MoviePlayerService implements AsyncDisposable {
           selectedSubtitleTrackIndex,
         },
       })
-      this.playbackInfo.setValue(result)
       this.playbackMode.setValue(result.mode)
+      this.playbackInfo.setValue(result)
 
       void this.logger.verbose({
         message: `Playback info received: mode=${result.mode}`,
@@ -206,8 +212,9 @@ export class MoviePlayerService implements AsyncDisposable {
     const mode = this.playbackMode.getValue()
     const audioTrack = this.audioTrackId.getValue()
     const audioParam = audioTrack ? `&audioTrack=${encode(String(audioTrack))}` : ''
+    const startTimeParam = this.hlsStartTime > 0 ? `&startTime=${encode(String(this.hlsStartTime))}` : ''
     const hlsUrl = this.toServiceUrl(
-      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encode(mode)}${audioParam}`,
+      `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encode(mode)}${audioParam}${startTimeParam}`,
     )
 
     const HlsModule = await loadHls()
@@ -289,45 +296,135 @@ export class MoviePlayerService implements AsyncDisposable {
   public async switchAudioTrack(trackIndex: number) {
     const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
 
+    this.isSwitching = true
     await this.teardownHlsSession()
 
     this.audioTrackId.setValue(trackIndex)
     this.currentProgress = previousProgress
+    this.progress.setValue(previousProgress)
+    this.hlsStartTime = Math.floor(previousProgress / SEGMENT_DURATION) * SEGMENT_DURATION
 
     await this.fetchPlaybackInfo()
 
     const info = this.playbackInfo.getValue()
     if (this.videoElement && info) {
       this.startPlayback(this.videoElement, info)
+      const video = this.videoElement
+      const onCanPlay = () => {
+        video.removeEventListener('canplay', onCanPlay)
+        this.isSwitching = false
+        void video.play().catch(() => {})
+      }
+      video.addEventListener('canplay', onCanPlay)
+    } else {
+      this.isSwitching = false
     }
   }
 
   /**
    * Switches resolution and restarts playback. Forces transcode mode when a
    * specific resolution is requested; restores the original mode on "Auto".
+   *
+   * If already in transcode mode, just changes hls.js level (no reload).
+   * A full reload only happens when the playback mode changes.
    */
   public async switchResolution(value: ResolutionValue | undefined) {
+    const currentMode = this.playbackMode.getValue()
+    const targetMode = value ? 'transcode' : this.originalPlaybackMode
+
+    if (currentMode === 'transcode' && targetMode === 'transcode') {
+      this.resolution.setValue(value)
+      return
+    }
+
     const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
     await this.teardownHlsSession()
 
+    this.isSwitching = true
     this.resolution.setValue(value)
     this.currentProgress = previousProgress
     this.progress.setValue(previousProgress)
-
-    if (value) {
-      if (this.playbackMode.getValue() !== 'transcode') {
-        this.playbackMode.setValue('transcode')
-      }
-    } else {
-      this.playbackMode.setValue(this.originalPlaybackMode)
-    }
+    this.hlsStartTime = Math.floor(previousProgress / SEGMENT_DURATION) * SEGMENT_DURATION
+    this.playbackMode.setValue(targetMode)
 
     if (this.videoElement) {
       const info = this.playbackInfo.getValue()
       if (info) {
         this.startPlayback(this.videoElement, info)
+        const video = this.videoElement
+        const onCanPlay = () => {
+          video.removeEventListener('canplay', onCanPlay)
+          this.isSwitching = false
+          void video.play().catch(() => {})
+        }
+        video.addEventListener('canplay', onCanPlay)
+      } else {
+        this.isSwitching = false
+      }
+    } else {
+      this.isSwitching = false
+    }
+  }
+
+  /**
+   * Handles a seek to a new time position. If the target is not within the
+   * video's buffered ranges and we're in HLS mode, tears down the current
+   * session and starts a new one with server-side seeking via `-ss`.
+   */
+  public seekToTime(targetSeconds: number) {
+    const mode = this.playbackMode.getValue()
+    if (mode === 'direct-play' || this.isSwitching) return
+
+    const video = this.videoElement
+    if (!video) return
+
+    if (this.isTimeBuffered(video, targetSeconds)) return
+
+    const quantizedStart = Math.floor(targetSeconds / SEGMENT_DURATION) * SEGMENT_DURATION
+    if (quantizedStart === this.hlsStartTime) return
+
+    void this.restartHlsAtTime(targetSeconds, quantizedStart)
+  }
+
+  private isTimeBuffered(video: HTMLVideoElement, time: number): boolean {
+    const { buffered } = video
+    for (let i = 0; i < buffered.length; i++) {
+      if (time >= buffered.start(i) && time <= buffered.end(i)) {
+        return true
       }
     }
+    return false
+  }
+
+  private async restartHlsAtTime(targetSeconds: number, quantizedStart: number) {
+    this.isSwitching = true
+
+    await this.teardownHlsSession()
+    if (this.hls) {
+      this.hls.destroy()
+      this.hls = null
+    }
+
+    this.hlsStartTime = quantizedStart
+    this.currentProgress = targetSeconds
+    this.progress.setValue(targetSeconds)
+
+    if (this.videoElement) {
+      void this.startHlsPlayback(this.videoElement)
+      const video = this.videoElement
+      const onCanPlay = () => {
+        video.removeEventListener('canplay', onCanPlay)
+        this.isSwitching = false
+        void video.play().catch(() => {})
+      }
+      video.addEventListener('canplay', onCanPlay)
+    } else {
+      this.isSwitching = false
+    }
+  }
+
+  public getIsSwitching(): boolean {
+    return this.isSwitching
   }
 
   public getAudioTrackInfoFromPlaybackInfo(): AudioTrackInfo[] {

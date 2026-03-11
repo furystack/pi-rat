@@ -10450,6 +10450,9 @@
             },
             "resolution": {
               "type": "string"
+            },
+            "startTime": {
+              "type": "number"
             }
           },
           "additionalProperties": false
@@ -10492,6 +10495,9 @@
             },
             "audioTrack": {
               "type": "number"
+            },
+            "startTime": {
+              "type": "number"
             }
           },
           "additionalProperties": false
@@ -10531,6 +10537,9 @@
             },
             "audioTrack": {
               "type": "number"
+            },
+            "startTime": {
+              "type": "number"
             }
           },
           "additionalProperties": false
@@ -10566,6 +10575,9 @@
               "type": "string"
             },
             "audioTrack": {
+              "type": "number"
+            },
+            "startTime": {
               "type": "number"
             }
           },
@@ -10611,6 +10623,9 @@
               "type": "string"
             },
             "audioTrack": {
+              "type": "number"
+            },
+            "startTime": {
               "type": "number"
             }
           },

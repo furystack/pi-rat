@@ -27,6 +27,7 @@ type TranscodingSessionEntry = {
   path: string
   audioTrackId: number
   resolution?: string
+  startTime: number
   totalDuration: number
   createdAt: number
   lastAccessedAt: number
@@ -72,8 +73,9 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number,
     resolution?: string,
+    startTime: number = 0,
   ): SessionKey {
-    return `${driveLetter}:${path}:${mode}:${audioTrackId}:${resolution || ''}`
+    return `${driveLetter}:${path}:${mode}:${audioTrackId}:${resolution || ''}:${startTime}`
   }
 
   private getSessionDir(key: SessionKey): string {
@@ -114,8 +116,9 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number = 0,
     resolution?: string,
+    startTime: number = 0,
   ): TranscodingSessionEntry | undefined {
-    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution, startTime)
     const session = this.sessions.get(key)
     if (session) {
       session.lastAccessedAt = Date.now()
@@ -129,14 +132,16 @@ export class TranscodingSessionService {
     mode,
     audioTrackId = 0,
     resolution,
+    startTime = 0,
   }: {
     driveLetter: string
     path: string
     mode: PlaybackMode
     audioTrackId?: number
     resolution?: string
+    startTime?: number
   }): Promise<TranscodingSessionEntry> {
-    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution, startTime)
     const existing = this.sessions.get(key)
     if (existing) {
       existing.lastAccessedAt = Date.now()
@@ -146,7 +151,7 @@ export class TranscodingSessionService {
     const pending = this.pendingSessions.get(key)
     if (pending) return pending
 
-    const createPromise = this.createSession(key, driveLetter, path, mode, audioTrackId, resolution)
+    const createPromise = this.createSession(key, driveLetter, path, mode, audioTrackId, resolution, startTime)
     this.pendingSessions.set(key, createPromise)
 
     try {
@@ -163,6 +168,7 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number,
     resolution?: string,
+    startTime: number = 0,
   ): Promise<TranscodingSessionEntry> {
     await this.getBaseDirFromConfig()
     const sessionDir = this.getSessionDir(key)
@@ -177,6 +183,7 @@ export class TranscodingSessionService {
       audioTrackId,
       resolution,
       sessionDir,
+      startTime,
     })
 
     void this.logger.verbose({
@@ -198,6 +205,7 @@ export class TranscodingSessionService {
       path,
       audioTrackId,
       resolution,
+      startTime,
       totalDuration,
       createdAt: Date.now(),
       lastAccessedAt: Date.now(),
@@ -283,7 +291,7 @@ export class TranscodingSessionService {
     const ready = await this.waitForFile(playlistPath, session)
     if (!ready) return null
     const content = await readFile(playlistPath, 'utf-8')
-    return this.padPlaylistToFullDuration(content, session.totalDuration)
+    return this.padPlaylistToFullDuration(content, session.totalDuration, session.startTime)
   }
 
   /**
@@ -292,7 +300,7 @@ export class TranscodingSessionService {
    * full VOD duration from the first request. The segment-serving endpoint
    * already waits for segments that haven't been transcoded yet.
    */
-  private padPlaylistToFullDuration(playlist: string, totalDuration: number): string {
+  private padPlaylistToFullDuration(playlist: string, totalDuration: number, startTime: number = 0): string {
     if (totalDuration <= 0 || playlist.includes('#EXT-X-ENDLIST')) {
       return playlist
     }
@@ -312,7 +320,8 @@ export class TranscodingSessionService {
       }
     }
 
-    const remainingDuration = totalDuration - encodedDuration
+    const effectiveDuration = totalDuration - startTime
+    const remainingDuration = effectiveDuration - encodedDuration
     if (remainingDuration <= 0) {
       return `${playlist.trimEnd()}\n#EXT-X-ENDLIST\n`
     }
@@ -346,6 +355,7 @@ export class TranscodingSessionService {
     audioTrackId,
     resolution,
     sessionDir,
+    startTime = 0,
   }: {
     driveLetter: string
     path: string
@@ -353,6 +363,7 @@ export class TranscodingSessionService {
     audioTrackId: number
     resolution?: string
     sessionDir: string
+    startTime?: number
   }): Promise<{ args: string[]; totalDuration: number }> {
     const [drive, config, ffprobe] = await Promise.all([
       (async () => {
@@ -380,6 +391,11 @@ export class TranscodingSessionService {
     const copyAudio = isRemux
 
     const args: string[] = []
+
+    // Input seeking (before -i for fast keyframe-based seeking)
+    if (startTime > 0) {
+      args.push('-ss', String(startTime))
+    }
 
     // Input with timestamp preservation (like Jellyfin)
     args.push('-copyts', '-avoid_negative_ts', 'disabled')
@@ -425,8 +441,8 @@ export class TranscodingSessionService {
 
       args.push('-c:v', videoCodec)
 
-      // Force keyframes at segment boundaries
-      args.push('-force_key_frames', `expr:gte(t,n_forced*${SEGMENT_DURATION})`)
+      // Force keyframes at segment boundaries (offset by startTime when -copyts preserves original PTS)
+      args.push('-force_key_frames', `expr:gte(t,n_forced*${SEGMENT_DURATION}+${startTime})`)
       args.push('-sc_threshold:v', '0')
 
       const isSoftwareEncoder = videoCodec === 'libx264' || videoCodec === 'libx265'
@@ -471,8 +487,9 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number = 0,
     resolution?: string,
+    startTime: number = 0,
   ) {
-    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution, startTime)
     const session = this.sessions.get(key)
     if (session) {
       this.destroySession(session)

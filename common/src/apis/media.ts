@@ -177,31 +177,38 @@ export type PlaybackInfoResponse = {
 
 export type HlsMasterEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; videoCodecs?: string; audioCodecs?: string; containers?: string; audioTrack?: number }
+  query: {
+    mode?: PlaybackMode
+    videoCodecs?: string
+    audioCodecs?: string
+    containers?: string
+    audioTrack?: number
+    startTime?: number
+  }
   result: unknown
 }
 
 export type HlsStreamEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number; startTime?: number }
   result: unknown
 }
 
 export type HlsSegmentEndpoint = {
   url: { letter: string; path: string; index: string }
-  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number; startTime?: number }
   result: unknown
 }
 
 export type HlsInitEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; audioTrack?: number; resolution?: string }
+  query: { mode?: PlaybackMode; audioTrack?: number; resolution?: string; startTime?: number }
   result: unknown
 }
 
 export type HlsSessionTeardownEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number; startTime?: number }
   result: { success: boolean }
 }
 
