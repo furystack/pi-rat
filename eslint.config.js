@@ -15,10 +15,10 @@ export default tseslint.config(
   {
     ignores: [
       'coverage',
-      '*/node_modules/*',
-      '*/esm/*',
-      '*/types/*',
-      '*/dist/*',
+      '**/node_modules/**',
+      '**/esm/**',
+      '**/types/**',
+      '**/dist/**',
       '.yarn/*',
       'eslint.config.js',
       'prettier.config.js',
