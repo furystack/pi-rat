@@ -10,6 +10,16 @@ import { getSubtitleTracks, getSubtitleTracksFromPlaybackInfo } from './get-subt
 import './media-chrome.js'
 import { MoviePlayerService } from './movie-player-service.js'
 
+const createRenditionList = (items: Rendition[], selectedIndex: number) => {
+  const target = new EventTarget()
+  return Object.assign([...items], {
+    addEventListener: target.addEventListener.bind(target),
+    removeEventListener: target.removeEventListener.bind(target),
+    dispatchEvent: target.dispatchEvent.bind(target),
+    selectedIndex,
+  })
+}
+
 type MoviePlayerProps = {
   file: PiRatFile
   ffprobe: FfprobeData
@@ -129,9 +139,9 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
                   const { value } = ev.currentTarget as HTMLInputElement
 
                   if (validValues.includes(value as (typeof validValues)[number])) {
-                    mediaService.resolution.setValue(value as (typeof validValues)[number])
+                    void mediaService.switchResolution(value as (typeof validValues)[number])
                   } else {
-                    mediaService.resolution.setValue(undefined)
+                    void mediaService.switchResolution(undefined)
                   }
                 }}
               >
@@ -184,7 +194,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
 
               const video = ev.currentTarget as HTMLVideoElement & {
                 audioTracks: AudioTrack[]
-                videoRenditions: Rendition[]
+                videoRenditions: ReturnType<typeof createRenditionList>
               }
 
               video.audioTracks = audioTracks.map((track, index) => ({
@@ -199,7 +209,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
               const videoStream = props.ffprobe.streams.find((stream) => stream.codec_type === 'video')
               const height = videoStream?.height || 1080
 
-              video.videoRenditions = [
+              const renditionItems: Rendition[] = [
                 ...(height >= 2160
                   ? [{ id: '4k', width: 3840, height: 2160, src: '', selected: currentValue === '4k' }]
                   : []),
@@ -214,6 +224,8 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
                   : []),
                 { id: '360p', width: 640, height: 360, src: '', selected: currentValue === '360p' },
               ]
+              const selectedIdx = renditionItems.findIndex((r) => r.selected)
+              video.videoRenditions = createRenditionList(renditionItems, selectedIdx)
 
               if (video.audioTracks[0]) {
                 mediaService.audioTrackId.setValue(parseInt(video.audioTracks[0].id as string, 10))

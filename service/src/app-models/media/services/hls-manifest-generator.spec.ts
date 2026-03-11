@@ -115,9 +115,46 @@ describe('generateMasterPlaylist', () => {
       subtitleTracks: [],
     })
 
+    expect(playlist).not.toContain('RESOLUTION=3840x2160')
     expect(playlist).not.toContain('RESOLUTION=1920x1080')
     expect(playlist).toContain('RESOLUTION=1280x720')
     expect(playlist).toContain('RESOLUTION=854x480')
     expect(playlist).toContain('RESOLUTION=640x360')
+  })
+
+  it('should include 4K variant for 4K sources in transcode mode', () => {
+    const ffprobe = createFfprobe({
+      streams: [
+        { index: 0, codec_type: 'video', codec_name: 'hevc', width: 3840, height: 2160, tags: {} },
+        { index: 1, codec_type: 'audio', codec_name: 'aac', channels: 2, tags: {} },
+      ],
+    })
+
+    const playlist = generateMasterPlaylist({
+      ffprobe,
+      file: { driveLetter: 'A', path: 'movies/test-4k.mkv' },
+      mode: 'transcode',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+    })
+
+    expect(playlist).toContain('RESOLUTION=3840x2160')
+    expect(playlist).toContain('RESOLUTION=1920x1080')
+    expect(playlist).toContain('RESOLUTION=1280x720')
+    expect(playlist).toContain('RESOLUTION=854x480')
+    expect(playlist).toContain('RESOLUTION=640x360')
+  })
+
+  it('should not include 4K variant for 1080p sources in transcode mode', () => {
+    const playlist = generateMasterPlaylist({
+      ffprobe: createFfprobe(),
+      file: { driveLetter: 'A', path: 'movies/test.mkv' },
+      mode: 'transcode',
+      baseUrl: '/api/media',
+      subtitleTracks: [],
+    })
+
+    expect(playlist).not.toContain('RESOLUTION=3840x2160')
+    expect(playlist).toContain('RESOLUTION=1920x1080')
   })
 })

@@ -58,6 +58,8 @@ const buildCodecSupportMap = () => {
   }
 }
 
+export type ResolutionValue = '4k' | '1080p' | '720p' | '480p' | '360p'
+
 export class MoviePlayerService implements AsyncDisposable {
   constructor(
     private readonly file: PiRatFile,
@@ -72,11 +74,12 @@ export class MoviePlayerService implements AsyncDisposable {
   }
 
   private hls: Hls | null = null
+  private originalPlaybackMode: PlaybackMode = 'transcode'
   public videoElement: HTMLVideoElement | null = null
   public audioTrackId = new ObservableValue(0)
   public playbackInfo = new ObservableValue<PlaybackInfoResponse | null>(null)
   public playbackMode = new ObservableValue<PlaybackMode>('transcode')
-  public resolution = new ObservableValue<'4k' | '1080p' | '720p' | '480p' | '360p' | undefined>(undefined)
+  public resolution = new ObservableValue<ResolutionValue | undefined>(undefined)
   public progress: ObservableValue<number>
 
   public async [Symbol.asyncDispose]() {
@@ -117,7 +120,10 @@ export class MoviePlayerService implements AsyncDisposable {
   }
 
   private async initialize() {
-    await this.fetchPlaybackInfo()
+    const info = await this.fetchPlaybackInfo()
+    if (info) {
+      this.originalPlaybackMode = info.mode
+    }
   }
 
   public async fetchPlaybackInfo(selectedSubtitleTrackIndex?: number): Promise<PlaybackInfoResponse | null> {
@@ -175,7 +181,8 @@ export class MoviePlayerService implements AsyncDisposable {
       this.hls = null
     }
 
-    if (info.mode === 'direct-play') {
+    const mode = this.playbackMode.getValue()
+    if (mode === 'direct-play') {
       this.startDirectPlayback(videoElement, info)
     } else {
       void this.startHlsPlayback(videoElement)
@@ -290,6 +297,33 @@ export class MoviePlayerService implements AsyncDisposable {
     const info = this.playbackInfo.getValue()
     if (this.videoElement && info) {
       this.startPlayback(this.videoElement, info)
+    }
+  }
+
+  /**
+   * Switches resolution and restarts playback. Forces transcode mode when a
+   * specific resolution is requested; restores the original mode on "Auto".
+   */
+  public async switchResolution(value: ResolutionValue | undefined) {
+    const previousProgress = this.videoElement?.currentTime ?? this.progress.getValue()
+    await this.teardownHlsSession()
+
+    this.resolution.setValue(value)
+    this.currentProgress = previousProgress
+
+    if (value) {
+      if (this.playbackMode.getValue() !== 'transcode') {
+        this.playbackMode.setValue('transcode')
+      }
+    } else {
+      this.playbackMode.setValue(this.originalPlaybackMode)
+    }
+
+    if (this.videoElement) {
+      const info = this.playbackInfo.getValue()
+      if (info) {
+        this.startPlayback(this.videoElement, info)
+      }
     }
   }
 

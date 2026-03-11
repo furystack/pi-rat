@@ -11,8 +11,9 @@ import { getSubtitleTracks, getSubtitleTracksFromPlaybackInfo } from './get-subt
  * and get-subtitle-tracks.spec.tsx.
  */
 
+type Rendition = { id: string; width: number; height: number; src: string; selected: boolean }
+
 const buildRenditionList = (height: number, currentValue?: string) => {
-  type Rendition = { id: string; width: number; height: number; src: string; selected: boolean }
   const renditions: Rendition[] = [
     ...(height >= 2160 ? [{ id: '4k', width: 3840, height: 2160, src: '', selected: currentValue === '4k' }] : []),
     ...(height >= 1080
@@ -23,6 +24,16 @@ const buildRenditionList = (height: number, currentValue?: string) => {
     { id: '360p', width: 640, height: 360, src: '', selected: currentValue === '360p' },
   ]
   return renditions
+}
+
+const createRenditionList = (items: Rendition[], selectedIndex: number) => {
+  const target = new EventTarget()
+  return Object.assign([...items], {
+    addEventListener: target.addEventListener.bind(target),
+    removeEventListener: target.removeEventListener.bind(target),
+    dispatchEvent: target.dispatchEvent.bind(target),
+    selectedIndex,
+  })
 }
 
 const mapAudioTracksForMediaChrome = (audioTracks: AudioTrackInfo[]) =>
@@ -63,6 +74,46 @@ describe('MoviePlayerV2 component logic', () => {
     it('should not mark any rendition when no value is selected', () => {
       const renditions = buildRenditionList(1080)
       expect(renditions.every((r) => !r.selected)).toBe(true)
+    })
+  })
+
+  describe('createRenditionList', () => {
+    it('should implement EventTarget methods', () => {
+      const items = buildRenditionList(1080)
+      const list = createRenditionList(items, -1)
+
+      expect(typeof list.addEventListener).toBe('function')
+      expect(typeof list.removeEventListener).toBe('function')
+      expect(typeof list.dispatchEvent).toBe('function')
+    })
+
+    it('should expose selectedIndex', () => {
+      const items = buildRenditionList(1080, '720p')
+      const selectedIdx = items.findIndex((r) => r.selected)
+      const list = createRenditionList(items, selectedIdx)
+
+      expect(list.selectedIndex).toBe(1)
+    })
+
+    it('should be array-like with rendition items', () => {
+      const items = buildRenditionList(1080)
+      const list = createRenditionList(items, -1)
+
+      expect(list).toHaveLength(4)
+      expect(list[0].id).toBe('1080p')
+      expect(list[3].id).toBe('360p')
+    })
+
+    it('should allow adding and dispatching events', () => {
+      const items = buildRenditionList(720)
+      const list = createRenditionList(items, 0)
+
+      let eventFired = false
+      list.addEventListener('change', () => {
+        eventFired = true
+      })
+      list.dispatchEvent(new Event('change'))
+      expect(eventFired).toBe(true)
     })
   })
 

@@ -252,3 +252,113 @@ describe('audioCodecs', () => {
     expect(audioCodecs.opus).toBe('opus')
   })
 })
+
+describe('switchResolution', () => {
+  let api: ReturnType<typeof createMockApi>
+
+  beforeEach(() => {
+    api = createMockApi()
+    vi.clearAllMocks()
+  })
+
+  it('should force transcode mode when a specific resolution is selected', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        expect(service.playbackMode.getValue()).toBe('remux')
+
+        await service.switchResolution('720p')
+        expect(service.resolution.getValue()).toBe('720p')
+        expect(service.playbackMode.getValue()).toBe('transcode')
+      },
+    )
+  })
+
+  it('should restore original playback mode when switching to Auto', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        expect(service.playbackMode.getValue()).toBe('remux')
+
+        await service.switchResolution('720p')
+        expect(service.playbackMode.getValue()).toBe('transcode')
+
+        await service.switchResolution(undefined)
+        expect(service.resolution.getValue()).toBeUndefined()
+        expect(service.playbackMode.getValue()).toBe('remux')
+      },
+    )
+  })
+
+  it('should preserve playback progress across resolution switches', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 50, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        const mockVideo = { currentTime: 75 } as HTMLVideoElement
+        service.videoElement = mockVideo
+
+        await service.switchResolution('480p')
+        expect(service.progress.getValue()).toBe(50)
+      },
+    )
+  })
+
+  it('should stay in transcode mode when already transcoding', async () => {
+    const transcodeResponse: PlaybackInfoResponse = {
+      ...mockPlaybackInfoResponse,
+      mode: 'transcode',
+    }
+    api.call.mockResolvedValue({ result: transcodeResponse })
+
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        expect(service.playbackMode.getValue()).toBe('transcode')
+
+        await service.switchResolution('720p')
+        expect(service.playbackMode.getValue()).toBe('transcode')
+
+        await service.switchResolution(undefined)
+        expect(service.playbackMode.getValue()).toBe('transcode')
+      },
+    )
+  })
+
+  it('should call teardown before switching', async () => {
+    await usingAsync(
+      new MoviePlayerService(mockFile, mockFfprobe, api as never, 0, mockLogger as never),
+      async (service) => {
+        await vi.waitFor(() => {
+          expect(service.playbackInfo.getValue()).not.toBeNull()
+        })
+
+        api.call.mockClear()
+
+        await service.switchResolution('720p')
+
+        expect(api.call).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'DELETE',
+            action: '/files/:letter/:path/hls-session',
+          }),
+        )
+      },
+    )
+  })
+})

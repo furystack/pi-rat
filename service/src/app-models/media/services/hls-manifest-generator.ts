@@ -9,6 +9,7 @@ export type HlsVariant = {
 }
 
 const DEFAULT_VARIANTS: HlsVariant[] = [
+  { resolution: '3840x2160', width: 3840, height: 2160, bandwidth: 15000000 },
   { resolution: '1920x1080', width: 1920, height: 1080, bandwidth: 5000000 },
   { resolution: '1280x720', width: 1280, height: 720, bandwidth: 2800000 },
   { resolution: '854x480', width: 854, height: 480, bandwidth: 1400000 },
