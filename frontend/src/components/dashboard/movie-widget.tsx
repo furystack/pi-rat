@@ -1,16 +1,15 @@
 import type { CacheWithValue } from '@furystack/cache'
 import { isLoadedCacheResult } from '@furystack/cache'
-import { serializeToQueryString } from '@furystack/rest'
-import { LazyLoad, Shade, createComponent } from '@furystack/shades'
+import { createComponent, LazyLoad, Shade } from '@furystack/shades'
 import { CacheView, cssVariableTheme, Skeleton } from '@furystack/shades-common-components'
 import type { Movie, MovieMetadataLocalized } from 'common'
 import { AppLink } from '../../routes/index.js'
-import { navigateToRoute } from '../../utils/navigate-to-route.js'
 import { LocalizedMetadataService } from '../../services/localized-metadata-service.js'
 import { MovieFilesService } from '../../services/movie-files-service.js'
 import { MoviesService } from '../../services/movies-service.js'
 import { SessionService } from '../../services/session.js'
 import { WatchProgressService } from '../../services/watch-progress-service.js'
+import { navigateToRoute } from '../../utils/navigate-to-route.js'
 import { WidgetCard } from './widget-card.js'
 
 const MovieWidgetContent = Shade<{
@@ -72,14 +71,7 @@ const MovieWidgetContent = Shade<{
                   onclick={(ev) => {
                     ev.preventDefault()
                     ev.stopImmediatePropagation()
-                    navigateToRoute(
-                      injector,
-                      '/entities/movies',
-                      {},
-                      {
-                        queryString: serializeToQueryString({ gedst: { mode: 'edit', currentId: imdbId } }),
-                      },
-                    )
+                    navigateToRoute(injector, '/entities/movies/edit/:id', { id: imdbId })
                   }}
                   title="Edit movie details"
                 >
