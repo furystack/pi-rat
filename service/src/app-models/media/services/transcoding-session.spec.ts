@@ -691,6 +691,95 @@ describe('TranscodingSessionService', () => {
     })
   })
 
+  it('should remove all resolution variants when resolution is undefined', async () => {
+    const mockProcess = createMockProcess()
+    mockSpawn.mockReturnValue(mockProcess)
+
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        FfprobeService,
+      )
+      injector.setExplicitInstance(
+        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        HwAccelDetector,
+      )
+
+      const service = injector.getInstance(TranscodingSessionService)
+      try {
+        await service.getOrCreateSession({
+          driveLetter: 'A',
+          path: 'test.mkv',
+          mode: 'transcode',
+          resolution: '1080p',
+        })
+        await service.getOrCreateSession({
+          driveLetter: 'A',
+          path: 'test.mkv',
+          mode: 'transcode',
+          resolution: '720p',
+        })
+        await service.getOrCreateSession({
+          driveLetter: 'A',
+          path: 'other.mkv',
+          mode: 'transcode',
+          resolution: '1080p',
+        })
+
+        expect(service.getActiveSessionCount()).toBe(3)
+
+        service.removeSession('A', 'test.mkv', 'transcode', 0)
+        expect(service.getActiveSessionCount()).toBe(1)
+        expect(service.getSession('A', 'test.mkv', 'transcode', 0, '1080p')).toBeUndefined()
+        expect(service.getSession('A', 'test.mkv', 'transcode', 0, '720p')).toBeUndefined()
+        expect(service.getSession('A', 'other.mkv', 'transcode', 0, '1080p')).toBeDefined()
+      } finally {
+        service.dispose()
+      }
+    })
+  })
+
+  it('should remove only exact match when resolution is specified', async () => {
+    const mockProcess = createMockProcess()
+    mockSpawn.mockReturnValue(mockProcess)
+
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        FfprobeService,
+      )
+      injector.setExplicitInstance(
+        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        HwAccelDetector,
+      )
+
+      const service = injector.getInstance(TranscodingSessionService)
+      try {
+        await service.getOrCreateSession({
+          driveLetter: 'A',
+          path: 'test.mkv',
+          mode: 'transcode',
+          resolution: '1080p',
+        })
+        await service.getOrCreateSession({
+          driveLetter: 'A',
+          path: 'test.mkv',
+          mode: 'transcode',
+          resolution: '720p',
+        })
+
+        expect(service.getActiveSessionCount()).toBe(2)
+
+        service.removeSession('A', 'test.mkv', 'transcode', 0, '1080p')
+        expect(service.getActiveSessionCount()).toBe(1)
+        expect(service.getSession('A', 'test.mkv', 'transcode', 0, '1080p')).toBeUndefined()
+        expect(service.getSession('A', 'test.mkv', 'transcode', 0, '720p')).toBeDefined()
+      } finally {
+        service.dispose()
+      }
+    })
+  })
+
   it('should handle removeSession on non-existent session gracefully', async () => {
     await usingAsync(new Injector(), async (injector) => {
       const service = injector.getInstance(TranscodingSessionService)

@@ -26,23 +26,41 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     const { driveLetter, path } = props.file
     const watchProgressService = injector.getInstance(WatchProgressService)
     useDisposable('watchProgressUpdater', () => {
+      const createUpdater = (video: HTMLVideoElement) =>
+        new WatchProgressUpdater({
+          intervalMs: 10 * 1000,
+          onSave: async (progress) => {
+            void watchProgressService.updateWatchEntry({
+              completed: (mediaService.playbackInfo.getValue()?.duration ?? video.duration) - progress < 10,
+              driveLetter,
+              path,
+              watchedSeconds: progress,
+            })
+          },
+          saveTresholdSeconds: 10,
+          videoElement: video,
+        })
+
       const video = videoRef.current
-      if (!video) {
-        return { [Symbol.asyncDispose]: async () => {} }
+      if (video) {
+        return createUpdater(video)
       }
-      return new WatchProgressUpdater({
-        intervalMs: 10 * 1000,
-        onSave: async (progress) => {
-          void watchProgressService.updateWatchEntry({
-            completed: video.duration - progress < 10,
-            driveLetter,
-            path,
-            watchedSeconds: progress,
-          })
-        },
-        saveTresholdSeconds: 10,
-        videoElement: video,
+
+      let updater: WatchProgressUpdater | null = null
+      const frameId = requestAnimationFrame(() => {
+        const deferredVideo = videoRef.current
+        if (deferredVideo) {
+          updater = createUpdater(deferredVideo)
+        }
       })
+      return {
+        [Symbol.asyncDispose]: async () => {
+          cancelAnimationFrame(frameId)
+          if (updater) {
+            await updater[Symbol.asyncDispose]()
+          }
+        },
+      }
     })
     const { watchProgress, file } = props
 
@@ -86,6 +104,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
         }}
       >
         <media-controller
+          defaultDuration={playbackInfo?.duration}
           style={{
             display: 'flex',
             width: '100%',

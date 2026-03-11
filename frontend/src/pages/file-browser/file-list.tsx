@@ -2,9 +2,11 @@ import type { FindOptions } from '@furystack/core'
 import { createComponent, Shade } from '@furystack/shades'
 import type { CollectionService, ContextMenuItem } from '@furystack/shades-common-components'
 import {
+  Button,
   ContextMenu,
   ContextMenuManager,
   DataGrid,
+  Dialog,
   Icon,
   icons,
   NotyService,
@@ -61,8 +63,23 @@ export const FileList = Shade<{
     const [activeEntry, setActiveEntry] = useState<DirectoryEntry | null>('activeEntry', null)
     const [isInfoVisible, setInfoVisible] = useState('isInfoVisible', false)
     const [isRelatedMoviesVisible, setRelatedMoviesVisible] = useState('isRelatedMoviesVisible', false)
+    const [isDeleteDialogVisible, setDeleteDialogVisible] = useState('isDeleteDialogVisible', false)
+    const [entriesToDelete, setEntriesToDelete] = useState<DirectoryEntry[]>('entriesToDelete', [])
+    const [isDeleting, setDeleting] = useState('isDeleting', false)
 
     const contextMenuManager = useDisposable('contextMenuManager', () => new ContextMenuManager<() => void>())
+
+    const collectDeleteTargets = (): DirectoryEntry[] => {
+      const selection = service.selection.getValue()
+      if (selection.length > 0) {
+        return selection.filter((e) => e.name !== '..')
+      }
+      const focused = service.focusedEntry.getValue()
+      if (focused && focused.name !== '..') {
+        return [focused]
+      }
+      return []
+    }
 
     const activate = () => {
       const focused = service.focusedEntry.getValue()
@@ -171,6 +188,25 @@ export const FileList = Shade<{
           label: 'Show file info',
           data: () => setInfoVisible(true),
         },
+        ...(entry.name !== '..'
+          ? [
+              {
+                type: 'separator' as const,
+              },
+              {
+                type: 'item' as const,
+                icon: <Icon icon={icons.trash} size="small" />,
+                label: 'Delete',
+                data: () => {
+                  const targets = collectDeleteTargets()
+                  if (targets.length > 0) {
+                    setEntriesToDelete(targets)
+                    setDeleteDialogVisible(true)
+                  }
+                },
+              },
+            ]
+          : []),
       ]
     }
 
@@ -181,6 +217,33 @@ export const FileList = Shade<{
         position: { x: ev.clientX, y: ev.clientY },
         items: getContextMenuItems(entry),
       })
+    }
+
+    const handleDeleteConfirm = async () => {
+      setDeleting(true)
+      try {
+        for (const entry of entriesToDelete) {
+          await drivesService.removeFile({
+            letter: currentDriveLetter,
+            path: getFullPath(currentPath, entry.name),
+          })
+        }
+        notyService.emit('onNotyAdded', {
+          type: 'success',
+          title: 'Delete completed',
+          body: <>{entriesToDelete.length} item(s) deleted successfully</>,
+        })
+      } catch (err) {
+        notyService.emit('onNotyAdded', {
+          type: 'error',
+          title: 'Delete failed',
+          body: <>{getErrorMessage(err)}</>,
+        })
+      } finally {
+        setDeleting(false)
+        setDeleteDialogVisible(false)
+        setEntriesToDelete([])
+      }
     }
 
     useDisposable('keypressListener', () => {
@@ -203,24 +266,10 @@ export const FileList = Shade<{
         }
 
         if (ev.key === 'Delete') {
-          const focused = service.focusedEntry.getValue()
-          if (focused) {
-            drivesService
-              .removeFile({ letter: currentDriveLetter, path: getFullPath(currentPath, focused.name) })
-              .then(() => {
-                notyService.emit('onNotyAdded', {
-                  type: 'success',
-                  title: 'Delete completed',
-                  body: <>The file is deleted succesfully</>,
-                })
-              })
-              .catch((err) =>
-                notyService.emit('onNotyAdded', {
-                  title: 'Delete failed',
-                  body: <>{getErrorMessage(err)}</>,
-                  type: 'error',
-                }),
-              )
+          const targets = collectDeleteTargets()
+          if (targets.length > 0) {
+            setEntriesToDelete(targets)
+            setDeleteDialogVisible(true)
           }
         }
       }
@@ -347,6 +396,32 @@ export const FileList = Shade<{
             onClose={() => setRelatedMoviesVisible(false)}
           />
         )}
+        <Dialog
+          isVisible={isDeleteDialogVisible}
+          title="Confirm Delete"
+          onClose={isDeleting ? undefined : () => setDeleteDialogVisible(false)}
+          actions={
+            <>
+              <Button onclick={() => setDeleteDialogVisible(false)} disabled={isDeleting}>
+                Cancel
+              </Button>
+              <Button variant="contained" danger loading={isDeleting} onclick={handleDeleteConfirm}>
+                Delete
+              </Button>
+            </>
+          }
+        >
+          <p style={{ margin: '0 0 8px' }}>
+            Are you sure you want to delete the following {entriesToDelete.length} item(s)?
+          </p>
+          <ul style={{ margin: '0', paddingLeft: '20px' }}>
+            {entriesToDelete.map((e) => (
+              <li style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '2px 0' }}>
+                <DirectoryEntryIcon entry={e} /> {e.name}
+              </li>
+            ))}
+          </ul>
+        </Dialog>
       </>
     )
   },

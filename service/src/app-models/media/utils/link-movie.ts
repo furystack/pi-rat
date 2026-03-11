@@ -3,8 +3,10 @@ import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import {
   Config,
+  Drive,
   getFallbackMetadata,
   getFileName,
+  getParentPath,
   isMovieFile,
   isSampleFile,
   MovieFile,
@@ -13,9 +15,12 @@ import {
   type PiRatFile,
 } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
+import { getPhysicalParentPath } from '../../../utils/physical-path-utils.js'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { TmdbClientService } from '../metadata-services/tmdb-client-service.js'
 import { ensureMovieExists } from './ensure-movie-exists.js'
+import { extractImdbIdFromFfprobeTags } from './extract-imdb-id-from-tags.js'
+import { extractImdbIdFromNfoFiles } from './extract-imdb-id-from-nfo.js'
 import { ensureOmdbMovieExists } from './ensure-omdb-movie-exists.js'
 import { ensureOmdbSeriesExists } from './ensure-omdb-series-exists.js'
 import { ensureTmdbMovieExists } from './ensure-tmdb-movie-exists.js'
@@ -166,7 +171,57 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
 
-  // Check existing OMDB metadata first (backward compatibility)
+  // Try extracting IMDB ID directly from ffprobe tags or sibling .nfo files
+  const tagImdbId = extractImdbIdFromFfprobeTags(ffprobeResult.format?.tags)
+
+  const driveDataSet = getDataSetFor(injector, Drive, 'letter')
+  const drive = await driveDataSet.get(injector, driveLetter)
+
+  let nfoFiles: string[] = []
+  let nfoImdbId: string | undefined
+
+  if (!tagImdbId && drive) {
+    const physicalParent = getPhysicalParentPath(drive, file)
+    const relativeParent = getParentPath(file)
+    ;({ nfoFiles, imdbId: nfoImdbId } = await extractImdbIdFromNfoFiles(physicalParent, relativeParent))
+  }
+
+  const directImdbId = tagImdbId ?? nfoImdbId
+  const relatedFiles: Array<{ type: 'subtitle' | 'audio' | 'trailer' | 'info' | 'other'; path: string }> = nfoFiles.map(
+    (nfoPath) => ({ type: 'info' as const, path: nfoPath }),
+  )
+
+  if (directImdbId) {
+    const movie = await ensureMovieExists(
+      {
+        imdbId: directImdbId,
+        year,
+        season,
+        episode,
+        type: season != null && episode != null ? 'episode' : 'movie',
+      },
+      injector,
+    )
+
+    const {
+      created: [newMovieFile],
+    } = await movieFileDataSet.add(injector, {
+      driveLetter,
+      path,
+      imdbId: directImdbId,
+      ffprobe: ffprobeResult,
+      ...(relatedFiles.length > 0 ? { relatedFiles } : {}),
+    })
+
+    await logger.debug({
+      message: `File ${fileName} linked successfully (from ${tagImdbId ? 'ffprobe tags' : '.nfo file'}).`,
+      data: { file, movieFile: newMovieFile, movie, source: tagImdbId ? 'ffprobe-tags' : 'nfo-file' },
+    })
+
+    return { status: 'linked', movieFile: newMovieFile, movie } as const
+  }
+
+  // Check existing OMDB metadata (backward compatibility)
   const omdbDataSet = getDataSetFor(injector, OmdbMovieMetadata, 'imdbID')
   const storedResult = await omdbDataSet.find(injector, {
     filter: {

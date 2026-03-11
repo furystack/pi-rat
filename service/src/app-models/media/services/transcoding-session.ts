@@ -415,11 +415,25 @@ export class TranscodingSessionService {
     audioTrackId: number = 0,
     resolution?: string,
   ) {
-    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
-    const session = this.sessions.get(key)
-    if (session) {
-      this.destroySession(session)
-      this.sessions.delete(key)
+    if (resolution !== undefined) {
+      const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+      const session = this.sessions.get(key)
+      if (session) {
+        this.destroySession(session)
+        this.sessions.delete(key)
+      }
+      return
+    }
+
+    const prefix = `${driveLetter}:${path}:${mode}:${audioTrackId}:`
+    const keysToRemove = [...this.sessions.keys()].filter((k) => k.startsWith(prefix))
+    for (const key of keysToRemove) {
+      const session = this.sessions.get(key)
+      if (session) {
+        void this.logger.verbose({ message: `Removing session: ${key}` })
+        this.destroySession(session)
+        this.sessions.delete(key)
+      }
     }
   }
 

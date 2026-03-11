@@ -1,7 +1,7 @@
 import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
+import type { MovieFile, PiRatFile } from 'common'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { PiRatFile } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { TmdbClientService } from '../metadata-services/tmdb-client-service.js'
@@ -10,6 +10,7 @@ import { linkMovie } from './link-movie.js'
 const mockMovieFileStoreFind = vi.fn()
 const mockMovieFileStoreAdd = vi.fn()
 const mockOmdbStoreFind = vi.fn()
+const mockDriveGet = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
   getDataSetFor: (_injector: unknown, model: { name?: string } | ((...args: unknown[]) => unknown)) => {
@@ -28,6 +29,11 @@ vi.mock('@furystack/repository', () => ({
     if (name === 'Config') {
       return {
         get: vi.fn().mockResolvedValue(null),
+      }
+    }
+    if (name === 'Drive') {
+      return {
+        get: (...args: unknown[]) => mockDriveGet(...args) as unknown,
       }
     }
     return {}
@@ -77,13 +83,31 @@ vi.mock('./map-tmdb-to-localized.js', () => ({
   mapTmdbMovieToLocalized: vi.fn().mockReturnValue({}),
 }))
 
-const mockGetFfprobeForPiratFile = vi.fn().mockResolvedValue({ duration: 7200 })
+const mockExtractImdbIdFromFfprobeTags = vi.fn()
+vi.mock('./extract-imdb-id-from-tags.js', () => ({
+  extractImdbIdFromFfprobeTags: (...args: unknown[]) => mockExtractImdbIdFromFfprobeTags(...args) as unknown,
+}))
+
+const mockExtractImdbIdFromNfoFiles = vi.fn()
+vi.mock('./extract-imdb-id-from-nfo.js', () => ({
+  extractImdbIdFromNfoFiles: (...args: unknown[]) => mockExtractImdbIdFromNfoFiles(...args) as unknown,
+}))
+
+vi.mock('../../../utils/physical-path-utils.js', () => ({
+  getPhysicalParentPath: (_drive: unknown, file: { path: string }) =>
+    `/mnt/media/${file.path.split('/').slice(0, -1).join('/')}`,
+}))
+
+const mockGetFfprobeForPiratFile = vi.fn().mockResolvedValue({ format: { tags: {} }, duration: 7200 })
 const mockFetchOmdbMovieMetadata = vi.fn()
 const mockFetchTmdbMovieMetadata = vi.fn()
 
 describe('linkMovie', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockExtractImdbIdFromFfprobeTags.mockReturnValue(undefined)
+    mockExtractImdbIdFromNfoFiles.mockResolvedValue({ nfoFiles: [] })
+    mockDriveGet.mockResolvedValue({ letter: 'A', physicalPath: '/mnt/media' })
   })
 
   const createFile = (path: string): PiRatFile => ({
@@ -272,6 +296,117 @@ describe('linkMovie', () => {
         })
 
         expect(result.status).toBe('metadata-not-found')
+      })
+    })
+  })
+
+  describe('linking via ffprobe tags', () => {
+    it('should link directly when ffprobe tags contain IMDB ID', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromFfprobeTags.mockReturnValue('tt9999999')
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id', path: 'movies/Tagged.Movie.2024.mkv', imdbId: 'tt9999999' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Tagged.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        expect(mockMovieFileStoreAdd).toHaveBeenCalled()
+        expect(mockOmdbStoreFind).not.toHaveBeenCalled()
+        expect(mockFetchOmdbMovieMetadata).not.toHaveBeenCalled()
+        expect(mockFetchTmdbMovieMetadata).not.toHaveBeenCalled()
+      })
+    })
+
+    it('should skip .nfo scanning when ffprobe tags already have IMDB ID', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromFfprobeTags.mockReturnValue('tt8888888')
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        await linkMovie({
+          injector,
+          file: createFile('movies/Tagged.Movie.2024.mkv'),
+        })
+
+        expect(mockExtractImdbIdFromNfoFiles).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('linking via .nfo files', () => {
+    it('should link when .nfo file contains IMDB ID', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromNfoFiles.mockResolvedValue({
+        imdbId: 'tt5555555',
+        nfoFiles: ['movies/movie.nfo'],
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id', path: 'movies/Nfo.Movie.2024.mkv', imdbId: 'tt5555555' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Nfo.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        expect(mockMovieFileStoreAdd).toHaveBeenCalled()
+        expect(mockOmdbStoreFind).not.toHaveBeenCalled()
+        expect(mockFetchOmdbMovieMetadata).not.toHaveBeenCalled()
+      })
+    })
+
+    it('should store .nfo files in relatedFiles when linking via .nfo', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromNfoFiles.mockResolvedValue({
+        imdbId: 'tt4444444',
+        nfoFiles: ['movies/movie.nfo', 'movies/extra.nfo'],
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        await linkMovie({
+          injector,
+          file: createFile('movies/Nfo.Movie.2024.mkv'),
+        })
+
+        const addCall = mockMovieFileStoreAdd.mock.calls[0]
+        const addedEntity = addCall[1] as unknown as MovieFile
+        expect(addedEntity.relatedFiles).toEqual([
+          { type: 'info', path: 'movies/movie.nfo' },
+          { type: 'info', path: 'movies/extra.nfo' },
+        ])
+      })
+    })
+
+    it('should fall back to OMDB/TMDB when .nfo has no IMDB ID', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromNfoFiles.mockResolvedValue({
+        nfoFiles: ['movies/movie.nfo'],
+      })
+      mockOmdbStoreFind.mockResolvedValue([{ imdbID: 'tt1234567', Title: 'Test Movie', Year: '2024' }])
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Test.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        expect(mockOmdbStoreFind).toHaveBeenCalled()
       })
     })
   })
