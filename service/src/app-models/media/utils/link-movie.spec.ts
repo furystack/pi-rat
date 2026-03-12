@@ -457,6 +457,83 @@ describe('linkMovie', () => {
       })
     })
 
+    it('should resolve episode IMDB ID via provider when .nfo has series ID for an episode file', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromNfoFiles.mockResolvedValue({
+        imdbId: 'tt9876543',
+        nfoFiles: ['series/show.nfo'],
+      })
+      mockFetchOmdbMovieMetadata.mockResolvedValue({
+        status: 'success',
+        data: { imdbID: 'tt1111111', Title: 'Episode Title', Year: '2024', Season: '1', Episode: '5' },
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id', path: 'series/Show.S01E05.mkv', imdbId: 'tt1111111' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('series/Show.S01E05.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        const addCall = mockMovieFileStoreAdd.mock.calls[0]
+        const addedEntity = addCall[1] as unknown as MovieFile
+        expect(addedEntity.imdbId).toBe('tt1111111')
+      })
+    })
+
+    it('should fall back to .nfo ID when providers fail for episode file', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromNfoFiles.mockResolvedValue({
+        imdbId: 'tt9876543',
+        nfoFiles: ['series/show.nfo'],
+      })
+      mockFetchOmdbMovieMetadata.mockResolvedValue({ status: 'not-configured' })
+      mockFetchTmdbMovieMetadata.mockResolvedValue({ status: 'not-configured' })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id', path: 'series/Show.S01E05.mkv', imdbId: 'tt9876543' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('series/Show.S01E05.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        const addCall = mockMovieFileStoreAdd.mock.calls[0]
+        const addedEntity = addCall[1] as unknown as MovieFile
+        expect(addedEntity.imdbId).toBe('tt9876543')
+      })
+    })
+
+    it('should use .nfo ID directly for non-episode files without consulting providers', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromNfoFiles.mockResolvedValue({
+        imdbId: 'tt5555555',
+        nfoFiles: ['movies/movie.nfo'],
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id', path: 'movies/Nfo.Movie.2024.mkv', imdbId: 'tt5555555' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        const result = await linkMovie({
+          injector,
+          file: createFile('movies/Nfo.Movie.2024.mkv'),
+        })
+
+        expect(result.status).toBe('linked')
+        const addCall = mockMovieFileStoreAdd.mock.calls[0]
+        const addedEntity = addCall[1] as unknown as MovieFile
+        expect(addedEntity.imdbId).toBe('tt5555555')
+        expect(mockFetchOmdbMovieMetadata).not.toHaveBeenCalled()
+        expect(mockFetchTmdbMovieMetadata).not.toHaveBeenCalled()
+      })
+    })
+
     it('should fall back to OMDB/TMDB when .nfo has no IMDB ID', async () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockExtractImdbIdFromNfoFiles.mockResolvedValue({

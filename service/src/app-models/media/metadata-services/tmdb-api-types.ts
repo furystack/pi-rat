@@ -225,6 +225,7 @@ export type TmdbEpisodeDetailsResponse = {
     order: number
     profile_path: string | null
   }>
+  external_ids?: TmdbExternalIds
 }
 
 // ── Find by External ID ── GET /3/find/{external_id} ─────────────────

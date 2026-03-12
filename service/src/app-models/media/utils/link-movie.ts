@@ -242,43 +242,75 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   )
 
   if (directImdbId) {
-    const movie = await ensureMovieExists(
-      {
-        imdbId: directImdbId,
-        year,
-        season,
-        episode,
-        type: season != null && episode != null ? 'episode' : 'movie',
-      },
-      injector,
-    )
+    const isEpisode = season != null && episode != null
+
+    // For episodes, the NFO/ffprobe ID may be the series ID rather than the episode ID.
+    // Try providers with title+season+episode to resolve the episode-specific IMDB ID.
+    let resolvedImdbId = directImdbId
+    let resolvedMovie: Movie | undefined
+
+    if (isEpisode) {
+      const priority = await getProviderPriority(injector)
+      for (const provider of priority) {
+        const tryProvider = metadataProviders[provider]
+        if (!tryProvider) continue
+
+        const result = await tryProvider(injector, { title, year, season, episode }, { file })
+        if (result.status === 'linked') {
+          resolvedImdbId = result.imdbId
+          resolvedMovie = result.movie
+          break
+        }
+        if (result.status === 'rate-limited') break
+      }
+    }
+
+    if (!resolvedMovie) {
+      resolvedMovie = await ensureMovieExists(
+        {
+          imdbId: resolvedImdbId,
+          year,
+          season,
+          episode,
+          type: isEpisode ? 'episode' : 'movie',
+        },
+        injector,
+      )
+    }
 
     const {
       created: [newMovieFile],
     } = await movieFileDataSet.add(injector, {
       driveLetter,
       path,
-      imdbId: directImdbId,
+      imdbId: resolvedImdbId,
       ffprobe: ffprobeResult,
       ...(relatedFiles.length > 0 ? { relatedFiles } : {}),
     })
 
+    const source = tagImdbId ? 'ffprobe-tags' : 'nfo-file'
+    const resolvedViaProvider = isEpisode && resolvedImdbId !== directImdbId
+
     await logger.debug({
-      message: `File ${fileName} linked successfully (from ${tagImdbId ? 'ffprobe tags' : '.nfo file'}).`,
-      data: { file, movieFile: newMovieFile, movie, source: tagImdbId ? 'ffprobe-tags' : 'nfo-file' },
+      message: `File ${fileName} linked successfully (from ${source}${resolvedViaProvider ? ', episode ID resolved via provider' : ''}).`,
+      data: { file, movieFile: newMovieFile, movie: resolvedMovie, source },
     })
 
-    // Fire-and-forget: enrich localized metadata via providers
-    void enrichMetadataFromProviders(injector, { title, year, season, episode, imdbId: directImdbId }, { file }).catch(
-      (error) => {
+    // Fire-and-forget: enrich localized metadata (skip if already resolved via provider for episodes)
+    if (!resolvedViaProvider) {
+      void enrichMetadataFromProviders(
+        injector,
+        { title, year, season, episode, imdbId: resolvedImdbId },
+        { file },
+      ).catch((error) => {
         void logger.warning({
           message: `Failed to enrich metadata for '${fileName}' after direct-ID link`,
           data: { error },
         })
-      },
-    )
+      })
+    }
 
-    return { status: 'linked', movieFile: newMovieFile, movie } as const
+    return { status: 'linked', movieFile: newMovieFile, movie: resolvedMovie } as const
   }
 
   // Check existing OMDB metadata (backward compatibility)

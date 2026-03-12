@@ -377,6 +377,16 @@ describe('TmdbClientService', () => {
       const calledUrl = mockFetch.mock.calls[0][0] as string
       expect(calledUrl).toContain('/tv/67890/season/2/episode/3')
     })
+
+    it('should include append_to_response for external_ids', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(createMockResponse(createEpisodeDetailsResponse()))
+      globalThis.fetch = mockFetch
+
+      await service.getEpisodeDetails(67890, 1, 5)
+
+      const calledUrl = mockFetch.mock.calls[0][0] as string
+      expect(calledUrl).toContain('append_to_response=external_ids')
+    })
   })
 
   describe('findByImdbId', () => {
@@ -675,6 +685,54 @@ describe('TmdbClientService', () => {
         expect(result.data.movie.runtime).toBe(60)
       }
     })
+
+    it('should use episode IMDB ID when available instead of series IMDB ID', async () => {
+      expect.assertions(2)
+
+      const searchTvResponse = createSearchTvResponse([{ id: 67890 }])
+      const tvDetailsResponse = createTvDetailsResponse()
+      const episodeResponse = createEpisodeDetailsResponse({
+        external_ids: {
+          imdb_id: 'tt1111111',
+          facebook_id: null,
+          instagram_id: null,
+          twitter_id: null,
+          wikidata_id: null,
+        },
+      })
+
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(createMockResponse(searchTvResponse))
+        .mockResolvedValueOnce(createMockResponse(tvDetailsResponse))
+        .mockResolvedValueOnce(createMockResponse(episodeResponse))
+
+      const result = await service.fetchTmdbMovieMetadata({ title: 'Test Series', season: 1, episode: 5 })
+      expect(result.status).toBe('success')
+      if (result.status === 'success') {
+        expect(result.data.movie.imdb_id).toBe('tt1111111')
+      }
+    })
+
+    it('should fall back to series IMDB ID when episode has no external_ids', async () => {
+      expect.assertions(2)
+
+      const searchTvResponse = createSearchTvResponse([{ id: 67890 }])
+      const tvDetailsResponse = createTvDetailsResponse()
+      const episodeResponse = createEpisodeDetailsResponse()
+
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(createMockResponse(searchTvResponse))
+        .mockResolvedValueOnce(createMockResponse(tvDetailsResponse))
+        .mockResolvedValueOnce(createMockResponse(episodeResponse))
+
+      const result = await service.fetchTmdbMovieMetadata({ title: 'Test Series', season: 1, episode: 5 })
+      expect(result.status).toBe('success')
+      if (result.status === 'success') {
+        expect(result.data.movie.imdb_id).toBe('tt9876543')
+      }
+    })
   })
 
   describe('fetchTmdbMovieMetadataByImdbId', () => {
@@ -745,6 +803,38 @@ describe('TmdbClientService', () => {
       expect(result.status).toBe('success')
       if (result.status === 'success') {
         expect(result.data.series?.name).toBe('Test Series')
+      }
+    })
+
+    it('should use episode IMDB ID when resolving episode via tv_results', async () => {
+      expect.assertions(2)
+
+      const findResponse = createFindByIdResponse({
+        tv_results: [{ id: 67890 } as TmdbSearchTvResult],
+      })
+      const tvDetailsResponse = createTvDetailsResponse()
+      const episodeResponse = createEpisodeDetailsResponse({
+        season_number: 1,
+        episode_number: 5,
+        external_ids: {
+          imdb_id: 'tt2222222',
+          facebook_id: null,
+          instagram_id: null,
+          twitter_id: null,
+          wikidata_id: null,
+        },
+      })
+
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(createMockResponse(findResponse))
+        .mockResolvedValueOnce(createMockResponse(tvDetailsResponse))
+        .mockResolvedValueOnce(createMockResponse(episodeResponse))
+
+      const result = await service.fetchTmdbMovieMetadataByImdbId({ imdbId: 'tt9876543', season: 1, episode: 5 })
+      expect(result.status).toBe('success')
+      if (result.status === 'success') {
+        expect(result.data.movie.imdb_id).toBe('tt2222222')
       }
     })
 

@@ -201,6 +201,7 @@ export class TmdbClientService {
   ): Promise<MetadataFetchResult<TmdbEpisodeDetailsResponse>> {
     const params = new URLSearchParams({
       language: this.getLanguage(options?.language),
+      append_to_response: 'external_ids',
     })
 
     const path = `/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}?${params}`
@@ -283,8 +284,8 @@ export class TmdbClientService {
     const tvResult = await this.getTvDetails(tvId)
     if (tvResult.status !== 'success') return tvResult
 
-    const imdbId = tvResult.data.external_ids?.imdb_id
-    if (!imdbId) {
+    const seriesImdbId = tvResult.data.external_ids?.imdb_id
+    if (!seriesImdbId) {
       await this.logger.debug({
         message: `TMDB TV #${tvId} has no IMDB ID, skipping (D1)`,
         data: { file: context?.file },
@@ -295,10 +296,12 @@ export class TmdbClientService {
     const episodeResult = await this.getEpisodeDetails(tvId, season, episode)
     if (episodeResult.status !== 'success') return episodeResult
 
+    const episodeImdbId = episodeResult.data.external_ids?.imdb_id ?? seriesImdbId
+
     return {
       status: 'success',
       data: {
-        movie: buildSyntheticMovieFromEpisode(tvResult.data, episodeResult.data, imdbId),
+        movie: buildSyntheticMovieFromEpisode(tvResult.data, episodeResult.data, episodeImdbId),
         episode: episodeResult.data,
         series: tvResult.data,
       },
@@ -392,10 +395,12 @@ export class TmdbClientService {
           const episodeResult = await this.getEpisodeDetails(tvId, season, episode)
           if (episodeResult.status !== 'success') return episodeResult
 
+          const episodeImdbId = episodeResult.data.external_ids?.imdb_id ?? seriesImdbId
+
           return {
             status: 'success',
             data: {
-              movie: buildSyntheticMovieFromEpisode(tvResult.data, episodeResult.data, seriesImdbId),
+              movie: buildSyntheticMovieFromEpisode(tvResult.data, episodeResult.data, episodeImdbId),
               episode: episodeResult.data,
               series: tvResult.data,
             },
