@@ -59,6 +59,7 @@ export const DrivesPage = Shade({
           focused={focused === 'ld'}
           searchStateKey="ld"
           defaultDriveLetter={drives.value.entries[0].letter}
+          availableDriveLetters={drives.value.entries.map((e) => e.letter)}
           onclick={() => setFocused('ld')}
           onkeyup={(ev) => {
             if (ev.key === 'Tab') {
@@ -72,6 +73,7 @@ export const DrivesPage = Shade({
           focused={focused === 'rd'}
           searchStateKey="rd"
           defaultDriveLetter={drives.value.entries[0].letter}
+          availableDriveLetters={drives.value.entries.map((e) => e.letter)}
           onclick={() => setFocused('rd')}
           onkeyup={(ev) => {
             if (ev.key === 'Tab') {

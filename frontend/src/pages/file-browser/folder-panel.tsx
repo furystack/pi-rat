@@ -23,6 +23,7 @@ const upEntry: DirectoryEntry = {
 export const FolderPanel = Shade<{
   searchStateKey: string
   defaultDriveLetter: string
+  availableDriveLetters: string[]
   focused?: boolean
 }>({
   customElementName: 'folder-panel',
@@ -50,6 +51,11 @@ export const FolderPanel = Shade<{
     const { letter, path } = currentDrive
 
     if (!letter || !path) {
+      return null
+    }
+
+    if (!props.availableDriveLetters.includes(letter)) {
+      setCurrentDrive({ path: '/', letter: props.defaultDriveLetter })
       return null
     }
 
