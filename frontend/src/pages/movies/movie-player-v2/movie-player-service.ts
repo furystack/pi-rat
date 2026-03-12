@@ -435,6 +435,7 @@ export class MoviePlayerService implements AsyncDisposable {
     const onCanPlay = () => {
       video.removeEventListener('canplay', onCanPlay)
       this.isSwitching.setValue(false)
+      // play() can reject with AbortError when navigation interrupts playback; this is benign
       void video.play().catch(() => {})
     }
     video.addEventListener('canplay', onCanPlay)

@@ -14,3 +14,4 @@ This file contains a list of helpful information and context that the agent can 
 - [MFE runtime type boundaries, duplicate type contracts, and cross-package type sync](./MFE_TYPE_CONTRACTS.md)
 - [Double-cast anti-pattern (`as unknown as T`) and non-null assertion avoidance](./TYPESCRIPT_GUIDELINES.mdc)
 - [Provider/adapter fallback chain patterns with narrow internal result types](./BACKEND_PATTERNS.mdc)
+- [Fire-and-forget error handling, `fs/promises` in async contexts, and `void` promise patterns](./ASYNC_PATTERNS.mdc)

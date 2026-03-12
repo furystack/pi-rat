@@ -409,7 +409,7 @@ describe('TranscodingSessionService', () => {
       if (existsSync(testDir)) rmSync(testDir, { recursive: true, force: true })
     })
 
-    it('should calculate session disk usage', () => {
+    it('should calculate session disk usage', async () => {
       const sessionDir = join(testDir, 'session1')
       mkdirSync(sessionDir, { recursive: true })
       writeFileSync(join(sessionDir, 'segment0.m4s'), Buffer.alloc(1000))
@@ -419,20 +419,20 @@ describe('TranscodingSessionService', () => {
       const service = new TranscodingSessionService()
       try {
         const mockSession = { sessionDir } as Parameters<typeof service.getSessionDiskUsage>[0]
-        const usage = service.getSessionDiskUsage(mockSession)
+        const usage = await service.getSessionDiskUsage(mockSession)
         expect(usage).toBe(3500)
       } finally {
         service.dispose()
       }
     })
 
-    it('should return 0 for non-existent session directory', () => {
+    it('should return 0 for non-existent session directory', async () => {
       const service = new TranscodingSessionService()
       try {
         const mockSession = { sessionDir: join(testDir, 'nonexistent') } as Parameters<
           typeof service.getSessionDiskUsage
         >[0]
-        const usage = service.getSessionDiskUsage(mockSession)
+        const usage = await service.getSessionDiskUsage(mockSession)
         expect(usage).toBe(0)
       } finally {
         service.dispose()
@@ -469,7 +469,7 @@ describe('TranscodingSessionService', () => {
           writeFileSync(join(s1.sessionDir, 'segment0.m4s'), Buffer.alloc(100))
           writeFileSync(join(s2.sessionDir, 'segment0.m4s'), Buffer.alloc(200))
 
-          const total = service.getTotalDiskUsage()
+          const total = await service.getTotalDiskUsage()
           expect(total).toBe(300)
         } finally {
           service.dispose()

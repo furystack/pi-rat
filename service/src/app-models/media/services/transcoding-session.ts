@@ -6,8 +6,9 @@ import type { PlaybackMode } from 'common'
 import { Config, Drive, HLS_SEGMENT_DURATION, type MoviesConfig } from 'common'
 import { spawn, type ChildProcess } from 'child_process'
 import { createHash } from 'crypto'
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'fs'
-import { readFile } from 'fs/promises'
+import { existsSync, mkdirSync, rmSync } from 'fs'
+import { mkdir, readdir, readFile, stat } from 'fs/promises'
+import { existsAsync } from '../../../utils/exists-async.js'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { FfprobeService } from '../../../ffprobe-service.js'
@@ -97,7 +98,7 @@ export class TranscodingSessionService {
       const configDataSet = getDataSetFor(this.injector, Config, 'id')
       const config = (await configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
       const dir = config?.value?.hlsSegmentPath || join(tmpdir(), 'pirat-hls-sessions')
-      if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+      if (!(await existsAsync(dir))) await mkdir(dir, { recursive: true })
       this.baseDirCache = dir
 
       const mb = config?.value?.hlsMaxCacheSizeMb ?? DEFAULT_MAX_CACHE_SIZE_MB
@@ -171,8 +172,8 @@ export class TranscodingSessionService {
   ): Promise<TranscodingSessionEntry> {
     await this.getBaseDirFromConfig()
     const sessionDir = this.getSessionDir(key)
-    if (!existsSync(sessionDir)) {
-      mkdirSync(sessionDir, { recursive: true })
+    if (!(await existsAsync(sessionDir))) {
+      await mkdir(sessionDir, { recursive: true })
     }
 
     const { args: ffmpegArgs, totalDuration } = await this.buildHlsFfmpegArgs({
@@ -229,7 +230,9 @@ export class TranscodingSessionService {
     })
 
     this.sessions.set(key, session)
-    void this.evictByDiskUsage()
+    void this.evictByDiskUsage().catch((error) => {
+      void this.logger.error({ message: 'Failed to evict sessions by disk usage', data: { error } })
+    })
     return session
   }
 
@@ -241,23 +244,22 @@ export class TranscodingSessionService {
     const deadline = Date.now() + WAIT_TIMEOUT_MS
 
     while (Date.now() < deadline) {
-      if (existsSync(filePath)) {
-        // For segments, check that the file has non-zero size
+      if (await existsAsync(filePath)) {
         try {
-          const stat = statSync(filePath)
-          if (stat.size > 0) return true
+          const fileStat = await stat(filePath)
+          if (fileStat.size > 0) return true
         } catch {
           // File might have been deleted between check and stat
         }
       }
 
       if (session.state === 'error') return false
-      if (session.state === 'completed' && !existsSync(filePath)) return false
+      if (session.state === 'completed' && !(await existsAsync(filePath))) return false
 
       await new Promise((resolve) => setTimeout(resolve, WAIT_POLL_INTERVAL_MS))
     }
 
-    return existsSync(filePath)
+    return existsAsync(filePath)
   }
 
   /**
@@ -270,9 +272,8 @@ export class TranscodingSessionService {
     const deadline = Date.now() + WAIT_TIMEOUT_MS
 
     while (Date.now() < deadline) {
-      if (existsSync(segmentPath)) {
-        // Segment is fully written if the next one exists or ffmpeg is done
-        if (existsSync(nextSegmentPath) || session.state === 'completed' || session.state === 'error') {
+      if (await existsAsync(segmentPath)) {
+        if ((await existsAsync(nextSegmentPath)) || session.state === 'completed' || session.state === 'error') {
           return true
         }
       }
@@ -282,7 +283,7 @@ export class TranscodingSessionService {
       await new Promise((resolve) => setTimeout(resolve, WAIT_POLL_INTERVAL_MS))
     }
 
-    return existsSync(segmentPath)
+    return existsAsync(segmentPath)
   }
 
   public async readPlaylist(session: TranscodingSessionEntry): Promise<string | null> {
@@ -522,16 +523,19 @@ export class TranscodingSessionService {
   /**
    * Returns the total bytes used by a session's directory on disk.
    */
-  public getSessionDiskUsage(session: TranscodingSessionEntry): number {
+  public async getSessionDiskUsage(session: TranscodingSessionEntry): Promise<number> {
     try {
-      if (!existsSync(session.sessionDir)) return 0
-      return readdirSync(session.sessionDir).reduce((total, file) => {
+      if (!(await existsAsync(session.sessionDir))) return 0
+      const files = await readdir(session.sessionDir)
+      let total = 0
+      for (const file of files) {
         try {
-          return total + statSync(join(session.sessionDir, file)).size
+          total += (await stat(join(session.sessionDir, file))).size
         } catch {
-          return total
+          // File may have been deleted
         }
-      }, 0)
+      }
+      return total
     } catch {
       return 0
     }
@@ -540,10 +544,10 @@ export class TranscodingSessionService {
   /**
    * Returns the total bytes used across all active session directories.
    */
-  public getTotalDiskUsage(): number {
+  public async getTotalDiskUsage(): Promise<number> {
     let total = 0
     for (const session of this.sessions.values()) {
-      total += this.getSessionDiskUsage(session)
+      total += await this.getSessionDiskUsage(session)
     }
     return total
   }
@@ -567,7 +571,7 @@ export class TranscodingSessionService {
    */
   private async evictByDiskUsage(): Promise<void> {
     const maxBytes = await this.loadMaxCacheSize()
-    let totalUsage = this.getTotalDiskUsage()
+    let totalUsage = await this.getTotalDiskUsage()
     if (totalUsage <= maxBytes) return
 
     // Sort sessions by lastAccessedAt ascending (oldest first), prefer completed/error over active
@@ -580,7 +584,7 @@ export class TranscodingSessionService {
 
     for (const [key, session] of candidates) {
       if (totalUsage <= maxBytes) break
-      const usage = this.getSessionDiskUsage(session)
+      const usage = await this.getSessionDiskUsage(session)
       void this.logger.verbose({
         message: `Evicting session for cache limit: ${key} (${Math.round(usage / BYTES_PER_MB)}MB)`,
       })
@@ -607,7 +611,9 @@ export class TranscodingSessionService {
       }
     }
 
-    void this.evictByDiskUsage()
+    void this.evictByDiskUsage().catch((error) => {
+      void this.logger.error({ message: 'Failed to evict sessions by disk usage', data: { error } })
+    })
   }
 
   private destroySession(session: TranscodingSessionEntry) {

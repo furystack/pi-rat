@@ -1,0 +1,88 @@
+---
+alwaysApply: false
+---
+# Async Patterns
+
+## Fire-and-Forget Promises Must Handle Errors
+
+Every fire-and-forget `void` promise call must include a `.catch()` that logs the error. An unhandled async rejection is a silent bug.
+
+```typescript
+// ✅ Good — error is logged
+void this.evictByDiskUsage().catch((error) => {
+  void this.logger.error({ message: 'Failed to evict by disk usage', data: { error } })
+})
+
+// ✅ Good — singleton init pattern (see SINGLETON_CONCURRENCY.md)
+void this.initAsync().catch((error) => {
+  void this.logger.error({ message: 'Failed to initialize service', data: { error } })
+})
+
+// ❌ Bad — error silently lost
+void this.evictByDiskUsage()
+
+// ❌ Bad — empty catch swallows errors
+void this.evictByDiskUsage().catch(() => {})
+```
+
+### Exception: Browser `video.play()`
+
+Browser `HTMLMediaElement.play()` rejects with `AbortError` when navigation interrupts playback. This is benign and expected. An empty `.catch(() => {})` is acceptable **only** with an explanatory comment.
+
+```typescript
+// ✅ Acceptable — benign browser rejection documented
+// play() can reject with AbortError when navigation interrupts playback; this is benign
+void video.play().catch(() => {})
+```
+
+### When `void` logger calls are fine
+
+Logger methods return promises but are fire-and-forget by design. `void this.logger.verbose(...)` is the correct pattern — do not `await` logger calls in hot paths.
+
+### When `void` in frontend event handlers is fine
+
+Sync DOM callbacks (`onclick`, `onsubmit`, `ondrop`) cannot be `async`. Using `void asyncFn()` is correct when the called function handles its own errors internally (e.g., shows user-facing error notifications).
+
+## Prefer `fs/promises` in Async Contexts
+
+When inside an `async` function, use `fs/promises` instead of sync `fs` methods to avoid blocking the Node.js event loop.
+
+```typescript
+// ✅ Good — non-blocking in async context
+import { mkdir, stat, readdir, rm } from 'fs/promises'
+import { existsAsync } from '../../../utils/exists-async.js'
+
+async function ensureDir(dir: string) {
+  if (!(await existsAsync(dir))) {
+    await mkdir(dir, { recursive: true })
+  }
+}
+
+// ❌ Bad — blocks event loop in async context
+import { existsSync, mkdirSync } from 'fs'
+
+async function ensureDir(dir: string) {
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true })
+  }
+}
+```
+
+### Mapping sync → async
+
+| Sync                     | Async equivalent                                   |
+| ------------------------ | -------------------------------------------------- |
+| `existsSync(p)`          | `existsAsync(p)` (from `service/src/utils/exists-async.ts`) |
+| `statSync(p)`            | `stat(p)` from `fs/promises`                       |
+| `mkdirSync(p, opts)`     | `mkdir(p, opts)` from `fs/promises`                |
+| `readdirSync(p, opts)`   | `readdir(p, opts)` from `fs/promises`              |
+| `rmSync(p, opts)`        | `rm(p, opts)` from `fs/promises`                   |
+| `readFileSync(p, enc)`   | `readFile(p, enc)` from `fs/promises`              |
+| `writeFileSync(p, data)` | `writeFile(p, data)` from `fs/promises`            |
+
+### When sync FS is acceptable
+
+- **Sync-only API contracts:** Vite middleware, Vite build hooks, Express middleware
+- **Test setup/teardown:** `beforeEach` / `afterEach` with small temp directories
+- **One-time cached helpers:** Sync helper that runs once and caches the result (e.g., `getBaseDir()`)
+- **Synchronous process cleanup:** `destroySession()` where the caller needs the directory removed before the reference is dropped

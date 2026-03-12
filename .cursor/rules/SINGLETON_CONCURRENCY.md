@@ -56,6 +56,8 @@ Apply this pattern when **all** of the following are true:
 
 ## Fire-and-Forget Async Initialization
 
+> See also [ASYNC_PATTERNS.mdc](./ASYNC_PATTERNS.mdc) for the broader rule on fire-and-forget promises and `fs/promises` usage.
+
 Singleton services that need async initialization (e.g., loading config from a database, connecting to external APIs) should **not** block startup. Use a synchronous `init()` that kicks off the async work and logs errors.
 
 ### The Problem
