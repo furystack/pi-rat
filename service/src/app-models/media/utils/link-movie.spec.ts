@@ -100,7 +100,9 @@ vi.mock('../../../utils/physical-path-utils.js', () => ({
 
 const mockGetFfprobeForPiratFile = vi.fn().mockResolvedValue({ format: { tags: {} }, duration: 7200 })
 const mockFetchOmdbMovieMetadata = vi.fn()
+const mockFetchOmdbMovieMetadataByImdbId = vi.fn()
 const mockFetchTmdbMovieMetadata = vi.fn()
+const mockFetchTmdbMovieMetadataByImdbId = vi.fn()
 
 describe('linkMovie', () => {
   beforeEach(() => {
@@ -124,12 +126,19 @@ describe('linkMovie', () => {
     )
 
     injector.setExplicitInstance(
-      { fetchOmdbMovieMetadata: mockFetchOmdbMovieMetadata } as unknown as OmdbClientService,
+      {
+        fetchOmdbMovieMetadata: mockFetchOmdbMovieMetadata,
+        fetchOmdbMovieMetadataByImdbId: mockFetchOmdbMovieMetadataByImdbId,
+      } as unknown as OmdbClientService,
       OmdbClientService,
     )
 
     injector.setExplicitInstance(
-      { fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata, config: undefined } as unknown as TmdbClientService,
+      {
+        fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+        fetchTmdbMovieMetadataByImdbId: mockFetchTmdbMovieMetadataByImdbId,
+        config: undefined,
+      } as unknown as TmdbClientService,
       TmdbClientService,
     )
 
@@ -322,6 +331,34 @@ describe('linkMovie', () => {
       })
     })
 
+    it('should enrich metadata via OMDB by IMDB ID after direct-ID link', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromFfprobeTags.mockReturnValue('tt9999999')
+      mockFetchOmdbMovieMetadataByImdbId.mockResolvedValue({
+        status: 'success',
+        data: { imdbID: 'tt9999999', Title: 'Tagged Movie', Year: '2024' },
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id', path: 'movies/Tagged.Movie.2024.mkv', imdbId: 'tt9999999' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        await linkMovie({
+          injector,
+          file: createFile('movies/Tagged.Movie.2024.mkv'),
+        })
+
+        // Wait for fire-and-forget enrichment
+        await new Promise((resolve) => setTimeout(resolve, 10))
+
+        expect(mockFetchOmdbMovieMetadataByImdbId).toHaveBeenCalledWith(
+          { imdbId: 'tt9999999' },
+          expect.objectContaining({ file: expect.objectContaining({ driveLetter: 'A' }) }),
+        )
+        expect(mockFetchOmdbMovieMetadata).not.toHaveBeenCalled()
+      })
+    })
+
     it('should skip .nfo scanning when ffprobe tags already have IMDB ID', async () => {
       mockMovieFileStoreFind.mockResolvedValue([])
       mockExtractImdbIdFromFfprobeTags.mockReturnValue('tt8888888')
@@ -386,6 +423,37 @@ describe('linkMovie', () => {
           { type: 'info', path: 'movies/movie.nfo' },
           { type: 'info', path: 'movies/extra.nfo' },
         ])
+      })
+    })
+
+    it('should enrich metadata via OMDB by IMDB ID after .nfo link', async () => {
+      mockMovieFileStoreFind.mockResolvedValue([])
+      mockExtractImdbIdFromNfoFiles.mockResolvedValue({
+        imdbId: 'tt5555555',
+        nfoFiles: ['movies/movie.nfo'],
+      })
+      mockFetchOmdbMovieMetadataByImdbId.mockResolvedValue({
+        status: 'success',
+        data: { imdbID: 'tt5555555', Title: 'Nfo Movie', Year: '2024' },
+      })
+      mockMovieFileStoreAdd.mockResolvedValue({
+        created: [{ id: 'new-file-id', path: 'movies/Nfo.Movie.2024.mkv', imdbId: 'tt5555555' }],
+      })
+
+      await usingAsync(createTestInjector(), async (injector) => {
+        await linkMovie({
+          injector,
+          file: createFile('movies/Nfo.Movie.2024.mkv'),
+        })
+
+        // Wait for fire-and-forget enrichment
+        await new Promise((resolve) => setTimeout(resolve, 10))
+
+        expect(mockFetchOmdbMovieMetadataByImdbId).toHaveBeenCalledWith(
+          { imdbId: 'tt5555555' },
+          expect.objectContaining({ file: expect.objectContaining({ driveLetter: 'A' }) }),
+        )
+        expect(mockFetchOmdbMovieMetadata).not.toHaveBeenCalled()
       })
     })
 

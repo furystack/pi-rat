@@ -418,6 +418,42 @@ describe('TmdbClientService', () => {
     })
   })
 
+  describe('request deduplication', () => {
+    it('should deduplicate concurrent requests for the same endpoint', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(createMockResponse(createSearchMovieResponse([{ id: 1 }])))
+      globalThis.fetch = mockFetch
+
+      const [result1, result2] = await Promise.all([
+        service.searchMovie('Test Movie'),
+        service.searchMovie('Test Movie'),
+      ])
+
+      expect(result1.status).toBe('success')
+      expect(result2.status).toBe('success')
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should make separate requests for different endpoints', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(createMockResponse(createSearchMovieResponse([{ id: 1 }])))
+      globalThis.fetch = mockFetch
+
+      await service.searchMovie('Movie A')
+      await service.searchMovie('Movie B')
+
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should make a fresh request after the previous one completes', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(createMockResponse(createSearchMovieResponse([{ id: 1 }])))
+      globalThis.fetch = mockFetch
+
+      await service.searchMovie('Test Movie')
+      await service.searchMovie('Test Movie')
+
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+  })
+
   describe('rate limit handling', () => {
     it('should return rate-limited after exhausting retries', async () => {
       vi.useFakeTimers()
@@ -638,6 +674,93 @@ describe('TmdbClientService', () => {
         expect(result.data.movie.title).toBe('Pilot')
         expect(result.data.movie.runtime).toBe(60)
       }
+    })
+  })
+
+  describe('fetchTmdbMovieMetadataByImdbId', () => {
+    it('should return not-configured when config is missing', async () => {
+      service.config = undefined
+      const result = await service.fetchTmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      expect(result.status).toBe('not-configured')
+    })
+
+    it('should resolve a movie via movie_results', async () => {
+      expect.assertions(2)
+
+      const findResponse = createFindByIdResponse({
+        movie_results: [{ id: 12345 } as TmdbSearchMovieResult],
+      })
+      const detailsResponse = createMovieDetailsResponse({ imdb_id: 'tt1234567' })
+
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(createMockResponse(findResponse))
+        .mockResolvedValueOnce(createMockResponse(detailsResponse))
+
+      const result = await service.fetchTmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      expect(result.status).toBe('success')
+      if (result.status === 'success') {
+        expect(result.data.movie.imdb_id).toBe('tt1234567')
+      }
+    })
+
+    it('should resolve an episode via tv_results when season and episode are provided', async () => {
+      expect.assertions(4)
+
+      const findResponse = createFindByIdResponse({
+        tv_results: [{ id: 67890 } as TmdbSearchTvResult],
+      })
+      const tvDetailsResponse = createTvDetailsResponse()
+      const episodeResponse = createEpisodeDetailsResponse({ season_number: 1, episode_number: 5 })
+
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(createMockResponse(findResponse))
+        .mockResolvedValueOnce(createMockResponse(tvDetailsResponse))
+        .mockResolvedValueOnce(createMockResponse(episodeResponse))
+
+      const result = await service.fetchTmdbMovieMetadataByImdbId({ imdbId: 'tt9876543', season: 1, episode: 5 })
+      expect(result.status).toBe('success')
+      if (result.status === 'success') {
+        expect(result.data.series?.name).toBe('Test Series')
+        expect(result.data.episode?.season_number).toBe(1)
+        expect(result.data.episode?.episode_number).toBe(5)
+      }
+    })
+
+    it('should handle tv_results without season/episode by building synthetic movie from series', async () => {
+      expect.assertions(2)
+
+      const findResponse = createFindByIdResponse({
+        tv_results: [{ id: 67890 } as TmdbSearchTvResult],
+      })
+      const tvDetailsResponse = createTvDetailsResponse({ name: 'Test Series' })
+
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(createMockResponse(findResponse))
+        .mockResolvedValueOnce(createMockResponse(tvDetailsResponse))
+
+      const result = await service.fetchTmdbMovieMetadataByImdbId({ imdbId: 'tt9876543' })
+      expect(result.status).toBe('success')
+      if (result.status === 'success') {
+        expect(result.data.series?.name).toBe('Test Series')
+      }
+    })
+
+    it('should return not-found when no movie or tv results', async () => {
+      const findResponse = createFindByIdResponse()
+      globalThis.fetch = vi.fn().mockResolvedValue(createMockResponse(findResponse))
+
+      const result = await service.fetchTmdbMovieMetadataByImdbId({ imdbId: 'tt0000000' })
+      expect(result.status).toBe('not-found')
+    })
+
+    it('should return error when fetch throws', async () => {
+      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
+
+      const result = await service.fetchTmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      expect(result.status).toBe('error')
     })
   })
 

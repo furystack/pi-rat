@@ -5,6 +5,8 @@ import { getDataSetFor, type DataSet } from '@furystack/repository'
 import { AiChatMessage, Config, type AiChat, type OllamaConfig } from 'common'
 import type { Message } from 'ollama'
 import { Ollama, type ChatRequest } from 'ollama'
+
+import { type ConfigWatcher, createConfigWatcher } from '../utils/config-watcher.js'
 import { isToolingSupported, OllamaTools } from './tools/ollama-tools.js'
 
 const jsonFormat = {
@@ -50,52 +52,30 @@ export class OllamaClientService {
   @Injected((injector) => useSystemIdentityContext({ injector, username: 'ollama-service' }))
   declare private systemInjector: Injector
 
-  declare ollama: Ollama
+  declare ollama: Ollama | undefined
 
-  private isValidOllamaConfig<T extends Config>(config: T): config is T & OllamaConfig {
-    return (
-      config !== undefined &&
-      config.id === 'OLLAMA_CONFIG' &&
-      typeof config.value === 'object' &&
-      'host' in config.value &&
-      typeof config.value.host === 'string' &&
-      config.value.host.trim() !== ''
-    )
+  private configWatcher?: ConfigWatcher
+
+  public init() {
+    void this.initAsync().catch((error) => {
+      void this.logger.error({ message: 'Failed to initialize Ollama Client Service', data: { error } })
+    })
   }
 
-  private getOllamaConfig = async (): Promise<OllamaConfig | undefined> => {
-    const [ollamaConfig] = await this.configDataSet.find(this.systemInjector, {
-      top: 1,
-      filter: {
-        id: { $eq: 'OLLAMA_CONFIG' },
+  private async initAsync() {
+    this.configWatcher?.dispose()
+    this.configWatcher = createConfigWatcher<OllamaConfig>({
+      configDataSet: this.configDataSet,
+      systemInjector: this.systemInjector,
+      logger: this.logger,
+      configId: 'OLLAMA_CONFIG',
+      serviceName: 'Ollama Service',
+      onChange: (config) => {
+        this.config = config
+        this.ollama = config ? new Ollama({ host: config.value.host }) : undefined
       },
     })
-
-    if (!ollamaConfig || !this.isValidOllamaConfig(ollamaConfig)) {
-      return undefined
-    }
-
-    return this.isValidOllamaConfig(ollamaConfig) ? ollamaConfig : undefined
-  }
-
-  public async init() {
-    const config = await this.getOllamaConfig()
-    if (!config) {
-      this.config = undefined
-      await this.logger.information({
-        message: '🚫   No config found, Ollama Service will not be initialized',
-      })
-      return
-    }
-
-    this.config = config
-    this.ollama = new Ollama({
-      host: this.config?.value.host,
-    })
-
-    await this.logger.verbose({
-      message: '✅   Ollama Service initialized',
-    })
+    await this.configWatcher.init()
   }
 
   public getSupportedModels = async () => {

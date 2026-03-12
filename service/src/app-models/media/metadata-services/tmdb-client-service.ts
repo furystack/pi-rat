@@ -7,6 +7,7 @@ import { Semaphore, sleepAsync } from '@furystack/utils'
 import type { TmdbConfig, PiRatFile } from 'common'
 import { Config } from 'common'
 
+import { type ConfigWatcher, createConfigWatcher } from '../../../utils/config-watcher.js'
 import type {
   TmdbMovieDetailsResponse,
   TmdbTvDetailsResponse,
@@ -17,13 +18,7 @@ import type {
   TmdbSearchTvResult,
 } from './tmdb-api-types.js'
 import { buildSyntheticMovieFromEpisode } from './build-synthetic-movie.js'
-
-export type TmdbFetchResult<T> =
-  | { status: 'success'; data: T }
-  | { status: 'not-found' }
-  | { status: 'rate-limited' }
-  | { status: 'not-configured' }
-  | { status: 'error'; error: unknown }
+import type { MetadataFetchResult } from './metadata-fetch-result.js'
 
 const MAX_RETRIES = 3
 const INITIAL_BACKOFF_MS = 2_000
@@ -51,6 +46,9 @@ export class TmdbClientService {
   declare private systemInjector: Injector
 
   private readonly semaphore = new Semaphore(1)
+  private readonly pendingRequests = new Map<string, Promise<MetadataFetchResult<unknown>>>()
+
+  private configWatcher?: ConfigWatcher
 
   private getLanguage(override?: string): string {
     return override ?? this.config?.value.defaultLanguage ?? 'en-US'
@@ -62,63 +60,40 @@ export class TmdbClientService {
     })
   }
 
-  private configSubscriptions: Disposable[] = []
-
   private async initAsync() {
-    for (const sub of this.configSubscriptions) {
-      sub[Symbol.dispose]()
-    }
-    this.configSubscriptions = []
+    this.configWatcher?.dispose()
+    this.configWatcher = createConfigWatcher<TmdbConfig>({
+      configDataSet: this.configDataSet,
+      systemInjector: this.systemInjector,
+      logger: this.logger,
+      configId: 'TMDB_CONFIG',
+      serviceName: 'TMDB Service',
+      onChange: (config) => {
+        this.config = config
+      },
+    })
+    await this.configWatcher.init()
+  }
 
-    const config = await this.configDataSet.get(this.systemInjector, 'TMDB_CONFIG')
-    if (!config) {
-      this.config = undefined
-      await this.logger.information({
-        message: '🚫   No config found, TMDB Service will not be initialized',
-      })
-    } else {
-      this.config = config as TmdbConfig
-      await this.logger.verbose({
-        message: '✅   TMDB Service initialized',
-      })
-    }
+  private fetchWithDedup<T>(
+    key: string,
+    fetcher: () => Promise<MetadataFetchResult<T>>,
+  ): Promise<MetadataFetchResult<T>> {
+    const pending = this.pendingRequests.get(key)
+    if (pending) return pending as Promise<MetadataFetchResult<T>>
 
-    this.configSubscriptions.push(
-      this.configDataSet.subscribe('onEntityAdded', ({ entity }) => {
-        if (entity.id === 'TMDB_CONFIG') {
-          this.config = entity as TmdbConfig
-          void this.logger.information({
-            message: `🎬   TMDB Service config added`,
-          })
-        }
-      }),
-      this.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
-        if (change.id === 'TMDB_CONFIG') {
-          this.config = {
-            ...this.config,
-            ...change,
-          } as TmdbConfig
-          void this.logger.information({
-            message: `🎬   TMDB Service config updated`,
-            data: change,
-          })
-        }
-      }),
-      this.configDataSet.subscribe('onEntityRemoved', ({ key }) => {
-        if (key === 'TMDB_CONFIG') {
-          this.config = undefined
-          void this.logger.information({
-            message: '🚫   TMDB Service config removed, service will not be able to fetch metadata',
-          })
-        }
-      }),
-    )
+    const promise = this.semaphore.execute(fetcher)
+    this.pendingRequests.set(key, promise as Promise<MetadataFetchResult<unknown>>)
+
+    return promise.finally(() => {
+      this.pendingRequests.delete(key)
+    })
   }
 
   private async fetchJson<T>(
     path: string,
     context: { file?: PiRatFile; description: string },
-  ): Promise<TmdbFetchResult<T>> {
+  ): Promise<MetadataFetchResult<T>> {
     if (!this.config) {
       return { status: 'not-configured' }
     }
@@ -168,56 +143,54 @@ export class TmdbClientService {
   public async searchMovie(
     title: string,
     options?: { year?: number; language?: string },
-  ): Promise<TmdbFetchResult<TmdbPaginatedResponse<TmdbSearchMovieResult>>> {
+  ): Promise<MetadataFetchResult<TmdbPaginatedResponse<TmdbSearchMovieResult>>> {
     const params = new URLSearchParams({
       query: title,
       language: this.getLanguage(options?.language),
     })
     if (options?.year) params.set('year', String(options.year))
 
-    return this.semaphore.execute(() =>
-      this.fetchJson(`/search/movie?${params}`, { description: `search movie '${title}'` }),
-    )
+    const path = `/search/movie?${params}`
+    return this.fetchWithDedup(path, () => this.fetchJson(path, { description: `search movie '${title}'` }))
   }
 
   public async searchTv(
     title: string,
     options?: { language?: string },
-  ): Promise<TmdbFetchResult<TmdbPaginatedResponse<TmdbSearchTvResult>>> {
+  ): Promise<MetadataFetchResult<TmdbPaginatedResponse<TmdbSearchTvResult>>> {
     const params = new URLSearchParams({
       query: title,
       language: this.getLanguage(options?.language),
     })
 
-    return this.semaphore.execute(() => this.fetchJson(`/search/tv?${params}`, { description: `search tv '${title}'` }))
+    const path = `/search/tv?${params}`
+    return this.fetchWithDedup(path, () => this.fetchJson(path, { description: `search tv '${title}'` }))
   }
 
   public async getMovieDetails(
     tmdbId: number,
     options?: { language?: string },
-  ): Promise<TmdbFetchResult<TmdbMovieDetailsResponse>> {
+  ): Promise<MetadataFetchResult<TmdbMovieDetailsResponse>> {
     const params = new URLSearchParams({
       language: this.getLanguage(options?.language),
       append_to_response: 'external_ids',
     })
 
-    return this.semaphore.execute(() =>
-      this.fetchJson(`/movie/${tmdbId}?${params}`, { description: `movie details #${tmdbId}` }),
-    )
+    const path = `/movie/${tmdbId}?${params}`
+    return this.fetchWithDedup(path, () => this.fetchJson(path, { description: `movie details #${tmdbId}` }))
   }
 
   public async getTvDetails(
     tmdbId: number,
     options?: { language?: string },
-  ): Promise<TmdbFetchResult<TmdbTvDetailsResponse>> {
+  ): Promise<MetadataFetchResult<TmdbTvDetailsResponse>> {
     const params = new URLSearchParams({
       language: this.getLanguage(options?.language),
       append_to_response: 'external_ids',
     })
 
-    return this.semaphore.execute(() =>
-      this.fetchJson(`/tv/${tmdbId}?${params}`, { description: `tv details #${tmdbId}` }),
-    )
+    const path = `/tv/${tmdbId}?${params}`
+    return this.fetchWithDedup(path, () => this.fetchJson(path, { description: `tv details #${tmdbId}` }))
   }
 
   public async getEpisodeDetails(
@@ -225,27 +198,25 @@ export class TmdbClientService {
     seasonNumber: number,
     episodeNumber: number,
     options?: { language?: string },
-  ): Promise<TmdbFetchResult<TmdbEpisodeDetailsResponse>> {
+  ): Promise<MetadataFetchResult<TmdbEpisodeDetailsResponse>> {
     const params = new URLSearchParams({
       language: this.getLanguage(options?.language),
     })
 
-    return this.semaphore.execute(() =>
-      this.fetchJson(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}?${params}`, {
-        description: `episode S${seasonNumber}E${episodeNumber} of tv #${tvId}`,
-      }),
+    const path = `/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}?${params}`
+    return this.fetchWithDedup(path, () =>
+      this.fetchJson(path, { description: `episode S${seasonNumber}E${episodeNumber} of tv #${tvId}` }),
     )
   }
 
-  public async findByImdbId(imdbId: string): Promise<TmdbFetchResult<TmdbFindByIdResponse>> {
+  public async findByImdbId(imdbId: string): Promise<MetadataFetchResult<TmdbFindByIdResponse>> {
     const params = new URLSearchParams({
       external_source: 'imdb_id',
       language: this.getLanguage(),
     })
 
-    return this.semaphore.execute(() =>
-      this.fetchJson(`/find/${imdbId}?${params}`, { description: `find by IMDB ID '${imdbId}'` }),
-    )
+    const path = `/find/${imdbId}?${params}`
+    return this.fetchWithDedup(path, () => this.fetchJson(path, { description: `find by IMDB ID '${imdbId}'` }))
   }
 
   // ── High-level orchestration methods ───────────────────────────────
@@ -270,7 +241,7 @@ export class TmdbClientService {
     },
     context?: { file?: PiRatFile },
   ): Promise<
-    TmdbFetchResult<{
+    MetadataFetchResult<{
       movie: TmdbMovieDetailsResponse
       episode?: TmdbEpisodeDetailsResponse
       series?: TmdbTvDetailsResponse
@@ -298,7 +269,7 @@ export class TmdbClientService {
     { title, season, episode }: { title: string; season: number; episode: number },
     context?: { file?: PiRatFile },
   ): Promise<
-    TmdbFetchResult<{
+    MetadataFetchResult<{
       movie: TmdbMovieDetailsResponse
       episode?: TmdbEpisodeDetailsResponse
       series?: TmdbTvDetailsResponse
@@ -338,7 +309,7 @@ export class TmdbClientService {
     { title, year }: { title: string; year?: number },
     context?: { file?: PiRatFile },
   ): Promise<
-    TmdbFetchResult<{
+    MetadataFetchResult<{
       movie: TmdbMovieDetailsResponse
       episode?: TmdbEpisodeDetailsResponse
       series?: TmdbTvDetailsResponse
@@ -368,13 +339,114 @@ export class TmdbClientService {
   }
 
   /**
+   * Fetches movie/episode metadata from TMDB using an IMDB ID.
+   * Uses /find to bridge IMDB -> TMDB, then fetches full details.
+   * For movies: resolves via movie_results.
+   * For episodes: resolves via tv_results + season/episode params.
+   */
+  public async fetchTmdbMovieMetadataByImdbId(
+    {
+      imdbId,
+      season,
+      episode,
+    }: {
+      imdbId: string
+      season?: number
+      episode?: number
+    },
+    context?: { file?: PiRatFile },
+  ): Promise<
+    MetadataFetchResult<{
+      movie: TmdbMovieDetailsResponse
+      episode?: TmdbEpisodeDetailsResponse
+      series?: TmdbTvDetailsResponse
+    }>
+  > {
+    if (!this.config) {
+      return { status: 'not-configured' }
+    }
+
+    try {
+      const findResult = await this.findByImdbId(imdbId)
+      if (findResult.status !== 'success') return findResult
+
+      if (findResult.data.movie_results.length > 0) {
+        const tmdbId = findResult.data.movie_results[0].id
+        const detailResult = await this.getMovieDetails(tmdbId)
+        if (detailResult.status !== 'success') return detailResult
+
+        return {
+          status: 'success',
+          data: { movie: { ...detailResult.data, imdb_id: imdbId } },
+        }
+      }
+
+      if (findResult.data.tv_results.length > 0) {
+        const tvId = findResult.data.tv_results[0].id
+        const tvResult = await this.getTvDetails(tvId)
+        if (tvResult.status !== 'success') return tvResult
+
+        const seriesImdbId = tvResult.data.external_ids?.imdb_id ?? imdbId
+
+        if (season != null && episode != null) {
+          const episodeResult = await this.getEpisodeDetails(tvId, season, episode)
+          if (episodeResult.status !== 'success') return episodeResult
+
+          return {
+            status: 'success',
+            data: {
+              movie: buildSyntheticMovieFromEpisode(tvResult.data, episodeResult.data, seriesImdbId),
+              episode: episodeResult.data,
+              series: tvResult.data,
+            },
+          }
+        }
+
+        return {
+          status: 'success',
+          data: {
+            movie: buildSyntheticMovieFromEpisode(
+              tvResult.data,
+              {
+                air_date: tvResult.data.first_air_date,
+                episode_number: 0,
+                id: tvResult.data.id,
+                name: tvResult.data.name,
+                overview: tvResult.data.overview,
+                production_code: '',
+                runtime: tvResult.data.episode_run_time[0] ?? null,
+                season_number: 0,
+                still_path: tvResult.data.backdrop_path,
+                vote_average: tvResult.data.vote_average,
+                vote_count: tvResult.data.vote_count,
+                crew: [],
+                guest_stars: [],
+              },
+              seriesImdbId,
+            ),
+            series: tvResult.data,
+          },
+        }
+      }
+
+      return { status: 'not-found' }
+    } catch (error) {
+      await this.logger.warning({
+        message: `❗  Failed to fetch TMDB metadata by IMDB ID '${imdbId}'`,
+        data: { error, imdbId, season, episode, file: context?.file },
+      })
+      return { status: 'error', error }
+    }
+  }
+
+  /**
    * Fetches series metadata from TMDB using an IMDB ID.
    * Uses /find to bridge IMDB -> TMDB, then fetches full TV details.
    */
   public async fetchTmdbSeriesMetadata(
     { imdbId }: { imdbId: string },
     context?: { file?: PiRatFile },
-  ): Promise<TmdbFetchResult<TmdbTvDetailsResponse>> {
+  ): Promise<MetadataFetchResult<TmdbTvDetailsResponse>> {
     if (!this.config) {
       return { status: 'not-configured' }
     }

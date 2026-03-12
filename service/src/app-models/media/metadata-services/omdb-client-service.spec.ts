@@ -166,6 +166,84 @@ describe('OmdbClientService', () => {
     })
   })
 
+  describe('fetchOmdbMovieMetadataByImdbId', () => {
+    it('should return not-configured when config is missing', async () => {
+      service.config = undefined
+      const result = await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      expect(result.status).toBe('not-configured')
+    })
+
+    it('should return success with movie metadata', async () => {
+      expect.assertions(2)
+
+      globalThis.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({
+          Response: 'True',
+          imdbID: 'tt1234567',
+          Title: 'Test Movie',
+          Year: '2024',
+          Type: 'movie',
+        }),
+      )
+
+      const result = await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      expect(result.status).toBe('success')
+      if (result.status === 'success') {
+        expect(result.data.imdbID).toBe('tt1234567')
+      }
+    })
+
+    it('should use i= parameter in the URL', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValue(createMockResponse({ Response: 'True', imdbID: 'tt1234567', Title: 'Test' }))
+      globalThis.fetch = mockFetch
+
+      await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+
+      const calledUrl = mockFetch.mock.calls[0][0] as string
+      expect(calledUrl).toContain('i=tt1234567')
+      expect(calledUrl).toContain('plot=full')
+      expect(calledUrl).not.toContain('&t=')
+    })
+
+    it('should return not-found for Incorrect IMDb ID', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({
+          Response: 'False',
+          Error: 'Incorrect IMDb ID.',
+        }),
+      )
+
+      const result = await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'invalid' })
+      expect(result.status).toBe('not-found')
+    })
+
+    it('should return error when response is missing imdbID', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue(
+        createMockResponse({
+          Response: 'True',
+          Title: 'Test Movie',
+        }),
+      )
+
+      const result = await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      expect(result.status).toBe('error')
+    })
+
+    it('should return error when fetch throws', async () => {
+      expect.assertions(2)
+
+      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
+
+      const result = await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      expect(result.status).toBe('error')
+      if (result.status === 'error') {
+        expect((result.error as Error).message).toBe('Network error')
+      }
+    })
+  })
+
   describe('fetchOmdbSeriesMetadata', () => {
     it('should return not-configured when config is missing', async () => {
       service.config = undefined
@@ -202,6 +280,60 @@ describe('OmdbClientService', () => {
 
       const result = await service.fetchOmdbSeriesMetadata({ imdbId: 'invalid' })
       expect(result.status).toBe('not-found')
+    })
+  })
+
+  describe('request deduplication', () => {
+    it('should deduplicate concurrent requests for the same URL', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(
+        createMockResponse({
+          Response: 'True',
+          imdbID: 'tt1234567',
+          Title: 'Test Movie',
+        }),
+      )
+      globalThis.fetch = mockFetch
+
+      const [result1, result2] = await Promise.all([
+        service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' }),
+        service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' }),
+      ])
+
+      expect(result1.status).toBe('success')
+      expect(result2.status).toBe('success')
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should make separate requests for different URLs', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(
+        createMockResponse({
+          Response: 'True',
+          imdbID: 'tt1234567',
+          Title: 'Test Movie',
+        }),
+      )
+      globalThis.fetch = mockFetch
+
+      await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1111111' })
+      await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt2222222' })
+
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should make a fresh request after the previous one completes', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(
+        createMockResponse({
+          Response: 'True',
+          imdbID: 'tt1234567',
+          Title: 'Test Movie',
+        }),
+      )
+      globalThis.fetch = mockFetch
+
+      await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+      await service.fetchOmdbMovieMetadataByImdbId({ imdbId: 'tt1234567' })
+
+      expect(mockFetch).toHaveBeenCalledTimes(2)
     })
   })
 
