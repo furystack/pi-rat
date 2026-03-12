@@ -79,6 +79,13 @@ yarn create-schemas    # Generate schemas from API definitions
 yarn clean             # Clean build artifacts
 ```
 
+> **WARNING -- never run `tsc`, `tsc -b`, or `tsc --build` directly.**
+> The project uses `"composite": true` with project references, so bare
+> `tsc -b` emits `.js`, `.d.ts`, and `.js.map` files **into the source
+> tree**. Always use `yarn build` instead. If you only need a type check
+> without emitting, use the built-in linter tools (ReadLints) or run a
+> targeted `vitest` suite -- do NOT run tsc in any form.
+
 **Testing:**
 
 ```bash

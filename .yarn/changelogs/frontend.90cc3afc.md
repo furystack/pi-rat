@@ -24,11 +24,13 @@ Added `LocalizedMetadataService` with caches for fetching `MovieMetadataLocalize
 
 ## 🐛 Bug Fixes
 
-- Fixed movie duration not displaying correctly in the player controls by passing `defaultDuration` to `media-controller`
+- Fixed movie duration not displaying correctly by preferring `playbackInfo.duration` over stream duration in seek bar
 - Fixed legacy navigation issues by relocating route utilities to `utils/` directory
 
 ## ♻️ Refactoring
 
+- Replaced `media-chrome` and `hls.js` dependencies with modular native player controls (`PlayButton`, `SeekBar`, `VolumeControl`, `SettingsMenu`, etc.) under `controls/` directory
+- Moved video event binding and playback state (play/pause, volume, duration, buffered) into `MoviePlayerService` observables
 - Extracted file context menu items into a pure `getContextMenuItems()` function, replacing the Shade-based `FileContextMenu` component
 - Extracted file drag-and-drop upload logic into `handleFileDrop()` utility
 - Extracted `SessionUserUnavailableError`, `getUser()`, and `hasRole()` into `utils/session-helpers.ts` for reusable session access
