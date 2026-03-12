@@ -244,4 +244,8 @@ test.describe('Video Playback @media', () => {
       expect(currentTime).toBeGreaterThan(0)
     }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
   })
+
+  // Quality/resolution switching was removed in favour of server-side mode
+  // selection (transcode / remux / direct-play). No client-side resolution
+  // observable exists anymore, so the former E2E test is intentionally omitted.
 })

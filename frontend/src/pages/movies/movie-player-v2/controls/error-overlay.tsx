@@ -6,42 +6,53 @@ type ErrorOverlayProps = {
   mediaService: MoviePlayerService
 }
 
+/**
+ * Waits for `mediaService.videoElement` to be set, then calls `callback`.
+ * Uses rAF as a single-frame deferral since the video element is attached
+ * synchronously during the same render cycle.
+ */
+const whenVideoReady = (
+  mediaService: MoviePlayerService,
+  callback: (video: HTMLVideoElement) => Disposable | void,
+): Disposable => {
+  const video = mediaService.videoElement
+  if (video) {
+    const cleanup = callback(video)
+    return cleanup ?? { [Symbol.dispose]: () => {} }
+  }
+
+  let cleanup: Disposable | null = null
+  const frameId = requestAnimationFrame(() => {
+    const deferred = mediaService.videoElement
+    if (deferred) {
+      cleanup = callback(deferred) ?? null
+    }
+  })
+  return {
+    [Symbol.dispose]: () => {
+      cancelAnimationFrame(frameId)
+      cleanup?.[Symbol.dispose]()
+    },
+  }
+}
+
 export const ErrorOverlay = Shade<ErrorOverlayProps>({
   customElementName: 'pirat-player-error-overlay',
   render: ({ props, useState, useDisposable }) => {
     const [error, setError] = useState<string | null>('error', null)
 
-    useDisposable('errorListener', () => {
-      const onError = (video: HTMLVideoElement) => {
-        const mediaError = video.error
-        if (mediaError) {
-          setError(`Playback error: ${mediaError.message || `code ${mediaError.code}`}`)
+    useDisposable('errorListener', () =>
+      whenVideoReady(props.mediaService, (video) => {
+        const handler = () => {
+          const mediaError = video.error
+          if (mediaError) {
+            setError(`Playback error: ${mediaError.message || `code ${mediaError.code}`}`)
+          }
         }
-      }
-
-      const video = props.mediaService.videoElement
-      if (video) {
-        const handler = () => onError(video)
         video.addEventListener('error', handler)
         return { [Symbol.dispose]: () => video.removeEventListener('error', handler) }
-      }
-
-      let cleanup: Disposable | null = null
-      const frameId = requestAnimationFrame(() => {
-        const deferredVideo = props.mediaService.videoElement
-        if (deferredVideo) {
-          const handler = () => onError(deferredVideo)
-          deferredVideo.addEventListener('error', handler)
-          cleanup = { [Symbol.dispose]: () => deferredVideo.removeEventListener('error', handler) }
-        }
-      })
-      return {
-        [Symbol.dispose]: () => {
-          cancelAnimationFrame(frameId)
-          cleanup?.[Symbol.dispose]()
-        },
-      }
-    })
+      }),
+    )
 
     if (!error) return <div />
 

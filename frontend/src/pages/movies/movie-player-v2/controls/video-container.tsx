@@ -1,6 +1,7 @@
 import type { RefObject } from '@furystack/shades'
 import { Shade, createComponent } from '@furystack/shades'
 
+import { whenRefReady } from '../../../../utils/when-ref-ready.js'
 import type { MoviePlayerService } from '../movie-player-service.js'
 import { ControlBar } from './control-bar.js'
 import { ErrorOverlay } from './error-overlay.js'
@@ -54,43 +55,27 @@ export const VideoContainer = Shade<VideoContainerProps>({
         }
       }
 
-      const attach = (container: HTMLElement) => {
+      return whenRefReady(containerRef, (container) => {
         container.addEventListener('mousemove', resetTimer)
         container.addEventListener('mouseleave', onMouseLeave)
         container.addEventListener('mouseenter', resetTimer)
         resetTimer()
-      }
 
-      const container = containerRef.current
-      if (container) {
-        attach(container)
-      } else {
-        const frameId = requestAnimationFrame(() => {
-          const deferred = containerRef.current
-          if (deferred) attach(deferred)
-        })
         return {
           [Symbol.dispose]: () => {
-            cancelAnimationFrame(frameId)
             if (timerId) clearTimeout(timerId)
-          },
-        }
-      }
-
-      return {
-        [Symbol.dispose]: () => {
-          if (timerId) clearTimeout(timerId)
-          if (container) {
             container.removeEventListener('mousemove', resetTimer)
             container.removeEventListener('mouseleave', onMouseLeave)
             container.removeEventListener('mouseenter', resetTimer)
-          }
-        },
-      }
+          },
+        }
+      })
     })
 
-    useDisposable('keyboardShortcuts', () => {
-      const attach = (container: HTMLElement) => {
+    useDisposable('keyboardShortcuts', () =>
+      whenRefReady(containerRef, (container) => {
+        container.focus()
+
         const onKeyDown = (ev: KeyboardEvent) => {
           switch (ev.key) {
             case ' ':
@@ -124,23 +109,8 @@ export const VideoContainer = Shade<VideoContainerProps>({
         }
         container.addEventListener('keydown', onKeyDown)
         return { [Symbol.dispose]: () => container.removeEventListener('keydown', onKeyDown) }
-      }
-
-      const container = containerRef.current
-      if (container) return attach(container)
-
-      let cleanup: Disposable | null = null
-      const frameId = requestAnimationFrame(() => {
-        const deferred = containerRef.current
-        if (deferred) cleanup = attach(deferred)
-      })
-      return {
-        [Symbol.dispose]: () => {
-          cancelAnimationFrame(frameId)
-          cleanup?.[Symbol.dispose]()
-        },
-      }
-    })
+      }),
+    )
 
     return (
       <div ref={containerRef} tabIndex={0} style={{ outline: 'none', width: '100%', height: '100%' }}>

@@ -5,6 +5,7 @@ import { type FfprobeData, type Movie, type PiRatFile, type WatchHistoryEntry } 
 import { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { WatchProgressService } from '../../../services/watch-progress-service.js'
 import { WatchProgressUpdater } from '../../../services/watch-progress-updater.js'
+import { whenRefReady } from '../../../utils/when-ref-ready.js'
 import { VideoContainer } from './controls/index.js'
 import { getChaptersTrack } from './get-chapters-track.js'
 import { getSubtitleTracks, getSubtitleTracksFromPlaybackInfo } from './get-subtitle-tracks.js'
@@ -72,20 +73,11 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
       () => new MoviePlayerService(file, props.ffprobe, api, watchProgress?.watchedSeconds || 0, logger),
     )
 
-    useDisposable('videoAttachment', () => {
-      const video = videoRef.current
-      if (video) {
+    useDisposable('videoAttachment', () =>
+      whenRefReady(videoRef, (video) => {
         mediaService.attachToVideo(video)
-        return { [Symbol.dispose]: () => {} }
-      }
-      const frameId = requestAnimationFrame(() => {
-        const deferredVideo = videoRef.current
-        if (deferredVideo) {
-          mediaService.attachToVideo(deferredVideo)
-        }
-      })
-      return { [Symbol.dispose]: () => cancelAnimationFrame(frameId) }
-    })
+      }),
+    )
 
     const [playbackInfo] = useObservable('playbackInfo', mediaService.playbackInfo)
     const subtitleElements =

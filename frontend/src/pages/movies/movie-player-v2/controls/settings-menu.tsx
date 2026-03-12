@@ -231,6 +231,14 @@ export const SettingsMenu = Shade<SettingsMenuProps>({
         </button>
         {isOpen && (
           <>
+            <div
+              data-testid="settings-backdrop"
+              style={{ position: 'fixed', inset: '0', zIndex: '5' }}
+              onclick={() => {
+                setIsOpen(false)
+                setActiveSubmenu(null)
+              }}
+            />
             {activeSubmenu === null && renderMainMenu()}
             {activeSubmenu === 'speed' && renderSpeedSubmenu()}
             {activeSubmenu === 'audio' && renderAudioSubmenu()}
