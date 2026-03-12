@@ -51,6 +51,7 @@
   "scripts": {
     "prepare": "husky",
     "build:monaco-mfe": "yarn workspace monaco-mfe build",
+    "build:fast": "tsc -b common service frontend && yarn workspace frontend build",
     "build": "yarn build:monaco-mfe && tsc -b common service frontend && yarn workspace frontend build",
     "create-schemas": "yarn workspace common create-schemas",
     "test:e2e:install": "yarn playwright test --grep @install --project chromium",
