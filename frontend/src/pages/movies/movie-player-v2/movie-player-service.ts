@@ -10,6 +10,7 @@ import {
   type PlaybackMode,
   type SubtitleTrackInfo,
 } from 'common'
+import Hls from 'hls.js'
 import type { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 import { environmentOptions } from '../../../utils/environment-options.js'
 
@@ -87,6 +88,7 @@ export class MoviePlayerService implements AsyncDisposable {
   public activeSubtitleTrack = new ObservableValue<number | null>(null)
 
   private videoEventCleanup: Disposable | null = null
+  private hlsInstance: Hls | null = null
 
   /**
    * Converts a 0-based stream time (from video.currentTime during HLS)
@@ -115,6 +117,7 @@ export class MoviePlayerService implements AsyncDisposable {
       this.pendingCanPlayCleanup()
     }
 
+    this.destroyHlsInstance()
     this.videoEventCleanup?.[Symbol.dispose]()
     this.videoEventCleanup = null
 
@@ -340,19 +343,70 @@ export class MoviePlayerService implements AsyncDisposable {
     }
   }
 
-  private startHlsPlayback(videoElement: HTMLVideoElement) {
+  private buildHlsUrl(): string {
     const mode = this.playbackMode.getValue()
     const audioTrack = this.audioTrackId.getValue()
     const audioParam = audioTrack ? `&audioTrack=${encode(String(audioTrack))}` : ''
     const startTimeParam = this.hlsStartTime > 0 ? `&startTime=${encode(String(this.hlsStartTime))}` : ''
-    const hlsUrl = this.toServiceUrl(
+    return this.toServiceUrl(
       `/api/media/files/${encodeURIComponent(this.file.driveLetter)}/${encodeURIComponent(this.file.path)}/master.m3u8?mode=${encode(mode)}${audioParam}${startTimeParam}`,
     )
+  }
 
-    void this.logger.verbose({ message: 'Starting native HLS playback' })
-    videoElement.src = hlsUrl
-    if (this.currentProgress > this.hlsStartTime) {
-      videoElement.currentTime = this.currentProgress - this.hlsStartTime
+  private destroyHlsInstance() {
+    if (this.hlsInstance) {
+      this.hlsInstance.destroy()
+      this.hlsInstance = null
+    }
+  }
+
+  private startHlsPlayback(videoElement: HTMLVideoElement) {
+    this.destroyHlsInstance()
+    const hlsUrl = this.buildHlsUrl()
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        xhrSetup: (xhr) => {
+          xhr.withCredentials = true
+        },
+        enableWebVTT: false,
+        enableIMSC1: false,
+        enableCEA708Captions: false,
+      })
+      this.hlsInstance = hls
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        hls.subtitleTrack = -1
+        if (this.currentProgress > this.hlsStartTime) {
+          videoElement.currentTime = this.currentProgress - this.hlsStartTime
+        }
+      })
+
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.details === Hls.ErrorDetails.SUBTITLE_LOAD_ERROR) return
+
+        void this.logger.error({
+          message: 'HLS playback error',
+          data: { type: data.type, details: data.details, fatal: data.fatal },
+        })
+        if (data.fatal) {
+          if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+            hls.recoverMediaError()
+          } else {
+            this.destroyHlsInstance()
+          }
+        }
+      })
+
+      hls.loadSource(hlsUrl)
+      hls.attachMedia(videoElement)
+      void this.logger.verbose({ message: 'Starting hls.js playback' })
+    } else {
+      void this.logger.verbose({ message: 'Starting native HLS playback' })
+      videoElement.src = hlsUrl
+      if (this.currentProgress > this.hlsStartTime) {
+        videoElement.currentTime = this.currentProgress - this.hlsStartTime
+      }
     }
   }
 

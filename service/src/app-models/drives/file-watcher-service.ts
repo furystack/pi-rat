@@ -40,7 +40,10 @@ export class FileWatcherService extends EventHub<{
     }
 
     await this.logger.verbose({ message: `🔍  Starting File Watcher on volume '${drive.letter}'...` })
-    const watcher = watch(drive.physicalPath, { ignoreInitial: true })
+    const watcher = watch(drive.physicalPath, {
+      ignoreInitial: true,
+      awaitWriteFinish: { stabilityThreshold: 500, pollInterval: 100 },
+    })
 
     watcher.on('error', (error) => {
       const errorMessage = error instanceof Error ? error.message : String(error)
