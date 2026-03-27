@@ -59,7 +59,7 @@ const deleteFile = async (page: Page, fileName: string) => {
   await file.click()
   await page.keyboard.press('Delete')
 
-  const confirmButton = page.locator('shades-dialog button', { hasText: 'Delete' })
+  const confirmButton = page.locator('shade-dialog button', { hasText: /Delete/i })
   await expect(confirmButton).toBeVisible()
   await confirmButton.click()
 
