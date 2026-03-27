@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "lib": ["WebWorker", "DOM", "ES2021", "DOM.Iterable"],
+    "lib": ["WebWorker", "DOM", "ES2021"],
     "noEmit": true
   },
   "include": ["src"]

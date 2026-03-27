@@ -63,7 +63,7 @@ export default defineConfig(async () => {
       host: true,
     },
     build: {
-      rollupOptions: {
+      rolldownOptions: {
         external: ['vitest', '/monaco-mfe/index.js'],
       },
     },
