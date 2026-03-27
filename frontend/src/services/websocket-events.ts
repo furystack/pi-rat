@@ -2,7 +2,7 @@ import { Injectable, Injected } from '@furystack/inject'
 import { getLogger, type ScopedLogger } from '@furystack/logging'
 import { EventHub } from '@furystack/utils'
 import type { WebsocketMessage } from 'common'
-import { environmentOptions } from '../environment-options.js'
+import { environmentOptions } from '../utils/environment-options.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class WebsocketNotificationsService extends EventHub<{

@@ -18,6 +18,7 @@ import {
 } from 'common'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
+import { type ConfigWatcher, createConfigWatcher } from '../../../utils/config-watcher.js'
 import { existsAsync } from '../../../utils/exists-async.js'
 import { FileWatcherService } from '../../drives/file-watcher-service.js'
 import { direntToApiModel } from '../../drives/utils/dirent-to-api-model.js'
@@ -159,13 +160,26 @@ export class MovieMaintainerService {
   @Injected(FileWatcherService)
   declare private fileWatcherService: FileWatcherService
 
-  declare private addSubscription: Disposable
-
-  declare private unlinkDirSubscription: Disposable
-
-  declare private unlinkSubscription: Disposable
+  private fileWatcherSubscriptions: Disposable[] = []
 
   declare private config: MoviesConfig | undefined
+
+  private configWatcher?: ConfigWatcher
+
+  private setupFileWatchers() {
+    this.fileWatcherSubscriptions.push(
+      this.fileWatcherService.subscribe('add', (file) => void this.onAdd(file)),
+      this.fileWatcherService.subscribe('unlinkDir', (dir) => void this.onUnlinkDir(dir)),
+      this.fileWatcherService.subscribe('unlink', (file) => void this.onUnlink(file)),
+    )
+  }
+
+  private teardownFileWatchers() {
+    for (const sub of this.fileWatcherSubscriptions) {
+      sub[Symbol.dispose]()
+    }
+    this.fileWatcherSubscriptions = []
+  }
 
   public checkFolderForPossibleMovieFiles = async (
     path: string,
@@ -215,20 +229,26 @@ export class MovieMaintainerService {
   }
 
   private async initAsync() {
-    this.addSubscription?.[Symbol.dispose]()
-    this.unlinkDirSubscription?.[Symbol.dispose]()
-    this.unlinkSubscription?.[Symbol.dispose]()
+    this.teardownFileWatchers()
+    this.setupFileWatchers()
 
-    this.config = (await this.configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
-    this.addSubscription = this.fileWatcherService.subscribe('add', (file) => void this.onAdd(file))
-    this.unlinkDirSubscription = this.fileWatcherService.subscribe('unlinkDir', (dir) => void this.onUnlinkDir(dir))
-    this.unlinkSubscription = this.fileWatcherService.subscribe('unlink', (file) => void this.onUnlink(file))
-
-    if (this.config?.value.fullSyncOnStartup) {
-      void this.fullSync().catch((error) => {
-        void this.logger.error({ message: '🎬  Full sync on startup failed', data: { error } })
-      })
-    }
+    this.configWatcher?.dispose()
+    this.configWatcher = createConfigWatcher<MoviesConfig>({
+      configDataSet: this.configDataSet,
+      systemInjector: this.systemInjector,
+      logger: this.logger,
+      configId: 'MOVIES_CONFIG',
+      serviceName: 'Movie Maintainer',
+      onChange: (config) => {
+        this.config = config
+        if (config?.value.fullSyncOnStartup) {
+          void this.fullSync().catch((error) => {
+            void this.logger.error({ message: '🎬  Full sync failed', data: { error } })
+          })
+        }
+      },
+    })
+    await this.configWatcher.init()
   }
 
   public async fullSync(): Promise<ScanProgress> {
@@ -283,32 +303,11 @@ export class MovieMaintainerService {
   }
 
   public [Symbol.dispose]() {
-    this.addSubscription[Symbol.dispose]()
-    this.unlinkDirSubscription[Symbol.dispose]()
-    this.unlinkSubscription[Symbol.dispose]()
+    this.teardownFileWatchers()
+    this.configWatcher?.dispose()
   }
 }
 
 export const useMovieFileMaintainer = (injector: Injector) => {
-  const configDataSet = getDataSetFor(injector, Config, 'id')
-
-  configDataSet.subscribe('onEntityAdded', ({ entity }) => {
-    if (entity.id === 'MOVIES_CONFIG') {
-      injector.getInstance(MovieMaintainerService).init()
-    }
-  })
-
-  configDataSet.subscribe('onEntityUpdated', ({ id }) => {
-    if (id === 'MOVIES_CONFIG') {
-      injector.getInstance(MovieMaintainerService).init()
-    }
-  })
-
-  configDataSet.subscribe('onEntityRemoved', ({ key }) => {
-    if (key === 'MOVIES_CONFIG') {
-      injector.getInstance(MovieMaintainerService)[Symbol.dispose]()
-    }
-  })
-
   injector.getInstance(MovieMaintainerService)
 }

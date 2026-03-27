@@ -13,7 +13,7 @@ import {
   Skeleton,
 } from '@furystack/shades-common-components'
 import type { User } from 'common'
-import { navigateToRoute } from '../../navigate-to-route.js'
+import { navigateToRoute } from '../../utils/navigate-to-route.js'
 import { RoleTag } from '../../components/role-tag/index.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
 import { UsersService } from '../../services/users-service.js'

@@ -1,40 +1,35 @@
 import type { CommandProvider } from '@furystack/shades-common-components'
 import { createSuggestion } from './create-suggestion.js'
-import { navigateToRoute } from '../../../navigate-to-route.js'
+import { navigateToRoute } from '../../../utils/navigate-to-route.js'
 import { createComponent } from '@furystack/shades'
-import { MoviesService } from '../../../services/movies-service.js'
+import { MediaApiClient } from '../../../services/api-clients/media-api-client.js'
 
 export const searchMovieCommandProvider: CommandProvider = async ({ term, injector }) => {
   if (term.length > 4) {
-    const movieService = injector.getInstance(MoviesService)
-    const relatedMovies = await movieService.findMovie({
-      filter: {
-        $or: [
-          {
-            title: {
-              $like: `%${term}%`,
-            },
+    const mediaApiClient = injector.getInstance(MediaApiClient)
+    const { result: relatedLocalized } = await mediaApiClient.call({
+      method: 'GET',
+      action: '/movie-metadata-localized',
+      query: {
+        findOptions: {
+          filter: {
+            title: { $like: `%${term}%` },
           },
-          {
-            imdbId: {
-              $like: `%${term}%`,
-            },
-          },
-        ],
+        },
       },
     })
-    return relatedMovies.entries.map((movie) =>
+    return relatedLocalized.entries.map((entry) =>
       createSuggestion({
-        icon: movie.thumbnailImageUrl ? (
-          <img src={movie.thumbnailImageUrl} alt={movie.title} style={{ height: '64px', marginRight: '16px' }} />
+        icon: entry.posterUrl ? (
+          <img src={entry.posterUrl} alt={entry.title} style={{ height: '64px', marginRight: '16px' }} />
         ) : (
           '🎥'
         ),
-        name: movie.title,
-        description: movie.plot || '',
+        name: entry.title,
+        description: entry.plot || '',
         score: 5,
         onSelected: () => {
-          navigateToRoute(injector, '/movies/:imdbId/overview', { imdbId: movie.imdbId })
+          navigateToRoute(injector, '/movies/:imdbId/overview', { imdbId: entry.movieImdbId })
         },
       }),
     )

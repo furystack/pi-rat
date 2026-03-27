@@ -1,6 +1,6 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Typography } from '@furystack/shades-common-components'
-import { environmentOptions } from '../../environment-options.js'
+import { environmentOptions } from '../../utils/environment-options.js'
 
 export const ImageViewer = Shade<{ letter: string; path: string }>({
   customElementName: 'drives-files-image-viewer',

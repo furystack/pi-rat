@@ -299,26 +299,11 @@
         "imdbId": {
           "type": "string"
         },
-        "title": {
-          "type": "string"
-        },
         "year": {
           "type": "number"
         },
         "duration": {
           "type": "number"
-        },
-        "genre": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "thumbnailImageUrl": {
-          "type": "string"
-        },
-        "plot": {
-          "type": "string"
         },
         "type": {
           "type": "string",
@@ -340,7 +325,7 @@
           "type": "string"
         }
       },
-      "required": ["imdbId", "title", "createdAt", "updatedAt"],
+      "required": ["imdbId", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "MovieFile": {
@@ -380,6 +365,50 @@
         }
       },
       "required": ["id", "driveLetter", "path", "ffprobe"],
+      "additionalProperties": false
+    },
+    "MovieMetadataLocalized": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "movieImdbId": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "plot": {
+          "type": "string"
+        },
+        "posterUrl": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string",
+          "enum": ["omdb", "tmdb"]
+        },
+        "sourceId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "movieImdbId", "language", "title", "source", "createdAt", "updatedAt"],
       "additionalProperties": false
     },
     "OmdbMovieMetadata": {
@@ -641,16 +670,48 @@
         "imdbId": {
           "type": "string"
         },
-        "title": {
-          "type": "string"
-        },
         "year": {
           "type": "string"
         },
-        "thumbnailImageUrl": {
+        "numberOfSeasons": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["imdbId", "year", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "SeriesMetadataLocalized": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "seriesImdbId": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "title": {
           "type": "string"
         },
         "plot": {
+          "type": "string"
+        },
+        "posterUrl": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["omdb", "tmdb"]
+        },
+        "sourceId": {
           "type": "string"
         },
         "createdAt": {
@@ -660,7 +721,222 @@
           "type": "string"
         }
       },
-      "required": ["imdbId", "title", "year", "plot", "createdAt", "updatedAt"],
+      "required": ["id", "seriesImdbId", "language", "title", "source", "createdAt", "updatedAt"],
+      "additionalProperties": false
+    },
+    "TmdbMovieMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "originalTitle": {
+          "type": "string"
+        },
+        "overview": {
+          "type": "string"
+        },
+        "releaseDate": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "number"
+        },
+        "posterPath": {
+          "type": "string"
+        },
+        "backdropPath": {
+          "type": "string"
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "name"],
+            "additionalProperties": false
+          }
+        },
+        "voteAverage": {
+          "type": "number"
+        },
+        "voteCount": {
+          "type": "number"
+        },
+        "popularity": {
+          "type": "number"
+        },
+        "originalLanguage": {
+          "type": "string"
+        },
+        "spokenLanguages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "iso_639_1": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["iso_639_1", "name"],
+            "additionalProperties": false
+          }
+        },
+        "productionCountries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "iso_3166_1": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["iso_3166_1", "name"],
+            "additionalProperties": false
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "number"
+        },
+        "revenue": {
+          "type": "number"
+        },
+        "language": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "originalTitle",
+        "overview",
+        "genres",
+        "originalLanguage",
+        "language",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "TmdbSeriesMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "imdbId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "originalName": {
+          "type": "string"
+        },
+        "overview": {
+          "type": "string"
+        },
+        "firstAirDate": {
+          "type": "string"
+        },
+        "posterPath": {
+          "type": "string"
+        },
+        "backdropPath": {
+          "type": "string"
+        },
+        "genres": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "name"],
+            "additionalProperties": false
+          }
+        },
+        "voteAverage": {
+          "type": "number"
+        },
+        "voteCount": {
+          "type": "number"
+        },
+        "numberOfSeasons": {
+          "type": "number"
+        },
+        "numberOfEpisodes": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "originalLanguage": {
+          "type": "string"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "language": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "originalName",
+        "overview",
+        "genres",
+        "originalLanguage",
+        "language",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "WatchHistoryEntry": {

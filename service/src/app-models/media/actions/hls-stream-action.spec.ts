@@ -38,6 +38,7 @@ const mockSession = {
   driveLetter: 'A',
   path: 'test.mkv',
   audioTrackId: 0,
+  totalDuration: 16,
   createdAt: Date.now(),
   lastAccessedAt: Date.now(),
   ffmpegProcess: { killed: false, kill: vi.fn() },
@@ -239,7 +240,66 @@ describe('HlsStreamAction', () => {
         mode: 'transcode',
         audioTrackId: 2,
         resolution: '1080p',
+        startTime: 0,
       })
+    })
+  })
+
+  it('should pass startTime to session creation and include in segment URLs', async () => {
+    const getOrCreateSession = vi.fn().mockResolvedValue(mockSession)
+    let writtenBody = ''
+    const response = {
+      writeHead: vi.fn(),
+      end: vi.fn((body: string) => {
+        writtenBody = body
+      }),
+    }
+
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        {
+          getOrCreateSession,
+          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+        } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
+
+      await HlsStreamAction({
+        injector,
+        getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
+        getQuery: () => ({ mode: 'transcode', startTime: 3600 }),
+        response: response as unknown as ServerResponse,
+        request: {} as IncomingMessage,
+      })
+
+      expect(getOrCreateSession).toHaveBeenCalledWith(
+        expect.objectContaining({
+          startTime: 3600,
+        }),
+      )
+      expect(writtenBody).toContain('startTime')
+    })
+  })
+
+  it('should reject negative startTime', async () => {
+    await usingAsync(new Injector(), async (injector) => {
+      injector.setExplicitInstance(
+        { getOrCreateSession: vi.fn(), readPlaylist: vi.fn() } as unknown as TranscodingSessionService,
+        TranscodingSessionService,
+      )
+
+      try {
+        await HlsStreamAction({
+          injector,
+          getUrlParams: () => ({ letter: 'A', path: 'test.mkv' }),
+          getQuery: () => ({ mode: 'transcode', startTime: -10 }),
+          response: { writeHead: vi.fn(), end: vi.fn() } as unknown as ServerResponse,
+          request: {} as IncomingMessage,
+        })
+        expect.fail('Should have thrown')
+      } catch (error) {
+        expect((error as Error).message).toContain('Invalid startTime')
+      }
     })
   })
 })

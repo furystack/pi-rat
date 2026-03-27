@@ -2,7 +2,7 @@ import { createComponent, Shade } from '@furystack/shades'
 import { Button, NotyService, Paper, Skeleton, Typography } from '@furystack/shades-common-components'
 import { ErrorDisplay } from '../../components/error-display.js'
 import { GenericErrorPage } from '../../components/generic-error.js'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { ChatInvitationService } from './chat-intivation-service.js'
 
 export const ChatInvitationList = Shade({
@@ -16,7 +16,7 @@ export const ChatInvitationList = Shade({
     const filter = { filter: { status: { $eq: 'pending' } } } as const
 
     const chatInvitationService = injector.getInstance(ChatInvitationService)
-    const currentUser = injector.getInstance(SessionService).currentUser.getValue()
+    const currentUsername = getUser(injector).username
 
     const reloadChatInvitations = () => {
       void chatInvitationService.getChatInvitations(filter)
@@ -57,11 +57,11 @@ export const ChatInvitationList = Shade({
     const noty = injector.getInstance(NotyService)
 
     const received = invitations.value.entries.filter(
-      (invitation) => invitation.userId === currentUser?.username && invitation.status === 'pending',
+      (invitation) => invitation.userId === currentUsername && invitation.status === 'pending',
     )
 
     const sent = invitations.value.entries.filter(
-      (invitation) => invitation.createdBy === currentUser?.username && invitation.status === 'pending',
+      (invitation) => invitation.createdBy === currentUsername && invitation.status === 'pending',
     )
 
     return (
@@ -80,7 +80,7 @@ export const ChatInvitationList = Shade({
                     justifyContent: 'space-between',
                   }}
                 >
-                  {invitation.userId === currentUser?.username ? (
+                  {invitation.userId === currentUsername ? (
                     <div>
                       <Typography variant="body1">{invitation.chatName}</Typography>
                       <Button

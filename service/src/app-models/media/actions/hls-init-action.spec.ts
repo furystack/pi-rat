@@ -145,6 +145,8 @@ describe('HlsInitAction', () => {
         path: 'test.mkv',
         mode: 'transcode',
         audioTrackId: 1,
+        resolution: undefined,
+        startTime: 0,
       })
     })
   })

@@ -26,6 +26,14 @@
             {
               "type": "string",
               "const": "OLLAMA_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "TMDB_CONFIG"
+            },
+            {
+              "type": "string",
+              "const": "METADATA_PROVIDER_CONFIG"
             }
           ],
           "description": "Configuration entry for the OMDB API"
@@ -163,6 +171,43 @@
               },
               "required": ["host"],
               "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string",
+                  "description": "The API key (v3 auth) or Read Access Token (v4 auth / Bearer) for the TMDB API. Can be obtained at https://www.themoviedb.org/settings/api"
+                },
+                "defaultLanguage": {
+                  "type": "string",
+                  "description": "Primary language for metadata fetches, in TMDB locale format (e.g. 'en-US', 'fr-FR')."
+                },
+                "additionalLanguages": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Additional languages to fetch alongside the default (e.g. ['fr-FR', 'de-DE'])."
+                }
+              },
+              "required": ["apiKey", "defaultLanguage", "additionalLanguages"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "priority": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["omdb", "tmdb"]
+                  },
+                  "description": "Ordered list of metadata providers to try when linking movies. The first available provider that returns a result wins."
+                }
+              },
+              "required": ["priority"],
+              "additionalProperties": false
             }
           ]
         },
@@ -194,6 +239,12 @@
         },
         {
           "$ref": "#/definitions/OllamaConfig"
+        },
+        {
+          "$ref": "#/definitions/TmdbConfig"
+        },
+        {
+          "$ref": "#/definitions/MetadataProviderConfig"
         }
       ]
     },
@@ -241,6 +292,32 @@
             }
           },
           "required": ["pingIntervalMs", "pingTimeoutMs"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["id", "value"],
+      "additionalProperties": false
+    },
+    "MetadataProviderConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "METADATA_PROVIDER_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "priority": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["omdb", "tmdb"]
+              },
+              "description": "Ordered list of metadata providers to try when linking movies. The first available provider that returns a result wins."
+            }
+          },
+          "required": ["priority"],
           "additionalProperties": false
         }
       },
@@ -369,6 +446,39 @@
             }
           },
           "required": ["apiKey", "trySearchMovieFromTitle", "autoDownloadMetadata"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["id", "value"],
+      "additionalProperties": false
+    },
+    "TmdbConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "const": "TMDB_CONFIG"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "apiKey": {
+              "type": "string",
+              "description": "The API key (v3 auth) or Read Access Token (v4 auth / Bearer) for the TMDB API. Can be obtained at https://www.themoviedb.org/settings/api"
+            },
+            "defaultLanguage": {
+              "type": "string",
+              "description": "Primary language for metadata fetches, in TMDB locale format (e.g. 'en-US', 'fr-FR')."
+            },
+            "additionalLanguages": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Additional languages to fetch alongside the default (e.g. ['fr-FR', 'de-DE'])."
+            }
+          },
+          "required": ["apiKey", "defaultLanguage", "additionalLanguages"],
           "additionalProperties": false
         }
       },

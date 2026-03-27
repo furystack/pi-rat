@@ -3,11 +3,12 @@ import { Injectable, Injected, type Injector } from '@furystack/inject'
 import { getLogger, type ScopedLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PlaybackMode } from 'common'
-import { Config, Drive, type MoviesConfig } from 'common'
+import { Config, Drive, HLS_SEGMENT_DURATION, type MoviesConfig } from 'common'
 import { spawn, type ChildProcess } from 'child_process'
 import { createHash } from 'crypto'
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'fs'
-import { readFile } from 'fs/promises'
+import { existsSync, mkdirSync, rmSync } from 'fs'
+import { mkdir, readdir, readFile, stat } from 'fs/promises'
+import { existsAsync } from '../../../utils/exists-async.js'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { FfprobeService } from '../../../ffprobe-service.js'
@@ -27,12 +28,13 @@ type TranscodingSessionEntry = {
   path: string
   audioTrackId: number
   resolution?: string
+  startTime: number
+  totalDuration: number
   createdAt: number
   lastAccessedAt: number
 }
 
 const SESSION_IDLE_TIMEOUT_MS = 5 * 60 * 1000
-const SEGMENT_DURATION = 6
 const WAIT_POLL_INTERVAL_MS = 100
 const WAIT_TIMEOUT_MS = 60_000
 const DEFAULT_MAX_CACHE_SIZE_MB = 5000
@@ -71,8 +73,9 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number,
     resolution?: string,
+    startTime: number = 0,
   ): SessionKey {
-    return `${driveLetter}:${path}:${mode}:${audioTrackId}:${resolution || ''}`
+    return `${driveLetter}:${path}:${mode}:${audioTrackId}:${resolution || ''}:${startTime}`
   }
 
   private getSessionDir(key: SessionKey): string {
@@ -95,7 +98,7 @@ export class TranscodingSessionService {
       const configDataSet = getDataSetFor(this.injector, Config, 'id')
       const config = (await configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
       const dir = config?.value?.hlsSegmentPath || join(tmpdir(), 'pirat-hls-sessions')
-      if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+      if (!(await existsAsync(dir))) await mkdir(dir, { recursive: true })
       this.baseDirCache = dir
 
       const mb = config?.value?.hlsMaxCacheSizeMb ?? DEFAULT_MAX_CACHE_SIZE_MB
@@ -113,8 +116,9 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number = 0,
     resolution?: string,
+    startTime: number = 0,
   ): TranscodingSessionEntry | undefined {
-    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution, startTime)
     const session = this.sessions.get(key)
     if (session) {
       session.lastAccessedAt = Date.now()
@@ -128,14 +132,16 @@ export class TranscodingSessionService {
     mode,
     audioTrackId = 0,
     resolution,
+    startTime = 0,
   }: {
     driveLetter: string
     path: string
     mode: PlaybackMode
     audioTrackId?: number
     resolution?: string
+    startTime?: number
   }): Promise<TranscodingSessionEntry> {
-    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution, startTime)
     const existing = this.sessions.get(key)
     if (existing) {
       existing.lastAccessedAt = Date.now()
@@ -145,7 +151,7 @@ export class TranscodingSessionService {
     const pending = this.pendingSessions.get(key)
     if (pending) return pending
 
-    const createPromise = this.createSession(key, driveLetter, path, mode, audioTrackId, resolution)
+    const createPromise = this.createSession(key, driveLetter, path, mode, audioTrackId, resolution, startTime)
     this.pendingSessions.set(key, createPromise)
 
     try {
@@ -162,20 +168,22 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number,
     resolution?: string,
+    startTime: number = 0,
   ): Promise<TranscodingSessionEntry> {
     await this.getBaseDirFromConfig()
     const sessionDir = this.getSessionDir(key)
-    if (!existsSync(sessionDir)) {
-      mkdirSync(sessionDir, { recursive: true })
+    if (!(await existsAsync(sessionDir))) {
+      await mkdir(sessionDir, { recursive: true })
     }
 
-    const ffmpegArgs = await this.buildHlsFfmpegArgs({
+    const { args: ffmpegArgs, totalDuration } = await this.buildHlsFfmpegArgs({
       driveLetter,
       path,
       mode,
       audioTrackId,
       resolution,
       sessionDir,
+      startTime,
     })
 
     void this.logger.verbose({
@@ -197,6 +205,8 @@ export class TranscodingSessionService {
       path,
       audioTrackId,
       resolution,
+      startTime,
+      totalDuration,
       createdAt: Date.now(),
       lastAccessedAt: Date.now(),
     }
@@ -220,7 +230,9 @@ export class TranscodingSessionService {
     })
 
     this.sessions.set(key, session)
-    void this.evictByDiskUsage()
+    void this.evictByDiskUsage().catch((error) => {
+      void this.logger.error({ message: 'Failed to evict sessions by disk usage', data: { error } })
+    })
     return session
   }
 
@@ -232,23 +244,22 @@ export class TranscodingSessionService {
     const deadline = Date.now() + WAIT_TIMEOUT_MS
 
     while (Date.now() < deadline) {
-      if (existsSync(filePath)) {
-        // For segments, check that the file has non-zero size
+      if (await existsAsync(filePath)) {
         try {
-          const stat = statSync(filePath)
-          if (stat.size > 0) return true
+          const fileStat = await stat(filePath)
+          if (fileStat.size > 0) return true
         } catch {
           // File might have been deleted between check and stat
         }
       }
 
       if (session.state === 'error') return false
-      if (session.state === 'completed' && !existsSync(filePath)) return false
+      if (session.state === 'completed' && !(await existsAsync(filePath))) return false
 
       await new Promise((resolve) => setTimeout(resolve, WAIT_POLL_INTERVAL_MS))
     }
 
-    return existsSync(filePath)
+    return existsAsync(filePath)
   }
 
   /**
@@ -261,9 +272,8 @@ export class TranscodingSessionService {
     const deadline = Date.now() + WAIT_TIMEOUT_MS
 
     while (Date.now() < deadline) {
-      if (existsSync(segmentPath)) {
-        // Segment is fully written if the next one exists or ffmpeg is done
-        if (existsSync(nextSegmentPath) || session.state === 'completed' || session.state === 'error') {
+      if (await existsAsync(segmentPath)) {
+        if ((await existsAsync(nextSegmentPath)) || session.state === 'completed' || session.state === 'error') {
           return true
         }
       }
@@ -273,14 +283,69 @@ export class TranscodingSessionService {
       await new Promise((resolve) => setTimeout(resolve, WAIT_POLL_INTERVAL_MS))
     }
 
-    return existsSync(segmentPath)
+    return existsAsync(segmentPath)
   }
 
   public async readPlaylist(session: TranscodingSessionEntry): Promise<string | null> {
     const playlistPath = join(session.sessionDir, 'playlist.m3u8')
     const ready = await this.waitForFile(playlistPath, session)
     if (!ready) return null
-    return readFile(playlistPath, 'utf-8')
+    const content = await readFile(playlistPath, 'utf-8')
+    return this.padPlaylistToFullDuration(content, session.totalDuration, session.startTime)
+  }
+
+  /**
+   * If the playlist is still being written by FFmpeg (no #EXT-X-ENDLIST),
+   * pad it with the remaining expected segments so that clients see the
+   * full VOD duration from the first request. The segment-serving endpoint
+   * already waits for segments that haven't been transcoded yet.
+   */
+  private padPlaylistToFullDuration(playlist: string, totalDuration: number, startTime: number = 0): string {
+    if (totalDuration <= 0 || playlist.includes('#EXT-X-ENDLIST')) {
+      return playlist
+    }
+
+    const lines = playlist.split('\n')
+
+    let encodedDuration = 0
+    let maxSegmentIndex = -1
+    for (const line of lines) {
+      const extinfMatch = line.match(/^#EXTINF:([\d.]+)/)
+      if (extinfMatch) {
+        encodedDuration += parseFloat(extinfMatch[1])
+      }
+      const segmentMatch = line.match(/^segment(\d+)\.m4s/)
+      if (segmentMatch) {
+        maxSegmentIndex = Math.max(maxSegmentIndex, parseInt(segmentMatch[1], 10))
+      }
+    }
+
+    const effectiveDuration = totalDuration - startTime
+    const remainingDuration = effectiveDuration - encodedDuration
+    if (remainingDuration <= 0) {
+      return `${playlist.trimEnd()}\n#EXT-X-ENDLIST\n`
+    }
+
+    const fullSegmentCount = Math.floor(remainingDuration / HLS_SEGMENT_DURATION)
+    const lastSegmentDuration = remainingDuration - fullSegmentCount * HLS_SEGMENT_DURATION
+
+    const padLines: string[] = []
+    let nextIndex = maxSegmentIndex + 1
+
+    for (let i = 0; i < fullSegmentCount; i++) {
+      padLines.push(`#EXTINF:${HLS_SEGMENT_DURATION.toFixed(6)},`)
+      padLines.push(`segment${nextIndex}.m4s`)
+      nextIndex++
+    }
+
+    if (lastSegmentDuration > 0.01) {
+      padLines.push(`#EXTINF:${lastSegmentDuration.toFixed(6)},`)
+      padLines.push(`segment${nextIndex}.m4s`)
+    }
+
+    padLines.push('#EXT-X-ENDLIST')
+
+    return `${playlist.trimEnd()}\n${padLines.join('\n')}\n`
   }
 
   private async buildHlsFfmpegArgs({
@@ -290,6 +355,7 @@ export class TranscodingSessionService {
     audioTrackId,
     resolution,
     sessionDir,
+    startTime = 0,
   }: {
     driveLetter: string
     path: string
@@ -297,7 +363,8 @@ export class TranscodingSessionService {
     audioTrackId: number
     resolution?: string
     sessionDir: string
-  }): Promise<string[]> {
+    startTime?: number
+  }): Promise<{ args: string[]; totalDuration: number }> {
     const [drive, config, ffprobe] = await Promise.all([
       (async () => {
         const driveDataSet = getDataSetFor(this.injector, Drive, 'letter')
@@ -313,6 +380,7 @@ export class TranscodingSessionService {
 
     if (!drive) throw new Error(`Drive ${driveLetter} not found`)
 
+    const totalDuration = parseFloat(ffprobe.format.duration ?? '0') || 0
     const fullPath = join(drive.physicalPath, path)
     const audioStreams = ffprobe.streams.filter((s) => s.codec_type === 'audio')
     const audioStream = audioStreams.find((t) => t.index === audioTrackId) || audioStreams[0]
@@ -324,8 +392,18 @@ export class TranscodingSessionService {
 
     const args: string[] = []
 
-    // Input with timestamp preservation (like Jellyfin)
-    args.push('-copyts', '-avoid_negative_ts', 'disabled')
+    // Input seeking (before -i for fast keyframe-based seeking).
+    // Do NOT add -copyts here: it preserves the original PTS from the
+    // source file which causes a mismatch between the HLS playlist
+    // timeline (starts at 0) and the media PTS (starts at ~startTime).
+    // This breaks hls.js startPosition, causes the progress bar to
+    // show 00:00, and introduces audio/video desync because -ss seeks
+    // to the nearest video keyframe while audio seeking is sample-precise.
+    // The client adds hlsStartTime to video.currentTime instead.
+    if (startTime > 0) {
+      args.push('-ss', String(startTime))
+    }
+
     args.push('-i', fullPath)
 
     // Thread config
@@ -368,8 +446,8 @@ export class TranscodingSessionService {
 
       args.push('-c:v', videoCodec)
 
-      // Force keyframes at segment boundaries
-      args.push('-force_key_frames', `expr:gte(t,n_forced*${SEGMENT_DURATION})`)
+      // Force keyframes at segment boundaries (t starts from 0 since we don't use -copyts)
+      args.push('-force_key_frames', `expr:gte(t,n_forced*${HLS_SEGMENT_DURATION})`)
       args.push('-sc_threshold:v', '0')
 
       const isSoftwareEncoder = videoCodec === 'libx264' || videoCodec === 'libx265'
@@ -393,7 +471,7 @@ export class TranscodingSessionService {
 
     // HLS muxer output (the core change from per-segment to continuous)
     args.push('-f', 'hls')
-    args.push('-hls_time', String(SEGMENT_DURATION))
+    args.push('-hls_time', String(HLS_SEGMENT_DURATION))
     args.push('-hls_segment_type', 'fmp4')
     args.push('-hls_fmp4_init_filename', 'init.mp4')
     args.push('-hls_segment_filename', join(sessionDir, 'segment%d.m4s'))
@@ -401,7 +479,7 @@ export class TranscodingSessionService {
     args.push('-hls_list_size', '0')
     args.push('-y', join(sessionDir, 'playlist.m3u8'))
 
-    return args
+    return { args, totalDuration }
   }
 
   public getActiveSessionCount(): number {
@@ -414,8 +492,9 @@ export class TranscodingSessionService {
     mode: PlaybackMode,
     audioTrackId: number = 0,
     resolution?: string,
+    startTime: number = 0,
   ) {
-    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution)
+    const key = this.buildSessionKey(driveLetter, path, mode, audioTrackId, resolution, startTime)
     const session = this.sessions.get(key)
     if (session) {
       this.destroySession(session)
@@ -424,18 +503,39 @@ export class TranscodingSessionService {
   }
 
   /**
+   * Removes all transcoding sessions for a given file, regardless of mode,
+   * audio track, or resolution. Used when a client disconnects or navigates
+   * away — there is no reason to keep any session alive for that file.
+   */
+  public removeAllSessionsForFile(driveLetter: string, path: string) {
+    const prefix = `${driveLetter}:${path}:`
+    const keysToRemove = [...this.sessions.keys()].filter((k) => k.startsWith(prefix))
+    for (const key of keysToRemove) {
+      const session = this.sessions.get(key)
+      if (session) {
+        void this.logger.verbose({ message: `Removing session for file teardown: ${key}` })
+        this.destroySession(session)
+        this.sessions.delete(key)
+      }
+    }
+  }
+
+  /**
    * Returns the total bytes used by a session's directory on disk.
    */
-  public getSessionDiskUsage(session: TranscodingSessionEntry): number {
+  public async getSessionDiskUsage(session: TranscodingSessionEntry): Promise<number> {
     try {
-      if (!existsSync(session.sessionDir)) return 0
-      return readdirSync(session.sessionDir).reduce((total, file) => {
+      if (!(await existsAsync(session.sessionDir))) return 0
+      const files = await readdir(session.sessionDir)
+      let total = 0
+      for (const file of files) {
         try {
-          return total + statSync(join(session.sessionDir, file)).size
+          total += (await stat(join(session.sessionDir, file))).size
         } catch {
-          return total
+          // File may have been deleted
         }
-      }, 0)
+      }
+      return total
     } catch {
       return 0
     }
@@ -444,10 +544,10 @@ export class TranscodingSessionService {
   /**
    * Returns the total bytes used across all active session directories.
    */
-  public getTotalDiskUsage(): number {
+  public async getTotalDiskUsage(): Promise<number> {
     let total = 0
     for (const session of this.sessions.values()) {
-      total += this.getSessionDiskUsage(session)
+      total += await this.getSessionDiskUsage(session)
     }
     return total
   }
@@ -471,7 +571,7 @@ export class TranscodingSessionService {
    */
   private async evictByDiskUsage(): Promise<void> {
     const maxBytes = await this.loadMaxCacheSize()
-    let totalUsage = this.getTotalDiskUsage()
+    let totalUsage = await this.getTotalDiskUsage()
     if (totalUsage <= maxBytes) return
 
     // Sort sessions by lastAccessedAt ascending (oldest first), prefer completed/error over active
@@ -484,7 +584,7 @@ export class TranscodingSessionService {
 
     for (const [key, session] of candidates) {
       if (totalUsage <= maxBytes) break
-      const usage = this.getSessionDiskUsage(session)
+      const usage = await this.getSessionDiskUsage(session)
       void this.logger.verbose({
         message: `Evicting session for cache limit: ${key} (${Math.round(usage / BYTES_PER_MB)}MB)`,
       })
@@ -511,7 +611,9 @@ export class TranscodingSessionService {
       }
     }
 
-    void this.evictByDiskUsage()
+    void this.evictByDiskUsage().catch((error) => {
+      void this.logger.error({ message: 'Failed to evict sessions by disk usage', data: { error } })
+    })
   }
 
   private destroySession(session: TranscodingSessionEntry) {

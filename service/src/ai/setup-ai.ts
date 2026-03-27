@@ -3,7 +3,7 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { usingAsync } from '@furystack/utils'
-import { AiChat, AiChatMessage, Config, User } from 'common'
+import { AiChat, AiChatMessage, User } from 'common'
 import { ImpersonatedIdentityContext } from '../utils/impersonated-identity-context.js'
 import { OllamaClientService } from './ollama-client-service.js'
 import { setupAiStore } from './setup-ai-store.js'
@@ -11,22 +11,7 @@ import { setupAiStore } from './setup-ai-store.js'
 export const setupAi = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('AI Setup')
   const clientService = injector.getInstance(OllamaClientService)
-
-  const configDataSet = getDataSetFor(injector, Config, 'id')
-
-  configDataSet.subscribe('onEntityAdded', async ({ entity }) => {
-    if (entity.id === 'OLLAMA_CONFIG') {
-      await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
-      await clientService.init()
-    }
-  })
-
-  configDataSet.subscribe('onEntityUpdated', async ({ id }) => {
-    if (id === 'OLLAMA_CONFIG') {
-      await logger.verbose({ message: '🔄   Config changed, reinitializing AI Services' })
-      await clientService.init()
-    }
-  })
+  clientService.init()
 
   await setupAiStore(injector)
 

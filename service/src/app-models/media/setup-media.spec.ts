@@ -3,7 +3,7 @@ import { usingAsync } from '@furystack/utils'
 import type { Movie, MovieFile } from 'common'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { WebsocketService } from '../../websocket-service.js'
-import { announceMovieFileAdded } from './setup-media.js'
+import { announceMovieFileAdded } from './announce-movie-file-added.js'
 
 const mockDataSetGet = vi.fn()
 const mockAnnounce = vi.fn().mockResolvedValue(undefined)
@@ -36,7 +36,6 @@ const createMovieFile = (overrides: Partial<MovieFile> = {}): MovieFile =>
 const createMovie = (overrides: Partial<Movie> = {}): Movie =>
   ({
     imdbId: 'tt1234567',
-    title: 'Test Movie',
     ...overrides,
   }) as Movie
 

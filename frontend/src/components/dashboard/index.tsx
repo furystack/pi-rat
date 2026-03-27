@@ -1,10 +1,9 @@
-import { serializeToQueryString } from '@furystack/rest'
 import { Shade, createComponent } from '@furystack/shades'
-import { ContextMenu, ContextMenuManager } from '@furystack/shades-common-components'
 import type { ContextMenuItem } from '@furystack/shades-common-components'
+import { ContextMenu, ContextMenuManager } from '@furystack/shades-common-components'
 import type { Dashboard as DashboardData } from 'common'
-import { navigateToRoute } from '../../navigate-to-route.js'
 import { SessionService } from '../../services/session.js'
+import { navigateToRoute } from '../../utils/navigate-to-route.js'
 import { Widget } from './widget.js'
 
 export const Dashboard = Shade<DashboardData>({
@@ -22,14 +21,7 @@ export const Dashboard = Shade<DashboardData>({
               icon: <span>📝</span>,
               label: 'Edit this dashboard',
               data: () => {
-                navigateToRoute(
-                  injector,
-                  '/entities/dashboards',
-                  {},
-                  {
-                    queryString: serializeToQueryString({ gedst: { currentId: props.id, mode: 'edit' } }),
-                  },
-                )
+                navigateToRoute(injector, '/entities/dashboards/edit/:id', { id: props.id })
               },
             },
           ]

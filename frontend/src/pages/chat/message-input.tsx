@@ -1,7 +1,7 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, Form, TextArea } from '@furystack/shades-common-components'
 import type { Chat } from 'common'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { ChatMessageService } from './chat-messages-service.js'
 
 export type ChatMessagePayload = {
@@ -18,7 +18,6 @@ export const MessageInput = Shade<{ chat: Chat }>({
   customElementName: 'shade-app-message-input',
   render: ({ injector, props, useRef }) => {
     const chatService = injector.getInstance(ChatMessageService)
-    const session = injector.getInstance(SessionService)
     const formRef = useRef<HTMLFormElement>('form')
 
     return (
@@ -30,7 +29,7 @@ export const MessageInput = Shade<{ chat: Chat }>({
             createdAt: new Date(),
             chatId: props.chat.id,
             content: formData.content,
-            owner: session.currentUser.getValue()?.username || '',
+            owner: getUser(injector).username,
             attachments: [],
           })
           formRef.current?.reset()

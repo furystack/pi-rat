@@ -1,5 +1,5 @@
 import { Injectable } from '@furystack/inject'
-import { environmentOptions } from '../environment-options.js'
+import { environmentOptions } from '../utils/environment-options.js'
 @Injectable()
 export class ErrorReporter {
   public sendErrorReport(

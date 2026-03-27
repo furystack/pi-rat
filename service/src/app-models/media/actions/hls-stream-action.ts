@@ -29,12 +29,18 @@ export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
 
   const sessionService = injector.getInstance(TranscodingSessionService)
 
+  const startTime = query.startTime ?? 0
+  if (startTime < 0) {
+    throw new RequestError('Invalid startTime', 400)
+  }
+
   const session = await sessionService.getOrCreateSession({
     driveLetter: letter,
     path,
     mode,
     audioTrackId: query.audioTrack ?? 0,
     resolution: query.resolution,
+    startTime,
   })
 
   const playlistContent = await sessionService.readPlaylist(session)
@@ -51,6 +57,7 @@ export const HlsStreamAction: RequestAction<HlsStreamEndpoint> = async ({
     mode,
     audioTrack: query.audioTrack ?? 0,
     ...(query.resolution ? { resolution: query.resolution } : {}),
+    ...(startTime > 0 ? { startTime } : {}),
   }
   const serializedQuery = serializeToQueryString(queryParams)
 

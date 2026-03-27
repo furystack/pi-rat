@@ -4,7 +4,7 @@ import { CollectionService, Paper } from '@furystack/shades-common-components'
 import { PathHelper } from '@furystack/utils'
 import type { DirectoryEntry } from 'common'
 import { encode, getFullPath } from 'common'
-import { navigateToRoute } from '../../navigate-to-route.js'
+import { navigateToRoute } from '../../utils/navigate-to-route.js'
 import { DrivesService } from '../../services/drives-service.js'
 import { DriveSelector } from './drive-selector.js'
 import { FileList } from './file-list.js'
@@ -23,6 +23,7 @@ const upEntry: DirectoryEntry = {
 export const FolderPanel = Shade<{
   searchStateKey: string
   defaultDriveLetter: string
+  availableDriveLetters: string[]
   focused?: boolean
 }>({
   customElementName: 'folder-panel',
@@ -50,6 +51,11 @@ export const FolderPanel = Shade<{
     const { letter, path } = currentDrive
 
     if (!letter || !path) {
+      return null
+    }
+
+    if (!props.availableDriveLetters.includes(letter)) {
+      setCurrentDrive({ path: '/', letter: props.defaultDriveLetter })
       return null
     }
 

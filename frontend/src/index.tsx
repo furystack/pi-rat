@@ -8,9 +8,9 @@ import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { AiChatMessage, Chat, ChatMessage, LogEntry } from 'common'
 import { Layout } from './components/layout.js'
-import { environmentOptions } from './environment-options.js'
+import { environmentOptions } from './utils/environment-options.js'
 import { SessionService } from './services/session.js'
-import { registerThemeSwitchCheat } from './theme-switch-cheat.js'
+import { registerThemeSwitchCheat } from './utils/theme-switch-cheat.js'
 import { darkTheme } from './themes/dark.js'
 
 const shadeInjector = new Injector()

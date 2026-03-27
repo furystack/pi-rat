@@ -9,9 +9,13 @@ import type {
 import type {
   Movie,
   MovieFile,
+  MovieMetadataLocalized,
   OmdbMovieMetadata,
   OmdbSeriesMetadata,
   Series,
+  SeriesMetadataLocalized,
+  TmdbMovieMetadata,
+  TmdbSeriesMetadata,
   WatchHistoryEntry,
 } from '../models/media/index.js'
 import type { PiRatFile } from '../models/pirat-file.js'
@@ -26,8 +30,8 @@ export type LinkMovie = {
       | 'not-movie-file'
       | 'rate-limited'
       | 'metadata-not-found'
-      | 'omdb-not-configured'
-      | 'omdb-error'
+      | 'provider-not-configured'
+      | 'provider-error'
     error?: unknown
   }
 }
@@ -56,8 +60,8 @@ export type ScanProgress = {
   failed: number
   rateLimited: number
   metadataNotFound: number
-  omdbNotConfigured: number
-  omdbError: number
+  providerNotConfigured: number
+  providerError: number
   skipped: number
 }
 
@@ -77,11 +81,11 @@ export const updateScanProgress = (progress: ScanProgress, status: LinkMovieStat
     case 'metadata-not-found':
       progress.metadataNotFound++
       break
-    case 'omdb-not-configured':
-      progress.omdbNotConfigured++
+    case 'provider-not-configured':
+      progress.providerNotConfigured++
       break
-    case 'omdb-error':
-      progress.omdbError++
+    case 'provider-error':
+      progress.providerError++
       break
     case 'failed':
       progress.failed++
@@ -99,8 +103,8 @@ export const createScanProgress = (total: number): ScanProgress => ({
   failed: 0,
   rateLimited: 0,
   metadataNotFound: 0,
-  omdbNotConfigured: 0,
-  omdbError: 0,
+  providerNotConfigured: 0,
+  providerError: 0,
   skipped: 0,
 })
 
@@ -110,8 +114,8 @@ export const getProcessedCount = (progress: ScanProgress): number =>
   progress.failed +
   progress.rateLimited +
   progress.metadataNotFound +
-  progress.omdbNotConfigured +
-  progress.omdbError +
+  progress.providerNotConfigured +
+  progress.providerError +
   progress.skipped
 
 export type ScanForMoviesEndpoint = {
@@ -173,31 +177,38 @@ export type PlaybackInfoResponse = {
 
 export type HlsMasterEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; videoCodecs?: string; audioCodecs?: string; containers?: string }
+  query: {
+    mode?: PlaybackMode
+    videoCodecs?: string
+    audioCodecs?: string
+    containers?: string
+    audioTrack?: number
+    startTime?: number
+  }
   result: unknown
 }
 
 export type HlsStreamEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number; startTime?: number }
   result: unknown
 }
 
 export type HlsSegmentEndpoint = {
   url: { letter: string; path: string; index: string }
-  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number; startTime?: number }
   result: unknown
 }
 
 export type HlsInitEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; audioTrack?: number; resolution?: string }
+  query: { mode?: PlaybackMode; audioTrack?: number; resolution?: string; startTime?: number }
   result: unknown
 }
 
 export type HlsSessionTeardownEndpoint = {
   url: { letter: string; path: string }
-  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number }
+  query: { mode?: PlaybackMode; resolution?: string; audioTrack?: number; startTime?: number }
   result: { success: boolean }
 }
 
@@ -225,6 +236,14 @@ export interface MediaApi extends RestApi {
     '/omdb-movie-metadata/:id': GetEntityEndpoint<OmdbMovieMetadata, 'imdbID'>
     '/omdb-series-metadata': GetCollectionEndpoint<OmdbSeriesMetadata>
     '/omdb-series-metadata/:id': GetEntityEndpoint<OmdbSeriesMetadata, 'imdbID'>
+    '/tmdb-movie-metadata': GetCollectionEndpoint<TmdbMovieMetadata>
+    '/tmdb-movie-metadata/:id': GetEntityEndpoint<TmdbMovieMetadata, 'id'>
+    '/tmdb-series-metadata': GetCollectionEndpoint<TmdbSeriesMetadata>
+    '/tmdb-series-metadata/:id': GetEntityEndpoint<TmdbSeriesMetadata, 'id'>
+    '/movie-metadata-localized': GetCollectionEndpoint<MovieMetadataLocalized>
+    '/movie-metadata-localized/:id': GetEntityEndpoint<MovieMetadataLocalized, 'id'>
+    '/series-metadata-localized': GetCollectionEndpoint<SeriesMetadataLocalized>
+    '/series-metadata-localized/:id': GetEntityEndpoint<SeriesMetadataLocalized, 'id'>
     '/movie-files': GetCollectionEndpoint<MovieFile>
     '/movie-files/:id': GetEntityEndpoint<MovieFile, 'id'>
     '/files/:letter/:path/master.m3u8': HlsMasterEndpoint

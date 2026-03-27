@@ -5,9 +5,10 @@ import furystack from '@furystack/eslint-plugin'
 import prettierConfig from 'eslint-config-prettier'
 import jsdoc from 'eslint-plugin-jsdoc'
 import playwright from 'eslint-plugin-playwright'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default defineConfig(
   {
     ...playwright.configs['flat/recommended'],
     files: ['e2e'],
@@ -15,10 +16,10 @@ export default tseslint.config(
   {
     ignores: [
       'coverage',
-      '*/node_modules/*',
-      '*/esm/*',
-      '*/types/*',
-      '*/dist/*',
+      '**/node_modules/**',
+      '**/esm/**',
+      '**/types/**',
+      '**/dist/**',
       '.yarn/*',
       'eslint.config.js',
       'prettier.config.js',
@@ -29,7 +30,9 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {
-    plugins: { furystack },
+    plugins: {
+      furystack,
+    },
     ...furystack.configs.recommendedStrict,
   },
   prettierConfig,

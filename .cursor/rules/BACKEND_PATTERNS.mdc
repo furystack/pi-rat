@@ -91,6 +91,39 @@ service/src/app-models/[module]/
 - **Clean up**: Remove partial state on failures
 - **Log appropriately**: Use scoped loggers with meaningful context
 
+### Provider / Adapter Fallback Chains
+
+When building fallback chains where multiple providers are tried in priority order:
+
+- **Use a narrow internal result type** for provider helpers, not the top-level result type
+- Providers should only return what they can produce (e.g., an `imdbId`), not dummy values for fields they don't have
+- The orchestrator function creates the full result from the provider's narrow output
+
+```typescript
+// ✅ Good - narrow type for internal helpers
+type ProviderResult =
+  | { status: 'skip' }
+  | { status: 'rate-limited' }
+  | { status: 'linked'; imdbId: string }
+
+const tryProvider = async (...): Promise<ProviderResult> => {
+  // ...
+  return { status: 'linked', imdbId: result.imdbID }
+}
+
+// The orchestrator builds the full result
+for (const provider of priority) {
+  const result = await providers[provider](injector, params)
+  if (result.status === 'linked') {
+    linkedImdbId = result.imdbId
+    break
+  }
+}
+
+// ❌ Bad - reusing the top-level type forces dummy values
+return { status: 'linked', movieFile: undefined as unknown as MovieFile, movie }
+```
+
 ### Service Layer
 
 ```typescript

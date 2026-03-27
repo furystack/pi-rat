@@ -1,7 +1,7 @@
 import { createClient } from '@furystack/rest-client-fetch'
 import type { IotApi } from 'common'
 import { Injectable } from '@furystack/inject'
-import { environmentOptions } from '../../environment-options.js'
+import { environmentOptions } from '../../utils/environment-options.js'
 
 @Injectable({ lifetime: 'singleton' })
 export class IotApiClient {

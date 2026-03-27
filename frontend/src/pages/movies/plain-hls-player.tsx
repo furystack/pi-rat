@@ -1,10 +1,10 @@
 import { Shade, createComponent } from '@furystack/shades'
-import type Hls from 'hls.js'
-import { environmentOptions } from '../../environment-options.js'
+
+import { environmentOptions } from '../../utils/environment-options.js'
 
 /**
- * Minimal HLS player for debugging — no media-chrome, no MoviePlayerService,
- * no watch progress, no audio/subtitle track management. Just hls.js + a <video>.
+ * Minimal HLS player for debugging -- native browser HLS playback + a <video>.
+ * No MoviePlayerService, no watch progress, no audio/subtitle track management.
  */
 export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
   customElementName: 'plain-hls-player',
@@ -14,9 +14,8 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
 
     const hlsUrl = `${environmentOptions.serviceUrl}/media/files/${encodeURIComponent(props.driveLetter)}/${encodeURIComponent(props.path)}/master.m3u8?mode=transcode`
 
-    let hlsInstance: Hls | null = null
-
-    useDisposable('hls-setup', () => {
+    useDisposable('video-setup', () => {
+      let cleanupListeners: Disposable | null = null
       const frameId = requestAnimationFrame(() => {
         const video = videoRef.current
         const log = logRef.current
@@ -29,66 +28,49 @@ export const PlainHlsPlayer = Shade<{ driveLetter: string; path: string }>({
         }
 
         append(`HLS URL: ${hlsUrl}`)
+        video.src = hlsUrl
 
-        void import('hls.js').then(({ default: HlsModule }) => {
-          if (!HlsModule.isSupported()) {
-            append('hls.js not supported, trying native')
-            video.src = hlsUrl
-            return
+        const onLoadedMetadata = () => append(`Metadata loaded: duration=${video.duration.toFixed(1)}s`)
+        const onCanPlay = () => {
+          append('Can play')
+          video.play().catch((err: unknown) => append(`Autoplay blocked: ${String(err)}`))
+        }
+        const onError = () => {
+          const err = video.error
+          append(`ERROR: ${err?.message ?? `code ${err?.code}`}`)
+        }
+        const onProgress = () => {
+          if (video.buffered.length > 0) {
+            const end = video.buffered.end(video.buffered.length - 1)
+            append(`Buffered to ${end.toFixed(1)}s`)
           }
+        }
+        const onWaiting = () => append('Waiting for data...')
+        const onPlaying = () => append('Playing')
 
-          const hls = new HlsModule({
-            debug: false,
-            xhrSetup: (xhr) => {
-              xhr.withCredentials = true
-            },
-          })
-          hlsInstance = hls
+        video.addEventListener('loadedmetadata', onLoadedMetadata)
+        video.addEventListener('canplay', onCanPlay)
+        video.addEventListener('error', onError)
+        video.addEventListener('progress', onProgress)
+        video.addEventListener('waiting', onWaiting)
+        video.addEventListener('playing', onPlaying)
 
-          hls.on(HlsModule.Events.MANIFEST_PARSED, (_e, data) => {
-            append(`Manifest parsed: ${data.levels.length} levels`)
-            video.play().catch((err: unknown) => append(`Autoplay blocked: ${String(err)}`))
-          })
-
-          hls.on(HlsModule.Events.LEVEL_LOADED, (_e, data) => {
-            append(
-              `Level ${data.level} loaded: ${data.details.totalduration?.toFixed(1)}s, ${data.details.fragments.length} frags`,
-            )
-          })
-
-          hls.on(HlsModule.Events.FRAG_LOADED, (_e, data) => {
-            const f = data.frag
-            append(`Frag ${f.sn} [${f.type}] start=${f.start.toFixed(1)} dur=${f.duration.toFixed(1)} level=${f.level}`)
-          })
-
-          hls.on(HlsModule.Events.FRAG_BUFFERED, (_e, data) => {
-            const { startPTS, endPTS } = data.frag
-            if (startPTS !== undefined && startPTS !== null) {
-              append(
-                `  -> buffered ${data.frag.sn} [${data.frag.type}] PTS=${startPTS.toFixed(2)}-${endPTS?.toFixed(2)}`,
-              )
-            }
-          })
-
-          hls.on(HlsModule.Events.ERROR, (_e, data) => {
-            append(`ERROR: ${data.type} / ${data.details}${data.fatal ? ' [FATAL]' : ''}`)
-            if (data.fatal && data.type === HlsModule.ErrorTypes.MEDIA_ERROR) {
-              append('Attempting recovery...')
-              hls.recoverMediaError()
-            }
-          })
-
-          hls.loadSource(hlsUrl)
-          hls.attachMedia(video)
-        })
+        cleanupListeners = {
+          [Symbol.dispose]: () => {
+            video.removeEventListener('loadedmetadata', onLoadedMetadata)
+            video.removeEventListener('canplay', onCanPlay)
+            video.removeEventListener('error', onError)
+            video.removeEventListener('progress', onProgress)
+            video.removeEventListener('waiting', onWaiting)
+            video.removeEventListener('playing', onPlaying)
+          },
+        }
       })
+
       return {
         [Symbol.dispose]: () => {
           cancelAnimationFrame(frameId)
-          if (hlsInstance) {
-            hlsInstance.destroy()
-            hlsInstance = null
-          }
+          cleanupListeners?.[Symbol.dispose]()
         },
       }
     })

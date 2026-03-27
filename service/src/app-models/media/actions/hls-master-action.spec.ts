@@ -17,14 +17,6 @@ vi.mock('@furystack/logging', () => ({
   }),
 }))
 
-const mockFind = vi.fn()
-
-vi.mock('@furystack/repository', () => ({
-  getDataSetFor: () => ({
-    find: (...args: unknown[]) => mockFind(...args) as unknown,
-  }),
-}))
-
 const mockFfprobe: FfprobeData = {
   streams: [
     { index: 0, codec_type: 'video', codec_name: 'h264', width: 1920, height: 1080, tags: {} },
@@ -43,8 +35,6 @@ const mockFfprobe: FfprobeData = {
 
 describe('HlsMasterAction', () => {
   it('should return a valid M3U8 master playlist', async () => {
-    mockFind.mockResolvedValue([])
-
     let writtenBody = ''
     const response = {
       writeHead: vi.fn(),
@@ -77,8 +67,6 @@ describe('HlsMasterAction', () => {
   })
 
   it('should use codec support from query params', async () => {
-    mockFind.mockResolvedValue([])
-
     let writtenBody = ''
     const response = {
       writeHead: vi.fn(),
@@ -105,14 +93,7 @@ describe('HlsMasterAction', () => {
     })
   })
 
-  it('should include subtitle tracks from related files', async () => {
-    mockFind.mockResolvedValue([
-      {
-        imdbId: 'tt1234',
-        relatedFiles: [{ type: 'subtitle', path: 'movies/test.eng.srt' }],
-      },
-    ])
-
+  it('should not include subtitle entries in master playlist (handled via HTML track elements)', async () => {
     let writtenBody = ''
     const response = {
       writeHead: vi.fn(),
@@ -135,7 +116,8 @@ describe('HlsMasterAction', () => {
         request: {} as IncomingMessage,
       })
 
-      expect(writtenBody).toContain('TYPE=SUBTITLES')
+      expect(writtenBody).not.toContain('TYPE=SUBTITLES')
+      expect(writtenBody).not.toContain('SUBTITLES=')
     })
   })
 })

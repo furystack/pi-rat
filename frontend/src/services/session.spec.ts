@@ -123,6 +123,23 @@ describe('SessionService', () => {
         expect(mockNotyService.emit).toHaveBeenCalledWith('onNotyAdded', expect.objectContaining({ type: 'warning' }))
       })
     })
+
+    it('should clear loginError before attempting login', async () => {
+      const mockCall = vi.fn().mockResolvedValue({
+        result: { username: 'testuser', roles: ['user'] },
+      })
+
+      const { injector } = createTestInjector(mockCall)
+
+      await usingAsync(injector, async (i) => {
+        const service = i.getInstance(SessionService)
+        service.loginError.setValue('previous error')
+
+        await service.login('testuser', 'password123')
+
+        expect(service.loginError.getValue()).toBe('')
+      })
+    })
   })
 
   describe('register', () => {
@@ -158,6 +175,23 @@ describe('SessionService', () => {
         expect(mockNotyService.emit).toHaveBeenCalledWith('onNotyAdded', expect.objectContaining({ type: 'warning' }))
       })
     })
+
+    it('should clear loginError before attempting registration', async () => {
+      const mockCall = vi.fn().mockResolvedValue({
+        result: { username: 'newuser', roles: [] },
+      })
+
+      const { injector } = createTestInjector(mockCall)
+
+      await usingAsync(injector, async (i) => {
+        const service = i.getInstance(SessionService)
+        service.loginError.setValue('previous error')
+
+        await service.register('newuser', 'password123')
+
+        expect(service.loginError.getValue()).toBe('')
+      })
+    })
   })
 
   describe('logout', () => {
@@ -169,16 +203,31 @@ describe('SessionService', () => {
       await usingAsync(injector, async (i) => {
         const service = i.getInstance(SessionService)
 
-        // Set up an authenticated state first
         service.currentUser.setValue({ username: 'testuser', roles: ['user'] })
 
         await service.logout()
 
-        // Verify API was called with logout action
         expect(mockCall).toHaveBeenCalledWith({ method: 'POST', action: '/logout' })
-        // Verify currentUser was cleared
         expect(service.currentUser.getValue()).toBeNull()
-        // Verify notification was shown
+        expect(mockNotyService.emit).toHaveBeenCalledWith('onNotyAdded', expect.objectContaining({ type: 'info' }))
+      })
+    })
+
+    it('should still clear state when logout API call fails', async () => {
+      const mockCall = vi.fn().mockRejectedValue(new Error('Network error'))
+
+      const { injector, mockNotyService } = createTestInjector(mockCall)
+
+      await usingAsync(injector, async (i) => {
+        const service = i.getInstance(SessionService)
+
+        service.currentUser.setValue({ username: 'testuser', roles: ['user'] })
+        service.state.setValue('authenticated')
+
+        await service.logout()
+
+        expect(service.currentUser.getValue()).toBeNull()
+        expect(service.state.getValue()).toBe('unauthenticated')
         expect(mockNotyService.emit).toHaveBeenCalledWith('onNotyAdded', expect.objectContaining({ type: 'info' }))
       })
     })
@@ -403,7 +452,6 @@ describe('SessionService', () => {
 
         const initPromise = service.init()
 
-        // Check during operation
         capturedInProgress = service.isOperationInProgress.getValue()
 
         await initPromise

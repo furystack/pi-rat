@@ -1,4 +1,5 @@
 import { getCurrentUser, getStoreManager } from '@furystack/core'
+import { useEntitySync } from '@furystack/entity-sync-service'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { Repository } from '@furystack/repository'
@@ -188,6 +189,10 @@ export const setupAiStore = async (injector: Injector) => {
         },
       }
     },
+  })
+
+  useEntitySync(injector, {
+    models: [{ model: AiChatMessage, primaryKey: 'id' }],
   })
 
   repository.createDataSet(AiChatMessage, 'id', {

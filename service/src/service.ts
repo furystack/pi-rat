@@ -2,10 +2,9 @@ import type { Injector } from '@furystack/inject'
 import { Injectable, Injected } from '@furystack/inject'
 import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
-import { SyncSubscribeAction, SyncUnsubscribeAction, useEntitySync } from '@furystack/entity-sync-service'
+import { SyncSubscribeAction, SyncUnsubscribeAction } from '@furystack/entity-sync-service'
 import { useWebsockets } from '@furystack/websocket-api'
 import { EventHub } from '@furystack/utils'
-import { AiChatMessage, Chat, ChatMessage, LogEntry } from 'common'
 import { AiAppModel } from './ai/ai-app-model.js'
 import { ChatAppModel } from './app-models/chat/chat-app-model.js'
 import { ConfigAppModel } from './app-models/config/config-app-model.js'
@@ -44,15 +43,6 @@ export class PiRatRootService extends EventHub<{ initialized: undefined }> {
       injector.getInstance(ChatAppModel),
       injector.getInstance(AiAppModel),
     )
-
-    useEntitySync(injector, {
-      models: [
-        { model: Chat, primaryKey: 'id' },
-        { model: ChatMessage, primaryKey: 'id', debounceMs: 100 },
-        { model: LogEntry, primaryKey: 'id', debounceMs: 200 },
-        { model: AiChatMessage, primaryKey: 'id' },
-      ],
-    })
 
     const syncInjector = injector.createChild({ owner: 'entity-sync' })
     await useWebsockets(syncInjector, {

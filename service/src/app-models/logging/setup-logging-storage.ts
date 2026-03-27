@@ -1,3 +1,4 @@
+import { useEntitySync } from '@furystack/entity-sync-service'
 import type { Injector } from '@furystack/inject'
 import { getLogger, type LogLevel } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
@@ -81,5 +82,9 @@ export const setupLoggingStorage = async (injector: Injector) => {
     authorizeUpdate: alwaysDeny,
     authorizeRemove: alwaysDeny,
     authorizeAdd: withRole('admin'),
+  })
+
+  useEntitySync(injector, {
+    models: [{ model: LogEntry, primaryKey: 'id', debounceMs: 200 }],
   })
 }

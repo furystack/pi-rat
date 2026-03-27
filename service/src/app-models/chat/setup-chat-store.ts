@@ -1,4 +1,5 @@
 import { getCurrentUser, getStoreManager } from '@furystack/core'
+import { useEntitySync } from '@furystack/entity-sync-service'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getRepository } from '@furystack/repository'
@@ -314,6 +315,13 @@ export const setupChatStore = async (injector: Injector) => {
 
       return { isAllowed: true }
     },
+  })
+
+  useEntitySync(injector, {
+    models: [
+      { model: Chat, primaryKey: 'id' },
+      { model: ChatMessage, primaryKey: 'id', debounceMs: 100 },
+    ],
   })
 
   repo.createDataSet(ChatInvitation, 'id', {

@@ -1,17 +1,16 @@
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, NotyService } from '@furystack/shades-common-components'
 import type { ChatMessage } from 'common'
-import { SessionService } from '../../services/session.js'
+import { getUser } from '../../utils/session-helpers.js'
 import { ChatMessageService } from './chat-messages-service.js'
 
 export const DeleteChatMessage = Shade<{ chatMessage: ChatMessage }>({
   customElementName: 'shade-app-delete-chat-message',
   render: ({ injector, props }) => {
-    const currentUser = injector.getInstance(SessionService).currentUser.getValue()
     const { chatMessage } = props
     const noty = injector.getInstance(NotyService)
 
-    if (chatMessage.owner !== currentUser?.username) {
+    if (chatMessage.owner !== getUser(injector).username) {
       return null
     }
 

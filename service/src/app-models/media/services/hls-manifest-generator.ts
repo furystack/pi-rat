@@ -1,5 +1,5 @@
 import { serializeToQueryString } from '@furystack/rest'
-import type { FfprobeData, PlaybackMode, SubtitleTrackInfo } from 'common'
+import type { FfprobeData, PlaybackMode } from 'common'
 
 export type HlsVariant = {
   resolution: string
@@ -9,6 +9,7 @@ export type HlsVariant = {
 }
 
 const DEFAULT_VARIANTS: HlsVariant[] = [
+  { resolution: '3840x2160', width: 3840, height: 2160, bandwidth: 15000000 },
   { resolution: '1920x1080', width: 1920, height: 1080, bandwidth: 5000000 },
   { resolution: '1280x720', width: 1280, height: 720, bandwidth: 2800000 },
   { resolution: '854x480', width: 854, height: 480, bandwidth: 1400000 },
@@ -20,13 +21,15 @@ export const generateMasterPlaylist = ({
   file,
   mode,
   baseUrl,
-  subtitleTracks,
+  audioTrack,
+  startTime,
 }: {
   ffprobe: FfprobeData
   file: { driveLetter: string; path: string }
   mode: PlaybackMode
   baseUrl: string
-  subtitleTracks: SubtitleTrackInfo[]
+  audioTrack?: number
+  startTime?: number
 }): string => {
   const lines: string[] = ['#EXTM3U', '#EXT-X-VERSION:7']
 
@@ -34,23 +37,21 @@ export const generateMasterPlaylist = ({
   const encodedPath = encodeURIComponent(file.path)
   const streamBase = `${baseUrl}/files/${encodedLetter}/${encodedPath}`
 
-  for (const track of subtitleTracks.filter((t) => !t.requiresBurnIn)) {
-    const isDefault = track.index === subtitleTracks.filter((t) => !t.requiresBurnIn)[0]?.index ? 'YES' : 'NO'
-    lines.push(
-      `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="${track.label}",LANGUAGE="${track.language}",DEFAULT=${isDefault},AUTOSELECT=${isDefault},URI="${track.url || `${streamBase}/subtitle/${track.index}.m3u8`}"`,
-    )
-  }
+  // Subtitles are handled via HTML <track> elements on the frontend,
+  // not embedded in the HLS manifest (raw VTT URLs aren't valid HLS subtitle playlists).
 
   const videoStream = ffprobe.streams.find((s) => s.codec_type === 'video')
   const sourceHeight = videoStream?.height || 1080
   const sourceWidth = videoStream?.width || 1920
   const sourceBitrate = ffprobe.format.bit_rate || 5000000
 
+  const audioTrackQuery = audioTrack !== undefined ? { audioTrack } : {}
+  const startTimeQuery = startTime && startTime > 0 ? { startTime } : {}
+
   if (mode === 'remux' || mode === 'direct-play' || mode === 'direct-stream') {
-    const subtitleGroup = subtitleTracks.filter((t) => !t.requiresBurnIn).length > 0 ? ',SUBTITLES="subs"' : ''
     lines.push(
-      `#EXT-X-STREAM-INF:BANDWIDTH=${sourceBitrate},RESOLUTION=${sourceWidth}x${sourceHeight},CODECS="${getCodecString(ffprobe)}"${subtitleGroup}`,
-      `${streamBase}/stream.m3u8?${serializeToQueryString({ mode })}`,
+      `#EXT-X-STREAM-INF:BANDWIDTH=${sourceBitrate},RESOLUTION=${sourceWidth}x${sourceHeight},CODECS="${getCodecString(ffprobe, mode)}"`,
+      `${streamBase}/stream.m3u8?${serializeToQueryString({ mode, ...audioTrackQuery, ...startTimeQuery })}`,
     )
   } else {
     const applicableVariants = DEFAULT_VARIANTS.filter((v) => v.height <= sourceHeight)
@@ -58,12 +59,10 @@ export const generateMasterPlaylist = ({
       applicableVariants.push(DEFAULT_VARIANTS[DEFAULT_VARIANTS.length - 1])
     }
 
-    const subtitleGroup = subtitleTracks.filter((t) => !t.requiresBurnIn).length > 0 ? ',SUBTITLES="subs"' : ''
-
     for (const variant of applicableVariants) {
       lines.push(
-        `#EXT-X-STREAM-INF:BANDWIDTH=${variant.bandwidth},RESOLUTION=${variant.resolution},CODECS="avc1.42E01E,mp4a.40.2"${subtitleGroup}`,
-        `${streamBase}/stream.m3u8?${serializeToQueryString({ mode: 'transcode' as PlaybackMode, resolution: `${variant.height}p` })}`,
+        `#EXT-X-STREAM-INF:BANDWIDTH=${variant.bandwidth},RESOLUTION=${variant.resolution},CODECS="avc1.42E01E,mp4a.40.2"`,
+        `${streamBase}/stream.m3u8?${serializeToQueryString({ mode: 'transcode' as PlaybackMode, resolution: `${variant.height}p`, ...audioTrackQuery, ...startTimeQuery })}`,
       )
     }
   }
@@ -71,7 +70,7 @@ export const generateMasterPlaylist = ({
   return `${lines.join('\n')}\n`
 }
 
-const getCodecString = (ffprobe: FfprobeData): string => {
+const getCodecString = (ffprobe: FfprobeData, mode: PlaybackMode): string => {
   const videoStream = ffprobe.streams.find((s) => s.codec_type === 'video')
   const audioStream = ffprobe.streams.find((s) => s.codec_type === 'audio')
 
@@ -89,7 +88,10 @@ const getCodecString = (ffprobe: FfprobeData): string => {
   }
 
   const videoCodec = videoCodecMap[videoStream?.codec_name ?? ''] ?? 'avc1.42E01E'
-  const audioCodec = audioCodecMap[audioStream?.codec_name ?? ''] ?? 'mp4a.40.2'
+
+  // In direct-stream mode, audio is transcoded to AAC regardless of the source codec
+  const audioCodec =
+    mode === 'direct-stream' ? 'mp4a.40.2' : (audioCodecMap[audioStream?.codec_name ?? ''] ?? 'mp4a.40.2')
 
   return `${videoCodec},${audioCodec}`
 }

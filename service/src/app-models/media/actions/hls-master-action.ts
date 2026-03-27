@@ -1,13 +1,11 @@
 import { getLogger } from '@furystack/logging'
-import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
 import type { MediaApi, PlaybackMode } from 'common'
-import { MovieFile } from 'common'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { generateMasterPlaylist } from '../services/hls-manifest-generator.js'
-import { buildSubtitleTrackList, resolvePlaybackMode } from '../services/stream-builder.js'
+import { resolvePlaybackMode } from '../services/stream-builder.js'
 
 const VALID_MODES: PlaybackMode[] = ['direct-play', 'remux', 'direct-stream', 'transcode']
 
@@ -45,20 +43,13 @@ export const HlsMasterAction: RequestAction<HlsMasterEndpoint> = async ({
           },
         }).mode
 
-  const movieFiles = await getDataSetFor(injector, MovieFile, 'id').find(injector, {
-    filter: { driveLetter: { $eq: letter }, path: { $eq: path } },
-    top: 1,
-  })
-  const movieFile = movieFiles[0]
-
-  const subtitleTracks = buildSubtitleTrackList(ffprobe, file, movieFile?.relatedFiles, movieFile?.imdbId)
-
   const playlist = generateMasterPlaylist({
     ffprobe,
     file,
     mode,
     baseUrl: '/api/media',
-    subtitleTracks,
+    audioTrack: query.audioTrack,
+    startTime: query.startTime,
   })
 
   await logger.verbose({ message: `Generated master playlist for ${letter}:${path}`, data: { mode } })

@@ -2,7 +2,7 @@ import { createComponent } from '@furystack/shades'
 import type { FfprobeData, PiRatFile, SubtitleTrackInfo } from 'common'
 import { getFileName, getParentPath } from 'common'
 
-import { environmentOptions } from '../../../environment-options.js'
+import { environmentOptions } from '../../../utils/environment-options.js'
 
 /**
  * Builds subtitle track elements from playback-info response data when available,

@@ -3,7 +3,7 @@ import { createComponent, type TitleResolverOptions } from '@furystack/shades'
 import { icons } from '@furystack/shades-common-components'
 import type { MatchResult } from 'path-to-regexp'
 import { PiRatLazyLoad } from '../components/pirat-lazy-load.js'
-import { navigateToRoute } from '../navigate-to-route.js'
+import { navigateToRoute } from '../utils/navigate-to-route.js'
 
 export const settingsChildren = {
   '/': {
@@ -19,6 +19,17 @@ export const settingsChildren = {
         component={async () => {
           const { OmdbSettingsPage } = await import('../pages/admin/omdb-settings.js')
           return <OmdbSettingsPage />
+        }}
+      />
+    ),
+  },
+  '/tmdb': {
+    meta: { title: 'TMDB Settings', icon: icons.film },
+    component: () => (
+      <PiRatLazyLoad
+        component={async () => {
+          const { TmdbSettingsPage } = await import('../pages/admin/tmdb-settings.js')
+          return <TmdbSettingsPage />
         }}
       />
     ),

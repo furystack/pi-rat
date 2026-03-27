@@ -5,14 +5,10 @@ import { MoviesService } from './movies-service.js'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 import type { Movie } from 'common'
 
-const createMockMovie = (imdbId = 'tt1234567', title = 'Test Movie'): Movie => ({
+const createMockMovie = (imdbId = 'tt1234567', _title = 'Test Movie'): Movie => ({
   imdbId,
-  title,
   year: 2024,
   type: 'movie',
-  genre: ['Action'],
-  plot: 'Test plot',
-  thumbnailImageUrl: 'https://example.com/poster.jpg',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 })
@@ -180,12 +176,8 @@ describe('MoviesService', () => {
 
         const body = {
           imdbId: 'tt1234567',
-          title: 'Test Movie',
           year: 2024,
           type: 'movie' as const,
-          genre: ['Action'],
-          plot: 'Test plot',
-          thumbnailImageUrl: 'https://example.com/poster.jpg',
         }
         const result = await service.createMovie(body)
 
@@ -216,12 +208,8 @@ describe('MoviesService', () => {
         await service.getMovie('tt1234567')
 
         const body = {
-          title: 'Updated Movie',
           year: 2024,
           type: 'movie' as const,
-          genre: ['Drama'],
-          plot: 'Updated plot',
-          thumbnailImageUrl: 'https://example.com/updated-poster.jpg',
         }
         const result = await service.updateMovie('tt1234567', body)
 

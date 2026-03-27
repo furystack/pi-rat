@@ -63,6 +63,14 @@ describe('resolvePlaybackMode', () => {
     expect(result.mode).toBe('remux')
   })
 
+  it('should return remux for matroska even when client claims webm container support', () => {
+    const ffprobe = createFfprobe({
+      format: { format_name: 'matroska,webm', duration: '100' },
+    })
+    const result = resolvePlaybackMode({ ffprobe, codecSupport: fullCodecSupport })
+    expect(result.mode).toBe('remux')
+  })
+
   it('should return direct-stream when video is supported but audio is not', () => {
     const ffprobe = createFfprobe({
       streams: [

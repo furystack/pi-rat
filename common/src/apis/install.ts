@@ -9,6 +9,10 @@ export type ServiceStatusResponse = {
      */
     omdb: boolean
     /**
+     * TMDB API Installation Status for metadata fetching
+     */
+    tmdb: boolean
+    /**
      * Github API Installation Status for external authentication
      */
     github: boolean

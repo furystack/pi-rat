@@ -7,12 +7,8 @@ import { Semaphore, sleepAsync } from '@furystack/utils'
 import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata, PiRatFile } from 'common'
 import { Config } from 'common'
 
-export type OmdbFetchResult<T> =
-  | { status: 'success'; data: T }
-  | { status: 'not-found' }
-  | { status: 'rate-limited' }
-  | { status: 'not-configured' }
-  | { status: 'error'; error: unknown }
+import { type ConfigWatcher, createConfigWatcher } from '../../../utils/config-watcher.js'
+import type { MetadataFetchResult } from './metadata-fetch-result.js'
 
 const MAX_RETRIES = 3
 const INITIAL_BACKOFF_MS = 5_000
@@ -43,6 +39,9 @@ export class OmdbClientService {
   declare private systemInjector: Injector
 
   private readonly semaphore = new Semaphore(1)
+  private readonly pendingRequests = new Map<string, Promise<MetadataFetchResult<unknown>>>()
+
+  private configWatcher?: ConfigWatcher
 
   public init() {
     void this.initAsync().catch((error) => {
@@ -50,63 +49,40 @@ export class OmdbClientService {
     })
   }
 
-  private configSubscriptions: Disposable[] = []
-
   private async initAsync() {
-    for (const sub of this.configSubscriptions) {
-      sub[Symbol.dispose]()
-    }
-    this.configSubscriptions = []
+    this.configWatcher?.dispose()
+    this.configWatcher = createConfigWatcher<OmdbConfig>({
+      configDataSet: this.configDataSet,
+      systemInjector: this.systemInjector,
+      logger: this.logger,
+      configId: 'OMDB_CONFIG',
+      serviceName: 'OMDB Service',
+      onChange: (config) => {
+        this.config = config
+      },
+    })
+    await this.configWatcher.init()
+  }
 
-    const config = await this.configDataSet.get(this.systemInjector, 'OMDB_CONFIG')
-    if (!config) {
-      this.config = undefined
-      await this.logger.information({
-        message: '🚫   No config found, OMDB Service will not be initialized',
-      })
-    } else {
-      this.config = config as OmdbConfig
-      await this.logger.verbose({
-        message: '✅   OMDB Service initialized',
-      })
-    }
+  private fetchWithDedup<T>(
+    key: string,
+    fetcher: () => Promise<MetadataFetchResult<T>>,
+  ): Promise<MetadataFetchResult<T>> {
+    const pending = this.pendingRequests.get(key)
+    if (pending) return pending as Promise<MetadataFetchResult<T>>
 
-    this.configSubscriptions.push(
-      this.configDataSet.subscribe('onEntityAdded', ({ entity }) => {
-        if (entity.id === 'OMDB_CONFIG') {
-          this.config = entity as OmdbConfig
-          void this.logger.information({
-            message: `🎬   OMDB Service config added`,
-          })
-        }
-      }),
-      this.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
-        if (change.id === 'OMDB_CONFIG') {
-          this.config = {
-            ...this.config,
-            ...change,
-          } as OmdbConfig
-          void this.logger.information({
-            message: `🎬   OMDB Service config updated`,
-            data: change,
-          })
-        }
-      }),
-      this.configDataSet.subscribe('onEntityRemoved', ({ key }) => {
-        if (key === 'OMDB_CONFIG') {
-          this.config = undefined
-          void this.logger.information({
-            message: '🚫   OMDB Service config removed, service will not be able to fetch metadata',
-          })
-        }
-      }),
-    )
+    const promise = this.semaphore.execute(fetcher)
+    this.pendingRequests.set(key, promise as Promise<MetadataFetchResult<unknown>>)
+
+    return promise.finally(() => {
+      this.pendingRequests.delete(key)
+    })
   }
 
   private async fetchWithRetry(
     url: string,
     context: { file?: PiRatFile; description: string },
-  ): Promise<OmdbFetchResult<Record<string, unknown>>> {
+  ): Promise<MetadataFetchResult<Record<string, unknown>>> {
     let backoffMs = INITIAL_BACKOFF_MS
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -160,7 +136,7 @@ export class OmdbClientService {
       episode?: number
     },
     context?: { file?: PiRatFile },
-  ): Promise<OmdbFetchResult<OmdbMovieMetadata>> {
+  ): Promise<MetadataFetchResult<OmdbMovieMetadata>> {
     if (!this.config) {
       await this.logger.error({
         message: '🚫   OMDB Service is not initialized, cannot fetch movie metadata',
@@ -181,7 +157,7 @@ export class OmdbClientService {
     const description = `movie '${title}'${year ? ` (${year})` : ''}`
 
     try {
-      return await this.semaphore.execute(async () => {
+      return await this.fetchWithDedup<OmdbMovieMetadata>(url, async () => {
         const result = await this.fetchWithRetry(url, { file: context?.file, description })
         if (result.status === 'success') {
           if (typeof result.data.imdbID !== 'string') {
@@ -200,10 +176,46 @@ export class OmdbClientService {
     }
   }
 
+  public async fetchOmdbMovieMetadataByImdbId(
+    { imdbId }: { imdbId: string },
+    context?: { file?: PiRatFile },
+  ): Promise<MetadataFetchResult<OmdbMovieMetadata>> {
+    if (!this.config) {
+      await this.logger.error({
+        message: '🚫   OMDB Service is not initialized, cannot fetch movie metadata',
+        data: { file: context?.file },
+      })
+      return { status: 'not-configured' }
+    }
+
+    const query = [`i=${imdbId}`, 'plot=full'].join('&')
+    const url = `http://www.omdbapi.com/?apikey=${this.config.value.apiKey}&${query}`
+    const description = `movie by IMDB ID '${imdbId}'`
+
+    try {
+      return await this.fetchWithDedup<OmdbMovieMetadata>(url, async () => {
+        const result = await this.fetchWithRetry(url, { file: context?.file, description })
+        if (result.status === 'success') {
+          if (typeof result.data.imdbID !== 'string') {
+            return { status: 'error', error: new Error(`Invalid OMDB response: missing imdbID`) }
+          }
+          return { status: 'success' as const, data: result.data as unknown as OmdbMovieMetadata }
+        }
+        return result
+      })
+    } catch (error) {
+      await this.logger.warning({
+        message: `❗  Failed to fetch OMDB Movie metadata for ${description}`,
+        data: { error, imdbId, file: context?.file },
+      })
+      return { status: 'error', error }
+    }
+  }
+
   public async fetchOmdbSeriesMetadata(
     { imdbId }: { imdbId: string },
     context?: { file?: PiRatFile },
-  ): Promise<OmdbFetchResult<OmdbSeriesMetadata>> {
+  ): Promise<MetadataFetchResult<OmdbSeriesMetadata>> {
     if (!this.config) {
       await this.logger.error({
         message: '🚫   OMDB Service is not initialized, cannot fetch series metadata',
@@ -216,7 +228,7 @@ export class OmdbClientService {
     const description = `series '${imdbId}'`
 
     try {
-      return await this.semaphore.execute(async () => {
+      return await this.fetchWithDedup<OmdbSeriesMetadata>(url, async () => {
         const result = await this.fetchWithRetry(url, { file: context?.file, description })
         if (result.status === 'success') {
           if (typeof result.data.imdbID !== 'string') {

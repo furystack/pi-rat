@@ -244,7 +244,7 @@ describe('HlsSegmentAction', () => {
         request: {} as IncomingMessage,
       })
 
-      expect(getSession).toHaveBeenCalledWith('A', 'test.mkv', 'transcode', 2, '720p')
+      expect(getSession).toHaveBeenCalledWith('A', 'test.mkv', 'transcode', 2, '720p', 0)
     })
   })
 })

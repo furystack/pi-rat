@@ -1,7 +1,7 @@
 import { Shade, createComponent } from '@furystack/shades'
 import { Button, Form, Input, cssVariableTheme, promisifyAnimation } from '@furystack/shades-common-components'
 import { PiRatLogo } from '../components/pi-rat-logo.js'
-import { navigateToRoute } from '../navigate-to-route.js'
+import { navigateToRoute } from '../utils/navigate-to-route.js'
 import { SessionService } from '../services/session.js'
 
 export type LoginPayload = {
@@ -144,7 +144,6 @@ export const Login = Shade({
           validate={isLoginPayload}
           className="login-form"
           onSubmit={({ userName, password }) => {
-            sessionService.loginError.setValue('')
             void sessionService.login(userName, password)
           }}
         >

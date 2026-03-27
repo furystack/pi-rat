@@ -91,11 +91,11 @@ const navigateToMovieAndPlay = async (page: Page, browserName: string, wIndex: n
 }
 
 const openSettingsSubmenu = async (page: Page, menuItemText: string) => {
-  const settingsButton = page.locator('media-settings-menu-button').first()
+  const settingsButton = page.locator('[data-testid="settings-menu-button"]').first()
   await expect(settingsButton).toBeVisible({ timeout: 5_000 })
   await settingsButton.click()
 
-  const menuItem = page.locator('media-settings-menu-item').filter({ hasText: menuItemText })
+  const menuItem = page.locator('[data-testid="settings-menu-item"]').filter({ hasText: menuItemText })
   await expect(menuItem).toBeVisible({ timeout: 5_000 })
   await menuItem.click()
 }
@@ -219,7 +219,7 @@ test.describe('Video Playback @media', () => {
     await navigateToMovieAndPlay(page, browserName, workerIndex)
     await openSettingsSubmenu(page, 'Captions')
 
-    const captionOptions = page.locator('media-captions-menu media-chrome-menu-item')
+    const captionOptions = page.locator('[data-testid="caption-track-item"]')
     await expect(captionOptions.first()).toBeVisible({ timeout: 5_000 })
     const optionCount = await captionOptions.count()
     expect(optionCount).toBeGreaterThan(0)
@@ -231,7 +231,7 @@ test.describe('Video Playback @media', () => {
     const video = await navigateToMovieAndPlay(page, browserName, workerIndex)
     await openSettingsSubmenu(page, 'Audio')
 
-    const audioOptions = page.locator('media-audio-track-menu media-chrome-menu-item')
+    const audioOptions = page.locator('[data-testid="audio-track-item"]')
     await expect(audioOptions.first()).toBeVisible({ timeout: 5_000 })
     const audioCount = await audioOptions.count()
     expect(audioCount).toBeGreaterThanOrEqual(2)
@@ -245,21 +245,7 @@ test.describe('Video Playback @media', () => {
     }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
   })
 
-  test('Quality switching (HLS): quality options are listed and selectable', async ({ page, browserName }) => {
-    const video = await navigateToMovieAndPlay(page, browserName, workerIndex)
-    await openSettingsSubmenu(page, 'Quality')
-
-    const qualityOptions = page.locator('media-rendition-menu media-chrome-menu-item')
-    await expect(qualityOptions.first()).toBeVisible({ timeout: 5_000 })
-    const qualityCount = await qualityOptions.count()
-    expect(qualityCount).toBeGreaterThanOrEqual(2)
-
-    await qualityOptions.last().click()
-
-    // Verify playback continues after quality switch
-    await expect(async () => {
-      const currentTime = await video.evaluate((el: HTMLVideoElement) => el.currentTime)
-      expect(currentTime).toBeGreaterThan(0)
-    }).toPass({ timeout: 30_000, intervals: [2_000, 3_000, 5_000] })
-  })
+  // Quality/resolution switching was removed in favour of server-side mode
+  // selection (transcode / remux / direct-play). No client-side resolution
+  // observable exists anymore, so the former E2E test is intentionally omitted.
 })

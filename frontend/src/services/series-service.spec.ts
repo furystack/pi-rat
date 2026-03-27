@@ -5,12 +5,9 @@ import { SeriesService } from './series-service.js'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 import type { Series } from 'common'
 
-const createMockSeries = (imdbId = 'tt9876543', title = 'Test Series'): Series => ({
+const createMockSeries = (imdbId = 'tt9876543', _title = 'Test Series'): Series => ({
   imdbId,
-  title,
   year: '2024',
-  plot: 'Test series plot',
-  thumbnailImageUrl: 'https://example.com/series-poster.jpg',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 })

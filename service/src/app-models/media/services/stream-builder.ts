@@ -69,8 +69,7 @@ export const resolvePlaybackMode = ({
   const formatAliases = ffprobe.format.format_name?.split(',').map((s) => s.trim()) ?? []
   const primaryFormat = formatAliases[0] ?? ''
   const containerSupported =
-    formatAliases.some((alias) => codecSupport.containers.includes(alias)) ||
-    BROWSER_NATIVE_PRIMARY_FORMATS.has(primaryFormat)
+    codecSupport.containers.includes(primaryFormat) || BROWSER_NATIVE_PRIMARY_FORMATS.has(primaryFormat)
 
   if (videoSupported && audioSupported && containerSupported) {
     return { mode: 'direct-play', warnings }
