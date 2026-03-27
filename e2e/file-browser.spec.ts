@@ -58,7 +58,12 @@ const deleteFile = async (page: Page, fileName: string) => {
   await expect(file).toBeVisible()
   await file.click()
   await page.keyboard.press('Delete')
-  await assertAndDismissNoty(page, 'The file is deleted succesfully')
+
+  const confirmButton = page.locator('shades-dialog button', { hasText: 'Delete' })
+  await expect(confirmButton).toBeVisible()
+  await confirmButton.click()
+
+  await assertAndDismissNoty(page, 'item(s) deleted successfully')
 }
 
 test.describe('File Browser', () => {
