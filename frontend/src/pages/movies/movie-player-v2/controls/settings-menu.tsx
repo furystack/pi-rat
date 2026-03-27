@@ -10,7 +10,15 @@ type SettingsMenuProps = {
 
 type SubmenuId = 'speed' | 'audio' | 'captions' | null
 
-const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const
+const getTagString = (tags: unknown, key: string): string | undefined => {
+  if (tags && typeof tags === 'object') {
+    const value = (tags as Record<string, unknown>)[key]
+    return typeof value === 'string' ? value : undefined
+  }
+  return undefined
+}
+
+export const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const
 
 export const SettingsMenu = Shade<SettingsMenuProps>({
   customElementName: 'pirat-player-settings-menu',
@@ -76,11 +84,8 @@ export const SettingsMenu = Shade<SettingsMenuProps>({
       audioTracks.length === 0
         ? props.mediaService.getAudioTracks().map((t) => ({
             index: t.id,
-            label:
-              (t.stream.tags as Record<string, string>)?.title ||
-              (t.stream.tags as Record<string, string>)?.language ||
-              'Audio Track',
-            language: (t.stream.tags as Record<string, string>)?.language || 'unknown',
+            label: getTagString(t.stream.tags, 'title') || getTagString(t.stream.tags, 'language') || 'Audio Track',
+            language: getTagString(t.stream.tags, 'language') || 'unknown',
             codecName: t.codecName ?? 'unknown',
             channels: t.stream.channels ?? 2,
             isDefault: t.stream.disposition?.default === 1,

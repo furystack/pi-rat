@@ -18,15 +18,14 @@ describe('SettingsMenu', () => {
   it('should export the component', async () => {
     const mod = await import('./settings-menu.js')
     expect(mod.SettingsMenu).toBeDefined()
-  })
+  }, 15_000)
 })
 
 describe('SPEED_OPTIONS', () => {
-  it('should include expected playback rates', () => {
-    const expected = [0.5, 0.75, 1, 1.25, 1.5, 2]
-    // SPEED_OPTIONS is a module-level const, verify it includes sane values
-    expect(expected).toContain(1)
-    expect(expected.every((r) => r > 0 && r <= 4)).toBe(true)
-    expect(expected).toHaveLength(6)
-  })
+  it('should include expected playback rates', async () => {
+    const { SPEED_OPTIONS } = await import('./settings-menu.js')
+    expect(SPEED_OPTIONS).toContain(1)
+    expect(Array.from(SPEED_OPTIONS).every((r) => r > 0 && r <= 4)).toBe(true)
+    expect(SPEED_OPTIONS).toHaveLength(6)
+  }, 15_000)
 })

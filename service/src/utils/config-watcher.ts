@@ -64,11 +64,14 @@ export const createConfigWatcher = <TConfig extends ConfigType>(
       }),
       options.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
         if (change.id === options.configId) {
-          currentConfig = narrowConfig<TConfig>({
-            id: change.id,
-            value: change.value ?? currentConfig?.value,
-          } as Config)
-          options.onChange(currentConfig)
+          const mergedValue = change.value ?? currentConfig?.value
+          if (mergedValue == null) {
+            currentConfig = undefined
+            options.onChange(undefined)
+          } else {
+            currentConfig = narrowConfig<TConfig>({ id: change.id, value: mergedValue } as Config)
+            options.onChange(currentConfig)
+          }
           void options.logger.information({
             message: `🎬   ${options.serviceName} config updated`,
             data: change,

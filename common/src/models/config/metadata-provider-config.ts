@@ -1,4 +1,4 @@
-export interface MetadataProviderConfig {
+export type MetadataProviderConfig = {
   id: 'METADATA_PROVIDER_CONFIG'
   value: {
     /**

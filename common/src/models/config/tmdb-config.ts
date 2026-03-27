@@ -1,4 +1,4 @@
-export interface TmdbConfig {
+export type TmdbConfig = {
   id: 'TMDB_CONFIG'
   value: {
     /**
