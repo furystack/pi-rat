@@ -8,16 +8,20 @@ const navigateToDashboardList = async (page: Page) => {
   await page.locator('shade-app-body').getByRole('link', { name: '📔 Dashboards' }).click()
 }
 
-const setMonacoValue = async (page: Page, value: any) => {
+const setMonacoValue = async (page: Page, value: unknown) => {
+  await page.locator('.monaco-editor').waitFor({ state: 'visible' })
   await page.locator('.monaco-editor').click()
 
-  const monaco = page.getByRole('textbox', { name: 'Editor content' })
+  const textbox = page.getByRole('textbox', { name: 'Editor content' })
 
-  await monaco.press('ControlOrMeta+a')
+  await textbox.press('ControlOrMeta+a')
 
-  await monaco.type(JSON.stringify(value, null, 2))
-  await monaco.press('ControlOrMeta+End', { delay: 10 })
-  await monaco.press('Backspace', { delay: 10 })
+  const jsonStr = JSON.stringify(value, null, 2)
+  await textbox.evaluate((el, text) => {
+    const dt = new DataTransfer()
+    dt.setData('text/plain', text)
+    el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }))
+  }, jsonStr)
 }
 
 const trySaveDashboard = async (page: Page) => {
