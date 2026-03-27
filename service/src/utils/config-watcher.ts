@@ -22,9 +22,13 @@ export type ConfigWatcher = {
  * The DataSet stores `Config` objects (with `createdAt`/`updatedAt`) but individual
  * config interfaces (`OmdbConfig`, `TmdbConfig`, etc.) only define `id` and `value`.
  * This helper narrows a loaded `Config` to the caller's expected `TConfig` shape.
+ *
+ * The caller guarantees the correct `TConfig` by filtering on `configId`, so the
+ * assertion is safe at runtime even though TypeScript cannot statically verify the
+ * id-value pairing within the `ConfigType` union.
  */
-const narrowConfig = <TConfig extends ConfigType>(raw: Config): TConfig =>
-  ({ id: raw.id, value: raw.value }) as unknown as TConfig
+const narrowConfig = <TConfig extends ConfigType>(raw: Pick<Config, 'id' | 'value'>): TConfig =>
+  ({ id: raw.id, value: raw.value }) as TConfig
 
 export const createConfigWatcher = <TConfig extends ConfigType>(
   options: ConfigWatcherOptions<TConfig>,
@@ -60,7 +64,10 @@ export const createConfigWatcher = <TConfig extends ConfigType>(
       }),
       options.configDataSet.subscribe('onEntityUpdated', ({ change }) => {
         if (change.id === options.configId) {
-          currentConfig = { ...currentConfig, ...change } as unknown as TConfig
+          currentConfig = narrowConfig<TConfig>({
+            id: change.id,
+            value: change.value ?? currentConfig?.value,
+          } as Config)
           options.onChange(currentConfig)
           void options.logger.information({
             message: `🎬   ${options.serviceName} config updated`,

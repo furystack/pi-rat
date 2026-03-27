@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('./control-bar.js', () => ({ ControlBar: {} }))
+vi.mock('./error-overlay.js', () => ({ ErrorOverlay: {} }))
+vi.mock('./loading-overlay.js', () => ({ LoadingOverlay: {} }))
 
 /**
  * VideoContainer is a Shades component whose logic is integration-level:

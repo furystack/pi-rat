@@ -89,6 +89,7 @@ export class MoviePlayerService implements AsyncDisposable {
 
   private videoEventCleanup: Disposable | null = null
   private hlsInstance: Hls | null = null
+  private isProgrammaticSeek = false
 
   /**
    * Converts a 0-based stream time (from video.currentTime during HLS)
@@ -237,6 +238,7 @@ export class MoviePlayerService implements AsyncDisposable {
       this.progress.setValue(this.streamTimeToAbsolute(video.currentTime) || 0)
     }
     const onSeeking = () => {
+      if (this.isProgrammaticSeek) return
       this.seekToTime(this.streamTimeToAbsolute(video.currentTime))
     }
     const onFullscreenChange = () => {
@@ -454,7 +456,9 @@ export class MoviePlayerService implements AsyncDisposable {
     if (streamTime >= 0 && this.isTimeBuffered(video, streamTime)) return
 
     if (targetSeconds >= this.hlsStartTime) {
+      this.isProgrammaticSeek = true
       video.currentTime = targetSeconds - this.hlsStartTime
+      this.isProgrammaticSeek = false
       return
     }
 

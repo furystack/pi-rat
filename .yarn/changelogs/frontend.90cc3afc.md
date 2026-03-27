@@ -44,3 +44,8 @@ Added `LocalizedMetadataService` with caches for fetching `MovieMetadataLocalize
 - Added tests for `session-helpers` utilities
 - Updated `MoviePlayerService` tests for seeking, resolution switching, and start-time support
 - Updated `MoviePlayerV2Component` tests for the new seeking and resolution switching behavior
+
+## ⬆️ Dependencies
+
+- Removed `media-chrome`
+- Re-added `hls.js` (^1.6.15) for cross-browser HLS playback support

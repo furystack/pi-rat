@@ -1,4 +1,4 @@
-<!-- version-type: patch -->
+<!-- version-type: minor -->
 
 # common
 
@@ -32,3 +32,8 @@
 - Moved language-dependent fields (`title`, `plot`, `genre`, `thumbnailImageUrl`) from `Movie` and `Series` models into the new localized metadata models
 - Renamed `omdb-not-configured` / `omdb-error` link statuses to `provider-not-configured` / `provider-error` to reflect multi-provider support
 - Renamed `omdbNotConfigured` / `omdbError` scan progress fields to `providerNotConfigured` / `providerError`
+
+## ⚠️ Breaking Changes
+
+- `LinkMovie` response status strings `omdb-not-configured` and `omdb-error` have been renamed to `provider-not-configured` and `provider-error`
+- `ScanProgress` fields `omdbNotConfigured` and `omdbError` have been renamed to `providerNotConfigured` and `providerError`
