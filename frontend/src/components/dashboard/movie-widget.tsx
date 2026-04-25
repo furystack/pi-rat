@@ -40,7 +40,7 @@ const MovieWidgetContent = Shade<{
     const posterUrl = localizedData?.posterUrl
 
     return (
-      <AppLink tabIndex={0} title={plot || title} href="/movies/:imdbId/overview" params={{ imdbId }}>
+      <AppLink tabIndex={0} title={plot || title} path="/movies/:imdbId/overview" params={{ imdbId }}>
         <WidgetCard size={size} index={props.index}>
           <div
             className="overlay"

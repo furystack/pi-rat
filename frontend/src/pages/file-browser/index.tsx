@@ -34,7 +34,7 @@ export const DrivesPage = Shade({
     const drivesService = injector.getInstance(DrivesService)
     const [drives] = useObservable('drives', drivesService.getVolumesAsObservable({}))
 
-    const [focused, setFocused] = useSearchState('focused', 'ld' as 'ld' | 'rd')
+    const [focused, setFocused] = useSearchState('focused', 'ld')
 
     if (!hasCacheValue(drives)) {
       return null

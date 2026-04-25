@@ -13,7 +13,7 @@ export const navigateToRoute = <TPath extends AppPaths>(
     : [params: ExtractRouteParams<TPath>, options?: NavigateOptions]
 ) => {
   const [params, options] = args
-  const destinationPath = params ? compileRoute(path, params as Record<string, string>) : path
+  const destinationPath = params ? compileRoute(path, params) : path
   const fullPath = destinationPath + (options?.queryString ? `?${options.queryString}` : '') || '/'
   const locationService = injector.getInstance(LocationService)
   if (options?.replace) {

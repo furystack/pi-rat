@@ -5,7 +5,6 @@ import { CacheView, Select, Skeleton } from '@furystack/shades-common-components
 import type { Drive } from 'common'
 import { DrivesService } from '../../services/drives-service.js'
 import { ErrorDisplay } from '../../components/error-display.js'
-import type { DriveLocation } from './index.js'
 
 const DriveSelectorContent = Shade<{
   data: CacheWithValue<GetCollectionResult<Drive>>
@@ -17,7 +16,7 @@ const DriveSelectorContent = Shade<{
     const [currentDrive, setCurrentDrive] = useSearchState(props.searchStateKey, {
       path: '/',
       letter: props.defaultDriveLetter,
-    } as DriveLocation)
+    })
 
     return (
       <Select

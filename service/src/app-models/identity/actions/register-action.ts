@@ -10,7 +10,7 @@ import { User } from 'common'
 export const RegisterAction: RequestAction<RegisterActionType> = async ({ injector, getBody, response }) => {
   const logger = getLogger(injector).withScope('Register')
   const postBody = await getBody()
-  const { username, password } = postBody as { username: string; password: string }
+  const { username, password } = postBody
 
   const systemInjector = useSystemIdentityContext({ injector, username: 'registration' })
   const userDataSet = getDataSetFor(injector, User, 'username')

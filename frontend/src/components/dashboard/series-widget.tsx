@@ -27,7 +27,7 @@ const SeriesWidgetContent = Shade<{
     const posterUrl = localizedData?.posterUrl
 
     return (
-      <AppLink tabIndex={0} title={plot || title} href="/series/:imdbId" params={{ imdbId }}>
+      <AppLink tabIndex={0} title={plot || title} path="/series/:imdbId" params={{ imdbId }}>
         <WidgetCard size={size} index={props.index}>
           {posterUrl ? (
             <img

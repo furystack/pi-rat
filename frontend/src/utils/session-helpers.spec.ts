@@ -11,7 +11,7 @@ vi.mock('./navigate-to-route.js', () => ({
 
 const createTestInjector = () => {
   const injector = new Injector()
-  injector.setExplicitInstance({ call: vi.fn() } as unknown as IdentityApiClient, IdentityApiClient)
+  injector.setExplicitInstance({ call: vi.fn() }, IdentityApiClient)
   injector.setExplicitInstance({ emit: vi.fn() } as unknown as NotyService, NotyService)
   return injector
 }

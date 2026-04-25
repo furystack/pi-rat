@@ -16,6 +16,6 @@ export type MonacoThemeData = {
 }
 
 export const applyTheme = (themeData: MonacoThemeData) => {
-  editor.defineTheme(MFE_THEME_NAME, themeData as editorTypes.IStandaloneThemeData)
+  editor.defineTheme(MFE_THEME_NAME, themeData)
   editor.setTheme(MFE_THEME_NAME)
 }

@@ -83,7 +83,7 @@ export class TmdbClientService {
     if (pending) return pending as Promise<MetadataFetchResult<T>>
 
     const promise = this.semaphore.execute(fetcher)
-    this.pendingRequests.set(key, promise as Promise<MetadataFetchResult<unknown>>)
+    this.pendingRequests.set(key, promise)
 
     return promise.finally(() => {
       this.pendingRequests.delete(key)

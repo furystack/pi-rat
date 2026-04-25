@@ -9,7 +9,7 @@ export const PasswordResetAction: RequestAction<PasswordResetActionType> = async
   const logger = getLogger(injector).withScope('PasswordReset')
 
   const postBody = await getBody()
-  const { currentPassword, newPassword } = postBody as { currentPassword: string; newPassword: string }
+  const { currentPassword, newPassword } = postBody
 
   // Get the current authenticated user
   const currentUser = await getCurrentUser(injector)

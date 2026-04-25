@@ -57,7 +57,7 @@ export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, ge
         resolve({ fields, files })
       })
     } catch (error) {
-      reject(error as Error)
+      reject(error instanceof Error ? error : new Error(String(error)))
     }
   })
 

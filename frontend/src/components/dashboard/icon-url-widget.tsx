@@ -91,10 +91,10 @@ export const IconUrlWidget = Shade<IconUrlWidgetProps>({
       return { [Symbol.dispose]: () => clearTimeout(id) }
     })
 
-    const href: string = props.url
+    const path: string = props.url
 
     return (
-      <NestedRouteLink title={props.description} href={href}>
+      <NestedRouteLink title={props.description} path={path}>
         <div
           ref={cardRef}
           className="widget-card"

@@ -50,7 +50,7 @@ export const DashboardsPage = Shade({
         rowComponents={{
           id: ({ id }) => {
             return (
-              <AppLink href="/dashboards/:id" params={{ id }}>
+              <AppLink path="/dashboards/:id" params={{ id }}>
                 Preview
               </AppLink>
             )

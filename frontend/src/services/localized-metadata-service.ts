@@ -1,6 +1,5 @@
 import { Injectable, Injected } from '@furystack/inject'
 import { Cache } from '@furystack/cache'
-import type { MovieMetadataLocalized, SeriesMetadataLocalized } from 'common'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 
 /**
@@ -28,7 +27,7 @@ export class LocalizedMetadataService implements Disposable {
           },
         },
       })
-      return result.entries[0] as MovieMetadataLocalized | undefined
+      return result.entries[0]
     },
   })
 
@@ -48,7 +47,7 @@ export class LocalizedMetadataService implements Disposable {
           },
         },
       })
-      return result.entries[0] as SeriesMetadataLocalized | undefined
+      return result.entries[0]
     },
   })
 

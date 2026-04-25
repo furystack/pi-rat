@@ -180,7 +180,7 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
           onFindOptionsChange={(opts) => service.findOptions.setValue(opts)}
           columns={['selection', ...columns, 'actions'] as unknown as typeof columns}
           headerComponents={extendedHeaderComponents as unknown as typeof headerComponents}
-          rowComponents={extendedRowComponents as unknown as typeof rowComponents}
+          rowComponents={extendedRowComponents}
           styles={{
             ...styles,
             header: { width: '128px', ...styles?.header },
