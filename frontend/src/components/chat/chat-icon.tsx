@@ -13,7 +13,7 @@ export const ChatIcon = Shade({
     }
 
     return (
-      <AppBarAppLink title="Chat" href="/chat">
+      <AppBarAppLink title="Chat" path="/chat">
         {sessionState === 'authenticated' ? '💬' : '🔒 Login to chat'}
       </AppBarAppLink>
     )

@@ -13,7 +13,7 @@ export const AiIcon = Shade({
     }
 
     return (
-      <AppBarAppLink title="Ai" href="/ai">
+      <AppBarAppLink title="Ai" path="/ai">
         {sessionState === 'authenticated' ? '🤖' : '🔒 Login to Ai'}
       </AppBarAppLink>
     )

@@ -212,13 +212,10 @@ export class MovieMaintainerService {
             (file) => file.path === join(path, entry.name) && file.driveLetter === drive.letter,
           ),
       )
-      .map(
-        (entry) =>
-          ({
-            driveLetter: drive.letter,
-            path: join(path, entry.name),
-          }) as PiRatFile,
-      )
+      .map((entry) => ({
+        driveLetter: drive.letter,
+        path: join(path, entry.name),
+      }))
     return [...fromDirs.flat(), ...fromFiles] as PiRatFile[]
   }
 

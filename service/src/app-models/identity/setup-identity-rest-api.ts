@@ -1,13 +1,14 @@
 import type { Injector } from '@furystack/inject'
 import {
+  createCookieLoginStrategy,
   createDeleteEndpoint,
   createGetCollectionEndpoint,
   createGetEntityEndpoint,
+  createPasswordLoginAction,
   createPatchEndpoint,
   createPostEndpoint,
   GetCurrentUser,
   IsAuthenticated,
-  LoginAction,
   LogoutAction,
   useRestService,
   Validate,
@@ -50,7 +51,7 @@ export const setupIdentityRestApi = async (injector: Injector) => {
       },
       POST: {
         '/login': Validate({ schema: identityApiSchema, schemaName: 'LoginAction' })(
-          LoginAction as RequestAction<PiRatLoginAction>,
+          createPasswordLoginAction(createCookieLoginStrategy(injector)) as RequestAction<PiRatLoginAction>,
         ),
         '/logout': Validate({ schema: identityApiSchema, schemaName: 'LogoutAction' })(LogoutAction),
         '/register': Validate({ schema: identityApiSchema, schemaName: 'RegisterAction' })(RegisterAction),

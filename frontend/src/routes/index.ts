@@ -1,7 +1,7 @@
 import './route-meta-augmentation.js'
 
-import { NestedRouteLink, type ChildrenList, type NestedRoute, type TypedNestedRouteLinkProps } from '@furystack/shades'
-import { AppBarLink, type AppBarLinkProps } from '@furystack/shades-common-components'
+import { defineNestedRoutes, type ExtractRoutePaths } from '@furystack/shades'
+import { createAppBarLink } from '@furystack/shades-common-components'
 
 import { authRoutes as _authRoutes } from './auth-routes.js'
 import { entityRoute } from './entity-routes.js'
@@ -14,17 +14,9 @@ import { seriesRoutes } from './series-routes.js'
 import { settingsRoute } from './settings-routes.js'
 import { userRoute } from './user-routes.js'
 
-type ConcatPaths<Parent extends string, Child extends string> = Parent extends '/' ? Child : `${Parent}${Child}`
+import { createNestedRouteLink } from '@furystack/shades'
 
-type ExtractRoutePaths<T extends Record<string, NestedRoute<any>>> = {
-  [K in keyof T & string]:
-    | K
-    | (T[K] extends { children: infer C extends Record<string, NestedRoute<any>> }
-        ? ConcatPaths<K, ExtractRoutePaths<C> & string>
-        : never)
-}[keyof T & string]
-
-export const appRoutes = {
+export const appRoutes = defineNestedRoutes({
   ...movieRoutes,
   ...seriesRoutes,
   '/app-settings': settingsRoute,
@@ -34,18 +26,12 @@ export const appRoutes = {
   '/logging': loggingRoute,
   '/user': userRoute,
   ...miscRoutes,
-}
+})
 
 export const authRoutes = _authRoutes
 
 export type AppPaths = ExtractRoutePaths<typeof appRoutes & typeof authRoutes>
 
-export const AppLink = NestedRouteLink as unknown as <TPath extends AppPaths>(
-  props: TypedNestedRouteLinkProps<TPath>,
-  children?: ChildrenList,
-) => JSX.Element
+export const AppLink = createNestedRouteLink<typeof appRoutes & typeof authRoutes>()
 
-export const AppBarAppLink = AppBarLink as unknown as <TPath extends AppPaths>(
-  props: AppBarLinkProps & { href: TPath },
-  children?: ChildrenList,
-) => JSX.Element
+export const AppBarAppLink = createAppBarLink<typeof appRoutes & typeof authRoutes>()

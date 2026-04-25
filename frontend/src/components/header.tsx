@@ -29,7 +29,7 @@ const AdminLinks = Shade({
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
 
     return isAdmin ? (
-      <AppBarAppLink href="/file-browser" title="Drives">
+      <AppBarAppLink path="/file-browser" title="Drives">
         <Icon icon={icons.folderOpen} size="small" /> Files
       </AppBarAppLink>
     ) : null
@@ -55,7 +55,7 @@ export const Header = Shade<HeaderProps>({
 
     return (
       <AppBar id="header">
-        <AppBarAppLink title={props.title} href="/" routingOptions={{ end: false }}>
+        <AppBarAppLink title={props.title} path="/" routingOptions={{ end: false }}>
           <PiRatLogo size={24} style={{ marginRight: '8px' }} />
           {props.title}
         </AppBarAppLink>
@@ -63,11 +63,11 @@ export const Header = Shade<HeaderProps>({
           <>
             {currentUser?.roles?.includes('admin') ? <AdminLinks /> : null}
 
-            <AppBarAppLink title="Movies" href="/movies">
+            <AppBarAppLink title="Movies" path="/movies">
               <Icon icon={icons.film} size="small" /> Movies
             </AppBarAppLink>
 
-            <AppBarAppLink title="Series" href="/series">
+            <AppBarAppLink title="Series" path="/series">
               📺 Series
             </AppBarAppLink>
           </>

@@ -26,7 +26,7 @@ const DeviceAvailabilityContent = Shade<{
       <AppLink
         tabIndex={0}
         title={device.name}
-        href="/iot/devices/:id"
+        path="/iot/devices/:id"
         params={{ id: device.name }}
         style={{ textDecoration: 'none' }}
       >

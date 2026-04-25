@@ -65,7 +65,7 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
 
     return (
       <Result status={status} title={mainTitle} subtitle={description}>
-        <NestedRouteLink href="/">
+        <NestedRouteLink path="/">
           <Button>
             <Icon icon={icons.home} size="small" /> Go Home
           </Button>

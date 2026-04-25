@@ -36,9 +36,7 @@ export const getFallbackMetaWithScore = (segment: string): { meta: FallbackMetad
     .join(' ')
     .trim()
 
-  const { season, episode } =
-    new RegExp(/\.S(?<season>\d+)E(?<episode>\d+)\./gm).exec(segment)?.groups ||
-    ({} as { [K: string]: string | undefined })
+  const { season, episode } = new RegExp(/\.S(?<season>\d+)E(?<episode>\d+)\./gm).exec(segment)?.groups || {}
 
   const score = [year, resolution, season, episode].filter((a) => a).length
 

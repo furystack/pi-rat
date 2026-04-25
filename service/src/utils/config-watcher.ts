@@ -69,7 +69,7 @@ export const createConfigWatcher = <TConfig extends ConfigType>(
             currentConfig = undefined
             options.onChange(undefined)
           } else {
-            currentConfig = narrowConfig<TConfig>({ id: change.id, value: mergedValue } as Config)
+            currentConfig = narrowConfig<TConfig>({ id: change.id, value: mergedValue })
             options.onChange(currentConfig)
           }
           void options.logger.information({
