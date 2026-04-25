@@ -71,5 +71,10 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "yarn@4.14.1"
+  "packageManager": "yarn@4.14.1",
+  "dependenciesMeta": {
+    "sqlite3@6.0.1": {
+      "built": true
+    }
+  }
 }
