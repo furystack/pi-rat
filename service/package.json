@@ -41,5 +41,10 @@
     "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1",
     "vitest": "^4.1.5"
+  },
+  "dependenciesMeta": {
+    "sqlite3@6.0.1": {
+      "built": true
+    }
   }
 }
