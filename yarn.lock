@@ -6219,6 +6219,9 @@ __metadata:
     typescript-eslint: "npm:^8.59.0"
     vite: "npm:^8.0.10"
     vitest: "npm:^4.1.5"
+  dependenciesMeta:
+    sqlite3@6.0.1:
+      built: true
   languageName: unknown
   linkType: soft
 
@@ -6903,9 +6906,6 @@ __metadata:
     sqlite3: "npm:^6.0.1"
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.5"
-  dependenciesMeta:
-    sqlite3@6.0.1:
-      built: true
   languageName: unknown
   linkType: soft
 
