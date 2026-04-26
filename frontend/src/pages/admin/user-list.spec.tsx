@@ -224,7 +224,7 @@ describe('UserListPage', () => {
     it('should navigate to user details when Edit button is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
       const locationService = injector.get(LocationService)
-      const updateStateSpy = vi.spyOn(locationService, 'updateState')
+      const navigateSpy = vi.spyOn(locationService, 'navigate')
 
       initializeShadeRoot({
         injector,
@@ -238,13 +238,13 @@ describe('UserListPage', () => {
       editButton.click()
 
       expect(window.location.pathname).toBe('/app-settings/users/user1%40example.com')
-      expect(updateStateSpy).toHaveBeenCalled()
+      expect(navigateSpy).toHaveBeenCalledWith('/app-settings/users/user1%40example.com')
     })
 
     it('should navigate to user details when table row is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
       const locationService = injector.get(LocationService)
-      const updateStateSpy = vi.spyOn(locationService, 'updateState')
+      const navigateSpy = vi.spyOn(locationService, 'navigate')
 
       initializeShadeRoot({
         injector,
@@ -258,7 +258,7 @@ describe('UserListPage', () => {
       row.click()
 
       expect(window.location.pathname).toBe('/app-settings/users/user1%40example.com')
-      expect(updateStateSpy).toHaveBeenCalled()
+      expect(navigateSpy).toHaveBeenCalledWith('/app-settings/users/user1%40example.com')
     })
 
     it('should encode username in URL to handle special characters', async () => {
