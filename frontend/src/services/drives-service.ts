@@ -8,6 +8,7 @@ import { WebsocketNotificationsService } from './websocket-events.js'
 
 const createDrivesService = (drivesApiClient: DrivesApiClient, socket: WebsocketNotificationsService) => {
   const hub = new EventHub<{ onFilesystemChanged: FileChangeMessage }>()
+  const disposeHub = hub[Symbol.dispose].bind(hub)
 
   const volumesCache = new Cache({
     load: async ({ findOptions }: { findOptions?: FindOptions<Drive, Array<keyof Drive>> }) => {
@@ -125,8 +126,7 @@ const createDrivesService = (drivesApiClient: DrivesApiClient, socket: Websocket
     singleVolumeCache[Symbol.dispose]()
     // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
     fileListCache[Symbol.dispose]()
-    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
-    hub[Symbol.dispose]()
+    disposeHub()
   }
 
   return Object.assign(hub, {
