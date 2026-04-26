@@ -38,9 +38,8 @@ export const startPiRat = async (injector: Injector): Promise<void> => {
     AiAppModel,
   )
 
-  const syncInjector = injector.createScope({ owner: 'entity-sync' })
   await useWebSocketApi({
-    injector: syncInjector,
+    injector,
     port: getPort(),
     path: '/api/sync',
     actions: [SyncSubscribeAction, SyncUnsubscribeAction],
