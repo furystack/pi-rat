@@ -1,10 +1,10 @@
+import { DriveDataSet } from '../setup-drives.js'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import { PathHelper } from '@furystack/utils'
 import type { SaveTextFileEndpoint } from 'common'
-import { Drive } from 'common'
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
 import { existsAsync } from '../../../utils/exists-async.js'
@@ -12,7 +12,7 @@ import { existsAsync } from '../../../utils/exists-async.js'
 export const SaveTextFileAction: RequestAction<SaveTextFileEndpoint> = async ({ getUrlParams, getBody, injector }) => {
   const { letter, path } = getUrlParams()
 
-  const dataSet = getDataSetFor(injector, Drive, 'letter')
+  const dataSet = getDataSetFor(injector, DriveDataSet)
   const drive = await dataSet.get(injector, letter)
 
   if (!drive) {

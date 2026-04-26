@@ -10,6 +10,7 @@ const mockTmdbSeriesAdd = vi.fn()
 const mockFetchTmdbSeriesMetadata = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     get: (...args: unknown[]) => mockTmdbSeriesGet(...args) as unknown,
     add: (...args: unknown[]) => mockTmdbSeriesAdd(...args) as unknown,
@@ -89,9 +90,9 @@ describe('ensureTmdbSeriesExists', () => {
     })
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { fetchTmdbSeriesMetadata: mockFetchTmdbSeriesMetadata } as unknown as TmdbClientService,
+      injector.bind(
         TmdbClientService,
+        () => ({ fetchTmdbSeriesMetadata: mockFetchTmdbSeriesMetadata }) as unknown as TmdbClientService,
       )
 
       await ensureTmdbSeriesExists('tt9876543', undefined, 'en', injector)
@@ -105,9 +106,9 @@ describe('ensureTmdbSeriesExists', () => {
     mockFetchTmdbSeriesMetadata.mockResolvedValue({ status: 'not-found' })
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { fetchTmdbSeriesMetadata: mockFetchTmdbSeriesMetadata } as unknown as TmdbClientService,
+      injector.bind(
         TmdbClientService,
+        () => ({ fetchTmdbSeriesMetadata: mockFetchTmdbSeriesMetadata }) as unknown as TmdbClientService,
       )
 
       await ensureTmdbSeriesExists('tt9876543', undefined, 'en', injector)

@@ -1,11 +1,13 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
+import type { Injector } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
+import { useScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { EventHub, sleepAsync } from '@furystack/utils'
-import { Config, Device, DevicePingHistory, type IotConfig } from 'common'
+import { type Device, type IotConfig } from 'common'
 import ping from 'ping'
+import { ConfigDataSet } from '../config/setup-config-store.js'
+import { DeviceDataSet, DevicePingHistoryDataSet } from './setup-store.js'
 
 const defaultIotConfig: IotConfig = {
   id: 'IOT_CONFIG',
@@ -15,26 +17,36 @@ const defaultIotConfig: IotConfig = {
   },
 }
 
-@Injectable({ lifetime: 'singleton' })
-export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconnected: Device; refresh: null }> {
+type DeviceAvailabilityEvents = { connected: Device; disconnected: Device; refresh: null }
+
+export interface DeviceAvailabilityHub extends EventHub<DeviceAvailabilityEvents> {
+  init(): Promise<void>
+}
+
+class DeviceAvailabilityHubImpl extends EventHub<DeviceAvailabilityEvents> {
   private devices: Device[] = []
-  public updateDevices = (devices: Device[]) => {
-    this.devices = [...devices]
-  }
   private deviceStatusMap = new Map<string, boolean>()
+  private stopped = false
 
-  @Injected((injector) => getLogger(injector).withScope('DeviceAvailabilityHub'))
-  declare private logger: ScopedLogger
+  constructor(
+    private readonly systemInjector: Injector,
+    private readonly logger: ReturnType<typeof useScopedLogger>,
+  ) {
+    super()
+  }
 
-  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
-  declare private configDataSet: DataSet<Config, 'id'>
+  public stop(): void {
+    this.stopped = true
+  }
 
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'device-availability' }))
-  declare private systemInjector: Injector
+  private updateDevices(next: Device[]): void {
+    this.devices = [...next]
+  }
 
-  private getCurrentConfig = async () => {
+  private async getCurrentConfig(): Promise<IotConfig> {
     try {
-      const loaded = (await this.configDataSet.get(this.systemInjector, 'IOT_CONFIG')) as IotConfig
+      const configDataSet = getDataSetFor(this.systemInjector, ConfigDataSet)
+      const loaded = (await configDataSet.get(this.systemInjector, 'IOT_CONFIG')) as IotConfig | undefined
       return loaded || defaultIotConfig
     } catch (error) {
       await this.logger.warning({
@@ -45,9 +57,10 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
     }
   }
 
-  private async refreshConnections() {
+  private async refreshConnections(): Promise<void> {
     this.emit('refresh', null)
     const currentConfig = await this.getCurrentConfig()
+    const pingHistoryDataSet = getDataSetFor(this.systemInjector, DevicePingHistoryDataSet)
 
     try {
       await Promise.all(
@@ -60,7 +73,7 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
             })
 
             if (lastStatus !== newStatus) {
-              await this.devicePingHistoryDataSet.add(this.systemInjector, {
+              await pingHistoryDataSet.add(this.systemInjector, {
                 name: device.name,
                 isAvailable: newStatus,
                 ping: parseFloat(avg) || undefined,
@@ -76,36 +89,50 @@ export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconn
       )
     } catch (error) {
       await this.logger.warning({
-        message: `Error while refreshing device connections: ${error?.toString()}`,
+        message: `Error while refreshing device connections: ${(error as Error)?.toString()}`,
         data: { error },
       })
     } finally {
-      const sleepMs = currentConfig.value.pingIntervalMs || 30 * 1000
-      // await this.logger.verbose({ message: `Device refresh done, sleeping for ${sleepMs}ms` })
-      await sleepAsync(sleepMs)
-      await this.refreshConnections()
+      if (!this.stopped) {
+        const sleepMs = currentConfig.value.pingIntervalMs || 30 * 1000
+        await sleepAsync(sleepMs)
+        if (!this.stopped) {
+          void this.refreshConnections()
+        }
+      }
     }
   }
 
-  @Injected((injector) => getDataSetFor(injector, Device, 'name'))
-  declare private deviceDataSet: DataSet<Device, 'name'>
-
-  @Injected((injector) => getDataSetFor(injector, DevicePingHistory, 'id'))
-  declare private devicePingHistoryDataSet: DataSet<DevicePingHistory, 'id'>
-
-  public async init() {
-    const currentDevices = await this.deviceDataSet.find(this.systemInjector, {})
+  public async init(): Promise<void> {
+    const deviceDataSet = getDataSetFor(this.systemInjector, DeviceDataSet)
+    const currentDevices = await deviceDataSet.find(this.systemInjector, {})
     this.updateDevices(currentDevices)
 
-    this.deviceDataSet.subscribe('onEntityAdded', ({ entity }) => {
+    deviceDataSet.subscribe('onEntityAdded', ({ entity }) => {
       this.updateDevices([...this.devices, entity])
     })
-    this.deviceDataSet.subscribe('onEntityRemoved', ({ key }) => {
+    deviceDataSet.subscribe('onEntityRemoved', ({ key }) => {
       this.updateDevices(this.devices.filter((device) => device.name !== key))
     })
-    this.deviceDataSet.subscribe('onEntityUpdated', ({ id, change }) => {
+    deviceDataSet.subscribe('onEntityUpdated', ({ id, change }) => {
       this.updateDevices(this.devices.map((device) => (device.name === id ? { ...device, ...change } : device)))
     })
     await this.refreshConnections()
   }
 }
+
+export const DeviceAvailabilityHub: Token<DeviceAvailabilityHub, 'singleton'> = defineService({
+  name: 'pi-rat/DeviceAvailabilityHub',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'device-availability' })
+    const impl = new DeviceAvailabilityHubImpl(systemInjector, logger)
+    onDispose(() => impl.stop())
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    return impl
+  },
+})

@@ -8,7 +8,7 @@ import { MoviesService } from '../../services/movies-service.js'
 export const MoviesPage = Shade({
   customElementName: 'shade-app-movies-page',
   render: ({ useDisposable, injector }) => {
-    const moviesService = injector.getInstance(MoviesService)
+    const moviesService = injector.get(MoviesService)
 
     const service = useDisposable(
       'service',

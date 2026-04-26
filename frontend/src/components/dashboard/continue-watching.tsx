@@ -33,9 +33,9 @@ export const ContinueWatchingWidgetGroup = Shade<ContinueWatchingWidgetGroupProp
   render: ({ props, injector }) => {
     const { count, size } = props
 
-    const watchProgressService = injector.getInstance(WatchProgressService)
-    const movieService = injector.getInstance(MoviesService)
-    const movieFileService = injector.getInstance(MovieFilesService)
+    const watchProgressService = injector.get(WatchProgressService)
+    const movieService = injector.get(MoviesService)
+    const movieFileService = injector.get(MovieFilesService)
 
     return (
       <PiRatLazyLoad

@@ -6,7 +6,7 @@ import { FfprobeService } from '../../../ffprobe-service.js'
 export const FfprobeAction: RequestAction<FfprobeEndpoint> = async ({ getUrlParams, injector }) => {
   const { letter, path } = getUrlParams()
 
-  const result = await injector.getInstance(FfprobeService).getFfprobeForPiratFile({ driveLetter: letter, path })
+  const result = await injector.get(FfprobeService).getFfprobeForPiratFile({ driveLetter: letter, path })
 
   return JsonResult(result)
 }

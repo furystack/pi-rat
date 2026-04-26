@@ -1,18 +1,11 @@
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 import type { Device, DeviceAwakeHistory, DevicePingHistory } from 'common'
 import { IotApiClient } from './api-clients/iot-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class IotDevicesService implements Disposable {
-  @Injected(WebsocketNotificationsService)
-  declare readonly websocketNotificationsService: WebsocketNotificationsService
-
-  @Injected(IotApiClient)
-  declare private readonly iotApiClient: IotApiClient
-
+class IotDevicesServiceImpl implements Disposable {
   public deviceCache = new Cache({
     capacity: 100,
     load: async (id: string) => {
@@ -32,9 +25,7 @@ export class IotDevicesService implements Disposable {
       const { result } = await this.iotApiClient.call({
         method: 'GET',
         action: '/devices',
-        query: {
-          findOptions,
-        },
+        query: { findOptions },
       })
 
       result.entries.forEach((entry) => {
@@ -86,15 +77,17 @@ export class IotDevicesService implements Disposable {
     },
   })
 
+  constructor(
+    private readonly iotApiClient: IotApiClient,
+    public readonly websocketNotificationsService: WebsocketNotificationsService,
+  ) {}
+
   public getDevice = this.deviceCache.get.bind(this.deviceCache)
   public getDeviceAsObservable = this.deviceCache.getObservable.bind(this.deviceCache)
-
   public findDevice = this.deviceQueryCache.get.bind(this.deviceQueryCache)
   public findDeviceAsObservable = this.deviceQueryCache.getObservable.bind(this.deviceQueryCache)
-
   public findPingHistory = this.devicePingHistoryCache.get.bind(this.devicePingHistoryCache)
   public findPingHistoryAsObservable = this.devicePingHistoryCache.getObservable.bind(this.devicePingHistoryCache)
-
   public findAwakeHistory = this.deviceAwakeHistoryCache.get.bind(this.deviceAwakeHistoryCache)
   public findAwakeHistoryAsObservable = this.deviceAwakeHistoryCache.getObservable.bind(this.deviceAwakeHistoryCache)
 
@@ -191,3 +184,16 @@ export class IotDevicesService implements Disposable {
     this.devicePingHistoryCache[Symbol.dispose]()
   }
 }
+
+export type IotDevicesService = IotDevicesServiceImpl
+
+export const IotDevicesService: Token<IotDevicesService, 'singleton'> = defineService({
+  name: 'pi-rat/IotDevicesService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new IotDevicesServiceImpl(inject(IotApiClient), inject(WebsocketNotificationsService))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

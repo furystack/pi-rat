@@ -31,17 +31,17 @@ export const AddDriveStep = Shade<WizardStepProps>({
         validate={isAddDrivePayload}
         onSubmit={async (data) => {
           try {
-            await injector.getInstance(DrivesService).addVolume({
+            await injector.get(DrivesService).addVolume({
               letter: data.letter,
               physicalPath: data.physicalPath,
             })
-            injector.getInstance(NotyService).emit('onNotyAdded', {
+            injector.get(NotyService).emit('onNotyAdded', {
               type: 'success',
               body: `Drive '${data.letter}' has been created successfully`,
               title: 'Drive created',
             })
           } catch (error) {
-            injector.getInstance(NotyService).emit('onNotyAdded', {
+            injector.get(NotyService).emit('onNotyAdded', {
               type: 'error',
               title: 'Error during drive creation',
               body: getErrorMessage(error),

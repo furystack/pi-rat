@@ -5,7 +5,7 @@ import { SessionService } from '../../services/session.js'
 export const ChatIcon = Shade({
   customElementName: 'shade-app-chat-icon',
   render: ({ injector, useObservable }) => {
-    const session = injector.getInstance(SessionService)
+    const session = injector.get(SessionService)
     const [sessionState] = useObservable('sessionState', session.state)
 
     if (sessionState !== 'authenticated') {

@@ -47,9 +47,9 @@ const mockSession = {
 describe('HlsStreamAction', () => {
   it('should reject path traversal attempts', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getOrCreateSession: vi.fn(), readPlaylist: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getOrCreateSession: vi.fn(), readPlaylist: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -69,9 +69,9 @@ describe('HlsStreamAction', () => {
 
   it('should reject invalid playback mode', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getOrCreateSession: vi.fn(), readPlaylist: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getOrCreateSession: vi.fn(), readPlaylist: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -91,12 +91,13 @@ describe('HlsStreamAction', () => {
 
   it('should return 500 when playlist is not available', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
-          readPlaylist: vi.fn().mockResolvedValue(null),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+            readPlaylist: vi.fn().mockResolvedValue(null),
+          }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -124,12 +125,13 @@ describe('HlsStreamAction', () => {
     }
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
-          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+            readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -160,12 +162,13 @@ describe('HlsStreamAction', () => {
     }
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
-          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+            readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -194,12 +197,13 @@ describe('HlsStreamAction', () => {
     }
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
-          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getOrCreateSession: vi.fn().mockResolvedValue(mockSession),
+            readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -218,12 +222,13 @@ describe('HlsStreamAction', () => {
     const getOrCreateSession = vi.fn().mockResolvedValue(mockSession)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getOrCreateSession,
-          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getOrCreateSession,
+            readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -256,12 +261,13 @@ describe('HlsStreamAction', () => {
     }
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getOrCreateSession,
-          readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getOrCreateSession,
+            readPlaylist: vi.fn().mockResolvedValue(MOCK_PLAYLIST),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsStreamAction({
@@ -283,9 +289,9 @@ describe('HlsStreamAction', () => {
 
   it('should reject negative startTime', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getOrCreateSession: vi.fn(), readPlaylist: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getOrCreateSession: vi.fn(), readPlaylist: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {

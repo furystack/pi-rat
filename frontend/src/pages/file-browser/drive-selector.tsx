@@ -41,7 +41,7 @@ export const DriveSelector = Shade<{
 }>({
   customElementName: 'drive-selector',
   render: ({ props, injector }) => {
-    const drivesService = injector.getInstance(DrivesService)
+    const drivesService = injector.get(DrivesService)
 
     return (
       <CacheView

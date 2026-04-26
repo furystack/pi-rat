@@ -1,5 +1,4 @@
 import type { Injector } from '@furystack/inject'
-import '@furystack/repository'
 import {
   createDeleteEndpoint,
   createGetCollectionEndpoint,
@@ -10,7 +9,6 @@ import {
   Validate,
 } from '@furystack/rest-service'
 import type { DrivesApi } from 'common'
-import { Drive } from 'common'
 import drivesApiSchema from 'common/schemas/drives-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
@@ -20,6 +18,7 @@ import { FfprobeAction } from './actions/ffprobe-action.js'
 import { GetDirectoryEntriesAction } from './actions/get-directory-entries.js'
 import { SaveTextFileAction } from './actions/save-text-file-action.js'
 import { UploadAction } from './actions/upload-action.js'
+import { DriveDataSet } from './setup-drives.js'
 
 export const setupDrivesRestApi = async (injector: Injector) => {
   await useRestService<DrivesApi>({
@@ -32,21 +31,11 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         '/volumes/:id': Validate({
           schema: drivesApiSchema,
           schemaName: 'GetEntityEndpoint<Drive,"letter">',
-        })(
-          createGetEntityEndpoint({
-            model: Drive,
-            primaryKey: 'letter',
-          }),
-        ),
+        })(createGetEntityEndpoint(DriveDataSet)),
         '/volumes': Validate({
           schema: drivesApiSchema,
           schemaName: 'GetCollectionEndpoint<Drive>',
-        })(
-          createGetCollectionEndpoint({
-            model: Drive,
-            primaryKey: 'letter',
-          }),
-        ),
+        })(createGetCollectionEndpoint(DriveDataSet)),
         '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'GetDirectoryEntries' })(
           GetDirectoryEntriesAction,
         ),
@@ -61,18 +50,12 @@ export const setupDrivesRestApi = async (injector: Injector) => {
         // eslint-disable-next-line furystack/rest-action-validate-wrapper -- Multipart/form-data upload; Validate() expects a JSON body which is incompatible with formidable parsing
         '/volumes/:letter/:path/upload': UploadAction,
         '/volumes': Validate({ schema: drivesApiSchema, schemaName: 'PostDriveEndpoint' })(
-          createPostEndpoint({
-            model: Drive,
-            primaryKey: 'letter',
-          }),
+          createPostEndpoint(DriveDataSet),
         ),
       },
       PATCH: {
         '/volumes/:id': Validate({ schema: drivesApiSchema, schemaName: 'PatchDriveEndpoint' })(
-          createPatchEndpoint({
-            model: Drive,
-            primaryKey: 'letter',
-          }),
+          createPatchEndpoint(DriveDataSet),
         ),
       },
       PUT: {
@@ -82,10 +65,7 @@ export const setupDrivesRestApi = async (injector: Injector) => {
       },
       DELETE: {
         '/volumes/:id': Validate({ schema: drivesApiSchema, schemaName: 'DeleteEndpoint<Drive,"letter">' })(
-          createDeleteEndpoint({
-            model: Drive,
-            primaryKey: 'letter',
-          }),
+          createDeleteEndpoint(DriveDataSet),
         ),
         '/files/:letter/:path': Validate({ schema: drivesApiSchema, schemaName: 'DeleteFileEndpoint' })(
           DeleteFileAction,

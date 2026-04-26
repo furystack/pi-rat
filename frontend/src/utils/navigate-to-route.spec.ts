@@ -13,7 +13,7 @@ describe('navigateToRoute', () => {
     await usingAsync(new Injector(), async (injector) => {
       const navigate = vi.fn()
       const replace = vi.fn()
-      injector.setExplicitInstance({ navigate, replace } as unknown as LocationService, LocationService)
+      injector.bind(LocationService, () => ({ navigate, replace }) as never)
 
       navigateToRoute(injector, '/movies')
 
@@ -25,7 +25,7 @@ describe('navigateToRoute', () => {
     await usingAsync(new Injector(), async (injector) => {
       const navigate = vi.fn()
       const replace = vi.fn()
-      injector.setExplicitInstance({ navigate, replace } as unknown as LocationService, LocationService)
+      injector.bind(LocationService, () => ({ navigate, replace }) as never)
 
       navigateToRoute(injector, '/movies/:imdbId/overview', { imdbId: 'tt1234567' })
 
@@ -37,7 +37,7 @@ describe('navigateToRoute', () => {
     await usingAsync(new Injector(), async (injector) => {
       const navigate = vi.fn()
       const replace = vi.fn()
-      injector.setExplicitInstance({ navigate, replace } as unknown as LocationService, LocationService)
+      injector.bind(LocationService, () => ({ navigate, replace }) as never)
 
       navigateToRoute(injector, '/entities/movies', {}, { queryString: 'gedst=%7B%22mode%22%3A%22edit%22%7D' })
 
@@ -49,7 +49,7 @@ describe('navigateToRoute', () => {
     await usingAsync(new Injector(), async (injector) => {
       const navigate = vi.fn()
       const replace = vi.fn()
-      injector.setExplicitInstance({ navigate, replace } as unknown as LocationService, LocationService)
+      injector.bind(LocationService, () => ({ navigate, replace }) as never)
 
       navigateToRoute(injector, '/app-settings/omdb', {}, { replace: true })
 
@@ -62,7 +62,7 @@ describe('navigateToRoute', () => {
     await usingAsync(new Injector(), async (injector) => {
       const navigate = vi.fn()
       const replace = vi.fn()
-      injector.setExplicitInstance({ navigate, replace } as unknown as LocationService, LocationService)
+      injector.bind(LocationService, () => ({ navigate, replace }) as never)
 
       navigateToRoute(injector, '/series')
 
@@ -75,7 +75,7 @@ describe('navigateToRoute', () => {
     await usingAsync(new Injector(), async (injector) => {
       const navigate = vi.fn()
       const replace = vi.fn()
-      injector.setExplicitInstance({ navigate, replace } as unknown as LocationService, LocationService)
+      injector.bind(LocationService, () => ({ navigate, replace }) as never)
 
       navigateToRoute(injector, '/chat')
 

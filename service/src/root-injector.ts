@@ -1,7 +1,7 @@
-import { Injector } from '@furystack/inject'
+import { createInjector } from '@furystack/inject'
 import { ConsoleLogger, useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { attachShutdownHandler } from './shutdown-handler.js'
 
-export const injector = new Injector()
+export const injector = createInjector()
 useLogging(injector, process.env.DEBUG ? VerboseConsoleLogger : ConsoleLogger)
 void attachShutdownHandler(injector)

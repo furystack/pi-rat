@@ -20,12 +20,9 @@ const RelatedMoviesContent = Shade<{
     const { drive, path, file } = props
     const linkedFiles = props.data
 
-    const linkedFilesService = injector.getInstance(MovieFilesService)
+    const linkedFilesService = injector.get(MovieFilesService)
 
-    const [serviceStatus] = useObservable(
-      'serviceStatus',
-      injector.getInstance(InstallService).getServiceStatusAsObservable(),
-    )
+    const [serviceStatus] = useObservable('serviceStatus', injector.get(InstallService).getServiceStatusAsObservable())
 
     if (linkedFiles.value.count === 0) {
       return (
@@ -37,7 +34,7 @@ const RelatedMoviesContent = Shade<{
               (serviceStatus.value.services.omdb || serviceStatus.value.services.tmdb) ? (
                 <Button
                   onclick={async () => {
-                    const mediaApiClient = injector.getInstance(MediaApiClient)
+                    const mediaApiClient = injector.get(MediaApiClient)
                     await mediaApiClient.call({
                       method: 'POST',
                       action: '/link-movie',
@@ -79,7 +76,7 @@ export const RelatedMoviesModalContent = Shade<{
   customElementName: 'shade-app-related-movies-modal-content',
   render: ({ injector, props }) => {
     const { drive, path, file } = props
-    const linkedFilesService = injector.getInstance(MovieFilesService)
+    const linkedFilesService = injector.get(MovieFilesService)
 
     return (
       <CacheView

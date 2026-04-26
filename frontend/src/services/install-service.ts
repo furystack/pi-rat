@@ -1,12 +1,8 @@
-import { Injectable, Injected } from '@furystack/inject'
-import { InstallApiClient } from './api-clients/install-api-client.js'
 import { Cache } from '@furystack/cache'
+import { defineService, type Token } from '@furystack/inject'
+import { InstallApiClient } from './api-clients/install-api-client.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class InstallService implements Disposable {
-  @Injected(InstallApiClient)
-  declare private readonly apiClient: InstallApiClient
-
+class InstallServiceImpl implements Disposable {
   private cache = new Cache({
     load: async () => {
       const { result } = await this.apiClient.call({
@@ -17,6 +13,8 @@ export class InstallService implements Disposable {
     },
   })
 
+  constructor(private readonly apiClient: InstallApiClient) {}
+
   public getServiceStatus = this.cache.get.bind(this.cache)
   public getServiceStatusAsObservable = this.cache.getObservable.bind(this.cache)
 
@@ -24,3 +22,16 @@ export class InstallService implements Disposable {
     this.cache[Symbol.dispose]()
   }
 }
+
+export type InstallService = InstallServiceImpl
+
+export const InstallService: Token<InstallService, 'singleton'> = defineService({
+  name: 'pi-rat/InstallService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new InstallServiceImpl(inject(InstallApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

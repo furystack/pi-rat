@@ -1,9 +1,10 @@
 import type { Injector } from '@furystack/inject'
 import { getDataSetFor } from '@furystack/repository'
-import { OmdbMovieMetadata } from 'common'
+import type { OmdbMovieMetadata } from 'common'
+import { OmdbMovieMetadataDataSet } from '../media-data-sets.js'
 
 export const ensureOmdbMovieExists = async (omdbMeta: OmdbMovieMetadata, injector: Injector) => {
-  const dataSet = getDataSetFor(injector, OmdbMovieMetadata, 'imdbID')
+  const dataSet = getDataSetFor(injector, OmdbMovieMetadataDataSet)
   const existing = await dataSet.get(injector, omdbMeta.imdbID)
   if (existing) {
     return existing

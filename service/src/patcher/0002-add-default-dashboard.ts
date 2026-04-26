@@ -1,5 +1,6 @@
 import { getDataSetFor } from '@furystack/repository'
-import { Dashboard } from 'common'
+import type { Dashboard } from 'common'
+import { DashboardDataSet } from '../app-models/dashboards/setup-dashboards.js'
 import type { Patch } from './patch.js'
 
 export const addDefaultDashboardPatcher: Patch = {
@@ -7,7 +8,7 @@ export const addDefaultDashboardPatcher: Patch = {
   description: 'Adds a default dashboard to the Dashboards DB',
   name: 'Add default dashboard',
   run: async (injector, addLogEntry) => {
-    const dashboardDataSet = getDataSetFor(injector, Dashboard, 'id')
+    const dashboardDataSet = getDataSetFor(injector, DashboardDataSet)
 
     await dashboardDataSet.add(injector, {
       name: 'Default',

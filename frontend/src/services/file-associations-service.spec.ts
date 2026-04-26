@@ -28,7 +28,7 @@ describe('FileAssociationsService', () => {
 
       it.each(videoExtensions)('should return video-player for .%s files', async (ext) => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', `movie.${ext}`)
 
@@ -38,7 +38,7 @@ describe('FileAssociationsService', () => {
 
       it('should handle video files in nested paths', async () => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', 'folder/subfolder/movie.mkv')
 
@@ -52,7 +52,7 @@ describe('FileAssociationsService', () => {
 
       it.each(musicExtensions)('should return music-player for .%s files', async (ext) => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', `song.${ext}`)
 
@@ -66,7 +66,7 @@ describe('FileAssociationsService', () => {
 
       it.each(imageExtensions)('should return image-viewer for .%s files', async (ext) => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', `image.${ext}`)
 
@@ -96,7 +96,7 @@ describe('FileAssociationsService', () => {
 
       it.each(editorExtensions)('should return monaco-editor for .%s files', async (ext) => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', `file.${ext}`)
 
@@ -108,7 +108,7 @@ describe('FileAssociationsService', () => {
     describe('unknown extensions', () => {
       it('should return null for unknown extension', async () => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', 'document.xyz')
 
@@ -118,7 +118,7 @@ describe('FileAssociationsService', () => {
 
       it('should return null for file without extension', async () => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', 'Makefile')
 
@@ -128,7 +128,7 @@ describe('FileAssociationsService', () => {
 
       it('should return null for common non-media files', async () => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result1 = await service.getServiceForFile('A', 'document.pdf')
           const result2 = await service.getServiceForFile('A', 'archive.zip')
@@ -144,7 +144,7 @@ describe('FileAssociationsService', () => {
     describe('edge cases', () => {
       it('should handle files with multiple dots in name', async () => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', 'movie.2024.1080p.mkv')
 
@@ -154,7 +154,7 @@ describe('FileAssociationsService', () => {
 
       it('should use last extension segment', async () => {
         await usingAsync(new Injector(), async (injector) => {
-          const service = injector.getInstance(FileAssociationsService)
+          const service = injector.get(FileAssociationsService)
 
           const result = await service.getServiceForFile('A', 'archive.tar.gz')
 

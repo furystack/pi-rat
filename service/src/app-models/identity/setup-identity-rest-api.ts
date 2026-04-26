@@ -15,12 +15,12 @@ import {
   type RequestAction,
 } from '@furystack/rest-service'
 import type { GetCurrentUserAction, IdentityApi, LoginAction as PiRatLoginAction } from 'common'
-import { User } from 'common'
 import identityApiSchema from 'common/schemas/identity-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
 import { PasswordResetAction } from './actions/password-reset-action.js'
 import { RegisterAction } from './actions/register-action.js'
+import { UserDataSet } from './setup-identity-store.js'
 
 export const setupIdentityRestApi = async (injector: Injector) => {
   await useRestService<IdentityApi>({
@@ -34,16 +34,10 @@ export const setupIdentityRestApi = async (injector: Injector) => {
           GetCurrentUser as RequestAction<GetCurrentUserAction>,
         ),
         '/users': Validate({ schema: identityApiSchema, schemaName: 'GetCollectionEndpoint<User>' })(
-          createGetCollectionEndpoint({
-            model: User,
-            primaryKey: 'username',
-          }),
+          createGetCollectionEndpoint(UserDataSet),
         ),
         '/users/:id': Validate({ schema: identityApiSchema, schemaName: 'GetEntityEndpoint<User,"username">' })(
-          createGetEntityEndpoint({
-            model: User,
-            primaryKey: 'username',
-          }),
+          createGetEntityEndpoint(UserDataSet),
         ),
         '/isAuthenticated': Validate({ schema: identityApiSchema, schemaName: 'IsAuthenticatedAction' })(
           IsAuthenticated,
@@ -56,10 +50,7 @@ export const setupIdentityRestApi = async (injector: Injector) => {
         '/logout': Validate({ schema: identityApiSchema, schemaName: 'LogoutAction' })(LogoutAction),
         '/register': Validate({ schema: identityApiSchema, schemaName: 'RegisterAction' })(RegisterAction),
         '/users': Validate({ schema: identityApiSchema, schemaName: 'PostUserEndpoint' })(
-          createPostEndpoint({
-            model: User,
-            primaryKey: 'username',
-          }),
+          createPostEndpoint(UserDataSet),
         ),
         '/password-reset': Validate({ schema: identityApiSchema, schemaName: 'PasswordResetAction' })(
           PasswordResetAction,
@@ -69,19 +60,11 @@ export const setupIdentityRestApi = async (injector: Injector) => {
         '/users/:id': Validate({
           schema: identityApiSchema,
           schemaName: 'PatchEndpoint<Omit<User,("createdAt"|"updatedAt")>,"username">',
-        })(
-          createPatchEndpoint({
-            model: User,
-            primaryKey: 'username',
-          }),
-        ),
+        })(createPatchEndpoint(UserDataSet)),
       },
       DELETE: {
         '/users/:id': Validate({ schema: identityApiSchema, schemaName: 'DeleteEndpoint<User,"username">' })(
-          createDeleteEndpoint({
-            model: User,
-            primaryKey: 'username',
-          }),
+          createDeleteEndpoint(UserDataSet),
         ),
       },
     },

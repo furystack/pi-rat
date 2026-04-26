@@ -1,11 +1,11 @@
 import { Cache } from '@furystack/cache'
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger, type ScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { Semaphore } from '@furystack/utils'
-import { Drive, PiRatFile, type FfprobeData } from 'common'
+import type { PiRatFile, FfprobeData } from 'common'
+import { DriveDataSet } from './app-models/drives/setup-drives.js'
 import { execFileAsync } from './utils/exec-file-async.js'
 import { existsAsync } from './utils/exists-async.js'
 import { getPhysicalPath } from './utils/physical-path-utils.js'
@@ -26,54 +26,54 @@ async function runFfprobe(filePath: string): Promise<FfprobeData> {
 
 export type FfprobeResult = FfprobeData
 
-@Injectable({ lifetime: 'singleton' })
-export class FfprobeService implements Disposable {
-  @Injected((injector) => getLogger(injector).withScope('FfprobeService'))
-  declare private readonly logger: ScopedLogger
+export interface FfprobeService extends Disposable {
+  getFfprobeForPiratFile(file: PiRatFile): Promise<FfprobeResult>
+  getFfprobeForPath(path: string): Promise<FfprobeResult>
+}
 
-  @Injected((injector) => getDataSetFor(injector, Drive, 'letter'))
-  declare private readonly driveDataSet: DataSet<Drive, 'letter'>
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'ffprobe-service' }))
-  declare private readonly systemInjector: Injector
-
+export class FfprobeServiceImpl implements FfprobeService {
   private readonly semaphore = new Semaphore(3)
 
-  private readonly piRatFileCache = new Cache({
-    capacity: 100,
-    load: async (file: PiRatFile) => {
-      const drive = await this.driveDataSet.get(this.systemInjector, file.driveLetter)
-      if (!drive) {
-        throw new Error(`Drive ${file.driveLetter} not found`)
-      }
-      const fullPath = getPhysicalPath(drive, file)
+  private readonly piRatFileCache: Cache<FfprobeResult, [PiRatFile]>
+  private readonly physicalFileCache: Cache<FfprobeResult, [string]>
 
-      if (!(await existsAsync(fullPath))) {
-        throw new Error(`File '${fullPath}' does not exist`)
-      }
+  constructor(
+    private readonly logger: ScopedLogger,
+    private readonly systemInjector: Injector,
+  ) {
+    this.physicalFileCache = new Cache({
+      capacity: 100,
+      load: async (fullPath: string) => {
+        await this.logger.verbose({ message: `Running ffprobe on '${fullPath}'` })
+        return await this.semaphore.execute(async () => {
+          try {
+            const result = await runFfprobe(fullPath)
+            await this.logger.verbose({ message: `ffprobe completed for '${fullPath}'` })
+            return result
+          } catch (error) {
+            await this.logger.error({ message: `ffprobe failed for '${fullPath}'`, data: { error } })
+            throw error
+          }
+        })
+      },
+    })
 
-      return await this.physicalFileCache.get(fullPath)
-    },
-  })
-
-  private physicalFileCache = new Cache({
-    capacity: 100,
-    load: async (fullPath: string) => {
-      await this.logger.verbose({ message: `Running ffprobe on '${fullPath}'` })
-      return await this.semaphore.execute(async () => {
-        try {
-          const result = await runFfprobe(fullPath)
-          await this.logger.verbose({ message: `ffprobe completed for '${fullPath}'` })
-          return result
-        } catch (error) {
-          await this.logger.error({ message: `ffprobe failed for '${fullPath}'`, data: { error } })
-          throw error
+    this.piRatFileCache = new Cache({
+      capacity: 100,
+      load: async (file: PiRatFile) => {
+        const driveDataSet = getDataSetFor(this.systemInjector, DriveDataSet)
+        const drive = await driveDataSet.get(this.systemInjector, file.driveLetter)
+        if (!drive) {
+          throw new Error(`Drive ${file.driveLetter} not found`)
         }
-      })
-    },
-  })
+        const fullPath = getPhysicalPath(drive, file)
+        if (!(await existsAsync(fullPath))) {
+          throw new Error(`File '${fullPath}' does not exist`)
+        }
+        return await this.physicalFileCache.get(fullPath)
+      },
+    })
 
-  constructor() {
     this.piRatFileCache.addListener('onLoadError', ({ args, error }) => {
       void this.logger.error({
         message: `Background cache load failed for file '${args[0].path}'`,
@@ -82,16 +82,26 @@ export class FfprobeService implements Disposable {
     })
   }
 
-  public getFfprobeForPiratFile = async (file: PiRatFile) => {
-    return await this.piRatFileCache.get(file)
-  }
-
-  public getFfprobeForPath = async (path: string) => {
-    return await this.physicalFileCache.get(path)
-  }
+  public getFfprobeForPiratFile = async (file: PiRatFile) => this.piRatFileCache.get(file)
+  public getFfprobeForPath = async (path: string) => this.physicalFileCache.get(path)
 
   public [Symbol.dispose](): void {
     this.piRatFileCache[Symbol.dispose]()
     this.physicalFileCache[Symbol.dispose]()
   }
 }
+
+export const FfprobeService: Token<FfprobeService, 'singleton'> = defineService({
+  name: 'pi-rat/FfprobeService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'ffprobe-service' })
+    const impl = new FfprobeServiceImpl(logger, systemInjector)
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    return impl
+  },
+})

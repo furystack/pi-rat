@@ -38,7 +38,7 @@ describe('Dashboard', () => {
     }
 
     injector = new Injector()
-    injector.setExplicitInstance(mockSessionService as unknown as SessionService, SessionService)
+    injector.bind(SessionService, () => mockSessionService as never)
   })
 
   afterEach(async () => {

@@ -6,7 +6,7 @@ import { MoviesService } from '../services/movies-service.js'
 export const MoviePicker = Shade({
   customElementName: 'movie-picker',
   render: ({ injector }) => {
-    const moviesService = injector.getInstance(MoviesService)
+    const moviesService = injector.get(MoviesService)
     return (
       <Suggest<Movie>
         getEntries={async (term) => {

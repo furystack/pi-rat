@@ -15,18 +15,18 @@ export const FileMoviePlayer = Shade<{ file: PiRatFile }>({
     return (
       <PiRatLazyLoad
         component={async () => {
-          const watchProgress = await injector.getInstance(WatchProgressService).findWatchProgressForFile(file)
-          const movieFile = await injector.getInstance(MovieFilesService).findMovieFile({
+          const watchProgress = await injector.get(WatchProgressService).findWatchProgressForFile(file)
+          const movieFile = await injector.get(MovieFilesService).findMovieFile({
             top: 1,
             filter: {
               path: { $eq: file.path },
               driveLetter: { $eq: file.driveLetter },
             },
           })
-          const ffProbe = await injector.getInstance(FfprobeService).getFfprobe(file)
+          const ffProbe = await injector.get(FfprobeService).getFfprobe(file)
 
           if (movieFile.entries[0]?.imdbId) {
-            const movie = await injector.getInstance(MoviesService).getMovie(movieFile.entries[0].imdbId)
+            const movie = await injector.get(MoviesService).getMovie(movieFile.entries[0].imdbId)
             return (
               <MoviePlayerV2
                 file={file}

@@ -48,8 +48,8 @@ const SecuritySection = Shade({
     },
   },
   render: ({ injector, useState }) => {
-    const session = injector.getInstance(SessionService)
-    const notyService = injector.getInstance(NotyService)
+    const session = injector.get(SessionService)
+    const notyService = injector.get(NotyService)
 
     const [isLoading, setIsLoading] = useState('isLoading', false)
     const [error, setError] = useState('error', '')
@@ -163,7 +163,7 @@ const ProfileSection = Shade({
     },
   },
   render: ({ injector, useObservable }) => {
-    const session = injector.getInstance(SessionService)
+    const session = injector.get(SessionService)
     const [currentUser] = useObservable('currentUser', session.currentUser)
 
     if (!currentUser) return null

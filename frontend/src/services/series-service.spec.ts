@@ -15,11 +15,12 @@ const createMockSeries = (imdbId = 'tt9876543', _title = 'Test Series'): Series 
 describe('SeriesService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as MediaApiClient,
+    injector.bind(
       MediaApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -31,7 +32,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         const result = await service.getSeries('tt9876543')
 
@@ -51,7 +52,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         await service.getSeries('tt9876543')
         await service.getSeries('tt9876543')
@@ -68,7 +69,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         const observable = service.getSeriesAsObservable('tt9876543')
 
@@ -83,7 +84,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         const observable1 = service.getSeriesAsObservable('tt9876543')
         const observable2 = service.getSeriesAsObservable('tt9876543')
@@ -103,7 +104,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         const findOptions = { top: 10 }
         const result = await service.findSeries(findOptions)
@@ -128,7 +129,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         const findOptions = { top: 10 }
         await service.findSeries(findOptions)
@@ -149,7 +150,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         // First call should populate both query cache and individual series cache
         await service.findSeries({ top: 10 })
@@ -174,7 +175,7 @@ describe('SeriesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SeriesService)
+        const service = i.get(SeriesService)
 
         const findOptions = { top: 10 }
         const observable = service.findSeriesAsObservable(findOptions)

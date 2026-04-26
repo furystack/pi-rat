@@ -1,27 +1,27 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import { AbstractLogger, type LeveledLogEntry } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
-import { LogEntry } from 'common'
+import { defineService, type Token } from '@furystack/inject'
+import { createLogger, type Logger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
+import type { LogEntry as PiRatLogEntry } from 'common'
+import { LogEntryDataSet } from './setup-logging-storage.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class DbLogger extends AbstractLogger {
-  @Injected((injector) => getDataSetFor(injector, LogEntry, 'id'))
-  declare private logEntryDataSet: DataSet<LogEntry, 'id'>
+export const DbLogger: Token<Logger, 'singleton'> = defineService({
+  name: 'pi-rat/DbLogger',
+  lifetime: 'singleton',
+  factory: ({ injector, onDispose }) => {
+    const systemInjector = useSystemIdentityContext({ injector, username: 'db-logger' })
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
 
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'db-logger' }))
-  declare private systemInjector: Injector
-
-  public async addEntry<T>(entry: LeveledLogEntry<T>): Promise<void> {
-    const logEntry: LogEntry = {
-      id: crypto.randomUUID(),
-      scope: entry.scope,
-      message: entry.message,
-      data: entry.data,
-      level: entry.level,
-      createdAt: new Date().toISOString(),
-    }
-
-    void this.logEntryDataSet.add(this.systemInjector, logEntry)
-  }
-}
+    return createLogger(async (entry) => {
+      const logEntry: PiRatLogEntry = {
+        id: crypto.randomUUID(),
+        scope: entry.scope,
+        message: entry.message,
+        data: entry.data,
+        level: entry.level,
+        createdAt: new Date().toISOString(),
+      }
+      await getDataSetFor(systemInjector, LogEntryDataSet).add(systemInjector, logEntry)
+    })
+  },
+})

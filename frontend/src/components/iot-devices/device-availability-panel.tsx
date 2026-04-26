@@ -7,7 +7,7 @@ import { IotDevicesService } from '../../services/iot-devices-service.js'
 export const DeviceAvailabilityPanel = Shade<Device>({
   customElementName: 'device-availability-panel',
   render: ({ props, useObservable, injector, useDisposable }) => {
-    const iotService = injector.getInstance(IotDevicesService)
+    const iotService = injector.get(IotDevicesService)
 
     const pingArgs: Parameters<typeof iotService.findPingHistoryAsObservable> = [
       props.name,

@@ -66,8 +66,8 @@ export const isIotRawFormData = (data: unknown): data is IotRawFormData => {
 const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
   customElementName: 'iot-settings-content',
   render: ({ props, injector, useObservable, useDisposable }) => {
-    const configService = injector.getInstance(ConfigService)
-    const notyService = injector.getInstance(NotyService)
+    const configService = injector.get(ConfigService)
+    const notyService = injector.get(NotyService)
 
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
@@ -195,7 +195,7 @@ const IotSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 export const IotSettingsPage = Shade({
   customElementName: 'iot-settings-page',
   render: ({ injector }) => {
-    const configService = injector.getInstance(ConfigService)
+    const configService = injector.get(ConfigService)
 
     return (
       <PageContainer gap="24px">

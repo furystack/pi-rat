@@ -1,10 +1,10 @@
+import { DriveDataSet } from '../setup-drives.js'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { GetDirectoryEntries } from 'common'
-import { Drive } from 'common'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { existsAsync } from '../../../utils/exists-async.js'
@@ -12,7 +12,7 @@ import { direntToApiModel } from '../utils/dirent-to-api-model.js'
 
 export const GetDirectoryEntriesAction: RequestAction<GetDirectoryEntries> = async ({ injector, getUrlParams }) => {
   const { letter, path } = getUrlParams()
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, letter)
+  const drive = await getDataSetFor(injector, DriveDataSet).get(injector, letter)
   if (!drive) {
     return JsonResult({ entries: [], count: 0 }, 404)
   }

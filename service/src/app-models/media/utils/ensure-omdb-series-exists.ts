@@ -1,7 +1,8 @@
+import { OmdbSeriesMetadataDataSet } from '../media-data-sets.js'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
-import { OmdbSeriesMetadata, type OmdbMovieMetadata, type PiRatFile } from 'common'
+import { type OmdbMovieMetadata, type PiRatFile } from 'common'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
 import { ensureSeriesExists } from './ensure-series-exists.js'
 import { ensureSeriesLocalizedMetadataExists } from './ensure-localized-metadata-exists.js'
@@ -16,10 +17,10 @@ export const ensureOmdbSeriesExists = async (
     return
   }
 
-  const omdbSeriesDataSet = getDataSetFor(injector, OmdbSeriesMetadata, 'imdbID')
+  const omdbSeriesDataSet = getDataSetFor(injector, OmdbSeriesMetadataDataSet)
   const storedResult = await omdbSeriesDataSet.get(injector, omdbMeta.seriesID)
   if (!storedResult) {
-    const omdbClientService = injector.getInstance(OmdbClientService)
+    const omdbClientService = injector.get(OmdbClientService)
     const result = await omdbClientService.fetchOmdbSeriesMetadata(
       { imdbId: omdbMeta.seriesID },
       { file: context?.file },

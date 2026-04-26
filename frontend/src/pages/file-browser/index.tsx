@@ -31,7 +31,7 @@ export const DrivesPage = Shade({
     },
   },
   render: ({ injector, useObservable, useSearchState }) => {
-    const drivesService = injector.getInstance(DrivesService)
+    const drivesService = injector.get(DrivesService)
     const [drives] = useObservable('drives', drivesService.getVolumesAsObservable({}))
 
     const [focused, setFocused] = useSearchState('focused', 'ld')

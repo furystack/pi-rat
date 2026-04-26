@@ -1,7 +1,8 @@
+import { TmdbSeriesMetadataDataSet } from '../media-data-sets.js'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
-import { TmdbSeriesMetadata, type PiRatFile } from 'common'
+import { type PiRatFile } from 'common'
 
 import type { TmdbTvDetailsResponse } from '../metadata-services/tmdb-api-types.js'
 import { TmdbClientService } from '../metadata-services/tmdb-client-service.js'
@@ -15,7 +16,7 @@ const storeTmdbSeriesMetadata = async (
   language: string,
   injector: Injector,
 ) => {
-  const dataSet = getDataSetFor(injector, TmdbSeriesMetadata, 'id')
+  const dataSet = getDataSetFor(injector, TmdbSeriesMetadataDataSet)
   const existing = await dataSet.get(injector, tmdbSeries.id)
   if (existing) return existing
 
@@ -72,7 +73,7 @@ export const ensureTmdbSeriesExists = async (
     return
   }
 
-  const tmdbClientService = injector.getInstance(TmdbClientService)
+  const tmdbClientService = injector.get(TmdbClientService)
   const result = await tmdbClientService.fetchTmdbSeriesMetadata({ imdbId: seriesImdbId }, { file: context?.file })
   if (result.status !== 'success') {
     const logger = getLogger(injector).withScope('ensureTmdbSeriesExists')

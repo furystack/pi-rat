@@ -71,8 +71,8 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
     },
   },
   render: ({ props, injector, useObservable, useDisposable }) => {
-    const configService = injector.getInstance(ConfigService)
-    const notyService = injector.getInstance(NotyService)
+    const configService = injector.get(ConfigService)
+    const notyService = injector.get(NotyService)
 
     const isLoadingObservable = useDisposable('isLoading', () => new ObservableValue(false))
     const [isLoading] = useObservable('isLoadingValue', isLoadingObservable)
@@ -163,7 +163,7 @@ const AiSettingsContent = Shade<{ data: CacheWithValue<Config> }>({
 export const AiSettingsPage = Shade({
   customElementName: 'ai-settings-page',
   render: ({ injector }) => {
-    const configService = injector.getInstance(ConfigService)
+    const configService = injector.get(ConfigService)
 
     return (
       <PageContainer gap="24px">

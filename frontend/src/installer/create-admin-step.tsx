@@ -33,7 +33,7 @@ export const CreateAdminStep = Shade<WizardStepProps>({
         {...props}
         validate={isCreateAdminPayload}
         onSubmit={async (data) => {
-          await injector.getInstance(InstallApiClient).call({
+          await injector.get(InstallApiClient).call({
             method: 'POST',
             action: '/install',
             body: {

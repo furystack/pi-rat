@@ -1,9 +1,10 @@
 import type { Injector } from '@furystack/inject'
 import { createGetCollectionEndpoint, createGetEntityEndpoint, useRestService, Validate } from '@furystack/rest-service'
-import { LogEntry, type LoggingApi } from 'common'
+import type { LoggingApi } from 'common'
 import loggingApiSchema from 'common/schemas/logging-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
+import { LogEntryDataSet } from './setup-logging-storage.js'
 
 export const setupLoggingRestApi = async (injector: Injector) => {
   await useRestService<LoggingApi>({
@@ -14,10 +15,10 @@ export const setupLoggingRestApi = async (injector: Injector) => {
     api: {
       GET: {
         '/logs': Validate({ schema: loggingApiSchema, schemaName: 'GetCollectionEndpoint<LogEntry>' })(
-          createGetCollectionEndpoint({ model: LogEntry, primaryKey: 'id' }),
+          createGetCollectionEndpoint(LogEntryDataSet),
         ),
         '/logs/:id': Validate({ schema: loggingApiSchema, schemaName: 'GetEntityEndpoint<LogEntry,"id">' })(
-          createGetEntityEndpoint({ model: LogEntry, primaryKey: 'id' }),
+          createGetEntityEndpoint(LogEntryDataSet),
         ),
       },
     },

@@ -2,19 +2,18 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import {
-  Config,
-  Drive,
   getFallbackMetadata,
   getFileName,
   getParentPath,
   isMovieFile,
   isSampleFile,
-  MovieFile,
-  OmdbMovieMetadata,
   type MetadataProviderConfig,
   type Movie,
   type PiRatFile,
 } from 'common'
+import { ConfigDataSet } from '../../config/setup-config-store.js'
+import { DriveDataSet } from '../../drives/setup-drives.js'
+import { MovieFileDataSet, OmdbMovieMetadataDataSet } from '../media-data-sets.js'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { getPhysicalParentPath } from '../../../utils/physical-path-utils.js'
 import { OmdbClientService } from '../metadata-services/omdb-client-service.js'
@@ -47,7 +46,7 @@ const normalizeLanguage = (locale: string): string => {
 
 const getProviderPriority = async (injector: Injector): Promise<Array<'omdb' | 'tmdb'>> => {
   try {
-    const configDataSet = getDataSetFor(injector, Config, 'id')
+    const configDataSet = getDataSetFor(injector, ConfigDataSet)
     const config = await configDataSet.get(injector, 'METADATA_PROVIDER_CONFIG')
     if (config) {
       return (config as MetadataProviderConfig).value.priority
@@ -69,7 +68,7 @@ const tryOmdbProvider = async (
   }: { title: string; year?: number; season?: number; episode?: number; imdbId?: string },
   context?: { file?: PiRatFile },
 ): Promise<ProviderResult> => {
-  const omdbClientService = injector.getInstance(OmdbClientService)
+  const omdbClientService = injector.get(OmdbClientService)
   const result = imdbId
     ? await omdbClientService.fetchOmdbMovieMetadataByImdbId({ imdbId }, context)
     : await omdbClientService.fetchOmdbMovieMetadata({ title, year, season, episode }, context)
@@ -109,7 +108,7 @@ const tryTmdbProvider = async (
   }: { title: string; year?: number; season?: number; episode?: number; imdbId?: string },
   context?: { file?: PiRatFile },
 ): Promise<ProviderResult> => {
-  const tmdbClientService = injector.getInstance(TmdbClientService)
+  const tmdbClientService = injector.get(TmdbClientService)
   const result = imdbId
     ? await tmdbClientService.fetchTmdbMovieMetadataByImdbId({ imdbId, season, episode }, context)
     : await tmdbClientService.fetchTmdbMovieMetadata({ title, year, season, episode }, context)
@@ -202,7 +201,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
 
   const { title, year, season, episode } = getFallbackMetadata(path)
 
-  const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
+  const movieFileDataSet = getDataSetFor(injector, MovieFileDataSet)
 
   const storedMovieFile = await movieFileDataSet.find(injector, {
     filter: {
@@ -219,12 +218,12 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
     return { status: 'already-linked' } as const
   }
 
-  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
+  const ffprobeResult = await injector.get(FfprobeService).getFfprobeForPiratFile(file)
 
   // Try extracting IMDB ID directly from ffprobe tags or sibling .nfo files
   const tagImdbId = extractImdbIdFromFfprobeTags(ffprobeResult.format?.tags)
 
-  const driveDataSet = getDataSetFor(injector, Drive, 'letter')
+  const driveDataSet = getDataSetFor(injector, DriveDataSet)
   const drive = await driveDataSet.get(injector, driveLetter)
 
   let nfoFiles: string[] = []
@@ -314,7 +313,7 @@ export const linkMovie = async (options: { injector: Injector; file: PiRatFile }
   }
 
   // Check existing OMDB metadata (backward compatibility)
-  const omdbDataSet = getDataSetFor(injector, OmdbMovieMetadata, 'imdbID')
+  const omdbDataSet = getDataSetFor(injector, OmdbMovieMetadataDataSet)
   const storedResult = await omdbDataSet.find(injector, {
     filter: {
       Title: { $eq: title },

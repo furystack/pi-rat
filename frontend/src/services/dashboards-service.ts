@@ -1,14 +1,10 @@
-import { Injectable, Injected } from '@furystack/inject'
 import { Cache } from '@furystack/cache'
-import type { Dashboard } from 'common'
 import type { FindOptions, WithOptionalId } from '@furystack/core'
+import { defineService, type Token } from '@furystack/inject'
+import type { Dashboard } from 'common'
 import { DashboardsApiClient } from './api-clients/dashboards-api-client.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class DashboardService implements Disposable {
-  @Injected(DashboardsApiClient)
-  declare private readonly dashboardsApiClient: DashboardsApiClient
-
+class DashboardServiceImpl implements Disposable {
   private dashboardCache = new Cache({
     capacity: 100,
     load: async (id: string) => {
@@ -28,21 +24,19 @@ export class DashboardService implements Disposable {
       const { result } = await this.dashboardsApiClient.call({
         method: 'GET',
         action: '/dashboards',
-        query: {
-          findOptions,
-        },
+        query: { findOptions },
       })
       return result
     },
   })
 
+  constructor(private readonly dashboardsApiClient: DashboardsApiClient) {}
+
   public getDashboard = this.dashboardCache.get.bind(this.dashboardCache)
-
   public getDashboardAsObservable = this.dashboardCache.getObservable.bind(this.dashboardCache)
-
   public findDashboard = this.dashboardQueryCache.get.bind(this.dashboardQueryCache)
-
   public getDashboardByNameAsObservable = this.dashboardQueryCache.getObservable.bind(this.dashboardQueryCache)
+
   public deleteDashboard = async (id: string) => {
     await this.dashboardsApiClient.call({
       method: 'DELETE',
@@ -83,3 +77,16 @@ export class DashboardService implements Disposable {
     this.dashboardQueryCache[Symbol.dispose]()
   }
 }
+
+export type DashboardService = DashboardServiceImpl
+
+export const DashboardService: Token<DashboardService, 'singleton'> = defineService({
+  name: 'pi-rat/DashboardService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new DashboardServiceImpl(inject(DashboardsApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

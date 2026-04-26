@@ -8,7 +8,7 @@ import { IdentityApiClient } from '../../services/api-clients/identity-api-clien
 export const UsersPage = Shade({
   customElementName: 'shade-app-users-page',
   render: ({ useDisposable, injector }) => {
-    const api = injector.getInstance(IdentityApiClient)
+    const api = injector.get(IdentityApiClient)
 
     const service = useDisposable(
       'service',

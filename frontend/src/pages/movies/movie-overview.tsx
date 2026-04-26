@@ -16,8 +16,8 @@ import { MediaOverviewLayout } from './media-overview-layout.js'
 export const PlayButtons = Shade<{ imdbId: string }>({
   customElementName: 'shade-movie-play-buttons',
   render: ({ props, useObservable, injector }) => {
-    const watchProgressService = injector.getInstance(WatchProgressService)
-    const movieFileService = injector.getInstance(MovieFilesService)
+    const watchProgressService = injector.get(WatchProgressService)
+    const movieFileService = injector.get(MovieFilesService)
     const [movieFilesResult] = useObservable(
       'movieFiles',
       movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: props.imdbId } } }),
@@ -97,10 +97,10 @@ export const PlayButtons = Shade<{ imdbId: string }>({
 const MovieOverviewContent = Shade<{ data: CacheWithValue<Movie> }>({
   customElementName: 'shade-movie-overview-content',
   render: ({ props, useObservable, injector }) => {
-    const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
+    const [currentUser] = useObservable('currentUser', injector.get(SessionService).currentUser)
     const movie = props.data.value
 
-    const localizedService = injector.getInstance(LocalizedMetadataService)
+    const localizedService = injector.get(LocalizedMetadataService)
     const [localized] = useObservable('localized', localizedService.getMovieLocalizedAsObservable(movie.imdbId))
 
     const localizedData = (localized as CacheWithValue<MovieMetadataLocalized | undefined> | undefined)?.value
@@ -147,7 +147,7 @@ const MovieOverviewContent = Shade<{ data: CacheWithValue<Movie> }>({
 export const MovieOverview = Shade<{ imdbId: string }>({
   customElementName: 'shade-movie-overview',
   render: ({ props, injector }) => {
-    const movieService = injector.getInstance(MoviesService)
+    const movieService = injector.get(MoviesService)
 
     return (
       <CacheView

@@ -23,7 +23,7 @@ const AdminLinks = Shade({
     gap: '8px',
   },
   render: ({ injector, useObservable }) => {
-    const session = injector.getInstance(SessionService)
+    const session = injector.get(SessionService)
     const [currentUser] = useObservable('currentUser', session.currentUser)
 
     const isAdmin = currentUser?.roles?.includes('admin') ?? false
@@ -49,7 +49,7 @@ export const Header = Shade<HeaderProps>({
     },
   },
   render: ({ props, injector, useObservable }) => {
-    const session = injector.getInstance(SessionService)
+    const session = injector.get(SessionService)
     const [sessionState] = useObservable('sessionState', session.state)
     const [currentUser] = useObservable('currentUser', session.currentUser)
 

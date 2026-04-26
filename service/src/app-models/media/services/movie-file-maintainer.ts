@@ -1,59 +1,67 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger, type ScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { PathHelper } from '@furystack/utils'
-import type { MoviesConfig, PiRatFile, ScanProgress } from 'common'
+import type { Drive, MovieFile, MoviesConfig, PiRatFile, ScanProgress } from 'common'
 import {
-  Config,
-  Drive,
   createScanProgress,
   getFallbackMetadata,
   getProcessedCount,
   isMovieFile,
   isSampleFile,
-  MovieFile,
   updateScanProgress,
 } from 'common'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 import { type ConfigWatcher, createConfigWatcher } from '../../../utils/config-watcher.js'
 import { existsAsync } from '../../../utils/exists-async.js'
+import { ConfigDataSet } from '../../config/setup-config-store.js'
 import { FileWatcherService } from '../../drives/file-watcher-service.js'
+import { DriveDataSet } from '../../drives/setup-drives.js'
 import { direntToApiModel } from '../../drives/utils/dirent-to-api-model.js'
+import { MovieFileDataSet } from '../media-data-sets.js'
 import { extractSubtitles } from '../utils/extract-subtitles.js'
 import { linkMovie } from '../utils/link-movie.js'
 
 const PROGRESS_LOG_INTERVAL = 50
 
-@Injectable({ lifetime: 'singleton' })
-export class MovieMaintainerService {
-  @Injected((i) => getLogger(i).withScope('MovieFileMaintainer'))
-  declare private logger: ScopedLogger
+export interface MovieMaintainerService {
+  init(): void
+  fullSync(): Promise<ScanProgress>
+  checkFolderForPossibleMovieFiles(
+    path: string,
+    drive: Drive,
+    alreadyAddedMovieFiles: MovieFile[],
+  ): Promise<PiRatFile[]>
+}
 
-  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
-  declare private configDataSet: DataSet<Config, 'id'>
+class MovieMaintainerServiceImpl implements MovieMaintainerService {
+  private fileWatcherSubscriptions: Disposable[] = []
+  private configWatcher?: ConfigWatcher
+  private config: MoviesConfig | undefined
 
-  @Injected((injector) => getDataSetFor(injector, MovieFile, 'id'))
-  declare private movieFileDataSet: DataSet<MovieFile, 'id'>
+  constructor(
+    private readonly logger: ScopedLogger,
+    private readonly systemInjector: Injector,
+    private readonly fileWatcherService: FileWatcherService,
+  ) {}
 
-  @Injected((injector) => getDataSetFor(injector, Drive, 'letter'))
-  declare private driveDataSet: DataSet<Drive, 'letter'>
+  private get configDataSet() {
+    return getDataSetFor(this.systemInjector, ConfigDataSet)
+  }
+  private get movieFileDataSet() {
+    return getDataSetFor(this.systemInjector, MovieFileDataSet)
+  }
+  private get driveDataSet() {
+    return getDataSetFor(this.systemInjector, DriveDataSet)
+  }
 
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'movie-maintainer' }))
-  declare private systemInjector: Injector
-
-  declare private injector: Injector
   private onUnlink = async (file: PiRatFile) => {
     try {
       const existingMovies = await this.movieFileDataSet.find(this.systemInjector, {
-        filter: {
-          path: { $eq: file.path },
-          driveLetter: { $eq: file.driveLetter },
-        },
+        filter: { path: { $eq: file.path }, driveLetter: { $eq: file.driveLetter } },
       })
-
       if (existingMovies.length > 0) {
         await this.logger.verbose({
           message: `🎬  A movie file has been removed, cleaning up '${file.path}' from DB...`,
@@ -62,33 +70,20 @@ export class MovieMaintainerService {
         await this.movieFileDataSet.remove(this.systemInjector, ...existingMovies.map((m) => m.id))
       }
     } catch (error) {
-      await this.logger.error({
-        message: '🎬  Failed to unlink movie',
-        data: { error, file },
-      })
+      await this.logger.error({ message: '🎬  Failed to unlink movie', data: { error, file } })
     }
   }
 
   private onUnlinkDir = async (file: PiRatFile) => {
     try {
       const normalizedPath = PathHelper.normalize(file.path)
-
       const existingMovies = await this.movieFileDataSet.find(this.systemInjector, {
-        filter: {
-          path: { $like: `${normalizedPath}%` },
-          driveLetter: { $eq: file.driveLetter },
-        },
+        filter: { path: { $like: `${normalizedPath}%` }, driveLetter: { $eq: file.driveLetter } },
       })
-
       if (existingMovies.length > 0) {
         await this.logger.verbose({
           message: `🎬  A folder has been removed, cleaning up movie files inside...`,
-          data: {
-            file,
-            entries: existingMovies.map((movie) => ({
-              path: movie.path,
-            })),
-          },
+          data: { file, entries: existingMovies.map((movie) => ({ path: movie.path })) },
         })
         await this.movieFileDataSet.remove(this.systemInjector, ...existingMovies.map((m) => m.id))
       }
@@ -101,28 +96,20 @@ export class MovieMaintainerService {
   }
 
   private shouldTryLinkMovie = (file: PiRatFile): boolean => {
-    if (!this.config) {
-      return false
-    }
-    if (this.config.value.watchFiles === 'all') {
-      return true
-    }
+    if (!this.config) return false
+    if (this.config.value.watchFiles === 'all') return true
     if (
-      this.config.value.watchFiles.some((watchConfig) => {
-        return watchConfig.drive === file.driveLetter && (!watchConfig.path || file.path.startsWith(watchConfig.path))
-      })
+      this.config.value.watchFiles.some(
+        (watchConfig) =>
+          watchConfig.drive === file.driveLetter && (!watchConfig.path || file.path.startsWith(watchConfig.path)),
+      )
     ) {
       return true
     }
     return false
   }
 
-  private shouldAutoExtractSubtitles = (): boolean => {
-    if (!this.config) {
-      return false
-    }
-    return !!this.config.value.autoExtractSubtitles
-  }
+  private shouldAutoExtractSubtitles = (): boolean => !!this.config?.value.autoExtractSubtitles
 
   private onAdd = async (file: PiRatFile) => {
     try {
@@ -134,10 +121,7 @@ export class MovieMaintainerService {
             data: file,
           })
           try {
-            await extractSubtitles({
-              injector: this.systemInjector,
-              file,
-            })
+            await extractSubtitles({ injector: this.systemInjector, file })
           } catch (error) {
             await this.logger.error({
               message: `🎬  Failed to auto extract subtitles for movie file '${file.path}'`,
@@ -157,15 +141,6 @@ export class MovieMaintainerService {
     }
   }
 
-  @Injected(FileWatcherService)
-  declare private fileWatcherService: FileWatcherService
-
-  private fileWatcherSubscriptions: Disposable[] = []
-
-  declare private config: MoviesConfig | undefined
-
-  private configWatcher?: ConfigWatcher
-
   private setupFileWatchers() {
     this.fileWatcherSubscriptions.push(
       this.fileWatcherService.subscribe('add', (file) => void this.onAdd(file)),
@@ -175,9 +150,7 @@ export class MovieMaintainerService {
   }
 
   private teardownFileWatchers() {
-    for (const sub of this.fileWatcherSubscriptions) {
-      sub[Symbol.dispose]()
-    }
+    for (const sub of this.fileWatcherSubscriptions) sub[Symbol.dispose]()
     this.fileWatcherSubscriptions = []
   }
 
@@ -187,18 +160,16 @@ export class MovieMaintainerService {
     alreadyAddedMovieFiles: MovieFile[],
   ): Promise<PiRatFile[]> => {
     const absolutePath = join(drive.physicalPath, path)
-    if (!(await existsAsync(absolutePath))) {
-      return []
-    }
+    if (!(await existsAsync(absolutePath))) return []
     const entries = await readdir(absolutePath, { withFileTypes: true, encoding: 'utf-8' })
     const fsEntries = entries.map(direntToApiModel)
 
     const fromDirs = await Promise.all(
       fsEntries
         .filter((entry) => entry.isDirectory)
-        .map(async (entry) => {
-          return this.checkFolderForPossibleMovieFiles(join(path, entry.name), drive, alreadyAddedMovieFiles)
-        }),
+        .map(async (entry) =>
+          this.checkFolderForPossibleMovieFiles(join(path, entry.name), drive, alreadyAddedMovieFiles),
+        ),
     )
 
     const fromFiles = fsEntries
@@ -212,10 +183,7 @@ export class MovieMaintainerService {
             (file) => file.path === join(path, entry.name) && file.driveLetter === drive.letter,
           ),
       )
-      .map((entry) => ({
-        driveLetter: drive.letter,
-        path: join(path, entry.name),
-      }))
+      .map((entry) => ({ driveLetter: drive.letter, path: join(path, entry.name) }))
     return [...fromDirs.flat(), ...fromFiles] as PiRatFile[]
   }
 
@@ -249,24 +217,18 @@ export class MovieMaintainerService {
   }
 
   public async fullSync(): Promise<ScanProgress> {
-    await this.logger.information({
-      message: '🎬  Starting full sync of movie files...',
-    })
+    await this.logger.information({ message: '🎬  Starting full sync of movie files...' })
 
     const [drives, alreadyAddedMovieFiles] = await Promise.all([
       this.driveDataSet.find(this.systemInjector, {}),
       this.movieFileDataSet.find(this.systemInjector, {}),
     ])
 
-    await this.logger.verbose({
-      message: `🎬  Starting checking files on ${drives.length} drives...`,
-    })
+    await this.logger.verbose({ message: `🎬  Starting checking files on ${drives.length} drives...` })
 
     const allPossibleMovieFiles = (
       await Promise.all(
-        drives.map(async (drive) => {
-          return await this.checkFolderForPossibleMovieFiles('', drive, alreadyAddedMovieFiles)
-        }),
+        drives.map(async (drive) => this.checkFolderForPossibleMovieFiles('', drive, alreadyAddedMovieFiles)),
       )
     ).flat()
 
@@ -276,12 +238,10 @@ export class MovieMaintainerService {
 
     const progress = createScanProgress(allPossibleMovieFiles.length)
 
-    // Sequential to respect OMDB API rate limits. Parallel processing triggers
-    // rate-limit responses that waste retries and slow down overall throughput.
+    // Sequential to respect OMDB API rate limits.
     for (const file of allPossibleMovieFiles) {
       const result = await this.onAdd(file)
       updateScanProgress(progress, result.status)
-
       const processed = getProcessedCount(progress)
       if (processed > 0 && processed % PROGRESS_LOG_INTERVAL === 0) {
         await this.logger.information({
@@ -291,20 +251,31 @@ export class MovieMaintainerService {
       }
     }
 
-    await this.logger.information({
-      message: `🎬  Full sync finished.`,
-      data: { progress },
-    })
-
+    await this.logger.information({ message: `🎬  Full sync finished.`, data: { progress } })
     return progress
   }
 
-  public [Symbol.dispose]() {
+  public dispose() {
     this.teardownFileWatchers()
     this.configWatcher?.dispose()
   }
 }
 
+export const MovieMaintainerService: Token<MovieMaintainerService, 'singleton'> = defineService({
+  name: 'pi-rat/MovieMaintainerService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { inject, injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'movie-maintainer' })
+    const fileWatcherService = inject(FileWatcherService)
+    const impl = new MovieMaintainerServiceImpl(logger, systemInjector, fileWatcherService)
+    onDispose(() => impl.dispose())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    return impl
+  },
+})
+
 export const useMovieFileMaintainer = (injector: Injector) => {
-  injector.getInstance(MovieMaintainerService)
+  injector.get(MovieMaintainerService).init()
 }

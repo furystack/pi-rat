@@ -25,7 +25,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     const playerContainerRef = useRef<HTMLElement>('playerContainer')
 
     const { driveLetter, path } = props.file
-    const watchProgressService = injector.getInstance(WatchProgressService)
+    const watchProgressService = injector.get(WatchProgressService)
     useDisposable('watchProgressUpdater', () => {
       const createUpdater = (video: HTMLVideoElement) =>
         new WatchProgressUpdater({
@@ -65,7 +65,7 @@ export const MoviePlayerV2 = Shade<MoviePlayerProps>({
     })
     const { watchProgress, file } = props
 
-    const api = injector.getInstance(MediaApiClient)
+    const api = injector.get(MediaApiClient)
     const logger = getLogger(injector).withScope('MoviePlayerService')
 
     const mediaService = useDisposable(

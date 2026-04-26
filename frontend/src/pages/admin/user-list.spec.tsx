@@ -45,7 +45,7 @@ describe('UserListPage', () => {
     }
 
     injector = new Injector()
-    injector.setExplicitInstance(mockUsersService as unknown as UsersService, UsersService)
+    injector.bind(UsersService, () => mockUsersService as never)
   })
 
   afterEach(async () => {
@@ -77,7 +77,7 @@ describe('UserListPage', () => {
       })
       mockUsersService.userQueryCache = neverResolvingCache
 
-      injector.setExplicitInstance(mockUsersService as unknown as UsersService, UsersService)
+      injector.bind(UsersService, () => mockUsersService as never)
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 
@@ -223,7 +223,7 @@ describe('UserListPage', () => {
   describe('navigation', () => {
     it('should navigate to user details when Edit button is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
-      const locationService = injector.getInstance(LocationService)
+      const locationService = injector.get(LocationService)
       const updateStateSpy = vi.spyOn(locationService, 'updateState')
 
       initializeShadeRoot({
@@ -243,7 +243,7 @@ describe('UserListPage', () => {
 
     it('should navigate to user details when table row is clicked', async () => {
       const rootElement = document.getElementById('root') as HTMLDivElement
-      const locationService = injector.getInstance(LocationService)
+      const locationService = injector.get(LocationService)
       const updateStateSpy = vi.spyOn(locationService, 'updateState')
 
       initializeShadeRoot({

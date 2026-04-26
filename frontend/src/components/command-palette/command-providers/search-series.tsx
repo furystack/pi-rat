@@ -6,7 +6,7 @@ import { MediaApiClient } from '../../../services/api-clients/media-api-client.j
 
 export const searchSeriesCommandProvider: CommandProvider = async ({ term, injector }) => {
   if (term.length > 4) {
-    const mediaApiClient = injector.getInstance(MediaApiClient)
+    const mediaApiClient = injector.get(MediaApiClient)
     const { result: relatedLocalized } = await mediaApiClient.call({
       method: 'GET',
       action: '/series-metadata-localized',

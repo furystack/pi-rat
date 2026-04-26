@@ -55,7 +55,7 @@ export const WizardStep = Shade<
       return { [Symbol.dispose]: () => clearTimeout(id) }
     })
 
-    const [isLargeScreen] = useObservable('screenSize', injector.getInstance(ScreenService).screenSize.atLeast.md)
+    const [isLargeScreen] = useObservable('screenSize', injector.get(ScreenService).screenSize.atLeast.md)
 
     return (
       <Form<Record<string, string>>

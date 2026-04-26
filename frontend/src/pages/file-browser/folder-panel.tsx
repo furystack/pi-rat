@@ -41,7 +41,7 @@ export const FolderPanel = Shade<{
     },
   },
   render: ({ props, injector, useDisposable, useSearchState, useObservable }) => {
-    const drivesService = injector.getInstance(DrivesService)
+    const drivesService = injector.get(DrivesService)
 
     const [currentDrive, setCurrentDrive] = useSearchState(props.searchStateKey, {
       path: '/',

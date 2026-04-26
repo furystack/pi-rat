@@ -7,6 +7,7 @@ const mockGet = vi.fn()
 const mockAdd = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     get: (...args: unknown[]) => mockGet(...args) as unknown,
     add: (...args: unknown[]) => mockAdd(...args) as unknown,

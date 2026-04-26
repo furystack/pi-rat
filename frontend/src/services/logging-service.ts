@@ -1,29 +1,38 @@
 import type { FindOptions } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 import type { LogEntry } from 'common'
 import { LoggingApiClient } from './api-clients/logging-api-client.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class LoggingService {
-  @Injected(LoggingApiClient)
-  declare private readonly loggingApiClient: LoggingApiClient
-
-  public async getLogEntry(id: string) {
-    const { result } = await this.loggingApiClient.call({
-      method: 'GET',
-      action: '/logs/:id',
-      url: { id },
-      query: {},
-    })
-    return result
-  }
-
-  public async findLogEntry(findOptions: FindOptions<LogEntry, Array<keyof LogEntry>>) {
-    const { result } = await this.loggingApiClient.call({
-      method: 'GET',
-      action: '/logs',
-      query: { findOptions },
-    })
-    return result
-  }
+export interface LoggingService {
+  getLogEntry(id: string): Promise<LogEntry>
+  findLogEntry(
+    findOptions: FindOptions<LogEntry, Array<keyof LogEntry>>,
+  ): Promise<{ entries: LogEntry[]; count: number }>
 }
+
+export const LoggingService: Token<LoggingService, 'singleton'> = defineService({
+  name: 'pi-rat/LoggingService',
+  lifetime: 'singleton',
+  factory: ({ inject }) => {
+    const loggingApiClient = inject(LoggingApiClient)
+    return {
+      getLogEntry: async (id) => {
+        const { result } = await loggingApiClient.call({
+          method: 'GET',
+          action: '/logs/:id',
+          url: { id },
+          query: {},
+        })
+        return result
+      },
+      findLogEntry: async (findOptions) => {
+        const { result } = await loggingApiClient.call({
+          method: 'GET',
+          action: '/logs',
+          query: { findOptions },
+        })
+        return result
+      },
+    }
+  },
+})

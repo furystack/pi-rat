@@ -35,11 +35,12 @@ const createMockSeriesLocalized = (imdbId = 'tt9876543'): SeriesMetadataLocalize
 describe('LocalizedMetadataService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as MediaApiClient,
+    injector.bind(
       MediaApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -53,7 +54,7 @@ describe('LocalizedMetadataService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LocalizedMetadataService)
+        const service = i.get(LocalizedMetadataService)
         const result = await service.getMovieLocalized('tt1234567')
 
         expect(mockCall).toHaveBeenCalledWith({
@@ -81,7 +82,7 @@ describe('LocalizedMetadataService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LocalizedMetadataService)
+        const service = i.get(LocalizedMetadataService)
 
         await service.getMovieLocalized('tt1234567')
         await service.getMovieLocalized('tt1234567')
@@ -97,7 +98,7 @@ describe('LocalizedMetadataService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LocalizedMetadataService)
+        const service = i.get(LocalizedMetadataService)
         const result = await service.getMovieLocalized('tt0000000')
 
         expect(result).toBeUndefined()
@@ -114,7 +115,7 @@ describe('LocalizedMetadataService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LocalizedMetadataService)
+        const service = i.get(LocalizedMetadataService)
         const result = await service.getSeriesLocalized('tt9876543')
 
         expect(mockCall).toHaveBeenCalledWith({
@@ -142,7 +143,7 @@ describe('LocalizedMetadataService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LocalizedMetadataService)
+        const service = i.get(LocalizedMetadataService)
 
         await service.getSeriesLocalized('tt9876543')
         await service.getSeriesLocalized('tt9876543')
@@ -160,7 +161,7 @@ describe('LocalizedMetadataService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LocalizedMetadataService)
+        const service = i.get(LocalizedMetadataService)
         const observable = service.getMovieLocalizedAsObservable('tt1234567')
 
         expect(observable).toBeDefined()
@@ -177,7 +178,7 @@ describe('LocalizedMetadataService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LocalizedMetadataService)
+        const service = i.get(LocalizedMetadataService)
         const movieDisposeSpy = vi.spyOn(service.movieLocalizedCache, Symbol.dispose as never)
         const seriesDisposeSpy = vi.spyOn(service.seriesLocalizedCache, Symbol.dispose as never)
 

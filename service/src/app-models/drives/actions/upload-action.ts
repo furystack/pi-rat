@@ -1,3 +1,4 @@
+import { DriveDataSet } from '../setup-drives.js'
 import { isAuthorized } from '@furystack/core'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
@@ -5,7 +6,6 @@ import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import type { DirectoryEntry, UploadEndpoint } from 'common'
-import { Drive } from 'common'
 import type { Fields, Files } from 'formidable'
 import { IncomingForm } from 'formidable'
 import { join } from 'path'
@@ -21,7 +21,7 @@ export const UploadAction: RequestAction<UploadEndpoint> = async ({ injector, ge
   const { letter, path } = getUrlParams()
   await logger.verbose({ message: `Uploading file to ${letter}:${path}` })
 
-  const dataSet = getDataSetFor(injector, Drive, 'letter')
+  const dataSet = getDataSetFor(injector, DriveDataSet)
 
   const drive = await dataSet.get(injector, letter)
 

@@ -17,11 +17,12 @@ const createMockLogEntry = (id = 'log-1', level: LogLevel = 'information'): LogE
 describe('LoggingService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as LoggingApiClient,
+    injector.bind(
       LoggingApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -33,7 +34,7 @@ describe('LoggingService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LoggingService)
+        const service = i.get(LoggingService)
 
         const result = await service.getLogEntry('log-1')
 
@@ -58,7 +59,7 @@ describe('LoggingService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LoggingService)
+        const service = i.get(LoggingService)
 
         const findOptions = { top: 10, order: { createdAt: 'DESC' as const } }
         const result = await service.findLogEntry(findOptions)
@@ -83,7 +84,7 @@ describe('LoggingService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(LoggingService)
+        const service = i.get(LoggingService)
 
         const findOptions = { top: 10 }
         await service.findLogEntry(findOptions)

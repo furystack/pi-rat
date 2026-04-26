@@ -79,8 +79,8 @@ describe('UserDetailsPage', () => {
     }
 
     injector = new Injector()
-    injector.setExplicitInstance(mockUsersService as unknown as UsersService, UsersService)
-    injector.setExplicitInstance(mockNotyService as unknown as NotyService, NotyService)
+    injector.bind(UsersService, () => mockUsersService as never)
+    injector.bind(NotyService, () => mockNotyService as never)
   })
 
   afterEach(async () => {
@@ -111,7 +111,7 @@ describe('UserDetailsPage', () => {
       })
       mockUsersService.userCache = neverResolvingCache
 
-      injector.setExplicitInstance(mockUsersService as unknown as UsersService, UsersService)
+      injector.bind(UsersService, () => mockUsersService as never)
 
       const rootElement = document.getElementById('root') as HTMLDivElement
 

@@ -17,9 +17,9 @@ export const MovieList = Shade({
     },
   },
   render: ({ injector }) => {
-    const movieService = injector.getInstance(MoviesService)
-    const movieFilesService = injector.getInstance(MovieFilesService)
-    const watchProgressService = injector.getInstance(WatchProgressService)
+    const movieService = injector.get(MoviesService)
+    const movieFilesService = injector.get(MovieFilesService)
+    const watchProgressService = injector.get(WatchProgressService)
     return (
       <PiRatLazyLoad
         component={async () => {

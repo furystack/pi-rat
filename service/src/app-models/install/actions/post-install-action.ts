@@ -5,7 +5,7 @@ import { ServiceStatusProvider } from '../service-installer.js'
 
 export const PostInstallAction: RequestAction<InstallAction> = async ({ injector, getBody }) => {
   const { username, password } = await getBody()
-  const provider = injector.getInstance(ServiceStatusProvider)
+  const provider = injector.get(ServiceStatusProvider)
   await provider.install(username, password)
   return JsonResult({
     success: true,

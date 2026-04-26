@@ -16,18 +16,20 @@ const createMockDrive = (letter = 'A', physicalPath = '/mnt/drive-a'): Drive => 
 describe('DrivesService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as DrivesApiClient,
+    injector.bind(
       DrivesApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
-    injector.setExplicitInstance(
-      {
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-      } as unknown as WebsocketNotificationsService,
+    injector.bind(
       WebsocketNotificationsService,
+      () =>
+        ({
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+        }) as never,
     )
     return injector
   }
@@ -39,7 +41,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
         const findOptions = { top: 10 }
 
         const result = await service.getVolumes({ findOptions })
@@ -59,7 +61,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
         const findOptions = { top: 10 }
 
         await service.getVolumes({ findOptions })
@@ -77,7 +79,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         const observable = service.getVolumesAsObservable({ findOptions: {} })
 
@@ -94,7 +96,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         const result = await service.getVolume('A')
 
@@ -114,7 +116,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         await service.getVolume('A')
         await service.getVolume('A')
@@ -131,7 +133,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         const observable = service.getVolumeAsObservable('A')
 
@@ -148,7 +150,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         const body = { physicalPath: '/mnt/drive-b' }
         const result = await service.addVolume(body)
@@ -173,7 +175,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         await service.getVolumes({ findOptions: {} })
         await service.addVolume({ physicalPath: '/mnt/drive-b' })
@@ -190,7 +192,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         const body = { physicalPath: '/mnt/drive-a-updated' }
         await service.updateVolume('A', body)
@@ -214,7 +216,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         await service.getVolumes({ findOptions: {} })
         await service.updateVolume('A', { physicalPath: '/updated' })
@@ -231,7 +233,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         await service.removeVolume('A')
 
@@ -253,7 +255,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         await service.getVolumes({ findOptions: {} })
         await service.removeVolume('A')
@@ -276,7 +278,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         const result = await service.getFileList('A', '/')
 
@@ -302,7 +304,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         const result = await service.getFileList('A', '/')
 
@@ -318,7 +320,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         await service.getFileList('A', '/')
         await service.getFileList('A', '/')
@@ -334,7 +336,7 @@ describe('DrivesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DrivesService)
+        const service = i.get(DrivesService)
 
         await service.removeFile({ letter: 'A', path: '/test.txt' })
 

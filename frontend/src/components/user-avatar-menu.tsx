@@ -16,7 +16,7 @@ export const UserAvatarMenu = Shade({
     },
   },
   render: ({ injector, useObservable }) => {
-    const session = injector.getInstance(SessionService)
+    const session = injector.get(SessionService)
     const [currentUser] = useObservable('currentUser', session.currentUser)
 
     if (!currentUser) return null

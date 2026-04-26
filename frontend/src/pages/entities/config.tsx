@@ -8,7 +8,7 @@ import { ConfigApiClient } from '../../services/api-clients/config-api-client.js
 export const ConfigPage = Shade({
   customElementName: 'shade-app-configs-page',
   render: ({ useDisposable, injector }) => {
-    const api = injector.getInstance(ConfigApiClient)
+    const api = injector.get(ConfigApiClient)
 
     const service = useDisposable(
       'service',

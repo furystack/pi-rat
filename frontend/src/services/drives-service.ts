@@ -1,16 +1,12 @@
 import { Cache } from '@furystack/cache'
 import type { FindOptions, WithOptionalId } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 import { EventHub, PathHelper } from '@furystack/utils'
 import type { Drive, FileChangeMessage, WebsocketMessage } from 'common'
 import { DrivesApiClient } from './api-clients/drives-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMessage }> implements Disposable {
-  @Injected(DrivesApiClient)
-  declare private readonly drivesApiClient: DrivesApiClient
-
+class DrivesServiceImpl extends EventHub<{ onFilesystemChanged: FileChangeMessage }> implements Disposable {
   public volumesCache = new Cache({
     load: async ({ findOptions }: { findOptions?: FindOptions<Drive, Array<keyof Drive>> }) => {
       const { result } = await this.drivesApiClient.call({
@@ -34,11 +30,40 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
     },
   })
 
+  private fileListCache = new Cache({
+    load: async (letter: string, path: string) => {
+      const { result } = await this.drivesApiClient
+        .call({
+          method: 'GET',
+          action: '/files/:letter/:path',
+          url: { letter, path },
+        })
+        .then((response) => ({
+          ...response,
+          result: {
+            ...response.result,
+            entries: response.result.entries.sort((a, b) => {
+              if (a.isDirectory && !b.isDirectory) return -1
+              if (!a.isDirectory && b.isDirectory) return 1
+              return a.name.localeCompare(b.name)
+            }),
+          },
+        }))
+      return { ...result, letter, path }
+    },
+  })
+
+  constructor(
+    private readonly drivesApiClient: DrivesApiClient,
+    private readonly socket: WebsocketNotificationsService,
+  ) {
+    super()
+  }
+
   public getVolumes = this.volumesCache.get.bind(this.volumesCache)
   public getVolumesAsObservable = this.volumesCache.getObservable.bind(this.volumesCache)
 
   public getVolume = this.singleVolumeCache.get.bind(this.singleVolumeCache)
-
   public getVolumeAsObservable = this.singleVolumeCache.getObservable.bind(this.singleVolumeCache)
 
   public addVolume = async (volume: Omit<WithOptionalId<Drive, 'letter'>, 'createdAt' | 'updatedAt'>) => {
@@ -73,51 +98,16 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
     return removeResult
   }
 
-  private fileListCache = new Cache({
-    load: async (letter: string, path: string) => {
-      const { result } = await this.drivesApiClient
-        .call({
-          method: 'GET',
-          action: '/files/:letter/:path',
-          url: { letter, path },
-        })
-        .then((response) => {
-          const orderedResult: typeof response = {
-            ...response,
-            result: {
-              ...response.result,
-              entries: response.result.entries.sort((a, b) => {
-                if (a.isDirectory && !b.isDirectory) {
-                  return -1
-                }
-                if (!a.isDirectory && b.isDirectory) {
-                  return 1
-                }
-                return a.name.localeCompare(b.name)
-              }),
-            },
-          }
-          return orderedResult
-        })
-      return { ...result, letter, path }
-    },
-  })
-
   public getFileList = this.fileListCache.get.bind(this.fileListCache)
-
   public getFileListAsObservable = this.fileListCache.getObservable.bind(this.fileListCache)
 
   public removeFile = async ({ letter, path }: { letter: string; path: string }) => {
-    const removeResult = await this.drivesApiClient.call({
+    return this.drivesApiClient.call({
       method: 'DELETE',
       action: '/files/:letter/:path',
       url: { letter, path },
     })
-    return removeResult
   }
-
-  @Injected(WebsocketNotificationsService)
-  declare private readonly socket: WebsocketNotificationsService
 
   private onMessage = ((messageData: WebsocketMessage) => {
     if (messageData.type === 'file-change') {
@@ -143,7 +133,7 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
     try {
       this.socket.removeListener('onMessage', this.onMessage)
     } catch {
-      // @Injected property may throw during disposal if injector is already disposed, or if init() was never called
+      // Socket may already be disposed
     }
     this.volumesCache[Symbol.dispose]()
     this.singleVolumeCache[Symbol.dispose]()
@@ -151,3 +141,16 @@ export class DrivesService extends EventHub<{ onFilesystemChanged: FileChangeMes
     super[Symbol.dispose]()
   }
 }
+
+export type DrivesService = DrivesServiceImpl
+
+export const DrivesService: Token<DrivesService, 'singleton'> = defineService({
+  name: 'pi-rat/DrivesService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new DrivesServiceImpl(inject(DrivesApiClient), inject(WebsocketNotificationsService))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

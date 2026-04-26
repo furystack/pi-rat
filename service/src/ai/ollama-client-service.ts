@@ -1,12 +1,14 @@
 import { getCurrentUser, useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import { getLogger, type ScopedLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
-import { AiChatMessage, Config, type AiChat, type OllamaConfig } from 'common'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger, type ScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
+import { type AiChat, type AiChatMessage, type OllamaConfig } from 'common'
 import type { Message } from 'ollama'
 import { Ollama, type ChatRequest } from 'ollama'
 
 import { type ConfigWatcher, createConfigWatcher } from '../utils/config-watcher.js'
+import { ConfigDataSet } from '../app-models/config/setup-config-store.js'
+import { AiChatMessageDataSet } from './setup-ai-store.js'
 import { isToolingSupported, OllamaTools } from './tools/ollama-tools.js'
 
 const jsonFormat = {
@@ -36,25 +38,28 @@ const jsonFormat = {
   required: ['content', 'thinking', 'references'],
 }
 
-@Injectable({ lifetime: 'singleton' })
-export class OllamaClientService {
+export interface OllamaClientService {
   config?: OllamaConfig
+  init(): void
+  getSupportedModels(): Promise<Awaited<ReturnType<Ollama['list']>>>
+  chat(request: ChatRequest & { stream?: false }): Promise<Awaited<ReturnType<Ollama['chat']>>>
+  handleChatMessageReceived(
+    injector: Injector,
+    chatMessage: AiChatMessage,
+    chat: AiChat,
+    history: AiChatMessage[],
+  ): Promise<void>
+}
 
-  @Injected((injector) => getLogger(injector).withScope('Ollama Client Service'))
-  declare private logger: ScopedLogger
-
-  @Injected((injector) => getDataSetFor(injector, AiChatMessage, 'id'))
-  declare private chatMessageDataSet: DataSet<AiChatMessage, 'id'>
-
-  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
-  declare private configDataSet: DataSet<Config, 'id'>
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'ollama-service' }))
-  declare private systemInjector: Injector
-
-  declare ollama: Ollama | undefined
-
+class OllamaClientServiceImpl implements OllamaClientService {
+  public config?: OllamaConfig
+  public ollama: Ollama | undefined
   private configWatcher?: ConfigWatcher
+
+  constructor(
+    private readonly logger: ScopedLogger,
+    private readonly systemInjector: Injector,
+  ) {}
 
   public init() {
     void this.initAsync().catch((error) => {
@@ -62,10 +67,14 @@ export class OllamaClientService {
     })
   }
 
+  public dispose() {
+    this.configWatcher?.dispose()
+  }
+
   private async initAsync() {
     this.configWatcher?.dispose()
     this.configWatcher = createConfigWatcher<OllamaConfig>({
-      configDataSet: this.configDataSet,
+      configDataSet: getDataSetFor(this.systemInjector, ConfigDataSet),
       systemInjector: this.systemInjector,
       logger: this.logger,
       configId: 'OLLAMA_CONFIG',
@@ -82,10 +91,8 @@ export class OllamaClientService {
     if (!this.ollama) {
       throw new Error('Ollama client is not initialized')
     }
-
     try {
-      const models = await this.ollama.list()
-      return models
+      return await this.ollama.list()
     } catch (error) {
       await this.logger.error({
         message: '❌  Failed to fetch supported models',
@@ -95,22 +102,14 @@ export class OllamaClientService {
     }
   }
 
-  public chat = async (
-    request: ChatRequest & {
-      stream?: false
-    },
-  ) => {
+  public chat: OllamaClientService['chat'] = async (request) => {
     if (!this.ollama) {
       throw new Error('Ollama client is not initialized')
     }
-
     try {
       return await this.ollama.chat(request)
     } catch (error) {
-      await this.logger.error({
-        message: '❌  Failed to chat with Ollama',
-        data: { error },
-      })
+      await this.logger.error({ message: '❌  Failed to chat with Ollama', data: { error } })
       throw error
     }
   }
@@ -224,7 +223,7 @@ export class OllamaClientService {
             })
           : result
 
-      await this.chatMessageDataSet.add(this.systemInjector, {
+      await getDataSetFor(this.systemInjector, AiChatMessageDataSet).add(this.systemInjector, {
         aiChatId: chat.id,
         role: 'assistant',
         content: resultWithToolResponses.message.content,
@@ -242,3 +241,17 @@ export class OllamaClientService {
     }
   }
 }
+
+export const OllamaClientService: Token<OllamaClientService, 'singleton'> = defineService({
+  name: 'pi-rat/OllamaClientService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'ollama-service' })
+    const impl = new OllamaClientServiceImpl(logger, systemInjector)
+    onDispose(() => impl.dispose())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    return impl
+  },
+})

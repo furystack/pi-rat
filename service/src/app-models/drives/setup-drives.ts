@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { getRepository } from '@furystack/repository'
-import { useSequelize } from '@furystack/sequelize-store'
+import { defineDataSet, type DataSetToken } from '@furystack/repository'
+import { defineSequelizeStore } from '@furystack/sequelize-store'
 import { Drive } from 'common'
 import { constants } from 'fs'
 import { access, mkdir } from 'fs/promises'
@@ -26,59 +26,42 @@ class DriveModel extends Model<Drive, Drive> implements Drive {
   declare updatedAt: string
 }
 
-export const setupDrives = async (injector: Injector) => {
-  const logger = getLogger(injector).withScope('Drives')
+export const DriveStore = defineSequelizeStore<Drive, DriveModel, 'letter'>({
+  name: 'pi-rat/DriveStore',
+  model: Drive,
+  sequelizeModel: DriveModel,
+  primaryKey: 'letter',
+  options: getDefaultDbSettings('drives.sqlite'),
+  initModel: async (sequelize) => {
+    DriveModel.init(
+      {
+        letter: { type: DataTypes.STRING, primaryKey: true, allowNull: false },
+        physicalPath: { type: DataTypes.STRING, unique: true, allowNull: false },
+        createdAt: { type: DataTypes.DATE },
+        updatedAt: { type: DataTypes.DATE },
+      },
+      { sequelize },
+    )
+  },
+})
 
-  useSequelize({
-    injector,
-    model: Drive,
-    sequelizeModel: DriveModel,
-    primaryKey: 'letter',
-    options: getDefaultDbSettings('drives.sqlite', logger),
-    initModel: async (sequelize) => {
-      DriveModel.init(
-        {
-          letter: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-            allowNull: false,
-          },
-          physicalPath: {
-            type: DataTypes.STRING,
-            unique: true,
-            allowNull: false,
-          },
-          createdAt: {
-            type: DataTypes.DATE,
-          },
-          updatedAt: {
-            type: DataTypes.DATE,
-          },
-        },
-        {
-          sequelize,
-        },
-      )
-    },
-  })
-
-  getRepository(injector).createDataSet(Drive, 'letter', {
+export const DriveDataSet: DataSetToken<Drive, 'letter'> = defineDataSet({
+  name: 'pi-rat/DriveDataSet',
+  store: DriveStore,
+  settings: {
     authorizeGet: withRole('admin'),
     authorizeUpdate: async (args) => {
       const internalFields = ['createdAt', 'updatedAt', 'letter']
-
       const isAuthorized = await withRole('admin')(args)
       if (isAuthorized?.isAllowed === false) {
         return isAuthorized
       }
-
       if (Object.keys(args.change).some((key) => internalFields.includes(key))) {
         return {
           isAllowed: false,
           message: `You are not allowed to change the following properties: ${internalFields.join(', ')}`,
         }
       }
-
       return { isAllowed: true }
     },
     authorizeRemove: withRole('admin'),
@@ -87,10 +70,10 @@ export const setupDrives = async (injector: Injector) => {
       if (isAuthorized?.isAllowed === false) {
         return isAuthorized
       }
-
       try {
         await ensureFolder(args.entity.physicalPath)
       } catch (error) {
+        const logger = getLogger(args.injector).withScope('Drives')
         await logger.warning({
           message: `Failed to create folder in path ${args.entity.physicalPath}`,
           data: { error },
@@ -100,10 +83,12 @@ export const setupDrives = async (injector: Injector) => {
           message: `Could not access the physical path: ${args.entity.physicalPath}`,
         }
       }
-
       return { isAllowed: true }
     },
-  })
+  },
+})
 
+export const setupDrives = async (injector: Injector) => {
+  injector.get(DriveDataSet)
   await useFileWatchers(injector)
 }

@@ -20,6 +20,7 @@ vi.mock('@furystack/logging', () => ({
 const mockFind = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     find: (...args: unknown[]) => mockFind(...args) as unknown,
   }),
@@ -46,9 +47,9 @@ describe('PlaybackInfoAction', () => {
     mockFind.mockResolvedValue([{ imdbId: 'tt1234', relatedFiles: [], driveLetter: 'A', path: 'test.mp4' }])
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
 
       const result = await PlaybackInfoAction({
@@ -79,9 +80,9 @@ describe('PlaybackInfoAction', () => {
     mockFind.mockResolvedValue([])
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mkvFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mkvFfprobe) }) as unknown as FfprobeService,
       )
 
       const result = await PlaybackInfoAction({
@@ -145,9 +146,9 @@ describe('PlaybackInfoAction', () => {
     mockFind.mockResolvedValue([])
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
 
       const result = await PlaybackInfoAction({

@@ -1,14 +1,10 @@
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 import type { Roles, User } from 'common'
 import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class UsersService implements Disposable {
-  @Injected(IdentityApiClient)
-  declare private readonly identityApiClient: IdentityApiClient
-
+class UsersServiceImpl implements Disposable {
   public userCache = new Cache({
     capacity: 100,
     load: async (username: string) => {
@@ -28,9 +24,7 @@ export class UsersService implements Disposable {
       const { result } = await this.identityApiClient.call({
         method: 'GET',
         action: '/users',
-        query: {
-          findOptions,
-        },
+        query: { findOptions },
       })
 
       result.entries.forEach((entry) => {
@@ -44,12 +38,11 @@ export class UsersService implements Disposable {
     },
   })
 
+  constructor(private readonly identityApiClient: IdentityApiClient) {}
+
   public getUser = this.userCache.get.bind(this.userCache)
-
   public getUserAsObservable = this.userCache.getObservable.bind(this.userCache)
-
   public findUsers = this.userQueryCache.get.bind(this.userQueryCache)
-
   public findUsersAsObservable = this.userQueryCache.getObservable.bind(this.userQueryCache)
 
   public updateUser = async (username: string, body: { username: string; roles: Roles }) => {
@@ -79,3 +72,16 @@ export class UsersService implements Disposable {
     this.userQueryCache[Symbol.dispose]()
   }
 }
+
+export type UsersService = UsersServiceImpl
+
+export const UsersService: Token<UsersService, 'singleton'> = defineService({
+  name: 'pi-rat/UsersService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new UsersServiceImpl(inject(IdentityApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

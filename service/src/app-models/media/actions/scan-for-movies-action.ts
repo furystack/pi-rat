@@ -1,16 +1,11 @@
+import { DriveDataSet } from '../../drives/setup-drives.js'
+import { MovieFileDataSet } from '../media-data-sets.js'
 import { useSystemIdentityContext } from '@furystack/core'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
-import {
-  Drive,
-  MovieFile,
-  createScanProgress,
-  getProcessedCount,
-  updateScanProgress,
-  type ScanForMoviesEndpoint,
-} from 'common'
+import { createScanProgress, getProcessedCount, updateScanProgress, type ScanForMoviesEndpoint } from 'common'
 import { MovieMaintainerService } from '../services/movie-file-maintainer.js'
 import { extractSubtitles } from '../utils/extract-subtitles.js'
 import { linkMovie } from '../utils/link-movie.js'
@@ -23,15 +18,15 @@ export const ScanForMoviesAction: RequestAction<ScanForMoviesEndpoint> = async (
   const logger = getLogger(injector).withScope('ScanForMoviesAction')
   const systemInjector = useSystemIdentityContext({ injector, username: 'scan-movies' })
 
-  const maintainer = injector.getInstance(MovieMaintainerService)
-  const driveDataSet = getDataSetFor(injector, Drive, 'letter')
+  const maintainer = injector.get(MovieMaintainerService)
+  const driveDataSet = getDataSetFor(injector, DriveDataSet)
   const drive = await driveDataSet.get(systemInjector, root.driveLetter)
 
   if (!drive) {
     throw new RequestError(`Drive ${root.driveLetter} not found`, 400)
   }
 
-  const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
+  const movieFileDataSet = getDataSetFor(injector, MovieFileDataSet)
   const alreadyAddedMovieFiles = await movieFileDataSet.find(systemInjector, {})
 
   await logger.verbose({

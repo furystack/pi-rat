@@ -1,13 +1,12 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger, type ScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { Semaphore, sleepAsync } from '@furystack/utils'
 import type { TmdbConfig, PiRatFile } from 'common'
-import { Config } from 'common'
 
 import { type ConfigWatcher, createConfigWatcher } from '../../../utils/config-watcher.js'
+import { ConfigDataSet } from '../../config/setup-config-store.js'
 import type {
   TmdbMovieDetailsResponse,
   TmdbTvDetailsResponse,
@@ -32,23 +31,65 @@ export const buildTmdbImageUrl = (path: string | null, size = DEFAULT_POSTER_SIZ
   return `${TMDB_IMAGE_BASE_URL}/${size}${path}`
 }
 
-@Injectable({ lifetime: 'singleton' })
-export class TmdbClientService {
+export interface TmdbClientService {
+  config?: TmdbConfig
+  init(): void
+  searchMovie(
+    title: string,
+    options?: { year?: number; language?: string },
+  ): Promise<MetadataFetchResult<TmdbPaginatedResponse<TmdbSearchMovieResult>>>
+  searchTv(
+    title: string,
+    options?: { language?: string },
+  ): Promise<MetadataFetchResult<TmdbPaginatedResponse<TmdbSearchTvResult>>>
+  getMovieDetails(
+    tmdbId: number,
+    options?: { language?: string },
+  ): Promise<MetadataFetchResult<TmdbMovieDetailsResponse>>
+  getTvDetails(tmdbId: number, options?: { language?: string }): Promise<MetadataFetchResult<TmdbTvDetailsResponse>>
+  getEpisodeDetails(
+    tvId: number,
+    seasonNumber: number,
+    episodeNumber: number,
+    options?: { language?: string },
+  ): Promise<MetadataFetchResult<TmdbEpisodeDetailsResponse>>
+  findByImdbId(imdbId: string): Promise<MetadataFetchResult<TmdbFindByIdResponse>>
+  fetchTmdbMovieMetadata(
+    args: { title: string; year?: number; season?: number; episode?: number },
+    context?: { file?: PiRatFile },
+  ): Promise<
+    MetadataFetchResult<{
+      movie: TmdbMovieDetailsResponse
+      episode?: TmdbEpisodeDetailsResponse
+      series?: TmdbTvDetailsResponse
+    }>
+  >
+  fetchTmdbMovieMetadataByImdbId(
+    args: { imdbId: string; season?: number; episode?: number },
+    context?: { file?: PiRatFile },
+  ): Promise<
+    MetadataFetchResult<{
+      movie: TmdbMovieDetailsResponse
+      episode?: TmdbEpisodeDetailsResponse
+      series?: TmdbTvDetailsResponse
+    }>
+  >
+  fetchTmdbSeriesMetadata(
+    args: { imdbId: string },
+    context?: { file?: PiRatFile },
+  ): Promise<MetadataFetchResult<TmdbTvDetailsResponse>>
+}
+
+export class TmdbClientServiceImpl implements TmdbClientService {
   public config?: TmdbConfig
-
-  @Injected((injector) => getLogger(injector).withScope('TMDB Client Service'))
-  declare private logger: ScopedLogger
-
-  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
-  declare private configDataSet: DataSet<Config, 'id'>
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'tmdb-service' }))
-  declare private systemInjector: Injector
-
   private readonly semaphore = new Semaphore(1)
   private readonly pendingRequests = new Map<string, Promise<MetadataFetchResult<unknown>>>()
-
   private configWatcher?: ConfigWatcher
+
+  constructor(
+    private readonly logger: ScopedLogger,
+    private readonly systemInjector: Injector,
+  ) {}
 
   private getLanguage(override?: string): string {
     return override ?? this.config?.value.defaultLanguage ?? 'en-US'
@@ -60,10 +101,14 @@ export class TmdbClientService {
     })
   }
 
+  public dispose() {
+    this.configWatcher?.dispose()
+  }
+
   private async initAsync() {
     this.configWatcher?.dispose()
     this.configWatcher = createConfigWatcher<TmdbConfig>({
-      configDataSet: this.configDataSet,
+      configDataSet: getDataSetFor(this.systemInjector, ConfigDataSet),
       systemInjector: this.systemInjector,
       logger: this.logger,
       configId: 'TMDB_CONFIG',
@@ -472,3 +517,17 @@ export class TmdbClientService {
     }
   }
 }
+
+export const TmdbClientService: Token<TmdbClientService, 'singleton'> = defineService({
+  name: 'pi-rat/TmdbClientService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'tmdb-service' })
+    const impl = new TmdbClientServiceImpl(logger, systemInjector)
+    onDispose(() => impl.dispose())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    return impl
+  },
+})

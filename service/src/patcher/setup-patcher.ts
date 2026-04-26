@@ -1,8 +1,7 @@
 import { useSystemIdentityContext } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, getRepository } from '@furystack/repository'
-import { useSequelize } from '@furystack/sequelize-store'
+import { defineDataSet, getDataSetFor, type DataSetToken } from '@furystack/repository'
+import { defineSequelizeStore } from '@furystack/sequelize-store'
 import { PatchRun } from 'common'
 import { DataTypes, Model } from 'sequelize'
 import { alwaysDeny } from '../authorization/always-deny.js'
@@ -23,78 +22,58 @@ class PatchModel extends Model<PatchRun, PatchRun> implements PatchRun {
   declare log: Array<{ timestamp: string; message: string }>
 }
 
-export const setupPatcher = async (injector: Injector) => {
-  const logger = getLogger(injector).withScope('Patcher')
-
-  useSequelize({
-    injector,
-    model: PatchRun,
-    sequelizeModel: PatchModel,
-    primaryKey: 'id',
-    options: getDefaultDbSettings('patcher.sqlite', logger),
-    initModel: async (sequelize) => {
-      PatchModel.init(
-        {
-          id: {
-            type: DataTypes.UUIDV4,
-            primaryKey: true,
-            defaultValue: () => crypto.randomUUID(),
-          },
-          name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
-          description: {
-            type: DataTypes.STRING,
-            allowNull: true,
-          },
-          patchId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
-          status: {
-            type: DataTypes.ENUM('orphaned', 'running', 'success', 'failed'),
-            allowNull: false,
-            defaultValue: 'running',
-          },
-          createdAt: {
-            type: DataTypes.DATE,
-          },
-          updatedAt: {
-            type: DataTypes.DATE,
-          },
-          log: {
-            type: DataTypes.JSON,
-          },
+export const PatchRunStore = defineSequelizeStore<PatchRun, PatchModel, 'id'>({
+  name: 'pi-rat/PatchRunStore',
+  model: PatchRun,
+  sequelizeModel: PatchModel,
+  primaryKey: 'id',
+  options: getDefaultDbSettings('patcher.sqlite'),
+  initModel: async (sequelize) => {
+    PatchModel.init(
+      {
+        id: { type: DataTypes.UUIDV4, primaryKey: true, defaultValue: () => crypto.randomUUID() },
+        name: { type: DataTypes.STRING, allowNull: false },
+        description: { type: DataTypes.STRING, allowNull: true },
+        patchId: { type: DataTypes.STRING, allowNull: false },
+        status: {
+          type: DataTypes.ENUM('orphaned', 'running', 'success', 'failed'),
+          allowNull: false,
+          defaultValue: 'running',
         },
-        {
-          indexes: [
-            {
-              fields: ['patchId'],
-            },
-            {
-              fields: ['status'],
-            },
-          ],
-          sequelize,
-        },
-      )
-    },
-  })
+        createdAt: { type: DataTypes.DATE },
+        updatedAt: { type: DataTypes.DATE },
+        log: { type: DataTypes.JSON },
+      },
+      {
+        indexes: [{ fields: ['patchId'] }, { fields: ['status'] }],
+        sequelize,
+      },
+    )
+  },
+})
 
-  getRepository(injector).createDataSet(PatchRun, 'id', {
+export const PatchRunDataSet: DataSetToken<PatchRun, 'id'> = defineDataSet({
+  name: 'pi-rat/PatchRunDataSet',
+  store: PatchRunStore,
+  settings: {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeRemove: alwaysDeny,
     authorizeUpdate: withRole('admin'),
-  })
+  },
+})
 
+export const setupPatcher = async (injector: Injector) => {
   const systemInjector = useSystemIdentityContext({ injector, username: 'patcher' })
-  const patchRunDataSet = getDataSetFor(injector, PatchRun, 'id')
+  try {
+    const patchRunDataSet = getDataSetFor(injector, PatchRunDataSet)
 
-  await checkForOrphanedPatch(systemInjector, patchRunDataSet)
+    await checkForOrphanedPatch(systemInjector, patchRunDataSet)
 
-  for (const patchInstance of patchList) {
-    await runPatch(systemInjector, patchInstance, patchRunDataSet)
+    for (const patchInstance of patchList) {
+      await runPatch(systemInjector, patchInstance, patchRunDataSet)
+    }
+  } finally {
+    await systemInjector[Symbol.asyncDispose]()
   }
 }

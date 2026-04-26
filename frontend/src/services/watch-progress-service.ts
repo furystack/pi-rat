@@ -1,15 +1,10 @@
-import { Injectable, Injected } from '@furystack/inject'
-import { MediaApiClient } from './api-clients/media-api-client.js'
 import { Cache } from '@furystack/cache'
 import type { FilterType, FindOptions } from '@furystack/core'
-import type { WatchHistoryEntry } from 'common'
-import type { PiRatFile } from 'common'
+import { defineService, type Token } from '@furystack/inject'
+import type { PiRatFile, WatchHistoryEntry } from 'common'
+import { MediaApiClient } from './api-clients/media-api-client.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class WatchProgressService implements Disposable {
-  @Injected(MediaApiClient)
-  declare private readonly mediaApiClient: MediaApiClient
-
+class WatchProgressServiceImpl implements Disposable {
   private watchProgressCache = new Cache({
     capacity: 100,
     load: async (id: string) => {
@@ -29,9 +24,7 @@ export class WatchProgressService implements Disposable {
       const { result } = await this.mediaApiClient.call({
         method: 'GET',
         action: '/my-watch-progresses',
-        query: {
-          findOptions,
-        },
+        query: { findOptions },
       })
       result.entries.forEach((entry) => {
         this.watchProgressCache.setExplicitValue({
@@ -55,11 +48,12 @@ export class WatchProgressService implements Disposable {
     },
   })
 
+  constructor(private readonly mediaApiClient: MediaApiClient) {}
+
   public getWatchProgress = this.watchProgressCache.get.bind(this.watchProgressCache)
-
   public getWatchProgressAsObservable = this.watchProgressCache.getObservable.bind(this.watchProgressCache)
-
   public findWatchProgress = this.watchProgressQueryCache.get.bind(this.watchProgressQueryCache)
+  public findWatchProgressAsObservable = this.watchProgressQueryCache.getObservable.bind(this.watchProgressQueryCache)
 
   public findWatchProgressForFile = async ({ path, driveLetter }: PiRatFile) => {
     const { result } = await this.mediaApiClient.call({
@@ -94,7 +88,6 @@ export class WatchProgressService implements Disposable {
     })
   }
 
-  public findWatchProgressAsObservable = this.watchProgressQueryCache.getObservable.bind(this.watchProgressQueryCache)
   public deleteWatchEntry = async (id: string) => {
     await this.mediaApiClient.call({
       method: 'DELETE',
@@ -127,9 +120,7 @@ export class WatchProgressService implements Disposable {
       })),
     }
 
-    const result = await this.findWatchProgress({
-      filter,
-    })
+    const result = await this.findWatchProgress({ filter })
 
     files.forEach(({ path, driveLetter }) => {
       const relatedWatchProgresses = result.entries.filter(
@@ -146,10 +137,7 @@ export class WatchProgressService implements Disposable {
         ],
         value: {
           status: 'loaded',
-          value: {
-            entries: relatedWatchProgresses,
-            count: relatedWatchProgresses.length,
-          },
+          value: { entries: relatedWatchProgresses, count: relatedWatchProgresses.length },
           updatedAt: new Date(),
         },
       })
@@ -161,3 +149,16 @@ export class WatchProgressService implements Disposable {
     this.watchProgressQueryCache[Symbol.dispose]()
   }
 }
+
+export type WatchProgressService = WatchProgressServiceImpl
+
+export const WatchProgressService: Token<WatchProgressService, 'singleton'> = defineService({
+  name: 'pi-rat/WatchProgressService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new WatchProgressServiceImpl(inject(MediaApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

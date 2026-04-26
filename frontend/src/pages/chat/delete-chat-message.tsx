@@ -8,7 +8,7 @@ export const DeleteChatMessage = Shade<{ chatMessage: ChatMessage }>({
   customElementName: 'shade-app-delete-chat-message',
   render: ({ injector, props }) => {
     const { chatMessage } = props
-    const noty = injector.getInstance(NotyService)
+    const noty = injector.get(NotyService)
 
     if (chatMessage.owner !== getUser(injector).username) {
       return null
@@ -27,7 +27,7 @@ export const DeleteChatMessage = Shade<{ chatMessage: ChatMessage }>({
             return
           }
           try {
-            await injector.getInstance(ChatMessageService).deleteChatMessage(chatMessage.id)
+            await injector.get(ChatMessageService).deleteChatMessage(chatMessage.id)
             noty.emit('onNotyAdded', {
               type: 'success',
               title: '✅ Success',

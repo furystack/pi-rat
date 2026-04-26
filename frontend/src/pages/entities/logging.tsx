@@ -8,7 +8,7 @@ import { LoggingService } from '../../services/logging-service.js'
 export const LoggingPage = Shade({
   customElementName: 'shade-app-logging-page',
   render: ({ useDisposable, injector }) => {
-    const loggingService = injector.getInstance(LoggingService)
+    const loggingService = injector.get(LoggingService)
 
     const service = useDisposable(
       'service',

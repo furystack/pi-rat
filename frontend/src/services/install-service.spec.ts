@@ -10,11 +10,12 @@ const createMockServiceStatus = (): ServiceStatus => 'installed'
 describe('InstallService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as InstallApiClient,
+    injector.bind(
       InstallApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -26,7 +27,7 @@ describe('InstallService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(InstallService)
+        const service = i.get(InstallService)
 
         const result = await service.getServiceStatus()
 
@@ -44,7 +45,7 @@ describe('InstallService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(InstallService)
+        const service = i.get(InstallService)
 
         await service.getServiceStatus()
         await service.getServiceStatus()
@@ -61,7 +62,7 @@ describe('InstallService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(InstallService)
+        const service = i.get(InstallService)
 
         const observable = service.getServiceStatusAsObservable()
 
@@ -76,7 +77,7 @@ describe('InstallService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(InstallService)
+        const service = i.get(InstallService)
 
         const observable1 = service.getServiceStatusAsObservable()
         const observable2 = service.getServiceStatusAsObservable()

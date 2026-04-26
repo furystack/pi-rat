@@ -1,13 +1,12 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger, type ScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { Semaphore, sleepAsync } from '@furystack/utils'
 import type { OmdbConfig, OmdbMovieMetadata, OmdbSeriesMetadata, PiRatFile } from 'common'
-import { Config } from 'common'
 
 import { type ConfigWatcher, createConfigWatcher } from '../../../utils/config-watcher.js'
+import { ConfigDataSet } from '../../config/setup-config-store.js'
 import type { MetadataFetchResult } from './metadata-fetch-result.js'
 
 const MAX_RETRIES = 3
@@ -25,23 +24,33 @@ const isNotFoundResponse = (body: Record<string, unknown>): boolean =>
 const isErrorResponse = (body: Record<string, unknown>): boolean =>
   body.Response === 'False' && typeof body.Error === 'string' && !isRateLimitResponse(body) && !isNotFoundResponse(body)
 
-@Injectable({ lifetime: 'singleton' })
-export class OmdbClientService {
+export interface OmdbClientService {
+  config?: OmdbConfig
+  init(): void
+  fetchOmdbMovieMetadata(
+    args: { title: string; year?: number; season?: number; episode?: number },
+    context?: { file?: PiRatFile },
+  ): Promise<MetadataFetchResult<OmdbMovieMetadata>>
+  fetchOmdbMovieMetadataByImdbId(
+    args: { imdbId: string },
+    context?: { file?: PiRatFile },
+  ): Promise<MetadataFetchResult<OmdbMovieMetadata>>
+  fetchOmdbSeriesMetadata(
+    args: { imdbId: string },
+    context?: { file?: PiRatFile },
+  ): Promise<MetadataFetchResult<OmdbSeriesMetadata>>
+}
+
+export class OmdbClientServiceImpl implements OmdbClientService {
   public config?: OmdbConfig
-
-  @Injected((injector) => getLogger(injector).withScope('OMDB Client Service'))
-  declare private logger: ScopedLogger
-
-  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
-  declare private configDataSet: DataSet<Config, 'id'>
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'omdb-service' }))
-  declare private systemInjector: Injector
-
   private readonly semaphore = new Semaphore(1)
   private readonly pendingRequests = new Map<string, Promise<MetadataFetchResult<unknown>>>()
-
   private configWatcher?: ConfigWatcher
+
+  constructor(
+    private readonly logger: ScopedLogger,
+    private readonly systemInjector: Injector,
+  ) {}
 
   public init() {
     void this.initAsync().catch((error) => {
@@ -49,10 +58,14 @@ export class OmdbClientService {
     })
   }
 
+  public dispose() {
+    this.configWatcher?.dispose()
+  }
+
   private async initAsync() {
     this.configWatcher?.dispose()
     this.configWatcher = createConfigWatcher<OmdbConfig>({
-      configDataSet: this.configDataSet,
+      configDataSet: getDataSetFor(this.systemInjector, ConfigDataSet),
       systemInjector: this.systemInjector,
       logger: this.logger,
       configId: 'OMDB_CONFIG',
@@ -247,3 +260,17 @@ export class OmdbClientService {
     }
   }
 }
+
+export const OmdbClientService: Token<OmdbClientService, 'singleton'> = defineService({
+  name: 'pi-rat/OmdbClientService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'omdb-service' })
+    const impl = new OmdbClientServiceImpl(logger, systemInjector)
+    onDispose(() => impl.dispose())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    return impl
+  },
+})

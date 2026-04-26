@@ -40,7 +40,7 @@ export const Register = Shade({
     },
   },
   render: ({ injector, useObservable }) => {
-    const sessionService = injector.getInstance(SessionService)
+    const sessionService = injector.get(SessionService)
     const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
     return (
       <Paper elevation={3} style={{ flexGrow: '1' }}>

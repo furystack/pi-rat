@@ -23,11 +23,11 @@ const MovieWidgetContent = Shade<{
     const movie = props.data.value
     const { imdbId } = movie
 
-    const movieFileService = injector.getInstance(MovieFilesService)
-    const watchProgressService = injector.getInstance(WatchProgressService)
-    const localizedService = injector.getInstance(LocalizedMetadataService)
+    const movieFileService = injector.get(MovieFilesService)
+    const watchProgressService = injector.get(WatchProgressService)
+    const localizedService = injector.get(LocalizedMetadataService)
 
-    const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
+    const [currentUser] = useObservable('currentUser', injector.get(SessionService).currentUser)
     const [movieFile] = useObservable(
       'movieFile',
       movieFileService.findMovieFileAsObservable({ filter: { imdbId: { $eq: imdbId } } }),
@@ -139,7 +139,7 @@ export const MovieWidget = Shade<{
 }>({
   customElementName: 'pi-rat-movie-widget',
   render: ({ props, injector }) => {
-    const movieService = injector.getInstance(MoviesService)
+    const movieService = injector.get(MoviesService)
 
     return (
       <CacheView

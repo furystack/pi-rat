@@ -1,4 +1,4 @@
-import { Injectable } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 import { Semaphore } from '@furystack/utils'
 
 type SpeechRecognitionEvent = {
@@ -26,41 +26,48 @@ declare class webkitSpeechRecognition {
   public onend: () => void
 }
 
-@Injectable({ lifetime: 'singleton' })
-export class SpeechRecognitionService {
-  private readonly semaphore = new Semaphore(1)
+export interface SpeechRecognitionService {
+  recognizeSpeech(): Promise<string>
+}
 
-  public recognizeSpeech(): Promise<string> {
-    return this.semaphore.execute(() => this.performRecognition())
-  }
+export const SpeechRecognitionService: Token<SpeechRecognitionService, 'singleton'> = defineService({
+  name: 'pi-rat/SpeechRecognitionService',
+  lifetime: 'singleton',
+  factory: () => {
+    const semaphore = new Semaphore(1)
 
-  private performRecognition(): Promise<string> {
-    if (typeof webkitSpeechRecognition === 'undefined') {
-      return Promise.reject(new Error('Speech recognition is not supported in this browser.'))
+    const performRecognition = (): Promise<string> => {
+      if (typeof webkitSpeechRecognition === 'undefined') {
+        return Promise.reject(new Error('Speech recognition is not supported in this browser.'))
+      }
+
+      const speechRecognition = new webkitSpeechRecognition()
+
+      return new Promise((resolve, reject) => {
+        speechRecognition.lang = 'hu-HU'
+
+        speechRecognition.onresult = (event) => {
+          if (event.results.length > 0) {
+            resolve(event.results[0][0].transcript)
+          } else {
+            reject(new Error('No speech recognized.'))
+          }
+        }
+
+        speechRecognition.onerror = (event: SpeechRecognitionError) => {
+          reject(new Error(`Speech recognition error: ${event.error}`))
+        }
+
+        speechRecognition.onend = () => {
+          reject(new Error('Speech recognition ended without result.'))
+        }
+
+        speechRecognition.start()
+      })
     }
 
-    const speechRecognition = new webkitSpeechRecognition()
-
-    return new Promise((resolve, reject) => {
-      speechRecognition.lang = 'hu-HU'
-
-      speechRecognition.onresult = (event) => {
-        if (event.results.length > 0) {
-          resolve(event.results[0][0].transcript)
-        } else {
-          reject(new Error('No speech recognized.'))
-        }
-      }
-
-      speechRecognition.onerror = (event: SpeechRecognitionError) => {
-        reject(new Error(`Speech recognition error: ${event.error}`))
-      }
-
-      speechRecognition.onend = () => {
-        reject(new Error('Speech recognition ended without result.'))
-      }
-
-      speechRecognition.start()
-    })
-  }
-}
+    return {
+      recognizeSpeech: () => semaphore.execute(performRecognition),
+    }
+  },
+})

@@ -1,5 +1,5 @@
-import { getRepository } from '@furystack/repository'
-import { User } from 'common'
+import { getDataSetFor } from '@furystack/repository'
+import { UserDataSet } from '../../app-models/identity/setup-identity-store.js'
 import type { OllamaTool } from './ollama-tools.js'
 
 export const UserContextTool: OllamaTool = {
@@ -25,19 +25,13 @@ export const UserContextTool: OllamaTool = {
   },
   execute: async (injector, response) => {
     const userName = response.message.tool_calls?.[0].function?.arguments?.userName
-
     if (!userName || typeof userName !== 'string' || userName.trim() === '') {
       return null
     }
 
-    const usersStore = getRepository(injector).getDataSetFor(User, 'username')
-
-    const user = await usersStore.get(injector, userName)
-
-    if (!user) {
-      return null
-    }
-
+    const usersDataSet = getDataSetFor(injector, UserDataSet)
+    const user = await usersDataSet.get(injector, userName)
+    if (!user) return null
     return JSON.stringify(user)
   },
 }

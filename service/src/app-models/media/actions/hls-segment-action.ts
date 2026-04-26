@@ -35,7 +35,7 @@ export const HlsSegmentAction: RequestAction<HlsSegmentEndpoint> = async ({
     throw new RequestError('Invalid playback mode', 400)
   }
 
-  const sessionService = injector.getInstance(TranscodingSessionService)
+  const sessionService = injector.get(TranscodingSessionService)
 
   const session = sessionService.getSession(
     letter,

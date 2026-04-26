@@ -1,48 +1,52 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import { LoggerCollection } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
-import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
+import { defineService, type Token } from '@furystack/inject'
+import { useScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
+import { PasswordAuthenticator, PasswordCredentialDataSet } from '@furystack/security'
 import type { ServiceStatus } from 'common'
-import { User } from 'common'
+import { UserDataSet } from '../identity/setup-identity-store.js'
 
-@Injectable()
-export class ServiceStatusProvider {
-  public async getStatus(): Promise<ServiceStatus> {
-    const userCount = await this.userDataSet.count(this.systemInjector)
-    return userCount > 0 ? 'installed' : 'needsInstall'
-  }
-
-  public async install(username: string, password: string): Promise<void> {
-    const status = await this.getStatus()
-    if (status === 'installed') {
-      throw Error('Service is already installed')
-    }
-    await this.userDataSet.add(this.systemInjector, {
-      username,
-      roles: ['admin'],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    })
-    const credential = await this.authenticator.hasher.createCredential(username, password)
-    await this.credentialDataSet.add(this.systemInjector, credential)
-    await this.logger
-      .withScope(this.constructor.name)
-      .information({ message: `Service installed for user '${username}'` })
-  }
-
-  @Injected((injector) => getDataSetFor(injector, User, 'username'))
-  declare private userDataSet: DataSet<User, 'username'>
-
-  @Injected((injector) => getDataSetFor(injector, PasswordCredential, 'userName'))
-  declare private credentialDataSet: DataSet<PasswordCredential, 'userName'>
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'service-installer' }))
-  declare private systemInjector: Injector
-
-  @Injected(PasswordAuthenticator)
-  declare public authenticator: PasswordAuthenticator
-
-  @Injected(LoggerCollection)
-  declare public logger: LoggerCollection
+export interface ServiceStatusProvider {
+  getStatus(): Promise<ServiceStatus>
+  install(username: string, password: string): Promise<void>
 }
+
+export const ServiceStatusProvider: Token<ServiceStatusProvider, 'singleton'> = defineService({
+  name: 'pi-rat/ServiceStatusProvider',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { inject, injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const authenticator = inject(PasswordAuthenticator)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'service-installer' })
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+
+    const getStatus = async (): Promise<ServiceStatus> => {
+      const userDataSet = getDataSetFor(systemInjector, UserDataSet)
+      const userCount = await userDataSet.count(systemInjector)
+      return userCount > 0 ? 'installed' : 'needsInstall'
+    }
+
+    return {
+      getStatus,
+      install: async (username, password) => {
+        const status = await getStatus()
+        if (status === 'installed') {
+          throw Error('Service is already installed')
+        }
+        const userDataSet = getDataSetFor(systemInjector, UserDataSet)
+        const credentialDataSet = getDataSetFor(systemInjector, PasswordCredentialDataSet)
+
+        await userDataSet.add(systemInjector, {
+          username,
+          roles: ['admin'],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        const credential = await authenticator.hasher.createCredential(username, password)
+        await credentialDataSet.add(systemInjector, credential)
+        await logger.information({ message: `Service installed for user '${username}'` })
+      },
+    }
+  },
+})

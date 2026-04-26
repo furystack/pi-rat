@@ -1,7 +1,7 @@
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
-import { getRepository } from '@furystack/repository'
-import { useSequelize } from '@furystack/sequelize-store'
+import { defineDataSet, type DataSetToken } from '@furystack/repository'
+import { defineSequelizeStore } from '@furystack/sequelize-store'
 import type { ConfigType } from 'common'
 import { Config } from 'common'
 import { DataTypes, Model } from 'sequelize'
@@ -15,46 +15,52 @@ class ConfigModel extends Model<Config, Config> implements Config {
   declare updatedAt: Date
 }
 
-export const setupConfig = async (injector: Injector) => {
-  const logger = getLogger(injector).withScope('Config')
+const dbOptions = getDefaultDbSettings('config.sqlite')
 
-  const dbOptions = getDefaultDbSettings('config.sqlite', logger)
-
-  useSequelize({
-    injector,
-    model: Config,
-    sequelizeModel: ConfigModel,
-    primaryKey: 'id',
-    options: dbOptions,
-    initModel: async (sequelize) => {
-      ConfigModel.init(
-        {
-          id: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-            allowNull: false,
-          },
-          value: {
-            type: DataTypes.JSON,
-          },
-          createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-          },
-          updatedAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-          },
+export const ConfigStore = defineSequelizeStore<Config, ConfigModel, 'id'>({
+  name: 'pi-rat/ConfigStore',
+  model: Config,
+  sequelizeModel: ConfigModel,
+  primaryKey: 'id',
+  options: dbOptions,
+  initModel: async (sequelize) => {
+    ConfigModel.init(
+      {
+        id: {
+          type: DataTypes.STRING,
+          primaryKey: true,
+          allowNull: false,
         },
-        { sequelize },
-      )
-    },
-  })
+        value: {
+          type: DataTypes.JSON,
+        },
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
+      },
+      { sequelize },
+    )
+  },
+})
 
-  getRepository(injector).createDataSet(Config, 'id', {
+export const ConfigDataSet: DataSetToken<Config, 'id'> = defineDataSet({
+  name: 'pi-rat/ConfigDataSet',
+  store: ConfigStore,
+  settings: {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeUpdate: withRole('admin'),
     authorizeRemove: withRole('admin'),
-  })
+  },
+})
+
+export const setupConfig = async (injector: Injector) => {
+  const logger = getLogger(injector).withScope('Config')
+  await logger.verbose({ message: 'Initializing config store...' })
+  injector.get(ConfigDataSet)
 }

@@ -18,6 +18,7 @@ vi.mock('@furystack/core', () => {
 const mockDataSetGet = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     get: (...args: unknown[]) => mockDataSetGet(...args) as unknown,
   }),

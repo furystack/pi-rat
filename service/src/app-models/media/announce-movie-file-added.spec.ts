@@ -53,7 +53,7 @@ describe('announceMovieFileAdded', () => {
     mockGet.mockResolvedValue(movie)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance({ announce: mockAnnounce } as unknown as WebsocketService, WebsocketService)
+      injector.bind(WebsocketService, async () => ({ announce: mockAnnounce }))
 
       await announceMovieFileAdded({
         entity: createEntity(),
@@ -78,7 +78,7 @@ describe('announceMovieFileAdded', () => {
     mockGet.mockResolvedValue(null)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance({ announce: mockAnnounce } as unknown as WebsocketService, WebsocketService)
+      injector.bind(WebsocketService, async () => ({ announce: mockAnnounce }))
 
       await announceMovieFileAdded({
         entity: createEntity(),

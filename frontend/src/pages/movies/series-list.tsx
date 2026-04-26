@@ -15,7 +15,7 @@ export const SeriesList = Shade({
     },
   },
   render: ({ injector }) => {
-    const seriesService = injector.getInstance(SeriesService)
+    const seriesService = injector.get(SeriesService)
     return (
       <PiRatLazyLoad
         component={async () => {

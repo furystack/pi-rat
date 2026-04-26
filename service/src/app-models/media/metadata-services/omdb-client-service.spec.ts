@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { OmdbClientService } from './omdb-client-service.js'
+import { OmdbClientServiceImpl as OmdbClientService } from './omdb-client-service.js'
 
 vi.mock('@furystack/core', () => ({
   useSystemIdentityContext: () => ({}),
@@ -14,14 +14,20 @@ vi.mock('@furystack/logging', () => ({
       error: vi.fn().mockResolvedValue(undefined),
     }),
   }),
+  useScopedLogger: () => ({
+    verbose: vi.fn().mockResolvedValue(undefined),
+    information: vi.fn().mockResolvedValue(undefined),
+    warning: vi.fn().mockResolvedValue(undefined),
+    error: vi.fn().mockResolvedValue(undefined),
+  }),
 }))
 
 vi.mock('@furystack/inject', () => ({
-  Injectable: () => (target: unknown) => target,
-  Injected: () => () => undefined,
+  defineService: ({ factory }: { factory: (ctx: unknown) => unknown }) => factory,
 }))
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     get: vi.fn(),
     subscribe: vi.fn(),
@@ -41,7 +47,13 @@ describe('OmdbClientService', () => {
   const originalFetch = globalThis.fetch
 
   beforeEach(() => {
-    service = new OmdbClientService()
+    const noopLogger = {
+      verbose: vi.fn().mockResolvedValue(undefined),
+      information: vi.fn().mockResolvedValue(undefined),
+      warning: vi.fn().mockResolvedValue(undefined),
+      error: vi.fn().mockResolvedValue(undefined),
+    }
+    service = new OmdbClientService(noopLogger as never, {} as never)
 
     Object.defineProperty(service, 'logger', {
       value: {

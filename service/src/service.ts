@@ -1,10 +1,7 @@
 import type { Injector } from '@furystack/inject'
-import { Injectable, Injected } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
 import { getLogger } from '@furystack/logging'
 import { SyncSubscribeAction, SyncUnsubscribeAction } from '@furystack/entity-sync-service'
-import { useWebsockets } from '@furystack/websocket-api'
-import { EventHub } from '@furystack/utils'
+import { useWebSocketApi } from '@furystack/websocket-api'
 import { AiAppModel } from './ai/ai-app-model.js'
 import { ChatAppModel } from './app-models/chat/chat-app-model.js'
 import { ConfigAppModel } from './app-models/config/config-app-model.js'
@@ -21,45 +18,38 @@ import { setupPatcher } from './patcher/setup-patcher.js'
 import { setupFrontendBundle } from './setup-frontend-bundle.js'
 import { WebsocketService } from './websocket-service.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class PiRatRootService extends EventHub<{ initialized: undefined }> {
-  @Injected((injector) => getLogger(injector).withScope('service'))
-  declare private logger: ScopedLogger
+export const startPiRat = async (injector: Injector): Promise<void> => {
+  const logger = getLogger(injector).withScope('service')
+  await logger.information({ message: '🐀 Starting PI-RAT service...' })
 
-  public async init(injector: Injector) {
-    await this.logger.information({ message: '🐀 Starting PI-RAT service...' })
+  const appModelManager = injector.get(AppModelManager)
 
-    const appModelManager = injector.getInstance(AppModelManager)
+  await appModelManager.registerInternalAppModels(
+    injector,
+    LoggingAppModel,
+    ConfigAppModel,
+    IdentityAppModel,
+    InstallAppModel,
+    DrivesAppModel,
+    DashboardsAppModel,
+    MediaAppModel,
+    IotAppModel,
+    ChatAppModel,
+    AiAppModel,
+  )
 
-    await appModelManager.registerInternalAppModels(
-      injector.getInstance(LoggingAppModel),
-      injector.getInstance(ConfigAppModel),
-      injector.getInstance(IdentityAppModel),
-      injector.getInstance(InstallAppModel),
-      injector.getInstance(DrivesAppModel),
-      injector.getInstance(DashboardsAppModel),
-      injector.getInstance(MediaAppModel),
-      injector.getInstance(IotAppModel),
-      injector.getInstance(ChatAppModel),
-      injector.getInstance(AiAppModel),
-    )
+  const syncInjector = injector.createScope({ owner: 'entity-sync' })
+  await useWebSocketApi({
+    injector: syncInjector,
+    port: getPort(),
+    path: '/api/sync',
+    actions: [SyncSubscribeAction, SyncUnsubscribeAction],
+  })
 
-    const syncInjector = injector.createChild({ owner: 'entity-sync' })
-    await useWebsockets(syncInjector, {
-      port: getPort(),
-      path: '/api/sync',
-      actions: [SyncSubscribeAction, SyncUnsubscribeAction],
-    })
+  const wsService = await injector.getAsync(WebsocketService)
+  await wsService.announce({ type: 'service-started' })
 
-    const wsService = injector.getInstance(WebsocketService)
-    await wsService.announce({
-      type: 'service-started',
-    })
+  await setupFrontendBundle(injector)
 
-    await setupFrontendBundle(injector)
-
-    await setupPatcher(injector)
-
-    this.emit('initialized', undefined)
-  }
+  await setupPatcher(injector)
 }

@@ -1,15 +1,11 @@
 import { Cache } from '@furystack/cache'
 import type { FindOptions } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 import { ResponseError } from '@furystack/rest-client-fetch'
 import type { Config, ConfigType } from 'common'
 import { ConfigApiClient } from './api-clients/config-api-client.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class ConfigService implements Disposable {
-  @Injected(ConfigApiClient)
-  declare private readonly configApiClient: ConfigApiClient
-
+class ConfigServiceImpl implements Disposable {
   public configCache = new Cache({
     capacity: 50,
     load: async (id: ConfigType['id']) => {
@@ -50,9 +46,10 @@ export class ConfigService implements Disposable {
     },
   })
 
+  constructor(private readonly configApiClient: ConfigApiClient) {}
+
   public getConfig = this.configCache.get.bind(this.configCache)
   public getConfigAsObservable = this.configCache.getObservable.bind(this.configCache)
-
   public getConfigs = this.configsQueryCache.get.bind(this.configsQueryCache)
   public getConfigsAsObservable = this.configsQueryCache.getObservable.bind(this.configsQueryCache)
 
@@ -105,3 +102,16 @@ export class ConfigService implements Disposable {
     this.configsQueryCache[Symbol.dispose]()
   }
 }
+
+export type ConfigService = ConfigServiceImpl
+
+export const ConfigService: Token<ConfigService, 'singleton'> = defineService({
+  name: 'pi-rat/ConfigService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new ConfigServiceImpl(inject(ConfigApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

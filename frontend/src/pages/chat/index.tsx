@@ -51,11 +51,11 @@ export const ChatPage = Shade({
     },
   },
   render: ({ injector }) => {
-    const speechSynthesis = injector.getInstance(SpeechSynthesisService)
+    const speechSynthesis = injector.get(SpeechSynthesisService)
 
-    const speechRecognizer = injector.getInstance(SpeechRecognitionService)
+    const speechRecognizer = injector.get(SpeechRecognitionService)
 
-    injector.getInstance(WebsocketNotificationsService)
+    injector.get(WebsocketNotificationsService)
 
     return (
       <>

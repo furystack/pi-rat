@@ -1,8 +1,9 @@
+import { DriveDataSet } from '../../drives/setup-drives.js'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
-import { Drive, getFileName } from 'common'
+import { getFileName } from 'common'
 import { promises } from 'fs'
 import { spawn } from 'child_process'
 import { FfprobeService } from '../../../ffprobe-service.js'
@@ -35,14 +36,14 @@ export const extractSubtitles = async ({ injector, file }: { injector: Injector;
     data: file,
   })
 
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, file.driveLetter)
+  const drive = await getDataSetFor(injector, DriveDataSet).get(injector, file.driveLetter)
 
   if (!drive) {
     throw new Error(`Drive with letter '${file.driveLetter}' not found`)
   }
 
   const fullPath = getPhysicalPath(drive, file)
-  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
+  const ffprobeResult = await injector.get(FfprobeService).getFfprobeForPiratFile(file)
 
   const subtitles = ffprobeResult.streams
     .filter((stream) => stream.codec_type === 'subtitle' && EXTRACTABLE_TEXT_CODECS.includes(stream.codec_name ?? ''))

@@ -15,7 +15,7 @@ export const navigateToRoute = <TPath extends AppPaths>(
   const [params, options] = args
   const destinationPath = params ? compileRoute(path, params) : path
   const fullPath = destinationPath + (options?.queryString ? `?${options.queryString}` : '') || '/'
-  const locationService = injector.getInstance(LocationService)
+  const locationService = injector.get(LocationService)
   if (options?.replace) {
     locationService.replace(fullPath)
   } else {

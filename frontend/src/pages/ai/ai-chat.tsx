@@ -15,10 +15,10 @@ export const AiChat = Shade<{ selectedChatId: string }>({
   },
   render: ({ props, useObservable, injector }) => {
     const { selectedChatId } = props
-    const chatService = injector.getInstance(AiChatService)
+    const chatService = injector.get(AiChatService)
     const [chat] = useObservable('chat', chatService.getAiChatAsObservable(selectedChatId))
 
-    const noty = injector.getInstance(NotyService)
+    const noty = injector.get(NotyService)
 
     return (
       <Paper style={{ padding: '16px', flexGrow: '1' }}>

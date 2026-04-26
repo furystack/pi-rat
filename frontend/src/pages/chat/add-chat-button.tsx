@@ -23,7 +23,7 @@ export const AddChatButton = Shade({
   render: ({ useState, injector }) => {
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
 
-    const chats = injector.getInstance(ChatService)
+    const chats = injector.get(ChatService)
 
     return (
       <>

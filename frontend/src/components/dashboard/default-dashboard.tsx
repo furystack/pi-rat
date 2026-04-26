@@ -17,7 +17,7 @@ const DefaultDashboardContent = Shade<{ data: CacheWithValue<GetCollectionResult
 export const DefaultDashboard = Shade({
   customElementName: 'pi-rat-default-dashboard',
   render: ({ injector }) => {
-    const dashboardService = injector.getInstance(DashboardService)
+    const dashboardService = injector.get(DashboardService)
     return (
       <CacheView
         cache={dashboardService.dashboardQueryCache}

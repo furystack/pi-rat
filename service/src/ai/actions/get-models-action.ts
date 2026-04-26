@@ -3,7 +3,7 @@ import type { GetModelsAction as GetModelsActionType } from 'common'
 import { OllamaClientService } from '../ollama-client-service.js'
 
 export const GetModelsAction: RequestAction<GetModelsActionType> = async ({ injector }) => {
-  const ollamaService = injector.getInstance(OllamaClientService)
+  const ollamaService = injector.get(OllamaClientService)
   const { models } = await ollamaService.getSupportedModels()
 
   return JsonResult(models)

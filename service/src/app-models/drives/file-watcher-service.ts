@@ -1,38 +1,41 @@
 import { isAuthorized, useSystemIdentityContext } from '@furystack/core'
-import type { Injector } from '@furystack/inject'
-import { Injectable, Injected } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { EventHub, PathHelper } from '@furystack/utils'
 import type { FSWatcher } from 'chokidar'
 import { watch } from 'chokidar'
-import type { PiRatFile } from 'common'
-import { Drive } from 'common'
+import type { Drive, PiRatFile } from 'common'
 import { sep } from 'path'
 import { WebsocketService } from '../../websocket-service.js'
+import { DriveDataSet } from './setup-drives.js'
 
-type EventParam = PiRatFile
+type FileWatcherEvents = {
+  add: PiRatFile
+  addDir: PiRatFile
+  change: PiRatFile
+  unlink: PiRatFile
+  unlinkDir: PiRatFile
+  all: PiRatFile
+  ready: PiRatFile
+  raw: PiRatFile
+  error: PiRatFile & { errorMessage: string; error: unknown }
+}
 
-@Injectable({ lifetime: 'singleton' })
-export class FileWatcherService extends EventHub<{
-  add: EventParam
-  addDir: EventParam
-  change: EventParam
-  unlink: EventParam
-  unlinkDir: EventParam
-  all: EventParam
-  ready: EventParam
-  raw: EventParam
-  error: EventParam & { errorMessage: string; error: unknown }
-}> {
-  private watchers: { [key: string]: FSWatcher } = {}
+export interface FileWatcherService extends EventHub<FileWatcherEvents> {
+  init(): void
+}
 
-  @Injected((injector) => getLogger(injector).withScope('FileWatchers'))
-  declare private logger: ScopedLogger
+class FileWatcherServiceImpl extends EventHub<FileWatcherEvents> {
+  private watchers: Record<string, FSWatcher> = {}
 
-  @Injected(WebsocketService)
-  declare private webSocketService: WebsocketService
+  constructor(
+    private readonly logger: ReturnType<typeof useScopedLogger>,
+    private readonly systemInjector: Injector,
+    private readonly getWebsocketService: () => Promise<WebsocketService>,
+  ) {
+    super()
+  }
 
   private addWatcher = async (drive: Drive) => {
     if (this.watchers[drive.letter]) {
@@ -45,14 +48,15 @@ export class FileWatcherService extends EventHub<{
       awaitWriteFinish: { stabilityThreshold: 500, pollInterval: 100 },
     })
 
+    const ws = await this.getWebsocketService()
+
     watcher.on('error', (error) => {
       const errorMessage = error instanceof Error ? error.message : String(error)
       void this.logger.error({ message: `Error watching volume '${drive.letter}': ${errorMessage}`, data: { error } })
       this.emit('error', { path: '', driveLetter: drive.letter, errorMessage, error })
 
-      void this.webSocketService.announce(
-        { type: 'file-change', event: 'error', path: '', drive: drive.letter },
-        ({ injector }) => isAuthorized(injector, 'admin'),
+      void ws.announce({ type: 'file-change', event: 'error', path: '', drive: drive.letter }, ({ injector }) =>
+        isAuthorized(injector, 'admin'),
       )
     })
 
@@ -61,9 +65,8 @@ export class FileWatcherService extends EventHub<{
       void this.logger.verbose({ message: `📁  Event '${event}' in volume '${drive.letter}': ${relativePath}` })
       this.emit(event, { path: relativePath, driveLetter: drive.letter })
 
-      void this.webSocketService.announce(
-        { type: 'file-change', event, path: relativePath, drive: drive.letter },
-        ({ injector }) => isAuthorized(injector, 'admin'),
+      void ws.announce({ type: 'file-change', event, path: relativePath, drive: drive.letter }, ({ injector }) =>
+        isAuthorized(injector, 'admin'),
       )
     })
 
@@ -80,14 +83,6 @@ export class FileWatcherService extends EventHub<{
     }
   }
 
-  declare private injector: Injector
-
-  @Injected((injector) => getDataSetFor(injector, Drive, 'letter'))
-  declare private driveDataSet: DataSet<Drive, 'letter'>
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'file-watcher' }))
-  declare private systemInjector: Injector
-
   public init() {
     void this.startWatchCurrentDirectories().catch((error) => {
       void this.logger.error({ message: 'Failed to initialize file watchers', data: { error } })
@@ -95,13 +90,34 @@ export class FileWatcherService extends EventHub<{
   }
 
   private async startWatchCurrentDirectories() {
-    this.driveDataSet.subscribe('onEntityAdded', ({ entity }) => void this.addWatcher(entity))
-    this.driveDataSet.subscribe('onEntityRemoved', ({ key }) => void this.removeWatcher(key))
-    const allDrives = await this.driveDataSet.find(this.systemInjector, {})
+    const driveDataSet = getDataSetFor(this.systemInjector, DriveDataSet)
+    driveDataSet.subscribe('onEntityAdded', ({ entity }) => void this.addWatcher(entity))
+    driveDataSet.subscribe('onEntityRemoved', ({ key }) => void this.removeWatcher(key))
+    const allDrives = await driveDataSet.find(this.systemInjector, {})
     allDrives.forEach((drive) => void this.addWatcher(drive))
+  }
+
+  public async dispose() {
+    await Promise.all(Object.values(this.watchers).map((w) => w.close()))
   }
 }
 
+export const FileWatcherService: Token<FileWatcherService, 'singleton'> = defineService({
+  name: 'pi-rat/FileWatcherService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'file-watcher' })
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    const impl = new FileWatcherServiceImpl(logger, systemInjector, () => injector.getAsync(WebsocketService))
+    onDispose(() => impl.dispose())
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})
+
 export const useFileWatchers = async (injector: Injector) => {
-  injector.getInstance(FileWatcherService)
+  injector.get(FileWatcherService).init()
 }

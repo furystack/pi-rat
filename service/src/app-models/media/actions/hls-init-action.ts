@@ -25,7 +25,7 @@ export const HlsInitAction: RequestAction<HlsInitEndpoint> = async ({ injector, 
     throw new RequestError('Invalid playback mode', 400)
   }
 
-  const sessionService = injector.getInstance(TranscodingSessionService)
+  const sessionService = injector.get(TranscodingSessionService)
 
   const startTime = query.startTime ?? 0
 

@@ -18,7 +18,7 @@ const SeriesWidgetContent = Shade<{
     const series = props.data.value
     const { imdbId } = series
 
-    const localizedService = injector.getInstance(LocalizedMetadataService)
+    const localizedService = injector.get(LocalizedMetadataService)
     const [localized] = useObservable('localized', localizedService.getSeriesLocalizedAsObservable(imdbId))
 
     const localizedData = (localized as CacheWithValue<SeriesMetadataLocalized | undefined> | undefined)?.value
@@ -53,7 +53,7 @@ export const SeriesWidget = Shade<{
 }>({
   customElementName: 'pi-rat-series-widget',
   render: ({ props, injector }) => {
-    const seriesService = injector.getInstance(SeriesService)
+    const seriesService = injector.get(SeriesService)
 
     return (
       <CacheView

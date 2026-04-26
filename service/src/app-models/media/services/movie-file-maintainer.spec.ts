@@ -12,21 +12,22 @@ const mockLinkMovie = vi.fn().mockResolvedValue({ status: 'linked' })
 const mockExtractSubtitles = vi.fn().mockResolvedValue(undefined)
 
 vi.mock('@furystack/repository', () => ({
-  getDataSetFor: (_injector: unknown, model: { name?: string } | ((...args: unknown[]) => unknown)) => {
-    const name = typeof model === 'function' ? model.name : ''
-    if (name === 'MovieFile') {
+  defineDataSet: ({ name, store }: { name: string; store: unknown }) => ({ name, store }),
+  getDataSetFor: (_injector: unknown, token: { name?: string } | ((...args: unknown[]) => unknown)) => {
+    const tokenName = typeof token === 'function' ? token.name : (token?.name ?? '')
+    if (tokenName.includes('MovieFileDataSet')) {
       return {
         find: (...args: unknown[]) => mockMovieFileFind(...args) as unknown,
         remove: (...args: unknown[]) => mockMovieFileRemove(...args) as unknown,
       }
     }
-    if (name === 'Config') {
+    if (tokenName.includes('ConfigDataSet')) {
       return {
         get: (...args: unknown[]) => mockConfigGet(...args) as unknown,
         subscribe: vi.fn().mockReturnValue({ [Symbol.dispose]: vi.fn() }),
       }
     }
-    if (name === 'Drive') {
+    if (tokenName.includes('DriveDataSet')) {
       return {
         find: (...args: unknown[]) => mockDriveFind(...args) as unknown,
       }
@@ -43,6 +44,12 @@ vi.mock('@furystack/logging', () => ({
       information: vi.fn().mockResolvedValue(undefined),
       debug: vi.fn().mockResolvedValue(undefined),
     }),
+  }),
+  useScopedLogger: () => ({
+    verbose: vi.fn().mockResolvedValue(undefined),
+    error: vi.fn().mockResolvedValue(undefined),
+    information: vi.fn().mockResolvedValue(undefined),
+    debug: vi.fn().mockResolvedValue(undefined),
   }),
 }))
 
@@ -83,16 +90,15 @@ type FileWatcherEvents = {
 
 let mockFileWatcher: EventHub<FileWatcherEvents>
 
-vi.mock('../../drives/file-watcher-service.js', async () => {
-  const { InjectableOptionsSymbol } = await vi.importActual<{ InjectableOptionsSymbol: symbol }>('@furystack/inject')
-
-  class MockFileWatcherService {}
-  Object.assign(MockFileWatcherService, {
-    [InjectableOptionsSymbol]: { lifetime: 'singleton' },
-  })
-
-  return { FileWatcherService: MockFileWatcherService }
-})
+vi.mock('../../drives/file-watcher-service.js', () => ({
+  FileWatcherService: {
+    id: Symbol('FileWatcherService'),
+    name: 'pi-rat/FileWatcherService',
+    lifetime: 'singleton',
+    isAsync: false,
+    factory: () => undefined,
+  },
+}))
 
 const createMoviesConfig = (overrides?: Partial<MoviesConfig['value']>): MoviesConfig => ({
   id: 'MOVIES_CONFIG',
@@ -114,12 +120,9 @@ describe('MovieMaintainerService', () => {
     mockConfigGet.mockResolvedValue(config)
 
     const { FileWatcherService } = await import('../../drives/file-watcher-service.js')
-    injector.setExplicitInstance(
-      mockFileWatcher as unknown as InstanceType<typeof FileWatcherService>,
-      FileWatcherService,
-    )
+    injector.bind(FileWatcherService, () => mockFileWatcher as never)
 
-    const service = injector.getInstance(MovieMaintainerService)
+    const service = injector.get(MovieMaintainerService)
     service.init()
     await vi.waitFor(() => {
       expect(mockConfigGet).toHaveBeenCalled()

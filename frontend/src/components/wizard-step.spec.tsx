@@ -55,7 +55,7 @@ describe('WizardStep', () => {
 
   it('should render with title', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -78,7 +78,7 @@ describe('WizardStep', () => {
 
   it('should render children in content area', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -103,7 +103,7 @@ describe('WizardStep', () => {
 
   it('should disable Previous button on first page', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -128,7 +128,7 @@ describe('WizardStep', () => {
 
   it('should enable Previous button when not on first page', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -153,7 +153,7 @@ describe('WizardStep', () => {
 
   it('should render Next/Finish button that is enabled when not on last page', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -178,7 +178,7 @@ describe('WizardStep', () => {
 
   it('should render Next/Finish button on last page', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -203,7 +203,7 @@ describe('WizardStep', () => {
 
   it('should call onPrev when Previous button is clicked', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
       const onPrev = vi.fn()
 
@@ -230,7 +230,7 @@ describe('WizardStep', () => {
 
   it('should call onNext on form submit when no onSubmit provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
       const onNext = vi.fn()
 
@@ -256,7 +256,7 @@ describe('WizardStep', () => {
 
   it('should call onSubmit on form submit when provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockScreenService(), ScreenService)
+      injector.bind(ScreenService, () => createMockScreenService())
       const rootElement = document.getElementById('root') as HTMLDivElement
       const onSubmit = vi.fn()
       const onNext = vi.fn()

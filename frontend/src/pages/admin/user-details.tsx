@@ -79,8 +79,8 @@ const UserDetailsContent = Shade<{ data: CacheWithValue<User> }>({
     },
   },
   render: ({ props, injector, useState, useObservable, useDisposable }) => {
-    const usersService = injector.getInstance(UsersService)
-    const notyService = injector.getInstance(NotyService)
+    const usersService = injector.get(UsersService)
+    const notyService = injector.get(NotyService)
     const user = props.data.value
 
     const roleChangeObservable = useDisposable(
@@ -304,7 +304,7 @@ type UserDetailsPageProps = {
 export const UserDetailsPage = Shade<UserDetailsPageProps>({
   customElementName: 'user-details-page',
   render: ({ props, injector }) => {
-    const usersService = injector.getInstance(UsersService)
+    const usersService = injector.get(UsersService)
 
     return (
       <PageContainer gap="24px">

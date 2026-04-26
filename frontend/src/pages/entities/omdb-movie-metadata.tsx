@@ -8,7 +8,7 @@ import { MediaApiClient } from '../../services/api-clients/media-api-client.js'
 export const OmdbMovieMetadataPage = Shade({
   customElementName: 'shade-app-omdb-movie-metadata-page',
   render: ({ useDisposable, injector }) => {
-    const api = injector.getInstance(MediaApiClient)
+    const api = injector.get(MediaApiClient)
 
     const service = useDisposable(
       'service',

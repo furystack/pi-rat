@@ -1,16 +1,8 @@
-import { Injectable, Injected } from '@furystack/inject'
 import { Cache } from '@furystack/cache'
+import { defineService, type Token } from '@furystack/inject'
 import { MediaApiClient } from './api-clients/media-api-client.js'
 
-/**
- * Provides cached access to localized movie/series display data.
- * Uses 'en' as the default language until user language preferences are integrated.
- */
-@Injectable({ lifetime: 'singleton' })
-export class LocalizedMetadataService implements Disposable {
-  @Injected(MediaApiClient)
-  declare private readonly mediaApiClient: MediaApiClient
-
+class LocalizedMetadataServiceImpl implements Disposable {
   public movieLocalizedCache = new Cache({
     capacity: 200,
     load: async (movieImdbId: string, language = 'en') => {
@@ -51,9 +43,10 @@ export class LocalizedMetadataService implements Disposable {
     },
   })
 
+  constructor(private readonly mediaApiClient: MediaApiClient) {}
+
   public getMovieLocalized = this.movieLocalizedCache.get.bind(this.movieLocalizedCache)
   public getMovieLocalizedAsObservable = this.movieLocalizedCache.getObservable.bind(this.movieLocalizedCache)
-
   public getSeriesLocalized = this.seriesLocalizedCache.get.bind(this.seriesLocalizedCache)
   public getSeriesLocalizedAsObservable = this.seriesLocalizedCache.getObservable.bind(this.seriesLocalizedCache)
 
@@ -62,3 +55,16 @@ export class LocalizedMetadataService implements Disposable {
     this.seriesLocalizedCache[Symbol.dispose]()
   }
 }
+
+export type LocalizedMetadataService = LocalizedMetadataServiceImpl
+
+export const LocalizedMetadataService: Token<LocalizedMetadataService, 'singleton'> = defineService({
+  name: 'pi-rat/LocalizedMetadataService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new LocalizedMetadataServiceImpl(inject(MediaApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

@@ -36,9 +36,9 @@ describe('HlsSessionTeardownAction', () => {
     const removeAllSessionsForFile = vi.fn()
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { removeAllSessionsForFile } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ removeAllSessionsForFile }) as unknown as TranscodingSessionService,
       )
 
       const result = await HlsSessionTeardownAction({
@@ -62,9 +62,9 @@ describe('HlsSessionTeardownAction', () => {
     const removeAllSessionsForFile = vi.fn()
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { removeAllSessionsForFile } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ removeAllSessionsForFile }) as unknown as TranscodingSessionService,
       )
 
       await HlsSessionTeardownAction({

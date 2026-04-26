@@ -38,13 +38,14 @@ const mockSession = {
 describe('HlsInitAction', () => {
   it('should reject path traversal attempts', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn(),
-          getOrCreateSession: vi.fn(),
-          waitForFile: vi.fn(),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn(),
+            getOrCreateSession: vi.fn(),
+            waitForFile: vi.fn(),
+          }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -64,13 +65,14 @@ describe('HlsInitAction', () => {
 
   it('should reject invalid playback mode', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn(),
-          getOrCreateSession: vi.fn(),
-          waitForFile: vi.fn(),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn(),
+            getOrCreateSession: vi.fn(),
+            waitForFile: vi.fn(),
+          }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -92,13 +94,14 @@ describe('HlsInitAction', () => {
     const writeHead = vi.fn()
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn().mockReturnValue(mockSession),
-          getOrCreateSession: vi.fn(),
-          waitForFile: vi.fn().mockResolvedValue(true),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn().mockReturnValue(mockSession),
+            getOrCreateSession: vi.fn(),
+            waitForFile: vi.fn().mockResolvedValue(true),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsInitAction({
@@ -123,13 +126,14 @@ describe('HlsInitAction', () => {
     const getOrCreateSession = vi.fn().mockResolvedValue(mockSession)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn().mockReturnValue(undefined),
-          getOrCreateSession,
-          waitForFile: vi.fn().mockResolvedValue(true),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn().mockReturnValue(undefined),
+            getOrCreateSession,
+            waitForFile: vi.fn().mockResolvedValue(true),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsInitAction({
@@ -153,13 +157,14 @@ describe('HlsInitAction', () => {
 
   it('should return 504 if init segment is not available', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn().mockReturnValue(mockSession),
-          getOrCreateSession: vi.fn(),
-          waitForFile: vi.fn().mockResolvedValue(false),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn().mockReturnValue(mockSession),
+            getOrCreateSession: vi.fn(),
+            waitForFile: vi.fn().mockResolvedValue(false),
+          }) as unknown as TranscodingSessionService,
       )
 
       try {

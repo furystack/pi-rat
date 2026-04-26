@@ -40,8 +40,8 @@ export const GenericEditor: <T, TKey extends keyof T, TReadonlyProperties extend
 
     const refresh = () => service.findOptions.setValue({ ...service.findOptions.getValue() })
 
-    const noty = injector.getInstance(NotyService)
-    const locationService = injector.getInstance(LocationService)
+    const noty = injector.get(NotyService)
+    const locationService = injector.get(LocationService)
 
     const [currentPath] = useObservable('locationPath', locationService.onLocationPathChanged)
 
