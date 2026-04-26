@@ -10,6 +10,6 @@ export const IotAppModel: InternalAppModel = {
   setup: async (injector) => {
     await setupIotStore(injector)
     await setupIotApi(injector)
-    void injector.get(DeviceAvailabilityHub).init()
+    injector.get(DeviceAvailabilityHub)
   },
 }

@@ -18,8 +18,6 @@ export const setupMedia = async (injector: Injector) => {
 
   const omdbClientService = injector.get(OmdbClientService)
   const tmdbClientService = injector.get(TmdbClientService)
-  omdbClientService.init()
-  tmdbClientService.init()
 
   const registry = injector.get(ExternalServiceStatusRegistry)
   registry.register('omdb', () => !!omdbClientService.config)

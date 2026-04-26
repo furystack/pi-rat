@@ -872,24 +872,26 @@ public updateDevice = async (name: string, body: DeviceUpdate) => {
 For event handlers and callbacks where you cannot await (e.g., WebSocket listeners), add explicit error handling:
 
 ```typescript
-// ✅ GOOD - Error handling in event listeners
-public init() {
-  this.websocketService.addListener('onMessage', (message) => {
+// ✅ GOOD - Error handling in event listeners (registered inline in the factory)
+factory: (ctx) => {
+  const websocketService = inject(WebsocketNotificationsService)
+  websocketService.addListener('onMessage', (message) => {
     if (message.type === 'device-connected') {
       // Fire-and-forget is acceptable here with error handling
-      void this.deviceCache.reload(message.device.name).catch((error) => {
+      void deviceCache.reload(message.device.name).catch((error) => {
         // Log error but don't throw (listener context)
         console.error('Failed to reload device cache:', error)
       })
     }
   })
+  // ...
 }
 
 // ❌ AVOID - No error handling
-public init() {
-  this.websocketService.addListener('onMessage', (message) => {
+factory: (ctx) => {
+  websocketService.addListener('onMessage', (message) => {
     if (message.type === 'device-connected') {
-      void this.deviceCache.reload(message.device.name) // ❌ Unhandled rejection
+      void deviceCache.reload(message.device.name) // ❌ Unhandled rejection
     }
   })
 }

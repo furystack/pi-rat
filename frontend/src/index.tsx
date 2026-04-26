@@ -43,9 +43,8 @@ syncService.addListener('onReconnectFailed', ({ attempt }) => {
   void syncLogger.error({ message: `Entity sync reconnect failed (attempt ${attempt})` })
 })
 
-void shadeInjector.get(SessionService).init()
-
 shadeInjector.bind(IdentityContext, () => shadeInjector.get(SessionService))
+shadeInjector.get(SessionService)
 
 void getLogger(shadeInjector).withScope('Startup').verbose({
   message: 'Initializing Shade Frontend...',

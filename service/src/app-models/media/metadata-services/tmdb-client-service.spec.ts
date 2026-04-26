@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { TmdbClientServiceImpl as TmdbClientService, buildTmdbImageUrl } from './tmdb-client-service.js'
+import { createTmdbClientService, buildTmdbImageUrl, type TmdbClientService } from './tmdb-client-service.js'
 import type {
   TmdbMovieDetailsResponse,
   TmdbTvDetailsResponse,
@@ -9,36 +9,6 @@ import type {
   TmdbSearchMovieResult,
   TmdbSearchTvResult,
 } from './tmdb-api-types.js'
-
-vi.mock('@furystack/core', () => ({
-  useSystemIdentityContext: () => ({}),
-}))
-
-vi.mock('@furystack/logging', () => ({
-  getLogger: () => ({
-    withScope: () => ({
-      verbose: vi.fn().mockResolvedValue(undefined),
-      information: vi.fn().mockResolvedValue(undefined),
-      warning: vi.fn().mockResolvedValue(undefined),
-      error: vi.fn().mockResolvedValue(undefined),
-      debug: vi.fn().mockResolvedValue(undefined),
-    }),
-  }),
-}))
-
-vi.mock('@furystack/inject', () => ({
-  defineService: ({ factory }: { factory: (ctx: unknown) => unknown }) => factory,
-  Injectable: () => (target: unknown) => target,
-  Injected: () => () => undefined,
-}))
-
-vi.mock('@furystack/repository', () => ({
-  defineDataSet: ({ store }: { store: unknown }) => store,
-  getDataSetFor: () => ({
-    get: vi.fn(),
-    subscribe: vi.fn(),
-  }),
-}))
 
 const createMockResponse = (body: unknown, status = 200) =>
   ({
@@ -208,28 +178,17 @@ describe('TmdbClientService', () => {
       error: vi.fn().mockResolvedValue(undefined),
       debug: vi.fn().mockResolvedValue(undefined),
     }
-    service = new TmdbClientService(noopLogger as never, {} as never)
-
-    Object.defineProperty(service, 'logger', {
-      value: {
-        verbose: vi.fn().mockResolvedValue(undefined),
-        information: vi.fn().mockResolvedValue(undefined),
-        warning: vi.fn().mockResolvedValue(undefined),
-        error: vi.fn().mockResolvedValue(undefined),
-        debug: vi.fn().mockResolvedValue(undefined),
+    service = createTmdbClientService({
+      logger: noopLogger as never,
+      semaphore: {
+        execute: <T>(task: (options: { signal: AbortSignal }) => Promise<T>) =>
+          task({ signal: new AbortController().signal }),
       },
-      writable: true,
+      initialConfig: {
+        id: 'TMDB_CONFIG',
+        value: { apiKey: 'test-api-key', defaultLanguage: 'en-US' },
+      } as never,
     })
-
-    Object.defineProperty(service, 'semaphore', {
-      value: { execute: <T>(fn: () => Promise<T>) => fn() },
-      writable: true,
-    })
-
-    service.config = {
-      id: 'TMDB_CONFIG',
-      value: { apiKey: 'test-api-key', defaultLanguage: 'en-US' },
-    } as never
   })
 
   afterEach(() => {

@@ -14,7 +14,6 @@ export const setupAi = async (injector: Injector) => {
   await setupAiStore(injector)
 
   const clientService = injector.get(OllamaClientService)
-  clientService.init()
 
   const systemInjector = useSystemIdentityContext({ injector, username: 'ai-setup' })
   const chatMessageDataSet = getDataSetFor(injector, AiChatMessageDataSet)

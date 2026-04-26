@@ -49,129 +49,115 @@ public async getOrCreateSession(key: string): Promise<Session> {
 
 Apply this pattern when **all** of the following are true:
 
-1. The service is a singleton (`@Injectable({ lifetime: 'singleton' })`)
+1. The service is a singleton (`defineService({ lifetime: 'singleton' })`)
 2. The creation step is async (involves I/O, spawning processes, network calls)
 3. The resource is expensive or has side effects (ffmpeg process, file creation, external connection)
 4. Multiple concurrent HTTP requests may trigger creation for the same key
 
-## Fire-and-Forget Async Initialization
+## Inline Initialization in `defineService` Factories
 
 > See also [ASYNC_PATTERNS.mdc](./ASYNC_PATTERNS.mdc) for the broader rule on fire-and-forget promises and `fs/promises` usage.
 
-Singleton services that need async initialization (e.g., loading config from a database, connecting to external APIs) should **not** block startup. Use a synchronous `init()` that kicks off the async work and logs errors.
+Singleton services run their setup logic inside the `defineService` factory body. The factory creates internal state, registers event listeners, kicks off async work, and returns the service interface. There is no separate public `init()` method to call from setup helpers.
 
-### The Problem
-
-```typescript
-// ❌ Blocks startup — if configDataSet.get() hangs or is slow, the entire
-// application startup stalls waiting for this single service.
-@Injectable({ lifetime: 'singleton' })
-export class MyService {
-  public async init() {
-    this.config = await this.configDataSet.get(this.systemInjector, 'MY_CONFIG')
-    // ... subscribe to changes ...
-  }
-}
-
-// Caller must await:
-await injector.getInstance(MyService).init()
-```
-
-### The Fix: Synchronous `init()` with Error Logging
+### The Pattern
 
 ```typescript
-// ✅ Non-blocking — startup continues, errors are logged not swallowed
-@Injectable({ lifetime: 'singleton' })
-export class MyService {
-  public init() {
-    void this.initAsync().catch((error) => {
-      void this.logger.error({ message: 'Failed to initialize MyService', data: { error } })
+// ✅ Init logic is inline; the factory returns a fully-wired service
+export const MyService: Token<MyService, 'singleton'> = defineService({
+  name: 'pi-rat/MyService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+
+    let config: MyConfig | undefined
+
+    const service: MyService = {
+      // ... methods that close over `config`, `logger`, ... ...
+    }
+
+    // Sync setup runs inline.
+    socket.addListener('onMessage', onMessage)
+
+    // Async work that should not block startup is fire-and-forget here.
+    const configWatcher = createConfigWatcher<MyConfig>({
+      /* ... */ onChange: (next) => {
+        config = next
+      },
     })
-  }
+    void configWatcher.init().catch((error) => {
+      void logger.error({ message: 'Failed to initialize MyService', data: { error } })
+    })
 
-  private async initAsync() {
-    this.config = await this.configDataSet.get(this.systemInjector, 'MY_CONFIG')
-    // ... subscribe to changes ...
-  }
-}
+    onDispose(() => configWatcher.dispose())
+    onDispose(() => socket.removeListener('onMessage', onMessage))
 
-// Caller does not need to await:
-injector.getInstance(MyService).init()
-```
-
-### When to Apply
-
-Use fire-and-forget init when:
-
-1. The service depends on external data (database, API, file system) during initialization
-2. The service can operate in a degraded state until initialization completes
-3. Blocking startup would prevent other independent services from starting
-4. The initialization failure should be logged, not crash the application
-
-**Keep `async init()` when:**
-
-- The service **must** be fully initialized before any caller uses it (e.g., schema migrations)
-- The caller needs to know whether initialization succeeded before proceeding
-
-## Dispose-Before-Reinit Guard
-
-When a singleton service's `init()` method may be called more than once (e.g., triggered by config change events), dispose existing subscriptions before creating new ones. Without this guard, each call to `init()` creates duplicate event handlers while the old ones keep firing.
-
-### The Problem
-
-```typescript
-// ❌ Each init() call leaks old subscriptions — handlers accumulate
-@Injectable({ lifetime: 'singleton' })
-export class MyService {
-  declare private subscription: Disposable
-
-  private async initAsync() {
-    this.config = await this.configDataSet.get(...)
-    // Old subscription is overwritten but never disposed!
-    this.subscription = this.eventHub.subscribe('event', (e) => this.handle(e))
-  }
-}
-
-// Caller re-initializes on config update — duplicate handlers
-configDataSet.subscribe('onEntityUpdated', () => {
-  injector.getInstance(MyService).init()
+    return service
+  },
 })
 ```
 
-### The Fix: Dispose Old Subscriptions First
+### Rules
+
+- **Do not expose a public `init()` method on the service interface.** Initialization is the factory's responsibility.
+- **Sync init logic is inlined** in the factory body before `return`.
+- **Async init logic that can finish quickly and must complete before usage** uses `defineServiceAsync` and is `await`ed inline. Consumers must use `injector.getAsync(...)`.
+- **Async init logic that should not block startup** (config loading from external sources, ping loops, etc.) is launched fire-and-forget inline with a `.catch` that logs the error. The factory stays sync (`defineService`).
+- **Setup helpers (`useFooBar(injector)`, `setupBaz(injector)`)** trigger initialization by calling `injector.get(MyService)` or `await injector.getAsync(MyService)`. They no longer call `service.init()`.
+
+### Fire-and-Forget Async Setup
 
 ```typescript
-// ✅ Old subscriptions are disposed before re-subscribing
-@Injectable({ lifetime: 'singleton' })
-export class MyService {
-  declare private subscription: Disposable
+// ❌ Blocks startup — if configDataSet.get() hangs, the entire app stalls.
+factory: async (ctx) => {
+  const config = await configDataSet.get(systemInjector, 'MY_CONFIG')
+  // ...
+}
 
-  private async initAsync() {
-    this.subscription?.[Symbol.dispose]()
-
-    this.config = await this.configDataSet.get(...)
-    this.subscription = this.eventHub.subscribe('event', (e) => this.handle(e))
-  }
+// ✅ Non-blocking — startup continues, errors are logged not swallowed.
+factory: (ctx) => {
+  // ...
+  void configWatcher.init().catch((error) => {
+    void logger.error({ message: 'Failed to initialize MyService', data: { error } })
+  })
+  // ...
 }
 ```
 
-For multiple subscriptions, use an array pattern:
+Use fire-and-forget init when **all** of the following are true:
+
+1. The service depends on external data (database, API, file system) during initialization.
+2. The service can operate in a degraded state until initialization completes.
+3. Blocking startup would prevent other independent services from starting.
+4. The initialization failure should be logged, not crash the application.
+
+Use `defineServiceAsync` only when:
+
+- The service **must** be fully initialized before any caller uses it (e.g., schema migrations).
+- The caller needs to know whether initialization succeeded before proceeding.
+
+## Dispose Subscriptions on Service Teardown
+
+The factory pattern guarantees init runs once per singleton, so the historical "dispose-before-reinit" guard is no longer needed. However, every subscription created inside the factory must still be torn down via `onDispose`.
 
 ```typescript
-// ✅ Batch dispose for multiple subscriptions
-private configSubscriptions: Disposable[] = []
+// ✅ All subscriptions are disposed when the injector tears down the service.
+factory: (ctx) => {
+  const { onDispose } = ctx
 
-private async initAsync() {
-  for (const sub of this.configSubscriptions) {
-    sub[Symbol.dispose]()
-  }
-  this.configSubscriptions = []
-
-  this.configSubscriptions.push(
-    this.dataSet.subscribe('onEntityAdded', ...),
-    this.dataSet.subscribe('onEntityUpdated', ...),
-    this.dataSet.subscribe('onEntityRemoved', ...),
+  const subscriptions: Disposable[] = []
+  subscriptions.push(
+    dataSet.subscribe('onEntityAdded' /* ... */),
+    dataSet.subscribe('onEntityUpdated' /* ... */),
+    dataSet.subscribe('onEntityRemoved' /* ... */),
   )
+
+  onDispose(() => {
+    for (const sub of subscriptions) sub[Symbol.dispose]()
+  })
+
+  return service
 }
 ```
 
@@ -179,9 +165,8 @@ private async initAsync() {
 
 Apply this pattern when **any** of the following are true:
 
-1. The service subscribes to events or datasets during `init()`
-2. `init()` can be called more than once (e.g., from config change listeners)
-3. The service is re-initialized without being fully disposed first
+1. The service subscribes to events or datasets during the factory body.
+2. The service holds external resources that must be released (file watchers, sockets, timers).
 
 ### Don't Mutate Collections While Iterating
 

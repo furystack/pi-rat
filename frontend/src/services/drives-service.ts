@@ -6,10 +6,12 @@ import type { Drive, FileChangeMessage, WebsocketMessage } from 'common'
 import { DrivesApiClient } from './api-clients/drives-api-client.js'
 import { WebsocketNotificationsService } from './websocket-events.js'
 
-class DrivesServiceImpl extends EventHub<{ onFilesystemChanged: FileChangeMessage }> implements Disposable {
-  public volumesCache = new Cache({
+const createDrivesService = (drivesApiClient: DrivesApiClient, socket: WebsocketNotificationsService) => {
+  const hub = new EventHub<{ onFilesystemChanged: FileChangeMessage }>()
+
+  const volumesCache = new Cache({
     load: async ({ findOptions }: { findOptions?: FindOptions<Drive, Array<keyof Drive>> }) => {
-      const { result } = await this.drivesApiClient.call({
+      const { result } = await drivesApiClient.call({
         method: 'GET',
         action: '/volumes',
         query: { findOptions },
@@ -18,9 +20,9 @@ class DrivesServiceImpl extends EventHub<{ onFilesystemChanged: FileChangeMessag
     },
   })
 
-  private singleVolumeCache = new Cache({
+  const singleVolumeCache = new Cache({
     load: async (id: string, query?: { select?: Array<keyof Drive> }) => {
-      const { result } = await this.drivesApiClient.call({
+      const { result } = await drivesApiClient.call({
         method: 'GET',
         action: '/volumes/:id',
         url: { id },
@@ -30,9 +32,9 @@ class DrivesServiceImpl extends EventHub<{ onFilesystemChanged: FileChangeMessag
     },
   })
 
-  private fileListCache = new Cache({
+  const fileListCache = new Cache({
     load: async (letter: string, path: string) => {
-      const { result } = await this.drivesApiClient
+      const { result } = await drivesApiClient
         .call({
           method: 'GET',
           action: '/files/:letter/:path',
@@ -53,67 +55,51 @@ class DrivesServiceImpl extends EventHub<{ onFilesystemChanged: FileChangeMessag
     },
   })
 
-  constructor(
-    private readonly drivesApiClient: DrivesApiClient,
-    private readonly socket: WebsocketNotificationsService,
-  ) {
-    super()
-  }
-
-  public getVolumes = this.volumesCache.get.bind(this.volumesCache)
-  public getVolumesAsObservable = this.volumesCache.getObservable.bind(this.volumesCache)
-
-  public getVolume = this.singleVolumeCache.get.bind(this.singleVolumeCache)
-  public getVolumeAsObservable = this.singleVolumeCache.getObservable.bind(this.singleVolumeCache)
-
-  public addVolume = async (volume: Omit<WithOptionalId<Drive, 'letter'>, 'createdAt' | 'updatedAt'>) => {
-    const addResult = await this.drivesApiClient.call({
+  const addVolume = async (volume: Omit<WithOptionalId<Drive, 'letter'>, 'createdAt' | 'updatedAt'>) => {
+    const addResult = await drivesApiClient.call({
       method: 'POST',
       action: '/volumes',
       body: volume,
     })
-    this.volumesCache.obsoleteRange(() => true)
+    volumesCache.obsoleteRange(() => true)
     return addResult
   }
 
-  public updateVolume = async (letter: string, volume: Omit<Drive, 'letter' | 'createdAt' | 'updatedAt'>) => {
-    await this.drivesApiClient.call({
+  const updateVolume = async (letter: string, volume: Omit<Drive, 'letter' | 'createdAt' | 'updatedAt'>) => {
+    await drivesApiClient.call({
       method: 'PATCH',
       action: '/volumes/:id',
       url: { id: letter },
       body: volume,
     })
-    this.volumesCache.obsoleteRange(() => true)
-    this.singleVolumeCache.obsoleteRange((drive) => drive.letter === letter)
+    volumesCache.obsoleteRange(() => true)
+    singleVolumeCache.obsoleteRange((drive) => drive.letter === letter)
   }
 
-  public removeVolume = async (letter: string) => {
-    const removeResult = await this.drivesApiClient.call({
+  const removeVolume = async (letter: string) => {
+    const removeResult = await drivesApiClient.call({
       method: 'DELETE',
       action: '/volumes/:id',
       url: { id: letter },
     })
-    this.volumesCache.flushAll()
-    this.singleVolumeCache.removeRange((drive) => drive.letter === letter)
+    volumesCache.flushAll()
+    singleVolumeCache.removeRange((drive) => drive.letter === letter)
     return removeResult
   }
 
-  public getFileList = this.fileListCache.get.bind(this.fileListCache)
-  public getFileListAsObservable = this.fileListCache.getObservable.bind(this.fileListCache)
-
-  public removeFile = async ({ letter, path }: { letter: string; path: string }) => {
-    return this.drivesApiClient.call({
+  const removeFile = async ({ letter, path }: { letter: string; path: string }) => {
+    return drivesApiClient.call({
       method: 'DELETE',
       action: '/files/:letter/:path',
       url: { letter, path },
     })
   }
 
-  private onMessage = ((messageData: WebsocketMessage) => {
+  const onMessage = (messageData: WebsocketMessage) => {
     if (messageData.type === 'file-change') {
-      this.emit('onFilesystemChanged', messageData)
+      hub.emit('onFilesystemChanged', messageData)
 
-      this.fileListCache.obsoleteRange((fileList) => {
+      fileListCache.obsoleteRange((fileList) => {
         const rootPath = PathHelper.getParentPath(messageData.path)
         const parentPath = rootPath === messageData.path ? '' : rootPath
         const currentPath = PathHelper.normalize(fileList.path)
@@ -123,33 +109,49 @@ class DrivesServiceImpl extends EventHub<{ onFilesystemChanged: FileChangeMessag
         )
       })
     }
-  }).bind(this)
-
-  public init() {
-    this.socket.addListener('onMessage', this.onMessage)
   }
 
-  public [Symbol.dispose](): void {
+  socket.addListener('onMessage', onMessage)
+
+  const dispose = () => {
     try {
-      this.socket.removeListener('onMessage', this.onMessage)
+      socket.removeListener('onMessage', onMessage)
     } catch {
       // Socket may already be disposed
     }
-    this.volumesCache[Symbol.dispose]()
-    this.singleVolumeCache[Symbol.dispose]()
-    this.fileListCache[Symbol.dispose]()
-    super[Symbol.dispose]()
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
+    volumesCache[Symbol.dispose]()
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
+    singleVolumeCache[Symbol.dispose]()
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
+    fileListCache[Symbol.dispose]()
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
+    hub[Symbol.dispose]()
   }
+
+  return Object.assign(hub, {
+    volumesCache,
+    getVolumes: volumesCache.get.bind(volumesCache),
+    getVolumesAsObservable: volumesCache.getObservable.bind(volumesCache),
+    getVolume: singleVolumeCache.get.bind(singleVolumeCache),
+    getVolumeAsObservable: singleVolumeCache.getObservable.bind(singleVolumeCache),
+    addVolume,
+    updateVolume,
+    removeVolume,
+    getFileList: fileListCache.get.bind(fileListCache),
+    getFileListAsObservable: fileListCache.getObservable.bind(fileListCache),
+    removeFile,
+    [Symbol.dispose]: dispose,
+  })
 }
 
-export type DrivesService = DrivesServiceImpl
+export type DrivesService = ReturnType<typeof createDrivesService>
 
 export const DrivesService: Token<DrivesService, 'singleton'> = defineService({
   name: 'pi-rat/DrivesService',
   lifetime: 'singleton',
   factory: ({ inject, onDispose }) => {
-    const impl = new DrivesServiceImpl(inject(DrivesApiClient), inject(WebsocketNotificationsService))
-    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    const impl = createDrivesService(inject(DrivesApiClient), inject(WebsocketNotificationsService))
     onDispose(() => impl[Symbol.dispose]())
     return impl
   },

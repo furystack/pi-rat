@@ -611,27 +611,42 @@ export class LoggingService {
 
 ### Service Initialization Patterns
 
-Services that require initialization should be initialized explicitly:
+Services initialize themselves inside their `defineService` factory. Listener registration, cache priming, and other startup work runs inline before the factory returns. Callers no longer invoke a separate `init()` method.
 
 ```typescript
-// ✅ Good - explicit service initialization
-// In app setup or component
-const loggingService = injector.getInstance(LoggingService)
-loggingService.init()
+// ✅ Good - factory wires the service and returns it ready to use
+export const LoggingService: Token<LoggingService, 'singleton'> = defineService({
+  name: 'pi-rat/LoggingService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const websocketNotificationsService = inject(WebsocketNotificationsService)
 
-// Or use useDisposable for automatic disposal
-export const LogViewer = Shade({
-  customElementName: 'log-viewer',
-  render: ({ injector, useDisposable }) => {
-    const loggingService = useDisposable('loggingService', () => {
-      const service = injector.getInstance(LoggingService)
-      service.init()
-      return {
-        service,
-        [Symbol.dispose]: () => service.dispose(),
-      }
+    const logEntryCache = new Cache({
+      /* ... */
     })
 
+    const onMessage = (messageData: WebsocketMessage) => {
+      if (messageData.type === 'log-entry-added') {
+        logEntryCache.setExplicitValue({
+          loadArgs: [messageData.logEntry.id],
+          value: { status: 'loaded', value: messageData.logEntry, updatedAt: new Date() },
+        })
+      }
+    }
+
+    websocketNotificationsService.addListener('onMessage', onMessage)
+
+    onDispose(() => websocketNotificationsService.removeListener('onMessage', onMessage))
+
+    return { logEntryCache /* ... */ }
+  },
+})
+
+// In an app component
+export const LogViewer = Shade({
+  customElementName: 'log-viewer',
+  render: ({ injector }) => {
+    const loggingService = injector.get(LoggingService)
     return <div>Log viewer content</div>
   },
 })
@@ -643,37 +658,37 @@ Always ensure listeners are removed when the service is no longer needed:
 
 ```typescript
 // ❌ Bad - listener never removed
-@Injectable({ lifetime: 'singleton' })
-export class BrokenService {
-  @Injected(EventService)
-  declare readonly eventService: EventService
+export const BrokenService: Token<BrokenService, 'singleton'> = defineService({
+  name: 'pi-rat/BrokenService',
+  lifetime: 'singleton',
+  factory: ({ inject }) => {
+    const eventService = inject(EventService)
+    eventService.addListener('event', (data) => handleEvent(data))
+    return {
+      /* ... */
+    }
+  },
+})
 
-  constructor() {
-    // Memory leak: listener added but never removed
-    this.eventService.addListener('event', (data) => {
-      this.handleEvent(data)
-    })
-  }
-}
+// ✅ Good - listener registered inline and disposed via onDispose
+export const ProperService: Token<ProperService, 'singleton'> = defineService({
+  name: 'pi-rat/ProperService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const eventService = inject(EventService)
 
-// ✅ Good - listener properly managed
-@Injectable({ lifetime: 'singleton' })
-export class ProperService {
-  @Injected(EventService)
-  declare readonly eventService: EventService
+    const handleEvent = (data: EventData) => {
+      /* handle event */
+    }
 
-  private handleEvent = ((data: EventData) => {
-    // Handle event
-  }).bind(this)
+    eventService.addListener('event', handleEvent)
+    onDispose(() => eventService.removeListener('event', handleEvent))
 
-  public init() {
-    this.eventService.addListener('event', this.handleEvent)
-  }
-
-  public [Symbol.dispose]() {
-    this.eventService.removeListener('event', this.handleEvent)
-  }
-}
+    return {
+      /* ... */
+    }
+  },
+})
 ```
 
 ## Summary

@@ -123,7 +123,6 @@ describe('MovieMaintainerService', () => {
     injector.bind(FileWatcherService, () => mockFileWatcher as never)
 
     const service = injector.get(MovieMaintainerService)
-    service.init()
     await vi.waitFor(() => {
       expect(mockConfigGet).toHaveBeenCalled()
     })
@@ -440,21 +439,6 @@ describe('MovieMaintainerService', () => {
 
         await new Promise((resolve) => setTimeout(resolve, 50))
         expect(mockDriveFind).not.toHaveBeenCalled()
-      })
-    })
-
-    it('should re-subscribe on re-init without errors', async () => {
-      const config = createMoviesConfig()
-
-      await usingAsync(new Injector(), async (injector) => {
-        const service = await initService(injector, config)
-        const initialCallCount = mockConfigGet.mock.calls.length
-
-        mockConfigGet.mockResolvedValue(config)
-        service.init()
-        await vi.waitFor(() => {
-          expect(mockConfigGet.mock.calls.length).toBeGreaterThan(initialCallCount)
-        })
       })
     })
   })

@@ -13,6 +13,10 @@ export interface SessionService extends IdentityContext, Disposable {
   readonly currentUser: ObservableValue<User | null>
   readonly isOperationInProgress: ObservableValue<boolean>
   readonly loginError: ObservableValue<string>
+  /**
+   * The service kicks off initialization on construction. Calling this is a safe no-op
+   * after the first invocation and is mainly used by tests that need to await completion.
+   */
   init(): Promise<void>
   login(username: string, password: string): Promise<void>
   register(username: string, password: string): Promise<void>
@@ -205,6 +209,8 @@ export const SessionService: Token<SessionService, 'singleton'> = defineService(
       // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
       loginError[Symbol.dispose]()
     }
+
+    void init()
 
     return {
       state,

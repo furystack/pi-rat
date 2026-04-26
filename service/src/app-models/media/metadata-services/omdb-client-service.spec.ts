@@ -1,38 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { OmdbClientServiceImpl as OmdbClientService } from './omdb-client-service.js'
-
-vi.mock('@furystack/core', () => ({
-  useSystemIdentityContext: () => ({}),
-}))
-
-vi.mock('@furystack/logging', () => ({
-  getLogger: () => ({
-    withScope: () => ({
-      verbose: vi.fn().mockResolvedValue(undefined),
-      information: vi.fn().mockResolvedValue(undefined),
-      warning: vi.fn().mockResolvedValue(undefined),
-      error: vi.fn().mockResolvedValue(undefined),
-    }),
-  }),
-  useScopedLogger: () => ({
-    verbose: vi.fn().mockResolvedValue(undefined),
-    information: vi.fn().mockResolvedValue(undefined),
-    warning: vi.fn().mockResolvedValue(undefined),
-    error: vi.fn().mockResolvedValue(undefined),
-  }),
-}))
-
-vi.mock('@furystack/inject', () => ({
-  defineService: ({ factory }: { factory: (ctx: unknown) => unknown }) => factory,
-}))
-
-vi.mock('@furystack/repository', () => ({
-  defineDataSet: ({ store }: { store: unknown }) => store,
-  getDataSetFor: () => ({
-    get: vi.fn(),
-    subscribe: vi.fn(),
-  }),
-}))
+import { createOmdbClientService, type OmdbClientService } from './omdb-client-service.js'
 
 const createMockResponse = (body: Record<string, unknown>, ok = true) =>
   ({
@@ -53,27 +20,14 @@ describe('OmdbClientService', () => {
       warning: vi.fn().mockResolvedValue(undefined),
       error: vi.fn().mockResolvedValue(undefined),
     }
-    service = new OmdbClientService(noopLogger as never, {} as never)
-
-    Object.defineProperty(service, 'logger', {
-      value: {
-        verbose: vi.fn().mockResolvedValue(undefined),
-        information: vi.fn().mockResolvedValue(undefined),
-        warning: vi.fn().mockResolvedValue(undefined),
-        error: vi.fn().mockResolvedValue(undefined),
+    service = createOmdbClientService({
+      logger: noopLogger as never,
+      semaphore: {
+        execute: <T>(task: (options: { signal: AbortSignal }) => Promise<T>) =>
+          task({ signal: new AbortController().signal }),
       },
-      writable: true,
+      initialConfig: { id: 'OMDB_CONFIG', value: { apiKey: 'test-key' } } as never,
     })
-
-    Object.defineProperty(service, 'semaphore', {
-      value: { execute: <T>(fn: () => Promise<T>) => fn() },
-      writable: true,
-    })
-
-    service.config = {
-      id: 'OMDB_CONFIG',
-      value: { apiKey: 'test-key' },
-    } as never
   })
 
   afterEach(() => {
