@@ -10,7 +10,7 @@ export const Body = Shade({
     color: cssVariableTheme.text.secondary,
   },
   render: ({ useObservable, injector }) => {
-    const session = injector.getInstance(SessionService)
+    const session = injector.get(SessionService)
     const [sessionState] = useObservable('sessionState', session.state)
 
     switch (sessionState) {

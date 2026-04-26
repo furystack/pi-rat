@@ -8,7 +8,7 @@ import { IotDevicesService } from '../../services/iot-devices-service.js'
 export const IotDevicesPage = Shade({
   customElementName: 'shade-app-iot-devices-page',
   render: ({ useDisposable, injector }) => {
-    const iotService = injector.getInstance(IotDevicesService)
+    const iotService = injector.get(IotDevicesService)
 
     const service = useDisposable(
       'service',

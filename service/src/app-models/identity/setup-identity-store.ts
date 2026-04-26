@@ -1,22 +1,29 @@
-import { getCurrentUser } from '@furystack/core'
+import { getCurrentUser, type PhysicalStore } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, getRepository } from '@furystack/repository'
-import { DefaultSession, useHttpAuthentication } from '@furystack/rest-service'
-import { PasswordCredential, PasswordResetToken, usePasswordPolicy } from '@furystack/security'
-import { useSequelize } from '@furystack/sequelize-store'
-import { User, type Roles } from 'common'
+import { defineDataSet, type DataSetToken } from '@furystack/repository'
+import {
+  DefaultSession,
+  SessionStore as FrameworkSessionStore,
+  UserStore as FrameworkUserStore,
+  useHttpAuthentication,
+} from '@furystack/rest-service'
+import {
+  PasswordCredential,
+  PasswordCredentialStore as FrameworkPasswordCredentialStore,
+  PasswordResetToken,
+  PasswordResetTokenStore as FrameworkPasswordResetTokenStore,
+  usePasswordPolicy,
+} from '@furystack/security'
+import { defineSequelizeStore } from '@furystack/sequelize-store'
+import { User as PiRatUser, type Roles } from 'common'
 import { DataTypes, Model } from 'sequelize'
 import { withRole } from '../../authorization/with-role.js'
 import { getDefaultDbSettings } from '../../get-default-db-options.js'
 
-class UserModel extends Model<User, User> implements User {
+class UserModel extends Model<PiRatUser, PiRatUser> implements PiRatUser {
   declare username: string
-
   declare roles: Roles
-
   declare createdAt: string
-
   declare updatedAt: string
 }
 
@@ -38,157 +45,147 @@ class SessionModel extends Model<DefaultSession, DefaultSession> implements Defa
   declare username: string
 }
 
-export const setupIdentity = async (injector: Injector) => {
-  const logger = getLogger(injector).withScope('Identity')
+const dbOptions = getDefaultDbSettings('identity.sqlite')
 
-  const options = getDefaultDbSettings('identity.sqlite', logger)
+export const UserStore = defineSequelizeStore<PiRatUser, UserModel, 'username'>({
+  name: 'pi-rat/UserStore',
+  model: PiRatUser,
+  sequelizeModel: UserModel,
+  primaryKey: 'username',
+  options: dbOptions,
+  initModel: async (sequelize) => {
+    UserModel.init(
+      {
+        username: {
+          type: DataTypes.STRING,
+          primaryKey: true,
+        },
+        roles: {
+          type: DataTypes.JSON,
+          defaultValue: [],
+        },
+        createdAt: { type: DataTypes.DATE },
+        updatedAt: { type: DataTypes.DATE },
+      },
+      { sequelize },
+    )
+  },
+})
 
-  useSequelize({
-    injector,
-    model: User,
-    sequelizeModel: UserModel,
-    primaryKey: 'username',
+export const PasswordCredentialStore = defineSequelizeStore<PasswordCredential, PasswordCredentialModel, 'userName'>({
+  name: 'pi-rat/PasswordCredentialStore',
+  model: PasswordCredential,
+  sequelizeModel: PasswordCredentialModel,
+  primaryKey: 'userName',
+  options: dbOptions,
+  initModel: async (sequelize) => {
+    PasswordCredentialModel.init(
+      {
+        userName: { type: DataTypes.STRING, primaryKey: true },
+        passwordHash: { type: DataTypes.STRING },
+        salt: { type: DataTypes.STRING },
+        creationDate: { type: DataTypes.STRING },
+      },
+      { sequelize },
+    )
+  },
+})
 
-    options,
-    initModel: async (sequelize) => {
-      UserModel.init(
-        {
-          username: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-          },
-          roles: {
-            type: DataTypes.JSON,
-            defaultValue: [],
-          },
-          createdAt: {
-            type: DataTypes.DATE,
-          },
-          updatedAt: {
-            type: DataTypes.DATE,
-          },
-        },
-        {
-          sequelize,
-        },
-      )
-    },
-  })
+export const PasswordResetTokenStore = defineSequelizeStore<PasswordResetToken, PasswordResetTokenModel, 'token'>({
+  name: 'pi-rat/PasswordResetTokenStore',
+  model: PasswordResetToken,
+  sequelizeModel: PasswordResetTokenModel,
+  primaryKey: 'token',
+  options: dbOptions,
+  initModel: async (sequelize) => {
+    PasswordResetTokenModel.init(
+      {
+        token: { type: DataTypes.STRING, primaryKey: true },
+        userName: { type: DataTypes.STRING },
+        createdAt: { type: DataTypes.STRING },
+      },
+      { sequelize },
+    )
+  },
+})
 
-  useSequelize({
-    injector,
-    model: PasswordCredential,
-    sequelizeModel: PasswordCredentialModel,
-    primaryKey: 'userName',
-    options,
-    initModel: async (sequelize) => {
-      PasswordCredentialModel.init(
-        {
-          userName: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-          },
-          passwordHash: {
-            type: DataTypes.STRING,
-          },
-          salt: {
-            type: DataTypes.STRING,
-          },
-          creationDate: {
-            type: DataTypes.STRING,
-          },
-        },
-        {
-          sequelize,
-        },
-      )
-    },
-  })
+export const SessionStore = defineSequelizeStore<DefaultSession, SessionModel, 'sessionId'>({
+  name: 'pi-rat/SessionStore',
+  model: DefaultSession,
+  sequelizeModel: SessionModel,
+  primaryKey: 'sessionId',
+  options: dbOptions,
+  initModel: async (sequelize) => {
+    SessionModel.init(
+      {
+        sessionId: { type: DataTypes.STRING, primaryKey: true },
+        username: { type: DataTypes.STRING },
+      },
+      { sequelize },
+    )
+  },
+})
 
-  useSequelize({
-    injector,
-    model: PasswordResetToken,
-    sequelizeModel: PasswordResetTokenModel,
-    primaryKey: 'token',
-    options,
-    initModel: async (sequelize) => {
-      PasswordResetTokenModel.init(
-        {
-          token: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-          },
-          userName: {
-            type: DataTypes.STRING,
-          },
-          createdAt: {
-            type: DataTypes.STRING,
-          },
-        },
-        {
-          sequelize,
-        },
-      )
-    },
-  })
-
-  useSequelize({
-    injector,
-    model: DefaultSession,
-    sequelizeModel: SessionModel,
-    primaryKey: 'sessionId',
-    options,
-    initModel: async (sequelize) => {
-      SessionModel.init(
-        {
-          sessionId: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-          },
-          username: {
-            type: DataTypes.STRING,
-          },
-        },
-        {
-          sequelize,
-        },
-      )
-    },
-  })
-
-  const repo = getRepository(injector)
-
-  repo.createDataSet(User, 'username', {
+export const UserDataSet: DataSetToken<PiRatUser, 'username'> = defineDataSet({
+  name: 'pi-rat/UserDataSet',
+  store: UserStore,
+  settings: {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeRemove: withRole('admin'),
-    authorizeRemoveEntity: async (args) => {
-      const currentUser = await getCurrentUser(args.injector)
-      if (currentUser?.username === args.entity.username) {
+    authorizeRemoveEntity: async ({ injector, entity }) => {
+      const currentUser = await getCurrentUser(injector)
+      if (currentUser?.username === entity.username) {
         return { isAllowed: false, message: 'Cannot remove your own account' }
       }
       return { isAllowed: true }
     },
     authorizeUpdate: withRole('admin'),
-  })
+  },
+})
 
-  repo.createDataSet(PasswordCredential, 'userName', {
+export const PasswordCredentialDataSet: DataSetToken<PasswordCredential, 'userName'> = defineDataSet({
+  name: 'pi-rat/PasswordCredentialDataSet',
+  store: PasswordCredentialStore,
+  settings: {
     authorizeAdd: withRole('admin'),
     authorizeGet: withRole('admin'),
     authorizeUpdate: withRole('admin'),
     authorizeRemove: withRole('admin'),
-  })
+  },
+})
 
-  repo.createDataSet(PasswordResetToken, 'token')
+export const PasswordResetTokenDataSet: DataSetToken<PasswordResetToken, 'token'> = defineDataSet({
+  name: 'pi-rat/PasswordResetTokenDataSet',
+  store: PasswordResetTokenStore,
+})
 
-  repo.createDataSet(DefaultSession, 'sessionId')
+export const SessionDataSet: DataSetToken<DefaultSession, 'sessionId'> = defineDataSet({
+  name: 'pi-rat/SessionDataSet',
+  store: SessionStore,
+})
+
+export const setupIdentity = async (injector: Injector): Promise<void> => {
+  injector.bind(
+    FrameworkUserStore,
+    ({ inject }) => inject(UserStore) as PhysicalStore<{ username: string; roles: string[] }, 'username'>,
+  )
+  injector.bind(FrameworkSessionStore, ({ inject }) => inject(SessionStore))
+  injector.bind(FrameworkPasswordCredentialStore, ({ inject }) => inject(PasswordCredentialStore))
+  injector.bind(FrameworkPasswordResetTokenStore, ({ inject }) => inject(PasswordResetTokenStore))
 
   usePasswordPolicy(injector)
-
   useHttpAuthentication(injector, {
     enableBasicAuth: false,
-    getUserDataSet: (i) => getDataSetFor(i, User, 'username'),
+    userDataSet: UserDataSet as unknown as DataSetToken<{ username: string; roles: string[] }, 'username'>,
   })
 
-  await UserModel.sequelize?.sync()
+  // Force sequelize sync via store resolution
+  const { SequelizeStore } = await import('@furystack/sequelize-store')
+  // eslint-disable-next-line furystack/no-direct-store-token -- Need the SequelizeStore handle to trigger sequelize.sync() at bootstrap
+  const userStore = injector.get(UserStore)
+  if (userStore instanceof SequelizeStore) {
+    const model = await userStore.getModel()
+    await model.sequelize?.sync()
+  }
 }

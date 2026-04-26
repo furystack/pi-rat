@@ -9,10 +9,10 @@ import {
   useRestService,
 } from '@furystack/rest-service'
 import type { DashboardsApi } from 'common'
-import { Dashboard } from 'common'
 import dashboardsApiSchema from 'common/schemas/dashboards-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
+import { DashboardDataSet } from './setup-dashboards.js'
 
 export const setupDashboardsRestApi = async (injector: Injector) => {
   await useRestService<DashboardsApi>({
@@ -23,40 +23,25 @@ export const setupDashboardsRestApi = async (injector: Injector) => {
     api: {
       GET: {
         '/dashboards': Validate({ schema: dashboardsApiSchema, schemaName: 'GetCollectionEndpoint<Dashboard>' })(
-          createGetCollectionEndpoint({
-            model: Dashboard,
-            primaryKey: 'id',
-          }),
+          createGetCollectionEndpoint(DashboardDataSet),
         ),
         '/dashboards/:id': Validate({ schema: dashboardsApiSchema, schemaName: 'GetEntityEndpoint<Dashboard,"id">' })(
-          createGetEntityEndpoint({
-            model: Dashboard,
-            primaryKey: 'id',
-          }),
+          createGetEntityEndpoint(DashboardDataSet),
         ),
       },
       POST: {
         '/dashboards': Validate({ schema: dashboardsApiSchema, schemaName: 'PostDashboardEndpoint' })(
-          createPostEndpoint({
-            model: Dashboard,
-            primaryKey: 'id',
-          }),
+          createPostEndpoint(DashboardDataSet),
         ),
       },
       PATCH: {
         '/dashboards/:id': Validate({ schema: dashboardsApiSchema, schemaName: 'PatchDashboardEndpoint' })(
-          createPatchEndpoint({
-            model: Dashboard,
-            primaryKey: 'id',
-          }),
+          createPatchEndpoint(DashboardDataSet),
         ),
       },
       DELETE: {
         '/dashboards/:id': Validate({ schema: dashboardsApiSchema, schemaName: 'DeleteEndpoint<Dashboard,"id">' })(
-          createDeleteEndpoint({
-            model: Dashboard,
-            primaryKey: 'id',
-          }),
+          createDeleteEndpoint(DashboardDataSet),
         ),
       },
     },

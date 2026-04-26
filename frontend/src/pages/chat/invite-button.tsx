@@ -35,8 +35,8 @@ export const InviteButton = Shade<{ chat: Chat }>({
   render: ({ useState, props, injector }) => {
     const [isModalOpen, setIsModalOpen] = useState('isModalOpen', false)
 
-    const invitationService = injector.getInstance(ChatInvitationService)
-    const noty = injector.getInstance(NotyService)
+    const invitationService = injector.get(ChatInvitationService)
+    const noty = injector.get(NotyService)
 
     return (
       <>

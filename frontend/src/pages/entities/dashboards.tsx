@@ -9,7 +9,7 @@ import { DashboardService } from '../../services/dashboards-service.js'
 export const DashboardsPage = Shade({
   customElementName: 'shade-app-dashboards-page',
   render: ({ useDisposable, injector }) => {
-    const dashboardsService = injector.getInstance(DashboardService)
+    const dashboardsService = injector.get(DashboardService)
 
     const service = useDisposable(
       'service',

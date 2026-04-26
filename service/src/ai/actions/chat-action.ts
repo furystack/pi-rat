@@ -5,7 +5,7 @@ import { OllamaClientService } from '../ollama-client-service.js'
 export const ChatAction: RequestAction<ChatActionType> = async ({ injector, getBody }) => {
   const payload = await getBody()
 
-  const ollamaService = injector.getInstance(OllamaClientService)
+  const ollamaService = injector.get(OllamaClientService)
 
   const result = (await ollamaService.chat(payload)) as ChatResponse
 

@@ -15,13 +15,13 @@ describe('SessionService', () => {
     const injector = new Injector()
 
     // Mock IdentityApiClient
-    injector.setExplicitInstance({ call: mockCall } as unknown as IdentityApiClient, IdentityApiClient)
+    injector.bind(IdentityApiClient, () => ({ call: mockCall }) as never)
 
     // Mock NotyService
     const mockNotyService = {
       emit: vi.fn(),
     }
-    injector.setExplicitInstance(mockNotyService as unknown as NotyService, NotyService)
+    injector.bind(NotyService, () => mockNotyService as never)
 
     return { injector, mockNotyService }
   }
@@ -36,7 +36,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.init()
 
@@ -51,7 +51,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.init()
 
@@ -66,7 +66,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.init()
 
@@ -80,7 +80,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.init()
         await service.init()
@@ -99,7 +99,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.login('testuser', 'password123')
 
@@ -115,7 +115,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.login('testuser', 'wrongpassword')
 
@@ -132,7 +132,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.loginError.setValue('previous error')
 
         await service.login('testuser', 'password123')
@@ -151,7 +151,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.register('newuser', 'password123')
 
@@ -167,7 +167,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.register('existinguser', 'password123')
 
@@ -184,7 +184,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.loginError.setValue('previous error')
 
         await service.register('newuser', 'password123')
@@ -201,7 +201,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         service.currentUser.setValue({ username: 'testuser', roles: ['user'] })
 
@@ -219,7 +219,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         service.currentUser.setValue({ username: 'testuser', roles: ['user'] })
         service.state.setValue('authenticated')
@@ -240,7 +240,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.state.setValue('authenticated')
 
         const result = await service.isAuthenticated()
@@ -255,7 +255,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.state.setValue('unauthenticated')
 
         const result = await service.isAuthenticated()
@@ -272,7 +272,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.currentUser.setValue({ username: 'admin', roles: ['admin', 'user'] })
 
         const result = await service.isAuthorized('admin')
@@ -287,7 +287,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.currentUser.setValue({ username: 'user', roles: ['user'] })
 
         const result = await service.isAuthorized('admin')
@@ -302,7 +302,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.currentUser.setValue({ username: 'user', roles: [] })
 
         const result = await service.isAuthorized()
@@ -319,7 +319,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.currentUser.setValue({ username: 'testuser', roles: ['user'] })
 
         const result = await service.getCurrentUser()
@@ -334,7 +334,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
         service.currentUser.setValue(null)
 
         await expect(service.getCurrentUser()).rejects.toThrow('No user available')
@@ -351,7 +351,7 @@ describe('SessionService', () => {
       const { injector, mockNotyService } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         await service.resetPassword('oldPassword', 'newPassword')
 
@@ -376,7 +376,7 @@ describe('SessionService', () => {
       )
 
       const { injector } = createTestInjector(mockCall)
-      const service = injector.getInstance(SessionService)
+      const service = injector.get(SessionService)
 
       const setStateSpy = vi.spyOn(service.state, 'setValue')
       const setCurrentUserSpy = vi.spyOn(service.currentUser, 'setValue')
@@ -404,7 +404,7 @@ describe('SessionService', () => {
       )
 
       const { injector } = createTestInjector(mockCall)
-      const service = injector.getInstance(SessionService)
+      const service = injector.get(SessionService)
 
       const setStateSpy = vi.spyOn(service.state, 'setValue')
 
@@ -423,7 +423,7 @@ describe('SessionService', () => {
       const mockCall = vi.fn()
 
       const { injector } = createTestInjector(mockCall)
-      const service = injector.getInstance(SessionService)
+      const service = injector.get(SessionService)
 
       service[Symbol.dispose]()
 
@@ -448,7 +448,7 @@ describe('SessionService', () => {
       const { injector } = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(SessionService)
+        const service = i.get(SessionService)
 
         const initPromise = service.init()
 

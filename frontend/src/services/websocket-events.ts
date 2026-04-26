@@ -1,24 +1,26 @@
-import { Injectable, Injected } from '@furystack/inject'
-import { getLogger, type ScopedLogger } from '@furystack/logging'
+import { defineService, type Token } from '@furystack/inject'
+import { useScopedLogger, type ScopedLogger } from '@furystack/logging'
 import { EventHub } from '@furystack/utils'
 import type { WebsocketMessage } from 'common'
 import { environmentOptions } from '../utils/environment-options.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class WebsocketNotificationsService extends EventHub<{
+type WebsocketNotificationEvents = {
   onMessage: WebsocketMessage
   onInvalidMessage: [unknown]
-}> {
-  private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
+}
 
+class WebsocketNotificationsServiceImpl extends EventHub<WebsocketNotificationEvents> {
+  private readonly wsUrl = new URL(`${environmentOptions.serviceUrl}/ws`, window.location.href)
   public socket: WebSocket
+
+  constructor(private readonly logger: ScopedLogger) {
+    super()
+    this.socket = this.createSocket()
+  }
 
   public dispose() {
     this.socket.close()
   }
-
-  @Injected((i) => getLogger(i).withScope('WebsocketNotificationsService'))
-  declare private logger: ScopedLogger
 
   private createSocket() {
     const socket = new WebSocket(this.wsUrl.toString().replace('http', 'ws'))
@@ -45,14 +47,23 @@ export class WebsocketNotificationsService extends EventHub<{
           message: 'WebSocket connection closed unexpectedly',
           data: { code: event.code, reason: event.reason },
         })
-        // this.createSocket() // Recreate the socket on unexpected closure
       }
     }
     return socket
   }
-
-  constructor() {
-    super()
-    this.socket = this.createSocket()
-  }
 }
+
+export type WebsocketNotificationsService = WebsocketNotificationsServiceImpl
+
+export const WebsocketNotificationsService: Token<WebsocketNotificationsService, 'singleton'> = defineService({
+  name: 'pi-rat/WebsocketNotificationsService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const logger = useScopedLogger(ctx)
+    const impl = new WebsocketNotificationsServiceImpl(logger)
+    ctx.onDispose(() => impl.dispose())
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    ctx.onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

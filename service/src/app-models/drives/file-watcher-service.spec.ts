@@ -2,6 +2,7 @@ import { Injector } from '@furystack/inject'
 import { usingAsync } from '@furystack/utils'
 import { describe, expect, it, vi } from 'vitest'
 import { FileWatcherService } from './file-watcher-service.js'
+import { WebsocketService } from '../../websocket-service.js'
 
 const mockLogger = {
   verbose: vi.fn().mockResolvedValue(undefined),
@@ -14,6 +15,7 @@ vi.mock('@furystack/logging', () => ({
   getLogger: () => ({
     withScope: () => mockLogger,
   }),
+  useScopedLogger: () => mockLogger,
 }))
 
 vi.mock('chokidar', () => ({
@@ -23,16 +25,11 @@ vi.mock('chokidar', () => ({
   }),
 }))
 
-vi.mock('../../websocket-service.js', () => ({
-  WebsocketService: class {
-    announce = vi.fn()
-  },
-}))
-
 const mockSubscribe = vi.fn().mockReturnValue({ [Symbol.dispose]: vi.fn() })
 const mockFind = vi.fn().mockResolvedValue([])
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     subscribe: mockSubscribe,
     find: mockFind,
@@ -44,10 +41,15 @@ vi.mock('@furystack/core', () => ({
   useSystemIdentityContext: ({ injector }: { injector: unknown }) => injector,
 }))
 
+const buildService = (injector: Injector) => {
+  injector.bind(WebsocketService, async () => ({ announce: vi.fn() }))
+  return injector.get(FileWatcherService)
+}
+
 describe('FileWatcherService', () => {
   it('should log a warning instead of throwing when removing a non-existent watcher', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const service = injector.getInstance(FileWatcherService)
+      const service = buildService(injector)
 
       await (service as unknown as { removeWatcher: (letter: string) => Promise<void> }).removeWatcher('Z')
 
@@ -61,7 +63,7 @@ describe('FileWatcherService', () => {
 
   it('should close and remove an existing watcher', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const service = injector.getInstance(FileWatcherService)
+      const service = buildService(injector)
 
       const { addWatcher } = service as unknown as {
         addWatcher: (drive: { letter: string; physicalPath: string }) => Promise<void>
@@ -81,7 +83,7 @@ describe('FileWatcherService', () => {
 
   it('should throw when adding a watcher for an already-watched drive', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const service = injector.getInstance(FileWatcherService)
+      const service = buildService(injector)
 
       const { addWatcher } = service as unknown as {
         addWatcher: (drive: { letter: string; physicalPath: string }) => Promise<void>

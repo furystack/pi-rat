@@ -9,11 +9,12 @@ import { IdentityApiClient } from './api-clients/identity-api-client.js'
 describe('UsersService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as IdentityApiClient,
+    injector.bind(
       IdentityApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -25,7 +26,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const result = await service.getUser('testuser@example.com')
 
@@ -45,7 +46,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await service.getUser('testuser@example.com')
         await service.getUser('testuser@example.com')
@@ -59,7 +60,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await expect(service.getUser('nonexistent@example.com')).rejects.toThrow('User not found')
       })
@@ -70,7 +71,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await expect(service.getUser('testuser@example.com')).rejects.toThrow('Internal server error')
       })
@@ -84,7 +85,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const observable = service.getUserAsObservable('testuser@example.com')
 
@@ -99,7 +100,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const observable1 = service.getUserAsObservable('testuser@example.com')
         const observable2 = service.getUserAsObservable('testuser@example.com')
@@ -119,7 +120,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const findOptions = { top: 10 }
         const result = await service.findUsers(findOptions)
@@ -144,7 +145,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const findOptions = { top: 10 }
         await service.findUsers(findOptions)
@@ -165,7 +166,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await service.findUsers({ top: 10 })
 
@@ -187,7 +188,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const observable = service.findUsersAsObservable({ top: 10 })
 
@@ -205,7 +206,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const findOptions = { top: 10 }
         const observable1 = service.findUsersAsObservable(findOptions)
@@ -227,7 +228,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         const body = {
           username: 'testuser@example.com',
@@ -263,7 +264,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await service.getUser('testuser@example.com')
 
@@ -309,7 +310,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await service.findUsers({ top: 10 })
 
@@ -336,7 +337,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await expect(
           service.updateUser('testuser@example.com', {
@@ -352,7 +353,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await expect(
           service.updateUser('testuser@example.com', {
@@ -370,7 +371,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await service.deleteUser('testuser@example.com')
 
@@ -392,7 +393,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await service.getUser('testuser@example.com')
 
@@ -421,7 +422,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await service.findUsers({ top: 10 })
 
@@ -438,7 +439,7 @@ describe('UsersService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(UsersService)
+        const service = i.get(UsersService)
 
         await expect(service.deleteUser('nonexistent@example.com')).rejects.toThrow('User not found')
       })

@@ -1,9 +1,7 @@
-import { getCurrentUser, getStoreManager } from '@furystack/core'
-import { useEntitySync } from '@furystack/entity-sync-service'
+import { getCurrentUser } from '@furystack/core'
 import type { Injector } from '@furystack/inject'
-import { getLogger } from '@furystack/logging'
-import { Repository } from '@furystack/repository'
-import { SequelizeStore, useSequelize } from '@furystack/sequelize-store'
+import { defineDataSet, type DataSetToken } from '@furystack/repository'
+import { defineSequelizeStore, SequelizeStore } from '@furystack/sequelize-store'
 import { AiChat, AiChatMessage } from 'common'
 import { DATE, Model, STRING } from 'sequelize'
 import { getDefaultDbSettings } from '../get-default-db-options.js'
@@ -31,187 +29,126 @@ class AiChatMessageModel extends Model<AiChatMessage, AiChatMessage> implements 
   declare owner: string
 }
 
+const dbOptions = getDefaultDbSettings('ai.sqlite')
+
+export const AiChatStore = defineSequelizeStore<AiChat, AiChatModel, 'id'>({
+  name: 'pi-rat/AiChatStore',
+  model: AiChat,
+  sequelizeModel: AiChatModel,
+  primaryKey: 'id',
+  options: dbOptions,
+  initModel: async (sequelize) => {
+    AiChatModel.init(
+      {
+        id: { type: STRING, primaryKey: true, allowNull: false },
+        name: { type: STRING, allowNull: false },
+        description: { type: STRING, allowNull: true },
+        createdAt: { type: DATE, allowNull: false, defaultValue: new Date() },
+        model: { type: STRING, allowNull: false },
+        owner: { type: STRING, allowNull: false },
+        status: { type: STRING, allowNull: false, defaultValue: 'active' },
+        visibility: { type: STRING, allowNull: false, defaultValue: 'private' },
+      },
+      {
+        indexes: [{ fields: ['owner'], name: 'idx_ai_chat_owner' }],
+        sequelize,
+      },
+    )
+  },
+})
+
+export const AiChatMessageStore = defineSequelizeStore<AiChatMessage, AiChatMessageModel, 'id'>({
+  name: 'pi-rat/AiChatMessageStore',
+  model: AiChatMessage,
+  sequelizeModel: AiChatMessageModel,
+  primaryKey: 'id',
+  options: dbOptions,
+  initModel: async (sequelize) => {
+    AiChatMessageModel.init(
+      {
+        id: { type: STRING, primaryKey: true, allowNull: false },
+        aiChatId: { type: STRING, allowNull: false },
+        content: { type: STRING, allowNull: false },
+        role: { type: STRING, allowNull: false },
+        createdAt: { type: DATE, allowNull: false, defaultValue: new Date() },
+        visibility: { type: STRING, allowNull: false, defaultValue: 'private' },
+        owner: { type: STRING, allowNull: false },
+      },
+      {
+        indexes: [
+          { fields: ['aiChatId'], name: 'idx_ai_chat_message_ai_chat_id' },
+          { fields: ['owner'], name: 'idx_ai_chat_message_owner' },
+          { fields: ['visibility', 'owner'], name: 'idx_ai_chat_message_visibility' },
+        ],
+        sequelize,
+      },
+    )
+  },
+})
+
+export const AiChatDataSet: DataSetToken<AiChat, 'id'> = defineDataSet({
+  name: 'pi-rat/AiChatDataSet',
+  store: AiChatStore,
+  settings: {
+    modifyOnAdd: async ({ injector: i, entity }) => {
+      const currentUser = await getCurrentUser(i)
+      entity.owner = currentUser.username
+      entity.createdAt = new Date()
+      return entity
+    },
+    addFilter: async ({ injector: i, filter }) => {
+      const currentUser = await getCurrentUser(i)
+      return {
+        ...filter,
+        filter: {
+          ...filter.filter,
+          $or: [{ owner: { $eq: currentUser.username } }, { visibility: { $eq: 'public' as const } }],
+        },
+      }
+    },
+  },
+})
+
+export const AiChatMessageDataSet: DataSetToken<AiChatMessage, 'id'> = defineDataSet({
+  name: 'pi-rat/AiChatMessageDataSet',
+  store: AiChatMessageStore,
+  settings: {
+    modifyOnAdd: async ({ injector: i, entity }) => {
+      const currentUser = await getCurrentUser(i)
+      entity.owner = currentUser.username
+      entity.createdAt = new Date()
+      return entity
+    },
+    addFilter: async ({ injector: i, filter }) => {
+      const currentUser = await getCurrentUser(i)
+      return {
+        ...filter,
+        filter: {
+          ...filter.filter,
+          $or: [{ owner: { $eq: currentUser.username } }, { visibility: { $eq: 'public' as const } }],
+        },
+      }
+    },
+  },
+})
+
 export const setupAiStore = async (injector: Injector) => {
-  const logger = getLogger(injector).withScope('AI Store Setup')
-
-  const dbOptions = getDefaultDbSettings('ai.sqlite', logger)
-
-  useSequelize({
-    injector,
-    model: AiChat,
-    sequelizeModel: AiChatModel,
-    primaryKey: 'id',
-    options: dbOptions,
-    initModel: async (sequelize) => {
-      AiChatModel.init(
-        {
-          id: {
-            type: STRING,
-            primaryKey: true,
-            allowNull: false,
-          },
-          name: {
-            type: STRING,
-            allowNull: false,
-          },
-          description: {
-            type: STRING,
-            allowNull: true,
-          },
-          createdAt: {
-            type: DATE,
-            allowNull: false,
-            defaultValue: new Date(),
-          },
-          model: {
-            type: STRING,
-            allowNull: false,
-          },
-          owner: {
-            type: STRING,
-            allowNull: false,
-          },
-          status: {
-            type: STRING,
-            allowNull: false,
-            defaultValue: 'active',
-          },
-          visibility: {
-            type: STRING,
-            allowNull: false,
-            defaultValue: 'private',
-          },
-        },
-        {
-          indexes: [
-            {
-              fields: ['owner'],
-              name: 'idx_ai_chat_owner',
-            },
-          ],
-          sequelize,
-        },
-      )
-    },
-  })
-
-  useSequelize({
-    injector,
-    model: AiChatMessage,
-    sequelizeModel: AiChatMessageModel,
-    primaryKey: 'id',
-    options: dbOptions,
-    initModel: async (sequelize) => {
-      AiChatMessageModel.init(
-        {
-          id: {
-            type: STRING,
-            primaryKey: true,
-            allowNull: false,
-          },
-          aiChatId: {
-            type: STRING,
-            allowNull: false,
-          },
-          content: {
-            type: STRING,
-            allowNull: false,
-          },
-          role: {
-            type: STRING,
-            allowNull: false,
-          },
-          createdAt: {
-            type: DATE,
-            allowNull: false,
-            defaultValue: new Date(),
-          },
-          visibility: {
-            type: STRING,
-            allowNull: false,
-            defaultValue: 'private',
-          },
-          owner: {
-            type: STRING,
-            allowNull: false,
-          },
-        },
-        {
-          indexes: [
-            {
-              fields: ['aiChatId'],
-              name: 'idx_ai_chat_message_ai_chat_id',
-            },
-            {
-              fields: ['owner'],
-              name: 'idx_ai_chat_message_owner',
-            },
-            {
-              fields: ['visibility', 'owner'],
-              name: 'idx_ai_chat_message_visibility',
-            },
-          ],
-          sequelize,
-        },
-      )
-
-      // eslint-disable-next-line furystack/no-direct-physical-store -- Physical store access needed to initialize Sequelize model for foreign key associations
-      const aiChatStore = getStoreManager(injector).getStoreFor(AiChat, 'id')
-      if (aiChatStore instanceof SequelizeStore) {
-        await aiChatStore.getModel()
-      }
-
-      AiChatMessageModel.belongsTo(AiChatModel, {
-        foreignKey: 'aiChatId',
-        as: 'aiChat',
-        onDelete: 'CASCADE',
-      })
-    },
-  })
-
-  const repository = injector.getInstance(Repository)
-
-  repository.createDataSet(AiChat, 'id', {
-    modifyOnAdd: async ({ injector: i, entity }) => {
-      const currentUser = await getCurrentUser(i)
-      entity.owner = currentUser.username
-      entity.createdAt = new Date()
-      return entity
-    },
-    addFilter: async ({ injector: i, filter }) => {
-      const currentUser = await getCurrentUser(i)
-
-      return {
-        ...filter,
-        filter: {
-          ...filter.filter,
-          $or: [{ owner: { $eq: currentUser.username } }, { visibility: { $eq: 'public' as const } }],
-        },
-      }
-    },
-  })
-
-  useEntitySync(injector, {
-    models: [{ model: AiChatMessage, primaryKey: 'id' }],
-  })
-
-  repository.createDataSet(AiChatMessage, 'id', {
-    modifyOnAdd: async ({ injector: i, entity }) => {
-      const currentUser = await getCurrentUser(i)
-      entity.owner = currentUser.username
-      entity.createdAt = new Date()
-      return entity
-    },
-    addFilter: async ({ injector: i, filter }) => {
-      const currentUser = await getCurrentUser(i)
-
-      return {
-        ...filter,
-        filter: {
-          ...filter.filter,
-          $or: [{ owner: { $eq: currentUser.username } }, { visibility: { $eq: 'public' as const } }],
-        },
-      }
-    },
-  })
+  // Initialize AiChat first so AiChatMessage's FK can reference it.
+  // eslint-disable-next-line furystack/no-direct-store-token -- Need the SequelizeStore handle to wire FK relations between sequelize models
+  const chatStore = injector.get(AiChatStore)
+  if (chatStore instanceof SequelizeStore) {
+    await chatStore.getModel()
+  }
+  // eslint-disable-next-line furystack/no-direct-store-token -- Need the SequelizeStore handle to wire FK relations between sequelize models
+  const messageStore = injector.get(AiChatMessageStore)
+  if (messageStore instanceof SequelizeStore) {
+    const messageModel = await messageStore.getModel()
+    messageModel.belongsTo(AiChatModel, {
+      foreignKey: 'aiChatId',
+      as: 'aiChat',
+      onDelete: 'CASCADE',
+    })
+  }
+  injector.get(AiChatDataSet)
+  injector.get(AiChatMessageDataSet)
 }

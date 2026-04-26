@@ -1,4 +1,4 @@
-import { useCollectionSync } from '@furystack/entity-sync-client'
+import { useCollectionSync } from '../../services/entity-sync.js'
 import { createComponent, Shade } from '@furystack/shades'
 import { Button, Paper, Skeleton, Typography } from '@furystack/shades-common-components'
 import { Chat } from 'common'

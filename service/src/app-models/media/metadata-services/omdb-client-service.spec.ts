@@ -1,32 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { OmdbClientService } from './omdb-client-service.js'
-
-vi.mock('@furystack/core', () => ({
-  useSystemIdentityContext: () => ({}),
-}))
-
-vi.mock('@furystack/logging', () => ({
-  getLogger: () => ({
-    withScope: () => ({
-      verbose: vi.fn().mockResolvedValue(undefined),
-      information: vi.fn().mockResolvedValue(undefined),
-      warning: vi.fn().mockResolvedValue(undefined),
-      error: vi.fn().mockResolvedValue(undefined),
-    }),
-  }),
-}))
-
-vi.mock('@furystack/inject', () => ({
-  Injectable: () => (target: unknown) => target,
-  Injected: () => () => undefined,
-}))
-
-vi.mock('@furystack/repository', () => ({
-  getDataSetFor: () => ({
-    get: vi.fn(),
-    subscribe: vi.fn(),
-  }),
-}))
+import { createOmdbClientService, type OmdbClientService } from './omdb-client-service.js'
 
 const createMockResponse = (body: Record<string, unknown>, ok = true) =>
   ({
@@ -41,27 +14,20 @@ describe('OmdbClientService', () => {
   const originalFetch = globalThis.fetch
 
   beforeEach(() => {
-    service = new OmdbClientService()
-
-    Object.defineProperty(service, 'logger', {
-      value: {
-        verbose: vi.fn().mockResolvedValue(undefined),
-        information: vi.fn().mockResolvedValue(undefined),
-        warning: vi.fn().mockResolvedValue(undefined),
-        error: vi.fn().mockResolvedValue(undefined),
+    const noopLogger = {
+      verbose: vi.fn().mockResolvedValue(undefined),
+      information: vi.fn().mockResolvedValue(undefined),
+      warning: vi.fn().mockResolvedValue(undefined),
+      error: vi.fn().mockResolvedValue(undefined),
+    }
+    service = createOmdbClientService({
+      logger: noopLogger as never,
+      semaphore: {
+        execute: <T>(task: (options: { signal: AbortSignal }) => Promise<T>) =>
+          task({ signal: new AbortController().signal }),
       },
-      writable: true,
+      initialConfig: { id: 'OMDB_CONFIG', value: { apiKey: 'test-key' } } as never,
     })
-
-    Object.defineProperty(service, 'semaphore', {
-      value: { execute: <T>(fn: () => Promise<T>) => fn() },
-      writable: true,
-    })
-
-    service.config = {
-      id: 'OMDB_CONFIG',
-      value: { apiKey: 'test-key' },
-    } as never
   })
 
   afterEach(() => {

@@ -1,14 +1,13 @@
 import { getCurrentUser } from '@furystack/core'
 import { getDataSetFor } from '@furystack/repository'
-import type { RequestAction } from '@furystack/rest-service'
-import { JsonResult } from '@furystack/rest-service'
-import type { SaveWatchProgress } from 'common'
-import { WatchHistoryEntry } from 'common'
+import { JsonResult, type RequestAction } from '@furystack/rest-service'
+import type { SaveWatchProgress, WatchHistoryEntry } from 'common'
+import { WatchHistoryEntryDataSet } from '../media-data-sets.js'
 
 export const SaveWatchProgressAction: RequestAction<SaveWatchProgress> = async ({ injector, getBody }) => {
   const { completed, driveLetter, path, watchedSeconds } = await getBody()
 
-  const dataSet = getDataSetFor(injector, WatchHistoryEntry, 'id')
+  const dataSet = getDataSetFor(injector, WatchHistoryEntryDataSet)
 
   const [existing] = await dataSet.find(injector, {
     filter: {

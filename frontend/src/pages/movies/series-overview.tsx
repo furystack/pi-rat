@@ -16,12 +16,12 @@ export type SeriesListProps = {
 export const SeriesOverview = Shade<SeriesListProps>({
   customElementName: 'series-overview-page',
   render: ({ props, injector, useObservable }) => {
-    const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
-    const seriesService = injector.getInstance(SeriesService)
-    const moviesService = injector.getInstance(MoviesService)
-    const movieFileService = injector.getInstance(MovieFilesService)
-    const watchProgresses = injector.getInstance(WatchProgressService)
-    const localizedService = injector.getInstance(LocalizedMetadataService)
+    const [isDesktop] = useObservable('isDesktop', injector.get(ScreenService).screenSize.atLeast.md)
+    const seriesService = injector.get(SeriesService)
+    const moviesService = injector.get(MoviesService)
+    const movieFileService = injector.get(MovieFilesService)
+    const watchProgresses = injector.get(WatchProgressService)
+    const localizedService = injector.get(LocalizedMetadataService)
 
     return (
       <PiRatLazyLoad

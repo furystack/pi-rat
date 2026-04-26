@@ -108,7 +108,7 @@ export const Login = Shade({
     },
   },
   render: ({ injector, useObservable, useRef, useDisposable }) => {
-    const sessionService = injector.getInstance(SessionService)
+    const sessionService = injector.get(SessionService)
     const [isOperationInProgress] = useObservable('isOperationInProgress', sessionService.isOperationInProgress)
     const [loginError] = useObservable('loginError', sessionService.loginError)
     const cardRef = useRef<HTMLElement>('card')

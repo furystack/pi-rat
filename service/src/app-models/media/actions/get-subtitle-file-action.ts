@@ -1,10 +1,12 @@
+import { DriveDataSet } from '../../drives/setup-drives.js'
+import { MovieFileDataSet } from '../media-data-sets.js'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { BypassResult } from '@furystack/rest-service'
 import type { MediaApi } from 'common'
-import { Drive, MovieFile, getFileName, getParentPath } from 'common'
+import { getFileName, getParentPath } from 'common'
 import { createReadStream } from 'fs'
 import { stat } from 'fs/promises'
 import { resolve, relative } from 'path'
@@ -19,7 +21,7 @@ export const GetSubtitleFileAction: RequestAction<GetSubtitleFileEndpoint> = asy
   const logger = getLogger(injector).withScope('GetSubtitleFileAction')
   const { movieId, subtitleName } = getUrlParams()
 
-  const movieFiles = await getDataSetFor(injector, MovieFile, 'id').find(injector, {
+  const movieFiles = await getDataSetFor(injector, MovieFileDataSet).find(injector, {
     filter: { imdbId: { $eq: movieId } },
   })
 
@@ -28,7 +30,7 @@ export const GetSubtitleFileAction: RequestAction<GetSubtitleFileEndpoint> = asy
   }
 
   for (const movieFile of movieFiles) {
-    const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, movieFile.driveLetter)
+    const drive = await getDataSetFor(injector, DriveDataSet).get(injector, movieFile.driveLetter)
     if (!drive) continue
 
     const parentPath = getParentPath({ driveLetter: movieFile.driveLetter, path: movieFile.path })

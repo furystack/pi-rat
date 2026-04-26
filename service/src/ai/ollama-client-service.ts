@@ -1,12 +1,14 @@
 import { getCurrentUser, useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import { getLogger, type ScopedLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
-import { AiChatMessage, Config, type AiChat, type OllamaConfig } from 'common'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
+import { type AiChat, type AiChatMessage, type OllamaConfig } from 'common'
 import type { Message } from 'ollama'
 import { Ollama, type ChatRequest } from 'ollama'
 
-import { type ConfigWatcher, createConfigWatcher } from '../utils/config-watcher.js'
+import { createConfigWatcher } from '../utils/config-watcher.js'
+import { ConfigDataSet } from '../app-models/config/setup-config-store.js'
+import { AiChatMessageDataSet } from './setup-ai-store.js'
 import { isToolingSupported, OllamaTools } from './tools/ollama-tools.js'
 
 const jsonFormat = {
@@ -36,209 +38,195 @@ const jsonFormat = {
   required: ['content', 'thinking', 'references'],
 }
 
-@Injectable({ lifetime: 'singleton' })
-export class OllamaClientService {
+export interface OllamaClientService {
   config?: OllamaConfig
-
-  @Injected((injector) => getLogger(injector).withScope('Ollama Client Service'))
-  declare private logger: ScopedLogger
-
-  @Injected((injector) => getDataSetFor(injector, AiChatMessage, 'id'))
-  declare private chatMessageDataSet: DataSet<AiChatMessage, 'id'>
-
-  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
-  declare private configDataSet: DataSet<Config, 'id'>
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'ollama-service' }))
-  declare private systemInjector: Injector
-
-  declare ollama: Ollama | undefined
-
-  private configWatcher?: ConfigWatcher
-
-  public init() {
-    void this.initAsync().catch((error) => {
-      void this.logger.error({ message: 'Failed to initialize Ollama Client Service', data: { error } })
-    })
-  }
-
-  private async initAsync() {
-    this.configWatcher?.dispose()
-    this.configWatcher = createConfigWatcher<OllamaConfig>({
-      configDataSet: this.configDataSet,
-      systemInjector: this.systemInjector,
-      logger: this.logger,
-      configId: 'OLLAMA_CONFIG',
-      serviceName: 'Ollama Service',
-      onChange: (config) => {
-        this.config = config
-        this.ollama = config ? new Ollama({ host: config.value.host }) : undefined
-      },
-    })
-    await this.configWatcher.init()
-  }
-
-  public getSupportedModels = async () => {
-    if (!this.ollama) {
-      throw new Error('Ollama client is not initialized')
-    }
-
-    try {
-      const models = await this.ollama.list()
-      return models
-    } catch (error) {
-      await this.logger.error({
-        message: '❌  Failed to fetch supported models',
-        data: { error },
-      })
-      throw error
-    }
-  }
-
-  public chat = async (
-    request: ChatRequest & {
-      stream?: false
-    },
-  ) => {
-    if (!this.ollama) {
-      throw new Error('Ollama client is not initialized')
-    }
-
-    try {
-      return await this.ollama.chat(request)
-    } catch (error) {
-      await this.logger.error({
-        message: '❌  Failed to chat with Ollama',
-        data: { error },
-      })
-      throw error
-    }
-  }
-
-  public async handleChatMessageReceived(
+  ollama?: Ollama
+  getSupportedModels(): Promise<Awaited<ReturnType<Ollama['list']>>>
+  chat(request: ChatRequest & { stream?: false }): Promise<Awaited<ReturnType<Ollama['chat']>>>
+  handleChatMessageReceived(
     injector: Injector,
     chatMessage: AiChatMessage,
     chat: AiChat,
     history: AiChatMessage[],
-  ) {
-    // Ollama client is not initialized, do nothing
-    if (!this.ollama) {
-      return
-    }
-
-    // Check if the chat message is from the user
-    if (chatMessage.role !== 'user') {
-      return
-    }
-
-    const response = chatMessage.content?.trim()
-    if (!response) {
-      return
-    }
-
-    const { models } = await this.ollama.list()
-    const currentModel = models.find((model) => model.name === chat.model)
-
-    if (!currentModel) {
-      await this.logger.error({
-        message: '❌  Model not found',
-        data: { model: chat.model, chatMessage, chat, history },
-      })
-      throw new Error(`Model ${chat.model} not found`)
-    }
-
-    const currentUser = await getCurrentUser(injector)
-
-    const enableTooling = isToolingSupported(currentModel)
-
-    const historyInOrder = [
-      ...history
-        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-        .filter((msg) => msg.id !== chatMessage.id),
-      chatMessage,
-    ]
-
-    const systemMessages: Message[] = [
-      {
-        role: 'system',
-        content: `You are currently using the ${chat.model} model.`,
-      },
-      {
-        role: 'system',
-        content: enableTooling
-          ? `You can use tools to enhance your responses.`
-          : `You cannot use tools with this model.`,
-      },
-      {
-        role: 'system',
-        content: `This is the current user context in JSON format: \`${JSON.stringify(currentUser)}\`. This information is not confidential as the user already should know it`,
-      },
-    ]
-
-    try {
-      const messages = [
-        ...systemMessages,
-        ...historyInOrder.map((msg) => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-      ]
-
-      const result = await this.chat({
-        model: chat.model,
-        messages: [...messages, ...(enableTooling ? [] : [{ role: 'system', content: 'Answer in JSON format' }])],
-        tools: enableTooling ? OllamaTools.map((tool) => tool.toolDefinition) : [],
-        stream: false,
-        format: enableTooling ? undefined : jsonFormat,
-      })
-
-      const toolResponses = await Promise.all(
-        OllamaTools.map(async (tool) => {
-          if (tool.shouldExecute(result)) {
-            return tool.execute(injector, result)
-          }
-          return null
-        }),
-      )
-
-      const validToolResponses = toolResponses.filter((r) => r !== null)
-
-      const resultWithToolResponses =
-        validToolResponses.length > 0
-          ? await this.ollama.chat({
-              model: chat.model,
-              messages: [
-                ...historyInOrder.map((msg) => ({ role: msg.role, content: msg.content })),
-                {
-                  role: 'system',
-                  content: 'Answer in JSON format',
-                },
-                ...validToolResponses.map((r) => ({
-                  role: 'tool',
-                  content: r,
-                })),
-              ],
-              tools: OllamaTools.map((tool) => tool.toolDefinition),
-              stream: false,
-              format: jsonFormat,
-            })
-          : result
-
-      await this.chatMessageDataSet.add(this.systemInjector, {
-        aiChatId: chat.id,
-        role: 'assistant',
-        content: resultWithToolResponses.message.content,
-        createdAt: new Date(),
-        owner: chat.owner,
-        visibility: chat.visibility,
-        id: crypto.randomUUID(),
-      })
-    } catch (error) {
-      await this.logger.error({
-        message: '❌  Failed to handle chat message',
-        data: { error, chatMessage, chat, history },
-      })
-      throw error
-    }
-  }
+  ): Promise<void>
 }
+
+export const OllamaClientService: Token<OllamaClientService, 'singleton'> = defineService({
+  name: 'pi-rat/OllamaClientService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'ollama-service' })
+
+    const service: OllamaClientService = {
+      config: undefined,
+      ollama: undefined,
+      getSupportedModels: async () => {
+        if (!service.ollama) {
+          throw new Error('Ollama client is not initialized')
+        }
+        try {
+          return await service.ollama.list()
+        } catch (error) {
+          await logger.error({
+            message: '❌  Failed to fetch supported models',
+            data: { error },
+          })
+          throw error
+        }
+      },
+      chat: async (request) => {
+        if (!service.ollama) {
+          throw new Error('Ollama client is not initialized')
+        }
+        try {
+          return await service.ollama.chat(request)
+        } catch (error) {
+          await logger.error({ message: '❌  Failed to chat with Ollama', data: { error } })
+          throw error
+        }
+      },
+      handleChatMessageReceived: async (handlerInjector, chatMessage, chat, history) => {
+        if (!service.ollama) {
+          return
+        }
+
+        if (chatMessage.role !== 'user') {
+          return
+        }
+
+        const response = chatMessage.content?.trim()
+        if (!response) {
+          return
+        }
+
+        const { models } = await service.ollama.list()
+        const currentModel = models.find((model) => model.name === chat.model)
+
+        if (!currentModel) {
+          await logger.error({
+            message: '❌  Model not found',
+            data: { model: chat.model, chatMessage, chat, history },
+          })
+          throw new Error(`Model ${chat.model} not found`)
+        }
+
+        const currentUser = await getCurrentUser(handlerInjector)
+
+        const enableTooling = isToolingSupported(currentModel)
+
+        const historyInOrder = [
+          ...history
+            .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+            .filter((msg) => msg.id !== chatMessage.id),
+          chatMessage,
+        ]
+
+        const systemMessages: Message[] = [
+          {
+            role: 'system',
+            content: `You are currently using the ${chat.model} model.`,
+          },
+          {
+            role: 'system',
+            content: enableTooling
+              ? `You can use tools to enhance your responses.`
+              : `You cannot use tools with this model.`,
+          },
+          {
+            role: 'system',
+            content: `This is the current user context in JSON format: \`${JSON.stringify(currentUser)}\`. This information is not confidential as the user already should know it`,
+          },
+        ]
+
+        try {
+          const messages = [
+            ...systemMessages,
+            ...historyInOrder.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+          ]
+
+          const result = await service.chat({
+            model: chat.model,
+            messages: [...messages, ...(enableTooling ? [] : [{ role: 'system', content: 'Answer in JSON format' }])],
+            tools: enableTooling ? OllamaTools.map((tool) => tool.toolDefinition) : [],
+            stream: false,
+            format: enableTooling ? undefined : jsonFormat,
+          })
+
+          const toolResponses = await Promise.all(
+            OllamaTools.map(async (tool) => {
+              if (tool.shouldExecute(result)) {
+                return tool.execute(handlerInjector, result)
+              }
+              return null
+            }),
+          )
+
+          const validToolResponses = toolResponses.filter((r) => r !== null)
+
+          const resultWithToolResponses =
+            validToolResponses.length > 0
+              ? await service.ollama.chat({
+                  model: chat.model,
+                  messages: [
+                    ...historyInOrder.map((msg) => ({ role: msg.role, content: msg.content })),
+                    {
+                      role: 'system',
+                      content: 'Answer in JSON format',
+                    },
+                    ...validToolResponses.map((r) => ({
+                      role: 'tool',
+                      content: r,
+                    })),
+                  ],
+                  tools: OllamaTools.map((tool) => tool.toolDefinition),
+                  stream: false,
+                  format: jsonFormat,
+                })
+              : result
+
+          await getDataSetFor(systemInjector, AiChatMessageDataSet).add(systemInjector, {
+            aiChatId: chat.id,
+            role: 'assistant',
+            content: resultWithToolResponses.message.content,
+            createdAt: new Date(),
+            owner: chat.owner,
+            visibility: chat.visibility,
+            id: crypto.randomUUID(),
+          })
+        } catch (error) {
+          await logger.error({
+            message: '❌  Failed to handle chat message',
+            data: { error, chatMessage, chat, history },
+          })
+          throw error
+        }
+      },
+    }
+
+    const configWatcher = createConfigWatcher<OllamaConfig>({
+      configDataSet: getDataSetFor(systemInjector, ConfigDataSet),
+      systemInjector,
+      logger,
+      configId: 'OLLAMA_CONFIG',
+      serviceName: 'Ollama Service',
+      onChange: (config) => {
+        service.config = config
+        service.ollama = config ? new Ollama({ host: config.value.host }) : undefined
+      },
+    })
+
+    void configWatcher.init().catch((error) => {
+      void logger.error({ message: 'Failed to initialize Ollama Client Service', data: { error } })
+    })
+
+    onDispose(() => configWatcher.dispose())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+
+    return service
+  },
+})

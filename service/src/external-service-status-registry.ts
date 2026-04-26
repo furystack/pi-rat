@@ -1,18 +1,26 @@
-import { Injectable } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 
-@Injectable({ lifetime: 'singleton' })
-export class ExternalServiceStatusRegistry {
-  private providers = new Map<string, () => boolean>()
-
-  public register(name: string, statusGetter: () => boolean) {
-    this.providers.set(name, statusGetter)
-  }
-
-  public getStatuses(): Record<string, boolean> {
-    const result: Record<string, boolean> = {}
-    for (const [name, getter] of this.providers) {
-      result[name] = getter()
-    }
-    return result
-  }
+export interface ExternalServiceStatusRegistry {
+  register(name: string, statusGetter: () => boolean): void
+  getStatuses(): Record<string, boolean>
 }
+
+export const ExternalServiceStatusRegistry: Token<ExternalServiceStatusRegistry, 'singleton'> = defineService({
+  name: 'pi-rat/ExternalServiceStatusRegistry',
+  lifetime: 'singleton',
+  factory: () => {
+    const providers = new Map<string, () => boolean>()
+    return {
+      register: (name, statusGetter) => {
+        providers.set(name, statusGetter)
+      },
+      getStatuses: () => {
+        const result: Record<string, boolean> = {}
+        for (const [name, getter] of providers) {
+          result[name] = getter()
+        }
+        return result
+      },
+    }
+  },
+})

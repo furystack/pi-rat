@@ -1,33 +1,25 @@
 /** ToDo: Main entry point */
 
 import { IdentityContext } from '@furystack/core'
-import { createInMemoryCacheStore, EntitySyncService } from '@furystack/entity-sync-client'
-import { Injector } from '@furystack/inject'
+import { createInjector } from '@furystack/inject'
 import { getLogger, useLogging, VerboseConsoleLogger } from '@furystack/logging'
 import { createComponent, initializeShadeRoot } from '@furystack/shades'
 import { ThemeProviderService } from '@furystack/shades-common-components'
 import { AiChatMessage, Chat, ChatMessage, LogEntry } from 'common'
 import { Layout } from './components/layout.js'
-import { environmentOptions } from './utils/environment-options.js'
+import { AppEntitySync } from './services/entity-sync.js'
 import { SessionService } from './services/session.js'
-import { registerThemeSwitchCheat } from './utils/theme-switch-cheat.js'
 import { darkTheme } from './themes/dark.js'
+import { environmentOptions } from './utils/environment-options.js'
+import { registerThemeSwitchCheat } from './utils/theme-switch-cheat.js'
 
-const shadeInjector = new Injector()
+const shadeInjector = createInjector()
 
 useLogging(shadeInjector, VerboseConsoleLogger)
 
-shadeInjector.getInstance(ThemeProviderService).setAssignedTheme(darkTheme)
+shadeInjector.get(ThemeProviderService).setAssignedTheme(darkTheme)
 
-const syncWsUrl = new URL(`${environmentOptions.serviceUrl}/sync`, window.location.href)
-  .toString()
-  .replace('http', 'ws')
-
-const syncService = new EntitySyncService({
-  wsUrl: syncWsUrl,
-  localStore: createInMemoryCacheStore(),
-})
-
+const syncService = shadeInjector.get(AppEntitySync)
 syncService.registerModel(Chat)
 syncService.registerModel(ChatMessage)
 syncService.registerModel(LogEntry, { suspendDelayMs: 5000 })
@@ -51,11 +43,8 @@ syncService.addListener('onReconnectFailed', ({ attempt }) => {
   void syncLogger.error({ message: `Entity sync reconnect failed (attempt ${attempt})` })
 })
 
-shadeInjector.setExplicitInstance(syncService)
-
-void shadeInjector.getInstance(SessionService).init()
-
-shadeInjector.setExplicitInstance(shadeInjector.getInstance(SessionService), IdentityContext)
+shadeInjector.bind(IdentityContext, () => shadeInjector.get(SessionService))
+shadeInjector.get(SessionService)
 
 void getLogger(shadeInjector).withScope('Startup').verbose({
   message: 'Initializing Shade Frontend...',

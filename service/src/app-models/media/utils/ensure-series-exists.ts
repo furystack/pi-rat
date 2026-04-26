@@ -1,6 +1,6 @@
+import { SeriesDataSet } from '../media-data-sets.js'
 import type { Injector } from '@furystack/inject'
 import { getDataSetFor } from '@furystack/repository'
-import { Series } from 'common'
 
 type SeriesInput = {
   imdbId: string
@@ -9,7 +9,7 @@ type SeriesInput = {
 }
 
 export const ensureSeriesExists = async (input: SeriesInput, injector: Injector) => {
-  const seriesDataSet = getDataSetFor(injector, Series, 'imdbId')
+  const seriesDataSet = getDataSetFor(injector, SeriesDataSet)
   const existingSeries = await seriesDataSet.get(injector, input.imdbId)
 
   if (!existingSeries) {

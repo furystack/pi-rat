@@ -28,14 +28,20 @@ vi.mock('@furystack/logging', () => ({
       error: vi.fn().mockResolvedValue(undefined),
     }),
   }),
+  useScopedLogger: () => ({
+    verbose: vi.fn().mockResolvedValue(undefined),
+    information: vi.fn().mockResolvedValue(undefined),
+    warning: vi.fn().mockResolvedValue(undefined),
+    error: vi.fn().mockResolvedValue(undefined),
+  }),
 }))
 
 vi.mock('@furystack/inject', () => ({
-  Injectable: () => (target: unknown) => target,
-  Injected: () => () => undefined,
+  defineService: ({ factory }: { factory: (ctx: unknown) => unknown }) => factory,
 }))
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     get: vi.fn().mockResolvedValue({ letter: 'A', physicalPath: '/mnt/data' }),
   }),
@@ -62,8 +68,14 @@ describe('FfprobeService', () => {
   })
 
   it('should call execFileAsync with correct ffprobe arguments', async () => {
-    const { FfprobeService } = await import('./ffprobe-service.js')
-    const service = new FfprobeService()
+    const { FfprobeServiceImpl } = await import('./ffprobe-service.js')
+    const service = new FfprobeServiceImpl(
+      {
+        verbose: vi.fn().mockResolvedValue(undefined),
+        error: vi.fn().mockResolvedValue(undefined),
+      } as never,
+      {} as never,
+    )
 
     Object.defineProperty(service, 'logger', {
       value: {
@@ -98,17 +110,15 @@ describe('FfprobeService', () => {
   it('should throw and log when ffprobe command fails', async () => {
     mockExecFileAsync.mockRejectedValue(new Error('ffprobe not found'))
 
-    const { FfprobeService } = await import('./ffprobe-service.js')
-    const service = new FfprobeService()
-
+    const { FfprobeServiceImpl } = await import('./ffprobe-service.js')
     const mockError = vi.fn().mockResolvedValue(undefined)
-    Object.defineProperty(service, 'logger', {
-      value: {
+    const service = new FfprobeServiceImpl(
+      {
         verbose: vi.fn().mockResolvedValue(undefined),
         error: mockError,
-      },
-      writable: true,
-    })
+      } as never,
+      {} as never,
+    )
 
     Object.defineProperty(service, 'semaphore', {
       value: { execute: <T>(fn: () => Promise<T>) => fn() },

@@ -38,7 +38,7 @@ export const MediaOverviewLayout = Shade<MediaOverviewLayoutProps>({
   },
   render: ({ props, children, useObservable, useDisposable, useRef, injector }) => {
     const imgRef = useRef<HTMLImageElement>('posterImg')
-    const [isDesktop] = useObservable('isDesktop', injector.getInstance(ScreenService).screenSize.atLeast.md)
+    const [isDesktop] = useObservable('isDesktop', injector.get(ScreenService).screenSize.atLeast.md)
 
     useDisposable('posterAnimation', () => {
       const id = setTimeout(() => {

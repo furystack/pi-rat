@@ -3,22 +3,22 @@ import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { usingAsync } from '@furystack/utils'
-import { AiChat, AiChatMessage, User } from 'common'
-import { ImpersonatedIdentityContext } from '../utils/impersonated-identity-context.js'
+import { UserDataSet } from '../app-models/identity/setup-identity-store.js'
+import { createImpersonatedIdentityContext } from '../utils/impersonated-identity-context.js'
 import { OllamaClientService } from './ollama-client-service.js'
-import { setupAiStore } from './setup-ai-store.js'
+import { AiChatDataSet, AiChatMessageDataSet, setupAiStore } from './setup-ai-store.js'
 
 export const setupAi = async (injector: Injector) => {
   const logger = getLogger(injector).withScope('AI Setup')
-  const clientService = injector.getInstance(OllamaClientService)
-  clientService.init()
 
   await setupAiStore(injector)
 
+  const clientService = injector.get(OllamaClientService)
+
   const systemInjector = useSystemIdentityContext({ injector, username: 'ai-setup' })
-  const chatMessageDataSet = getDataSetFor(injector, AiChatMessage, 'id')
-  const chatDataSet = getDataSetFor(injector, AiChat, 'id')
-  const userDataSet = getDataSetFor(injector, User, 'username')
+  const chatMessageDataSet = getDataSetFor(injector, AiChatMessageDataSet)
+  const chatDataSet = getDataSetFor(injector, AiChatDataSet)
+  const userDataSet = getDataSetFor(injector, UserDataSet)
 
   chatMessageDataSet.subscribe('onEntityAdded', async ({ entity }) => {
     const chat = await chatDataSet.get(systemInjector, entity.aiChatId)
@@ -34,16 +34,14 @@ export const setupAi = async (injector: Injector) => {
 
     const currentUser = await userDataSet.get(systemInjector, entity.owner)
 
-    await usingAsync(injector.createChild({}), async (handlerInjector) => {
-      handlerInjector.setExplicitInstance(new ImpersonatedIdentityContext(currentUser), IdentityContext)
+    await usingAsync(injector.createScope({}), async (handlerInjector) => {
+      handlerInjector.bind(IdentityContext, () => createImpersonatedIdentityContext(currentUser))
       try {
         await clientService.handleChatMessageReceived(handlerInjector, entity, chat, chatHistory)
       } catch (error) {
         await logger.error({
           message: `❌  Error handling chat message received for chat ${chat.id} and message ${entity.id}`,
-          data: {
-            error,
-          },
+          data: { error },
         })
       }
     })

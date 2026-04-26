@@ -10,6 +10,7 @@ const mockEnsureSeriesExists = vi.fn().mockResolvedValue(undefined)
 const mockFetchOmdbSeriesMetadata = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     get: (...args: unknown[]) => mockOmdbSeriesGet(...args) as unknown,
     add: (...args: unknown[]) => mockOmdbSeriesAdd(...args) as unknown,
@@ -49,9 +50,9 @@ const createMeta = (overrides?: Partial<OmdbMovieMetadata>): OmdbMovieMetadata =
 
 const createTestInjector = () => {
   const injector = new Injector()
-  injector.setExplicitInstance(
-    { fetchOmdbSeriesMetadata: mockFetchOmdbSeriesMetadata } as unknown as OmdbClientService,
+  injector.bind(
     OmdbClientService,
+    () => ({ fetchOmdbSeriesMetadata: mockFetchOmdbSeriesMetadata }) as unknown as OmdbClientService,
   )
   return injector
 }

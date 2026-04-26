@@ -14,7 +14,7 @@ export const FilesPage = Shade<{ letter: string; path: string }>({
     return (
       <PiRatLazyLoad
         component={async () => {
-          const associations = injector.getInstance(FileAssociationsService)
+          const associations = injector.get(FileAssociationsService)
           const component = await associations.getServiceForFile(letter, path)
 
           switch (component) {

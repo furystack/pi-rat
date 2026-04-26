@@ -1,5 +1,4 @@
-import type { FindOptions } from '@furystack/core'
-import type { Constructable } from '@furystack/inject'
+import type { Constructable, FindOptions } from '@furystack/core'
 import type { GetCollectionResult } from '@furystack/rest'
 import type { CollectionServiceOptions } from '@furystack/shades-common-components'
 import { CollectionService } from '@furystack/shades-common-components'

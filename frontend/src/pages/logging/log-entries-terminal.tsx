@@ -1,5 +1,5 @@
 import type { SyncState } from '@furystack/entity-sync'
-import { useCollectionSync } from '@furystack/entity-sync-client'
+import { useCollectionSync } from '../../services/entity-sync.js'
 import { Shade, createComponent, type RenderOptions } from '@furystack/shades'
 import { FitAddon } from '@xterm/addon-fit'
 import { SearchAddon } from '@xterm/addon-search'

@@ -1,4 +1,4 @@
-import { useEntitySync } from '@furystack/entity-sync-client'
+import { useEntitySync } from '../../services/entity-sync.js'
 import { createComponent, Shade } from '@furystack/shades'
 import { Skeleton } from '@furystack/shades-common-components'
 import { LogEntry as LogEntryModel } from 'common'

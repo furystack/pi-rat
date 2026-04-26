@@ -1,6 +1,6 @@
+import { TmdbMovieMetadataDataSet } from '../media-data-sets.js'
 import type { Injector } from '@furystack/inject'
 import { getDataSetFor } from '@furystack/repository'
-import { TmdbMovieMetadata } from 'common'
 
 import type { TmdbMovieDetailsResponse } from '../metadata-services/tmdb-api-types.js'
 
@@ -9,7 +9,7 @@ export const ensureTmdbMovieExists = async (
   language: string,
   injector: Injector,
 ) => {
-  const dataSet = getDataSetFor(injector, TmdbMovieMetadata, 'id')
+  const dataSet = getDataSetFor(injector, TmdbMovieMetadataDataSet)
   const existing = await dataSet.get(injector, tmdbMovie.id)
   if (existing) {
     return existing

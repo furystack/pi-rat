@@ -7,9 +7,9 @@ import { ChatService } from './chat-service.js'
 export const DeleteChatButton = Shade<{ chat: Chat }>({
   customElementName: 'shade-app-delete-chat-button',
   render: ({ injector, props, useSearchState }) => {
-    const chatService = injector.getInstance(ChatService)
+    const chatService = injector.get(ChatService)
 
-    const noty = injector.getInstance(NotyService)
+    const noty = injector.get(NotyService)
 
     const [selectedChatId, setSelectedChatId] = useSearchState('selectedChatId', '')
 

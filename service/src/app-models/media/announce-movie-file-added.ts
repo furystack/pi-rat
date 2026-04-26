@@ -21,7 +21,8 @@ export const announceMovieFileAdded = async ({
   try {
     const movie = await movieDataSet.get(injector, entity.imdbId)
     if (movie) {
-      await injector.getInstance(WebsocketService).announce(
+      const ws = await injector.getAsync(WebsocketService)
+      await ws.announce(
         {
           type: 'add-movie',
           file: { driveLetter: entity.driveLetter, path: entity.path },

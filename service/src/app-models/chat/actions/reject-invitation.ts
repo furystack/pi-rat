@@ -2,7 +2,8 @@ import { getCurrentUser, useSystemIdentityContext } from '@furystack/core'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
-import { ChatInvitation, type RejectInvitationAction as RejectInvitationActionType } from 'common'
+import { type RejectInvitationAction as RejectInvitationActionType } from 'common'
+import { ChatInvitationDataSet } from '../setup-chat-store.js'
 
 export const RejectInvitationAction: RequestAction<RejectInvitationActionType> = async ({ getUrlParams, injector }) => {
   const user = await getCurrentUser(injector)
@@ -10,7 +11,7 @@ export const RejectInvitationAction: RequestAction<RejectInvitationActionType> =
   const { id } = getUrlParams()
 
   const systemInjector = useSystemIdentityContext({ injector, username: 'chat-actions' })
-  const chatInvitationDataSet = getDataSetFor(injector, ChatInvitation, 'id')
+  const chatInvitationDataSet = getDataSetFor(injector, ChatInvitationDataSet)
 
   const chatInvitation = await chatInvitationDataSet.get(systemInjector, id)
 

@@ -1,5 +1,5 @@
-import { getRepository } from '@furystack/repository'
-import { Movie } from 'common'
+import { getDataSetFor } from '@furystack/repository'
+import { MovieDataSet } from '../../app-models/media/media-data-sets.js'
 import type { OllamaTool } from './ollama-tools.js'
 
 export const MoviesTool: OllamaTool = {
@@ -19,7 +19,7 @@ export const MoviesTool: OllamaTool = {
     return !!response.message.tool_calls?.some((toolCall) => toolCall.function?.name === 'getMovies')
   },
   execute: async (injector, _response) => {
-    const moviesDataSet = getRepository(injector).getDataSetFor(Movie, 'imdbId')
+    const moviesDataSet = getDataSetFor(injector, MovieDataSet)
     const movies = await moviesDataSet.find(injector, {
       filter: {},
       order: { createdAt: 'DESC' },

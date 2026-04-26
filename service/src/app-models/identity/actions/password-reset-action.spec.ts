@@ -34,7 +34,7 @@ describe('PasswordResetAction', () => {
       setPasswordForUser: vi.fn().mockResolvedValue(undefined),
     }
 
-    injector.setExplicitInstance(mockAuthenticator as unknown as PasswordAuthenticator, PasswordAuthenticator)
+    injector.bind(PasswordAuthenticator, () => mockAuthenticator as unknown as PasswordAuthenticator)
 
     return { injector, mockAuthenticator }
   }

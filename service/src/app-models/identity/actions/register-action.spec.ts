@@ -32,12 +32,13 @@ vi.mock('@furystack/core', () => ({
 }))
 
 vi.mock('@furystack/repository', () => ({
-  getDataSetFor: (_injector: unknown, model: { name?: string } | ((...args: unknown[]) => unknown)) => {
-    const name = typeof model === 'function' ? model.name : ''
-    if (name === 'User') return mockUserDataSet
-    if (name === 'PasswordCredential') return mockCredentialDataSet
+  defineDataSet: ({ name, store }: { name: string; store: unknown }) => ({ name, store }),
+  getDataSetFor: (_injector: unknown, token: { name?: string } | ((...args: unknown[]) => unknown)) => {
+    const tokenName = typeof token === 'function' ? token.name : (token?.name ?? '')
+    if (tokenName.includes('UserDataSet')) return mockUserDataSet
+    if (tokenName.includes('PasswordCredentialDataSet')) return mockCredentialDataSet
     // eslint-disable-next-line furystack/rest-action-use-request-error -- Test mock helper, not a REST action
-    throw new Error(`Unknown model: ${name}`)
+    throw new Error(`Unknown token: ${tokenName}`)
   },
 }))
 
@@ -62,8 +63,8 @@ describe('RegisterAction', () => {
       cookieLogin: vi.fn().mockResolvedValue(undefined),
     }
 
-    injector.setExplicitInstance(mockAuthenticator as unknown as PasswordAuthenticator, PasswordAuthenticator)
-    injector.setExplicitInstance(mockUserContext as unknown as HttpUserContext, HttpUserContext)
+    injector.bind(PasswordAuthenticator, () => mockAuthenticator as unknown as PasswordAuthenticator)
+    injector.bind(HttpUserContext, () => mockUserContext as unknown as HttpUserContext)
 
     return { injector, mockHasher, mockUserContext }
   }

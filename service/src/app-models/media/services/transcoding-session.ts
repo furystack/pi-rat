@@ -1,9 +1,9 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import { getLogger, type ScopedLogger } from '@furystack/logging'
+import { defineService, type Injector, type Token } from '@furystack/inject'
+import { useScopedLogger, type ScopedLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PlaybackMode } from 'common'
-import { Config, Drive, HLS_SEGMENT_DURATION, type MoviesConfig } from 'common'
+import { HLS_SEGMENT_DURATION, type MoviesConfig } from 'common'
 import { spawn, type ChildProcess } from 'child_process'
 import { createHash } from 'crypto'
 import { existsSync, mkdirSync, rmSync } from 'fs'
@@ -12,6 +12,8 @@ import { existsAsync } from '../../../utils/exists-async.js'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { FfprobeService } from '../../../ffprobe-service.js'
+import { ConfigDataSet } from '../../config/setup-config-store.js'
+import { DriveDataSet } from '../../drives/setup-drives.js'
 import { HwAccelDetector } from './hw-accel-detector.js'
 
 type SessionKey = string
@@ -40,22 +42,54 @@ const WAIT_TIMEOUT_MS = 60_000
 const DEFAULT_MAX_CACHE_SIZE_MB = 5000
 const BYTES_PER_MB = 1024 * 1024
 
-@Injectable({ lifetime: 'singleton' })
-export class TranscodingSessionService {
-  declare injector: Injector
+export interface TranscodingSessionService {
+  getSession(
+    driveLetter: string,
+    path: string,
+    mode: PlaybackMode,
+    audioTrackId?: number,
+    resolution?: string,
+    startTime?: number,
+  ): TranscodingSessionEntry | undefined
+  getOrCreateSession(opts: {
+    driveLetter: string
+    path: string
+    mode: PlaybackMode
+    audioTrackId?: number
+    resolution?: string
+    startTime?: number
+  }): Promise<TranscodingSessionEntry>
+  waitForFile(filePath: string, session: TranscodingSessionEntry): Promise<boolean>
+  waitForSegment(session: TranscodingSessionEntry, segmentIndex: number): Promise<boolean>
+  readPlaylist(session: TranscodingSessionEntry): Promise<string | null>
+  getActiveSessionCount(): number
+  removeSession(
+    driveLetter: string,
+    path: string,
+    mode: PlaybackMode,
+    audioTrackId?: number,
+    resolution?: string,
+    startTime?: number,
+  ): void
+  removeAllSessionsForFile(driveLetter: string, path: string): void
+  getSessionDiskUsage(session: TranscodingSessionEntry): Promise<number>
+  getTotalDiskUsage(): Promise<number>
+  getBaseDirFromConfig(): Promise<string>
+  dispose(): void
+}
 
-  @Injected((injector) => getLogger(injector).withScope('TranscodingSession'))
-  declare private logger: ScopedLogger
-
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'transcoding-session' }))
-  declare private systemInjector: Injector
-
+export class TranscodingSessionServiceImpl implements TranscodingSessionService {
   private sessions = new Map<SessionKey, TranscodingSessionEntry>()
   private pendingSessions = new Map<SessionKey, Promise<TranscodingSessionEntry>>()
   private cleanupInterval: ReturnType<typeof setInterval>
   private maxCacheSizeBytes: number | null = null
+  private baseDirCache: string | null = null
 
-  constructor() {
+  constructor(
+    private readonly injector: Injector,
+    private readonly logger: ScopedLogger,
+    private readonly systemInjector: Injector,
+  ) {
     this.cleanupInterval = setInterval(() => this.cleanupIdleSessions(), SESSION_IDLE_TIMEOUT_MS / 2)
   }
 
@@ -83,7 +117,6 @@ export class TranscodingSessionService {
     return join(this.getBaseDir(), hash)
   }
 
-  private baseDirCache: string | null = null
   private getBaseDir(): string {
     if (this.baseDirCache) return this.baseDirCache
     this.baseDirCache = join(tmpdir(), 'pirat-hls-sessions')
@@ -95,7 +128,7 @@ export class TranscodingSessionService {
 
   public async getBaseDirFromConfig(): Promise<string> {
     try {
-      const configDataSet = getDataSetFor(this.injector, Config, 'id')
+      const configDataSet = getDataSetFor(this.injector, ConfigDataSet)
       const config = (await configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
       const dir = config?.value?.hlsSegmentPath || join(tmpdir(), 'pirat-hls-sessions')
       if (!(await existsAsync(dir))) await mkdir(dir, { recursive: true })
@@ -367,15 +400,15 @@ export class TranscodingSessionService {
   }): Promise<{ args: string[]; totalDuration: number }> {
     const [drive, config, ffprobe] = await Promise.all([
       (async () => {
-        const driveDataSet = getDataSetFor(this.injector, Drive, 'letter')
+        const driveDataSet = getDataSetFor(this.injector, DriveDataSet)
         return driveDataSet.get(this.systemInjector, driveLetter)
       })(),
       (async () => {
-        const configDataSet = getDataSetFor(this.injector, Config, 'id')
+        const configDataSet = getDataSetFor(this.injector, ConfigDataSet)
         const c = await configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')
         return c as MoviesConfig | undefined
       })(),
-      this.injector.getInstance(FfprobeService).getFfprobeForPiratFile({ driveLetter, path }),
+      this.injector.get(FfprobeService).getFfprobeForPiratFile({ driveLetter, path }),
     ])
 
     if (!drive) throw new Error(`Drive ${driveLetter} not found`)
@@ -437,7 +470,7 @@ export class TranscodingSessionService {
       const hwAccelMethod = config?.value?.hwAccelMethod
       if (hwAccelMethod && hwAccelMethod !== 'none') {
         try {
-          const hwDetector = this.injector.getInstance(HwAccelDetector)
+          const hwDetector = this.injector.get(HwAccelDetector)
           videoCodec = await hwDetector.getEncoder('h264', hwAccelMethod)
         } catch {
           videoCodec = requestedCodec
@@ -555,7 +588,7 @@ export class TranscodingSessionService {
   private async loadMaxCacheSize(): Promise<number> {
     if (this.maxCacheSizeBytes !== null) return this.maxCacheSizeBytes
     try {
-      const configDataSet = getDataSetFor(this.injector, Config, 'id')
+      const configDataSet = getDataSetFor(this.injector, ConfigDataSet)
       const config = (await configDataSet.get(this.systemInjector, 'MOVIES_CONFIG')) as MoviesConfig | undefined
       const mb = config?.value?.hlsMaxCacheSizeMb ?? DEFAULT_MAX_CACHE_SIZE_MB
       this.maxCacheSizeBytes = mb * BYTES_PER_MB
@@ -625,7 +658,6 @@ export class TranscodingSessionService {
       // Process may already be dead
     }
 
-    // Clean up session directory
     try {
       if (existsSync(session.sessionDir)) {
         rmSync(session.sessionDir, { recursive: true, force: true })
@@ -635,3 +667,17 @@ export class TranscodingSessionService {
     }
   }
 }
+
+export const TranscodingSessionService: Token<TranscodingSessionService, 'singleton'> = defineService({
+  name: 'pi-rat/TranscodingSessionService',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'transcoding-session' })
+    const impl = new TranscodingSessionServiceImpl(injector, logger, systemInjector)
+    onDispose(() => impl.dispose())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+    return impl
+  },
+})

@@ -23,7 +23,7 @@ export const Layout = Shade({
         <NotyList style={{ zIndex: '2' }} />
         <PiRatLazyLoad
           component={async () => {
-            const result = await injector.getInstance(InstallService).getServiceStatus()
+            const result = await injector.get(InstallService).getServiceStatus()
             if (result.state === 'installed') {
               return (
                 <PageLayout

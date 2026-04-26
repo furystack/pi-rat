@@ -28,7 +28,7 @@ describe('GenericErrorPage 404 handling', () => {
 
   it('should render Result with status 404 for a 404 ResponseError', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -46,7 +46,7 @@ describe('GenericErrorPage 404 handling', () => {
 
   it('should render Result with status error for a generic error', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -64,7 +64,7 @@ describe('GenericErrorPage 404 handling', () => {
 
   it('should render Go Home button', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -80,7 +80,7 @@ describe('GenericErrorPage 404 handling', () => {
 
   it('should render Retry button when retry prop is provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -96,7 +96,7 @@ describe('GenericErrorPage 404 handling', () => {
 
   it('should render Report error button when error is provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({

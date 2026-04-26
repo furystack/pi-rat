@@ -28,7 +28,7 @@ export const LazyMonacoEditor = Shade<LazyMonacoEditorProps>({
     position: 'relative',
   },
   render: ({ props, injector, useObservable, useDisposable }) => {
-    const themeProvider = injector.getInstance(ThemeProviderService)
+    const themeProvider = injector.get(ThemeProviderService)
 
     const monacoThemeObs = useDisposable(
       'monacoThemeObs',

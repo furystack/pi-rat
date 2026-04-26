@@ -22,8 +22,8 @@ export const AiChatInput = Shade<{ selectedChatId: string }>({
     width: '100%',
   },
   render: ({ props, injector, useObservable, useRef }) => {
-    const aiChatMessageService = injector.getInstance(AiChatMessageService)
-    const aiChatService = injector.getInstance(AiChatService)
+    const aiChatMessageService = injector.get(AiChatMessageService)
+    const aiChatService = injector.get(AiChatService)
     const formRef = useRef<HTMLFormElement>('form')
 
     const [selectedChat] = useObservable(

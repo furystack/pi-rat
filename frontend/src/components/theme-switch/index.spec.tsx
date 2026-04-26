@@ -27,7 +27,7 @@ describe('ThemeSwitch', () => {
 
   it('should render with correct shadow DOM name', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -44,7 +44,7 @@ describe('ThemeSwitch', () => {
 
   it('should render with dark theme', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(darkTheme), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService(darkTheme))
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -61,7 +61,7 @@ describe('ThemeSwitch', () => {
 
   it('should render with light theme', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(lightTheme), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService(lightTheme))
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -79,7 +79,7 @@ describe('ThemeSwitch', () => {
   it('should use theme provider service', async () => {
     await usingAsync(new Injector(), async (injector) => {
       const mockThemeProvider = createMockThemeProviderService(darkTheme)
-      injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
+      injector.bind(ThemeProviderService, () => mockThemeProvider as never)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -97,7 +97,7 @@ describe('ThemeSwitch', () => {
   it('should accept additional props', async () => {
     await usingAsync(new Injector(), async (injector) => {
       const mockThemeProvider = createMockThemeProviderService(lightTheme)
-      injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
+      injector.bind(ThemeProviderService, () => mockThemeProvider as never)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -115,7 +115,7 @@ describe('ThemeSwitch', () => {
   it('should subscribe to theme changes', async () => {
     await usingAsync(new Injector(), async (injector) => {
       const mockThemeProvider = createMockThemeProviderService()
-      injector.setExplicitInstance(mockThemeProvider, ThemeProviderService)
+      injector.bind(ThemeProviderService, () => mockThemeProvider as never)
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({
@@ -131,7 +131,7 @@ describe('ThemeSwitch', () => {
 
   it('should render with custom variant prop', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(createMockThemeProviderService(), ThemeProviderService)
+      injector.bind(ThemeProviderService, () => createMockThemeProviderService())
       const rootElement = document.getElementById('root') as HTMLDivElement
 
       initializeShadeRoot({

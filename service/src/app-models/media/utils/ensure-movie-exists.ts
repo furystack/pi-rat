@@ -1,6 +1,6 @@
+import { MovieDataSet } from '../media-data-sets.js'
 import type { Injector } from '@furystack/inject'
 import { getDataSetFor } from '@furystack/repository'
-import { Movie } from 'common'
 
 type MovieInput = {
   imdbId: string
@@ -13,7 +13,7 @@ type MovieInput = {
 }
 
 export const ensureMovieExists = async (input: MovieInput, injector: Injector) => {
-  const movieDataSet = getDataSetFor(injector, Movie, 'imdbId')
+  const movieDataSet = getDataSetFor(injector, MovieDataSet)
   const existingMovie = await movieDataSet.get(injector, input.imdbId)
 
   if (!existingMovie) {

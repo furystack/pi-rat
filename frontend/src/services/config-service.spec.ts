@@ -3,9 +3,9 @@ import { usingAsync } from '@furystack/utils'
 import { describe, expect, it, vi } from 'vitest'
 import { ConfigService } from './config-service.js'
 import { ConfigApiClient } from './api-clients/config-api-client.js'
-import type { Config, OmdbConfig, MoviesConfig } from 'common'
+import type { OmdbConfig, MoviesConfig } from 'common'
 
-const createMockOmdbConfig = (): Config => ({
+const createMockOmdbConfig = () => ({
   id: 'OMDB_CONFIG' as const,
   value: {
     apiKey: 'test-api-key',
@@ -16,14 +16,14 @@ const createMockOmdbConfig = (): Config => ({
   updatedAt: new Date(),
 })
 
-const createMockMoviesConfig = (): Config => ({
+const createMockMoviesConfig = () => ({
   id: 'MOVIES_CONFIG' as const,
   value: {
     autoExtractSubtitles: true,
     fullSyncOnStartup: false,
-    preset: 'medium',
+    preset: 'medium' as const,
     threads: 4,
-    watchFiles: 'all',
+    watchFiles: 'all' as const,
   } satisfies MoviesConfig['value'],
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -32,11 +32,12 @@ const createMockMoviesConfig = (): Config => ({
 describe('ConfigService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as ConfigApiClient,
+    injector.bind(
       ConfigApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -48,7 +49,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         const result = await service.getConfig('OMDB_CONFIG')
 
@@ -68,7 +69,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         await service.getConfig('OMDB_CONFIG')
         await service.getConfig('OMDB_CONFIG')
@@ -85,7 +86,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         const observable = service.getConfigAsObservable('OMDB_CONFIG')
 
@@ -100,7 +101,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         const observable1 = service.getConfigAsObservable('OMDB_CONFIG')
         const observable2 = service.getConfigAsObservable('OMDB_CONFIG')
@@ -122,9 +123,9 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
-        const result = await service.saveConfig('OMDB_CONFIG', newConfig.value as OmdbConfig['value'])
+        const result = await service.saveConfig('OMDB_CONFIG', newConfig.value)
 
         expect(mockCall).toHaveBeenCalledWith({
           method: 'POST',
@@ -151,7 +152,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         await service.saveConfig('OMDB_CONFIG', updatedValue)
 
@@ -171,7 +172,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         await service.deleteConfig('OMDB_CONFIG')
 
@@ -191,7 +192,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         // First call populates the cache
         await service.getConfig('OMDB_CONFIG')
@@ -219,7 +220,7 @@ describe('ConfigService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(ConfigService)
+        const service = i.get(ConfigService)
 
         // First calls populate the cache
         await service.getConfig('OMDB_CONFIG')

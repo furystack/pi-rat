@@ -7,12 +7,15 @@ import {
   createPatchEndpoint,
   createPostEndpoint,
   useRestService,
+  type RequestAction,
 } from '@furystack/rest-service'
 import type { ConfigApi } from 'common'
-import { Config } from 'common'
 import configApiSchema from 'common/schemas/config-api.json' with { type: 'json' }
 import { getCorsOptions } from '../../get-cors-options.js'
 import { getPort } from '../../get-port.js'
+import { ConfigDataSet } from './setup-config-store.js'
+
+type PostConfigEndpointType = ConfigApi['POST']['/config']
 
 export const setupConfigRestApi = async (injector: Injector) => {
   await useRestService<ConfigApi>({
@@ -25,29 +28,29 @@ export const setupConfigRestApi = async (injector: Injector) => {
         '/config': Validate({
           schema: configApiSchema,
           schemaName: 'GetCollectionEndpoint<Config>',
-        })(createGetCollectionEndpoint({ model: Config, primaryKey: 'id' })),
+        })(createGetCollectionEndpoint(ConfigDataSet)),
         '/config/:id': Validate({
           schema: configApiSchema,
           schemaName: 'GetEntityEndpoint<Config,"id">',
-        })(createGetEntityEndpoint({ model: Config, primaryKey: 'id' })),
+        })(createGetEntityEndpoint(ConfigDataSet)),
       },
       POST: {
         '/config': Validate({
           schema: configApiSchema,
           schemaName: 'PostConfigEndpoint',
-        })(createPostEndpoint({ model: Config, primaryKey: 'id' })),
+        })(createPostEndpoint(ConfigDataSet) as RequestAction<PostConfigEndpointType>),
       },
       PATCH: {
         '/config/:id': Validate({
           schema: configApiSchema,
           schemaName: 'PatchConfigEndpoint',
-        })(createPatchEndpoint({ model: Config, primaryKey: 'id' })),
+        })(createPatchEndpoint(ConfigDataSet)),
       },
       DELETE: {
         '/config/:id': Validate({
           schema: configApiSchema,
           schemaName: 'DeleteEndpoint<Config,"id">',
-        })(createDeleteEndpoint({ model: Config, primaryKey: 'id' })),
+        })(createDeleteEndpoint(ConfigDataSet)),
       },
     },
   })

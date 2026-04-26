@@ -68,7 +68,7 @@ export const RouteIndexPage = Shade<RouteIndexPageProps>({
     },
   },
   render: ({ props, injector, useObservable }) => {
-    const locationService = injector.getInstance(LocationService)
+    const locationService = injector.get(LocationService)
     const [currentPath] = useObservable('locationChange', locationService.onLocationPathChanged)
 
     const navigate = (path: string) => {

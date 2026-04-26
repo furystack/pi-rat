@@ -25,7 +25,7 @@ export const registerThemeSwitchCheat = (injector: Injector) => {
         | 'xenomorph'
         | 'hawkins',
     ) => {
-      const themeProvider = injector.getInstance(ThemeProviderService)
+      const themeProvider = injector.get(ThemeProviderService)
       switch (themeName) {
         case 'dark':
           themeProvider.setAssignedTheme(defaultDarkTheme)

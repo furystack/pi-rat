@@ -1,10 +1,11 @@
+import { MovieFileDataSet } from '../media-data-sets.js'
 import { getLogger } from '@furystack/logging'
 import { RequestError } from '@furystack/rest'
 import type { RequestAction } from '@furystack/rest-service'
 import { JsonResult } from '@furystack/rest-service'
 import { getDataSetFor } from '@furystack/repository'
 import type { PlaybackInfoRequest } from 'common'
-import { MovieFile } from 'common'
+
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { buildPlaybackInfoResponse } from '../services/stream-builder.js'
 
@@ -19,9 +20,9 @@ export const PlaybackInfoAction: RequestAction<PlaybackInfoRequest> = async ({ i
 
   await logger.verbose({ message: 'Playback info requested', data: { file, selectedAudioTrackIndex } })
 
-  const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
+  const ffprobe = await injector.get(FfprobeService).getFfprobeForPiratFile(file)
 
-  const movieFileDataSet = getDataSetFor(injector, MovieFile, 'id')
+  const movieFileDataSet = getDataSetFor(injector, MovieFileDataSet)
   const movieFiles = await movieFileDataSet.find(injector, {
     filter: { driveLetter: { $eq: file.driveLetter }, path: { $eq: file.path } },
     top: 1,

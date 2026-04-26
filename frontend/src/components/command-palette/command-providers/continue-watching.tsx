@@ -7,15 +7,15 @@ import { MoviesService } from '../../../services/movies-service.js'
 
 export const continueWatchingCommandProvider: CommandProvider = async ({ term, injector }) => {
   if (term.toLocaleLowerCase() === 'continue') {
-    const watchProgressService = injector.getInstance(WatchProgressService)
+    const watchProgressService = injector.get(WatchProgressService)
 
     const { entries: lastEntries } = await watchProgressService.findWatchProgress({
       top: 3,
       order: { updatedAt: 'DESC' },
     })
     if (lastEntries.length) {
-      const movieFilesService = injector.getInstance(MovieFilesService)
-      const moviesService = injector.getInstance(MoviesService)
+      const movieFilesService = injector.get(MovieFilesService)
+      const moviesService = injector.get(MoviesService)
 
       const movieFiles = await movieFilesService.findMovieFile({
         filter: {

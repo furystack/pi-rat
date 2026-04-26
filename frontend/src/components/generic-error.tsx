@@ -76,7 +76,7 @@ export const GenericErrorPage = Shade<GenericErrorProps>({
           </Button>
         ) : null}
         {props.error ? (
-          <Button onclick={() => injector.getInstance(ErrorReporter).sendErrorReport(props.error as Error)}>
+          <Button onclick={() => injector.get(ErrorReporter).sendErrorReport(props.error as Error)}>
             <Icon icon={icons.send} size="small" /> Report error
           </Button>
         ) : null}

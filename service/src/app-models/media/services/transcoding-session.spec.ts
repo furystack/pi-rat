@@ -5,7 +5,7 @@ import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest'
 import { mkdirSync, writeFileSync, existsSync, rmSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
-import { TranscodingSessionService } from './transcoding-session.js'
+import { TranscodingSessionServiceImpl } from './transcoding-session.js'
 import { FfprobeService } from '../../../ffprobe-service.js'
 import { HwAccelDetector } from './hw-accel-detector.js'
 
@@ -16,6 +16,10 @@ vi.mock('@furystack/logging', () => ({
       error: vi.fn().mockResolvedValue(undefined),
     }),
   }),
+  useScopedLogger: () => ({
+    verbose: vi.fn().mockResolvedValue(undefined),
+    error: vi.fn().mockResolvedValue(undefined),
+  }),
 }))
 
 vi.mock('@furystack/core', () => ({
@@ -23,9 +27,10 @@ vi.mock('@furystack/core', () => ({
 }))
 
 vi.mock('@furystack/repository', () => ({
-  getDataSetFor: (_injector: unknown, model: unknown) => {
-    const name = (model as { name?: string })?.name
-    if (name === 'Drive') {
+  defineDataSet: ({ name, store }: { name: string; store: unknown }) => ({ name, store }),
+  getDataSetFor: (_injector: unknown, token: unknown) => {
+    const tokenName = (token as { name?: string })?.name ?? ''
+    if (tokenName.includes('DriveDataSet')) {
       return { get: vi.fn().mockResolvedValue({ letter: 'A', physicalPath: '/mnt/media' }) }
     }
     return { get: vi.fn().mockResolvedValue(undefined) }
@@ -82,7 +87,11 @@ describe('TranscodingSessionService', () => {
 
   it('should return undefined for non-existent session', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         const session = service.getSession('A', 'test.mkv', 'transcode', 0)
         expect(session).toBeUndefined()
@@ -97,16 +106,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         const session = await service.getOrCreateSession({
           driveLetter: 'A',
@@ -134,16 +147,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         const session1 = await service.getOrCreateSession({
           driveLetter: 'A',
@@ -169,16 +186,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         const session1 = await service.getOrCreateSession({
           driveLetter: 'A',
@@ -207,16 +228,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         expect(service.getActiveSessionCount()).toBe(0)
 
@@ -238,16 +263,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         await service.getOrCreateSession({
           driveLetter: 'A',
@@ -271,16 +300,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
 
       await service.getOrCreateSession({
         driveLetter: 'A',
@@ -311,7 +344,7 @@ describe('TranscodingSessionService', () => {
       const filePath = join(testDir, 'test-file.mp4')
       writeFileSync(filePath, 'content')
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSessionEntry = { state: 'running' as const } as Parameters<typeof service.waitForFile>[1]
         const result = await service.waitForFile(filePath, mockSessionEntry)
@@ -325,7 +358,7 @@ describe('TranscodingSessionService', () => {
       vi.useRealTimers()
       const filePath = join(testDir, 'nonexistent.mp4')
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSessionEntry = { state: 'error' as const } as Parameters<typeof service.waitForFile>[1]
         const result = await service.waitForFile(filePath, mockSessionEntry)
@@ -352,7 +385,7 @@ describe('TranscodingSessionService', () => {
       writeFileSync(join(testDir, 'segment0.m4s'), 'seg0')
       writeFileSync(join(testDir, 'segment1.m4s'), 'seg1')
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSessionEntry = {
           sessionDir: testDir,
@@ -369,7 +402,7 @@ describe('TranscodingSessionService', () => {
       vi.useRealTimers()
       writeFileSync(join(testDir, 'segment5.m4s'), 'seg5')
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSessionEntry = {
           sessionDir: testDir,
@@ -384,7 +417,7 @@ describe('TranscodingSessionService', () => {
 
     it('should return false when session errors without producing segment', async () => {
       vi.useRealTimers()
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSessionEntry = {
           sessionDir: testDir,
@@ -416,7 +449,7 @@ describe('TranscodingSessionService', () => {
       writeFileSync(join(sessionDir, 'segment1.m4s'), Buffer.alloc(2000))
       writeFileSync(join(sessionDir, 'init.mp4'), Buffer.alloc(500))
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSession = { sessionDir } as Parameters<typeof service.getSessionDiskUsage>[0]
         const usage = await service.getSessionDiskUsage(mockSession)
@@ -427,7 +460,7 @@ describe('TranscodingSessionService', () => {
     })
 
     it('should return 0 for non-existent session directory', async () => {
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSession = { sessionDir: join(testDir, 'nonexistent') } as Parameters<
           typeof service.getSessionDiskUsage
@@ -444,16 +477,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           const s1 = await service.getOrCreateSession({
             driveLetter: 'A',
@@ -484,16 +521,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           const session = await service.getOrCreateSession({
             driveLetter: 'A',
@@ -518,16 +559,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           const session = await service.getOrCreateSession({
             driveLetter: 'A',
@@ -552,16 +597,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           const session = await service.getOrCreateSession({
             driveLetter: 'A',
@@ -584,16 +633,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           const session = await service.getOrCreateSession({
             driveLetter: 'A',
@@ -616,16 +669,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           const session = await service.getOrCreateSession({
             driveLetter: 'A',
@@ -660,7 +717,7 @@ describe('TranscodingSessionService', () => {
       const playlistContent = '#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-ENDLIST\n'
       writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSession = {
           sessionDir: testDir,
@@ -690,7 +747,7 @@ describe('TranscodingSessionService', () => {
       ].join('\n')
       writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSession = {
           sessionDir: testDir,
@@ -722,7 +779,7 @@ describe('TranscodingSessionService', () => {
       ].join('\n')
       writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSession = {
           sessionDir: testDir,
@@ -740,7 +797,7 @@ describe('TranscodingSessionService', () => {
 
     it('should return null when session errors before playlist is created', async () => {
       vi.useRealTimers()
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSession = {
           sessionDir: testDir,
@@ -762,16 +819,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -811,7 +872,11 @@ describe('TranscodingSessionService', () => {
 
     it('should handle no matching sessions gracefully', async () => {
       await usingAsync(new Injector(), async (injector) => {
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           service.removeAllSessionsForFile('Z', 'nonexistent.mkv')
           expect(service.getActiveSessionCount()).toBe(0)
@@ -824,7 +889,11 @@ describe('TranscodingSessionService', () => {
 
   it('should handle removeSession on non-existent session gracefully', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         service.removeSession('Z', 'nonexistent.mkv', 'transcode')
         expect(service.getActiveSessionCount()).toBe(0)
@@ -840,16 +909,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       await service.getOrCreateSession({
         driveLetter: 'A',
         path: 'test.mkv',
@@ -868,16 +941,20 @@ describe('TranscodingSessionService', () => {
     mockSpawn.mockReturnValue(mockProcess)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
-      injector.setExplicitInstance(
-        { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+      injector.bind(
         HwAccelDetector,
+        () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
       )
 
-      const service = injector.getInstance(TranscodingSessionService)
+      const service = new TranscodingSessionServiceImpl(
+        injector,
+        { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+        injector,
+      )
       try {
         const session = await service.getOrCreateSession({
           driveLetter: 'A',
@@ -903,16 +980,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -939,16 +1020,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -971,16 +1056,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -1004,16 +1093,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -1040,16 +1133,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -1076,16 +1173,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -1108,16 +1209,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           await service.getOrCreateSession({
             driveLetter: 'A',
@@ -1142,16 +1247,20 @@ describe('TranscodingSessionService', () => {
       mockSpawn.mockReturnValue(mockProcess)
 
       await usingAsync(new Injector(), async (injector) => {
-        injector.setExplicitInstance(
-          { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+        injector.bind(
           FfprobeService,
+          () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
         )
-        injector.setExplicitInstance(
-          { getEncoder: vi.fn().mockResolvedValue('libx264') } as unknown as HwAccelDetector,
+        injector.bind(
           HwAccelDetector,
+          () => ({ getEncoder: vi.fn().mockResolvedValue('libx264') }) as unknown as HwAccelDetector,
         )
 
-        const service = injector.getInstance(TranscodingSessionService)
+        const service = new TranscodingSessionServiceImpl(
+          injector,
+          { verbose: vi.fn().mockResolvedValue(undefined), error: vi.fn().mockResolvedValue(undefined) } as never,
+          injector,
+        )
         try {
           const session1 = await service.getOrCreateSession({
             driveLetter: 'A',
@@ -1200,7 +1309,7 @@ describe('TranscodingSessionService', () => {
       ].join('\n')
       writeFileSync(join(testDir, 'playlist.m3u8'), playlistContent)
 
-      const service = new TranscodingSessionService()
+      const service = new TranscodingSessionServiceImpl({} as never, {} as never, {} as never)
       try {
         const mockSession = {
           sessionDir: testDir,

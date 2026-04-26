@@ -1,16 +1,13 @@
 import type { Injector } from '@furystack/inject'
 import { getDataSetFor } from '@furystack/repository'
 import type { MovieMetadataLocalized, SeriesMetadataLocalized } from 'common'
-import {
-  MovieMetadataLocalized as MovieMetadataLocalizedClass,
-  SeriesMetadataLocalized as SeriesMetadataLocalizedClass,
-} from 'common'
+import { MovieMetadataLocalizedDataSet, SeriesMetadataLocalizedDataSet } from '../media-data-sets.js'
 
 export const ensureMovieLocalizedMetadataExists = async (
   data: Omit<MovieMetadataLocalized, 'id' | 'createdAt' | 'updatedAt'>,
   injector: Injector,
 ) => {
-  const dataSet = getDataSetFor(injector, MovieMetadataLocalizedClass, 'id')
+  const dataSet = getDataSetFor(injector, MovieMetadataLocalizedDataSet)
   const existing = await dataSet.find(injector, {
     filter: {
       movieImdbId: { $eq: data.movieImdbId },
@@ -39,7 +36,7 @@ export const ensureSeriesLocalizedMetadataExists = async (
   data: Omit<SeriesMetadataLocalized, 'id' | 'createdAt' | 'updatedAt'>,
   injector: Injector,
 ) => {
-  const dataSet = getDataSetFor(injector, SeriesMetadataLocalizedClass, 'id')
+  const dataSet = getDataSetFor(injector, SeriesMetadataLocalizedDataSet)
   const existing = await dataSet.find(injector, {
     filter: {
       seriesImdbId: { $eq: data.seriesImdbId },

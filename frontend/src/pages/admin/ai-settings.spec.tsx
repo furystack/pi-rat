@@ -49,8 +49,8 @@ describe('AiSettingsPage', () => {
     }
 
     injector = new Injector()
-    injector.setExplicitInstance(mockConfigService as unknown as ConfigService, ConfigService)
-    injector.setExplicitInstance(mockNotyService as unknown as NotyService, NotyService)
+    injector.bind(ConfigService, () => mockConfigService as never)
+    injector.bind(NotyService, () => mockNotyService as never)
   })
 
   afterEach(async () => {
@@ -80,7 +80,7 @@ describe('AiSettingsPage', () => {
     })
     mockConfigService.configCache = neverResolvingCache
 
-    injector.setExplicitInstance(mockConfigService as unknown as ConfigService, ConfigService)
+    injector.bind(ConfigService, () => mockConfigService as never)
 
     const rootElement = document.getElementById('root') as HTMLDivElement
 

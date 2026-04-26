@@ -16,11 +16,12 @@ const createMockMovie = (imdbId = 'tt1234567', _title = 'Test Movie'): Movie => 
 describe('MoviesService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as MediaApiClient,
+    injector.bind(
       MediaApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -32,7 +33,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         const result = await service.getMovie('tt1234567')
 
@@ -52,7 +53,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         await service.getMovie('tt1234567')
         await service.getMovie('tt1234567')
@@ -69,7 +70,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         const observable = service.getMovieAsObservable('tt1234567')
 
@@ -84,7 +85,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         const observable1 = service.getMovieAsObservable('tt1234567')
         const observable2 = service.getMovieAsObservable('tt1234567')
@@ -104,7 +105,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         const findOptions = { top: 10 }
         const result = await service.findMovie(findOptions)
@@ -129,7 +130,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         const findOptions = { top: 10 }
         await service.findMovie(findOptions)
@@ -150,7 +151,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         // First call should populate both query cache and individual movie cache
         await service.findMovie({ top: 10 })
@@ -172,7 +173,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         const body = {
           imdbId: 'tt1234567',
@@ -202,7 +203,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         // First load the movie to populate the cache
         await service.getMovie('tt1234567')
@@ -230,7 +231,7 @@ describe('MoviesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(MoviesService)
+        const service = i.get(MoviesService)
 
         await service.deleteMovie('tt1234567')
 

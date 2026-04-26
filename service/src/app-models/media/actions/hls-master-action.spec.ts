@@ -44,9 +44,9 @@ describe('HlsMasterAction', () => {
     }
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
 
       await HlsMasterAction({
@@ -76,9 +76,9 @@ describe('HlsMasterAction', () => {
     }
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
 
       await HlsMasterAction({
@@ -103,9 +103,9 @@ describe('HlsMasterAction', () => {
     }
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(mockFfprobe) }) as unknown as FfprobeService,
       )
 
       await HlsMasterAction({

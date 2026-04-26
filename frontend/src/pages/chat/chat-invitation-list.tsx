@@ -15,7 +15,7 @@ export const ChatInvitationList = Shade({
   render: ({ injector, useObservable, useDisposable }) => {
     const filter = { filter: { status: { $eq: 'pending' } } } as const
 
-    const chatInvitationService = injector.getInstance(ChatInvitationService)
+    const chatInvitationService = injector.get(ChatInvitationService)
     const currentUsername = getUser(injector).username
 
     const reloadChatInvitations = () => {
@@ -54,7 +54,7 @@ export const ChatInvitationList = Shade({
       )
     }
 
-    const noty = injector.getInstance(NotyService)
+    const noty = injector.get(NotyService)
 
     const received = invitations.value.entries.filter(
       (invitation) => invitation.userId === currentUsername && invitation.status === 'pending',

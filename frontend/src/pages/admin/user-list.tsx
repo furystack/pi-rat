@@ -147,7 +147,7 @@ type UserListPageProps = Record<string, never>
 export const UserListPage = Shade<UserListPageProps>({
   customElementName: 'user-list-page',
   render: ({ injector }) => {
-    const usersService = injector.getInstance(UsersService)
+    const usersService = injector.get(UsersService)
 
     return (
       <PageContainer gap="24px">

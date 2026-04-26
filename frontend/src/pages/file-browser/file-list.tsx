@@ -52,10 +52,10 @@ export const FileList = Shade<{
   render: ({ useDisposable, useState, props, injector }) => {
     const { currentDriveLetter, currentPath, service } = props
 
-    const drivesService = injector.getInstance(DrivesService)
-    const notyService = injector.getInstance(NotyService)
-    const mediaApiClient = injector.getInstance(MediaApiClient)
-    const sessionService = injector.getInstance(SessionService)
+    const drivesService = injector.get(DrivesService)
+    const notyService = injector.get(NotyService)
+    const mediaApiClient = injector.get(MediaApiClient)
+    const sessionService = injector.get(SessionService)
 
     const [findOptions, setFindOptions] = useState<FindOptions<DirectoryEntry, Array<keyof DirectoryEntry>>>(
       'findOptions',

@@ -8,7 +8,7 @@ import { DrivesService } from '../../services/drives-service.js'
 export const DrivesPage = Shade({
   customElementName: 'shade-app-drives-page',
   render: ({ useDisposable, injector }) => {
-    const drivesService = injector.getInstance(DrivesService)
+    const drivesService = injector.get(DrivesService)
 
     const service = useDisposable(
       'service',

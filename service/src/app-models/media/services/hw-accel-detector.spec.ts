@@ -11,6 +11,11 @@ vi.mock('@furystack/logging', () => ({
       information: vi.fn().mockResolvedValue(undefined),
     }),
   }),
+  useScopedLogger: () => ({
+    verbose: vi.fn().mockResolvedValue(undefined),
+    error: vi.fn().mockResolvedValue(undefined),
+    information: vi.fn().mockResolvedValue(undefined),
+  }),
 }))
 
 const mockExecAsync = vi.fn()
@@ -28,7 +33,7 @@ describe('HwAccelDetector', () => {
       )
 
     await usingAsync(new Injector(), async (injector) => {
-      const detector = injector.getInstance(HwAccelDetector)
+      const detector = injector.get(HwAccelDetector)
       const info = await detector.detect()
 
       expect(info.available).toContain('vaapi')
@@ -41,7 +46,7 @@ describe('HwAccelDetector', () => {
     mockExecAsync.mockRejectedValue(new Error('ffmpeg not found'))
 
     await usingAsync(new Injector(), async (injector) => {
-      const detector = injector.getInstance(HwAccelDetector)
+      const detector = injector.get(HwAccelDetector)
       const info = await detector.detect()
 
       expect(info.available).toHaveLength(0)
@@ -56,7 +61,7 @@ describe('HwAccelDetector', () => {
       .mockResolvedValueOnce(' V..... h264_vaapi           H.264/AVC (VAAPI)\n')
 
     await usingAsync(new Injector(), async (injector) => {
-      const detector = injector.getInstance(HwAccelDetector)
+      const detector = injector.get(HwAccelDetector)
 
       const first = await detector.detect()
       const second = await detector.detect()
@@ -70,7 +75,7 @@ describe('HwAccelDetector', () => {
     mockExecAsync.mockResolvedValueOnce('Hardware acceleration methods:\n').mockResolvedValueOnce('')
 
     await usingAsync(new Injector(), async (injector) => {
-      const detector = injector.getInstance(HwAccelDetector)
+      const detector = injector.get(HwAccelDetector)
       const encoder = await detector.getEncoder('h264')
 
       expect(encoder).toBe('libx264')
@@ -81,7 +86,7 @@ describe('HwAccelDetector', () => {
     mockExecAsync.mockResolvedValueOnce('Hardware acceleration methods:\n').mockResolvedValueOnce('')
 
     await usingAsync(new Injector(), async (injector) => {
-      const detector = injector.getInstance(HwAccelDetector)
+      const detector = injector.get(HwAccelDetector)
       const encoder = await detector.getEncoder('hevc')
 
       expect(encoder).toBe('libx265')
@@ -96,7 +101,7 @@ describe('HwAccelDetector', () => {
       )
 
     await usingAsync(new Injector(), async (injector) => {
-      const detector = injector.getInstance(HwAccelDetector)
+      const detector = injector.get(HwAccelDetector)
       const encoder = await detector.getEncoder('h264', 'vaapi')
 
       expect(encoder).toBe('h264_vaapi')

@@ -52,7 +52,7 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
               initialValue={text}
               language={getMonacoLanguage(path)}
               onSave={(newValue) => {
-                const client = injector.getInstance(DrivesApiClient)
+                const client = injector.get(DrivesApiClient)
                 client
                   .call({
                     method: 'PUT',
@@ -61,14 +61,14 @@ export const MonacoFileEditor = Shade<{ letter: string; path: string }>({
                     body: { text: newValue },
                   })
                   .then(() => {
-                    injector.getInstance(NotyService).emit('onNotyAdded', {
+                    injector.get(NotyService).emit('onNotyAdded', {
                       title: 'File saved',
                       body: `File ${path} has been saved successfully.`,
                       type: 'success',
                     })
                   })
                   .catch((error) => {
-                    injector.getInstance(NotyService).emit('onNotyAdded', {
+                    injector.get(NotyService).emit('onNotyAdded', {
                       title: 'Failed to save file',
                       body: getErrorMessage(error),
                       type: 'error',

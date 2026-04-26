@@ -3,9 +3,10 @@ import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { HttpUserContext, JsonResult, type RequestAction } from '@furystack/rest-service'
-import { PasswordAuthenticator, PasswordCredential } from '@furystack/security'
+import { PasswordAuthenticator, PasswordCredentialDataSet } from '@furystack/security'
 import type { RegisterAction as RegisterActionType } from 'common'
-import { User } from 'common'
+import type { User } from 'common'
+import { UserDataSet } from '../setup-identity-store.js'
 
 export const RegisterAction: RequestAction<RegisterActionType> = async ({ injector, getBody, response }) => {
   const logger = getLogger(injector).withScope('Register')
@@ -13,8 +14,8 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
   const { username, password } = postBody
 
   const systemInjector = useSystemIdentityContext({ injector, username: 'registration' })
-  const userDataSet = getDataSetFor(injector, User, 'username')
-  const authenticator = injector.getInstance(PasswordAuthenticator)
+  const userDataSet = getDataSetFor(injector, UserDataSet)
+  const authenticator = injector.get(PasswordAuthenticator)
 
   // Check if user already exists
   const existingUser = await userDataSet.get(systemInjector, username)
@@ -24,10 +25,8 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
   }
 
   try {
-    // Create password credential first (this can fail early if password is invalid)
     const credential = await authenticator.hasher.createCredential(username, password)
 
-    // Create user with default (empty) roles
     const newUser: User = {
       username,
       roles: [],
@@ -38,12 +37,11 @@ export const RegisterAction: RequestAction<RegisterActionType> = async ({ inject
     await userDataSet.add(systemInjector, newUser)
     await logger.information({ message: `User created: ${username}` })
 
-    // Now add the credential to the store
-    const credentialDataSet = getDataSetFor(injector, PasswordCredential, 'userName')
+    const credentialDataSet = getDataSetFor(injector, PasswordCredentialDataSet)
     await credentialDataSet.add(systemInjector, credential)
     await logger.information({ message: `Registration completed for: ${username}` })
 
-    const userContext = injector.getInstance(HttpUserContext)
+    const userContext = injector.get(HttpUserContext)
     const user = await userContext.authenticateUser(username, password)
     await userContext.cookieLogin(user, response)
 

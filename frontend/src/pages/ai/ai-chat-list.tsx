@@ -44,7 +44,7 @@ const AiChatListContent = Shade<{
 export const AiChatList = Shade<{ selectedChatId?: string; onSelect: (chat: AiChat) => void }>({
   customElementName: 'pi-rat-ai-chat-list',
   render: ({ injector, props }) => {
-    const aiChatService = injector.getInstance(AiChatService)
+    const aiChatService = injector.get(AiChatService)
 
     return (
       <CacheView

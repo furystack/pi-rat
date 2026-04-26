@@ -23,7 +23,7 @@ describe('MediaOverviewLayout', () => {
         },
       },
     }
-    injector.setExplicitInstance(mockScreenService as unknown as ScreenService, ScreenService)
+    injector.bind(ScreenService, () => mockScreenService as never)
   })
 
   afterEach(async () => {

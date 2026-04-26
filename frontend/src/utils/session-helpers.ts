@@ -15,7 +15,7 @@ export class SessionUserUnavailableError extends Error {
  * @throws {SessionUserUnavailableError} if no user is available
  */
 export const getUser = (injector: Injector): User => {
-  const user = injector.getInstance(SessionService).currentUser.getValue()
+  const user = injector.get(SessionService).currentUser.getValue()
   if (!user) {
     throw new SessionUserUnavailableError()
   }

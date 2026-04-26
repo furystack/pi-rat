@@ -13,25 +13,26 @@ const mockOmdbStoreFind = vi.fn()
 const mockDriveGet = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
-  getDataSetFor: (_injector: unknown, model: { name?: string } | ((...args: unknown[]) => unknown)) => {
-    const name = typeof model === 'function' ? model.name : ''
-    if (name === 'MovieFile') {
+  defineDataSet: ({ name, store }: { name: string; store: unknown }) => ({ name, store }),
+  getDataSetFor: (_injector: unknown, token: { name?: string } | ((...args: unknown[]) => unknown)) => {
+    const tokenName = typeof token === 'function' ? token.name : (token?.name ?? '')
+    if (tokenName.includes('MovieFile')) {
       return {
         find: (...args: unknown[]) => mockMovieFileStoreFind(...args) as unknown,
         add: (...args: unknown[]) => mockMovieFileStoreAdd(...args) as unknown,
       }
     }
-    if (name === 'OmdbMovieMetadata') {
+    if (tokenName.includes('OmdbMovieMetadata')) {
       return {
         find: (...args: unknown[]) => mockOmdbStoreFind(...args) as unknown,
       }
     }
-    if (name === 'Config') {
+    if (tokenName.includes('Config')) {
       return {
         get: vi.fn().mockResolvedValue(null),
       }
     }
-    if (name === 'Drive') {
+    if (tokenName.includes('Drive')) {
       return {
         get: (...args: unknown[]) => mockDriveGet(...args) as unknown,
       }
@@ -120,26 +121,28 @@ describe('linkMovie', () => {
   const createTestInjector = () => {
     const injector = new Injector()
 
-    injector.setExplicitInstance(
-      { getFfprobeForPiratFile: mockGetFfprobeForPiratFile } as unknown as FfprobeService,
+    injector.bind(
       FfprobeService,
+      () => ({ getFfprobeForPiratFile: mockGetFfprobeForPiratFile }) as unknown as FfprobeService,
     )
 
-    injector.setExplicitInstance(
-      {
-        fetchOmdbMovieMetadata: mockFetchOmdbMovieMetadata,
-        fetchOmdbMovieMetadataByImdbId: mockFetchOmdbMovieMetadataByImdbId,
-      } as unknown as OmdbClientService,
+    injector.bind(
       OmdbClientService,
+      () =>
+        ({
+          fetchOmdbMovieMetadata: mockFetchOmdbMovieMetadata,
+          fetchOmdbMovieMetadataByImdbId: mockFetchOmdbMovieMetadataByImdbId,
+        }) as unknown as OmdbClientService,
     )
 
-    injector.setExplicitInstance(
-      {
-        fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
-        fetchTmdbMovieMetadataByImdbId: mockFetchTmdbMovieMetadataByImdbId,
-        config: undefined,
-      } as unknown as TmdbClientService,
+    injector.bind(
       TmdbClientService,
+      () =>
+        ({
+          fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+          fetchTmdbMovieMetadataByImdbId: mockFetchTmdbMovieMetadataByImdbId,
+          config: undefined,
+        }) as unknown as TmdbClientService,
     )
 
     return injector
@@ -577,12 +580,13 @@ describe('linkMovie', () => {
       })
 
       await usingAsync(createTestInjector(), async (injector) => {
-        injector.setExplicitInstance(
-          {
-            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
-            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
-          } as unknown as TmdbClientService,
+        injector.bind(
           TmdbClientService,
+          () =>
+            ({
+              fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+              config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+            }) as unknown as TmdbClientService,
         )
 
         const result = await linkMovie({
@@ -623,12 +627,13 @@ describe('linkMovie', () => {
       })
 
       await usingAsync(createTestInjector(), async (injector) => {
-        injector.setExplicitInstance(
-          {
-            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
-            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
-          } as unknown as TmdbClientService,
+        injector.bind(
           TmdbClientService,
+          () =>
+            ({
+              fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+              config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+            }) as unknown as TmdbClientService,
         )
 
         const result = await linkMovie({
@@ -676,12 +681,13 @@ describe('linkMovie', () => {
       })
 
       await usingAsync(createTestInjector(), async (injector) => {
-        injector.setExplicitInstance(
-          {
-            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
-            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
-          } as unknown as TmdbClientService,
+        injector.bind(
           TmdbClientService,
+          () =>
+            ({
+              fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+              config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+            }) as unknown as TmdbClientService,
         )
 
         const result = await linkMovie({
@@ -715,12 +721,13 @@ describe('linkMovie', () => {
       })
 
       await usingAsync(createTestInjector(), async (injector) => {
-        injector.setExplicitInstance(
-          {
-            fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
-            config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
-          } as unknown as TmdbClientService,
+        injector.bind(
           TmdbClientService,
+          () =>
+            ({
+              fetchTmdbMovieMetadata: mockFetchTmdbMovieMetadata,
+              config: { id: 'TMDB_CONFIG', value: { apiKey: 'key', defaultLanguage: 'en-US' } },
+            }) as unknown as TmdbClientService,
         )
 
         const result = await linkMovie({

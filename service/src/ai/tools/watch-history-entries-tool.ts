@@ -1,5 +1,5 @@
-import { getRepository } from '@furystack/repository'
-import { WatchHistoryEntry } from 'common'
+import { getDataSetFor } from '@furystack/repository'
+import { WatchHistoryEntryDataSet } from '../../app-models/media/media-data-sets.js'
 import type { OllamaTool } from './ollama-tools.js'
 
 export const WatchHistoryEntriesTool: OllamaTool = {
@@ -20,7 +20,7 @@ export const WatchHistoryEntriesTool: OllamaTool = {
     return !!response.message.tool_calls?.some((toolCall) => toolCall.function?.name === 'getMovieWatchHistory')
   },
   execute: async (injector, _response) => {
-    const watchHistoryDataSet = getRepository(injector).getDataSetFor(WatchHistoryEntry, 'id')
+    const watchHistoryDataSet = getDataSetFor(injector, WatchHistoryEntryDataSet)
     const movies = await watchHistoryDataSet.find(injector, {
       filter: {},
       order: { updatedAt: 'DESC' },

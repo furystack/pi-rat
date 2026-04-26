@@ -38,9 +38,9 @@ const mockSession = {
 describe('HlsSegmentAction', () => {
   it('should reject invalid segment index', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getSession: vi.fn(), waitForSegment: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -60,9 +60,9 @@ describe('HlsSegmentAction', () => {
 
   it('should reject path traversal attempts', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getSession: vi.fn(), waitForSegment: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -82,9 +82,9 @@ describe('HlsSegmentAction', () => {
 
   it('should reject negative segment index', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getSession: vi.fn(), waitForSegment: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -104,9 +104,9 @@ describe('HlsSegmentAction', () => {
 
   it('should reject segment index exceeding upper bound', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getSession: vi.fn(), waitForSegment: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -126,9 +126,9 @@ describe('HlsSegmentAction', () => {
 
   it('should reject invalid playback mode', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getSession: vi.fn(), waitForSegment: vi.fn() } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getSession: vi.fn(), waitForSegment: vi.fn() }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -148,12 +148,13 @@ describe('HlsSegmentAction', () => {
 
   it('should return 404 when no active session exists', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn().mockReturnValue(undefined),
-          waitForSegment: vi.fn(),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn().mockReturnValue(undefined),
+            waitForSegment: vi.fn(),
+          }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -173,12 +174,13 @@ describe('HlsSegmentAction', () => {
 
   it('should return 504 when segment is not available', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn().mockReturnValue(mockSession),
-          waitForSegment: vi.fn().mockResolvedValue(false),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn().mockReturnValue(mockSession),
+            waitForSegment: vi.fn().mockResolvedValue(false),
+          }) as unknown as TranscodingSessionService,
       )
 
       try {
@@ -200,12 +202,13 @@ describe('HlsSegmentAction', () => {
     const writeHead = vi.fn()
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        {
-          getSession: vi.fn().mockReturnValue(mockSession),
-          waitForSegment: vi.fn().mockResolvedValue(true),
-        } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () =>
+          ({
+            getSession: vi.fn().mockReturnValue(mockSession),
+            waitForSegment: vi.fn().mockResolvedValue(true),
+          }) as unknown as TranscodingSessionService,
       )
 
       await HlsSegmentAction({
@@ -231,9 +234,9 @@ describe('HlsSegmentAction', () => {
     const waitForSegment = vi.fn().mockResolvedValue(true)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getSession, waitForSegment } as unknown as TranscodingSessionService,
+      injector.bind(
         TranscodingSessionService,
+        () => ({ getSession, waitForSegment }) as unknown as TranscodingSessionService,
       )
 
       await HlsSegmentAction({

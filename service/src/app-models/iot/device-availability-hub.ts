@@ -1,11 +1,12 @@
 import { useSystemIdentityContext } from '@furystack/core'
-import { Injectable, Injected, type Injector } from '@furystack/inject'
-import type { ScopedLogger } from '@furystack/logging'
-import { getLogger } from '@furystack/logging'
-import { getDataSetFor, type DataSet } from '@furystack/repository'
+import { defineService, type Token } from '@furystack/inject'
+import { useScopedLogger } from '@furystack/logging'
+import { getDataSetFor } from '@furystack/repository'
 import { EventHub, sleepAsync } from '@furystack/utils'
-import { Config, Device, DevicePingHistory, type IotConfig } from 'common'
+import { type Device, type IotConfig } from 'common'
 import ping from 'ping'
+import { ConfigDataSet } from '../config/setup-config-store.js'
+import { DeviceDataSet, DevicePingHistoryDataSet } from './setup-store.js'
 
 const defaultIotConfig: IotConfig = {
   id: 'IOT_CONFIG',
@@ -15,97 +16,115 @@ const defaultIotConfig: IotConfig = {
   },
 }
 
-@Injectable({ lifetime: 'singleton' })
-export class DeviceAvailabilityHub extends EventHub<{ connected: Device; disconnected: Device; refresh: null }> {
-  private devices: Device[] = []
-  public updateDevices = (devices: Device[]) => {
-    this.devices = [...devices]
-  }
-  private deviceStatusMap = new Map<string, boolean>()
+type DeviceAvailabilityEvents = { connected: Device; disconnected: Device; refresh: null }
 
-  @Injected((injector) => getLogger(injector).withScope('DeviceAvailabilityHub'))
-  declare private logger: ScopedLogger
+export type DeviceAvailabilityHub = EventHub<DeviceAvailabilityEvents>
 
-  @Injected((injector) => getDataSetFor(injector, Config, 'id'))
-  declare private configDataSet: DataSet<Config, 'id'>
+export const DeviceAvailabilityHub: Token<DeviceAvailabilityHub, 'singleton'> = defineService({
+  name: 'pi-rat/DeviceAvailabilityHub',
+  lifetime: 'singleton',
+  factory: (ctx) => {
+    const { injector, onDispose } = ctx
+    const logger = useScopedLogger(ctx)
+    const systemInjector = useSystemIdentityContext({ injector, username: 'device-availability' })
 
-  @Injected((injector) => useSystemIdentityContext({ injector, username: 'device-availability' }))
-  declare private systemInjector: Injector
+    const hub = new EventHub<DeviceAvailabilityEvents>()
+    let devices: Device[] = []
+    const deviceStatusMap = new Map<string, boolean>()
+    let stopped = false
 
-  private getCurrentConfig = async () => {
-    try {
-      const loaded = (await this.configDataSet.get(this.systemInjector, 'IOT_CONFIG')) as IotConfig
-      return loaded || defaultIotConfig
-    } catch (error) {
-      await this.logger.warning({
-        message: 'Error while loading IOT_CONFIG, falling back to defaults',
-        data: { error },
-      })
-      return defaultIotConfig
+    const updateDevices = (next: Device[]): void => {
+      devices = [...next]
     }
-  }
 
-  private async refreshConnections() {
-    this.emit('refresh', null)
-    const currentConfig = await this.getCurrentConfig()
-
-    try {
-      await Promise.all(
-        this.devices
-          .filter((device) => device.ipAddress)
-          .map(async (device) => {
-            const lastStatus = this.deviceStatusMap.get(device.name)
-            const { alive: newStatus, avg } = await ping.promise.probe(device.ipAddress!, {
-              timeout: currentConfig.value.pingTimeoutMs,
-            })
-
-            if (lastStatus !== newStatus) {
-              await this.devicePingHistoryDataSet.add(this.systemInjector, {
-                name: device.name,
-                isAvailable: newStatus,
-                ping: parseFloat(avg) || undefined,
-                createdAt: new Date().toISOString(),
-              })
-              this.deviceStatusMap.set(device.name, newStatus)
-              this.emit(newStatus ? 'connected' : 'disconnected', device)
-              await this.logger.verbose({
-                message: `Device ${device.name} is ${newStatus ? 'connected' : 'disconnected'}`,
-              })
-            }
-          }),
-      )
-    } catch (error) {
-      await this.logger.warning({
-        message: `Error while refreshing device connections: ${error?.toString()}`,
-        data: { error },
-      })
-    } finally {
-      const sleepMs = currentConfig.value.pingIntervalMs || 30 * 1000
-      // await this.logger.verbose({ message: `Device refresh done, sleeping for ${sleepMs}ms` })
-      await sleepAsync(sleepMs)
-      await this.refreshConnections()
+    const getCurrentConfig = async (): Promise<IotConfig> => {
+      try {
+        const configDataSet = getDataSetFor(systemInjector, ConfigDataSet)
+        const loaded = (await configDataSet.get(systemInjector, 'IOT_CONFIG')) as IotConfig | undefined
+        return loaded || defaultIotConfig
+      } catch (error) {
+        await logger.warning({
+          message: 'Error while loading IOT_CONFIG, falling back to defaults',
+          data: { error },
+        })
+        return defaultIotConfig
+      }
     }
-  }
 
-  @Injected((injector) => getDataSetFor(injector, Device, 'name'))
-  declare private deviceDataSet: DataSet<Device, 'name'>
+    const refreshConnections = async (): Promise<void> => {
+      hub.emit('refresh', null)
+      const currentConfig = await getCurrentConfig()
+      const pingHistoryDataSet = getDataSetFor(systemInjector, DevicePingHistoryDataSet)
 
-  @Injected((injector) => getDataSetFor(injector, DevicePingHistory, 'id'))
-  declare private devicePingHistoryDataSet: DataSet<DevicePingHistory, 'id'>
+      try {
+        await Promise.all(
+          devices
+            .filter((device) => device.ipAddress)
+            .map(async (device) => {
+              const lastStatus = deviceStatusMap.get(device.name)
+              const { alive: newStatus, avg } = await ping.promise.probe(device.ipAddress!, {
+                timeout: currentConfig.value.pingTimeoutMs,
+              })
 
-  public async init() {
-    const currentDevices = await this.deviceDataSet.find(this.systemInjector, {})
-    this.updateDevices(currentDevices)
+              if (lastStatus !== newStatus) {
+                await pingHistoryDataSet.add(systemInjector, {
+                  name: device.name,
+                  isAvailable: newStatus,
+                  ping: parseFloat(avg) || undefined,
+                  createdAt: new Date().toISOString(),
+                })
+                deviceStatusMap.set(device.name, newStatus)
+                hub.emit(newStatus ? 'connected' : 'disconnected', device)
+                await logger.verbose({
+                  message: `Device ${device.name} is ${newStatus ? 'connected' : 'disconnected'}`,
+                })
+              }
+            }),
+        )
+      } catch (error) {
+        await logger.warning({
+          message: `Error while refreshing device connections: ${(error as Error)?.toString()}`,
+          data: { error },
+        })
+      } finally {
+        if (!stopped) {
+          const sleepMs = currentConfig.value.pingIntervalMs || 30 * 1000
+          await sleepAsync(sleepMs)
+          if (!stopped) {
+            void refreshConnections()
+          }
+        }
+      }
+    }
 
-    this.deviceDataSet.subscribe('onEntityAdded', ({ entity }) => {
-      this.updateDevices([...this.devices, entity])
+    const start = async () => {
+      const deviceDataSet = getDataSetFor(systemInjector, DeviceDataSet)
+      const currentDevices = await deviceDataSet.find(systemInjector, {})
+      updateDevices(currentDevices)
+
+      deviceDataSet.subscribe('onEntityAdded', ({ entity }) => {
+        updateDevices([...devices, entity])
+      })
+      deviceDataSet.subscribe('onEntityRemoved', ({ key }) => {
+        updateDevices(devices.filter((device) => device.name !== key))
+      })
+      deviceDataSet.subscribe('onEntityUpdated', ({ id, change }) => {
+        updateDevices(devices.map((device) => (device.name === id ? { ...device, ...change } : device)))
+      })
+      await refreshConnections()
+    }
+
+    void start().catch((error) => {
+      void logger.error({ message: 'Failed to start DeviceAvailabilityHub', data: { error } })
     })
-    this.deviceDataSet.subscribe('onEntityRemoved', ({ key }) => {
-      this.updateDevices(this.devices.filter((device) => device.name !== key))
+
+    onDispose(() => {
+      stopped = true
     })
-    this.deviceDataSet.subscribe('onEntityUpdated', ({ id, change }) => {
-      this.updateDevices(this.devices.map((device) => (device.name === id ? { ...device, ...change } : device)))
-    })
-    await this.refreshConnections()
-  }
-}
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to caller
+    onDispose(() => hub[Symbol.dispose]())
+    onDispose(() => systemInjector[Symbol.asyncDispose]())
+
+    return hub
+  },
+})

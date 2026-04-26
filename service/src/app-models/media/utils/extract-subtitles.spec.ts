@@ -18,6 +18,7 @@ vi.mock('@furystack/logging', () => ({
 const mockGet = vi.fn()
 
 vi.mock('@furystack/repository', () => ({
+  defineDataSet: ({ store }: { store: unknown }) => store,
   getDataSetFor: () => ({
     get: (...args: unknown[]) => mockGet(...args) as unknown,
   }),
@@ -77,9 +78,9 @@ describe('extractSubtitles', () => {
     mockGet.mockResolvedValue(null)
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeWithSubs) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeWithSubs) }) as unknown as FfprobeService,
       )
 
       await expect(extractSubtitles({ injector, file: { driveLetter: 'Z', path: 'test.mkv' } })).rejects.toThrow(
@@ -92,9 +93,9 @@ describe('extractSubtitles', () => {
     mockGet.mockResolvedValue({ physicalPath: '/mnt/media', letter: 'A' })
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeNoSubs) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeNoSubs) }) as unknown as FfprobeService,
       )
 
       await extractSubtitles({ injector, file: { driveLetter: 'A', path: 'movies/test.mkv' } })
@@ -106,9 +107,9 @@ describe('extractSubtitles', () => {
     mockGet.mockResolvedValue({ physicalPath: '/mnt/media', letter: 'A' })
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeBitmapSubs) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeBitmapSubs) }) as unknown as FfprobeService,
       )
 
       await extractSubtitles({ injector, file: { driveLetter: 'A', path: 'movies/test.mkv' } })
@@ -133,9 +134,9 @@ describe('extractSubtitles', () => {
     })
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeWithSubs) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeWithSubs) }) as unknown as FfprobeService,
       )
 
       await extractSubtitles({ injector, file: { driveLetter: 'A', path: 'movies/test.mkv' } })
@@ -167,9 +168,9 @@ describe('extractSubtitles', () => {
     })
 
     await usingAsync(new Injector(), async (injector) => {
-      injector.setExplicitInstance(
-        { getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeWithSubs) } as unknown as FfprobeService,
+      injector.bind(
         FfprobeService,
+        () => ({ getFfprobeForPiratFile: vi.fn().mockResolvedValue(ffprobeWithSubs) }) as unknown as FfprobeService,
       )
 
       await expect(extractSubtitles({ injector, file: { driveLetter: 'A', path: 'movies/test.mkv' } })).rejects.toThrow(

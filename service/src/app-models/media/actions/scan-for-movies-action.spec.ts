@@ -24,12 +24,13 @@ vi.mock('@furystack/logging', () => ({
 }))
 
 vi.mock('@furystack/repository', () => ({
-  getDataSetFor: (_injector: unknown, model: { name?: string } | ((...args: unknown[]) => unknown)) => {
-    const name = typeof model === 'function' ? model.name : ''
-    if (name === 'Drive') {
+  defineDataSet: ({ name, store }: { name: string; store: unknown }) => ({ name, store }),
+  getDataSetFor: (_injector: unknown, token: { name?: string } | ((...args: unknown[]) => unknown)) => {
+    const tokenName = typeof token === 'function' ? token.name : (token?.name ?? '')
+    if (tokenName.includes('DriveDataSet')) {
       return { get: mockDriveGet }
     }
-    if (name === 'MovieFile') {
+    if (tokenName.includes('MovieFileDataSet')) {
       return { find: mockMovieFileFind }
     }
     return {}
@@ -37,14 +38,13 @@ vi.mock('@furystack/repository', () => ({
 }))
 
 vi.mock('@furystack/inject', () => ({
-  Injectable: () => (target: unknown) => target,
-  Injected: () => () => undefined,
+  defineService: ({ factory }: { factory: (ctx: unknown) => unknown }) => factory,
+  defineServiceAsync: ({ factory }: { factory: (ctx: unknown) => unknown }) => factory,
 }))
 
+const mockMaintainerToken = Symbol('MovieMaintainerService')
 vi.mock('../services/movie-file-maintainer.js', () => ({
-  MovieMaintainerService: class {
-    checkFolderForPossibleMovieFiles = mockCheckFolderForPossibleMovieFiles
-  },
+  MovieMaintainerService: mockMaintainerToken,
 }))
 
 vi.mock('../utils/link-movie.js', () => ({
@@ -72,7 +72,7 @@ describe('ScanForMoviesAction', () => {
   const callAction = () =>
     ScanForMoviesAction({
       injector: {
-        getInstance: vi.fn().mockReturnValue({
+        get: vi.fn().mockReturnValue({
           checkFolderForPossibleMovieFiles: mockCheckFolderForPossibleMovieFiles,
         }),
       },

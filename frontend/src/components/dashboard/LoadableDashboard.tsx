@@ -9,7 +9,7 @@ export const LoadableDashboard = Shade<{ id: string }>({
     return (
       <PiRatLazyLoad
         component={async () => {
-          const dashboard = await injector.getInstance(DashboardService).getDashboard(props.id)
+          const dashboard = await injector.get(DashboardService).getDashboard(props.id)
           return <Dashboard {...dashboard} />
         }}
       />

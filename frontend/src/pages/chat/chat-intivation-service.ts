@@ -1,23 +1,18 @@
 import { Cache } from '@furystack/cache'
 import type { FilterType } from '@furystack/core'
-import { Injectable, Injected } from '@furystack/inject'
+import { defineService, type Token } from '@furystack/inject'
 import { EventHub } from '@furystack/utils'
 import type { ChatInvitation } from 'common'
 import { ChatApiClient } from '../../services/api-clients/chat-api-client.js'
 
-@Injectable({ lifetime: 'singleton' })
-export class ChatInvitationService
-  extends EventHub<{
-    invitationAccepted: ChatInvitation
-    invitationCreated: ChatInvitation
-    invitationRejected: ChatInvitation
-    invitationRevoked: ChatInvitation
-  }>
-  implements Disposable
-{
-  @Injected(ChatApiClient)
-  declare private readonly chatApiClient: ChatApiClient
+type ChatInvitationEvents = {
+  invitationAccepted: ChatInvitation
+  invitationCreated: ChatInvitation
+  invitationRejected: ChatInvitation
+  invitationRevoked: ChatInvitation
+}
 
+class ChatInvitationServiceImpl extends EventHub<ChatInvitationEvents> implements Disposable {
   private chatInvitationCache = new Cache({
     capacity: 100,
     load: async (id: string) => {
@@ -37,25 +32,23 @@ export class ChatInvitationService
       const { result } = await this.chatApiClient.call({
         method: 'GET',
         action: '/chat-invitations',
-        query: {
-          findOptions,
-        },
+        query: { findOptions },
       })
 
       result.entries.forEach((entry) => {
         this.chatInvitationCache.setExplicitValue({
           loadArgs: [entry.id],
-          value: {
-            status: 'loaded',
-            value: entry,
-            updatedAt: new Date(),
-          },
+          value: { status: 'loaded', value: entry, updatedAt: new Date() },
         })
       })
 
       return result
     },
   })
+
+  constructor(private readonly chatApiClient: ChatApiClient) {
+    super()
+  }
 
   public async getChatInvitation(id: string) {
     return this.chatInvitationCache.get(id)
@@ -82,11 +75,7 @@ export class ChatInvitationService
 
     this.chatInvitationCache.setExplicitValue({
       loadArgs: [result.id],
-      value: {
-        status: 'loaded',
-        value: result,
-        updatedAt: new Date(),
-      },
+      value: { status: 'loaded', value: result, updatedAt: new Date() },
     })
 
     this.chatInvitationQueryCache.obsoleteRange(() => true)
@@ -103,11 +92,7 @@ export class ChatInvitationService
 
     this.chatInvitationCache.setExplicitValue({
       loadArgs: [id],
-      value: {
-        status: 'loaded',
-        value: result,
-        updatedAt: new Date(),
-      },
+      value: { status: 'loaded', value: result, updatedAt: new Date() },
     })
     this.chatInvitationQueryCache.obsoleteRange(() => true)
     this.emit('invitationAccepted', result)
@@ -123,11 +108,7 @@ export class ChatInvitationService
 
     this.chatInvitationCache.setExplicitValue({
       loadArgs: [id],
-      value: {
-        status: 'loaded',
-        value: result,
-        updatedAt: new Date(),
-      },
+      value: { status: 'loaded', value: result, updatedAt: new Date() },
     })
     this.chatInvitationQueryCache.obsoleteRange(() => true)
     this.emit('invitationRejected', result)
@@ -143,11 +124,7 @@ export class ChatInvitationService
 
     this.chatInvitationCache.setExplicitValue({
       loadArgs: [id],
-      value: {
-        status: 'loaded',
-        value: result,
-        updatedAt: new Date(),
-      },
+      value: { status: 'loaded', value: result, updatedAt: new Date() },
     })
     this.chatInvitationQueryCache.obsoleteRange(() => true)
     this.emit('invitationRevoked', result)
@@ -160,3 +137,16 @@ export class ChatInvitationService
     super[Symbol.dispose]()
   }
 }
+
+export type ChatInvitationService = ChatInvitationServiceImpl
+
+export const ChatInvitationService: Token<ChatInvitationService, 'singleton'> = defineService({
+  name: 'pi-rat/ChatInvitationService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new ChatInvitationServiceImpl(inject(ChatApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})

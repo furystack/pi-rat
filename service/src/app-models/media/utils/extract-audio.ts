@@ -1,8 +1,9 @@
+import { DriveDataSet } from '../../drives/setup-drives.js'
 import type { Injector } from '@furystack/inject'
 import { getLogger } from '@furystack/logging'
 import { getDataSetFor } from '@furystack/repository'
 import type { PiRatFile } from 'common'
-import { Drive, getFileName, getParentPath } from 'common'
+import { getFileName, getParentPath } from 'common'
 import { promises } from 'fs'
 import { join } from 'path'
 
@@ -20,7 +21,7 @@ export const extractAudio = async ({ injector, file }: { injector: Injector; fil
     },
   })
 
-  const drive = await getDataSetFor(injector, Drive, 'letter').get(injector, file.driveLetter)
+  const drive = await getDataSetFor(injector, DriveDataSet).get(injector, file.driveLetter)
 
   if (!drive) {
     throw new Error(`Drive with letter '${file.driveLetter}' not found`)
@@ -28,7 +29,7 @@ export const extractAudio = async ({ injector, file }: { injector: Injector; fil
 
   const fullPath = getPhysicalPath(drive, file)
 
-  const ffprobeResult = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
+  const ffprobeResult = await injector.get(FfprobeService).getFfprobeForPiratFile(file)
 
   const audioTracks: Array<{
     streamIndex: number

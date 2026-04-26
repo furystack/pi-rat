@@ -16,7 +16,7 @@ export const HlsSessionTeardownAction: RequestAction<HlsSessionTeardownEndpoint>
     throw new RequestError('Invalid path', 400)
   }
 
-  const sessionService = injector.getInstance(TranscodingSessionService)
+  const sessionService = injector.get(TranscodingSessionService)
   sessionService.removeAllSessionsForFile(letter, path)
 
   await logger.verbose({

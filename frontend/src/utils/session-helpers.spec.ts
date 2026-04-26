@@ -11,8 +11,8 @@ vi.mock('./navigate-to-route.js', () => ({
 
 const createTestInjector = () => {
   const injector = new Injector()
-  injector.setExplicitInstance({ call: vi.fn() }, IdentityApiClient)
-  injector.setExplicitInstance({ emit: vi.fn() } as unknown as NotyService, NotyService)
+  injector.bind(IdentityApiClient, () => ({ call: vi.fn() }) as never)
+  injector.bind(NotyService, () => ({ emit: vi.fn() }) as never)
   return injector
 }
 
@@ -28,7 +28,7 @@ describe('SessionUserUnavailableError', () => {
 describe('getUser', () => {
   it('should return the current user when authenticated', () => {
     const injector = createTestInjector()
-    const service = injector.getInstance(SessionService)
+    const service = injector.get(SessionService)
     service.currentUser.setValue({ username: 'testuser', roles: ['admin'] })
 
     const user = getUser(injector)
@@ -40,7 +40,7 @@ describe('getUser', () => {
 
   it('should throw SessionUserUnavailableError when no user is set', () => {
     const injector = createTestInjector()
-    const service = injector.getInstance(SessionService)
+    const service = injector.get(SessionService)
 
     expect(() => getUser(injector)).toThrow(SessionUserUnavailableError)
 
@@ -51,7 +51,7 @@ describe('getUser', () => {
 describe('hasRole', () => {
   it('should return true when user has the role', () => {
     const injector = createTestInjector()
-    const service = injector.getInstance(SessionService)
+    const service = injector.get(SessionService)
     service.currentUser.setValue({ username: 'admin', roles: ['admin', 'user'] })
 
     expect(hasRole(injector, 'admin')).toBe(true)
@@ -62,7 +62,7 @@ describe('hasRole', () => {
 
   it('should return false when user does not have the role', () => {
     const injector = createTestInjector()
-    const service = injector.getInstance(SessionService)
+    const service = injector.get(SessionService)
     service.currentUser.setValue({ username: 'user', roles: ['user'] })
 
     expect(hasRole(injector, 'admin')).toBe(false)
@@ -72,7 +72,7 @@ describe('hasRole', () => {
 
   it('should throw SessionUserUnavailableError when no user is set', () => {
     const injector = createTestInjector()
-    const service = injector.getInstance(SessionService)
+    const service = injector.get(SessionService)
 
     expect(() => hasRole(injector, 'admin')).toThrow(SessionUserUnavailableError)
 

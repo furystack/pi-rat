@@ -18,7 +18,7 @@ export const DeviceList = Shade({
     return (
       <PiRatLazyLoad
         component={async () => {
-          const devices = await injector.getInstance(IotDevicesService).findDevice({})
+          const devices = await injector.get(IotDevicesService).findDevice({})
           return (
             <div className="device-grid">
               {devices.entries.map((device) => (

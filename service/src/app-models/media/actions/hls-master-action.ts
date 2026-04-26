@@ -26,7 +26,7 @@ export const HlsMasterAction: RequestAction<HlsMasterEndpoint> = async ({
   }
 
   const file = { driveLetter: letter, path }
-  const ffprobe = await injector.getInstance(FfprobeService).getFfprobeForPiratFile(file)
+  const ffprobe = await injector.get(FfprobeService).getFfprobeForPiratFile(file)
 
   // Normal flow: mode is set by the frontend after calling /playback-info.
   // Fallback codec defaults are conservative — they assume minimal browser

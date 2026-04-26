@@ -8,9 +8,9 @@ import { MoviePlayerV2 } from './movie-player-v2/movie-player-v2-component.js'
 export const MovieLoader = Shade<{ movieFileId: string }>({
   customElementName: 'pirat-movie-loader',
   render: ({ props, injector }) => {
-    const movieFilesService = injector.getInstance(MovieFilesService)
-    const watchProgressService = injector.getInstance(WatchProgressService)
-    const movieService = injector.getInstance(MoviesService)
+    const movieFilesService = injector.get(MovieFilesService)
+    const watchProgressService = injector.get(WatchProgressService)
+    const movieService = injector.get(MoviesService)
     const { movieFileId } = props
 
     return (

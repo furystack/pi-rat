@@ -18,11 +18,12 @@ const createMockDashboard = (id = 'dashboard-1', name = 'Test Dashboard'): Dashb
 describe('DashboardService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as DashboardsApiClient,
+    injector.bind(
       DashboardsApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     return injector
   }
@@ -34,7 +35,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         const result = await service.getDashboard('dashboard-1')
 
@@ -54,7 +55,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         await service.getDashboard('dashboard-1')
         await service.getDashboard('dashboard-1')
@@ -71,7 +72,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         const observable = service.getDashboardAsObservable('dashboard-1')
 
@@ -86,7 +87,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         const observable1 = service.getDashboardAsObservable('dashboard-1')
         const observable2 = service.getDashboardAsObservable('dashboard-1')
@@ -106,7 +107,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         const findOptions = { top: 10 }
         const result = await service.findDashboard(findOptions)
@@ -131,7 +132,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         const findOptions = { top: 10 }
         await service.findDashboard(findOptions)
@@ -149,7 +150,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         const body = {
           name: 'Test Dashboard',
@@ -180,7 +181,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         // First load the dashboard to populate the cache
         await service.getDashboard('dashboard-1')
@@ -210,7 +211,7 @@ describe('DashboardService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(DashboardService)
+        const service = i.get(DashboardService)
 
         await service.deleteDashboard('dashboard-1')
 

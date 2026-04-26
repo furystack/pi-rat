@@ -2,7 +2,8 @@ import { getCurrentUser, useSystemIdentityContext } from '@furystack/core'
 import { getDataSetFor } from '@furystack/repository'
 import { RequestError } from '@furystack/rest'
 import { JsonResult, type RequestAction } from '@furystack/rest-service'
-import { Chat, ChatInvitation, type AcceptInvitationAction as AcceptInvitationActionType } from 'common'
+import { type AcceptInvitationAction as AcceptInvitationActionType } from 'common'
+import { ChatDataSet, ChatInvitationDataSet } from '../setup-chat-store.js'
 
 export const AcceptInvitationAction: RequestAction<AcceptInvitationActionType> = async ({ getUrlParams, injector }) => {
   const user = await getCurrentUser(injector)
@@ -10,7 +11,7 @@ export const AcceptInvitationAction: RequestAction<AcceptInvitationActionType> =
   const { id } = getUrlParams()
 
   const systemInjector = useSystemIdentityContext({ injector, username: 'chat-actions' })
-  const chatInvitationDataSet = getDataSetFor(injector, ChatInvitation, 'id')
+  const chatInvitationDataSet = getDataSetFor(injector, ChatInvitationDataSet)
 
   const chatInvitation = await chatInvitationDataSet.get(systemInjector, id)
 
@@ -18,7 +19,7 @@ export const AcceptInvitationAction: RequestAction<AcceptInvitationActionType> =
     throw new RequestError('Chat invitation not found or you are not the recipient', 404)
   }
 
-  const chatDataSet = getDataSetFor(injector, Chat, 'id')
+  const chatDataSet = getDataSetFor(injector, ChatDataSet)
   const chat = await chatDataSet.get(systemInjector, chatInvitation.chatId)
 
   if (!chat) {

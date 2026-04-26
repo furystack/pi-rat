@@ -9,7 +9,7 @@ import { Widget } from './widget.js'
 export const Dashboard = Shade<DashboardData>({
   customElementName: 'pi-rat-dashboard',
   render: ({ props, injector, useObservable, useDisposable }) => {
-    const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
+    const [currentUser] = useObservable('currentUser', injector.get(SessionService).currentUser)
 
     const manager = useDisposable('contextMenuManager', () => new ContextMenuManager<() => void>())
 

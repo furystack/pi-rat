@@ -20,7 +20,7 @@ const DeviceAvailabilityContent = Shade<{
     const { size } = props
     const device = props.data.value
 
-    const [currentUser] = useObservable('currentUser', injector.getInstance(SessionService).currentUser)
+    const [currentUser] = useObservable('currentUser', injector.get(SessionService).currentUser)
 
     return (
       <AppLink
@@ -75,7 +75,7 @@ export const DeviceAvailability = Shade<DeviceAvailabilityProps & { index?: numb
   render: ({ props, injector }) => {
     const { size = 256 } = props
 
-    const iotDevices = injector.getInstance(IotDevicesService)
+    const iotDevices = injector.get(IotDevicesService)
 
     return (
       <CacheView

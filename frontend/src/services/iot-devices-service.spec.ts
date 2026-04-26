@@ -32,19 +32,21 @@ const createMockAwakeHistory = (name = 'test-device'): DeviceAwakeHistory => ({
 describe('IotDevicesService', () => {
   const createTestInjector = (mockCall: ReturnType<typeof vi.fn>) => {
     const injector = new Injector()
-    injector.setExplicitInstance(
-      {
-        call: mockCall,
-      } as unknown as IotApiClient,
+    injector.bind(
       IotApiClient,
+      () =>
+        ({
+          call: mockCall,
+        }) as never,
     )
     // Mock WebsocketNotificationsService to avoid websocket initialization
-    injector.setExplicitInstance(
-      {
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-      } as unknown as WebsocketNotificationsService,
+    injector.bind(
       WebsocketNotificationsService,
+      () =>
+        ({
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+        }) as never,
     )
     return injector
   }
@@ -56,7 +58,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const result = await service.getDevice('test-device')
 
@@ -76,7 +78,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         await service.getDevice('test-device')
         await service.getDevice('test-device')
@@ -93,7 +95,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const observable = service.getDeviceAsObservable('test-device')
 
@@ -113,7 +115,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const findOptions = { top: 10 }
         const result = await service.findDevice(findOptions)
@@ -140,7 +142,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         await service.findDevice({ top: 10 })
         const result = await service.getDevice('device-1')
@@ -161,7 +163,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const result = await service.findPingHistory('test-device', { top: 10 })
 
@@ -192,7 +194,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const result = await service.findAwakeHistory('test-device', { top: 10 })
 
@@ -220,7 +222,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const body = {
           name: 'test-device',
@@ -246,7 +248,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const body = {
           name: 'test-device',
@@ -270,7 +272,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const body = {
           name: 'test-device',
@@ -290,7 +292,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         await service.deleteDevice('test-device')
 
@@ -310,7 +312,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         await service.wakeUpDevice(mockDevice)
 
@@ -330,7 +332,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         await service.pingDevice(mockDevice)
 
@@ -354,7 +356,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const observable = service.observeLastPingForDevice(mockDevice)
 
@@ -375,7 +377,7 @@ describe('IotDevicesService', () => {
       const injector = createTestInjector(mockCall)
 
       await usingAsync(injector, async (i) => {
-        const service = i.getInstance(IotDevicesService)
+        const service = i.get(IotDevicesService)
 
         const observable = service.observeLastAwakeEntryForDevice(mockDevice)
 

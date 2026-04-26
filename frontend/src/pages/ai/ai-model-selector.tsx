@@ -12,7 +12,7 @@ export const AiModelSelector = Shade<{ value?: string; onSelect?: (newValue: str
     boxSizing: 'border-box',
   },
   render: ({ injector, useObservable, props }) => {
-    const aiModelsService = injector.getInstance(AiModelService)
+    const aiModelsService = injector.get(AiModelService)
 
     const [models] = useObservable('models', aiModelsService.getModelsAsObservable())
 

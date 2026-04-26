@@ -19,7 +19,7 @@ describe('ErrorReporter', () => {
 
   it('should open GitHub issue with error details', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const errorReporter = injector.getInstance(ErrorReporter)
+      const errorReporter = injector.get(ErrorReporter)
 
       const error = new Error('Test error message')
       error.stack = 'Error: Test error message\n  at test.ts:1:1'
@@ -39,7 +39,7 @@ describe('ErrorReporter', () => {
 
   it('should include error stack in issue body', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const errorReporter = injector.getInstance(ErrorReporter)
+      const errorReporter = injector.get(ErrorReporter)
 
       const error = new Error('Stack trace test')
       error.stack = 'Error: Stack trace test\n  at function1\n  at function2'
@@ -59,7 +59,7 @@ describe('ErrorReporter', () => {
 
   it('should include custom context when provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const errorReporter = injector.getInstance(ErrorReporter)
+      const errorReporter = injector.get(ErrorReporter)
 
       const error = new Error('Context test')
       const context = 'User was trying to upload a file'
@@ -77,7 +77,7 @@ describe('ErrorReporter', () => {
 
   it('should use default "none" when no context provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const errorReporter = injector.getInstance(ErrorReporter)
+      const errorReporter = injector.get(ErrorReporter)
 
       const error = new Error('No context test')
 
@@ -95,7 +95,7 @@ describe('ErrorReporter', () => {
 
   it('should use custom repository when provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const errorReporter = injector.getInstance(ErrorReporter)
+      const errorReporter = injector.get(ErrorReporter)
 
       const error = new Error('Custom repo test')
       const customRepo = 'https://github.com/custom/repo'
@@ -111,7 +111,7 @@ describe('ErrorReporter', () => {
 
   it('should include app version, build date, and commit hash when provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const errorReporter = injector.getInstance(ErrorReporter)
+      const errorReporter = injector.get(ErrorReporter)
 
       const error = new Error('Version info test')
       const appVersion = '1.2.3'
@@ -140,7 +140,7 @@ describe('ErrorReporter', () => {
 
   it('should use default values for app version, build date, and commit hash when not provided', async () => {
     await usingAsync(new Injector(), async (injector) => {
-      const errorReporter = injector.getInstance(ErrorReporter)
+      const errorReporter = injector.get(ErrorReporter)
 
       const error = new Error('Default values test')
 
