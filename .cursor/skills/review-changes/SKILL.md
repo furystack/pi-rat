@@ -51,6 +51,7 @@ git diff origin/develop...HEAD --name-only
 | `reviewer-typescript`   | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed |
 | `reviewer-eslint`       | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed |
 | `reviewer-tests`        | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed |
+| `reviewer-complexity`   | Conditional | Skip ONLY if NO `.ts`/`.tsx` in source directories changed |
 
 **When in doubt, run the check.** Fast failures are better than missed issues.
 
@@ -68,6 +69,7 @@ In one tool call batch, launch all applicable reviewers:
 - `reviewer-typescript` (if `.ts`/`.tsx` in `frontend/`, `service/`, or `common/` changed)
 - `reviewer-eslint` (if `.ts`/`.tsx` in `frontend/`, `service/`, or `common/` changed)
 - `reviewer-tests` (if `.ts`/`.tsx` in `frontend/`, `service/`, or `common/` changed)
+- `reviewer-complexity` (if `.ts`/`.tsx` in `frontend/`, `service/`, or `common/` changed)
 
 **Note:** `reviewer-dependencies` checks changelog documentation but does NOT create/modify changelogs. If both changelog and dependency changes exist, both reviewers run in parallel - the dependency reviewer only reads existing changelogs.
 
@@ -117,6 +119,10 @@ Check for:
 
 - Static `style` props in Shade definitions should use `css` instead
 
+**Complexity Audit:**
+
+- Delegate to `reviewer-complexity` subagent to flag overgrown components, services, and REST actions introduced or worsened by the branch (heuristics from `.cursor/rules/COMPLEXITY.mdc`)
+
 **Testing & Coverage:**
 
 - Delegate to `reviewer-tests` subagent to run unit tests and assess coverage
@@ -152,6 +158,7 @@ Check for:
 - If `reviewer-versioning` passes → Do NOT mention it in the output
 - If `reviewer-changelog` passes → Do NOT mention it in the output
 - If `reviewer-dependencies` passes → Do NOT mention it in the output
+- If `reviewer-complexity` passes → Do NOT mention it in the output
 
 Only report subagent findings when they detect actual problems.
 

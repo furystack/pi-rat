@@ -1,0 +1,310 @@
+---
+name: Observable State
+description: ObservableValue, useObservable / useDisposable, subscriptions, disposal, debouncing — reactive state management in PI-RAT
+globs:
+  - 'frontend/**/*.ts'
+  - 'frontend/**/*.tsx'
+  - 'service/**/*.ts'
+alwaysApply: false
+---
+
+# Observable State
+
+FuryStack uses observables for reactive state — no React hooks, no external state libraries. Reactive state lives in `ObservableValue` instances exposed by services.
+
+## ObservableValue in services
+
+```typescript
+class SessionServiceImpl implements Disposable {
+  public currentUser = new ObservableValue<User | null>(null)
+  public isAuthenticated = new ObservableValue(false)
+  public error = new ObservableValue<string>('')
+
+  constructor(private readonly authApi: AuthApiClient) {}
+
+  public async login(email: string, password: string) {
+    try {
+      const user = await this.authApi.login({ email, password })
+      this.currentUser.setValue(user)
+    } catch (err) {
+      this.currentUser.setValue(null)
+      throw err
+    }
+  }
+
+  public [Symbol.dispose](): void {
+    this.currentUser[Symbol.dispose]()
+    this.isAuthenticated[Symbol.dispose]()
+    this.error[Symbol.dispose]()
+  }
+}
+
+export type SessionService = SessionServiceImpl
+
+export const SessionService: Token<SessionService, 'singleton'> = defineService({
+  name: 'pi-rat/SessionService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new SessionServiceImpl(inject(AuthApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal deferred to injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})
+```
+
+Always type the generic explicitly for nullable or union states (`ObservableValue<User | null>`) — inference widens to `ObservableValue<null>`. The `Impl` class pattern + `defineService` token wrapper is the canonical pi-rat shape (see `CODE_STYLE.mdc`).
+
+## useObservable in components
+
+```typescript
+const UserDisplay = Shade({
+  customElementName: 'user-display',
+  render: ({ injector, useObservable }) => {
+    const session = injector.get(SessionService)
+    const [user] = useObservable('user', session.currentUser)
+
+    if (!user) return <div>Not logged in</div>
+    return <div>{user.name}</div>
+  },
+})
+```
+
+## CRITICAL — pair `useDisposable` with `useObservable` for reactive local state
+
+`.getValue()` reads do **not** subscribe. The component will not re-render when the value changes. Always pair `useDisposable` (creates the observable) with `useObservable` (subscribes to it).
+
+```typescript
+// ✅ component re-renders when value changes
+const FormComponent = Shade({
+  customElementName: 'form-component',
+  render: ({ useDisposable, useObservable }) => {
+    const isLoadingObs = useDisposable('isLoading', () => new ObservableValue(false))
+    const errorObs = useDisposable('error', () => new ObservableValue<string>(''))
+
+    const [isLoading] = useObservable('isLoadingValue', isLoadingObs)
+    const [error] = useObservable('errorValue', errorObs)
+
+    const handleSubmit = async () => {
+      isLoadingObs.setValue(true)
+      try { await doSomething() }
+      catch (err) { errorObs.setValue(err instanceof Error ? err.message : 'Failed') }
+      finally { isLoadingObs.setValue(false) }
+    }
+
+    return (
+      <div>
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        <button disabled={isLoading} onclick={() => void handleSubmit()}>
+          {isLoading ? 'Loading...' : 'Submit'}
+        </button>
+      </div>
+    )
+  },
+})
+
+// ❌ does NOT re-render — getValue() is a snapshot
+const Broken = Shade({
+  render: ({ useDisposable }) => {
+    const isLoading = useDisposable('isLoading', () => new ObservableValue(false))
+    return <button disabled={isLoading.getValue()}>{isLoading.getValue() ? '...' : 'Submit'}</button>
+  },
+})
+```
+
+**Rule of thumb:**
+
+- `useDisposable` alone — when you only need to **set** values (event handlers).
+- Pair with `useObservable` — when the UI must **react** to value changes.
+
+## Minimize subscriptions — only subscribe to what you need
+
+```typescript
+// ✅ only the user, not all users
+const UserName = Shade<{ userId: string }>({
+  customElementName: 'user-name',
+  render: ({ props, injector, useObservable }) => {
+    const userService = injector.get(UsersService)
+    const [user] = useObservable('user', userService.getUserAsObservable(props.userId))
+    return <span>{user?.name ?? 'Loading...'}</span>
+  },
+})
+```
+
+## Service-owned subscriptions
+
+Services that subscribe to other services / event hubs / websockets must clean up. Bind handlers to preserve `this` context, register them in the constructor (or a sync `init()` if startup may be deferred), and dispose them in `[Symbol.dispose]()`. Wire disposal through the factory's `onDispose` so the injector tears it down.
+
+```typescript
+class LoggingServiceImpl implements Disposable {
+  private onMessage = ((messageData: WebsocketMessage) => {
+    if (messageData.type === 'log-entry-added') {
+      this.logEntryCache.setExplicitValue({ /* ... */ })
+    }
+  }).bind(this)
+
+  constructor(private readonly notifications: WebsocketNotificationsService) {
+    this.notifications.addListener('onMessage', this.onMessage)
+  }
+
+  public [Symbol.dispose](): void {
+    this.notifications.removeListener('onMessage', this.onMessage)
+  }
+}
+
+export type LoggingService = LoggingServiceImpl
+
+export const LoggingService: Token<LoggingService, 'singleton'> = defineService({
+  name: 'pi-rat/LoggingService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new LoggingServiceImpl(inject(WebsocketNotificationsService))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal deferred to injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})
+```
+
+For singleton concurrency-safe init (race-free, fire-and-forget async init, dispose-before-reinit), see `ASYNC_PATTERNS.mdc`.
+
+## Operation wrappers for loading state
+
+```typescript
+class DataServiceImpl implements Disposable {
+  public isLoading = new ObservableValue(false)
+  public data = new ObservableValue<Data | null>(null)
+
+  private operation() {
+    this.isLoading.setValue(true)
+    return { [Symbol.dispose]: () => this.isLoading.setValue(false) }
+  }
+
+  public async loadData() {
+    await usingAsync(this.operation(), async () => {
+      const result = await this.fetchData()
+      this.data.setValue(result)
+    })
+  }
+
+  public [Symbol.dispose](): void {
+    this.isLoading[Symbol.dispose]()
+    this.data[Symbol.dispose]()
+  }
+}
+```
+
+## Loading / error / success pattern
+
+```typescript
+public async loadUsers() {
+  this.isLoading.setValue(true)
+  this.error.setValue('')
+  try {
+    const { result } = await this.apiClient.call({ method: 'GET', action: '/users', query: {} })
+    this.users.setValue(result)
+  } catch (err) {
+    this.error.setValue(err instanceof Error ? err.message : 'Failed to load users')
+    this.users.setValue([])
+  } finally {
+    this.isLoading.setValue(false)
+  }
+}
+```
+
+## Performance — debounce user input
+
+Debounce input that triggers expensive work (search, autosave). Typical delays: 300ms search, 500ms autosave.
+
+```typescript
+const SearchInput = Shade({
+  customElementName: 'search-input',
+  render: ({ injector, useDisposable }) => {
+    const searchService = injector.get(SearchService)
+    const searchTerm = useDisposable('searchTerm', () => new ObservableValue(''))
+    let debounceTimer: number | undefined
+
+    const handleInput = (ev: Event) => {
+      const value = (ev.target as HTMLInputElement).value
+      searchTerm.setValue(value)
+      if (debounceTimer) clearTimeout(debounceTimer)
+      debounceTimer = window.setTimeout(() => void searchService.search(value), 300)
+    }
+
+    return <input type="search" oninput={handleInput} />
+  },
+})
+```
+
+For larger codebases, factor the debounce into a reusable utility.
+
+## Performance — lazy load routes and heavy libs
+
+```typescript
+// route lazy-loaded via PiRatLazyLoad — see FRONTEND_PATTERNS.mdc
+
+// heavy lib loaded on demand
+class ChartServiceImpl {
+  private chartLib?: typeof import('chart.js')
+
+  public async createChart(data: ChartData) {
+    if (!this.chartLib) this.chartLib = await import('chart.js')
+    return new this.chartLib.Chart(data)
+  }
+}
+
+export type ChartService = ChartServiceImpl
+
+export const ChartService: Token<ChartService, 'singleton'> = defineService({
+  name: 'pi-rat/ChartService',
+  lifetime: 'singleton',
+  factory: () => new ChartServiceImpl(),
+})
+```
+
+## Performance — preload critical data in parallel
+
+```typescript
+class AppInitImpl {
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  public async initialize() {
+    await Promise.all([this.userService.loadCurrentUser(), this.configService.loadConfig()])
+  }
+}
+
+export type AppInit = AppInitImpl
+
+export const AppInit: Token<AppInit, 'singleton'> = defineService({
+  name: 'pi-rat/AppInit',
+  lifetime: 'singleton',
+  factory: ({ inject }) => new AppInitImpl(inject(UserService), inject(ConfigService)),
+})
+```
+
+## Memory leak — manual `.subscribe` without dispose
+
+```typescript
+// ❌ leak — handler never removed
+constructor(private readonly eventService: EventService) {
+  this.eventService.addListener('event', (data) => this.handleEvent(data))
+}
+
+// ✅ properly managed — register in constructor, remove in dispose
+private handleEvent = ((data: EventData) => { /* ... */ }).bind(this)
+
+constructor(private readonly eventService: EventService) {
+  this.eventService.addListener('event', this.handleEvent)
+}
+
+public [Symbol.dispose](): void {
+  this.eventService.removeListener('event', this.handleEvent)
+}
+```
+
+The `defineService` factory wires `[Symbol.dispose]()` through `onDispose`, so cleanup runs when the injector tears down.
+
+In components, prefer `useObservable` / `useDisposable` for automatic cleanup over manual `.subscribe(...)`.

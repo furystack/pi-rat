@@ -1,0 +1,83 @@
+---
+name: Complexity Thresholds
+description: Strict heuristic checklist to flag overgrown Shade components, services, and REST actions in PI-RAT
+globs:
+  - 'frontend/**/*.ts'
+  - 'frontend/**/*.tsx'
+  - 'service/**/*.ts'
+  - 'common/**/*.ts'
+  - 'monaco-mfe/**/*.ts'
+  - 'monaco-mfe/**/*.tsx'
+  - '!**/*.spec.ts'
+  - '!**/*.spec.tsx'
+  - '!**/*.e2e.spec.ts'
+  - '!e2e/**'
+alwaysApply: true
+---
+
+# Complexity Thresholds
+
+Flag whether a unit (Shade component, `defineService` factory / `Impl` class, REST action, hook helper) has grown too complex and warrants refactoring.
+
+## When to apply
+
+- **Code reviews** — check branch-modified `.ts` / `.tsx` files. Pre-existing complexity on the base branch is out of scope; only flag what the branch **introduces or worsens**.
+- **During implementation** — proactively decompose when crossing thresholds.
+
+## Heuristic table
+
+Flag when **3+ triggers** hit in a single file. Strict thresholds:
+
+| Signal | Trigger | Applies to |
+|---|---|---|
+| Multiple concerns | Unit owns >2 distinct responsibilities (state domains, side effects, UI sections) | all |
+| Observable sprawl | >3 `useObservable` / `useDisposable` calls in one `render` | Shade `.tsx` |
+| Subscription density | >1 manual `.subscribe()` inside a render or service body | Shade, service |
+| Token fan-out | >4 distinct `injector.get(...)` / `inject(...)` calls in one unit | all |
+| Service factory deps | `defineService` factory injects >4 tokens | service `.ts` |
+| Service file length | `Impl` class body >120 lines | service `.ts` |
+| Handler bloat | any handler / callback body >15 lines | Shade, action |
+| Prop count | Shade accepts >6 props (excluding `children`, `className`) | Shade `.tsx` |
+| Render length | JSX return block >60 lines | Shade `.tsx` |
+| Action body | REST action body >40 lines | `*-action.ts` |
+| Action fan-out | REST action touches >2 stores / DataSets | `*-action.ts` |
+| Type sprawl | single exported type definition >30 lines | all |
+| Test mock load | spec file requires >8 hoisted mocks | `*.spec.*` |
+| File length (soft) | Shade `.tsx` >200 / service `.ts` >150 / action `.ts` >80 | per file kind |
+
+`File length` is a soft signal — flag only when other triggers also hit.
+
+## Severity
+
+| Triggers hit | Severity | Required action |
+|---|---|---|
+| 3–4 | 🤔 Medium | address in this PR or follow-up |
+| 5–6 | 🔥 High | refactor before merge |
+| 7+ | 💀 Critical | must refactor; complexity is a maintenance risk |
+
+## Refactoring patterns
+
+1. **Extract a render-hook helper** — pull a coherent slice of `render` (state + subs + handlers) into a module-level function (`use-<feature>.ts`) that takes the destructured render context and returns `{ state, handlers }`.
+2. **Split into sub-Shades** — extract presentational regions into their own `Shade()` with focused props. Each sub-component is independently testable.
+3. **Extract pure helpers** — pure functions in sibling files (`format-foo.ts`, `validate-bar.ts`). No DI, no observables — easy to unit-test.
+4. **Service decomposition** — split a fat `defineService` factory / `Impl` class into multiple cooperating services bound at the same scope. Keep one orchestrator service if needed.
+5. **Action decomposition** — extract validation, business rules, persistence into pure helpers; keep the REST action handler as a thin glue layer.
+
+## Targets after refactoring
+
+- Orchestrator Shade: ~80–120 lines, wires services and renders sub-components.
+- Each extracted helper / sub-Shade: single responsibility, <100 lines.
+- Service: <150 lines, ≤4 deps.
+- REST action: <40 lines, ≤2 dataset/store touches.
+- Spec files: <250 lines, <8 hoisted mocks.
+
+## Counting concerns
+
+A "concern" is a coherent slice that could be extracted on its own:
+
+- A state domain with its own loading/error states (e.g. user profile vs. notifications)
+- A side-effect pipeline (polling, debounce, websocket subscription)
+- A distinct UI section (header, sidebar, content body)
+- A persistence boundary (one store/DataSet)
+
+If two slices share data they may still be separate concerns — the question is whether they could be extracted into independent units.

@@ -1,117 +1,98 @@
-# Development Patterns
+---
+name: Backend Patterns
+description: PI-RAT REST action patterns — auth, errors, module organization, provider/adapter chains, services
+globs:
+  - 'service/**/*.ts'
+alwaysApply: false
+---
 
-## API Development
+# Backend Patterns
 
-### Action Pattern
+## Action template
 
 ```typescript
 import { getCurrentUser } from '@furystack/core'
 import { getLogger } from '@furystack/logging'
 import { JsonResult, RequestError, type RequestAction } from '@furystack/rest-service'
 
-export const ActionName: RequestAction<ActionType> = async ({ injector, getBody }) => {
-  const logger = getLogger(injector).withScope('ActionName')
-  const currentUser = await getCurrentUser(injector) // If auth required
+export const CreateUserAction: RequestAction<CreateUserEndpoint> = async ({ injector, getBody }) => {
+  const logger = getLogger(injector).withScope('CreateUserAction')
+  await getCurrentUser(injector) // if auth required
 
   try {
     const body = await getBody()
-    // Action logic here
+    const result = await createUser(injector, body)
     return JsonResult(result)
   } catch (error) {
+    if (error instanceof RequestError) throw error
     await logger.error({ message: 'Action failed', data: { error } })
-    throw new RequestError('User-friendly message', 400)
+    throw new RequestError('Could not create user', 500)
   }
 }
 ```
 
-### Workflow
+## Module workflow
 
-1. **Define API**: Add to `common/src/apis/[module].ts`
-2. **Generate Schema**: Run `yarn create-schemas`
-3. **Implement Action**: Create in `service/src/app-models/[module]/actions/`
-4. **Register API**: Add to `setup-[module]-rest-api.ts` with validation
+1. Define API in `common/src/apis/<module>.ts`
+2. Run `yarn create-schemas`
+3. Implement the action in `service/src/app-models/<module>/actions/<verb>-<entity>-action.ts`
+4. Register in `setup-<module>-rest-api.ts` with `Validate(...)` (see `REST_ACTION_VALIDATION.mdc`)
 
-### Error Handling
+## HTTP error codes
 
-- `409` - Resource already exists
-- `400` - Validation errors
-- `401` - Authentication required
-- `404` - Resource not found
-- `500` - Internal server error
+| Code | Meaning |
+|---|---|
+| 400 | Validation / bad request |
+| 401 | Authentication required |
+| 403 | Forbidden (authorized but not permitted) |
+| 404 | Not found |
+| 409 | Conflict (resource already exists) |
+| 500 | Server error |
 
-Always log errors with context but return user-friendly messages.
+Always log errors with context but return user-friendly messages. Do **not** leak internal error details to clients.
 
-## Authentication Patterns
+## Authentication
 
-### Password Operations
-
-```typescript
-// ✅ Use framework methods
-await authenticator.setPasswordForUser(username, currentPassword, newPassword)
-
-// ❌ Don't implement custom validation
-const isValid = password.length >= 8 // Don't do this
-```
-
-### Registration Flow
-
-1. **Validate input** (email format, required fields)
-2. **Check existing user** (return 409 if exists)
-3. **Create credential first** (fail fast on invalid password)
-4. **Create user record**
-5. **Auto-login** on success
-6. **Cleanup** partial state on failure
-
-### Security Principles
-
-- Use `getCurrentUser(injector)` to verify authentication
-- Let `PasswordAuthenticator` handle complexity requirements
+- `await getCurrentUser(injector)` to verify authentication (returns `null` when missing — translate to 401)
+- Use framework methods for password ops: `PasswordAuthenticator.setPasswordForUser` etc. Don't roll custom validation
 - Don't update user records during credential operations
-- Log security events for audit purposes
 
-## Module Organization
+### Registration flow
 
-### Backend Structure
+1. Validate input (email format, required fields)
+2. Check existing user → 409 if exists
+3. Create credential first (fail fast on invalid password)
+4. Create user record
+5. Auto-login on success
+6. Cleanup partial state on failure
+
+## Module layout
 
 ```
-service/src/app-models/[module]/
+service/src/app-models/<module>/
 ├── actions/
-│   ├── create-[entity]-action.ts
-│   ├── update-[entity]-action.ts
-│   └── delete-[entity]-action.ts
-├── setup-[module]-rest-api.ts
-└── setup-[module]-store.ts
+│   ├── create-<entity>-action.ts
+│   ├── update-<entity>-action.ts
+│   └── delete-<entity>-action.ts
+├── setup-<module>-rest-api.ts
+└── setup-<module>-store.ts
 ```
 
-### Action Best Practices
+One action per file. Descriptive names. Imports order: framework → common → local.
 
-- **One action per file** with descriptive names
-- **Import order**: Framework → Common → Local
-- **Fail fast**: Validate early, create resources in dependency order
-- **Clean up**: Remove partial state on failures
-- **Log appropriately**: Use scoped loggers with meaningful context
+## Provider / adapter fallback chains
 
-### Provider / Adapter Fallback Chains
-
-When building fallback chains where multiple providers are tried in priority order:
-
-- **Use a narrow internal result type** for provider helpers, not the top-level result type
-- Providers should only return what they can produce (e.g., an `imdbId`), not dummy values for fields they don't have
-- The orchestrator function creates the full result from the provider's narrow output
+When trying providers in priority order, **return narrow internal result types** — providers only emit what they can produce. The orchestrator builds the full result.
 
 ```typescript
-// ✅ Good - narrow type for internal helpers
+// ✅ narrow result type
 type ProviderResult =
   | { status: 'skip' }
   | { status: 'rate-limited' }
   | { status: 'linked'; imdbId: string }
 
-const tryProvider = async (...): Promise<ProviderResult> => {
-  // ...
-  return { status: 'linked', imdbId: result.imdbID }
-}
+const tryProvider = async (...): Promise<ProviderResult> => { /* ... */ }
 
-// The orchestrator builds the full result
 for (const provider of priority) {
   const result = await providers[provider](injector, params)
   if (result.status === 'linked') {
@@ -120,28 +101,71 @@ for (const provider of priority) {
   }
 }
 
-// ❌ Bad - reusing the top-level type forces dummy values
+// ❌ reusing the top-level type forces dummy values
 return { status: 'linked', movieFile: undefined as unknown as MovieFile, movie }
 ```
 
-### Service Layer
+The double-cast (`as unknown as T`) is forbidden — see `TYPESCRIPT_GUIDELINES.mdc`.
+
+## Service layer
+
+Use `defineService` for singletons. For services with multiple methods, an `Impl` class for code organization wrapped by a `defineService` factory keeps construction explicit and the token surface clean. See `CODE_STYLE.mdc` § "DI — functional services" for the full pattern.
 
 ```typescript
-@Injectable({ lifetime: 'singleton' })
-export class MyService {
-  // Use observables for reactive state
-  public data = new ObservableValue(initialValue)
+import { defineService, type Token } from '@furystack/inject'
+import { ObservableValue, usingAsync } from '@furystack/utils'
 
-  // Use operation wrapper for loading states
+class MyServiceImpl implements Disposable {
+  public data = new ObservableValue<Data | null>(null)
+  public isLoading = new ObservableValue(false)
+
   private operation() {
     this.isLoading.setValue(true)
     return { [Symbol.dispose]: () => this.isLoading.setValue(false) }
   }
 
   public async performAction() {
-    await usingAsync(this.operation(), async () => {
-      // Action logic with automatic loading state management
-    })
+    await usingAsync(this.operation(), async () => { /* ... */ })
+  }
+
+  public [Symbol.dispose](): void {
+    this.data[Symbol.dispose]()
+    this.isLoading[Symbol.dispose]()
   }
 }
+
+export type MyService = MyServiceImpl
+
+export const MyService: Token<MyService, 'singleton'> = defineService({
+  name: 'pi-rat/MyService',
+  lifetime: 'singleton',
+  factory: ({ onDispose }) => {
+    const impl = new MyServiceImpl()
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal deferred to injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})
 ```
+
+For singleton concurrency (race-free `getOrCreate`, fire-and-forget init, dispose-before-reinit), see `ASYNC_PATTERNS.mdc`.
+
+## Result types over throwing for expected outcomes
+
+Reserve `RequestError` / `throw` for REST validation failures, programming bugs, and data integrity issues. For batch / loop operations where multiple **expected** outcomes exist, return a discriminated union:
+
+```typescript
+export type OperationResult<T> =
+  | { status: 'success'; data: T }
+  | { status: 'not-found' }
+  | { status: 'rate-limited' }
+  | { status: 'not-configured' }
+
+export const fetchMetadata = async (id: string): Promise<OperationResult<Metadata>> => {
+  if (!config) return { status: 'not-configured' }
+  if (rateLimited) return { status: 'rate-limited' }
+  return { status: 'success', data: result }
+}
+```
+
+When a result type is consumed in multiple places (progress tracking, etc.), define the mapping utility next to the type so they stay in sync.

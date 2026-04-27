@@ -1,0 +1,202 @@
+---
+name: Testing Guidelines
+description: Vitest unit + Playwright E2E patterns for PI-RAT
+globs:
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - 'e2e/**/*.ts'
+alwaysApply: false
+---
+
+# Testing Guidelines
+
+Vitest for unit + integration. Playwright for E2E. Specs co-located with source (`*.spec.ts(x)`). E2E in `e2e/<flow>.e2e.spec.ts`.
+
+## Disposable safety — wrap everything in `usingAsync`
+
+All `Injector` / `ObservableValue` / `Cache` / store usage in tests **must** be wrapped. Manual disposal at the end leaks if the test throws first.
+
+```typescript
+import { createInjector } from '@furystack/inject'
+import { usingAsync } from '@furystack/utils'
+
+await usingAsync(createInjector(), async (injector) => {
+  injector.bind(IdentityApiClient, () => ({ call: mockCall } as IdentityApiClient))
+  const service = injector.get(UsersService)
+  expect(await service.getUser('alice')).toEqual(mockUser)
+})
+```
+
+## Mocking — minimal, via `injector.bind`
+
+Substitute services with the same mechanism production uses for bootstrap overrides. Avoid `vi.mock` on FuryStack service tokens — `injector.bind(token, factory)` is cleaner and survives module reloads.
+
+```typescript
+await usingAsync(createInjector(), async (injector) => {
+  injector.bind(IdentityApiClient, () => ({
+    call: vi.fn().mockResolvedValue({ result: { username: 'alice' } }),
+  } as unknown as IdentityApiClient))
+  const service = injector.get(UsersService)
+  expect((await service.getUser('alice')).username).toBe('alice')
+})
+```
+
+Use `vi.mock` only for non-DI externals (raw `fetch`, file system, etc.). When you do, define the mocks via `vi.hoisted()` at the top of the spec, **before** any imports from the mocked modules.
+
+```typescript
+import { describe, expect, it, vi } from 'vitest'
+
+const mockFetch = vi.hoisted(() => vi.fn())
+
+vi.mock('node-fetch', () => ({ default: mockFetch }))
+```
+
+Type all mock callback / data accesses to avoid `any` errors:
+
+```typescript
+const cb = mockUpload.mock.calls[0][1] as { onSuccess: () => void }
+cb.onSuccess()
+```
+
+## When to test null / undefined / "wrong type" inputs
+
+**Rationale:** older guidance asked for blanket null/undefined/error tests on every export. That asserts TypeScript works (which it does) and encourages defensive guards for impossible-by-types inputs. Trust the TS type system; consumers will use it too.
+
+You **MUST** test null / undefined / malformed values when:
+
+- **External boundary, no schema validation upstream** — REST handlers not wrapped in `Validate(...)`, WebSocket message handlers, file parsers, env-var consumers, anything reading `unknown` or `JSON.parse` output. At runtime nothing prevents a bad payload, so the function is the line of defense.
+- **The type signature itself allows the case** — `T | null`, `T | undefined`, `unknown`, `T?`. The function declared the case as legal, so test the documented behavior on each branch.
+
+If a `Validate(...)` wrapper sits ahead of a REST handler, the wrapper covers bad-payload tests — the inner handler should not retest them.
+
+Outside those cases, do **not** add such tests.
+
+## Required scenarios per public method
+
+For every service method, ensure tests for:
+
+- **Happy path**
+- **Documented branches** — every distinct mode/option/discriminator value the method handles
+- **Error paths the method emits** — `RequestError(code)` codes (400/401/404/409/500), thrown errors, rejected promises
+- **Cache invalidation** — for update/delete, verify subsequent fetch hits the API again
+- **Observable state transitions** — for methods that mutate observables, assert the sequence of states
+
+## Async operation discipline
+
+Service methods called by tests must `await` async side effects (cache reloads, sync calls). Fire-and-forget `void` calls inside tested methods cause unhandled rejections after the injector is disposed.
+
+```typescript
+// ❌ unhandled rejection in tests
+public updateDevice = async (...) => {
+  await this.api.update(...)
+  void this.deviceCache.reload(name)
+}
+
+// ✅ awaited
+public updateDevice = async (...) => {
+  await this.api.update(...)
+  await this.deviceCache.reload(name)
+}
+```
+
+For event-handler contexts where you cannot await, attach `.catch()`:
+
+```typescript
+this.events.on('update', (id) => {
+  void this.cache.reload(id).catch((err) => {
+    console.error('Failed to reload cache:', err)
+  })
+})
+```
+
+Always wrap test injectors in `usingAsync` so cleanup waits for in-flight async to settle before disposal.
+
+## Backend action tests
+
+Bind a real `InMemoryStore` (or a stub matching the `PhysicalStore` contract) to the relevant DataSet/Store tokens via `injector.bind`. Test happy path **plus** every `RequestError` code the action emits (400/401/404/409/500). For authenticated actions, also mock `getCurrentUser` and assert 401 when null.
+
+```typescript
+import { InMemoryStore } from '@furystack/core'
+import { RequestError } from '@furystack/rest-service'
+import { UserStore } from '../setup-identity-store.js'
+
+it('throws 409 when user already exists', async () => {
+  await usingAsync(createInjector(), async (injector) => {
+    injector.bind(UserStore, () => new InMemoryStore({ model: User, primaryKey: 'username' }))
+    const dataSet = getDataSetFor(injector, UserDataSet)
+    await dataSet.add(injector, { username: 'alice', /* ... */ })
+
+    await expect(
+      RegisterAction({ injector, getBody: async () => ({ username: 'alice', password: 'p' }) }),
+    ).rejects.toThrow('User already exists')
+  })
+})
+```
+
+## Playwright E2E
+
+### Locator strategy (priority order)
+
+1. Semantic — `page.getByRole('button', { name: 'Login' })`
+2. Content-based — `page.getByText('Username')`
+3. Form elements — `page.locator('input[name="username"]')`
+4. Component-specific — `page.locator('shade-login form')`
+5. Style-based (last resort)
+
+### Helper functions over inline interactions
+
+Encapsulate repeated workflows (login, logout, navigation) in `e2e/helpers.ts`. Keep individual test bodies focused on the user journey.
+
+### One test = one user journey
+
+Don't fragment a workflow into many small tests. A test should drive a complete flow start-to-end and clean up its own data.
+
+```typescript
+test('admin edits user roles and changes persist', async ({ page }) => {
+  await login(page)
+  await navigateToAppSettings(page)
+  // ... interact ...
+  await page.reload()
+  // ... verify persistence ...
+  // ... cleanup ...
+})
+```
+
+### Project-specific test resources
+
+Tests run in parallel across browsers (chromium/firefox) sharing the same backend. Use `testInfo.project.name` to make resource names unique per browser:
+
+```typescript
+const userName = `test-user-${testInfo.project.name}@test.com`
+```
+
+Register resources **inside** the test, not in `beforeEach`, to avoid duplicate-creation races.
+
+### Don't test assumptions
+
+Assert what actually exists. If the validation message you're matching doesn't actually appear in the UI, the test will be flaky. Look for *any* error notification (`page.locator('shade-noty').first()`), not specific copy.
+
+## False-positive guards
+
+- Assertions inside `try/catch` → use `expect.assertions(N)`.
+- Assertions inside `.forEach` / `.map` callbacks → same risk; use `expect.assertions(N)`.
+- Async assertions without `await` → promise resolves after the test completes.
+- Mocks that always succeed → make at least one test exercise failure.
+
+## Architecture refactor → spec rewrite in same commit
+
+When you replace a module's internal architecture (e.g. `SegmentCache` → `TranscodingSessionService`), every spec file that mocks the old internals must be updated in the **same commit**. Stale mocks cause silent failures (tests pass at compile time, fail at runtime with unrelated errors).
+
+Search for `import.*<old-module>` across `*.spec.ts` files and update each.
+
+## Commands
+
+| Purpose | Command |
+|---|---|
+| Unit / integration | `yarn test` |
+| Coverage | `yarn test --coverage` |
+| Specific file | `yarn test <path>` |
+| E2E install (run once) | `yarn test:e2e:install` |
+| E2E full | `yarn test:e2e` |
+| E2E single | `yarn playwright test e2e/<file>` |
+| E2E debug | `yarn playwright test --debug` |

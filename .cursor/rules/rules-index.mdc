@@ -1,17 +1,28 @@
 ---
 alwaysApply: true
 ---
-This file contains a list of helpful information and context that the agent can reference when working in this codebase. Each entry provides specific guidance or rules for different aspects of the project. You can read these files using the readFile tool if the users prompt seems related.
 
-- [Error patterns for FuryStack, RequestError usage, Observable error states, and Cache error handling](./ERROR_HANDLING.md)
-- [FuryStack Cache patterns, cache invalidation, and observable cache subscriptions](./CACHE_HANDLING.md)
-- [Observable subscription optimization, lazy loading, disposal patterns, and debouncing](./PERFORMANCE_OPTIMIZATION.md)
-- [ObservableValue usage, useObservable, useDisposable, subscriptions, and state management patterns](./OBSERVABLE_STATE.md)
-- [Package manager detection, script simplification, and CI/CD best practices](./SCRIPT_EXECUTION.md)
-- [Vitest patterns, Playwright E2E testing, and mocking strategies](./TESTING_GUIDELINES.md)
-- [REST action Validate() wrappers and explicit param checking before system calls](./REST_ACTION_VALIDATION.mdc)
-- [Singleton concurrency guards, getOrCreate race prevention, fire-and-forget init, dispose-before-reinit, and safe Map iteration](./SINGLETON_CONCURRENCY.md)
-- [MFE runtime type boundaries, duplicate type contracts, and cross-package type sync](./MFE_TYPE_CONTRACTS.md)
-- [Double-cast anti-pattern (`as unknown as T`) and non-null assertion avoidance](./TYPESCRIPT_GUIDELINES.mdc)
-- [Provider/adapter fallback chain patterns with narrow internal result types](./BACKEND_PATTERNS.mdc)
-- [Fire-and-forget error handling, `fs/promises` in async contexts, and `void` promise patterns](./ASYNC_PATTERNS.mdc)
+Index of repository rules. Read the linked file when its topic is relevant to the user's prompt.
+
+- [Naming, formatting, imports, file/code organization](./CODE_STYLE.mdc) — auto-applied to all `.ts` / `.tsx`
+- [Type safety, no `any`, generics, type guards, discriminated unions](./TYPESCRIPT_GUIDELINES.mdc) — auto-applied to all `.ts` / `.tsx`
+- [Complexity thresholds for Shade components, services, REST actions](./COMPLEXITY.mdc) — auto-applied; used in reviews and during implementation
+- [Backend REST patterns — actions, auth, errors, services, provider chains](./BACKEND_PATTERNS.mdc) — auto-applied in `service/`
+- [Frontend Shade patterns — service-cached data, routing, components, forms, UI entry points](./FRONTEND_PATTERNS.mdc) — auto-applied in `frontend/`
+- [Observable state — ObservableValue, useObservable / useDisposable, subscriptions, perf](./OBSERVABLE_STATE.mdc) — auto-applied in `frontend/` and `service/`
+- [Async patterns — fire-and-forget catch, fs/promises, singleton concurrency, dispose-before-reinit](./ASYNC_PATTERNS.mdc) — auto-applied in `frontend/` and `service/`
+- [FuryStack Cache patterns — capacity, getObservable, invalidation](./CACHE_HANDLING.mdc) — auto-applied in `frontend/`
+- [Error handling — RequestError, observable errors, retry, graceful degradation](./ERROR_HANDLING.mdc) — auto-applied in `service/` and `frontend/`
+- [REST action `Validate()` wrappers + explicit param checks before system calls](./REST_ACTION_VALIDATION.mdc) — auto-applied in `service/**/actions/`
+- [Vitest unit + Playwright E2E patterns](./TESTING_GUIDELINES.mdc) — auto-applied to specs
+- [Yarn workspace commands; never run `tsc` directly](./SCRIPT_EXECUTION.mdc) — auto-applied to `package.json` and shell scripts
+- [Runtime MFE type contracts (host ↔ monaco-mfe)](./MFE_TYPE_CONTRACTS.mdc) — auto-applied in `frontend/` and `monaco-mfe/`
+
+Skills (on-demand workflows):
+
+- `create-api-endpoint` — add a REST endpoint end-to-end
+- `setup-data-layer` — wire an entity (model + store + DataSet + entity sync)
+- `create-shade-component` — author a Shade component with proper hooks, styling, tests
+- `write-tests` — author Vitest unit / integration / Playwright E2E tests
+- `fill-changelog` — fill changelog entries for the current branch
+- `review-changes` — full code review with reviewer subagents
