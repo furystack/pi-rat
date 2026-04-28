@@ -1,0 +1,101 @@
+---
+name: Script Execution
+description: Yarn workspace commands, package.json scripts, build sequences, never run tsc directly
+globs:
+  - 'package.json'
+  - '**/package.json'
+  - '**/*.sh'
+alwaysApply: false
+---
+
+# Script Execution
+
+Pi-rat uses **Yarn** (yarn.lock present). Never use `npm` or `pnpm`.
+
+## DO NOT run `tsc` directly
+
+> The project uses `"composite": true` with project references. Bare `tsc -b` (or any `tsc` invocation) emits `.js`, `.d.ts`, and `.js.map` files **into the source tree**, polluting the workspace.
+>
+> **Always use `yarn build`.** For type-checking without emit, use the `ReadLints` tool or run a targeted `vitest` suite — do **not** run `tsc` in any form.
+
+## Top-level scripts
+
+```bash
+yarn start:service          # backend, hot reload
+yarn start:frontend         # frontend dev server, HMR
+yarn build                  # build all workspaces (includes type check)
+yarn create-schemas         # regenerate schemas from API types
+yarn clean                  # clean dist + tsbuildinfo
+yarn lint                   # ESLint
+yarn format                 # Prettier write
+yarn format:check           # Prettier check (no changes)
+yarn test                   # Vitest unit tests
+yarn test:e2e:install       # one-time install test
+yarn test:e2e               # Playwright E2E
+yarn bumpVersions           # interactive version bump
+yarn applyVersionBumps      # apply prepared bumps
+yarn dockerize              # build Docker image
+```
+
+## Workspace commands
+
+Use `yarn workspace <name> <script>` rather than `cd` into the workspace.
+
+```bash
+# ✅
+yarn workspace common create-schemas
+yarn workspace service start
+yarn workspace frontend build
+
+# ❌ unnecessary cd
+cd common && yarn create-schemas
+```
+
+`cd` is only acceptable when running multiple sequential commands inside one workspace (e.g. `cd e2e && yarn playwright test --grep @install`).
+
+## Use defined scripts, not raw binaries
+
+```bash
+# ✅
+yarn test
+yarn lint
+yarn format
+
+# ❌ bypasses package.json scripts
+vitest
+eslint .
+prettier --write .
+```
+
+## Build dependencies
+
+`yarn build` orchestrates the order: `monaco-mfe` first, then `tsc -b common service frontend` (driven via the script — do not run directly), then `frontend build`. Don't try to short-circuit it.
+
+## Production sequence
+
+```bash
+yarn lint
+yarn test
+yarn build
+```
+
+## CI/CD sequence
+
+```bash
+yarn install --frozen-lockfile
+yarn lint
+yarn format:check
+yarn test
+yarn build
+yarn test:e2e:install
+yarn test:e2e
+```
+
+## Common fixes
+
+| Symptom | Fix |
+|---|---|
+| `engine 'node' incompatible` | wrong package manager — use `yarn` |
+| Stale build artifacts | `yarn clean && yarn install && yarn build` |
+| Workspace dependency mismatch | `yarn clean && yarn install && yarn build` |
+| `.js` / `.d.ts` files appearing in source dirs | someone ran `tsc` directly — clean and rebuild |

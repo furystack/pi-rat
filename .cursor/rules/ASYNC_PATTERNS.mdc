@@ -1,88 +1,184 @@
 ---
+name: Async Patterns
+description: Fire-and-forget error handling, fs/promises, singleton concurrency, dispose-before-reinit, safe Map iteration
+globs:
+  - 'service/**/*.ts'
+  - 'frontend/**/*.ts'
+  - 'frontend/**/*.tsx'
 alwaysApply: false
 ---
+
 # Async Patterns
 
-## Fire-and-Forget Promises Must Handle Errors
+## Fire-and-forget promises must handle errors
 
-Every fire-and-forget `void` promise call must include a `.catch()` that logs the error. An unhandled async rejection is a silent bug.
+Every fire-and-forget `void` promise call must include a `.catch()` that logs the error. Unhandled async rejections are silent bugs.
 
 ```typescript
-// ✅ Good — error is logged
+// ✅ error logged
 void this.evictByDiskUsage().catch((error) => {
   void this.logger.error({ message: 'Failed to evict by disk usage', data: { error } })
 })
 
-// ✅ Good — singleton init pattern (see SINGLETON_CONCURRENCY.md)
-void this.initAsync().catch((error) => {
-  void this.logger.error({ message: 'Failed to initialize service', data: { error } })
-})
-
-// ❌ Bad — error silently lost
+// ❌ error silently lost
 void this.evictByDiskUsage()
 
-// ❌ Bad — empty catch swallows errors
+// ❌ empty catch swallows errors
 void this.evictByDiskUsage().catch(() => {})
 ```
 
-### Exception: Browser `video.play()`
+### Exception — `HTMLMediaElement.play()`
 
-Browser `HTMLMediaElement.play()` rejects with `AbortError` when navigation interrupts playback. This is benign and expected. An empty `.catch(() => {})` is acceptable **only** with an explanatory comment.
+`video.play()` rejects with `AbortError` when navigation interrupts playback. Empty `.catch(() => {})` is acceptable **only** with an explanatory comment:
 
 ```typescript
-// ✅ Acceptable — benign browser rejection documented
 // play() can reject with AbortError when navigation interrupts playback; this is benign
 void video.play().catch(() => {})
 ```
 
-### When `void` logger calls are fine
+### When `void` is correct
 
-Logger methods return promises but are fire-and-forget by design. `void this.logger.verbose(...)` is the correct pattern — do not `await` logger calls in hot paths.
+- **Logger calls** — `void this.logger.verbose(...)` is the correct pattern. Don't `await` logger calls in hot paths.
+- **DOM event handlers** — sync DOM callbacks (`onclick`, `onsubmit`, `ondrop`) can't be `async`. `void asyncFn()` is correct when the called function handles its own errors (e.g. shows a noty).
 
-### When `void` in frontend event handlers is fine
+## `fs/promises` in async contexts
 
-Sync DOM callbacks (`onclick`, `onsubmit`, `ondrop`) cannot be `async`. Using `void asyncFn()` is correct when the called function handles its own errors internally (e.g., shows user-facing error notifications).
-
-## Prefer `fs/promises` in Async Contexts
-
-When inside an `async` function, use `fs/promises` instead of sync `fs` methods to avoid blocking the Node.js event loop.
+Inside an `async` function, use `fs/promises` instead of sync `fs` to avoid blocking the Node.js event loop.
 
 ```typescript
-// ✅ Good — non-blocking in async context
+// ✅ non-blocking
 import { mkdir, stat, readdir, rm } from 'fs/promises'
 import { existsAsync } from '../../../utils/exists-async.js'
 
 async function ensureDir(dir: string) {
-  if (!(await existsAsync(dir))) {
-    await mkdir(dir, { recursive: true })
-  }
-}
-
-// ❌ Bad — blocks event loop in async context
-import { existsSync, mkdirSync } from 'fs'
-
-async function ensureDir(dir: string) {
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true })
-  }
+  if (!(await existsAsync(dir))) await mkdir(dir, { recursive: true })
 }
 ```
 
-### Mapping sync → async
-
-| Sync                     | Async equivalent                                   |
-| ------------------------ | -------------------------------------------------- |
-| `existsSync(p)`          | `existsAsync(p)` (from `service/src/utils/exists-async.ts`) |
-| `statSync(p)`            | `stat(p)` from `fs/promises`                       |
-| `mkdirSync(p, opts)`     | `mkdir(p, opts)` from `fs/promises`                |
-| `readdirSync(p, opts)`   | `readdir(p, opts)` from `fs/promises`              |
-| `rmSync(p, opts)`        | `rm(p, opts)` from `fs/promises`                   |
-| `readFileSync(p, enc)`   | `readFile(p, enc)` from `fs/promises`              |
-| `writeFileSync(p, data)` | `writeFile(p, data)` from `fs/promises`            |
+| Sync | Async equivalent |
+|---|---|
+| `existsSync` | `existsAsync` (`service/src/utils/exists-async.ts`) |
+| `statSync` | `stat` from `fs/promises` |
+| `mkdirSync` | `mkdir` |
+| `readdirSync` | `readdir` |
+| `rmSync` | `rm` |
+| `readFileSync` | `readFile` |
+| `writeFileSync` | `writeFile` |
 
 ### When sync FS is acceptable
 
-- **Sync-only API contracts:** Vite middleware, Vite build hooks, Express middleware
-- **Test setup/teardown:** `beforeEach` / `afterEach` with small temp directories
-- **One-time cached helpers:** Sync helper that runs once and caches the result (e.g., `getBaseDir()`)
-- **Synchronous process cleanup:** `destroySession()` where the caller needs the directory removed before the reference is dropped
+- Sync-only API contracts (Vite middleware, Vite build hooks, Express middleware)
+- Test setup/teardown (`beforeEach` / `afterEach` with small temp dirs)
+- One-time cached helpers (sync helper that runs once and caches the result, e.g. `getBaseDir()`)
+- Synchronous process cleanup where the caller needs the directory removed before the reference is dropped
+
+## Singleton concurrency — race-safe `getOrCreate`
+
+Singletons that manage shared resources (ffmpeg sessions, DB connections, cached entries) with async creation are vulnerable to races when multiple concurrent callers hit `getOrCreate`-style methods.
+
+### Pending-promise map
+
+```typescript
+// ❌ race — two concurrent callers both see undefined
+public async getOrCreateSession(key: string): Promise<Session> {
+  const existing = this.sessions.get(key)
+  if (existing) return existing
+  const session = await this.createExpensiveResource(key)
+  this.sessions.set(key, session)
+  return session
+}
+
+// ✅ second caller awaits the first caller's promise
+private pendingSessions = new Map<string, Promise<Session>>()
+
+public async getOrCreateSession(key: string): Promise<Session> {
+  const existing = this.sessions.get(key)
+  if (existing) return existing
+
+  const pending = this.pendingSessions.get(key)
+  if (pending) return pending
+
+  const createPromise = this.createExpensiveResource(key)
+  this.pendingSessions.set(key, createPromise)
+  try { return await createPromise }
+  finally { this.pendingSessions.delete(key) }
+}
+```
+
+Apply when **all** are true: singleton, async creation step, expensive / side-effecting resource, multiple concurrent callers possible for the same key.
+
+## Fire-and-forget singleton init
+
+Singletons that need async setup (load config from DB, connect to external API) should **not** block startup. Use a sync `init()` that kicks off async work and logs errors.
+
+```typescript
+// ❌ blocks startup — caller has to await init()
+class MyServiceImpl {
+  public async init() {
+    this.config = await this.configDataSet.get(this.systemInjector, 'MY_CONFIG')
+  }
+}
+
+await injector.get(MyService).init()
+
+// ✅ non-blocking, errors logged
+class MyServiceImpl {
+  public init() {
+    void this.initAsync().catch((error) => {
+      void this.logger.error({ message: 'Failed to initialize MyService', data: { error } })
+    })
+  }
+
+  private async initAsync() {
+    this.config = await this.configDataSet.get(this.systemInjector, 'MY_CONFIG')
+  }
+}
+
+injector.get(MyService).init()
+```
+
+**Keep `async init()` only when** the service must be fully initialized before any caller uses it (schema migrations, must-fail-fast configurations) **and** the caller needs to know whether init succeeded.
+
+## Dispose-before-reinit
+
+If `init()` may be called more than once (e.g. on config change), dispose existing subscriptions first. Otherwise duplicate handlers accumulate.
+
+```typescript
+// ❌ leaks
+private async initAsync() {
+  this.config = await this.configDataSet.get(...)
+  this.subscription = this.eventHub.subscribe('event', (e) => this.handle(e)) // overwrites old, doesn't dispose
+}
+
+// ✅ batch dispose for multiple subscriptions
+private configSubscriptions: Disposable[] = []
+
+private async initAsync() {
+  for (const sub of this.configSubscriptions) sub[Symbol.dispose]()
+  this.configSubscriptions = []
+
+  this.configSubscriptions.push(
+    this.dataSet.subscribe('onEntityAdded', ...),
+    this.dataSet.subscribe('onEntityUpdated', ...),
+    this.dataSet.subscribe('onEntityRemoved', ...),
+  )
+}
+```
+
+## Don't mutate collections during iteration
+
+When pruning entries from a `Map` / `Set`, collect keys first then delete in a separate pass.
+
+```typescript
+// ❌ fragile
+for (const [key, session] of this.sessions) {
+  if (isExpired(session)) this.sessions.delete(key)
+}
+
+// ✅ safe
+const expired: string[] = []
+for (const [key, session] of this.sessions) {
+  if (isExpired(session)) expired.push(key)
+}
+for (const key of expired) this.sessions.delete(key)
+```

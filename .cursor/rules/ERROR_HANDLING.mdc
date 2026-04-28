@@ -1,0 +1,161 @@
+---
+name: Error Handling
+description: RequestError codes, logging, observable error states, user-friendly messages, retry, graceful degradation
+globs:
+  - 'service/**/*.ts'
+  - 'frontend/**/*.ts'
+  - 'frontend/**/*.tsx'
+alwaysApply: false
+---
+
+# Error Handling
+
+## RequestError — backend
+
+Throw `RequestError(message, code)` from REST actions. `furystack/rest-action-use-request-error` lint rule forbids plain `throw new Error(...)` in actions.
+
+| Code | Meaning |
+|---|---|
+| 400 | Validation / bad request |
+| 401 | Authentication required |
+| 403 | Forbidden (authorized but not permitted) |
+| 404 | Not found |
+| 409 | Conflict (resource already exists) |
+| 500 | Server error |
+
+```typescript
+export const CreateUserAction: RequestAction<CreateUserEndpoint> = async ({ injector, getBody }) => {
+  const logger = getLogger(injector).withScope('CreateUserAction')
+  const body = await getBody()
+
+  try {
+    const existing = await store.find({ filter: { email: { $eq: body.email } } })
+    if (existing.count > 0) throw new RequestError('User with this email already exists', 409)
+
+    const user = await store.add(body)
+    return JsonResult(user)
+  } catch (error) {
+    if (error instanceof RequestError) throw error
+    await logger.error({ message: 'Failed to create user', data: { error } })
+    throw new RequestError('Failed to create user', 500)
+  }
+}
+```
+
+Always log with context but return user-friendly messages — never leak stack traces or internal details to clients.
+
+## Result types over throwing for expected failures
+
+For batch / loop operations where multiple expected outcomes exist, return a discriminated union instead of throwing. Reserve `throw RequestError(...)` for REST validation, programming bugs, and data integrity issues. See `BACKEND_PATTERNS.mdc` for the full pattern.
+
+## Observable error states — frontend services
+
+Expose `error` and `isLoading` as observables on services. Components subscribe and render accordingly. The `Impl` class + `defineService` token wrapper is the canonical pi-rat shape — see `CODE_STYLE.mdc`.
+
+```typescript
+class UserServiceImpl implements Disposable {
+  public error = new ObservableValue<string>('')
+  public isLoading = new ObservableValue(false)
+  public users = new ObservableValue<User[]>([])
+
+  constructor(private readonly apiClient: IdentityApiClient) {}
+
+  public async loadUsers() {
+    this.isLoading.setValue(true)
+    this.error.setValue('')
+    try {
+      const users = await this.apiClient.getUsers()
+      this.users.setValue(users)
+    } catch (err) {
+      this.error.setValue(err instanceof Error ? err.message : 'Failed to load users')
+    } finally {
+      this.isLoading.setValue(false)
+    }
+  }
+
+  public [Symbol.dispose](): void {
+    this.error[Symbol.dispose]()
+    this.isLoading[Symbol.dispose]()
+    this.users[Symbol.dispose]()
+  }
+}
+```
+
+In Cache load functions, errors are translated to a `failed` cache state automatically — see `CACHE_HANDLING.mdc`.
+
+## User-friendly error messages
+
+Translate raw errors before showing them. Reusable utility:
+
+```typescript
+export const getUserFriendlyErrorMessage = (error: unknown): string => {
+  if (error instanceof RequestError) return error.message
+
+  if (error instanceof Error) {
+    if (/Network Error|fetch/.test(error.message)) return 'Unable to connect to the server. Please check your internet connection.'
+    if (/401|Unauthorized/.test(error.message)) return 'Your session has expired. Please log in again.'
+    if (/403|Forbidden/.test(error.message)) return 'You do not have permission to perform this action.'
+    if (/404|Not Found/.test(error.message)) return 'The requested resource was not found.'
+    if (/500|Internal Server Error/.test(error.message)) return 'Server error. Please try again later.'
+    return error.message
+  }
+  return 'Something went wrong. Please try again.'
+}
+```
+
+## Retry with exponential backoff
+
+For transient failures (network blips, 5xx). Cap the delay so no single retry stalls forever.
+
+```typescript
+export async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  initialDelay = 1000,
+): Promise<T> {
+  let lastError: unknown
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try { return await fn() }
+    catch (error) {
+      lastError = error
+      if (attempt < maxRetries) {
+        const delay = Math.min(initialDelay * 2 ** attempt, 30000)
+        await new Promise((resolve) => setTimeout(resolve, delay))
+      }
+    }
+  }
+  throw lastError
+}
+```
+
+## Graceful degradation
+
+Provide fallback content when data fails to load — don't show a broken UI.
+
+```typescript
+const UserAvatar = Shade<{ userId: string }>({
+  customElementName: 'user-avatar',
+  render: ({ props, injector, useObservable }) => {
+    const userService = injector.get(UsersService)
+    const [state] = useObservable('user', userService.userCache.getObservable(props.userId))
+
+    const isMissing = !state || state.status === 'failed' || state.status === 'loading'
+    if (isMissing) return <div class="avatar avatar-fallback">?</div>
+    return <div class="avatar">{state.value.name.charAt(0).toUpperCase()}</div>
+  },
+})
+```
+
+## Form validation
+
+Client-side: catch obvious problems early to give immediate feedback. Server-side: still authoritative — `Validate(...)` schemas + explicit checks (see `REST_ACTION_VALIDATION.mdc`).
+
+```typescript
+const handleSubmit = async (data: FormPayload) => {
+  if (data.password !== data.confirmPassword) {
+    error.setValue('Passwords do not match')
+    return
+  }
+  // ...
+}
+```

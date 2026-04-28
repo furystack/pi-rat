@@ -1,673 +1,236 @@
 ---
 name: Code Style
-description: Formatting, naming conventions, import ordering, and file organization
+description: Naming, formatting, imports, file/code organization for the PI-RAT app
 globs:
   - '**/*.ts'
   - '**/*.tsx'
 alwaysApply: true
 ---
 
-# Code Style Guidelines
+# Code Style
 
-## Formatting Standards
+Prettier + ESLint enforced. Run `yarn format` and `yarn lint`. Generate code that satisfies `@furystack/eslint-plugin` from the start.
 
-### Prettier Configuration
+## Naming
 
-This project uses Prettier for code formatting. **Always use the project's Prettier configuration**.
+| Kind | Convention | Example |
+|---|---|---|
+| File | kebab-case `.ts` / `.tsx` | `users-service.ts`, `user-avatar-menu.tsx` |
+| Spec | co-located, `.spec.ts` / `.spec.tsx` | `users-service.spec.ts` |
+| E2E spec | `e2e/<flow>.e2e.spec.ts` | `e2e/login.e2e.spec.ts` |
+| Class / type / component / service token | PascalCase | `UsersService`, `MediaApiClient` |
+| Service token suffix | `*Service` / `*ApiClient` | `SessionService` |
+| Service backing class (when used) | `*Impl` suffix | `UsersServiceImpl` |
+| Function / variable | camelCase, verb-led | `getCurrentUser`, `validateEmail` |
+| Constant | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| Boolean | `is*` / `has*` / `should*` / `can*` prefix | `isAuthenticated` |
+| Event handler (internal) | `handle*` | `handleSubmit` |
+| Event prop callback | `on*` | `onSave` |
+| Type alias | prefer `type` over `interface`. No `I` prefix, no `Type` suffix | `type User = { ... }` |
+| Component props | PascalCase + `Props` suffix | `type UserProfileProps` |
+| Shade element name | kebab-case, unique, namespaced | `customElementName: 'user-profile'` |
 
-**Configuration file:** `prettier.config.js`
+## Imports
 
-```bash
-# ✅ Good - format code
-yarn format
+Order, blank line between groups:
 
-# ✅ Good - check formatting
-yarn format:check
-```
-
-### ESLint Configuration
-
-This project uses ESLint for code quality. **Always use the project's ESLint configuration**.
-
-**Configuration file:** `eslint.config.js`
-
-```bash
-# ✅ Good - lint code
-yarn lint
-```
-
-### Automated Formatting
-
-Code is automatically formatted on commit via Husky:
-
-```json
-{
-  "lint-staged": {
-    "*.{ts,tsx}": ["eslint --fix", "prettier --write", "git add"]
-  }
-}
-```
-
-## Naming Conventions
-
-### Files and Directories
-
-#### Component Files
-
-- **Shades Components:** PascalCase, `.tsx` extension
-- **One component per file**
-- File name matches component name
-
-```
-✅ Good:
-frontend/src/components/user-profile.tsx
-frontend/src/pages/dashboard.tsx
-frontend/src/components/routes/settings-routes.tsx
-
-❌ Avoid:
-frontend/src/components/UserProfile.tsx (should be kebab-case for files)
-frontend/src/components/user_profile.tsx
-frontend/src/components/components.tsx (multiple components)
-```
-
-#### Non-Component Files
-
-- **Utilities:** kebab-case, `.ts` extension
-- **Services:** kebab-case with `-service` suffix, `.ts` extension
-- **Types:** kebab-case, `.ts` extension
-- **Constants:** kebab-case or UPPER_SNAKE_CASE, `.ts` extension
-- **API Clients:** kebab-case with `-api-client` suffix, `.ts` extension
-
-```
-✅ Good:
-service/src/utils/format-currency.ts
-frontend/src/services/session-service.ts
-common/src/models/user.ts
-common/src/constants/api-endpoints.ts
-frontend/src/services/api-clients/media-api-client.ts
-
-❌ Avoid:
-service/src/utils/FormatCurrency.ts
-frontend/src/services/SessionService.ts
-common/src/models/User.ts
-```
-
-#### Test Files
-
-- **Unit Tests:** `*.spec.ts` or `*.spec.tsx`
-- **E2E Tests:** `*.e2e.spec.ts`
-- Co-located with the file being tested
-
-```
-✅ Good:
-frontend/src/services/session-service.ts
-frontend/src/services/session-service.spec.ts
-e2e/login.e2e.spec.ts
-
-❌ Avoid:
-frontend/src/services/session-service-test.ts
-test/session-service.spec.ts (not co-located)
-```
-
-#### Directory Names
-
-- **Component directories:** kebab-case
-- **Service directories:** kebab-case
-- **Module directories:** kebab-case
-
-```
-✅ Good:
-frontend/src/components/user-profile/
-frontend/src/pages/media-library/
-service/src/app-models/auth/
-common/src/apis/
-
-❌ Avoid:
-frontend/src/components/UserProfile/
-frontend/src/components/user_profile/
-```
-
-### Variables and Functions
-
-#### Variables
-
-- **camelCase** for variables
-- **UPPER_SNAKE_CASE** for constants
-- Descriptive names
+1. FuryStack packages (`@furystack/*`)
+2. External deps
+3. Workspace package (`common`)
+4. Relative imports
+5. Type-only imports last in each group
 
 ```typescript
-// ✅ Good
-const userName = 'John Doe';
-const isAuthenticated = true;
-const userList = [];
-const MAX_RETRY_COUNT = 3;
-const API_BASE_URL = 'https://api.example.com';
+import { defineService } from '@furystack/inject'
+import { Shade } from '@furystack/shades'
+import { ObservableValue, usingAsync } from '@furystack/utils'
 
-// ❌ Avoid
-const user_name = 'John Doe';
-const User = 'John Doe';
-const x = true;
-const maxretrycount = 3;
+import type { User } from 'common'
+
+import { SessionService } from '../services/session.js'
+import type { UserProfileProps } from './types.js'
 ```
 
-#### Functions
+Group same-package imports together. Sort alphabetically when many.
 
-- **camelCase** for functions
-- Verb-based names
-- Descriptive and clear purpose
-
-```typescript
-// ✅ Good
-function getUserProfile() {}
-function calculateTotal() {}
-function validateEmail() {}
-function handleSubmit() {}
-function fetchUserData() {}
-
-// ❌ Avoid
-function user() {}
-function calc() {}
-function validate() {}
-function submit() {}
-function getData() {}
-```
-
-#### Event Handlers
-
-- **Prefix with `handle`** for internal handlers
-- **Prefix with `on`** for prop callbacks
-
-```typescript
-// ✅ Good - Shades component with event handlers
-const MyComponent = Shade({
-  customElementName: 'my-component',
-  render: ({ props, injector }) => {
-    const handleButtonClick = () => {
-      // Internal logic
-      props.onSave?.();
-    };
-
-    const handleFormSubmit = (ev: Event) => {
-      ev.preventDefault();
-      // Submit logic
-    };
-
-    return (
-      <form onsubmit={handleFormSubmit}>
-        <button onclick={handleButtonClick}>Save</button>
-        <button onclick={props.onCancel}>Cancel</button>
-      </form>
-    );
-  },
-});
-```
-
-#### Boolean Variables
-
-- Prefix with `is`, `has`, `should`, or `can`
-
-```typescript
-// ✅ Good
-const isAuthenticated = true;
-const hasPermission = false;
-const shouldRender = true;
-const canEdit = false;
-const isLoading = true;
-const hasError = false;
-
-// ❌ Avoid
-const authenticated = true;
-const permission = false;
-const render = true;
-const edit = false;
-```
-
-### Shades Components
-
-#### Component Names
-
-- **PascalCase** for components
-- Descriptive and specific
-
-```typescript
-// ✅ Good
-export const UserProfile = Shade({ /* ... */ });
-export const MediaLibrary = Shade({ /* ... */ });
-export const NavigationSidebar = Shade({ /* ... */ });
-
-// ❌ Avoid
-export const userProfile = Shade({ /* ... */ });
-export const Component = Shade({ /* ... */ }); // Too generic
-export const UP = Shade({ /* ... */ }); // Unclear abbreviation
-```
-
-#### Component Props Types
-
-- **PascalCase** with `Props` suffix
-- Use `type` instead of `interface`
-
-```typescript
-// ✅ Good
-type UserProfileProps = {
-  userId: string;
-  onEdit?: () => void;
-  onDelete?: () => void;
-};
-
-export const UserProfile = Shade<UserProfileProps>({
-  customElementName: 'user-profile',
-  render: ({ props }) => {
-    // Component implementation
-  },
-});
-
-// ❌ Avoid
-interface UserProfileProps { }  // Use type instead
-type UserProfileProperties { }  // Wrong suffix
-type Props { }  // Not specific enough
-```
-
-### Services and Injectables
-
-- **PascalCase** for class names
-- **Suffix with `Service`** for services
-- Use `@Injectable` decorator
-
-```typescript
-// ✅ Good
-@Injectable({ lifetime: 'singleton' })
-export class SessionService {
-  // Service implementation
-}
-
-@Injectable({ lifetime: 'singleton' })
-export class MediaApiClient {
-  // API client implementation
-}
-
-// ❌ Avoid
-export class session { } // Wrong case
-export class Session { } // Missing suffix
-export class SessionServiceClass { } // Redundant suffix
-```
-
-### TypeScript Types and Interfaces
-
-- **PascalCase** for types and interfaces
-- **Prefer `type` over `interface`**
-- Descriptive names
-
-```typescript
-// ✅ Good
-type User = {
-  id: string;
-  name: string;
-  email: string;
-};
-
-type UserWithProfile = User & {
-  avatar?: string;
-  bio?: string;
-};
-
-type RequestState<T> =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'success'; data: T }
-  | { status: 'error'; error: string };
-
-// ❌ Avoid
-interface User {} // Use type instead (per project guidelines)
-type user = {}; // Wrong case
-type UserType = {}; // Redundant suffix
-type T = {}; // Not descriptive
-```
-
-### Enums and Constants
-
-- **PascalCase** for enum names
-- **UPPER_SNAKE_CASE** for enum values
-- **UPPER_SNAKE_CASE** for constants
-
-```typescript
-// ✅ Good
-enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-  GUEST = 'GUEST',
-}
-
-const MAX_RETRY_COUNT = 3;
-const API_BASE_URL = 'https://api.example.com';
-const DEFAULT_PAGE_SIZE = 10;
-
-// ❌ Avoid
-enum userRole {} // Wrong case
-enum UserRole {
-  admin = 'admin', // Wrong case for values
-}
-const maxRetryCount = 3; // Should be UPPER_SNAKE_CASE
-```
-
-## File Organization Patterns
-
-### Component Directory Structure
-
-```
-frontend/src/components/user-profile/
-├── user-profile.tsx           # Main component
-├── user-profile.spec.tsx      # Unit tests
-└── components/                # Sub-components (if any)
-    ├── user-avatar.tsx
-    └── user-stats.tsx
-```
-
-### Project Structure
+## Workspace layout
 
 ```
 pi-rat/
-├── common/              # Shared types and APIs
-│   ├── src/
-│   │   ├── apis/       # API type definitions
-│   │   ├── models/     # Shared models
-│   │   └── schemas/    # Generated schemas
-├── frontend/           # Frontend application
-│   ├── src/
-│   │   ├── components/ # Reusable components
-│   │   ├── pages/      # Page components
-│   │   ├── services/   # Business logic
-│   │   └── styles/     # Global styles
-├── service/            # Backend service
-│   ├── src/
-│   │   ├── app-models/ # Domain models
-│   │   ├── actions/    # REST actions
-│   │   └── utils/      # Utility functions
-└── e2e/               # End-to-end tests
+├── common/                                 # shared types + per-module API contracts
+│   └── src/
+│       ├── apis/<module>.ts                # module API interfaces
+│       ├── apis/index.ts                   # re-export
+│       ├── models/                         # shared models
+│       └── schemas/                        # generated by yarn create-schemas
+├── frontend/                               # Shades app
+│   └── src/
+│       ├── components/<x>.tsx              # leaf components
+│       ├── components/<x>/index.tsx + assets
+│       ├── pages/<x>.tsx                   # route targets
+│       ├── pages/<module>/                 # module pages
+│       └── services/<x>-service.ts         # defineService tokens (Impl class + factory)
+├── service/                                # backend
+│   └── src/
+│       ├── service.ts                      # entry
+│       ├── config.ts                       # injector configuration
+│       ├── app-models/<module>/
+│       │   ├── actions/<verb>-<entity>-action.ts
+│       │   ├── setup-<module>-rest-api.ts
+│       │   └── setup-<module>-store.ts
+│       └── services/                       # singleton services
+├── monaco-mfe/                             # Monaco editor MFE (loaded at runtime)
+└── e2e/                                    # Playwright specs + helpers
 ```
 
-## Import Ordering and Grouping
+`common` re-exports through `common/src/index.ts`. Use `.js` import suffix on relative paths (NodeNext ESM).
 
-### Import Order
-
-Group imports in the following order:
-
-1. **FuryStack framework imports**
-2. **Third-party libraries**
-3. **Common package imports** (from `common`)
-4. **Absolute imports from the project** (frontend/service)
-5. **Relative imports**
-6. **Type imports** (if separated)
+## Service / component file structure
 
 ```typescript
-// ✅ Good - organized imports
-import { Injectable, Injected } from '@furystack/inject';
-import { ObservableValue } from '@furystack/utils';
-import { Shade } from '@furystack/shades';
+// 1. imports
+import { defineService, type Token } from '@furystack/inject'
 
-import type { FindOptions } from '@furystack/core';
-import { Cache } from '@furystack/cache';
+// 2. types
+type UserProfileProps = { userId: string; onEdit?: () => void }
 
-import type { User, Series } from 'common';
+// 3. constants
+const MAX_BIO_LENGTH = 500
 
-import { SessionService } from '../services/session-service.js';
-import { formatDate } from '../utils/format-date.js';
+// 4. helpers
+const formatDate = (date: Date): string => /* ... */
 
-import { UserAvatar } from './components/user-avatar.js';
-import { UserStats } from './components/user-stats.js';
-
-// ❌ Avoid - random ordering
-import { UserStats } from './components/user-stats.js';
-import { ObservableValue } from '@furystack/utils';
-import type { User } from 'common';
-import { SessionService } from '../services/session-service.js';
-```
-
-### Import Grouping with Blank Lines
-
-Separate import groups with blank lines:
-
-```typescript
-// ✅ Good - separated groups
-import { Injectable } from '@furystack/inject';
-import { Shade } from '@furystack/shades';
-
-import { Cache } from '@furystack/cache';
-
-import type { User } from 'common';
-
-import { SessionService } from '../services/session-service.js';
-
-import { UserAvatar } from './components/user-avatar.js';
-```
-
-### Named Imports
-
-Use named imports and group them logically:
-
-```typescript
-// ✅ Good - grouped FuryStack imports
-import { Injectable, Injected } from '@furystack/inject';
-import { ObservableValue, usingAsync } from '@furystack/utils';
-
-// ✅ Good - alphabetically sorted when many imports
-import { Cache } from '@furystack/cache';
-import { getCurrentUser } from '@furystack/core';
-import { getLogger } from '@furystack/logging';
-import { JsonResult, RequestError } from '@furystack/rest-service';
-
-// ❌ Avoid - separate imports for same package
-import { Injectable } from '@furystack/inject';
-import { Injected } from '@furystack/inject';
-```
-
-## Code Organization Within Files
-
-### Component File Structure
-
-Organize Shades components with this structure:
-
-```typescript
-// 1. Imports
-import { Shade } from '@furystack/shades';
-import { ObservableValue } from '@furystack/utils';
-
-import type { User } from 'common';
-
-// 2. Types
-type UserProfileProps = {
-  userId: string;
-  onEdit?: () => void;
-};
-
-// 3. Constants (if any)
-const MAX_BIO_LENGTH = 500;
-
-// 4. Helper functions (if any)
-const formatDate = (date: Date): string => {
-  // ...
-};
-
-// 5. Main component
+// 5. main export
 export const UserProfile = Shade<UserProfileProps>({
   customElementName: 'user-profile',
-  render: ({ props, injector, useObservable, useDisposable }) => {
-    // Services
-    const userService = injector.getInstance(UserService);
-
-    // Observable subscriptions
-    const [user] = useObservable('user', userService.getUserById(props.userId));
-
-    // Local state
-    const isEditing = useDisposable('isEditing', () => new ObservableValue(false));
-    const error = useDisposable('error', () => new ObservableValue(''));
-
-    // Handlers
-    const handleEditClick = () => {
-      isEditing.setValue(true);
-      props.onEdit?.();
-    };
-
-    // Render
-    return (
-      <div data-testid="user-profile">
-        {/* Component content */}
-      </div>
-    );
-  },
-});
+  render: ({ props, injector, useObservable }) => { /* ... */ },
+})
 ```
 
-### Service File Structure
+Component render order: services → host props → refs → observable subscriptions → local state → handlers → JSX.
 
-Organize services with this structure:
+## DI — functional services
+
+Pi-rat uses **functional DI**: services are declared with `defineService` returning a singleton `Token`. Resolve via `injector.get(...)` (synchronous) or inside a factory via `inject(...)`. See `BACKEND_PATTERNS.mdc` and `OBSERVABLE_STATE.mdc` for full patterns.
+
+For services with multi-method behaviour, the project commonly uses an **`Impl` class for code organization** wrapped by a `defineService` factory. Both the class type and the token are exported under the same name:
 
 ```typescript
-// 1. Imports
-import { Injectable, Injected } from '@furystack/inject';
-import { ObservableValue } from '@furystack/utils';
-import { Cache } from '@furystack/cache';
+import { Cache } from '@furystack/cache'
+import { defineService, type Token } from '@furystack/inject'
+import { IdentityApiClient } from './api-clients/identity-api-client.js'
 
-// 2. Types
-type UserData = {
-  id: string;
-  name: string;
-};
-
-// 3. Service class
-@Injectable({ lifetime: 'singleton' })
-export class UserService {
-  // Injected dependencies
-  @Injected(ApiClient)
-  private declare apiClient: ApiClient;
-
-  // Cache instances
+class UsersServiceImpl implements Disposable {
   public userCache = new Cache({
     capacity: 100,
-    load: async (id: string) => {
-      const { result } = await this.apiClient.call({
-        method: 'GET',
-        action: '/users/:id',
-        url: { id },
-        query: {},
-      });
-      return result;
-    },
-  });
+    load: async (id: string) => /* ... */,
+  })
 
-  // Observable state
-  public currentUser = new ObservableValue<UserData | null>(null);
+  constructor(private readonly identityApiClient: IdentityApiClient) {}
 
-  // Public methods
-  public getUser = this.userCache.get.bind(this.userCache);
-  public getUserAsObservable = this.userCache.getObservable.bind(this.userCache);
+  public getUser = this.userCache.get.bind(this.userCache)
+
+  public [Symbol.dispose](): void {
+    this.userCache[Symbol.dispose]()
+  }
 }
+
+export type UsersService = UsersServiceImpl
+
+export const UsersService: Token<UsersService, 'singleton'> = defineService({
+  name: 'pi-rat/UsersService',
+  lifetime: 'singleton',
+  factory: ({ inject, onDispose }) => {
+    const impl = new UsersServiceImpl(inject(IdentityApiClient))
+    // eslint-disable-next-line furystack/prefer-using-wrapper -- Disposal is deferred to the injector tear-down
+    onDispose(() => impl[Symbol.dispose]())
+    return impl
+  },
+})
 ```
 
-## JSX/TSX Code Style
+For simple stateless services, return an inline object literal from the factory and skip the `Impl` class.
 
-### JSX Formatting
+The legacy `@Injectable` / `@Injected` / `injector.getInstance(...)` decorator API is **removed** — do not use it.
+
+## JSX
+
+Multi-line for >2 attrs. Single-line for trivial cases. No nested ternaries — use early returns for >2 branches.
 
 ```tsx
-// ✅ Good - multi-line for readability
-<button
-  type="button"
-  onclick={handleClick}
-  style={{ padding: '8px 16px' }}
->
-  Save Changes
+// ✅
+<button type="button" onclick={handleClick} style={{ padding: '8px' }}>
+  Save
 </button>
 
-// ✅ Good - single line for simple cases
-<button onclick={handleClick}>Save</button>
-
-// ❌ Avoid - hard to read
-<button type="button" onclick={handleClick} style={{ padding: '8px 16px' }}>Save Changes</button>
+// ❌ nested ternary
+{isLoading ? <Loading /> : error ? <Err /> : <Content />}
 ```
 
-### Conditional Rendering
+## JSDoc
 
-```tsx
-// ✅ Good - logical AND for simple cases
-{isLoading && <div>Loading...</div>}
+Required on exported services / actions / shared utilities. For internal symbols, JsDoc is optional — only add it when it passes the value test below.
 
-// ✅ Good - ternary for if-else
-{isLoading ? <div>Loading...</div> : <div>Content</div>}
+### Value test
 
-// ✅ Good - early return for complex cases
-if (isLoading) return <div>Loading...</div>;
-if (error) return <div>Error: {error}</div>;
-return <div>Content</div>;
+Before writing or keeping JsDoc, strip the type signature mentally and read the JsDoc alone. If it still tells the reader something the type does not, keep it. If it just narrates the type, delete it.
 
-// ❌ Avoid - nested ternaries
-{isLoading ? <div>Loading...</div> : error ? <div>Error</div> : <div>Content</div>}
-```
+Keep when JsDoc explains:
 
-## Comments and Documentation
+- **Intent** — why this exists, what problem it solves
+- **Trade-offs** — design choices that have alternatives
+- **Constraints** — runtime invariants, ordering, lifecycle, side effects
+- **Non-obvious usage** — patterns the type allows but discourages, or shapes the caller is expected to follow
 
-### JSDoc for Functions
+Delete when JsDoc:
+
+- Restates the function name (`isUser` → "Runtime type guard for `User`.")
+- Restates parameter or return types already in the signature
+- Says "Service token for users" when the type is literally `Token<UsersService, 'singleton'>`
+
+### `@example`
+
+Include when usage is not obvious from the signature. Examples must be copy-paste compilable — if you copy the block into a fresh `.ts` file and add the imports shown, `tsc --noEmit` passes. Drift is the main failure mode; treat examples as code, not prose.
+
+Cross-link instead of duplicating. Write `See {@link UsersService} for cache semantics` rather than re-explaining it on every consumer.
+
+### Cross-file `{@link}` references
+
+When a `{@link Symbol}` references a symbol declared in another file, add a type-only import for that symbol at the top of the referencing file:
 
 ```typescript
+import type { UsersService } from '../services/users-service.js'
+```
+
+TypeScript recognizes JsDoc references as usage (no `noUnusedLocals` complaint) and IDE navigation works. Type-only imports are erased under `verbatimModuleSyntax: true`, so circular type-only imports between two files are fine.
+
+### Example — value test in practice
+
+```typescript
+// ✅ keeps — explains intent + trade-off, irreplaceable by the type
 /**
- * Formats a currency value with the specified currency code
- * @param value - The numeric value to format
- * @param currency - The ISO currency code (e.g., 'USD', 'EUR')
- * @returns Formatted currency string
+ * Capacity tuned to the typical session's working set; oversized caches
+ * waste memory on infrequently accessed users without measurable gains.
  */
-export const formatCurrency = (value: number, currency: string): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(value);
-};
-```
+const USER_CACHE_CAPACITY = 100
 
-### Component Documentation
-
-```typescript
+// ❌ deletes — narrates the type, no extra signal
 /**
- * UserProfile component displays user information and allows editing
+ * Runtime type guard for {@link User}.
  */
-export const UserProfile = Shade<UserProfileProps>({
-  customElementName: 'user-profile',
-  render: ({ props }) => {
-    // Component implementation
-  },
-});
+export const isUser = (value: unknown): value is User => { /* ... */ }
 ```
 
-### Inline Comments
+## Comments
 
-Use inline comments sparingly and only for complex logic:
+Only for non-obvious intent / trade-offs / constraints. Never narrate what code does.
 
 ```typescript
-// ✅ Good - explaining complex logic
-// Calculate exponential backoff: 1s, 2s, 4s, 8s...
-const delay = Math.min(1000 * 2 ** attempt, 30000);
+// ✅
+// Exponential backoff: 1s, 2s, 4s, 8s, capped at 30s
+const delay = Math.min(1000 * 2 ** attempt, 30000)
 
-// ❌ Avoid - stating the obvious
+// ❌
 // Set count to 0
-const count = 0;
+const count = 0
 ```
-
-## Summary
-
-**Key Principles:**
-
-1. **Follow project's Prettier and ESLint configs**
-2. **Use consistent naming conventions:**
-   - PascalCase: Components, services, types
-   - camelCase: Variables, functions
-   - kebab-case: File names
-   - UPPER_SNAKE_CASE: Constants
-3. **Organize files logically** with direct imports
-4. **Order imports** by category with blank lines (FuryStack → Third-party → Common → Local)
-5. **Structure components** consistently (services → observables → handlers → render)
-6. **Be explicit** with TypeScript where it adds clarity
-7. **Format JSX** for readability
-8. **Document** complex logic and public APIs
-
-**Tools:**
-
-- Prettier: `yarn format`
-- ESLint: `yarn lint`
-- Type Check: `yarn build`

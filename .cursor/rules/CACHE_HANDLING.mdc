@@ -1,0 +1,157 @@
+---
+name: Cache Handling
+description: FuryStack Cache patterns — capacity, load functions, getObservable subscriptions, invalidation, type safety
+globs:
+  - 'frontend/**/*.ts'
+  - 'frontend/**/*.tsx'
+alwaysApply: false
+---
+
+# Cache Handling
+
+`@furystack/cache` provides a Cache with built-in Observable integration. App code consumes data via services that own caches; components subscribe via `getObservable`. See `FRONTEND_PATTERNS.mdc` for the service-cache contract.
+
+## Basic setup
+
+The `Impl` class + `defineService` token pattern is the canonical pi-rat shape — see `CODE_STYLE.mdc` § "DI — functional services" and `FRONTEND_PATTERNS.mdc` for the full service/cache wiring. Here only the cache-specific bits:
+
+```typescript
+import { Cache } from '@furystack/cache'
+import { defineService, type Token } from '@furystack/inject'
+
+class UsersServiceImpl implements Disposable {
+  public userCache = new Cache({
+    capacity: 100,
+    load: async (id: string) => {
+      const { result } = await this.apiClient.call({
+        method: 'GET',
+        action: '/users/:id',
+        url: { id },
+        query: {},
+      })
+      return result
+    },
+  })
+
+  constructor(private readonly apiClient: IdentityApiClient) {}
+
+  public getUser = this.userCache.get.bind(this.userCache)
+  public getUserAsObservable = this.userCache.getObservable.bind(this.userCache)
+
+  public [Symbol.dispose](): void {
+    this.userCache[Symbol.dispose]()
+  }
+}
+
+export type UsersService = UsersServiceImpl
+export const UsersService: Token<UsersService, 'singleton'> = defineService({ /* ... */ })
+```
+
+## Individual + query cache pattern
+
+For list endpoints, run two caches: one keyed by `id`, one keyed by `FindOptions`. Populate the individual cache from list results so detail pages don't refetch.
+
+```typescript
+public seriesCache = new Cache({
+  capacity: 100,
+  load: async (id: string) => { /* GET /series/:id */ },
+})
+
+public seriesQueryCache = new Cache({
+  capacity: 100,
+  load: async (findOptions: FindOptions<Series, Array<keyof Series>>) => {
+    const { result } = await this.mediaApiClient.call({ method: 'GET', action: '/series', query: { findOptions } })
+    result.entries.forEach((entry) => {
+      this.seriesCache.setExplicitValue({
+        loadArgs: [entry.imdbId],
+        value: { status: 'loaded', value: entry, updatedAt: new Date() },
+      })
+    })
+    return result
+  },
+})
+```
+
+## Methods
+
+| Method | Use |
+|---|---|
+| `get(...args)` | async fetch, cache miss runs `load` |
+| `getObservable(...args)` | reactive subscription for components — emits `loading` / `loaded` / `error` cache states |
+| `setExplicitValue({ loadArgs, value })` | manually populate a cache entry (e.g. after a mutation, or from a list query) |
+| `reload(...args)` | force refetch (await it in service methods, see TESTING_GUIDELINES) |
+| `flushAll()` | invalidate all entries (typical for query caches after mutations) |
+| `remove(...args)` | drop a single entry |
+
+## Component subscription
+
+```typescript
+const MovieDetails = Shade<{ movieId: string }>({
+  customElementName: 'movie-details',
+  render: ({ props, injector, useObservable }) => {
+    const movieService = injector.get(MovieService)
+    const [state] = useObservable('movie', movieService.movieCache.getObservable(props.movieId))
+
+    if (!state || state.status === 'loading') return <div>Loading...</div>
+    if (state.status === 'failed') return (
+      <div style={{ color: 'red' }}>
+        Failed to load.
+        <button onclick={() => void movieService.movieCache.reload(props.movieId)}>Retry</button>
+      </div>
+    )
+    if (state.status === 'loaded') return <h1>{state.value.title}</h1>
+    return null
+  },
+})
+```
+
+Always handle all three cache states. The full union from `getObservable` is `loading | loaded | obsolete | failed` (depending on cache version) — check `state.status` before reading `state.value`.
+
+## Invalidation after mutations
+
+```typescript
+public updateUser = async (username: string, body: UserUpdate) => {
+  const { result } = await this.apiClient.call({ method: 'PATCH', action: '/users/:id', url: { id: username }, body })
+  await this.userCache.reload(username)   // refresh detail cache
+  this.userQueryCache.flushAll()          // drop list caches
+  return result
+}
+```
+
+Always `await` the reload — fire-and-forget triggers unhandled rejections in tests after the injector disposes (see `TESTING_GUIDELINES.mdc`).
+
+## Capacity guidance
+
+| Data shape | Capacity |
+|---|---|
+| Frequently changing recent items | 20 |
+| Frequent + balanced (entities, movies) | 100 |
+| Stable per-user data (preferences) | 500+ |
+
+## Error handling in `load`
+
+Errors thrown from `load` set the cache entry to `failed` — components reading via `getObservable` see `state.status === 'failed'`. Log with context before re-throwing or wrapping.
+
+```typescript
+public seriesCache = new Cache({
+  capacity: 100,
+  load: async (id: string) => {
+    try {
+      const { result } = await this.mediaApiClient.call({ method: 'GET', action: '/series/:id', url: { id }, query: {} })
+      return result
+    } catch (error) {
+      await this.logger.error({ message: 'Failed to load series', data: { seriesId: id, error } })
+      throw error
+    }
+  },
+})
+```
+
+## Type safety
+
+Use explicit generics for the cache type:
+
+```typescript
+public seriesCache: Cache<[string], Series> = new Cache({ /* ... */ })
+public seriesQueryCache: Cache<[FindOptions<Series, Array<keyof Series>>], SeriesQueryResult> = new Cache({ /* ... */ })
+```

@@ -1,6 +1,6 @@
 ---
 name: TypeScript Guidelines
-description: Type safety, strict typing, NEVER use any, generics, and type guards
+description: Type safety, strict typing, no `any`, generics, type guards for the PI-RAT app
 globs:
   - '**/*.ts'
   - '**/*.tsx'
@@ -9,661 +9,152 @@ alwaysApply: true
 
 # TypeScript Guidelines
 
-## Type Definitions
+## Public API
 
-### Component Props
-
-- **Prefer `type` over `interface`** for type definitions
-- Let TypeScript infer return types for simple components
-- Include types in the same file as the component they belong to
-- Only create separate type files for shared types used across multiple components
+- All exports have explicit types (params + return).
+- Generic params have constraints + descriptive names (`TUser`, `TArgs` — not `T`, `R`).
+- Prefer `type` over `interface`. No `I` prefix, no `Type` suffix.
 
 ```typescript
-// ✅ Good - let TypeScript infer return type
-type ButtonProps = {
-  variant?: 'contained' | 'outlined' | 'text';
-  color?: 'primary' | 'secondary' | 'error';
-  disabled?: boolean;
-  onclick?: () => void;
-};
+// ✅
+export const UsersService: Token<UsersService, 'singleton'> = defineService({
+  name: 'pi-rat/UsersService',
+  lifetime: 'singleton',
+  factory: ({ inject }): UsersService => new UsersServiceImpl(inject(IdentityApiClient)),
+})
 
-export const Button = Shade<ButtonProps>({
-  customElementName: 'pi-rat-button',
-  render: ({ props }) => {
-    const variant = props.variant ?? 'contained';
-    const color = props.color ?? 'primary';
-    
-    return (
-      <button
-        type="button"
-        disabled={props.disabled}
-        onclick={props.onclick}
-        style={{
-          backgroundColor: color === 'primary' ? '#2196f3' : '#f50057',
-          opacity: props.disabled ? 0.5 : 1,
-        }}
-      >
-        {/* Button content */}
-      </button>
-    );
-  },
-});
-
-// ✅ Good - explicit return type for complex conditional logic
-export const StatusBadge = Shade<{ status: string }>({
-  customElementName: 'status-badge',
-  render: ({ props }): JSX.Element | null => {
-    switch (props.status) {
-      case 'active':
-        return <div>Active</div>;
-      case 'inactive':
-        return <div>Inactive</div>;
-      case 'pending':
-        return <div>Pending</div>;
-      default:
-        return null; // Easier to specify return type than cast in each case
-    }
-  },
-});
-
-// ❌ Avoid - using interface (prefer type)
-interface ButtonProps {
-  variant?: string;
-}
+// ❌ implicit return type, single-letter generic
+export function fetchData<T>(url) { return fetch(url) }
 ```
 
-### Type Organization
+## NO `any` — one exception
 
-- Include component-specific types in the same file as the component
-- Create separate type files only for shared types used across multiple components
-- Use descriptive names for types
-- Group related types together
+`any` forbidden in values, params, return types. **Exception:** generic constraint position when variance breaks `unknown` inference (callback param positions).
 
 ```typescript
-// ✅ Good - types in source file
-type UserProfileProps = {
-  user: User;
-  onEdit?: (user: User) => void;
-  onDelete?: (userId: string) => void;
-};
+// ✅ unknown for truly unknown
+const process = (data: unknown): string =>
+  typeof data === 'string' ? data : JSON.stringify(data)
 
-export const UserProfile = Shade<UserProfileProps>({
-  customElementName: 'user-profile',
-  render: ({ props }) => {
-    // Component implementation
-  },
-});
+// ✅ any only allowed in constraint position
+type ExtractPaths<T extends Record<string, NestedRoute<any>>> = { /* ... */ }
 
-// ✅ Good - shared types in separate file
-// common/src/models/user.ts
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'user' | 'guest';
-};
-
-export type UserProfile = User & {
-  avatar?: string;
-  preferences: UserPreferences;
-};
-
-export type UserPreferences = {
-  theme: 'light' | 'dark';
-  language: string;
-  notifications: boolean;
-};
+// ❌ any anywhere else
+export function process(data: any): string { return data.toString() }
 ```
 
-## Generic Components
+`@typescript-eslint/no-explicit-any` is **disabled** in `eslint.config.js` because the rule has no option for the constraint-position exception. Reviewers enforce the rule in code review.
 
-### Generic Type Patterns
+## Inference
 
-- Use generics for flexible component types
-- Provide proper TypeScript constraints
-- Use descriptive generic parameter names
+Let TS infer internally. Be explicit at API boundaries, complex switch/case, or when inference is ambiguous.
 
 ```typescript
-// ✅ Good
-type ListProps<T> = {
-  items: T[];
-  renderItem: (item: T, index: number) => JSX.Element;
-  keyExtractor: (item: T) => string;
-};
+// ✅ inferred internally
+const users = ['Alice', 'Bob']
+const count = users.length
 
-export const List = <T,>(props: ListProps<T>) => Shade({
-  customElementName: 'generic-list',
-  render: () => {
-    return (
-      <ul data-testid="list">
-        {props.items.map((item, index) => (
-          <li key={props.keyExtractor(item)}>
-            {props.renderItem(item, index)}
-          </li>
-        ))}
-      </ul>
-    );
-  },
-});
+// ✅ explicit at exports
+export const getUserById = async (id: string): Promise<User | null> => { /* ... */ }
 
-// ❌ Avoid - not generic when it should be
-type ListProps = {
-  items: any[];
-  renderItem: (item: any) => JSX.Element;
-};
+// ❌ noisy
+const count: number = 5
 ```
 
-### Generic Constraints
+## API contract types
 
-- Use constraints to limit generic types
-- Provide meaningful constraints for type safety
-- Use `extends` keyword for type constraints
+Frontend and service share contracts through `common/src/apis/<module>.ts`. Each module exports a `RestApi`-derived interface. Always import the typed module API from `common`.
 
 ```typescript
-// ✅ Good - with constraints
-type DataItem = {
-  id: string;
-  name: string;
-};
+import type { IdentityApi } from 'common'
 
-type DataListProps<T extends DataItem> = {
-  items: T[];
-  onItemClick: (item: T) => void;
-};
-
-export const DataList = <T extends DataItem>(props: DataListProps<T>) => Shade({
-  customElementName: 'data-list',
-  render: () => {
-    return (
-      <div data-testid="data-list">
-        {props.items.map(item => (
-          <div key={item.id} onclick={() => props.onItemClick(item)}>
-            {item.name}
-          </div>
-        ))}
-      </div>
-    );
-  },
-});
-
-// ❌ Avoid - no constraints when needed
-type DataListProps<T> = {
-  items: T[];
-  onItemClick: (item: T) => void;
-};
+// API client token (frontend)
+export const IdentityApiClient: Token<IdentityApiClient, 'singleton'> = defineService({
+  name: 'pi-rat/IdentityApiClient',
+  lifetime: 'singleton',
+  factory: () => new IdentityApiClientImpl(/* typed via IdentityApi */),
+})
 ```
 
-## Type Safety
+## Type guards
 
-### Strict Type Checking
-
-- Enable strict TypeScript configuration
-- Use proper type annotations
-- **NEVER use `any` type** - There are no acceptable uses of `any`
+Use guards for runtime checks. Use them, not type assertions.
 
 ```typescript
-// ✅ Good - strict typing
-const handleSubmit = (event: Event) => {
-  event.preventDefault();
-  const target = event.target as HTMLFormElement;
-  const formData = new FormData(target);
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
+// ✅
+export const isUser = (value: unknown): value is User =>
+  typeof value === 'object' && value !== null && 'username' in value
 
-  onSubmit({ email, password });
-};
+const isNonNullable = <T>(value: T | null | undefined): value is T =>
+  value !== null && value !== undefined
 
-// ✅ Good - use unknown instead of any
-const processData = (data: unknown) => {
-  if (typeof data === 'string') {
-    return data.toUpperCase();
-  }
-  throw new Error('Invalid data type');
-};
-
-// ✅ Good - use generics instead of any
-const processItem = <T>(item: T): T => {
-  return item;
-};
-
-// ❌ FORBIDDEN - using any
-const handleSubmit = (event: any) => {
-  // NEVER DO THIS
-};
-
-// ❌ FORBIDDEN - using any
-const data: any = fetchData();
-
-// ❌ FORBIDDEN - any in function parameters
-const processData = (data: any) => {
-  // NEVER DO THIS
-};
+users.filter(isNonNullable) // type-narrowed
 ```
 
-### Alternatives to `any`
+## Discriminated unions
 
-When you think you need `any`, use these instead:
-
-1. **`unknown`** - For truly unknown types that need runtime checking
-2. **Generics** - For flexible, type-safe functions
-3. **Union types** - For known possible types
-4. **Type guards** - For runtime type checking
-5. **Utility types** - For transforming existing types
+For multi-state values. Always include a `status` / `kind` discriminator.
 
 ```typescript
-// ✅ Good - unknown with type guard
-const processValue = (value: unknown) => {
-  if (typeof value === 'string') {
-    return value.toUpperCase();
-  }
-  if (typeof value === 'number') {
-    return value * 2;
-  }
-  throw new Error('Unsupported type');
-};
-
-// ✅ Good - generics
-const identity = <T>(value: T): T => {
-  return value;
-};
-
-// ✅ Good - union types
-const processInput = (input: string | number | boolean) => {
-  if (typeof input === 'string') return input.toUpperCase();
-  if (typeof input === 'number') return input * 2;
-  return !input;
-};
-
-// ✅ Good - Record for object with unknown keys
-const processConfig = (config: Record<string, unknown>) => {
-  // Process configuration
-};
-```
-
-### Union Types and Discriminated Unions
-
-- Use union types for multiple possible values
-- Use discriminated unions for complex state
-- Provide proper type guards
-
-```typescript
-// ✅ Good - discriminated union
+// ✅
 type CacheState<T> =
   | { status: 'idle' }
   | { status: 'loading' }
   | { status: 'loaded'; value: T }
-  | { status: 'error'; error: string };
+  | { status: 'error'; error: string }
 
-@Injectable({ lifetime: 'singleton' })
-export class DataService {
-  private dataState = new ObservableValue<CacheState<Data>>({ status: 'idle' });
-
-  public async loadData() {
-    this.dataState.setValue({ status: 'loading' });
-    try {
-      const data = await this.fetchData();
-      this.dataState.setValue({ status: 'loaded', value: data });
-    } catch (error) {
-      this.dataState.setValue({ 
-        status: 'error', 
-        error: (error as Error).message 
-      });
-    }
-  }
-}
-
-// Usage with type narrowing
-const state = dataState.getValue();
-
-if (state.status === 'loaded') {
-  // TypeScript knows state.value is available
-  console.log(state.value);
-}
-
-// ❌ Avoid - no discriminator
-type CacheState<T> = {
-  loading: boolean;
-  error?: string;
-  data?: T;
-};
+// ❌ no discriminator → cannot narrow
+type Bad<T> = { loading: boolean; error?: string; data?: T }
 ```
 
-## Type Utilities
+## Observable typing
 
-### Utility Types
-
-- Use TypeScript utility types for common patterns
-- Create custom utility types when needed
-- Leverage built-in utility types
+`ObservableValue<T>` is invariant — provide explicit `T`, especially for nullable / union states.
 
 ```typescript
-// ✅ Good - using utility types
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-};
+// ✅
+public currentUser = new ObservableValue<User | null>(null)
+public state = new ObservableValue<SessionState>('initializing')
 
-// Partial for optional fields
-type PartialUser = Partial<User>;
-
-// Pick for specific fields
-type UserCredentials = Pick<User, 'email' | 'password'>;
-
-// Omit for excluding fields
-type PublicUser = Omit<User, 'password'>;
-
-// Record for object types
-type UserMap = Record<string, User>;
-
-// Required for making all fields required
-type RequiredUser = Required<Partial<User>>;
-
-// Readonly for immutable types
-type ImmutableUser = Readonly<User>;
+// ❌ inference widens to ObservableValue<null>
+public currentUser = new ObservableValue(null)
 ```
 
-### Custom Utility Types
+## Assertions
 
-- Create reusable utility types
-- Use descriptive names for custom types
-- Document complex utility types
+Avoid. Use type guards or `as const` instead.
 
 ```typescript
-// ✅ Good - custom utility types
+// ✅ as const for literal types
+const colors = ['red', 'green', 'blue'] as const
+type Color = (typeof colors)[number]
 
-/**
- * Makes all properties of T deeply partial
- */
-type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
-};
+// ✅ assertion only when DOM API leaves no choice
+const el = document.getElementById('x') as HTMLInputElement | null
 
-/**
- * Extracts the return type of an async function
- */
-type AsyncReturnType<T extends (...args: unknown[]) => Promise<unknown>> = T extends (
-  ...args: unknown[]
-) => Promise<infer R>
-  ? R
-  : never;
-
-/**
- * Makes specific properties required
- */
-type RequireKeys<T, K extends keyof T> = T & Required<Pick<T, K>>;
-
-// Usage
-type UserWithRequiredEmail = RequireKeys<Partial<User>, 'email'>;
+// ❌ dangerous
+const user = unknownValue as User       // prefer guard
+const x = maybe!                        // prefer optional chaining
 ```
 
-## Type Guards
+Avoid `!` non-null assertion. Prefer `?.` and `??`.
 
-### Type Guard Functions
+## Double-cast anti-pattern
 
-- Create type guards for runtime type checking
-- Use type guards to narrow types
-- Provide meaningful type guard functions
+Never `as unknown as T` (e.g. `undefined as unknown as MovieFile`). If you need a cast that strong, you're missing a type guard or a generic — refactor. For provider/adapter chains where partial results are valid, use a **narrow internal result type** (see `BACKEND_PATTERNS.mdc`).
 
-```typescript
-// ✅ Good - type guards
-const isUser = (value: unknown): value is User => {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'id' in value &&
-    'name' in value &&
-    'email' in value
-  );
-};
+## Utility types
 
-const isError = (value: unknown): value is Error => {
-  return value instanceof Error;
-};
+Reuse built-ins (`Partial`, `Pick`, `Omit`, `Record`, `Required`, `Readonly`). Export project-specific helpers when reused 2+ times.
 
-const isString = (value: unknown): value is string => {
-  return typeof value === 'string';
-};
+## Checklist (public API)
 
-const isNonNullable = <T>(value: T | null | undefined): value is T => {
-  return value !== null && value !== undefined;
-};
+- [ ] No `any` (except generic constraint exception)
+- [ ] Explicit types on all exports
+- [ ] Generic params named & constrained
+- [ ] Type guards for runtime checks
+- [ ] Discriminated unions for multi-state
+- [ ] No `as unknown as T`, no `!` non-null
+- [ ] `ObservableValue` types explicit
 
-// Usage
-const processData = (data: unknown) => {
-  if (isUser(data)) {
-    // TypeScript knows data is User here
-    console.log(data.name);
-  }
-};
-
-// Filter with type guard
-const validUsers = users.filter(isNonNullable);
-
-// ❌ Avoid - no type guard
-const processData = (data: any) => {
-  console.log(data.name); // No type safety
-};
-```
-
-### Array Type Guards
-
-```typescript
-// ✅ Good - array type guards
-const isStringArray = (value: unknown): value is string[] => {
-  return Array.isArray(value) && value.every((item) => typeof item === 'string');
-};
-
-const isUserArray = (value: unknown): value is User[] => {
-  return Array.isArray(value) && value.every(isUser);
-};
-```
-
-## TypeScript Best Practices
-
-### Type Inference
-
-- **Let TypeScript infer types when possible** - TypeScript's inference is powerful
-- Use explicit types strategically for:
-  - Public APIs where you want to enforce a contract
-  - Complex conditional logic (switch/case) where explicit types are clearer than casting
-  - When inference would be ambiguous or incorrect
-  - When it significantly improves error messages
-- Avoid unnecessary type annotations
-
-```typescript
-// ✅ Good - let TypeScript infer
-const users = ['Alice', 'Bob', 'Charlie']; // Inferred as string[]
-const count = users.length; // Inferred as number
-const hasUsers = users.length > 0; // Inferred as boolean
-
-// ✅ Good - infer component return types when straightforward
-export const SimpleComponent = Shade<{ title: string }>({
-  customElementName: 'simple-component',
-  render: ({ props }) => {
-    return <div>{props.title}</div>; // Return type inferred
-  },
-});
-
-// ✅ Good - explicit for public APIs
-export const createUser = (userData: CreateUserData): Promise<User> => {
-  // Explicit return type enforces contract
-};
-
-// ✅ Good - explicit for complex conditional logic
-export const getStatusDisplay = (status: Status): JSX.Element | null => {
-  // Easier to specify return type than cast in each branch
-  switch (status) {
-    case 'active':
-      return <div>Active</div>;
-    case 'inactive':
-      return <div>Inactive</div>;
-    case 'pending':
-      return <div>Pending</div>;
-    default:
-      return null;
-  }
-};
-
-// ✅ Good - explicit when inference would be wrong or ambiguous
-const processUsers = (users: User[]): Map<string, User> => {
-  return new Map(users.map(user => [user.id, user]));
-};
-
-// ❌ Avoid - unnecessary annotations
-const count: number = 5;
-const name: string = 'John';
-const isActive: boolean = true;
-```
-
-### Type Assertions
-
-- Use type assertions sparingly
-- Prefer type guards over type assertions
-- Use `as const` for literal types
-
-```typescript
-// ✅ Good - as const for literal types
-const colors = ['red', 'green', 'blue'] as const;
-type Color = (typeof colors)[number]; // 'red' | 'green' | 'blue'
-
-const config = {
-  apiUrl: 'https://api.example.com',
-  timeout: 5000,
-} as const;
-
-// ✅ Good - type assertion when necessary
-const element = document.getElementById('my-element') as HTMLInputElement;
-
-// ✅ Good - with null check
-const element = document.getElementById('my-element');
-if (element) {
-  const input = element as HTMLInputElement;
-  input.value = 'test';
-}
-
-// ❌ Avoid - unnecessary assertion
-const value = 'hello' as string;
-
-// ❌ Avoid - dangerous assertion
-const value = unknownValue as User; // Prefer type guard
-```
-
-### Double-Cast Anti-Pattern (`as unknown as T`)
-
-**NEVER** use `undefined as unknown as T` or `null as unknown as T` to satisfy a type contract.
-This hides a design flaw — if a function doesn't have the value, the return type should reflect that.
-
-```typescript
-// ❌ FORBIDDEN - double-cast to satisfy type
-return { status: 'linked', movieFile: undefined as unknown as MovieFile, movie };
-
-// ✅ Good - use a narrower return type that doesn't require the value
-type ProviderResult =
-  | { status: 'skip' }
-  | { status: 'rate-limited' }
-  | { status: 'linked'; imdbId: string };
-
-return { status: 'linked', imdbId: added.imdbID };
-
-// ✅ Good - if the caller needs different shapes, use discriminated unions
-type InternalResult = { status: 'linked'; imdbId: string };
-type FullResult = { status: 'linked'; movieFile: MovieFile; movie: Movie };
-```
-
-If you encounter `as unknown as T`, refactor the types so the cast is unnecessary.
-
-### Non-Null Assertion Operator
-
-- Avoid using `!` operator when possible
-- Prefer optional chaining and nullish coalescing
-- Use type guards for null checks
-
-```typescript
-// ✅ Good - optional chaining
-const userName = user?.name ?? 'Anonymous';
-
-// ✅ Good - type guard
-if (user) {
-  console.log(user.name);
-}
-
-// ⚠️ Use sparingly - non-null assertion
-const element = document.getElementById('my-element')!;
-
-// ❌ Avoid - dangerous non-null assertion
-const user = maybeUser!; // Can cause runtime error
-```
-
-## Injectable Services and DI
-
-### Service Type Safety
-
-- Use proper typing for injected dependencies
-- Leverage TypeScript's type system with dependency injection
-
-```typescript
-// ✅ Good - properly typed service
-@Injectable({ lifetime: 'singleton' })
-export class UserService {
-  @Injected(ApiClient)
-  private declare apiClient: ApiClient;
-
-  @Injected(LoggerService)
-  private declare logger: LoggerService;
-
-  public async getUser(id: string): Promise<User> {
-    try {
-      const { result } = await this.apiClient.call({
-        method: 'GET',
-        action: '/users/:id',
-        url: { id },
-        query: {},
-      });
-      return result;
-    } catch (error) {
-      this.logger.error({ message: 'Failed to get user', data: { id, error } });
-      throw error;
-    }
-  }
-}
-
-// ❌ Avoid - untyped dependencies
-@Injectable({ lifetime: 'singleton' })
-export class UserService {
-  private apiClient: any; // Don't do this
-}
-```
-
-## Summary
-
-**Key Principles:**
-
-1. **NEVER use `any`** - Use `unknown`, generics, or union types instead
-2. **Prefer `type` over `interface`** for type definitions
-3. **Let TypeScript infer** when possible, be explicit when needed
-4. **Use type guards** for runtime type checking
-5. **Leverage utility types** for common patterns
-6. **Use discriminated unions** for complex state
-7. **Type all function parameters** and public APIs
-8. **Use generics** for flexible, reusable code
-9. **Prefer `unknown`** over `any` for truly unknown types
-10. **Enable strict mode** in tsconfig.json
-
-**Type Safety Checklist:**
-
-- [ ] No `any` types anywhere in the code
-- [ ] All function parameters are typed
-- [ ] Public APIs have explicit return types
-- [ ] Type guards are used for runtime checking
-- [ ] Generic types have proper constraints
-- [ ] Discriminated unions for complex state
-- [ ] Utility types used where appropriate
-- [ ] No dangerous type assertions
-
-**Tools:**
-
-- Type checking: `yarn build` or `tsc --noEmit`
-- Strict mode: Enabled in `tsconfig.json`
+Tools: `yarn build` runs the actual build (do **not** run `tsc -b` directly per `SCRIPT_EXECUTION.mdc`).
