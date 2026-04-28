@@ -43,6 +43,8 @@ type ExtractPaths<T extends Record<string, NestedRoute<any>>> = { /* ... */ }
 export function process(data: any): string { return data.toString() }
 ```
 
+`@typescript-eslint/no-explicit-any` is **disabled** in `eslint.config.js` because the rule has no option for the constraint-position exception. Reviewers enforce the rule in code review.
+
 ## Inference
 
 Let TS infer internally. Be explicit at API boundaries, complex switch/case, or when inference is ambiguous.
